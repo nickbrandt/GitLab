@@ -2,16 +2,90 @@
 
 exports[`CustomStageForm Editing a custom stage isSavingCustomStage=true displays a loading icon 1`] = `
 "<button disabled=\\"disabled\\" type=\\"button\\" class=\\"js-save-stage btn btn-success\\"><span class=\\"gl-spinner-container\\"><span aria-label=\\"Loading\\" aria-hidden=\\"true\\" class=\\"gl-spinner gl-spinner-orange gl-spinner-sm\\"></span></span>
-      Update stage
-    </button>"
+  Update stage
+</button>"
 `;
 
-exports[`CustomStageForm Empty form Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__122\\"><option value=\\"\\">Select start event</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"merge_request_created\\">Merge request created</option><option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option><option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option><option value=\\"merge_request_last_build_started\\">Merge request last build start time</option><option value=\\"merge_request_merged\\">Merge request merged</option><option value=\\"code_stage_start\\">Issue first mentioned in a commit</option><option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option><option value=\\"issue_closed\\">Issue closed</option><option value=\\"issue_first_added_to_board\\">Issue first added to a board</option><option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"issue_label_added\\">Issue label was added</option><option value=\\"issue_label_removed\\">Issue label was removed</option><option value=\\"merge_request_closed\\">Merge request closed</option><option value=\\"merge_request_label_added\\">Merge Request label was added</option><option value=\\"merge_request_label_removed\\">Merge Request label was removed</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"merge_request_created\\">Merge request created</option><option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option><option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option><option value=\\"merge_request_last_build_started\\">Merge request last build start time</option><option value=\\"merge_request_merged\\">Merge request merged</option><option value=\\"issue_closed\\">Issue closed</option><option value=\\"issue_first_added_to_board\\">Issue first added to a board</option><option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"issue_label_added\\">Issue label was added</option><option value=\\"issue_label_removed\\">Issue label was removed</option><option value=\\"merge_request_closed\\">Merge request closed</option><option value=\\"merge_request_label_added\\">Merge Request label was added</option><option value=\\"merge_request_label_removed\\">Merge Request label was removed</option><option value=\\"issue_created\\">Issue created</option></select>"`;
+exports[`CustomStageForm Empty form Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__122\\">
+  <option value=\\"\\">Select start event</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"code_stage_start\\">Issue first mentioned in a commit</option>
+  <option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+  <option value=\\"issue_created\\">Issue created</option>
+</select>"
+`;
 
-exports[`CustomStageForm Empty form Start event with events selects events with canBeStartEvent=true for the start events dropdown 1`] = `"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__94\\"><option value=\\"\\">Select start event</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"merge_request_created\\">Merge request created</option><option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option><option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option><option value=\\"merge_request_last_build_started\\">Merge request last build start time</option><option value=\\"merge_request_merged\\">Merge request merged</option><option value=\\"code_stage_start\\">Issue first mentioned in a commit</option><option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option><option value=\\"issue_closed\\">Issue closed</option><option value=\\"issue_first_added_to_board\\">Issue first added to a board</option><option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"issue_label_added\\">Issue label was added</option><option value=\\"issue_label_removed\\">Issue label was removed</option><option value=\\"merge_request_closed\\">Merge request closed</option><option value=\\"merge_request_label_added\\">Merge Request label was added</option><option value=\\"merge_request_label_removed\\">Merge Request label was removed</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"merge_request_created\\">Merge request created</option><option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option><option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option><option value=\\"merge_request_last_build_started\\">Merge request last build start time</option><option value=\\"merge_request_merged\\">Merge request merged</option><option value=\\"issue_closed\\">Issue closed</option><option value=\\"issue_first_added_to_board\\">Issue first added to a board</option><option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option><option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option><option value=\\"issue_label_added\\">Issue label was added</option><option value=\\"issue_label_removed\\">Issue label was removed</option><option value=\\"merge_request_closed\\">Merge request closed</option><option value=\\"merge_request_label_added\\">Merge Request label was added</option><option value=\\"merge_request_label_removed\\">Merge Request label was removed</option><option value=\\"issue_created\\">Issue created</option></select>"`;
+exports[`CustomStageForm Empty form Start event with events selects events with canBeStartEvent=true for the start events dropdown 1`] = `
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__94\\">
+  <option value=\\"\\">Select start event</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"code_stage_start\\">Issue first mentioned in a commit</option>
+  <option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+  <option value=\\"issue_created\\">Issue created</option>
+</select>"
+`;
 
 exports[`CustomStageForm Empty form isSavingCustomStage=true displays a loading icon 1`] = `
 "<button disabled=\\"disabled\\" type=\\"button\\" class=\\"js-save-stage btn btn-success\\"><span class=\\"gl-spinner-container\\"><span aria-label=\\"Loading\\" aria-hidden=\\"true\\" class=\\"gl-spinner gl-spinner-orange gl-spinner-sm\\"></span></span>
-      Add stage
-    </button>"
+  Add stage
+</button>"
 `;
