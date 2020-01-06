@@ -26,7 +26,7 @@ describe 'User creates feature flag', :js do
     it 'shows the created feature flag' do
       within_feature_flag_row(1) do
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-        expect(page).to have_css('.js-feature-flag-status .badge-success')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -57,7 +57,7 @@ describe 'User creates feature flag', :js do
     it 'shows the created feature flag' do
       within_feature_flag_row(1) do
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-        expect(page).to have_css('.js-feature-flag-status .badge-danger')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -89,7 +89,7 @@ describe 'User creates feature flag', :js do
     it 'shows the created feature flag' do
       within_feature_flag_row(1) do
         expect(page.find('.feature-flag-name')).to have_content('mr_train')
-        expect(page).to have_css('.js-feature-flag-status .badge-success')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -121,7 +121,7 @@ describe 'User creates feature flag', :js do
     it 'shows the created feature flag' do
       within_feature_flag_row(1) do
         expect(page.find('.feature-flag-name')).to have_content('mr_train')
-        expect(page).to have_css('.js-feature-flag-status .badge-success')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')

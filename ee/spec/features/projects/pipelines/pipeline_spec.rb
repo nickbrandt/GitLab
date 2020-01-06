@@ -101,37 +101,16 @@ describe 'Pipeline', :js do
     context 'with a sast artifact' do
       before do
         create(:ee_ci_build, :sast, pipeline: pipeline)
+        visit security_project_pipeline_path(project, pipeline)
       end
 
-      context 'when feature flag is enabled' do
-        before do
-          visit security_project_pipeline_path(project, pipeline)
-        end
-
-        it 'shows jobs tab pane as active' do
-          expect(page).to have_content('Security')
-          expect(page).to have_css('#js-tab-security')
-        end
-
-        it 'shows security dashboard' do
-          expect(page).to have_css('.js-security-dashboard-table')
-        end
+      it 'shows jobs tab pane as active' do
+        expect(page).to have_content('Security')
+        expect(page).to have_css('#js-tab-security')
       end
 
-      context 'when feature flag is disabled' do
-        before do
-          stub_feature_flags(pipeline_report_api: false)
-          visit security_project_pipeline_path(project, pipeline)
-        end
-
-        it 'shows jobs tab pane as active' do
-          expect(page).to have_content('Security')
-          expect(page).to have_css('#js-tab-security')
-        end
-
-        it 'shows security report section' do
-          expect(page).to have_content('SAST is loading')
-        end
+      it 'shows security dashboard' do
+        expect(page).to have_css('.js-security-dashboard-table')
       end
     end
 

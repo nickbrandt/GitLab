@@ -1,0 +1,5 @@
+---
+title: Remove old pipeline security report view in favor of the Security Dashboard
+merge_request: 22152
+author:
+type: removed

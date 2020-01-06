@@ -331,7 +331,7 @@ class Project < ApplicationRecord
   delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
   delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
-  delegate :root_ancestor, :actual_limits, to: :namespace, allow_nil: true
+  delegate :root_ancestor, to: :namespace, allow_nil: true
   delegate :last_pipeline, to: :commit, allow_nil: true
   delegate :external_dashboard_url, to: :metrics_setting, allow_nil: true, prefix: true
   delegate :default_git_depth, :default_git_depth=, to: :ci_cd_settings, prefix: :ci
@@ -1318,7 +1318,7 @@ class Project < ApplicationRecord
   end
 
   def has_active_hooks?(hooks_scope = :push_hooks)
-    hooks.hooks_for(hooks_scope).any? || SystemHook.hooks_for(hooks_scope).any?
+    hooks.hooks_for(hooks_scope).any? || SystemHook.hooks_for(hooks_scope).any? || Gitlab::Plugin.any?
   end
 
   def has_active_services?(hooks_scope = :push_hooks)

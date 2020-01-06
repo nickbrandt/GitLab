@@ -7,10 +7,14 @@ const mapFlag = flag => ({ ...flag, scopes: mapToScopesViewModel(flag.scopes || 
 
 const updateFlag = (state, flag) => {
   const i = state.featureFlags.findIndex(({ id }) => id === flag.id);
+  const staleFlag = state.featureFlags.find(({ id }) => id === flag.id);
   Vue.set(state.featureFlags, i, flag);
 
-  Vue.set(state.count, 'enabled', state.featureFlags.filter(({ active }) => active).length);
-  Vue.set(state.count, 'disabled', state.featureFlags.filter(({ active }) => !active).length);
+  if (staleFlag.active !== flag.active) {
+    const change = flag.active ? 1 : -1;
+    Vue.set(state.count, 'enabled', state.count.enabled + change);
+    Vue.set(state.count, 'disabled', state.count.disabled - change);
+  }
 };
 
 export default {
@@ -67,7 +71,7 @@ export default {
     state.hasRotateError = true;
   },
   [types.UPDATE_FEATURE_FLAG](state, flag) {
-    updateFlag(state, mapFlag(flag));
+    updateFlag(state, flag);
   },
   [types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS](state, data) {
     updateFlag(state, mapFlag(data));

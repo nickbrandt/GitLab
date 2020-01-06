@@ -41,3 +41,8 @@ export const STAGE_ACTIONS = {
   CREATE: 'createStage',
   UPDATE: 'updateStage',
 };
+
+export const STAGE_NAME = {
+  TOTAL: 'total',
+  PRODUCTION: 'production',
+};

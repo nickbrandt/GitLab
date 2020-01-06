@@ -127,7 +127,7 @@ describe 'Group Cycle Analytics', :js do
       it 'displays the default list of stages' do
         stage_nav = page.find(stage_nav_selector)
 
-        %w[Issue Plan Code Test Review Staging Production].each do |item|
+        %w[Issue Plan Code Test Review Staging Total].each do |item|
           expect(stage_nav).to have_content(item)
         end
       end
@@ -172,7 +172,7 @@ describe 'Group Cycle Analytics', :js do
       { title: "Test", description: "Total test time for all commits/merges", events_count: 0, median: "Not enough data" },
       { title: "Review", description: "Time between merge request creation and merge/close", events_count: 0, median: "Not enough data" },
       { title: "Staging", description: "From merge request merge until deploy to production", events_count: 0, median: "Not enough data" },
-      { title: "Production", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
+      { title: "Total", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
     ]
 
     it 'each stage will have median values', :sidekiq_might_not_need_inline do

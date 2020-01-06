@@ -71,9 +71,22 @@ module Sentry
     end
 
     def http_get(url, params = {})
-      response = handle_request_exceptions do
+      http_request do
         Gitlab::HTTP.get(url, **request_params.merge(params))
       end
+    end
+
+    def http_put(url, params = {})
+      http_request do
+        Gitlab::HTTP.put(url, **request_params.merge({ body: params }))
+      end
+    end
+
+    def http_request
+      response = handle_request_exceptions do
+        yield
+      end
+
       handle_response(response)
     end
 
@@ -187,13 +200,13 @@ module Sentry
 
     def parse_stack_trace(event)
       exception_entry = event.dig('entries')&.detect { |h| h['type'] == 'exception' }
-      return unless exception_entry
+      return [] unless exception_entry
 
       exception_values = exception_entry.dig('data', 'values')
       stack_trace_entry = exception_values&.detect { |h| h['stacktrace'].present? }
-      return unless stack_trace_entry
+      return [] unless stack_trace_entry
 
-      stack_trace_entry.dig('stacktrace', 'frames')
+      stack_trace_entry.dig('stacktrace', 'frames') || []
     end
 
     def map_to_error(issue)

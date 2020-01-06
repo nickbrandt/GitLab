@@ -12,6 +12,7 @@
     "active": { "type": "boolean" },
     "description": { "type": ["string", "null"] },
     "edit_path": { "type": ["string", "null"] },
+    "update_path": { "type": ["string", "null"] },
     "destroy_path": { "type": ["string", "null"] },
     "scopes": { "type": "array", "items": { "$ref": "feature_flag_scope.json" } }
   },

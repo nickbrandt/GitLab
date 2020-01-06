@@ -162,6 +162,7 @@ describe('Feature flags store Mutations', () => {
 
       mutations[types.UPDATE_FEATURE_FLAG](stateCopy, {
         ...featureFlag,
+        scopes: mapToScopesViewModel(featureFlag.scopes || []),
         active: false,
       });
     });
@@ -182,21 +183,25 @@ describe('Feature flags store Mutations', () => {
       expect(stateCopy.count.disabled).toBe(1);
     });
   });
+
   describe('RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS', () => {
-    beforeEach(() => {
+    const runUpdate = (stateCount, flagState, featureFlagUpdateParams) => {
       stateCopy.featureFlags = getRequestData.feature_flags.map(flag => ({
         ...flag,
+        ...flagState,
         scopes: mapToScopesViewModel(flag.scopes || []),
       }));
-      stateCopy.count = { enabled: 1, disabled: 0 };
+      stateCopy.count = stateCount;
 
       mutations[types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS](stateCopy, {
         ...featureFlag,
-        active: false,
+        ...featureFlagUpdateParams,
       });
-    });
+    };
 
-    it('should update the flag with the matching ID', () => {
+    it('updates the flag with the matching ID', () => {
+      runUpdate({ all: 1, enabled: 1, disabled: 0 }, { active: true }, { active: false });
+
       expect(stateCopy.featureFlags).toEqual([
         {
           ...featureFlag,
@@ -205,13 +210,34 @@ describe('Feature flags store Mutations', () => {
         },
       ]);
     });
-    it('should update the enabled count', () => {
-      expect(stateCopy.count.enabled).toBe(0);
+
+    it('updates the count data', () => {
+      runUpdate({ all: 1, enabled: 1, disabled: 0 }, { active: true }, { active: false });
+
+      expect(stateCopy.count).toEqual({ all: 1, enabled: 0, disabled: 1 });
     });
-    it('should update the disabled count', () => {
-      expect(stateCopy.count.disabled).toBe(1);
+
+    describe('when count data does not match up with the number of flags in state', () => {
+      it('updates the count data when the flag changes to inactive', () => {
+        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: true }, { active: false });
+
+        expect(stateCopy.count).toEqual({ all: 4, enabled: 0, disabled: 4 });
+      });
+
+      it('updates the count data when the flag changes to active', () => {
+        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: false }, { active: true });
+
+        expect(stateCopy.count).toEqual({ all: 4, enabled: 2, disabled: 2 });
+      });
+
+      it('retains the count data when flag.active does not change', () => {
+        runUpdate({ all: 4, enabled: 1, disabled: 3 }, { active: true }, { active: true });
+
+        expect(stateCopy.count).toEqual({ all: 4, enabled: 1, disabled: 3 });
+      });
     });
   });
+
   describe('RECEIVE_UPDATE_FEATURE_FLAG_ERROR', () => {
     beforeEach(() => {
       stateCopy.featureFlags = getRequestData.feature_flags.map(flag => ({

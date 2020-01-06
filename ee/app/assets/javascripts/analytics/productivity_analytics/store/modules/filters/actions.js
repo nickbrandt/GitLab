@@ -1,7 +1,10 @@
+import dateFormat from 'dateformat';
 import { historyPushState } from '~/lib/utils/common_utils';
 import { setUrlParams } from '~/lib/utils/url_utility';
+import { beginOfDayTime, endOfDayTime } from '~/lib/utils/datetime_utility';
 import * as types from './mutation_types';
 import { chartKeys } from '../../../constants';
+import { dateFormats } from '../../../../shared/constants';
 
 export const setInitialData = ({ commit, dispatch }, { skipFetch = false, data }) => {
   commit(types.SET_INITIAL_DATA, data);
@@ -77,7 +80,12 @@ export const setFilters = (
 export const setDateRange = ({ commit, dispatch }, { startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
 
-  historyPushState(setUrlParams({ merged_at_after: startDate, merged_at_before: endDate }));
+  const mergedAtAfter = `${dateFormat(startDate, dateFormats.isoDate)}${beginOfDayTime}`;
+  const mergedAtBefore = `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`;
+
+  historyPushState(
+    setUrlParams({ merged_at_after: mergedAtAfter, merged_at_before: mergedAtBefore }),
+  );
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 

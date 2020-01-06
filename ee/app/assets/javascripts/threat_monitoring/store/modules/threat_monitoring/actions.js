@@ -14,23 +14,23 @@ export const receiveEnvironmentsError = ({ commit }) => {
 };
 
 const getAllEnvironments = (url, page = 1) =>
-  axios({
-    method: 'GET',
-    url,
-    params: {
-      per_page: 100,
-      page,
-    },
-  }).then(({ headers, data }) => {
-    const nextPage = headers && headers['x-next-page'];
-    return nextPage
-      ? // eslint-disable-next-line promise/no-nesting
-        getAllEnvironments(url, nextPage).then(environments => [
-          ...data.environments,
-          ...environments,
-        ])
-      : data.environments;
-  });
+  axios
+    .get(url, {
+      params: {
+        per_page: 100,
+        page,
+      },
+    })
+    .then(({ headers, data }) => {
+      const nextPage = headers && headers['x-next-page'];
+      return nextPage
+        ? // eslint-disable-next-line promise/no-nesting
+          getAllEnvironments(url, nextPage).then(environments => [
+            ...data.environments,
+            ...environments,
+          ])
+        : data.environments;
+    });
 
 export const fetchEnvironments = ({ state, dispatch }) => {
   if (!state.environmentsEndpoint) {

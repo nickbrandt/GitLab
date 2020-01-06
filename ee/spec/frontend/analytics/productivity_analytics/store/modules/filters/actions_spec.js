@@ -11,9 +11,8 @@ jest.mock('~/lib/utils/url_utility');
 
 describe('Productivity analytics filter actions', () => {
   let store;
-  const currentYear = new Date().getFullYear();
-  const startDate = new Date(currentYear, 8, 1);
-  const endDate = new Date(currentYear, 8, 7);
+  const startDate = new Date('2019-09-01');
+  const endDate = new Date('2019-09-07');
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
   const initialData = {
@@ -250,8 +249,8 @@ describe('Productivity analytics filter actions', () => {
         .setDateRange(store, { startDate, endDate })
         .then(() => {
           expect(setUrlParams).toHaveBeenCalledWith({
-            merged_at_after: startDate,
-            merged_at_before: endDate,
+            merged_at_after: '2019-09-01T00:00:00Z',
+            merged_at_before: '2019-09-07T23:59:59Z',
           });
 
           expect(historyPushState).toHaveBeenCalled();

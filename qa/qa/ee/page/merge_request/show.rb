@@ -90,6 +90,12 @@ module QA
             end
           end
 
+          def wait_for_license_compliance_report
+            wait(reload: false) do
+              has_no_text?('Loading License Compliance report')
+            end
+          end
+
           def approvals_required_from
             approvals_content.match(/approvals? from (.*)/)[1]
           end
