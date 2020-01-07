@@ -54,15 +54,32 @@ module EE
       end
     end
 
-    def selective_sync_type_options_for_select(geo_node)
-      options_for_select(
-        [
-          [s_('Geo|All projects'), ''],
-          [s_('Geo|Projects in certain groups'), 'namespaces'],
-          [s_('Geo|Projects in certain storage shards'), 'shards']
-        ],
-        geo_node.selective_sync_type
-      )
+    def selective_sync_types_json
+      options = [
+        {
+          label: s_('Geo|All projects'),
+          value: ''
+        },
+        {
+          label: s_('Geo|Projects in certain groups'),
+          value: 'namespaces'
+        },
+        {
+          label: s_('Geo|Projects in certain storage shards'),
+          value: 'shards'
+        }
+      ]
+
+      options.to_json
+    end
+
+    def node_json(node)
+      node_data = {
+        node: node,
+        namespace_ids: node.namespace_ids
+      }
+
+      node_data.to_json
     end
 
     def status_loading_icon
