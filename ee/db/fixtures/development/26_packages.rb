@@ -16,7 +16,7 @@ class Gitlab::Seeder::Packages
           .gsub('1.0.1', version))
         .with_indifferent_access
 
-      ::Packages::CreateNpmPackageService.new(@project, @user, params).execute
+      ::Packages::Npm::CreatePackageService.new(@project, @user, params).execute
     end
   end
 

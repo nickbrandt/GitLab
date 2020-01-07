@@ -205,4 +205,9 @@ FactoryBot.define do
     dependency { create(:packages_dependency) }
     dependency_type { :dependencies }
   end
+
+  factory :packages_tag, class: Packages::Tag do
+    package
+    sequence(:name) { |n| "tag-#{n}"}
+  end
 end
