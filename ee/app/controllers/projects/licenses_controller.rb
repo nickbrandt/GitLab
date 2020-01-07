@@ -68,9 +68,10 @@ module Projects
     def matching_policies_from(license_compliance)
       if params[:detected]
         license_compliance.detected_policies
-      elsif params[:classifications].present?
+      elsif params[:classification].present?
+        classifications = Array(params[:classification])
         license_compliance.policies.find_all do |policy|
-          params[:classifications].include?(policy.classification)
+          classifications.include?(policy.classification)
         end
       else
         license_compliance.policies

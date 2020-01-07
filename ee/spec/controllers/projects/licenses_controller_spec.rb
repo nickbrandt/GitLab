@@ -178,7 +178,7 @@ describe Projects::LicensesController do
               get :index, params: {
                 namespace_id: project.namespace,
                 project_id: project,
-                classifications: ['allowed']
+                classification: ['allowed']
               }, format: :json
             end
 
@@ -190,6 +190,35 @@ describe Projects::LicensesController do
                 "id" => other_license_policy.id,
                 "spdx_identifier" => "Other-Id",
                 "classification" => "allowed"
+              })
+            end
+          end
+
+          context "when loading `allowed` and `denied` software policies" do
+            before do
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                classification: ['allowed', 'denied']
+              }, format: :json
+            end
+
+            it { expect(response).to have_http_status(:ok) }
+            it { expect(json_response["licenses"].count).to be(2) }
+
+            it 'includes `denied` policies' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => mit_policy.id,
+                "spdx_identifier" => mit.spdx_identifier,
+                "classification" => mit_policy.classification
+              })
+            end
+
+            it 'includes `allowed` policies' do
+              expect(json_response.dig("licenses", 1)).to include({
+                "id" => other_license_policy.id,
+                "spdx_identifier" => other_license_policy.spdx_identifier,
+                "classification" => other_license_policy.classification
               })
             end
           end
