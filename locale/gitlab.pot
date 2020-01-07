@@ -13836,9 +13836,6 @@ msgstr ""
 msgid "Project access must be granted explicitly to each user."
 msgstr ""
 
-msgid "Project already created"
-msgstr ""
-
 msgid "Project already deleted"
 msgstr ""
 
