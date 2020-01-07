@@ -42,7 +42,9 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     create_merge_request_closing_issue(user, project, issue_1)
     create_merge_request_closing_issue(user, project, issue_2)
     merge_merge_requests_closing_issue(user, project, issue_3)
+  end
 
+  def create_deployment
     deploy_master(user, project, environment: 'staging')
     deploy_master(user, project)
   end
@@ -93,6 +95,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       stub_licensed_features(cycle_analytics_for_groups: true)
 
       prepare_cycle_analytics_data
+      create_deployment
 
       sign_in(user)
     end
@@ -113,6 +116,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       stub_licensed_features(cycle_analytics_for_groups: true)
 
       prepare_cycle_analytics_data
+      create_deployment
 
       sign_in(user)
     end
@@ -142,6 +146,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       end
 
       prepare_cycle_analytics_data
+      create_deployment
 
       additional_cycle_analytics_metrics
 

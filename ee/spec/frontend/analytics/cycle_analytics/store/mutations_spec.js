@@ -171,7 +171,7 @@ describe('Cycle analytics mutations', () => {
 
     it('will set each summary item with a value of 0 to "-"', () => {
       expect(state.summary).toEqual([
-        { value: '-', title: 'New Issues' },
+        { value: 3, title: 'New Issues' },
         { value: '-', title: 'Deploys' },
       ]);
     });
