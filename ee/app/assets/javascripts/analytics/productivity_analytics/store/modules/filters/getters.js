@@ -14,8 +14,8 @@ import { dateFormats } from '../../../../shared/constants';
  *   author_username: 'author',
  *   milestone_title: 'my milestone',
  *   label_name: ['my label', 'yet another label'],
- *   merged_at_after: '2019-06-11T00:00:00Z'
- *   merged_at_before: '2019-09-09T23:59:59Z'
+ *   merged_after: '2019-06-11T00:00:00Z'
+ *   merged_before: '2019-09-09T23:59:59Z'
  * }
  *
  */
@@ -31,7 +31,7 @@ export const getCommonFilterParams = (state, getters) => chartKey => {
   } = state;
 
   // for the scatterplot we need to query the API with a date prior to the selected start date
-  const mergedAtAfterDate =
+  const mergedAfterDate =
     chartKey && chartKey === chartKeys.scatterplot
       ? dateFormat(getters.scatterplotStartDate, dateFormats.isoDate)
       : dateFormat(startDate, dateFormats.isoDate);
@@ -42,8 +42,8 @@ export const getCommonFilterParams = (state, getters) => chartKey => {
     author_username: authorUsername,
     milestone_title: milestoneTitle,
     label_name: labelName,
-    merged_at_after: `${mergedAtAfterDate}${beginOfDayTime}`,
-    merged_at_before: `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`,
+    merged_after: `${mergedAfterDate}${beginOfDayTime}`,
+    merged_before: `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`,
   };
 };
 

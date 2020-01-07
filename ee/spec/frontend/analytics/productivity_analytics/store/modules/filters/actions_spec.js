@@ -16,8 +16,8 @@ describe('Productivity analytics filter actions', () => {
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
   const initialData = {
-    mergedAtAfter: new Date('2019-11-01'),
-    mergedAtBefore: new Date('2019-12-09'),
+    mergedAfter: new Date('2019-11-01'),
+    mergedBefore: new Date('2019-12-09'),
     minDate: new Date('2019-01-01'),
   };
 
@@ -244,13 +244,13 @@ describe('Productivity analytics filter actions', () => {
         .catch(done.fail);
     });
 
-    it('calls setUrlParams with the merged_at_after=startDate and merged_at_before=endDate', done => {
+    it('calls setUrlParams with the merged_after=startDate and merged_before=endDate', done => {
       actions
         .setDateRange(store, { startDate, endDate })
         .then(() => {
           expect(setUrlParams).toHaveBeenCalledWith({
-            merged_at_after: '2019-09-01T00:00:00Z',
-            merged_at_before: '2019-09-07T23:59:59Z',
+            merged_after: '2019-09-01T00:00:00Z',
+            merged_before: '2019-09-07T23:59:59Z',
           });
 
           expect(historyPushState).toHaveBeenCalled();

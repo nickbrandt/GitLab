@@ -9,8 +9,8 @@ export default {
       authorUsername = null,
       labelName = [],
       milestoneTitle = null,
-      mergedAtAfter,
-      mergedAtBefore,
+      mergedAfter,
+      mergedBefore,
       minDate,
     },
   ) {
@@ -19,8 +19,8 @@ export default {
     state.authorUsername = authorUsername;
     state.labelName = labelName;
     state.milestoneTitle = milestoneTitle;
-    state.startDate = mergedAtAfter;
-    state.endDate = mergedAtBefore;
+    state.startDate = mergedAfter;
+    state.endDate = mergedBefore;
     state.minDate = minDate;
   },
   [types.SET_GROUP_NAMESPACE](state, groupNamespace) {

@@ -37,8 +37,8 @@ describe('Productivity analytics filter getters', () => {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: '2019-09-01T00:00:00Z',
-          merged_at_before: '2019-09-07T23:59:59Z',
+          merged_after: '2019-09-01T00:00:00Z',
+          merged_before: '2019-09-07T23:59:59Z',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };
@@ -51,20 +51,20 @@ describe('Productivity analytics filter getters', () => {
     */
 
     describe('when chart is scatterplot', () => {
-      it('returns an object with common filter params and subtracts 30 days from the merged_at_after date', () => {
-        const mergedAtAfter = '2019-08-02';
+      it('returns an object with common filter params and subtracts 30 days from the merged_after date', () => {
+        const mergedAfter = '2019-08-02';
         const expected = {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: `${mergedAtAfter}T00:00:00Z`,
-          merged_at_before: '2019-09-07T23:59:59Z',
+          merged_after: `${mergedAfter}T00:00:00Z`,
+          merged_before: '2019-09-07T23:59:59Z',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };
 
         const mockGetters = {
-          scatterplotStartDate: new Date(mergedAtAfter),
+          scatterplotStartDate: new Date(mergedAfter),
         };
 
         const result = getters.getCommonFilterParams(state, mockGetters)(chartKeys.scatterplot);

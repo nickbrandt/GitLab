@@ -10,24 +10,24 @@ module Analytics
 
     attr_writer :label_name
 
-    attribute :merged_at_after, :datetime
-    attribute :merged_at_before, :datetime
+    attribute :merged_after, :datetime
+    attribute :merged_before, :datetime
     attribute :author_username, :string
     attribute :milestone_title, :string
 
     attr_accessor :group, :project
 
     validates :group, presence: true
-    validates :merged_at_after, presence: true
-    validates :merged_at_before, presence: true
+    validates :merged_after, presence: true
+    validates :merged_before, presence: true
 
-    validate :validate_merged_at_after_is_earlier_than_merged_at_before
-    validate :validate_merged_at_before
-    validate :validate_merged_at_after
+    validate :validate_merged_after_is_earlier_than_merged_before
+    validate :validate_merged_before
+    validate :validate_merged_after
 
     def initialize(params = {})
-      params[:merged_at_before] ||= Date.today.at_end_of_day
-      params[:merged_at_after] ||= default_merged_at_after
+      params[:merged_before] ||= Date.today.at_end_of_day
+      params[:merged_after] ||= default_merged_after
 
       super(params)
     end
@@ -43,13 +43,13 @@ module Analytics
         attrs[:author_username] = author_username
         attrs[:label_name] = label_name.any? ? label_name.join(',') : nil
         attrs[:milestone_title] = milestone_title
-        attrs[:merged_at_after] = merged_at_after.iso8601
-        attrs[:merged_at_before] = merged_at_before.iso8601
+        attrs[:merged_after] = merged_after.iso8601
+        attrs[:merged_before] = merged_before.iso8601
       end.compact
     end
 
     def to_default_data_attributes
-      { merged_at_after: merged_at_after.iso8601, merged_at_before: merged_at_before.iso8601 }
+      { merged_after: merged_after.iso8601, merged_before: merged_before.iso8601 }
     end
 
     private
@@ -72,23 +72,23 @@ module Analytics
       }
     end
 
-    def validate_merged_at_after_is_earlier_than_merged_at_before
-      return if merged_at_after.nil? || merged_at_before.nil?
-      return if merged_at_after <= merged_at_before
+    def validate_merged_after_is_earlier_than_merged_before
+      return if merged_after.nil? || merged_before.nil?
+      return if merged_after <= merged_before
 
-      errors.add(:merged_at_before, s_('ProductivityAnalytics|is earlier than the given merged at after date'))
+      errors.add(:merged_before, s_('ProductivityAnalytics|is earlier than the given merged at after date'))
     end
 
-    def validate_merged_at_before
-      return unless merged_at_before
+    def validate_merged_before
+      return unless merged_before
 
-      validate_against_productivity_analytics_start_date(:merged_at_before, merged_at_before)
+      validate_against_productivity_analytics_start_date(:merged_before, merged_before)
     end
 
-    def validate_merged_at_after
-      return unless merged_at_after
+    def validate_merged_after
+      return unless merged_after
 
-      validate_against_productivity_analytics_start_date(:merged_at_after, merged_at_after)
+      validate_against_productivity_analytics_start_date(:merged_after, merged_after)
     end
 
     def validate_against_productivity_analytics_start_date(attribute_name, value)
@@ -102,8 +102,8 @@ module Analytics
       @productivity_analytics_start_date ||= ApplicationSetting.current&.productivity_analytics_start_date&.beginning_of_day
     end
 
-    # Providing default value for `merged_at_after` and prevent setting the value to a datetime where we don't have data (`productivity_analytics_start_date`).
-    def default_merged_at_after
+    # Providing default value for `merged_after` and prevent setting the value to a datetime where we don't have data (`productivity_analytics_start_date`).
+    def default_merged_after
       default_value = DEFAULT_DATE_RANGE.ago.to_time.utc.beginning_of_day
 
       if productivity_analytics_start_date && productivity_analytics_start_date > default_value

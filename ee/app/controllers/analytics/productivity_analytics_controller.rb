@@ -85,8 +85,8 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
 
   def allowed_request_params
     params.permit(
-      :merged_at_after,
-      :merged_at_before,
+      :merged_after,
+      :merged_before,
       :author_username,
       :milestone_title,
       label_name: []

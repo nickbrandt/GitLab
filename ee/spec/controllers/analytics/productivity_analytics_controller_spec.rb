@@ -89,7 +89,7 @@ describe Analytics::ProductivityAnalyticsController do
     end
 
     context 'when invalid params are given' do
-      let(:params) { { group_id: group, merged_at_before: 10.days.ago, merged_at_after: 5.days.ago } }
+      let(:params) { { group_id: group, merged_before: 10.days.ago, merged_after: 5.days.ago } }
 
       before do
         group.add_owner(current_user)

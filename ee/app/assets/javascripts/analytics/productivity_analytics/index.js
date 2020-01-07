@@ -26,12 +26,12 @@ export default () => {
     authorUsername,
     labelName,
     milestoneTitle,
-    mergedAtAfter,
-    mergedAtBefore,
+    mergedAfter,
+    mergedBefore,
   } = container.dataset;
 
-  const mergedAtAfterDate = new Date(mergedAtAfter);
-  const mergedAtBeforeDate = new Date(mergedAtBefore);
+  const mergedAfterDate = new Date(mergedAfter);
+  const mergedBeforeDate = new Date(mergedBefore);
 
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
   const minDate = timeframeContainer.dataset.startDate
@@ -42,8 +42,8 @@ export default () => {
   let project = null;
 
   let initialData = {
-    mergedAtAfter: mergedAtAfterDate,
-    mergedAtBefore: mergedAtBeforeDate,
+    mergedAfter: mergedAfterDate,
+    mergedBefore: mergedBeforeDate,
     minDate,
   };
 
@@ -152,8 +152,8 @@ export default () => {
       return h(DateRange, {
         props: {
           show: this.groupNamespace !== null,
-          startDate: mergedAtAfterDate,
-          endDate: mergedAtBeforeDate,
+          startDate: mergedAfterDate,
+          endDate: mergedBeforeDate,
           minDate,
         },
         on: {
