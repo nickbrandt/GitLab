@@ -4,19 +4,17 @@ require 'spec_helper'
 
 describe API::ErrorTracking do
   describe "GET sentry project settings" do
-    let(:admin) { create(:admin) }
     let(:project_not_found_message) { "404 Project Not Found" }
     let(:unauthorized_message) { "401 Unauthorized" }
     let(:random_user) { create(:user) }
     let(:project_error_tracking_setting) { create(:project_error_tracking_setting) }
     let(:project) do
-      create(:project, :repository, creator: admin,
-        namespace: admin.namespace, error_tracking_setting: project_error_tracking_setting)
+      create(:project, :repository, error_tracking_setting: project_error_tracking_setting)
     end
 
     context 'when user has permission to view settings' do
       it 'returns 200' do
-        get api("/projects/#{project.id}/error_tracking/sentry_project_settings", admin)
+        get api("/projects/#{project.id}/error_tracking/sentry_project_settings", project.creator)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response["project_name"]).to eq(project_error_tracking_setting.project_name)
