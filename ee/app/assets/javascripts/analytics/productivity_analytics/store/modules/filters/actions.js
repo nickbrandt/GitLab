@@ -80,12 +80,10 @@ export const setFilters = (
 export const setDateRange = ({ commit, dispatch }, { startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
 
-  const mergedAtAfter = `${dateFormat(startDate, dateFormats.isoDate)}${beginOfDayTime}`;
-  const mergedAtBefore = `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`;
+  const mergedAfter = `${dateFormat(startDate, dateFormats.isoDate)}${beginOfDayTime}`;
+  const mergedBefore = `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`;
 
-  historyPushState(
-    setUrlParams({ merged_at_after: mergedAtAfter, merged_at_before: mergedAtBefore }),
-  );
+  historyPushState(setUrlParams({ merged_after: mergedAfter, merged_before: mergedBefore }));
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 

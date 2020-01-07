@@ -26,8 +26,8 @@ describe('Productivity analytics filter mutations', () => {
         authorUsername,
         labelName,
         milestoneTitle,
-        mergedAtAfter: startDate,
-        mergedAtBefore: endDate,
+        mergedAfter: startDate,
+        mergedBefore: endDate,
         minDate,
       };
       mutations[types.SET_INITIAL_DATA](state, initialData);
