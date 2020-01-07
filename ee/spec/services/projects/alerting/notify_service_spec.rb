@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Projects::Alerting::NotifyService do
-  set(:project) { create(:project) }
+  let_it_be(:project, reload: true) { create(:project) }
 
   before do
-    # We use `set(:project)` so we make sure to clear caches
+    # We use `let_it_be(:project)` so we make sure to clear caches
     project.clear_memoization(:licensed_feature_available)
   end
 

@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Projects::Prometheus::Alerts::CreateEventsService do
   let(:user) { create(:user) }
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:metric) { create(:prometheus_metric, project: project) }
   let(:service) { described_class.new(project, user, alerts_payload) }
 

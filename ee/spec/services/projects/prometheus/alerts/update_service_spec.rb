@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::Alerts::UpdateService do
-  set(:project) { create(:project) }
-  set(:user) { create(:user) }
-  set(:environment) { create(:environment, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:environment) { create(:environment, project: project) }
 
-  set(:alert) do
+  let_it_be(:alert) do
     create(:prometheus_alert, project: project, environment: environment)
   end
 

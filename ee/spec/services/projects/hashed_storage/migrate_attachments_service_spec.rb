@@ -11,8 +11,8 @@ describe Projects::HashedStorage::MigrateAttachmentsService do
   let(:old_attachments_path) { legacy_storage.disk_path }
   let(:new_attachments_path) { hashed_storage.disk_path }
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   subject { described_class.new(project: project, old_disk_path: old_attachments_path) }
 
