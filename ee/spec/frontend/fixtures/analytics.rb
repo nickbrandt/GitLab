@@ -171,6 +171,25 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
   end
 
+  describe Analytics::CycleAnalytics::SummaryController, type: :controller do
+    render_views
+
+    let(:params) { { created_after: 3.months.ago, created_before: Time.now, group_id: group.full_path } }
+
+    before do
+      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
+      stub_licensed_features(cycle_analytics_for_groups: true)
+
+      sign_in(user)
+    end
+
+    it 'analytics/cycle_analytics/summary.json' do
+      get(:show, params: params, format: :json)
+
+      expect(response).to be_successful
+    end
+  end
+
   describe Analytics::TasksByTypeController, type: :controller do
     render_views
 
