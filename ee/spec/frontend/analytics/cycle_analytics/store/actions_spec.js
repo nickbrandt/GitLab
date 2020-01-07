@@ -7,7 +7,7 @@ import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import createFlash from '~/flash';
 import {
   group,
-  cycleAnalyticsData,
+  summaryData,
   allowedStages as stages,
   groupLabels,
   startDate,
@@ -25,7 +25,7 @@ const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
 const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
-  cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
+  summaryData: '/analytics/cycle_analytics/summary',
   durationData: /analytics\/cycle_analytics\/stages\/\d+\/duration_chart/,
   stageData: /analytics\/cycle_analytics\/stages\/\d+\/records/,
   stageMedian: /analytics\/cycle_analytics\/stages\/\d+\/median/,
@@ -268,7 +268,7 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
-      mock.onGet(endpoints.cycleAnalyticsData).replyOnce(200, cycleAnalyticsData);
+      mock.onGet(endpoints.summaryData).replyOnce(200, summaryData);
       state = { ...state, selectedGroup, startDate, endDate };
     });
 
