@@ -1,0 +1,5 @@
+---
+title: Fix initial sorting of non-persisted Cycle Analytics stages
+merge_request: 22541
+author:
+type: fixed

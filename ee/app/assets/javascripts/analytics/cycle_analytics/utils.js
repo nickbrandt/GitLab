@@ -67,17 +67,15 @@ const stageUrlSlug = ({ id, title, custom = false }) => {
 };
 
 export const transformRawStages = (stages = []) =>
-  stages
-    .map(({ id, title, name = '', custom = false, ...rest }) => ({
-      ...convertObjectPropsToCamelCase(rest, { deep: true }),
-      id,
-      title,
-      custom,
-      slug: isPersistedStage({ custom, id }) ? id : stageUrlSlug({ custom, id, title }),
-      // the name field is used to create a stage, but the get request returns title
-      name: name.length ? name : title,
-    }))
-    .sort((a, b) => a.id > b.id);
+  stages.map(({ id, title, name = '', custom = false, ...rest }) => ({
+    ...convertObjectPropsToCamelCase(rest, { deep: true }),
+    id,
+    title,
+    custom,
+    slug: isPersistedStage({ custom, id }) ? id : stageUrlSlug({ custom, id, title }),
+    // the name field is used to create a stage, but the get request returns title
+    name: name.length ? name : title,
+  }));
 
 export const nestQueryStringKeys = (obj = null, targetKey = '') => {
   if (!obj || !isString(targetKey) || !targetKey.length) return {};
