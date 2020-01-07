@@ -118,4 +118,23 @@ describe('GeoDesigns Store Mutations', () => {
       expect(state.totalDesigns).toEqual(0);
     });
   });
+
+  describe.each`
+    mutation                                           | loadingBefore | loadingAfter
+    ${types.REQUEST_INITIATE_ALL_DESIGN_SYNCS}         | ${false}      | ${true}
+    ${types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_SUCCESS} | ${true}       | ${false}
+    ${types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_ERROR}   | ${true}       | ${false}
+    ${types.REQUEST_INITIATE_DESIGN_SYNC}              | ${false}      | ${true}
+    ${types.RECEIVE_INITIATE_DESIGN_SYNC_SUCCESS}      | ${true}       | ${false}
+    ${types.RECEIVE_INITIATE_DESIGN_SYNC_ERROR}        | ${true}       | ${false}
+  `(`Sync Mutations: `, ({ mutation, loadingBefore, loadingAfter }) => {
+    describe(`${mutation}`, () => {
+      it(`sets isLoading to ${loadingAfter}`, () => {
+        state.isLoading = loadingBefore;
+
+        mutations[mutation](state);
+        expect(state.isLoading).toEqual(loadingAfter);
+      });
+    });
+  });
 });

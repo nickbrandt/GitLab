@@ -208,4 +208,14 @@ export default {
     const url = Api.buildUrl(this.geoDesignsPath);
     return axios.get(url, { params });
   },
+
+  initiateAllGeoDesignSyncs(action) {
+    const url = Api.buildUrl(this.geoDesignsPath);
+    return axios.post(`${url}/${action}`, {});
+  },
+
+  initiateGeoDesignSync({ projectId, action }) {
+    const url = Api.buildUrl(this.geoDesignsPath);
+    return axios.put(`${url}/${projectId}/${action}`, {});
+  },
 };

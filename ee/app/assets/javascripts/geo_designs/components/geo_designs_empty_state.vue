@@ -36,7 +36,7 @@ export default {
 
 <template>
   <gl-empty-state :title="__('No Design Repositories match this filter')" :svg-path="issuesSvgPath">
-    <template v-slot:description>
+    <template #description>
       <div class="text-center">
         <p>{{ __('Adjust your filters/search criteria above.') }}</p>
         <p v-html="linkText"></p>

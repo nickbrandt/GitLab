@@ -38,3 +38,7 @@ export const MOCK_BASIC_FETCH_DATA_MAP = {
   perPage: MOCK_BASIC_FETCH_RESPONSE.headers['x-per-page'],
   total: MOCK_BASIC_FETCH_RESPONSE.headers['x-total'],
 };
+
+export const MOCK_BASIC_POST_RESPONSE = {
+  status: 'ok',
+};

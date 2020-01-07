@@ -556,19 +556,70 @@ describe('Api', () => {
     });
   });
 
-  describe('getGeoDesigns', () => {
-    it('fetches designs', () => {
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/designs`;
-      const apiResponse = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
-      const mockParams = { page: 1 };
+  describe('GeoDesigns', () => {
+    let expectedUrl;
+    let apiResponse;
+    let mockParams;
 
-      jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
-      jest.spyOn(axios, 'get');
-      mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+    beforeEach(() => {
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/designs`;
+    });
 
-      return Api.getGeoDesigns(mockParams).then(({ data }) => {
-        expect(data).toEqual(apiResponse);
-        expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: mockParams });
+    describe('getGeoDesigns', () => {
+      it('fetches designs', () => {
+        apiResponse = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
+        mockParams = { page: 1 };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.getGeoDesigns(mockParams).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: mockParams });
+        });
+      });
+    });
+
+    describe('initiateAllGeoDesignSyncs', () => {
+      it('POSTs with correct action', () => {
+        apiResponse = [{ status: 'ok' }];
+        mockParams = {};
+
+        const mockAction = 'reverify';
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'post');
+        mock.onPost(`${expectedUrl}/${mockAction}`).replyOnce(201, apiResponse);
+
+        return Api.initiateAllGeoDesignSyncs(mockAction).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.post).toHaveBeenCalledWith(`${expectedUrl}/${mockAction}`, mockParams);
+        });
+      });
+    });
+
+    describe('initiateGeoDesignSync', () => {
+      it('PUTs with correct action and projectId', () => {
+        apiResponse = [{ status: 'ok' }];
+        mockParams = {};
+
+        const mockAction = 'reverify';
+        const mockProjectId = 1;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(`${expectedUrl}/${mockProjectId}/${mockAction}`).replyOnce(201, apiResponse);
+
+        return Api.initiateGeoDesignSync({ projectId: mockProjectId, action: mockAction }).then(
+          ({ data }) => {
+            expect(data).toEqual(apiResponse);
+            expect(axios.put).toHaveBeenCalledWith(
+              `${expectedUrl}/${mockProjectId}/${mockAction}`,
+              mockParams,
+            );
+          },
+        );
       });
     });
   });

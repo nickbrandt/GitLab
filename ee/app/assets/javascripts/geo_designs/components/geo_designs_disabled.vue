@@ -26,7 +26,7 @@ export default {
 
 <template>
   <gl-empty-state :title="__('Design Sync Not Enabled')" :svg-path="geoSvgPath">
-    <template v-slot:description>
+    <template #description>
       <div class="text-center">
         <p>
           {{
