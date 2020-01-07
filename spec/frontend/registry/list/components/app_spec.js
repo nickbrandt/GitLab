@@ -36,7 +36,6 @@ describe('Registry List', () => {
   beforeEach(() => {
     wrapper = mount(registry, {
       attachToDocument: true,
-      sync: false,
       propsData,
       computed: {
         repos() {

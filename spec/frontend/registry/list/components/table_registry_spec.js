@@ -28,7 +28,7 @@ describe('table registry', () => {
   const bulkDeletePath = 'path';
 
   const mountWithStore = config =>
-    mount(tableRegistry, { ...config, store, localVue, attachToDocument: true, sync: false });
+    mount(tableRegistry, { ...config, store, localVue, attachToDocument: true });
 
   beforeEach(() => {
     store = new Vuex.Store({
@@ -111,15 +111,18 @@ describe('table registry', () => {
       });
     });
 
-    it('should delete multiple items when multiple items are selected', done => {
+    it('should delete multiple items when multiple items are selected', () => {
       const multiDeleteItems = jest.fn().mockResolvedValue();
       wrapper.setMethods({ multiDeleteItems });
 
-      wrapper.vm.$nextTick(() => {
-        const selectAll = findSelectAllCheckbox();
-        selectAll.trigger('click');
-
-        wrapper.vm.$nextTick(() => {
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          const selectAll = findSelectAllCheckbox();
+          selectAll.trigger('click');
+          return wrapper.vm.$nextTick();
+        })
+        .then(() => {
           const deleteBtn = findDeleteButton();
           expect(wrapper.vm.selectedItems).toEqual([0, 1]);
           expect(deleteBtn.attributes('disabled')).toEqual(undefined);
@@ -131,9 +134,7 @@ describe('table registry', () => {
             path: bulkDeletePath,
             items: [firstImage.tag, secondImage.tag],
           });
-          done();
         });
-      });
     });
 
     it('should show an error message if bulkDeletePath is not set', () => {

@@ -27,7 +27,6 @@ describe('collapsible registry container', () => {
       store,
       localVue,
       attachToDocument: true,
-      sync: false,
     });
 
   beforeEach(() => {
@@ -77,14 +76,13 @@ describe('collapsible registry container', () => {
       });
     });
 
-    it('should be closed when the user clicks on an opened repo', done => {
+    it('should be closed when the user clicks on an opened repo', () => {
       const toggleRepos = findToggleRepos();
       toggleRepos.at(0).trigger('click');
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         toggleRepos.at(0).trigger('click');
         wrapper.vm.$nextTick(() => {
           expectIsClosed();
-          done();
         });
       });
     });
