@@ -61,18 +61,15 @@ module Projects
       params.require(:software_license_policy).permit(:software_license_id, :spdx_identifier, :classification)
     end
 
-    def filter_params
-      params.permit(:detected, classification: [])
-    end
-
     def render_error_for(result)
       render json: { errors: result[:message].as_json }, status: result.fetch(:http_status, :unprocessable_entity)
     end
 
     def matching_policies_from(license_compliance)
+      filters = params.permit(:detected, classification: [])
       license_compliance.find_policies(
-        detected_only: filter_params[:detected].present?,
-        classification: Array(filter_params[:classification] || [])
+        detected_only: filters[:detected].present?,
+        classification: filters[:classification]
       )
     end
   end
