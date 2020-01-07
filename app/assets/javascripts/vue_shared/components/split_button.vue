@@ -49,6 +49,9 @@ export default {
     triggerEvent() {
       this.$emit(this.selectedItem.eventName);
     },
+    change(item) {
+      this.$emit('change', item);
+    },
   },
 };
 </script>
@@ -69,7 +72,7 @@ export default {
         active-class="is-active"
         @click="
           selectedItem = item;
-          triggerEvent();
+          change(item);
         "
       >
         <strong>{{ item.title }}</strong>
