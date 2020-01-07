@@ -19,9 +19,7 @@ module QA
 
           show.select_all_activities_filter
           show.start_discussion(my_first_discussion)
-          page.assert_text(my_first_discussion)
           show.reply_to_discussion(my_first_reply)
-          page.assert_text(my_first_reply)
         end
       end
 
