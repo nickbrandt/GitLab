@@ -59,18 +59,18 @@ export const mapToScopesViewModel = scopesFromRails =>
  */
 export const mapFromScopesViewModel = params => {
   const scopes = (params.scopes || []).map(s => {
-    const percentParameters = {};
+    const parameters = {};
     if (s.rolloutStrategy === ROLLOUT_STRATEGY_PERCENT_ROLLOUT) {
-      percentParameters.groupId = PERCENT_ROLLOUT_GROUP_ID;
-      percentParameters.percentage = s.rolloutPercentage;
+      parameters.groupId = PERCENT_ROLLOUT_GROUP_ID;
+      parameters.percentage = s.rolloutPercentage;
+    } else if (s.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID) {
+      parameters.userIds = (s.rolloutUserIds || '').replace(/, /g, ',');
     }
 
     const userIdParameters = {};
 
-    if (s.shouldIncludeUserIds || s.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID) {
+    if (s.shouldIncludeUserIds && s.rolloutStrategy !== ROLLOUT_STRATEGY_USER_ID) {
       userIdParameters.userIds = (s.rolloutUserIds || '').replace(/, /g, ',');
-    } else if (Array.isArray(s.rolloutUserIds) && s.rolloutUserIds.length > 0) {
-      userIdParameters.userIds = s.rolloutUserIds.join(',');
     }
 
     // Strip out any internal IDs
@@ -79,7 +79,7 @@ export const mapFromScopesViewModel = params => {
     const strategies = [
       {
         name: s.rolloutStrategy,
-        parameters: percentParameters,
+        parameters,
       },
     ];
 

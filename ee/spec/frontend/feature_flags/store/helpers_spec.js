@@ -161,9 +161,10 @@ describe('feature flags helpers spec', () => {
             canUpdate: true,
             protected: true,
             shouldBeDestroyed: true,
+            shouldIncludeUserIds: true,
             rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
             rolloutPercentage: '48',
-            rolloutUserIds: ['123', '234'],
+            rolloutUserIds: '123, 234',
           },
         ],
       };
