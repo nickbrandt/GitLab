@@ -42,7 +42,7 @@ describe API::Vulnerabilities do
         end
       end
 
-      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
     end
 
     describe 'permissions' do
@@ -88,7 +88,7 @@ describe API::Vulnerabilities do
       end
 
       it_behaves_like 'responds with "not found" for an unknown vulnerability ID'
-      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
     end
 
     describe 'permissions' do
@@ -159,7 +159,7 @@ describe API::Vulnerabilities do
         end
       end
 
-      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
     end
 
     describe 'permissions' do
@@ -246,7 +246,7 @@ describe API::Vulnerabilities do
         end
       end
 
-      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
     end
 
     describe 'permissions' do
@@ -303,7 +303,7 @@ describe API::Vulnerabilities do
         end
       end
 
-      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
     end
 
     describe 'permissions' do

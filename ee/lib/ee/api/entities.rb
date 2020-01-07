@@ -982,6 +982,12 @@ module EE
           ::Vulnerabilities::IssueLink.link_types.key(related_issue.vulnerability_link_type)
         end
       end
+
+      class VulnerabilityIssueLink < Grape::Entity
+        expose :vulnerability, using: ::EE::API::Entities::Vulnerability
+        expose :issue, using: ::API::Entities::IssueBasic
+        expose :link_type
+      end
     end
   end
 end

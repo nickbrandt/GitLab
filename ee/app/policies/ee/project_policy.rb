@@ -165,6 +165,7 @@ module EE
         enable :read_project_security_dashboard
         enable :create_vulnerability
         enable :admin_vulnerability
+        enable :admin_vulnerability_issue_link
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
@@ -219,6 +220,7 @@ module EE
       rule { auditor & ~developer }.policy do
         prevent :create_vulnerability
         prevent :admin_vulnerability
+        prevent :admin_vulnerability_issue_link
       end
 
       rule { auditor & ~guest }.policy do
