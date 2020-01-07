@@ -134,8 +134,8 @@ Add a corresponding section to your `.npmrc` file:
 
 ```ini
 @foo:registry=https://gitlab.com/api/v4/packages/npm/
-//gitlab.com/api/v4/packages/npm/:_authToken=${env.CI_JOB_TOKEN}
-//gitlab.com/api/v4/projects/{env.CI_PROJECT_ID>/packages/npm/:_authToken=${env.CI_JOB_TOKEN}
+//gitlab.com/api/v4/packages/npm/:_authToken=${CI_JOB_TOKEN}
+//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}
 ```
 
 ## Uploading packages
