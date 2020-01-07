@@ -70,13 +70,10 @@ module Projects
     end
 
     def matching_policies_from(license_compliance)
-      only_detected = filter_params[:detected]
-      classifications = Array(filter_params[:classification] || ['allowed', 'denied', 'unclassified'])
-      license_compliance.policies.find_all do |policy|
-        next if only_detected && policy.dependencies.none?
-
-        classifications.include?(policy.classification)
-      end
+      license_compliance.find_policies(
+        detected_only: filter_params[:detected].present?,
+        classification: Array(filter_params[:classification] || [])
+      )
     end
   end
 end

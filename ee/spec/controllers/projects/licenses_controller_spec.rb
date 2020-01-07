@@ -199,7 +199,7 @@ describe Projects::LicensesController do
               get :index, params: {
                 namespace_id: project.namespace,
                 project_id: project,
-                classification: ['allowed', 'denied']
+                classification: %w[allowed denied]
               }, format: :json
             end
 

@@ -14,8 +14,12 @@ module SCA
       end
     end
 
-    def detected_policies
-      policies.reject { |policy| policy.dependencies.count.zero? }
+    def find_policies(detected_only: false, classification: [])
+      classifications = Array(classification || [])
+      policies.reject do |policy|
+        (detected_only && policy.dependencies.none?) ||
+          (classifications.present? && !policy.classification.in?(classifications))
+      end
     end
 
     def latest_build_for_default_branch

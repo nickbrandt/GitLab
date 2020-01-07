@@ -147,38 +147,88 @@ RSpec.describe SCA::LicenseCompliance do
     end
   end
 
-  describe "#detected_policies" do
+  describe "#find_policies" do
     let!(:pipeline) { create(:ci_pipeline, :success, project: project, builds: [create(:ee_ci_build, :success, :license_scan_v2)]) }
     let!(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
     let!(:other_license_policy) { create(:software_license_policy, :allowed, software_license: other_license, project: project) }
-    let(:results) { subject.detected_policies }
 
-    it 'excludes policies for licenses that do not appear in the latest license scan report' do
-      expect(results.count).to eq(3)
+    context "when searching for policies for licenses that were detected in a scan report" do
+      let(:results) { subject.find_policies(detected_only: true) }
+
+      it 'excludes policies for licenses that do not appear in the latest license scan report' do
+        expect(results.count).to eq(3)
+      end
+
+      it 'includes a policy for an unclassified and known license that was detected in the scan report' do
+        expect(results[0].id).to be_nil
+        expect(results[0].name).to eq("BSD 3-Clause \"New\" or \"Revised\" License")
+        expect(results[0].url).to eq("http://spdx.org/licenses/BSD-3-Clause.json")
+        expect(results[0].classification).to eq("unclassified")
+        expect(results[0].spdx_identifier).to eq("BSD-3-Clause")
+      end
+
+      it 'includes an entry for a denied license found in the scan report' do
+        expect(results[1].id).to eq(mit_policy.id)
+        expect(results[1].name).to eq(mit.name)
+        expect(results[1].url).to eq("http://spdx.org/licenses/MIT.json")
+        expect(results[1].classification).to eq("denied")
+        expect(results[1].spdx_identifier).to eq("MIT")
+      end
+
+      it 'includes an entry for an allowed license found in the scan report' do
+        expect(results[2].id).to be_nil
+        expect(results[2].name).to eq("unknown")
+        expect(results[2].url).to be_blank
+        expect(results[2].classification).to eq("unclassified")
+        expect(results[2].spdx_identifier).to be_nil
+      end
     end
 
-    it 'includes a policy for an unclassified and known license that was detected in the scan report' do
-      expect(results[0].id).to be_nil
-      expect(results[0].name).to eq("BSD 3-Clause \"New\" or \"Revised\" License")
-      expect(results[0].url).to eq("http://spdx.org/licenses/BSD-3-Clause.json")
-      expect(results[0].classification).to eq("unclassified")
-      expect(results[0].spdx_identifier).to eq("BSD-3-Clause")
+    context "when searching for policies with a specific classification" do
+      let(:results) { subject.find_policies(classification: ['allowed']) }
+
+      it 'includes an entry for each `allowed` licensed' do
+        expect(results.count).to eq(1)
+        expect(results[0].id).to eql(other_license_policy.id)
+        expect(results[0].name).to eq(other_license_policy.software_license.name)
+        expect(results[0].url).to be_blank
+        expect(results[0].classification).to eq("allowed")
+        expect(results[0].spdx_identifier).to eq(other_license_policy.software_license.spdx_identifier)
+      end
     end
 
-    it 'includes an entry for a denied license found in the scan report' do
-      expect(results[1].id).to eq(mit_policy.id)
-      expect(results[1].name).to eq(mit.name)
-      expect(results[1].url).to eq("http://spdx.org/licenses/MIT.json")
-      expect(results[1].classification).to eq("denied")
-      expect(results[1].spdx_identifier).to eq("MIT")
+    context "when searching for policies by multiple classifications" do
+      let(:results) { subject.find_policies(classification: %w[allowed denied]) }
+
+      it 'includes an entry for each `allowed` and `denied` licensed' do
+        expect(results.count).to eq(2)
+
+        expect(results[0].id).to eql(mit_policy.id)
+        expect(results[0].name).to eq(mit_policy.software_license.name)
+        expect(results[0].url).to be_present
+        expect(results[0].classification).to eq("denied")
+        expect(results[0].spdx_identifier).to eq(mit_policy.software_license.spdx_identifier)
+
+        expect(results[1].id).to eql(other_license_policy.id)
+        expect(results[1].name).to eq(other_license_policy.software_license.name)
+        expect(results[1].url).to be_blank
+        expect(results[1].classification).to eq("allowed")
+        expect(results[1].spdx_identifier).to eq(other_license_policy.software_license.spdx_identifier)
+      end
     end
 
-    it 'includes an entry for an allowed license found in the scan report' do
-      expect(results[2].id).to be_nil
-      expect(results[2].name).to eq("unknown")
-      expect(results[2].url).to be_blank
-      expect(results[2].classification).to eq("unclassified")
-      expect(results[2].spdx_identifier).to be_nil
+    context "when searching for detected policies matching a classification" do
+      let(:results) { subject.find_policies(detected_only: true, classification: %w[allowed denied]) }
+
+      it 'includes an entry for each entry that was detected in the report and matches a classification' do
+        expect(results.count).to eq(1)
+
+        expect(results[0].id).to eql(mit_policy.id)
+        expect(results[0].name).to eq(mit_policy.software_license.name)
+        expect(results[0].url).to be_present
+        expect(results[0].classification).to eq("denied")
+        expect(results[0].spdx_identifier).to eq(mit_policy.software_license.spdx_identifier)
+      end
     end
   end
 
