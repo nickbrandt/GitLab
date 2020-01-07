@@ -2567,6 +2567,9 @@ msgstr ""
 msgid "BambooService|You must set up automatic revision labeling and a repository trigger in Bamboo."
 msgstr ""
 
+msgid "Batch operations"
+msgstr ""
+
 msgid "BatchComments|Delete all pending comments"
 msgstr ""
 
@@ -15434,6 +15437,12 @@ msgstr ""
 msgid "Resume replication"
 msgstr ""
 
+msgid "Resync"
+msgstr ""
+
+msgid "Resync all designs"
+msgstr ""
+
 msgid "Retry"
 msgstr ""
 
@@ -18330,6 +18339,9 @@ msgid "There was an error saving your notification settings."
 msgstr ""
 
 msgid "There was an error subscribing to this label."
+msgstr ""
+
+msgid "There was an error syncing the Design Repositories."
 msgstr ""
 
 msgid "There was an error trying to validate your query"

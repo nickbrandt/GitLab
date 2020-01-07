@@ -1,6 +1,8 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { mapActions } from 'vuex';
+import { GlLink, GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
+import { ACTION_TYPES } from '../store/constants';
 import GeoDesignStatus from './geo_design_status.vue';
 import GeoDesignTimeAgo from './geo_design_time_ago.vue';
 
@@ -8,6 +10,7 @@ export default {
   name: 'GeoDesign',
   components: {
     GlLink,
+    GlButton,
     GeoDesignTimeAgo,
     GeoDesignStatus,
   },
@@ -62,6 +65,10 @@ export default {
       ],
     };
   },
+  methods: {
+    ...mapActions(['initiateDesignSync']),
+  },
+  actionTypes: ACTION_TYPES,
 };
 </script>
 
@@ -69,6 +76,12 @@ export default {
   <div class="card">
     <div class="card-header d-flex align-center">
       <gl-link class="font-weight-bold" :href="`/${name}`" target="_blank">{{ name }}</gl-link>
+      <div class="ml-auto">
+        <gl-button
+          @click="initiateDesignSync({ projectId, name, action: $options.actionTypes.RESYNC })"
+          >{{ __('Resync') }}</gl-button
+        >
+      </div>
     </div>
     <div class="card-body">
       <div class="d-flex flex-column flex-md-row">

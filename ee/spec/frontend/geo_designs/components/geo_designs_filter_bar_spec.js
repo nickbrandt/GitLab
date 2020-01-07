@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlTabs, GlTab, GlFormInput } from '@gitlab/ui';
+import { GlTabs, GlTab, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import GeoDesignsFilterBar from 'ee/geo_designs/components/geo_designs_filter_bar.vue';
 import store from 'ee/geo_designs/store';
 import { DEFAULT_SEARCH_DELAY } from 'ee/geo_designs/store/constants';
@@ -15,6 +15,7 @@ describe('GeoDesignsFilterBar', () => {
     setSearch: jest.fn(),
     setFilter: jest.fn(),
     fetchDesigns: jest.fn(),
+    initiateAllDesignSyncs: jest.fn(),
   };
 
   const createComponent = () => {
@@ -34,6 +35,8 @@ describe('GeoDesignsFilterBar', () => {
   const findGlTabsContainer = () => wrapper.find(GlTabs);
   const findGlTab = () => findGlTabsContainer().findAll(GlTab);
   const findGlFormInput = () => findGlTabsContainer().find(GlFormInput);
+  const findGlDropdown = () => findGlTabsContainer().find(GlDropdown);
+  const findGlDropdownItem = () => findGlTabsContainer().find(GlDropdownItem);
 
   describe('template', () => {
     beforeEach(() => {
@@ -57,6 +60,22 @@ describe('GeoDesignsFilterBar', () => {
 
     it('renders GlFormInput', () => {
       expect(findGlFormInput().exists()).toBe(true);
+    });
+
+    it('renders GlDropdown', () => {
+      expect(findGlDropdown().exists()).toBe(true);
+    });
+
+    describe('GlDropDownItem', () => {
+      it('renders', () => {
+        expect(findGlDropdownItem().exists()).toBe(true);
+      });
+
+      it('calls initiateAllDesignSyncs when clicked', () => {
+        const innerButton = findGlDropdownItem().find('button');
+        innerButton.trigger('click');
+        expect(actionSpies.initiateAllDesignSyncs).toHaveBeenCalled();
+      });
     });
   });
 
