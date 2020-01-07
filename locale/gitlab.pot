@@ -3851,6 +3851,9 @@ msgstr ""
 msgid "ClusterIntegration|Enable Cloud Run on GKE (beta)"
 msgstr ""
 
+msgid "ClusterIntegration|Enable Web Application Firewall"
+msgstr ""
+
 msgid "ClusterIntegration|Enable or disable GitLab's connection to your Kubernetes cluster."
 msgstr ""
 
@@ -4035,6 +4038,9 @@ msgid "ClusterIntegration|Learn more about %{help_link_start_machine_type}machin
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}."
+msgstr ""
+
+msgid "ClusterIntegration|Learn more about %{startLink}ModSecurity%{endLink}"
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about %{startLink}Regions %{externalLinkIcon}%{endLink}."
