@@ -50,24 +50,4 @@ describe GroupsHelper do
       expect(helper.group_sidebar_links).not_to include(:contribution_analytics, :epics)
     end
   end
-
-  context 'when new Vulnerability Findings API enabled' do
-    it 'returns new "vulnerability findings" endpoint paths' do
-      expect(helper.group_vulnerabilities_endpoint_path(group)).to eq group_security_vulnerability_findings_path(group)
-      expect(helper.group_vulnerabilities_summary_endpoint_path(group)).to eq summary_group_security_vulnerability_findings_path(group)
-      expect(helper.group_vulnerabilities_history_endpoint_path(group)).to eq history_group_security_vulnerability_findings_path(group)
-    end
-  end
-
-  context 'when new Vulnerability Findings API disabled' do
-    before do
-      stub_feature_flags(first_class_vulnerabilities: false)
-    end
-
-    it 'returns legacy "vulnerabilities" endpoint paths' do
-      expect(helper.group_vulnerabilities_endpoint_path(group)).to eq group_security_vulnerabilities_path(group)
-      expect(helper.group_vulnerabilities_summary_endpoint_path(group)).to eq summary_group_security_vulnerabilities_path(group)
-      expect(helper.group_vulnerabilities_history_endpoint_path(group)).to eq history_group_security_vulnerabilities_path(group)
-    end
-  end
 end
