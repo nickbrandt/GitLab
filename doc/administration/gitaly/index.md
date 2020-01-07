@@ -566,14 +566,14 @@ a few things that you need to do:
 
 1. Make sure the [`git` user home directory](https://docs.gitlab.com/omnibus/settings/configuration.html#moving-the-home-directory-for-a-user) is on local disk.
 1. Configure [database lookup of SSH keys](../operations/fast_ssh_key_lookup.md)
-   to eliminate the need for a shared authorized_keys file.
+   to eliminate the need for a shared `authorized_keys` file.
 1. Configure [object storage for job artifacts](../job_artifacts.md#using-object-storage)
    including [incremental logging](../job_logs.md#new-incremental-logging-architecture).
 1. Configure [object storage for LFS objects](../lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage).
 1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
-1. Configure [object storage for Merge Request Diffs](../merge_request_diffs.md#using-object-storage).
-1. Configure [object storage for Packages](../packages/index.md#using-object-storage) (Optional Feature).
-1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (Optional Feature).
+1. Configure [object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
+1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature).
+1. Configure [object storage for dependency proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature).
 
 NOTE: **Note:**
 One current feature of GitLab that still requires a shared directory (NFS) is
@@ -867,7 +867,7 @@ remote: GitLab: 401 Unauthorized
 You will need to sync your `gitlab-secrets.json` file with your GitLab
 app nodes.
 
-### Client side GRPC logs
+### Client side gRPC logs
 
 Gitaly uses the [gRPC](https://grpc.io/) RPC framework. The Ruby gRPC
 client has its own log file which may contain useful information when
