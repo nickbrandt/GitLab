@@ -139,17 +139,16 @@ export const receiveSummaryDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_SUMMARY_DATA_SUCCESS, data);
 
 export const fetchSummaryData = ({ state, dispatch, getters }) => {
-  const { cycleAnalyticsRequestParams = {} } = getters;
+  const {
+    cycleAnalyticsRequestParams: { created_after, created_before },
+  } = getters;
   dispatch('requestSummaryData');
 
   const {
     selectedGroup: { fullPath },
   } = state;
 
-  return Api.cycleAnalyticsSummaryData(
-    fullPath,
-    nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
-  )
+  return Api.cycleAnalyticsSummaryData({ group_id: fullPath, created_after, created_before })
     .then(({ data }) => dispatch('receiveSummaryDataSuccess', data))
     .catch(error => dispatch('receiveSummaryDataError', error));
 };

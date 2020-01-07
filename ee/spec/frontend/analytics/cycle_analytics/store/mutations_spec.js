@@ -165,7 +165,6 @@ describe('Cycle analytics mutations', () => {
 
   describe(`${types.RECEIVE_SUMMARY_DATA_SUCCESS}`, () => {
     beforeEach(() => {
-      console.log('summaryData', summaryData);
       state = { stages: [{ slug: 'plan' }, { slug: 'issue' }, { slug: 'test' }] };
       mutations[types.RECEIVE_SUMMARY_DATA_SUCCESS](state, summaryData);
     });

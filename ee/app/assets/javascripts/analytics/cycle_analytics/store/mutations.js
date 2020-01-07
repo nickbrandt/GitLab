@@ -111,8 +111,7 @@ export default {
     state.summary = [];
   },
   [types.RECEIVE_SUMMARY_DATA_SUCCESS](state, data) {
-    const { summary } = data;
-    state.summary = summary.map(item => ({
+    state.summary = data.map(item => ({
       ...item,
       value: item.value || '-',
     }));

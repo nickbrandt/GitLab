@@ -16,7 +16,7 @@ export default {
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
-  cycleAnalyticsSummaryDataPath: '/groups/:group_id/-/cycle_analytics',
+  cycleAnalyticsSummaryDataPath: '/-/analytics/cycle_analytics/summary',
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
   cycleAnalyticsStageEventsPath: '/-/analytics/cycle_analytics/stages/:stage_id/records',
   cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
@@ -144,9 +144,8 @@ export default {
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsSummaryData(groupId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsSummaryDataPath).replace(':group_id', groupId);
-
+  cycleAnalyticsSummaryData(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsSummaryDataPath);
     return axios.get(url, { params });
   },
 
