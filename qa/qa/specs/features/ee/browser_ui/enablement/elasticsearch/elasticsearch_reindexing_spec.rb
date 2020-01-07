@@ -2,7 +2,8 @@
 
 module QA
   context 'Create' do
-    describe 'Search using Elasticsearch', :orchestrated, :elasticsearch, :requires_admin do
+    # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/35877
+    describe 'Search using Elasticsearch', :orchestrated, :elasticsearch, :requires_admin, :quarantine do
       include Runtime::Fixtures
 
       before do
