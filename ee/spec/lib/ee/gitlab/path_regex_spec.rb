@@ -19,4 +19,17 @@ describe Gitlab::PathRegex do
       expect(subject.match('ruby:2.3.6')[0]).to eq('ruby')
     end
   end
+
+  describe '.container_image_blob_sha_regex' do
+    subject { described_class.container_image_blob_sha_regex }
+
+    it { is_expected.to match('sha256:asdf1234567890ASDF') }
+    it { is_expected.to match('foo:123') }
+    it { is_expected.to match('a12bc3f590szp') }
+    it { is_expected.not_to match('') }
+
+    it 'does not match malicious characters' do
+      expect(subject.match('sha256:asdf1234%2f')[0]).to eq('sha256:asdf1234')
+    end
+  end
 end
