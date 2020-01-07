@@ -37,6 +37,25 @@ exports[`Design management design index page renders design index 1`] = `
   <div
     class="image-notes"
   >
+    <h2
+      class="gl-font-size-20 font-weight-bold mt-0"
+    >
+      My precious issue
+    </h2>
+     
+    <a
+      class="text-tertiary text-decoration-none mb-3 d-block"
+      href="full-issue-url"
+    >
+      ull-issue-path
+    </a>
+     
+    <participants-stub
+      class="mb-4"
+      numberoflessparticipants="7"
+      participants="[object Object]"
+    />
+     
     <design-discussion-stub
       designid="1"
       discussion="[object Object]"
@@ -114,7 +133,26 @@ exports[`Design management design index page with error GlAlert is rendered in c
     class="image-notes"
   >
     <h2
-      class="new-discussion-disclaimer m-0"
+      class="gl-font-size-20 font-weight-bold mt-0"
+    >
+      My precious issue
+    </h2>
+     
+    <a
+      class="text-tertiary text-decoration-none mb-3 d-block"
+      href="full-issue-url"
+    >
+      ull-issue-path
+    </a>
+     
+    <participants-stub
+      class="mb-4"
+      numberoflessparticipants="7"
+      participants="[object Object]"
+    />
+     
+    <h2
+      class="new-discussion-disclaimer gl-font-size-14 m-0"
     >
       
         Click the image where you'd like to start a new discussion

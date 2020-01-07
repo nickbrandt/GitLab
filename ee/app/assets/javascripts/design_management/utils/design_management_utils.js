@@ -86,3 +86,11 @@ export const designUploadOptimisticResponse = files => {
     },
   };
 };
+
+const normalizeAuthor = author => ({
+  ...author,
+  web_url: author.webUrl,
+  avatar_url: author.avatarUrl,
+});
+
+export const extractParticipants = users => users.edges.map(({ node }) => normalizeAuthor(node));

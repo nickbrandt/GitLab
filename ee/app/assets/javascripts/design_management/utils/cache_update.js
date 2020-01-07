@@ -62,6 +62,23 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
   ];
 
   design.notesCount += 1;
+  if (
+    !design.issue.participants.edges.some(
+      participant => participant.node.username === createNote.note.author.username,
+    )
+  ) {
+    design.issue.participants.edges = [
+      ...design.issue.participants.edges,
+      {
+        __typename: 'UserEdge',
+        node: {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          __typename: 'User',
+          ...createNote.note.author,
+        },
+      },
+    ];
+  }
   store.writeQuery({
     query,
     variables: queryVariables,
@@ -101,6 +118,23 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
   const design = extractDesign(data);
   const notesCount = design.notesCount + 1;
   design.discussions.edges = [...design.discussions.edges, newDiscussion];
+  if (
+    !design.issue.participants.edges.some(
+      participant => participant.node.username === createImageDiffNote.note.author.username,
+    )
+  ) {
+    design.issue.participants.edges = [
+      ...design.issue.participants.edges,
+      {
+        __typename: 'UserEdge',
+        node: {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          __typename: 'User',
+          ...createImageDiffNote.note.author,
+        },
+      },
+    ];
+  }
   store.writeQuery({
     query,
     variables,
