@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import createStore from './store';
+import store from './store';
 import CodeAnalyticsApp from './components/app.vue';
 import FilteredSearchCodeReviewAnalytics from './filtered_search_code_review_analytics';
 
@@ -12,7 +12,7 @@ export default () => {
   // eslint-disable-next-line no-new
   new Vue({
     el: container,
-    store: createStore(),
+    store,
     created() {
       this.filterManager = new FilteredSearchCodeReviewAnalytics();
       this.filterManager.setup();
