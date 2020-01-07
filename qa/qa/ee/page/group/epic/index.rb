@@ -38,14 +38,6 @@ module QA
                 has_element?(:epic_title_text, text: title)
               end
             end
-
-            def has_no_epic?(title)
-              # First, check that the new epic button is present,
-              # meaning that the test is in the right page before
-              # checking that the epic is not there.
-              find_element(:new_epic_button)
-              has_no_element?(:epic_title_text, text: title)
-            end
           end
         end
       end
