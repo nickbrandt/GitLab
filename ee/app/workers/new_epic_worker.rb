@@ -4,7 +4,7 @@ class NewEpicWorker
   include ApplicationWorker
   include NewIssuable
 
-  feature_category :agile_portfolio_management
+  feature_category :epics
   worker_resource_boundary :cpu
 
   def perform(epic_id, user_id)
