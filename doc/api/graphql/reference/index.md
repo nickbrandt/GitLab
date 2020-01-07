@@ -704,6 +704,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `onlyAllowMergeIfAllDiscussionsAreResolved` | Boolean | Indicates if merge requests of the project can only be merged when all the discussions are resolved |
 | `printingMergeRequestLinkEnabled` | Boolean | Indicates if a link to create or view a merge request should display after a push to Git repositories of the project from the command line |
 | `removeSourceBranchAfterMerge` | Boolean | Indicates if `Delete source branch` option should be enabled by default for all new merge requests of the project |
+| `autocloseReferencedIssues` | Boolean | Indicates if issues referenced by merge requests and commits within the default branch are closed automatically |
 | `namespace` | Namespace | Namespace of the project |
 | `group` | Group | Group of the project |
 | `statistics` | ProjectStatistics | Statistics of the project |

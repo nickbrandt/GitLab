@@ -4610,6 +4610,11 @@ type Project {
   archived: Boolean
 
   """
+  Indicates if issues referenced by merge requests and commits within the default branch are closed automatically
+  """
+  autocloseReferencedIssues: Boolean
+
+  """
   URL to avatar image file of the project
   """
   avatarUrl: String

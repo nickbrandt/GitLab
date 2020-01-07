@@ -323,6 +323,20 @@
               "deprecationReason": null
             },
             {
+              "name": "autocloseReferencedIssues",
+              "description": "Indicates if issues referenced by merge requests and commits within the default branch are closed automatically",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "avatarUrl",
               "description": "URL to avatar image file of the project",
               "args": [
