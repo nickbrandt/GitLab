@@ -117,10 +117,8 @@ module Security
               }
             },
             {
-              query_string: {
-                query: environment_proxy_upstream_name,
-                default_field: "message",
-                default_operator: "and"
+              "term": {
+                "message.upstream": "[#{environment_proxy_upstream_name}]"
               }
             },
             {
@@ -171,8 +169,10 @@ module Security
 
     # Derive proxy upstream name to filter nginx log by environment
     # See https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/log-format/
+    #
+    # This depends on a static service name and port, as defaulted by auto-deploy job
     def environment_proxy_upstream_name
-      "#{@environment.deployment_namespace}-#{@environment.slug}"
+      "#{@environment.deployment_namespace}-#{@environment.slug}-#{@environment.slug}-auto-deploy-5000"
     end
   end
 end
