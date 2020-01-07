@@ -172,6 +172,27 @@ describe Projects::LicensesController do
               })
             end
           end
+
+          context "when loading `allowed` software policies only" do
+            before do
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                classification: ['allowed']
+              }, format: :json
+            end
+
+            it { expect(response).to have_http_status(:ok) }
+            it { expect(json_response["licenses"].count).to be(1) }
+
+            it 'includes only `allowed` policies' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => other_license_policy.id,
+                "spdx_identifier" => "Other-Id",
+                "classification" => "allowed"
+              })
+            end
+          end
         end
 
         context 'without existing report' do
