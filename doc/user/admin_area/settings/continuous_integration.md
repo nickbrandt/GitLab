@@ -79,7 +79,8 @@ This setting is set per job and can be overridden in
 To disable the expiration, set it to `0`. The default unit is in seconds.
 
 NOTE: **Note**
-When changed, this setting applies to artifacts created after the setting change.
+Any changes to this setting will apply to new artifacts only. The expiration time will not
+be updated for artifacts created before this setting was changed.
 The administrator may need to manually search for and expire previously-created
 artifacts, as described in the [troubleshooting documentation](../../../administration/troubleshooting/gitlab_rails_cheat_sheet.md#remove-artifacts-more-than-a-week-old).
 
