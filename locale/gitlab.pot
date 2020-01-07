@@ -2381,6 +2381,9 @@ msgstr ""
 msgid "Auto-cancel redundant, pending pipelines"
 msgstr ""
 
+msgid "Auto-close referenced issues on default branch"
+msgstr ""
+
 msgid "AutoDevOps|Auto DevOps"
 msgstr ""
 
@@ -10075,6 +10078,9 @@ msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are sear
 msgstr ""
 
 msgid "Issues closed"
+msgstr ""
+
+msgid "Issues referenced by merge requests and commits within the default branch will be closed automatically"
 msgstr ""
 
 msgid "Issues with comments, merge requests with diffs and comments, labels, milestones, snippets, and other project entities"
