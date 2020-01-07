@@ -4,6 +4,7 @@ import { ApolloMutation } from 'vue-apollo';
 import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
+import Participants from '~/sidebar/components/participants/participants.vue';
 import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
 import design from '../../mock_data/design';
 
@@ -44,6 +45,7 @@ describe('Design management design index page', () => {
 
   const findDiscussions = () => wrapper.findAll(DesignDiscussion);
   const findDiscussionForm = () => wrapper.find(DesignReplyForm);
+  const findParticipants = () => wrapper.find(Participants);
 
   function createComponent(loading = false) {
     const $apollo = {
@@ -97,6 +99,22 @@ describe('Design management design index page', () => {
       expect(wrapper.element).toMatchSnapshot();
       expect(wrapper.find(GlAlert).exists()).toBe(false);
     });
+  });
+
+  it('renders participants', () => {
+    setDesign();
+
+    wrapper.setData({
+      design,
+    });
+
+    return wrapper.vm.$nextTick().then(() => {
+      expect(findParticipants().exists()).toBe(true);
+    });
+  });
+
+  it('passes the correct amount of participants to the Participants component', () => {
+    expect(findParticipants().props('participants').length).toBe(1);
   });
 
   describe('when has no discussions', () => {

@@ -18,7 +18,7 @@ exports[`Design management toolbar component renders design and updated data 1`]
     class="overflow-hidden d-flex align-items-center"
   >
     <h2
-      class="m-0 str-truncated-100"
+      class="m-0 str-truncated-100 gl-font-size-14"
     >
       test.jpg
     </h2>

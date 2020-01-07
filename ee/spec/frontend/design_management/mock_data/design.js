@@ -7,6 +7,23 @@ export default {
   updatedBy: {
     name: 'test',
   },
+  issue: {
+    title: 'My precious issue',
+    webPath: 'full-issue-path',
+    webUrl: 'full-issue-url',
+    participants: {
+      edges: [
+        {
+          node: {
+            name: 'Administrator',
+            username: 'root',
+            webUrl: 'link-to-author',
+            avatarUrl: 'link-to-avatar',
+          },
+        },
+      ],
+    },
+  },
   discussions: {
     edges: [
       {
@@ -19,6 +36,12 @@ export default {
                 node: {
                   id: 'note-id',
                   body: '123',
+                  author: {
+                    name: 'Administrator',
+                    username: 'root',
+                    webUrl: 'link-to-author',
+                    avatarUrl: 'link-to-avatar',
+                  },
                 },
               },
             ],

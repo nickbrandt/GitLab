@@ -105,7 +105,7 @@ export default {
       <icon :size="18" name="close" />
     </router-link>
     <div class="overflow-hidden d-flex align-items-center">
-      <h2 class="m-0 str-truncated-100">{{ filename }}</h2>
+      <h2 class="m-0 str-truncated-100 gl-font-size-14">{{ filename }}</h2>
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
     <pagination :id="id" class="ml-auto flex-shrink-0" />

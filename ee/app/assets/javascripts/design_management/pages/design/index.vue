@@ -10,10 +10,15 @@ import DesignOverlay from '../../components/design_overlay.vue';
 import DesignDiscussion from '../../components/design_notes/design_discussion.vue';
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import DesignDestroyer from '../../components/design_destroyer.vue';
+import Participants from '~/sidebar/components/participants/participants.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
+import {
+  extractDiscussions,
+  extractDesign,
+  extractParticipants,
+} from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import {
   ADD_DISCUSSION_COMMENT_ERROR,
@@ -33,6 +38,7 @@ export default {
     DesignReplyForm,
     GlLoadingIcon,
     GlAlert,
+    Participants,
   },
   mixins: [allVersionsMixin],
   props: {
@@ -51,8 +57,8 @@ export default {
         height: 0,
       },
       projectPath: '',
-      issueId: '',
       errorMessage: '',
+      issueIid: '',
     };
   },
   apollo: {
@@ -94,6 +100,9 @@ export default {
     discussionStartingNotes() {
       return this.discussions.map(discussion => discussion.notes[0]);
     },
+    discussionParticipants() {
+      return extractParticipants(this.design.issue.participants);
+    },
     markdownPreviewPath() {
       return `/${this.projectPath}/preview_markdown?target_type=Issue`;
     },
@@ -128,6 +137,12 @@ export default {
             newPath: this.design.fullPath,
           },
         },
+      };
+    },
+    issue() {
+      return {
+        ...this.design.issue,
+        webPath: this.design.issue.webPath.substr(1),
       };
     },
   },
@@ -243,6 +258,15 @@ export default {
         </div>
       </div>
       <div class="image-notes">
+        <h2 class="gl-font-size-20 font-weight-bold mt-0">{{ issue.title }}</h2>
+        <a class="text-tertiary text-decoration-none mb-3 d-block" :href="issue.webUrl">{{
+          issue.webPath
+        }}</a>
+        <participants
+          :participants="discussionParticipants"
+          :show-participant-label="false"
+          class="mb-4"
+        />
         <template v-if="renderDiscussions">
           <design-discussion
             v-for="(discussion, index) in discussions"
@@ -274,7 +298,7 @@ export default {
             />
           </apollo-mutation>
         </template>
-        <h2 v-else class="new-discussion-disclaimer m-0">
+        <h2 v-else class="new-discussion-disclaimer gl-font-size-14 m-0">
           {{ __("Click the image where you'd like to start a new discussion") }}
         </h2>
       </div>

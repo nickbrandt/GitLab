@@ -1,12 +1,10 @@
 #import "./diffRefs.fragment.graphql"
+#import "./author.fragment.graphql"
 
 fragment DesignNote on Note {
   id
   author {
-    avatarUrl
-    name
-    username
-    webUrl
+    ...Author
   }
   body
   bodyHtml

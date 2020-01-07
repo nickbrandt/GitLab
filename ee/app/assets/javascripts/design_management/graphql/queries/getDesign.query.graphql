@@ -1,4 +1,5 @@
 #import "../fragments/design.fragment.graphql"
+#import "../fragments/author.fragment.graphql"
 
 query getDesign($fullPath: ID!, $iid: String!, $atVersion: ID, $filenames: [String!]) {
   project(fullPath: $fullPath) {
@@ -9,6 +10,18 @@ query getDesign($fullPath: ID!, $iid: String!, $atVersion: ID, $filenames: [Stri
           edges {
             node {
               ...DesignItem
+              issue {
+                title
+                webPath
+                webUrl
+                participants {
+                  edges {
+                    node {
+                      ...Author
+                    }
+                  }
+                }
+              }
             }
           }
         }
