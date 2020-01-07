@@ -46,7 +46,7 @@ module Types
           description: 'Timestamp of the project last activity'
 
     field :archived, GraphQL::BOOLEAN_TYPE, null: true,
-          description: 'Archived status of the project'
+          description: 'Indicates the archived status of the project'
 
     field :visibility, GraphQL::STRING_TYPE, null: true,
           description: 'Visibility of the project'
