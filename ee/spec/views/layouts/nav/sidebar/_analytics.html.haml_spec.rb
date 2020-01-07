@@ -40,6 +40,10 @@ describe 'layouts/nav/sidebar/_analytics' do
       end
 
       context 'and user has access to instance statistics features' do
+        before do
+          allow(view).to receive(:can?) { true }
+        end
+
         it 'has `DevOps Score` link' do
           render
 
@@ -58,9 +62,11 @@ describe 'layouts/nav/sidebar/_analytics' do
       end
 
       context 'and user does not have access to instance statistics features' do
-        it 'no instance statistics links are rendered' do
-          allow(view).to receive(:dashboard_nav_link?).and_return(false)
+        before do
+          allow(view).to receive(:can?) { false }
+        end
 
+        it 'no instance statistics links are rendered' do
           render
 
           expect(rendered).not_to have_content('DevOps Score')
@@ -78,6 +84,10 @@ describe 'layouts/nav/sidebar/_analytics' do
       end
 
       context 'and user has access to instance statistics features' do
+        before do
+          allow(view).to receive(:can?) { true }
+        end
+
         it 'has `DevOps Score` link' do
           render
 
@@ -96,9 +106,11 @@ describe 'layouts/nav/sidebar/_analytics' do
       end
 
       context 'and user does not have access to instance statistics features' do
-        it 'no instance statistics links are rendered' do
-          allow(view).to receive(:dashboard_nav_link?).and_return(false)
+        before do
+          allow(view).to receive(:can?) { false }
+        end
 
+        it 'no instance statistics links are rendered' do
           render
 
           expect(rendered).not_to have_content('DevOps Score')
