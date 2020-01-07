@@ -21,11 +21,9 @@ module Analytics
       private
 
       def group_params
-        {
-          created_after: request_params.created_after,
-          created_before: request_params.created_before,
-          project_ids: request_params.project_ids
-        }
+        hash = { created_after: request_params.created_after, created_before: request_params.created_before }
+        hash[:project_ids] = request_params.project_ids if request_params.project_ids.any?
+        hash
       end
 
       def validate_params

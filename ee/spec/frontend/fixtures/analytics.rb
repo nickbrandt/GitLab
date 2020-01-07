@@ -180,6 +180,8 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
       stub_licensed_features(cycle_analytics_for_groups: true)
 
+      prepare_cycle_analytics_data
+
       sign_in(user)
     end
 
