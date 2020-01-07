@@ -191,6 +191,11 @@ Git operations in GitLab will result in an API error.
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
 
+   <!--
+   updates to following example must also be made at
+   https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/advanced/external-gitaly/external-omnibus-gitaly.md#configure-omnibus-gitlab
+   -->
+
    On `gitaly1.internal`:
 
    ```
