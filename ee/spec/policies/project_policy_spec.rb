@@ -36,6 +36,7 @@ describe ProjectPolicy do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
         read_vulnerability create_vulnerability admin_vulnerability
+        admin_vulnerability_issue_link
       ]
     end
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }

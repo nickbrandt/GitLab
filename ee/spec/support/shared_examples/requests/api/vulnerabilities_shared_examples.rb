@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'forbids actions on vulnerability in case of disabled features' do
+shared_examples 'forbids access to vulnerability API endpoint in case of disabled features' do
   context 'when "first-class vulnerabilities" feature is disabled' do
     before do
       stub_feature_flags(first_class_vulnerabilities: false)
