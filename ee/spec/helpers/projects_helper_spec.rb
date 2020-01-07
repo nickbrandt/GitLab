@@ -133,25 +133,12 @@ describe ProjectsHelper do
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
 
-      context 'when new Vulnerability Findings API enabled' do
-        it 'returns new "vulnerability findings" endpoint paths' do
-          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
-          expect(subject[:vulnerabilities_summary_endpoint]).to(
-            eq(
-              summary_project_security_vulnerability_findings_path(project)
-            ))
-        end
-      end
-
-      context 'when new Vulnerability Findings API disabled' do
-        before do
-          stub_feature_flags(first_class_vulnerabilities: false)
-        end
-
-        it 'returns legacy "vulnerabilities" endpoint paths' do
-          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerabilities_path(project)
-          expect(subject[:vulnerabilities_summary_endpoint]).to eq summary_project_security_vulnerabilities_path(project)
-        end
+      it 'returns the "vulnerability findings" endpoint paths' do
+        expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
+        expect(subject[:vulnerabilities_summary_endpoint]).to(
+          eq(
+            summary_project_security_vulnerability_findings_path(project)
+          ))
       end
     end
   end
