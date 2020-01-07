@@ -12,35 +12,55 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
   scope :namespace_in, -> (namespaces) { where(namespace_id: namespaces) }
 
+  BATCH_OPERATION_SIZE = 1000
+
   def self.target_attr_name
     :namespace_id
   end
 
-  # rubocop: disable Naming/UncommunicativeMethodParamName
-  def self.index_first_n_namespaces_of_plan(plan, n)
+  def self.index_first_n_namespaces_of_plan(plan, number_of_namespaces)
     indexed_namespaces = self.select(:namespace_id)
+    now = Time.now
 
-    GitlabSubscription
+    ids = GitlabSubscription
       .with_hosted_plan(plan)
       .where.not(namespace_id: indexed_namespaces)
       .order(namespace_id: :asc)
-      .limit(n)
+      .limit(number_of_namespaces)
       .pluck(:namespace_id)
-      .each { |id| create!(namespace_id: id) }
+
+    ids.in_groups_of(BATCH_OPERATION_SIZE, false) do |batch_ids|
+      insert_rows = batch_ids.map do |id|
+        # Ensure ordering with incremental created_at,
+        # so rollback can start from the bigger namespace_id
+        now += 1.0e-05.seconds
+        { created_at: now, updated_at: now, namespace_id: id }
+      end
+
+      Gitlab::Database.bulk_insert(table_name, insert_rows)
+
+      jobs = batch_ids.map { |id| [id, :index] }
+
+      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs)
+    end
   end
 
-  def self.unindex_last_n_namespaces_of_plan(plan, n)
+  def self.unindex_last_n_namespaces_of_plan(plan, number_of_namespaces)
     namespaces_under_plan = GitlabSubscription.with_hosted_plan(plan).select(:namespace_id)
 
-    # rubocop: disable Cop/DestroyAll
-    # destroy_all is used in order to trigger `delete_from_index` callback
-    where(namespace: namespaces_under_plan)
+    ids = where(namespace: namespaces_under_plan)
       .order(created_at: :desc)
-      .limit(n)
-      .destroy_all
-    # rubocop: enable Cop/DestroyAll
+      .limit(number_of_namespaces)
+      .pluck(:namespace_id)
+
+    ids.in_groups_of(BATCH_OPERATION_SIZE, false) do |batch_ids|
+      where(namespace_id: batch_ids).delete_all
+
+      jobs = batch_ids.map { |id| [id, :delete] }
+
+      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs)
+    end
   end
-  # rubocop: enable Naming/UncommunicativeMethodParamName
 
   private
 

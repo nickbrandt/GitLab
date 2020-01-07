@@ -47,24 +47,30 @@ describe ElasticsearchIndexedNamespace do
       described_class.order(:created_at).pluck(:namespace_id)
     end
 
+    def expect_queue_to_contain(*args)
+      expect(ElasticNamespaceIndexerWorker.jobs).to include(
+        hash_including("args" => args)
+      )
+    end
+
     describe '.index_first_n_namespaces_of_plan' do
       it 'creates records, scoped by plan and ordered by namespace id' do
         ids = namespaces.map(&:id)
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[0], :index)
 
         described_class.index_first_n_namespaces_of_plan('gold', 1)
 
         expect(get_indexed_namespaces).to eq([ids[0]])
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[2], :index)
+        expect_queue_to_contain(ids[0], "index")
 
         described_class.index_first_n_namespaces_of_plan('gold', 2)
 
         expect(get_indexed_namespaces).to eq([ids[0], ids[2]])
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[1], :index)
+        expect_queue_to_contain(ids[2], "index")
 
         described_class.index_first_n_namespaces_of_plan('silver', 1)
 
         expect(get_indexed_namespaces).to eq([ids[0], ids[2], ids[1]])
+        expect_queue_to_contain(ids[1], "index")
       end
     end
 
@@ -77,22 +83,22 @@ describe ElasticsearchIndexedNamespace do
       it 'creates records, scoped by plan and ordered by namespace id' do
         ids = namespaces.map(&:id)
 
-        expect(get_indexed_namespaces).to eq([ids[0], ids[2], ids[1]])
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[2], :delete)
+        expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[2], ids[1])
 
         described_class.unindex_last_n_namespaces_of_plan('gold', 1)
 
-        expect(get_indexed_namespaces).to eq([ids[0], ids[1]])
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[1], :delete)
+        expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[1])
+        expect_queue_to_contain(ids[2], "delete")
 
         described_class.unindex_last_n_namespaces_of_plan('silver', 1)
 
-        expect(get_indexed_namespaces).to eq([ids[0]])
-        expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(ids[0], :delete)
+        expect(get_indexed_namespaces).to contain_exactly(ids[0])
+        expect_queue_to_contain(ids[1], "delete")
 
         described_class.unindex_last_n_namespaces_of_plan('gold', 1)
 
         expect(get_indexed_namespaces).to be_empty
+        expect_queue_to_contain(ids[0], "delete")
       end
     end
   end
