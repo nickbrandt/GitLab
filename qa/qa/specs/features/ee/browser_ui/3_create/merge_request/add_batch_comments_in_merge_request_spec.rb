@@ -70,7 +70,6 @@ module QA
 
         Page::MergeRequest::Show.perform do |show|
           show.click_discussions_tab
-          show.refresh
           show.resolve_discussion_at_index(0)
 
           expect(show).to have_content("Can you check this line of code?")
