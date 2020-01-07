@@ -67,7 +67,10 @@ export default {
         :key="item.eventName"
         :active="selectedItem === item"
         active-class="is-active"
-        @click="selectedItem = item"
+        @click="
+          selectedItem = item;
+          triggerEvent();
+        "
       >
         <strong>{{ item.title }}</strong>
         <div>{{ item.description }}</div>

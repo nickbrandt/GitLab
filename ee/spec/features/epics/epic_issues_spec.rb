@@ -98,6 +98,15 @@ describe 'Epic Issues', :js do
       visit_epic
     end
 
+    it 'user can display create new epic form by clicking the dropdown item' do
+      expect(page).not_to have_selector('input[placeholder="New epic title"]')
+
+      find('.related-items-tree-container .js-add-epics-button .dropdown-toggle').click
+      find('.related-items-tree-container .js-add-epics-button .dropdown-item', text: 'Create new epic').click
+
+      expect(page).to have_selector('input[placeholder="New epic title"]')
+    end
+
     it 'user can see all issues of the group and delete the associations' do
       within('.related-items-tree-container ul.related-items-list') do
         expect(page).to have_selector('li.js-item-type-issue', count: 2)
