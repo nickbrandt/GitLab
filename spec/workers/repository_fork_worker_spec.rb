@@ -47,6 +47,15 @@ describe RepositoryForkWorker do
         perform!
       end
 
+      it 'calls LfsObjectsProjects::BulkCreateService#execute' do
+        expect_fork_repository.and_return(true)
+        expect_next_instance_of(LfsObjectsProjects::BulkCreateService) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        perform!
+      end
+
       it 'protects the default branch' do
         expect_fork_repository.and_return(true)
 

@@ -29,7 +29,13 @@ class RepositoryForkWorker
 
     result = gitlab_shell.fork_repository(source_project, target_project)
 
-    raise "Unable to fork project #{target_project.id} for repository #{source_project.disk_path} -> #{target_project.disk_path}" unless result
+    if result
+      LfsObjectsProjects::BulkCreateService
+        .new(source_project, target_project: target_project)
+        .execute
+    else
+      raise "Unable to fork project #{target_project.id} for repository #{source_project.disk_path} -> #{target_project.disk_path}"
+    end
 
     target_project.after_import
   end
