@@ -115,3 +115,17 @@ RSpec.shared_examples 'background upload schedules a file migration' do
     end
   end
 end
+
+shared_examples 'package workhorse uploads' do
+  context 'without a workhorse header' do
+    let(:workhorse_token) { JWT.encode({ 'iss' => 'invalid header' }, Gitlab::Workhorse.secret, 'HS256') }
+
+    it_behaves_like 'returning response status', :forbidden
+
+    it 'logs an error' do
+      expect(Gitlab::ErrorTracking).to receive(:track_exception).once
+
+      subject
+    end
+  end
+end
