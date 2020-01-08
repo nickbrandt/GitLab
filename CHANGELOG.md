@@ -483,7 +483,7 @@ entry.
 - Do not display project labels that are not visible for user accessing group labels.
 - Standardize error response when route is missing.
 
-### Fixed (99 changes, 14 of them are from the community)
+### Fixed (100 changes, 15 of them are from the community)
 
 - Fix incorrect selection of custom templates. !17205
 - Smaller width for design comments layout, truncate image title. !17547
@@ -584,6 +584,7 @@ entry.
 - Only allow confirmed users to run pipelines.
 - Fix scroll to bottom with new job log.
 - Fixed protected branches flash styling.
+- Show tag link whenever it's a tag in chat message integration for push events and pipeline events. !18126 (Mats Estensen)
 
 ### Deprecated (2 changes)
 
