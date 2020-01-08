@@ -1,17 +1,14 @@
 import Vue from 'vue';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlPopover, GlLink } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import component from 'ee/approvals/components/approval_check_popover.vue';
-
-const localVue = createLocalVue();
 
 describe('Approval Check Popover', () => {
   let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(component, {
-      localVue,
       propsData: {
         title: 'Title',
       },

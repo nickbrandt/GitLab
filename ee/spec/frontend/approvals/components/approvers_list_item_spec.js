@@ -1,11 +1,10 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from 'ee/approvals/constants';
 import ApproversListItem from 'ee/approvals/components/approvers_list_item.vue';
 import HiddenGroupsItem from 'ee/approvals/components/hidden_groups_item.vue';
 import Avatar from '~/vue_shared/components/project_avatar/default.vue';
 
-const localVue = createLocalVue();
 const TEST_USER = {
   id: 1,
   type: TYPE_USER,
@@ -22,9 +21,8 @@ describe('Approvals ApproversListItem', () => {
   let wrapper;
 
   const factory = (options = {}) => {
-    wrapper = shallowMount(localVue.extend(ApproversListItem), {
+    wrapper = shallowMount(ApproversListItem, {
       ...options,
-      localVue,
       sync: false,
     });
   };
