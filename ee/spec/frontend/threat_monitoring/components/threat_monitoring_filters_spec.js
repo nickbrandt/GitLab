@@ -1,11 +1,9 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
 import { INVALID_CURRENT_ENVIRONMENT_NAME } from 'ee/threat_monitoring/store/modules/threat_monitoring/constants';
 import { mockEnvironmentsResponse } from '../mock_data';
-
-const localVue = createLocalVue();
 
 describe('ThreatMonitoringFilters component', () => {
   let store;
@@ -18,7 +16,6 @@ describe('ThreatMonitoringFilters component', () => {
     jest.spyOn(store, 'dispatch').mockImplementation();
 
     wrapper = shallowMount(ThreatMonitoringFilters, {
-      localVue,
       store,
       sync: false,
     });
