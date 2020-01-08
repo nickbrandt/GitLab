@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
+require_dependency 'active_model'
 
 describe EE::Gitlab::Ci::Config::Entry::Trigger do
   subject { described_class.new(config) }
@@ -78,53 +79,6 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
             expect(subject.errors.first)
               .to match /trigger strategy should be depend/
           end
-        end
-      end
-    end
-
-    context '#include' do
-      context 'with simple include' do
-        let(:config) { { include: 'path/to/config.yml' } }
-
-        it { is_expected.to be_valid }
-
-        it 'returns a trigger configuration hash' do
-          expect(subject.value).to eq(include: 'path/to/config.yml' )
-        end
-      end
-
-      context 'with project' do
-        let(:config) { { project: 'some/project', include: 'path/to/config.yml' } }
-
-        it { is_expected.not_to be_valid }
-
-        it 'is returns an error' do
-          expect(subject.errors.first)
-            .to match /config contains unknown keys: project/
-        end
-      end
-
-      context 'with branch' do
-        let(:config) { { branch: 'feature', include: 'path/to/config.yml' } }
-
-        it { is_expected.not_to be_valid }
-
-        it 'is returns an error' do
-          expect(subject.errors.first)
-            .to match /config contains unknown keys: branch/
-        end
-      end
-
-      context 'when feature flag is off' do
-        before do
-          stub_feature_flags(ci_parent_child_pipeline: false)
-        end
-
-        let(:config) { { include: 'path/to/config.yml' } }
-
-        it 'is returns an error if include is used' do
-          expect(subject.errors.first)
-            .to match /config must specify project/
         end
       end
     end

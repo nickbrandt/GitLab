@@ -5,7 +5,7 @@ module Ci
     include ::Gitlab::Utils::StrongMemoize
 
     def execute(bridge)
-      return unless bridge.upstream_project_path
+      return unless bridge.upstream_project
 
       @bridge = bridge
 
@@ -29,7 +29,7 @@ module Ci
 
     def upstream_project
       strong_memoize(:upstream_project) do
-        @bridge.upstream_project
+        ::Project.find_by_full_path(@bridge.target_project_path)
       end
     end
 
