@@ -11,7 +11,7 @@ module EE
         super
 
         ActiveRecord::Base.no_touching do
-          handle_weight_change
+          handle_weight_change(is_update)
           handle_date_change_note if is_update
         end
       end
@@ -28,11 +28,13 @@ module EE
         end
       end
 
-      def handle_weight_change
+      def handle_weight_change(is_update)
         return unless issuable.previous_changes.include?('weight')
 
         if weight_changes_tracking_enabled?
-          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute
+          # Only create a resource event here if is_update is true to exclude the move issue operation.
+          # ResourceEvents for moved issues are written within AttributesRewriter.
+          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute if is_update
         else
           ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
         end

@@ -62,13 +62,8 @@ describe Issuable::CommonSystemNotesService do
         stub_feature_flags(track_issue_weight_change_events: true)
       end
 
-      it 'creates a resource weight event' do
-        subject
-
-        event = issuable.resource_weight_events.last
-
-        expect(event.weight).to eq(5)
-        expect(event.user_id).to eq(user.id)
+      it 'does not create a resource weight event' do
+        expect { subject }.not_to change { ResourceWeightEvent.count }
       end
 
       it 'does not create a system note' do
