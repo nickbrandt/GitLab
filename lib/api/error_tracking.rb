@@ -16,8 +16,11 @@ module API
       get ':id/error_tracking/sentry_project_settings' do
         authorize! :read_sentry_issue, user_project
 
-        sentry_project_settings = user_project.error_tracking_setting
-        present sentry_project_settings, with: Entities::SentryProjectErrorTrackingSettings
+        setting = user_project.error_tracking_setting
+
+        not_found!('Error Tracking Setting') unless setting
+
+        present setting, with: Entities::SentryProjectErrorTrackingSettings
       end
     end
   end
