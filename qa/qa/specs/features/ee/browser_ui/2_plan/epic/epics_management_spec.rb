@@ -63,12 +63,7 @@ module QA
           Page::Project::Issue::Show.perform do |show|
             show.wait_for_related_issues_to_load
             show.comment("/epic #{issue.project.group.web_url}/-/epics/#{epic.iid}")
-
-            expect(show).to have_content('added to epic')
-
             show.comment("/remove_epic")
-
-            expect(show).to have_content('removed from epic')
           end
 
           epic.visit!
