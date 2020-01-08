@@ -1,6 +1,10 @@
+import axios from 'axios';
+import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import actions from 'ee/boards/stores/actions';
 import * as types from 'ee/boards/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
+
+jest.mock('axios');
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -32,6 +36,33 @@ describe('setActiveListId', () => {
       [],
       done,
     );
+  });
+});
+
+describe('updateListWipLimit', () => {
+  let storeMock;
+
+  beforeEach(() => {
+    storeMock = {
+      state: { endpoints: { listsEndpoint: '/test' } },
+      create: () => {},
+      setCurrentBoard: () => {},
+    };
+
+    boardsStoreEE.initEESpecific(storeMock);
+  });
+
+  it('should call the correct url', () => {
+    axios.put.mockResolvedValue({ data: {} });
+    const maxIssueCount = 0;
+    const activeListId = 1;
+
+    return actions.updateListWipLimit({ state: { activeListId } }, { maxIssueCount }).then(() => {
+      expect(axios.put).toHaveBeenCalledWith(
+        `${boardsStoreEE.store.state.endpoints.listsEndpoint}/${activeListId}`,
+        { list: { max_issue_count: maxIssueCount } },
+      );
+    });
   });
 });
 
