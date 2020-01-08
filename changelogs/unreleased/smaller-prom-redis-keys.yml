@@ -2,4 +2,4 @@
 title: Reduce redis key size for the Prometheus proxy and the amount of queries by half
 merge_request: 20006
 author:
-type: fixed
+type: performance
