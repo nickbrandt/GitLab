@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { sprintf, s__, __ } from '~/locale';
+import { n__, s__, __ } from '~/locale';
 import Api from '~/api';
 import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
@@ -52,9 +52,11 @@ export default {
       if (this.selectedProjects.length === 1) {
         return this.selectedProjects[0].name;
       } else if (this.selectedProjects.length > 1) {
-        return sprintf(s__('CycleAnalytics|%{projectCount} projects selected'), {
-          projectCount: this.selectedProjects.length,
-        });
+        return n__(
+          'CycleAnalytics|Project selected',
+          'CycleAnalytics|%d projects selected',
+          this.selectedProjects.length,
+        );
       }
 
       return this.selectedProjectsPlaceholder;
