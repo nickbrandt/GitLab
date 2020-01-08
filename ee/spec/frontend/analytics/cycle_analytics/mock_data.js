@@ -7,15 +7,11 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
 
-/*
- * With the new API endpoints (analytics/cycle_analytics) we will
- * fetch stages, cycleEvents and summary data from different endpoints
- */
 const endpoints = {
-  cycleAnalyticsData: 'cycle_analytics/mock_data.json', // existing cycle analytics data
   customizableCycleAnalyticsStagesAndEvents: 'analytics/cycle_analytics/stages.json', // customizable stages and events endpoint
   stageEvents: stage => `analytics/cycle_analytics/stages/${stage}/records.json`,
   stageMedian: stage => `analytics/cycle_analytics/stages/${stage}/median.json`,
+  summaryData: 'analytics/cycle_analytics/summary.json',
 };
 
 export const groupLabels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
@@ -31,7 +27,7 @@ export const group = {
 const getStageByTitle = (stages, title) =>
   stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
-export const cycleAnalyticsData = getJSONFixture(endpoints.cycleAnalyticsData);
+export const summaryData = getJSONFixture(endpoints.summaryData);
 
 export const customizableStagesAndEvents = getJSONFixture(
   endpoints.customizableCycleAnalyticsStagesAndEvents,

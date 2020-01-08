@@ -319,6 +319,11 @@ describe('Api', () => {
     const createdBefore = '2019-11-18';
     const createdAfter = '2019-08-18';
     const stageId = 'thursday';
+    const defaultParams = {
+      group_id: groupId,
+      created_after: createdAfter,
+      created_before: createdBefore,
+    };
 
     const expectRequestWithCorrectParameters = (responseObj, { params, expectedUrl, response }) => {
       const {
@@ -351,9 +356,7 @@ describe('Api', () => {
         ];
         const labelIds = [10, 9, 8, 7];
         const params = {
-          group_id: groupId,
-          created_after: createdAfter,
-          created_before: createdBefore,
+          ...defaultParams,
           project_ids: null,
           subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
           label_ids: labelIds,
@@ -372,16 +375,16 @@ describe('Api', () => {
     });
 
     describe('cycleAnalyticsSummaryData', () => {
-      it('fetches cycle analytics summary, stage stats and permissions data', done => {
-        const response = { summary: [], stats: [], permissions: {} };
+      it('fetches cycle analytics summary data', done => {
+        const response = [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }];
         const params = {
-          'cycle_analytics[created_after]': createdAfter,
-          'cycle_analytics[created_before]': createdBefore,
+          ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/groups/${groupId}/-/cycle_analytics`;
+
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/summary`;
         mock.onGet(expectedUrl).reply(200, response);
 
-        Api.cycleAnalyticsSummaryData(groupId, params)
+        Api.cycleAnalyticsSummaryData(params)
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -422,9 +425,7 @@ describe('Api', () => {
       it('fetches stage events', done => {
         const response = { events: [] };
         const params = {
-          group_id: groupId,
-          created_after: createdAfter,
-          created_before: createdBefore,
+          ...defaultParams,
         };
         const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/records`;
         mock.onGet(expectedUrl).reply(200, response);
@@ -446,9 +447,7 @@ describe('Api', () => {
       it('fetches stage events', done => {
         const response = { value: '5 days ago' };
         const params = {
-          group_id: groupId,
-          created_after: createdAfter,
-          created_before: createdBefore,
+          ...defaultParams,
         };
         const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/median`;
         mock.onGet(expectedUrl).reply(200, response);
@@ -535,9 +534,7 @@ describe('Api', () => {
       it('fetches stage duration data', done => {
         const response = [];
         const params = {
-          group_id: groupId,
-          created_after: createdAfter,
-          created_before: createdBefore,
+          ...defaultParams,
         };
         const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/thursday/duration_chart`;
         mock.onGet(expectedUrl).reply(200, response);

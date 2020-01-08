@@ -3,7 +3,7 @@ import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
-  cycleAnalyticsData,
+  summaryData,
   rawIssueEvents,
   issueEvents as transformedEvents,
   issueStage,
@@ -78,7 +78,6 @@ describe('Cycle analytics mutations', () => {
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
       state = {
-        endpoints: { cycleAnalyticsData: '/fake/api' },
         selectedGroup: { fullPath: 'rad-stage' },
       };
       mutations[mutation](state, payload);
@@ -167,15 +166,12 @@ describe('Cycle analytics mutations', () => {
   describe(`${types.RECEIVE_SUMMARY_DATA_SUCCESS}`, () => {
     beforeEach(() => {
       state = { stages: [{ slug: 'plan' }, { slug: 'issue' }, { slug: 'test' }] };
-      mutations[types.RECEIVE_SUMMARY_DATA_SUCCESS](state, {
-        ...cycleAnalyticsData,
-        summary: [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }],
-      });
+      mutations[types.RECEIVE_SUMMARY_DATA_SUCCESS](state, summaryData);
     });
 
     it('will set each summary item with a value of 0 to "-"', () => {
       expect(state.summary).toEqual([
-        { value: '-', title: 'New Issues' },
+        { value: 3, title: 'New Issues' },
         { value: '-', title: 'Deploys' },
       ]);
     });

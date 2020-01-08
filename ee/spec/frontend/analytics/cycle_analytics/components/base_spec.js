@@ -363,8 +363,8 @@ describe('Cycle Analytics component', () => {
       const defaultRequests = {
         fetchSummaryData: {
           status: defaultStatus,
-          endpoint: `/groups/${groupId}/-/cycle_analytics`,
-          response: { ...mockData.cycleAnalyticsData },
+          endpoint: `/-/analytics/cycle_analytics/summary`,
+          response: [...mockData.summaryData],
         },
         fetchGroupStagesAndEvents: {
           status: defaultStatus,
@@ -435,7 +435,7 @@ describe('Cycle Analytics component', () => {
         overrides: {
           fetchSummaryData: {
             status: httpStatusCodes.NOT_FOUND,
-            endpoint: `/groups/${groupId}/-/cycle_analytics`,
+            endpoint: '/-/analytics/cycle_analytics/summary',
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },
         },
