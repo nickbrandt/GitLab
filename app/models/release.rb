@@ -81,7 +81,7 @@ class Release < ApplicationRecord
     evidence&.summary || {}
   end
 
-  def milestone_list
+  def milestone_titles
     self.milestones.map {|m| m.title }.sort.join(", ")
   end
 

@@ -182,9 +182,9 @@ RSpec.describe Release do
     end
   end
 
-  describe '#milestone_list' do
+  describe '#milestone_titles' do
     let(:release) { create(:release, :with_milestones) }
 
-    it { expect(release.milestone_list).to eq(release.milestones.map {|m| m.title }.sort.join(", "))}
+    it { expect(release.milestone_titles).to eq(release.milestones.map {|m| m.title }.sort.join(", "))}
   end
 end
