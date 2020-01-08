@@ -195,7 +195,7 @@ export default {
     <header v-if="showToolbar" class="row-content-block border-top-0 p-2 d-flex">
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
-        <div v-if="hasDesigns" class="d-flex qa-selector-toolbar">
+        <div v-show="hasDesigns" class="d-flex qa-selector-toolbar">
           <gl-button
             v-if="isLatestVersion"
             variant="link"
