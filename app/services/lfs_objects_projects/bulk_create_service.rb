@@ -21,8 +21,9 @@ module LfsObjectsProjects
 
     private
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def lfs_objects_projects_map(target_project)
-      project.lfs_objects_projects.map do |objects_project|
+      project.lfs_objects_projects.where.not(lfs_object: target_project.lfs_objects).map do |objects_project|
         {
           lfs_object_id: objects_project.lfs_object_id,
           project_id: target_project.id,
@@ -30,5 +31,6 @@ module LfsObjectsProjects
         }
       end
     end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
