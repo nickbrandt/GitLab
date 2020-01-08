@@ -208,7 +208,7 @@ func (u *upstream) configureRoutes() {
 		route("PUT", apiPattern+`v4/packages/conan/`, filestore.BodyUploader(api, proxy, nil)),
 
 		// NuGet Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, filestore.BodyUploader(api, proxy, nil)),
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, proxy)),
 
 		// We are porting API to disk acceleration
 		// we need to declare each routes until we have fixed all the routes on the rails codebase.

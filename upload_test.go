@@ -117,18 +117,27 @@ func TestAcceleratedUpload(t *testing.T) {
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	resources := []string{
-		`/example`,
-		`/uploads/personal_snippet`,
-		`/uploads/user`,
-		`/api/v4/projects/1/wikis/attachments`,
-		`/api/graphql`,
+	tests := []struct {
+		method   string
+		resource string
+	}{
+		{"POST", `/example`},
+		{"POST", `/uploads/personal_snippet`},
+		{"POST", `/uploads/user`},
+		{"POST", `/api/v4/projects/1/wikis/attachments`},
+		{"POST", `/api/graphql`},
+		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files"},
 	}
-	for _, resource := range resources {
+
+	for _, tt := range tests {
 		reqBody, contentType, err := multipartBodyWithFile()
 		require.NoError(t, err)
 
-		resp, err := http.Post(ws.URL+resource, contentType, reqBody)
+		req, err := http.NewRequest(tt.method, ws.URL+tt.resource, reqBody)
+		require.NoError(t, err)
+
+		req.Header.Set("Content-Type", contentType)
+		resp, err := http.DefaultClient.Do(req)
 		require.NoError(t, err)
 		require.Equal(t, 200, resp.StatusCode)
 
@@ -330,7 +339,6 @@ func testPackageFileUpload(t *testing.T, resource string) {
 func TestPackageFilesUpload(t *testing.T) {
 	routes := []string{
 		"/api/v4/packages/conan/v1/files",
-		"/api/v4/projects/9001/packages/nuget/v1/files",
 		"/api/v4/projects/2412/packages/maven/v1/files",
 	}
 
