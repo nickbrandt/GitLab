@@ -61,7 +61,7 @@ module Gitlab
       end
 
       def order(vulnerabilities)
-        ordered = vulnerabilities.sort do |a, b|
+        vulnerabilities.sort do |a, b|
           [
             ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[b['severity']],
             ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[b['confidence']],

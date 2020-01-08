@@ -72,6 +72,12 @@ describe Security::StoreReportsService do
 
         subject
       end
+
+      it 'caches vulnerability occurrence' do
+        expect_any_instance_of(Gitlab::Vulnerabilities::OccurrenceCache).to receive(:fetch)
+
+        subject
+      end
     end
   end
 end

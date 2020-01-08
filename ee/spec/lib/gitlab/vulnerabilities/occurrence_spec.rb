@@ -9,27 +9,27 @@ describe Gitlab::Vulnerabilities::Occurrence do
   let(:critical_vulnerabilities) do
     pipeline = create(:ci_pipeline, :success, project: project2)
     (
-      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :undefined}) +
-      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :unknown}) +
-      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :low}) +
-      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :high}) +
-      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :confirmed}) +
-      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :medium}) +
-      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :experimental}) +
-      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :ignore})
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :undefined }) +
+      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :unknown }) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :low }) +
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :high }) +
+      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :confirmed }) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :medium }) +
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :experimental }) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :ignore })
     ).sort { |x, y| [y.confidence_value, x.id] <=> [x.confidence_value, y.id] }
   end
   let(:med_vulnerabilities) do
     pipeline = create(:ci_pipeline, :success, project: project1)
     (
-      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :undefined}) +
-      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :unknown}) +
-      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :low}) +
-      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :high}) +
-      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :confirmed}) +
-      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :medium}) +
-      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :experimental}) +
-      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :ignore})
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :undefined }) +
+      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :unknown }) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :low }) +
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :high }) +
+      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :confirmed }) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :medium }) +
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :experimental }) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :ignore })
     ).sort { |x, y| [y.confidence_value, x.id] <=> [x.confidence_value, y.id] }
   end
   let(:params) { ActionController::Parameters.new }
@@ -84,7 +84,7 @@ describe Gitlab::Vulnerabilities::Occurrence do
       end
 
       context 'page param is provided with value 2' do
-        let (:params) { ActionController::Parameters.new(page: 2) }
+        let(:params) { ActionController::Parameters.new(page: 2) }
 
         it 'calls Gitlab::Vulnerabilities::OccurrenceCache' do
           expect(Gitlab::Vulnerabilities::OccurrenceCache).to receive(:new).twice.and_call_original
@@ -99,7 +99,6 @@ describe Gitlab::Vulnerabilities::Occurrence do
       end
 
       it 'calls Gitlab::Vulnerabilities::OccurrenceCache' do
-
         expect(Gitlab::Vulnerabilities::OccurrenceCache).to receive(:new).twice.and_call_original
 
         findings

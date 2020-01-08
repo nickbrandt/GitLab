@@ -34,7 +34,7 @@ describe Gitlab::Vulnerabilities::OccurrenceCache do
       expect(fetched.first['id']).to eq vulnerabilities.first.id
     end
 
-    it 'returns the proper format for cached summary' do
+    it 'returns the proper format for cached occurrence' do
       described_class.new(group, project.id, user).fetch
       fetched = described_class.new(group, project.id, user).fetch
 

@@ -30,6 +30,8 @@ module Security
 
       Gitlab::Vulnerabilities::HistoryCache.new(project.group, project.id)
         .fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE, force: true)
+      Gitlab::Vulnerabilities::OccurrenceCache.new(project.group, project.id, nil)
+        .fetch(force: true)
     rescue => err
       error("Failed to cache vulnerabilities for pipeline #{@pipeline.id}: #{err}")
     end
