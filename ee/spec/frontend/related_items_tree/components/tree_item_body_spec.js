@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton, GlLink } from '@gitlab/ui';
 
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
@@ -28,8 +28,6 @@ const mockItem = Object.assign({}, mockIssue1, {
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
 });
 
-const localVue = createLocalVue();
-
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
@@ -49,7 +47,6 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   return shallowMount(TreeItemBody, {
     attachToDocument: true,
     sync: false,
-    localVue,
     store,
     propsData: {
       parentItem,

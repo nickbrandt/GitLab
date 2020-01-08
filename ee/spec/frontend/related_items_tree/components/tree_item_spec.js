@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 
 import TreeItem from 'ee/related_items_tree/components/tree_item.vue';
@@ -23,8 +23,6 @@ const mockItem = Object.assign({}, mockEpic1, {
   pathIdSeparator: PathIdSeparator.Epic,
 });
 
-const localVue = createLocalVue();
-
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
@@ -45,8 +43,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
     isSubItem: true,
   });
 
-  return shallowMount(localVue.extend(TreeItem), {
-    localVue,
+  return shallowMount(TreeItem, {
     store,
     stubs: {
       'tree-root': TreeRoot,
