@@ -27,7 +27,7 @@ describe('GeoDesignsApp', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(localVue.extend(GeoDesign), {
+    wrapper = mount(GeoDesign, {
       localVue,
       store,
       propsData,
