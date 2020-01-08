@@ -11,7 +11,7 @@ describe('Subscriptions Actions', () => {
         actions.activateStep,
         'secondStep',
         {},
-        [{ type: 'ACTIVATE_STEP', payload: 'secondStep' }],
+        [{ type: 'UPDATE_CURRENT_STEP', payload: 'secondStep' }],
         [],
         done,
       );
@@ -27,15 +27,78 @@ describe('Subscriptions Actions', () => {
       testAction(
         actions.activateNextStep,
         {},
-        { activeStepIndex: 0 },
-        [{ type: 'ACTIVATE_STEP', payload: 'secondStep' }],
+        { currentStepIndex: 0 },
+        [{ type: 'UPDATE_CURRENT_STEP', payload: 'secondStep' }],
         [],
         done,
       );
     });
 
     it('does not change the currentStep if the current step is the last step', done => {
-      testAction(actions.activateNextStep, {}, { activeStepIndex: 1 }, [], [], done);
+      testAction(actions.activateNextStep, {}, { currentStepIndex: 1 }, [], [], done);
+    });
+  });
+
+  describe('updateSelectedPlan', () => {
+    it('updates the selected plan', done => {
+      testAction(
+        actions.updateSelectedPlan,
+        'planId',
+        {},
+        [{ type: 'UPDATE_SELECTED_PLAN', payload: 'planId' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleIsSetupForCompany', () => {
+    it('toggles the isSetupForCompany value', done => {
+      testAction(
+        actions.toggleIsSetupForCompany,
+        {},
+        { isSetupForCompany: true },
+        [{ type: 'UPDATE_IS_SETUP_FOR_COMPANY', payload: false }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('updateNumberOfUsers', () => {
+    it('updates numberOfUsers to 0 when no value is provided', done => {
+      testAction(
+        actions.updateNumberOfUsers,
+        null,
+        {},
+        [{ type: 'UPDATE_NUMBER_OF_USERS', payload: 0 }],
+        [],
+        done,
+      );
+    });
+
+    it('updates numberOfUsers when a value is provided', done => {
+      testAction(
+        actions.updateNumberOfUsers,
+        2,
+        {},
+        [{ type: 'UPDATE_NUMBER_OF_USERS', payload: 2 }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('updateOrganizationName', () => {
+    it('updates organizationName to the provided value', done => {
+      testAction(
+        actions.updateOrganizationName,
+        'name',
+        {},
+        [{ type: 'UPDATE_ORGANIZATION_NAME', payload: 'name' }],
+        [],
+        done,
+      );
     });
   });
 });

@@ -5,6 +5,14 @@ constants.STEPS = ['firstStep', 'secondStep'];
 
 const state = {
   currentStep: 'secondStep',
+  isSetupForCompany: true,
+  availablePlans: [
+    {
+      value: 'firstPlan',
+      text: 'first plan',
+    },
+  ],
+  selectedPlan: 'firstPlan',
 };
 
 describe('Subscriptions Getters', () => {
@@ -24,16 +32,33 @@ describe('Subscriptions Getters', () => {
     });
   });
 
-  describe('activeStepIndex', () => {
+  describe('currentStepIndex', () => {
     it('returns a function', () => {
-      expect(getters.activeStepIndex(state, getters)).toBeInstanceOf(Function);
+      expect(getters.currentStepIndex(state, getters)).toBeInstanceOf(Function);
     });
 
     it('calls the stepIndex function with the current step name', () => {
       const stepIndexSpy = jest.spyOn(getters, 'stepIndex');
-      getters.activeStepIndex(state, getters);
+      getters.currentStepIndex(state, getters);
 
       expect(stepIndexSpy).toHaveBeenCalledWith('secondStep');
+    });
+  });
+
+  describe('selectedPlanText', () => {
+    it('returns the text for selectedPlan', () => {
+      expect(
+        getters.selectedPlanText(state, { selectedPlanDetails: { text: 'selected plan' } }),
+      ).toEqual('selected plan');
+    });
+  });
+
+  describe('selectedPlanDetails', () => {
+    it('returns the details for the selected plan', () => {
+      expect(getters.selectedPlanDetails(state)).toEqual({
+        value: 'firstPlan',
+        text: 'first plan',
+      });
     });
   });
 });

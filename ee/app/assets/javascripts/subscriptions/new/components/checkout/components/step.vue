@@ -37,10 +37,10 @@ export default {
     isFinished() {
       return this.isValid && !this.isActive;
     },
-    editable() {
-      return this.isFinished && this.stepIndex(this.step) < this.activeStepIndex;
+    isEditable() {
+      return this.isFinished && this.stepIndex(this.step) < this.currentStepIndex;
     },
-    ...mapGetters(['currentStep', 'stepIndex', 'activeStepIndex']),
+    ...mapGetters(['currentStep', 'stepIndex', 'currentStepIndex']),
   },
   methods: {
     ...mapActions(['activateStep', 'activateNextStep']),
@@ -67,7 +67,7 @@ export default {
           </gl-button>
         </gl-form-group>
       </div>
-      <step-summary v-if="isFinished" :editable="editable" :edit="edit">
+      <step-summary v-if="isFinished" :is-editable="isEditable" :edit="edit">
         <slot name="summary"></slot>
       </step-summary>
     </div>

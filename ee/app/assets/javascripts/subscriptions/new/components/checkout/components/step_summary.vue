@@ -7,7 +7,7 @@ export default {
     GlButton,
   },
   props: {
-    editable: {
+    isEditable: {
       type: Boolean,
       required: true,
     },
@@ -26,7 +26,7 @@ export default {
     <div>
       <slot></slot>
     </div>
-    <div v-if="editable" class="d-flex flex-column justify-content-center">
+    <div v-if="isEditable" class="d-flex flex-column justify-content-center">
       <gl-button @click="edit">{{ $options.i18n.edit }}</gl-button>
     </div>
   </div>

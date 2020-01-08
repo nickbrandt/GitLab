@@ -24,7 +24,7 @@
 
     @media(min-width: map-get($grid-breakpoints, lg)) {
       justify-content: inherit !important;
-      margin-top: 36px;
+      margin-top: $gl-padding-32;
       max-width: none;
     }
 
