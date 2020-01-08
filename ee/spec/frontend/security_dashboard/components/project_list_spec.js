@@ -1,10 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import { GlBadge, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
-
-const localVue = createLocalVue();
 
 const getArrayWithLength = n => [...Array(n).keys()];
 const generateMockProjects = (projectsCount, mockProject = {}) =>
@@ -16,7 +14,6 @@ describe('Project List component', () => {
   const factory = ({ projects = [], stubs = {}, showLoadingIndicator = false } = {}) => {
     wrapper = shallowMount(ProjectList, {
       stubs,
-      localVue,
       propsData: {
         projects,
         showLoadingIndicator,
