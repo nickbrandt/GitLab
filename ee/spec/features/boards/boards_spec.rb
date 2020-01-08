@@ -216,6 +216,64 @@ describe 'issue boards', :js do
           expect(page.find('.js-board-settings-sidebar').find('.gl-label-text')).to have_text("Brount")
         end
       end
+
+      context 'when boards setting sidebar is open' do
+        before do
+          page.within(find(".board:nth-child(2)")) do
+            click_button('List Settings')
+          end
+        end
+
+        context "when user off clicks" do
+          it 'updates the max issue count wip limit' do
+            max_issue_count = 2
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            find('body').click
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text(max_issue_count)
+          end
+
+          context "When user sets max issue count to 0" do
+            it 'updates the max issue count wip limit to None' do
+              max_issue_count = 0
+              page.within(find('.js-board-settings-sidebar')) do
+                click_button("Edit")
+
+                find('input').set(max_issue_count)
+              end
+
+              # Off click
+              find('body').click
+
+              wait_for_requests
+
+              expect(page.find('.js-wip-limit')).to have_text("None")
+            end
+          end
+        end
+
+        context "when user hits enter" do
+          it 'updates the max issue count wip limit' do
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(1).native.send_keys(:return)
+            end
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text(1)
+          end
+        end
+      end
     end
 
     context 'When FF is turned off' do
