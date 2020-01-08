@@ -13,7 +13,13 @@ module QA
 
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
         expected_events.each do |expected_event|
-          expect(page).to have_text(expected_event)
+          # Sometimes the audit logs are not displayed in the UI
+          # right away so a refresh may be needed.
+          # https://gitlab.com/gitlab-org/gitlab/issues/119203
+          # TODO: https://gitlab.com/gitlab-org/gitlab/issues/195424
+          Support::Retrier.retry_on_exception(reload_page: page) do
+            expect(page).to have_text(expected_event)
+          end
         end
       end
     end
