@@ -7,15 +7,16 @@ module Gitlab
       attr_reader :shared
       attr_reader :project
 
-      def initialize(user:, shared:, project:)
+      def initialize(user:, shared:, project:, project_tree_processor: nil)
         @path = File.join(shared.export_path, 'project.json')
         @user = user
         @shared = shared
         @project = project
+        @project_tree_processor = project_tree_processor || ProjectTreeProcessor.new_for_file(@path)
       end
 
       def restore
-        @tree_hash = read_tree_hash
+        @tree_hash = @project_tree_processor.process(read_tree_hash)
         @project_members = @tree_hash.delete('project_members')
 
         RelationRenameService.rename(@tree_hash)
