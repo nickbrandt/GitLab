@@ -17,7 +17,7 @@ describe('DependenciesActions component', () => {
     store = createStore();
     jest.spyOn(store, 'dispatch').mockImplementation();
 
-    wrapper = shallowMount(localVue.extend(DependenciesActions), {
+    wrapper = shallowMount(DependenciesActions, {
       ...options,
       localVue,
       store,

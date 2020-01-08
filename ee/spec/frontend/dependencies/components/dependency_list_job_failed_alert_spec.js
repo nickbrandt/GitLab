@@ -13,7 +13,7 @@ describe('DependencyListJobFailedAlert component', () => {
   const factory = (options = {}) => {
     const localVue = createLocalVue();
 
-    wrapper = shallowMount(localVue.extend(DependencyListJobFailedAlert), {
+    wrapper = shallowMount(DependencyListJobFailedAlert, {
       localVue,
       sync: false,
       ...options,

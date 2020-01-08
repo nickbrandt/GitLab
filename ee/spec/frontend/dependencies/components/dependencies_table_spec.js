@@ -9,7 +9,7 @@ describe('DependenciesTable component', () => {
   const factory = ({ propsData, ...options } = {}) => {
     const localVue = createLocalVue();
 
-    wrapper = shallowMount(localVue.extend(DependenciesTable), {
+    wrapper = shallowMount(DependenciesTable, {
       ...options,
       localVue,
       sync: false,

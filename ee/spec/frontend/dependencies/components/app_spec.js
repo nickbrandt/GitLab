@@ -1,5 +1,5 @@
 import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlLink } from '@gitlab/ui';
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
 import { addListType } from 'ee/dependencies/store/utils';
@@ -25,8 +25,6 @@ describe('DependenciesApp component', () => {
   };
 
   const factory = (props = basicAppProps) => {
-    const localVue = createLocalVue();
-
     store = createStore();
     addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
     jest.spyOn(store, 'dispatch').mockImplementation();
@@ -35,7 +33,6 @@ describe('DependenciesApp component', () => {
     const stubs = Object.keys(DependenciesApp.components).filter(canBeStubbed);
 
     wrapper = mount(DependenciesApp, {
-      localVue,
       store,
       sync: false,
       attachToDocument: true,
