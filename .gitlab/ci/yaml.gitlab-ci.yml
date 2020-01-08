@@ -13,5 +13,5 @@ lint-ci-gitlab:
   variables:
     LINT_PATHS: .gitlab-ci.yml .gitlab/ci lib/gitlab/ci/templates changelogs
   script:
-    - '[[ -d "ee/" ]] && export LINT_PATHS="$LINT_PATHS ee/changelogs"'
+    - '[[ ! -d "ee/" ]] || export LINT_PATHS="$LINT_PATHS ee/changelogs"'
     - yamllint $LINT_PATHS
