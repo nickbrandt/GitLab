@@ -48,14 +48,20 @@ export default {
 <template>
   <div class="row-fluid clearfix py-3 primary-section">
     <div class="col-md-8">
-      <div>
-        <div class="text-secondary-700 node-detail-title">{{ s__('GeoNodes|GitLab version') }}</div>
-        <div
+      <div class="d-flex flex-column">
+        <span class="text-secondary-700 js-node-url-title">{{ s__('GeoNodes|Node URL') }}</span>
+        <span class="mt-1 font-weight-bold js-node-url-value">{{ node.url }}</span>
+      </div>
+      <div class="d-flex flex-column mt-2">
+        <span class="text-secondary-700 js-node-version-title">{{
+          s__('GeoNodes|GitLab version')
+        }}</span>
+        <span
           :class="{ 'text-danger-500': versionMismatch }"
-          class="mt-1 font-weight-bold node-detail-value"
+          class="mt-1 font-weight-bold js-node-version-value"
         >
           {{ nodeVersion }}
-        </div>
+        </span>
       </div>
       <geo-node-health-status :status="nodeHealthStatus" />
     </div>
