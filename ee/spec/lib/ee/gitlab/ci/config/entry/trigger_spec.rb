@@ -13,7 +13,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
     end
 
     describe '#value' do
-      it 'returns a trigger configuration hash' do
+      it 'is returns a trigger configuration hash' do
         expect(subject.value).to eq(project: 'some/project')
       end
     end
@@ -27,7 +27,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
     end
 
     describe '#errors' do
-      it 'returns an error about an empty config' do
+      it 'is returns an error about an empty config' do
         expect(subject.errors.first)
           .to match /config can't be blank/
       end
@@ -43,7 +43,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
       end
 
       describe '#value' do
-        it 'returns a trigger configuration hash' do
+        it 'is returns a trigger configuration hash' do
           expect(subject.value)
             .to eq(project: 'some/project', branch: 'feature')
         end
@@ -59,7 +59,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
         end
 
         describe '#value' do
-          it 'returns a trigger configuration hash' do
+          it 'is returns a trigger configuration hash' do
             expect(subject.value)
               .to eq(project: 'some/project', strategy: 'depend')
           end
@@ -74,7 +74,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
         end
 
         describe '#errors' do
-          it 'returns an error about unknown config key' do
+          it 'is returns an error about unknown config key' do
             expect(subject.errors.first)
               .to match /trigger strategy should be depend/
           end
@@ -98,7 +98,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
 
         it { is_expected.not_to be_valid }
 
-        it 'returns an error' do
+        it 'is returns an error' do
           expect(subject.errors.first)
             .to match /config contains unknown keys: project/
         end
@@ -109,7 +109,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
 
         it { is_expected.not_to be_valid }
 
-        it 'returns an error' do
+        it 'is returns an error' do
           expect(subject.errors.first)
             .to match /config contains unknown keys: branch/
         end
@@ -137,7 +137,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
       end
 
       describe '#errors' do
-        it 'returns an error about unknown config key' do
+        it 'is returns an error about unknown config key' do
           expect(subject.errors.first)
             .to match /config contains unknown keys: unknown/
         end

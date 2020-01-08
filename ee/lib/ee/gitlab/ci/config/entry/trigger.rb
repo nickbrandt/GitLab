@@ -51,7 +51,6 @@ module EE
                 include ::Gitlab::Config::Entry::Attributable
                 include ::Gitlab::Config::Entry::Configurable
 
-                INCLUDE_MAX_SIZE = 3
                 ALLOWED_KEYS = %i[strategy include].freeze
                 attributes :strategy
 
@@ -63,8 +62,7 @@ module EE
 
                 entry :include, ::Gitlab::Ci::Config::Entry::Includes,
                   description: 'List of external YAML files to include.',
-                  reserved: true,
-                  metadata: { max_size: INCLUDE_MAX_SIZE }
+                  reserved: true
 
                 def value
                   @config
