@@ -1,10 +1,8 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlSingleStat } from '@gitlab/ui/dist/charts';
 import createStore from 'ee/threat_monitoring/store';
 import WafStatisticsSummary from 'ee/threat_monitoring/components/waf_statistics_summary.vue';
 import { mockWafStatisticsResponse } from '../mock_data';
-
-const localVue = createLocalVue();
 
 describe('WafStatisticsSummary component', () => {
   let store;
@@ -15,7 +13,6 @@ describe('WafStatisticsSummary component', () => {
     Object.assign(store.state.threatMonitoring, state);
 
     wrapper = shallowMount(WafStatisticsSummary, {
-      localVue,
       store,
       sync: false,
     });
