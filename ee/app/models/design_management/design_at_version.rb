@@ -34,6 +34,14 @@ module DesignManagement
       "#{design.id}.#{version.id}"
     end
 
+    def ==(other)
+      return false unless other && self.class == other.class
+
+      other.id == id
+    end
+
+    alias_method :eql?, :==
+
     def self.lazy_find(id)
       BatchLoader.for(id).batch do |ids, callback|
         find(ids).each do |record|

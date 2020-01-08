@@ -18,6 +18,59 @@ describe DesignManagement::DesignAtVersion do
     end
   end
 
+  describe '#==' do
+    it 'identifies objects created with the same parameters as equal' do
+      design = build_stubbed(:design, issue: issue)
+      version = build_stubbed(:design_version, designs: [design], issue: issue)
+
+      this = build_stubbed(:design_at_version, design: design, version: version)
+      other = build_stubbed(:design_at_version, design: design, version: version)
+
+      expect(this).to eq(other)
+      expect(other).to eq(this)
+    end
+
+    it 'identifies unequal objects as unequal, by virtue of their version' do
+      design = build_stubbed(:design, issue: issue)
+      version_a = build_stubbed(:design_version, designs: [design])
+      version_b = build_stubbed(:design_version, designs: [design])
+
+      this = build_stubbed(:design_at_version, design: design, version: version_a)
+      other = build_stubbed(:design_at_version, design: design, version: version_b)
+
+      expect(this).not_to eq(nil)
+      expect(this).not_to eq(design)
+      expect(this).not_to eq(other)
+      expect(other).not_to eq(this)
+    end
+
+    it 'identifies unequal objects as unequal, by virtue of their design' do
+      design_a = build_stubbed(:design, issue: issue)
+      design_b = build_stubbed(:design, issue: issue)
+      version = build_stubbed(:design_version, designs: [design_a, design_b])
+
+      this = build_stubbed(:design_at_version, design: design_a, version: version)
+      other = build_stubbed(:design_at_version, design: design_b, version: version)
+
+      expect(this).not_to eq(other)
+      expect(other).not_to eq(this)
+    end
+
+    it 'rejects objects with the same id and the wrong class' do
+      dav = build_stubbed(:design_at_version)
+
+      expect(dav).not_to eq(OpenStruct.new(id: dav.id))
+    end
+
+    it 'expects objects to be of the same type, not subtypes' do
+      subtype = Class.new(described_class)
+      dav = build_stubbed(:design_at_version)
+      other = subtype.new(design: dav.design, version: dav.version)
+
+      expect(dav).not_to eq(other)
+    end
+  end
+
   describe 'status methods' do
     let!(:design_a) { create(:design, issue: issue) }
     let!(:design_b) { create(:design, issue: issue) }
