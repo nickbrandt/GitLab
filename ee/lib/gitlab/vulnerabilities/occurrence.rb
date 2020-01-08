@@ -48,18 +48,30 @@ module Gitlab
             .fetch
         end
 
-        order occurrences
+        paginate occurrences
+      end
+
+      def paginate(occurrences)
+        page = params[:page].nil? ? 1 : params[:page].to_i
+        per_page = ::Vulnerabilities::Occurrence.page(1).limit_value
+        first_index = (page - 1) * per_page
+        last_index = (page * per_page) - 1
+
+        order(occurrences)[first_index..last_index]
       end
 
       def order(vulnerabilities)
-        ordered = vulnerabilities.sort { |x| x['id'] }.reverse.sort_by do |x|
+        ordered = vulnerabilities.sort do |a, b|
           [
-            ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[x['severity']],
-            ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[x['confidence']]
+            ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[b['severity']],
+            ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[b['confidence']],
+            a['id']
+          ] <=> [
+            ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[a['severity']],
+            ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[a['confidence']],
+            b['id']
           ]
         end
-
-        ordered.reverse
       end
 
       def use_vulnerability_cache?
@@ -67,7 +79,7 @@ module Gitlab
       end
 
       def dynamic_filters_included?
-        dynamic_filters = [:report_type, :confidence, :severity, :project_id, :page]
+        dynamic_filters = [:report_type, :confidence, :severity, :project_id]
 
         params.keys.any? { |k| dynamic_filters.include? k.to_sym }
       end

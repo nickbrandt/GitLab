@@ -7,10 +7,31 @@ describe Gitlab::Vulnerabilities::Occurrence do
   let(:project1) { create(:project, :public, namespace: group) }
   let(:project2) { create(:project, :public, namespace: group) }
   let(:critical_vulnerabilities) do
-    create_vulnerabilities(2, project2, { severity: :critical, report_type: :sast })
-      .sort_by { |x| x.confidence_value }
+    pipeline = create(:ci_pipeline, :success, project: project2)
+    (
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :undefined}) +
+      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :unknown}) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :low}) +
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :high}) +
+      create_vulnerabilities(2, project2, pipeline, { severity: :critical, confidence: :confirmed}) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :medium}) +
+      create_vulnerabilities(1, project2, pipeline, { severity: :critical, confidence: :experimental}) +
+      create_vulnerabilities(3, project2, pipeline, { severity: :critical, confidence: :ignore})
+    ).sort { |x, y| [y.confidence_value, x.id] <=> [x.confidence_value, y.id] }
   end
-  let(:med_vulnerabilities) { create_vulnerabilities(1, project1, { severity: :medium, report_type: :sast }) }
+  let(:med_vulnerabilities) do
+    pipeline = create(:ci_pipeline, :success, project: project1)
+    (
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :undefined}) +
+      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :unknown}) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :low}) +
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :high}) +
+      create_vulnerabilities(2, project1, pipeline, { severity: :medium, confidence: :confirmed}) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :medium}) +
+      create_vulnerabilities(1, project1, pipeline, { severity: :medium, confidence: :experimental}) +
+      create_vulnerabilities(3, project1, pipeline, { severity: :medium, confidence: :ignore})
+    ).sort { |x, y| [y.confidence_value, x.id] <=> [x.confidence_value, y.id] }
+  end
   let(:params) { ActionController::Parameters.new }
   let(:user) { create(:user) }
   let(:request) { ActionController::TestRequest.new({ remote_ip: '127.0.0.1' }, ActionController::TestSession.new, nil) }
@@ -43,7 +64,7 @@ describe Gitlab::Vulnerabilities::Occurrence do
 
       it 'returns the vulnerability occurrences in the correct order' do
         expect(findings.first['id']).to eq critical_vulnerabilities.first.id
-        expect(findings.last['id']).to eq med_vulnerabilities.first.id
+        expect(findings.last['id']).to eq med_vulnerabilities[3].id
       end
     end
 
@@ -53,7 +74,7 @@ describe Gitlab::Vulnerabilities::Occurrence do
       end
 
       context 'dynamic filters are passed' do
-        let(:params) { ActionController::Parameters.new(report_type: :sast) }
+        let(:params) { ActionController::Parameters.new(report_type: :sast, page: 2) }
 
         it 'does not call Gitlab::Vulnerabilities::OccurrenceCache' do
           expect(Gitlab::Vulnerabilities::OccurrenceCache).not_to receive(:new)
@@ -62,7 +83,23 @@ describe Gitlab::Vulnerabilities::Occurrence do
         end
       end
 
+      context 'page param is provided with value 2' do
+        let (:params) { ActionController::Parameters.new(page: 2) }
+
+        it 'calls Gitlab::Vulnerabilities::OccurrenceCache' do
+          expect(Gitlab::Vulnerabilities::OccurrenceCache).to receive(:new).twice.and_call_original
+
+          findings
+        end
+
+        it 'provides the 2nd page of the results' do
+          expect(findings.first['id']).to eq med_vulnerabilities[4].id
+          expect(findings.last['id']).to eq med_vulnerabilities.last.id
+        end
+      end
+
       it 'calls Gitlab::Vulnerabilities::OccurrenceCache' do
+
         expect(Gitlab::Vulnerabilities::OccurrenceCache).to receive(:new).twice.and_call_original
 
         findings
@@ -75,14 +112,12 @@ describe Gitlab::Vulnerabilities::Occurrence do
 
       it 'returns the vulnerability occurrences in the correct order' do
         expect(findings.first['id']).to eq critical_vulnerabilities.first.id
-        expect(findings.last['id']).to eq med_vulnerabilities.first.id
+        expect(findings.last['id']).to eq med_vulnerabilities[3].id
       end
     end
   end
 
-  def create_vulnerabilities(count, project, options = {})
-    pipeline = create(:ci_pipeline, :success, project: project)
-
+  def create_vulnerabilities(count, project, pipeline, options = {})
     create_list(
       :vulnerabilities_occurrence,
       count,
@@ -90,7 +125,8 @@ describe Gitlab::Vulnerabilities::Occurrence do
       severity:    options[:severity] || :high,
       pipelines:   [pipeline],
       project:     project,
-      created_at:  options[:created_at] || Date.today
+      created_at:  options[:created_at] || Date.today,
+      confidence: options[:confidence] || :medium
     )
   end
 end
