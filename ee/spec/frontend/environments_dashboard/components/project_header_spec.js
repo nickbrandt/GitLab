@@ -1,12 +1,9 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import component from 'ee/environments_dashboard/components/dashboard/project_header.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
-const localVue = createLocalVue();
-
 describe('Project Header', () => {
-  const Component = localVue.extend(component);
   let wrapper;
   let propsData;
 
@@ -24,11 +21,10 @@ describe('Project Header', () => {
   });
 
   beforeEach(() => {
-    wrapper = shallowMount(Component, {
+    wrapper = shallowMount(component, {
       sync: false,
       attachToDocument: true,
       propsData,
-      localVue,
     });
   });
 

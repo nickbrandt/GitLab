@@ -1,13 +1,10 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLink, GlBadge } from '@gitlab/ui';
 import component from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ReviewAppLink from '~/vue_merge_request_widget/components/review_app_link.vue';
 
-const localVue = createLocalVue();
-
 describe('Environment Header', () => {
-  const Component = localVue.extend(component);
   let wrapper;
   let propsData;
 
@@ -27,11 +24,10 @@ describe('Environment Header', () => {
 
   describe('renders name and link to app', () => {
     beforeEach(() => {
-      wrapper = shallowMount(Component, {
+      wrapper = shallowMount(component, {
         sync: false,
         attachToDocument: true,
         propsData,
-        localVue,
       });
     });
 
@@ -64,11 +60,10 @@ describe('Environment Header', () => {
       propsData.environment.within_folder = true;
       propsData.environment.name = 'review/testing';
 
-      wrapper = shallowMount(Component, {
+      wrapper = shallowMount(component, {
         sync: false,
         attachToDocument: true,
         propsData,
-        localVue,
       });
     });
 
@@ -91,11 +86,10 @@ describe('Environment Header', () => {
     beforeEach(() => {
       propsData.hasErrors = true;
 
-      wrapper = shallowMount(Component, {
+      wrapper = shallowMount(component, {
         sync: false,
         attachToDocument: true,
         propsData,
-        localVue,
       });
     });
 
@@ -108,11 +102,10 @@ describe('Environment Header', () => {
     beforeEach(() => {
       propsData.hasPipelineFailed = true;
 
-      wrapper = shallowMount(Component, {
+      wrapper = shallowMount(component, {
         sync: false,
         attachToDocument: true,
         propsData,
-        localVue,
       });
     });
 
