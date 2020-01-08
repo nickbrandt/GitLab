@@ -64,7 +64,7 @@ module Gitlab
         deleted_rows = prune_orphaned_rows(table_name)
         table_name   = next_table(table_name) if deleted_rows.zero?
 
-        BackgroundMigrationWorker.perform_in(RESCHEDULE_DELAY, self.class.name, table_name) if table_name
+        BackgroundMigrationWorker.perform_in(RESCHEDULE_DELAY, self.class.name.demodulize, table_name) if table_name
       end
 
       def prune_orphaned_rows(table)

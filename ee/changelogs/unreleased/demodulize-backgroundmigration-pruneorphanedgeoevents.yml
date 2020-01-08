@@ -1,0 +1,5 @@
+---
+title: Fix PruneOrphanedGeoEvents to pass in demodulized name to BackgroundMigrationWorker
+merge_request: 22451
+author:
+type: fixed
