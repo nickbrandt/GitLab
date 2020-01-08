@@ -34,7 +34,7 @@ describe('ProductivityApp component', () => {
   const mainChartData = { 1: 2, 2: 3 };
 
   const createComponent = (scatterplotEnabled = true) => {
-    wrapper = shallowMount(localVue.extend(ProductivityApp), {
+    wrapper = shallowMount(ProductivityApp, {
       localVue,
       store,
       sync: false,

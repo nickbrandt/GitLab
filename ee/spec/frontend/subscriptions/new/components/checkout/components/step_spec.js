@@ -20,7 +20,7 @@ describe('Step', () => {
   };
 
   const factory = propsData => {
-    wrapper = shallowMount(localVue.extend(component), {
+    wrapper = shallowMount(component, {
       store,
       propsData: { ...initialData, ...propsData },
       localVue,

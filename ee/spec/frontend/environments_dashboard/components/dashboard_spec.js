@@ -14,7 +14,6 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('dashboard', () => {
-  const Component = localVue.extend(component);
   let actionSpies;
   const store = createStore();
   let wrapper;
@@ -38,7 +37,7 @@ describe('dashboard', () => {
       emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
     };
 
-    wrapper = shallowMount(Component, {
+    wrapper = shallowMount(component, {
       propsData,
       localVue,
       store,

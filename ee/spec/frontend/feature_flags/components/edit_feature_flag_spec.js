@@ -22,7 +22,7 @@ describe('Edit feature flag form', () => {
   });
 
   const factory = () => {
-    wrapper = shallowMount(localVue.extend(EditFeatureFlag), {
+    wrapper = shallowMount(EditFeatureFlag, {
       localVue,
       propsData: {
         endpoint: `${TEST_HOST}/feature_flags.json'`,
