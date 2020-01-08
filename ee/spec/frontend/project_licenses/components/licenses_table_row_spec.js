@@ -1,17 +1,15 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLink, GlSkeletonLoading } from '@gitlab/ui';
 import LicenseComponentLinks from 'ee/project_licenses/components/license_component_links.vue';
 import LicensesTableRow from 'ee/project_licenses/components/licenses_table_row.vue';
 import { makeLicense } from './utils';
 
 describe('LicensesTableRow component', () => {
-  const localVue = createLocalVue();
   let wrapper;
   let license;
 
   const factory = (propsData = {}) => {
-    wrapper = shallowMount(localVue.extend(LicensesTableRow), {
-      localVue,
+    wrapper = shallowMount(LicensesTableRow, {
       sync: false,
       propsData,
     });

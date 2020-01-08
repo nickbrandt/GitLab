@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlModal, GlLink, GlIntersperse } from '@gitlab/ui';
 
 import LicenseComponentLinks, {
@@ -6,9 +6,6 @@ import LicenseComponentLinks, {
 } from 'ee/project_licenses/components/license_component_links.vue';
 
 describe('LicenseComponentLinks component', () => {
-  // local Vue
-  const localVue = createLocalVue();
-
   // data helpers
   const createComponents = n => [...Array(n).keys()].map(i => ({ name: `component ${i + 1}` }));
   const addUrls = (components, numComponentsWithUrls = Infinity) =>
@@ -22,8 +19,7 @@ describe('LicenseComponentLinks component', () => {
   const factory = ({ numComponents, numComponentsWithUrl = 0, title = 'test-component' } = {}) => {
     const components = addUrls(createComponents(numComponents), numComponentsWithUrl);
 
-    wrapper = shallowMount(localVue.extend(LicenseComponentLinks), {
-      localVue,
+    wrapper = shallowMount(LicenseComponentLinks, {
       propsData: {
         components,
         title,

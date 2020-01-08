@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import createStore from 'ee/project_licenses/store';
 import LicensesTable from 'ee/project_licenses/components/licenses_table.vue';
 import { toLicenseObject } from 'ee/project_licenses/utils/mappers';
@@ -12,7 +12,6 @@ jest.mock('underscore', () => ({
 }));
 
 describe('PaginatedLicensesTable component', () => {
-  const localVue = createLocalVue();
   const namespace = LICENSE_LIST;
 
   let store;
@@ -21,8 +20,7 @@ describe('PaginatedLicensesTable component', () => {
   const factory = () => {
     store = createStore();
 
-    wrapper = shallowMount(localVue.extend(PaginatedLicensesTable), {
-      localVue,
+    wrapper = shallowMount(PaginatedLicensesTable, {
       store,
       sync: false,
     });
