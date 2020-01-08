@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MergeRequestTable from 'ee/analytics/productivity_analytics/components/mr_table.vue';
 import MergeRequestTableRow from 'ee/analytics/productivity_analytics/components/mr_table_row.vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
@@ -20,10 +20,7 @@ describe('MergeRequestTable component', () => {
   };
 
   const factory = (props = defaultProps) => {
-    const localVue = createLocalVue();
-
-    wrapper = shallowMount(localVue.extend(MergeRequestTable), {
-      localVue,
+    wrapper = shallowMount(MergeRequestTable, {
       sync: false,
       propsData: { ...props },
     });

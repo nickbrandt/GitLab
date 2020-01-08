@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MetricColumn from 'ee/analytics/productivity_analytics/components/metric_column.vue';
 
 describe('MetricColumn component', () => {
@@ -11,10 +11,7 @@ describe('MetricColumn component', () => {
   };
 
   const factory = (props = defaultProps) => {
-    const localVue = createLocalVue();
-
-    wrapper = shallowMount(localVue.extend(MetricColumn), {
-      localVue,
+    wrapper = shallowMount(MetricColumn, {
       sync: false,
       propsData: { ...props },
     });
