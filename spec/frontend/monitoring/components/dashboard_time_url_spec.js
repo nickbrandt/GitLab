@@ -1,10 +1,8 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import createFlash from '~/flash';
 import Dashboard from '~/monitoring/components/dashboard.vue';
 import { createStore } from '~/monitoring/stores';
 import { propsData } from '../init_utils';
-
-const localVue = createLocalVue();
 
 jest.mock('~/flash');
 
@@ -17,8 +15,7 @@ describe('dashboard invalid url parameters', () => {
   let wrapper;
 
   const createMountedWrapper = (props = {}, options = {}) => {
-    wrapper = mount(localVue.extend(Dashboard), {
-      localVue,
+    wrapper = mount(Dashboard, {
       sync: false,
       propsData: { ...propsData, ...props },
       store,

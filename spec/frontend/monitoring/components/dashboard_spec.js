@@ -24,13 +24,12 @@ const localVue = createLocalVue();
 const expectedPanelCount = 2;
 
 describe('Dashboard', () => {
-  let DashboardComponent;
   let store;
   let wrapper;
   let mock;
 
   const createShallowWrapper = (props = {}, options = {}) => {
-    wrapper = shallowMount(localVue.extend(DashboardComponent), {
+    wrapper = shallowMount(Dashboard, {
       localVue,
       sync: false,
       propsData: { ...propsData, ...props },
@@ -40,7 +39,7 @@ describe('Dashboard', () => {
   };
 
   const createMountedWrapper = (props = {}, options = {}) => {
-    wrapper = mount(localVue.extend(DashboardComponent), {
+    wrapper = mount(Dashboard, {
       localVue,
       sync: false,
       propsData: { ...propsData, ...props },
@@ -51,7 +50,6 @@ describe('Dashboard', () => {
 
   beforeEach(() => {
     store = createStore();
-    DashboardComponent = localVue.extend(Dashboard);
     mock = new MockAdapter(axios);
   });
 
