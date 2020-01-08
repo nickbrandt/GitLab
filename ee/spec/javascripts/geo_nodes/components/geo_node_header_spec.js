@@ -92,4 +92,10 @@ describe('GeoNodeHeader', () => {
       });
     });
   });
+
+  describe('template', () => {
+    it('renders node name element', () => {
+      expect(vm.$el.innerText).toContain(vm.node.name);
+    });
+  });
 });

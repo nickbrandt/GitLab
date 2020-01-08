@@ -4,6 +4,8 @@ import NodeDetailsSectionMainComponent from 'ee/geo_nodes/components/node_detail
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNode, mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
 
+const MOCK_VERSION_TEXT = `${mockNodeDetails.version} (${mockNodeDetails.revision})`;
+
 const createComponent = ({
   node = Object.assign({}, mockNode),
   nodeDetails = Object.assign({}, mockNodeDetails),
@@ -47,7 +49,7 @@ describe('NodeDetailsSectionMain', () => {
       });
 
       it('returns version string', () => {
-        expect(vm.nodeVersion).toBe('10.4.0-pre (b93c51849b)');
+        expect(vm.nodeVersion).toBe(MOCK_VERSION_TEXT);
       });
     });
 
@@ -74,10 +76,18 @@ describe('NodeDetailsSectionMain', () => {
       expect(vm.$el.classList.contains('primary-section')).toBe(true);
     });
 
+    it('renders node url element', () => {
+      expect(vm.$el.querySelector('.js-node-url-title').innerText.trim()).toBe('Node URL');
+      expect(vm.$el.querySelector('.js-node-url-value').innerText.trim()).toBe(vm.node.url);
+    });
+
     it('renders node version element', () => {
-      expect(vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe('GitLab version');
-      expect(vm.$el.querySelector('.node-detail-value').innerText.trim()).toBe(
-        '10.4.0-pre (b93c51849b)',
+      expect(vm.$el.querySelector('.js-node-version-title').innerText.trim()).toBe(
+        'GitLab version',
+      );
+
+      expect(vm.$el.querySelector('.js-node-version-value').innerText.trim()).toBe(
+        MOCK_VERSION_TEXT,
       );
     });
   });

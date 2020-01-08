@@ -8,6 +8,7 @@ export const NODE_DETAILS_PATH = '/admin/geo/nodes';
 export const mockNodes = [
   {
     id: 1,
+    name: 'Test Node 1',
     url: 'http://127.0.0.1:3001/',
     primary: true,
     enabled: true,
@@ -26,6 +27,7 @@ export const mockNodes = [
   },
   {
     id: 2,
+    name: 'Test Node 2',
     url: 'http://127.0.0.1:3002/',
     primary: false,
     enabled: true,
@@ -47,6 +49,7 @@ export const mockNodes = [
 
 export const mockNode = {
   id: 1,
+  name: 'Test Node',
   url: 'http://127.0.0.1:3001/',
   internalUrl: 'http://127.0.0.1:3001/',
   primary: true,
