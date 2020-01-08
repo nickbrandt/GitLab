@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import BoardScope from 'ee/boards/components/board_scope.vue';
 import { TEST_HOST } from 'helpers/test_constants';
 
@@ -7,8 +7,6 @@ describe('BoardScope', () => {
   let vm;
 
   beforeEach(() => {
-    const localVue = createLocalVue();
-
     const propsData = {
       collapseScope: false,
       canAdminBoard: false,
@@ -22,7 +20,6 @@ describe('BoardScope', () => {
 
     wrapper = mount(BoardScope, {
       propsData,
-      localVue,
       sync: false,
     });
 

@@ -10,7 +10,7 @@ describe('project header component', () => {
   let wrapper;
 
   const factory = () => {
-    wrapper = shallowMount(localVue.extend(ProjectHeader), {
+    wrapper = shallowMount(ProjectHeader, {
       propsData: {
         project: mockOneProject,
       },

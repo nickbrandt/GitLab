@@ -1,12 +1,10 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import DesignVersionDropdown from 'ee/design_management/components/upload/design_version_dropdown.vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import mockAllVersions from './mock_data/all_versions';
 
 const LATEST_VERSION_ID = 3;
 const PREVIOUS_VERSION_ID = 2;
-
-const localVue = createLocalVue();
 
 const designRouteFactory = versionId => ({
   path: `/designs?version=${versionId}`,
@@ -29,7 +27,6 @@ describe('Design management design version dropdown component', () => {
         projectPath: '',
         issueIid: '',
       },
-      localVue,
       mocks: {
         $route,
       },

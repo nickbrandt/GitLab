@@ -7,7 +7,6 @@ import environments from './mock_data';
 const localVue = createLocalVue();
 
 describe('Environments', () => {
-  const Component = localVue.extend(Environments);
   let wrapper;
   let propsData;
 
@@ -20,7 +19,7 @@ describe('Environments', () => {
       isFetching: false,
     };
 
-    wrapper = mount(Component, {
+    wrapper = mount(Environments, {
       propsData,
       localVue,
     });
@@ -43,7 +42,7 @@ describe('Environments', () => {
     let table;
 
     beforeAll(() => {
-      wrapper = mount(Component, {
+      wrapper = mount(Environments, {
         propsData: { ...propsData, environments },
         localVue,
         stubs: { deploymentInstance: '<div class="js-deployment-instance"></div>' },
