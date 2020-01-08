@@ -1,16 +1,13 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import TerminalControls from 'ee/ide/components/terminal/terminal_controls.vue';
 import ScrollButton from '~/ide/components/jobs/detail/scroll_button.vue';
-
-const localVue = createLocalVue();
 
 describe('EE IDE TerminalControls', () => {
   let wrapper;
   let buttons;
 
   const factory = (options = {}) => {
-    wrapper = shallowMount(localVue.extend(TerminalControls), {
-      localVue,
+    wrapper = shallowMount(TerminalControls, {
       ...options,
     });
 
