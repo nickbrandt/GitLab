@@ -22,7 +22,7 @@ describe('GeoDesignsDisabled', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(localVue.extend(GeoDesignsDisabled), {
+    wrapper = mount(GeoDesignsDisabled, {
       localVue,
       store,
       propsData,
