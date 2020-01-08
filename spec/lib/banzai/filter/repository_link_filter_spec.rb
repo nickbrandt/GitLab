@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Banzai::Filter::RelativeLinkFilter do
+describe Banzai::Filter::RepositoryLinkFilter do
   include GitHelpers
   include RepoHelpers
 

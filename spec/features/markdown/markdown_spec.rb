@@ -216,8 +216,8 @@ describe 'GitLab Markdown', :aggregate_failures do
     it_behaves_like 'all pipelines'
 
     it 'includes custom filters' do
-      aggregate_failures 'RelativeLinkFilter' do
-        expect(doc).to parse_relative_links
+      aggregate_failures 'RepositoryLinkFilter' do
+        expect(doc).to parse_repository_links
       end
 
       aggregate_failures 'EmojiFilter' do
@@ -277,8 +277,8 @@ describe 'GitLab Markdown', :aggregate_failures do
     it_behaves_like 'all pipelines'
 
     it 'includes custom filters' do
-      aggregate_failures 'RelativeLinkFilter' do
-        expect(doc).not_to parse_relative_links
+      aggregate_failures 'RepositoryLinkFilter' do
+        expect(doc).not_to parse_repository_links
       end
 
       aggregate_failures 'EmojiFilter' do

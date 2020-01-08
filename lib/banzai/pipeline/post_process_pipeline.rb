@@ -16,7 +16,7 @@ module Banzai
         [
           Filter::ReferenceRedactorFilter,
           Filter::InlineMetricsRedactorFilter,
-          Filter::RelativeLinkFilter,
+          Filter::RepositoryLinkFilter,
           Filter::IssuableStateFilter,
           Filter::SuggestionFilter
         ]

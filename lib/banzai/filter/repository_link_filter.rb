@@ -4,7 +4,7 @@ require 'uri'
 
 module Banzai
   module Filter
-    # HTML filter that "fixes" relative links to uploads or files in a repository.
+    # HTML filter that "fixes" relative links to files in a repository.
     #
     # Context options:
     #   :commit
@@ -14,7 +14,7 @@ module Banzai
     #   :project_wiki
     #   :ref
     #   :requested_path
-    class RelativeLinkFilter < HTML::Pipeline::Filter
+    class RepositoryLinkFilter < HTML::Pipeline::Filter
       include Gitlab::Utils::StrongMemoize
 
       def call

@@ -10,8 +10,8 @@ module MarkdownMatchers
   extend RSpec::Matchers::DSL
   include Capybara::Node::Matchers
 
-  # RelativeLinkFilter
-  matcher :parse_relative_links do
+  # RepositoryLinkFilter
+  matcher :parse_repository_links do
     set_default_markdown_messages
 
     match do |actual|
