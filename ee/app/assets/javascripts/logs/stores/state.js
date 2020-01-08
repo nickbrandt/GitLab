@@ -1,3 +1,5 @@
+import { defaultTimeWindow, timeWindows } from '../constants';
+
 export default () => ({
   /**
    * Current project path
@@ -13,6 +15,14 @@ export default () => ({
    * True if log source is elasticsearch
    */
   enableAdvancedQuerying: false,
+
+  /**
+   * Time range (Show last)
+   */
+  timeWindow: {
+    options: { ...timeWindows },
+    current: defaultTimeWindow,
+  },
 
   /**
    * Environments list information

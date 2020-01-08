@@ -15,6 +15,10 @@ export default {
   [types.ENABLE_ADVANCED_QUERYING](state, enableAdvancedQuerying) {
     state.enableAdvancedQuerying = enableAdvancedQuerying;
   },
+  /** Time Range data */
+  [types.SET_TIME_WINDOW](state, timeWindow) {
+    state.timeWindow.current = timeWindow;
+  },
 
   /** Environments data */
   [types.SET_PROJECT_ENVIRONMENT](state, environmentName) {

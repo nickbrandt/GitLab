@@ -238,7 +238,7 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(env.name);
       });
-      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-4');
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-3');
     });
 
     it('populates pods dropdown', () => {
@@ -250,7 +250,7 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(pod);
       });
-      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-4');
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-3');
     });
 
     it('populates logs trace', () => {
@@ -262,7 +262,7 @@ describe('EnvironmentLogs', () => {
     it('displays an enabled search bar', () => {
       expect(findSearchBar().exists()).toEqual(true);
       expect(findSearchBar().attributes('disabled')).toEqual(undefined);
-      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-4');
+      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-3');
     });
 
     it('update control buttons state', () => {

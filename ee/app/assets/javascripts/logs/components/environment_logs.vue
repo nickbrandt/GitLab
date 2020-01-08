@@ -45,7 +45,13 @@ export default {
     };
   },
   computed: {
-    ...mapState('environmentLogs', ['environments', 'logs', 'pods', 'enableAdvancedQuerying']),
+    ...mapState('environmentLogs', [
+      'environments',
+      'timeWindow',
+      'logs',
+      'pods',
+      'enableAdvancedQuerying',
+    ]),
     ...mapGetters('environmentLogs', ['trace']),
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
@@ -87,6 +93,7 @@ export default {
     ...mapActions('environmentLogs', [
       'setInitData',
       'setSearch',
+      'setTimeWindow',
       'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
@@ -119,7 +126,7 @@ export default {
           :label="s__('Environments|Environment')"
           label-size="sm"
           label-for="environments-dropdown"
-          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
+          :class="featureElasticEnabled ? 'col-3' : 'col-6'"
         >
           <gl-dropdown
             id="environments-dropdown"
@@ -142,7 +149,7 @@ export default {
           :label="s__('Environments|Pod logs from')"
           label-size="sm"
           label-for="pods-dropdown"
-          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
+          :class="featureElasticEnabled ? 'col-3' : 'col-6'"
         >
           <gl-dropdown
             id="pods-dropdown"
@@ -166,7 +173,7 @@ export default {
           :label="s__('Environments|Search')"
           label-size="sm"
           label-for="search"
-          class="col-4"
+          class="col-3"
         >
           <gl-search-box-by-click
             v-model.trim="searchQuery"
@@ -177,6 +184,29 @@ export default {
             autofocus
             @submit="setSearch(searchQuery)"
           />
+        </gl-form-group>
+        <gl-form-group
+          v-if="featureElasticEnabled"
+          id="dates-fg"
+          :label="s__('Environments|Show last')"
+          label-size="sm"
+          label-for="time-window-dropdown"
+          class="col-3"
+        >
+          <gl-dropdown
+            id="time-window-dropdown"
+            :text="timeWindow.options[timeWindow.current].label"
+            class="d-flex"
+            toggle-class="dropdown-menu-toggle"
+          >
+            <gl-dropdown-item
+              v-for="(option, key) in timeWindow.options"
+              :key="key"
+              @click="setTimeWindow(key)"
+            >
+              {{ option.label }}
+            </gl-dropdown-item>
+          </gl-dropdown>
         </gl-form-group>
       </div>
 
