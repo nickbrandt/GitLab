@@ -1,14 +1,11 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import { GlButton } from '@gitlab/ui';
 import DropdownSearchInput from 'ee/vue_shared/components/sidebar/epics_select/dropdown_search_input.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
-const createComponent = () => {
-  const localVue = createLocalVue();
-
-  return shallowMount(DropdownSearchInput, {
-    localVue,
+const createComponent = () =>
+  shallowMount(DropdownSearchInput, {
     directives: {
       /**
        * We don't want any observers
@@ -18,7 +15,6 @@ const createComponent = () => {
       autofocusonshow: {},
     },
   });
-};
 
 describe('EpicsSelect', () => {
   describe('DropdownSearchInput', () => {

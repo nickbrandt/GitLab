@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { uniqueId } from 'underscore';
 
 import { AccordionItem } from 'ee/vue_shared/components/accordion';
@@ -11,8 +11,6 @@ jest.mock('ee/vue_shared/components/accordion/accordion_event_bus', () => ({
 }));
 
 jest.mock('underscore');
-
-const localVue = createLocalVue();
 
 describe('AccordionItem component', () => {
   const mockUniqueId = 'mockUniqueId';
@@ -28,7 +26,6 @@ describe('AccordionItem component', () => {
     };
 
     wrapper = shallowMount(AccordionItem, {
-      localVue,
       sync: false,
       propsData: {
         ...defaultPropsData,

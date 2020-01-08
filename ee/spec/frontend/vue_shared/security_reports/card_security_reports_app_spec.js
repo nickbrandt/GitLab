@@ -1,4 +1,4 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
@@ -7,8 +7,6 @@ import CardSecurityDashboardApp from 'ee/vue_shared/security_reports/card_securi
 import createStore from 'ee/security_dashboard/store';
 import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
-
-const localVue = createLocalVue();
 
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesSummaryEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
@@ -22,7 +20,6 @@ describe('Card security reports app', () => {
 
   const createComponent = props => {
     wrapper = mount(CardSecurityDashboardApp, {
-      localVue,
       store: createStore(),
       sync: false,
       attachToDocument: true,
