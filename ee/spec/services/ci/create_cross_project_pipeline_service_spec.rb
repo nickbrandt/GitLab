@@ -217,27 +217,6 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
           # it does not auto-cancel pipelines from the same family
           it_behaves_like 'creates a child pipeline'
         end
-
-        context 'when upstream pipeline is a child pipeline' do
-          let!(:pipeline_source) do
-            create(:ci_sources_pipeline,
-              source_pipeline: create(:ci_pipeline, project: upstream_pipeline.project),
-              pipeline: upstream_pipeline
-            )
-          end
-
-          before do
-            upstream_pipeline.update!(source: :parent_pipeline)
-          end
-
-          it 'does not create a further child pipeline' do
-            expect { service.execute(bridge) }
-              .not_to change { Ci::Pipeline.count }
-
-            expect(bridge.reload).to be_failed
-            expect(bridge.failure_reason).to eq 'bridge_pipeline_is_child_pipeline'
-          end
-        end
       end
     end
 
