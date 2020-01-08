@@ -1188,4 +1188,41 @@ describe ProjectPolicy do
 
     it { is_expected.to be_disallowed(:read_group_timelogs) }
   end
+
+  describe ':read_code_review_analytics' do
+    let(:project) { create(:project, namespace: owner.namespace) }
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:role, :allowed) do
+      :guest | false
+      :reporter | true
+      :developer | true
+      :maintainer | true
+      :owner | true
+      :admin | true
+    end
+
+    with_them do
+      let(:current_user) { public_send(role) }
+
+      before do
+        stub_licensed_features(code_review_analytics: true)
+      end
+
+      it do
+        is_expected.to(allowed ? be_allowed(:read_code_review_analytics) : be_disallowed(:read_code_review_analytics))
+      end
+    end
+
+    context 'with code review analytics is not available in license' do
+      let(:current_user) { owner }
+
+      before do
+        stub_licensed_features(code_review_analytics: false)
+      end
+
+      it { is_expected.to be_disallowed(:read_code_review_analytics) }
+    end
+  end
 end
