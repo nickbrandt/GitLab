@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 import RelatedItemsTreeApp from 'ee/related_items_tree/components/related_items_tree_app.vue';
@@ -19,8 +19,6 @@ import {
   mockParentItem,
 } from '../../../javascripts/related_items_tree/mock_data';
 
-const localVue = createLocalVue();
-
 const mockProjects = getJSONFixture('static/projects.json');
 
 const createComponent = () => {
@@ -29,8 +27,7 @@ const createComponent = () => {
   store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setInitialParentItem', mockParentItem);
 
-  return shallowMount(localVue.extend(RelatedItemsTreeApp), {
-    localVue,
+  return shallowMount(RelatedItemsTreeApp, {
     store,
     sync: false,
   });

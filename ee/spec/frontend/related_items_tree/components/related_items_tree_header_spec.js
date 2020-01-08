@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
@@ -15,7 +15,6 @@ import {
 
 const createComponent = ({ slots } = {}) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -33,7 +32,6 @@ const createComponent = ({ slots } = {}) => {
   return shallowMount(RelatedItemsTreeHeader, {
     attachToDocument: true,
     sync: false,
-    localVue,
     store,
     slots,
   });
