@@ -25,7 +25,7 @@ describe('EE IDE TerminalSession', () => {
       },
     });
 
-    wrapper = shallowMount(localVue.extend(TerminalSession), {
+    wrapper = shallowMount(TerminalSession, {
       localVue,
       store,
       ...options,

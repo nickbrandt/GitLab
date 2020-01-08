@@ -14,7 +14,7 @@ describe('ee/ide/components/ide_status_list', () => {
   const createComponent = () => {
     store = createStore();
 
-    wrapper = mount(localVue.extend(IdeStatusList), {
+    wrapper = mount(IdeStatusList, {
       localVue,
       sync: false,
       store,
