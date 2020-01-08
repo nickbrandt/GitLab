@@ -18,6 +18,8 @@ module Namespaces
       Namespace::AggregationSchedule.safe_find_or_create_by!(namespace_id: root_ancestor.id)
     rescue ActiveRecord::RecordNotFound
       log_error(namespace_id)
+    rescue ActiveRecord::RecordNotUnique
+      # no-op
     end
 
     private

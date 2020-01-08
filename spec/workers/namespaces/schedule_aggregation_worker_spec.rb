@@ -44,6 +44,18 @@ describe Namespaces::ScheduleAggregationWorker, '#perform', :clean_gitlab_redis_
 
       expect(parent_group.aggregation_schedule).to be_present
     end
+
+    context 'when the record already exists on AggregationSchedule' do
+      it 'does not log the error' do
+        allow(Namespace::AggregationSchedule)
+          .to receive(:safe_find_or_create_by!)
+          .and_raise(ActiveRecord::RecordNotUnique)
+
+        expect(Gitlab::SidekiqLogger).not_to receive(:error)
+
+        worker.perform(group.id)
+      end
+    end
   end
 
   context 'when namespace does not exist' do
