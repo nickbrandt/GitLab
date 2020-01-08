@@ -95,8 +95,9 @@ describe Gitlab::SidekiqCluster::CLI do
       expect(Gitlab::SidekiqCluster).to receive(:signal_processes)
         .with([], :KILL)
 
-      # Check every 0.1s, for no more than 1 second total
-      cli.wait_for_termination(0.1, 1)
+      stub_const("Gitlab::SidekiqCluster::CLI::CHECK_TERMINATE_INTERVAL_SECONDS", 0.1)
+      stub_const("Gitlab::SidekiqCluster::CLI::TERMINATE_TIMEOUT_SECONDS", 1)
+      cli.wait_for_termination
     end
 
     context 'with hanging workers' do
@@ -123,8 +124,9 @@ describe Gitlab::SidekiqCluster::CLI do
 
         cli.run(%w(foo))
 
-        # Check every 0.1s, for no more than 1 second total
-        cli.wait_for_termination(0.1, 1)
+        stub_const("Gitlab::SidekiqCluster::CLI::CHECK_TERMINATE_INTERVAL_SECONDS", 0.1)
+        stub_const("Gitlab::SidekiqCluster::CLI::TERMINATE_TIMEOUT_SECONDS", 1)
+        cli.wait_for_termination
       end
     end
   end

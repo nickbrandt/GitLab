@@ -68,17 +68,21 @@ module Gitlab
         SidekiqCluster.write_pid(@pid) if @pid
       end
 
+      def monotonic_time
+        Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)
+      end
+
       def continue_waiting?(deadline)
-        SidekiqCluster.any_alive?(@processes) && Gitlab::Metrics::System.monotonic_time < deadline
+        SidekiqCluster.any_alive?(@processes) && monotonic_time < deadline
       end
 
       def hard_stop_stuck_pids
         SidekiqCluster.signal_processes(SidekiqCluster.pids_alive(@processes), :KILL)
       end
 
-      def wait_for_termination(check_interval = CHECK_TERMINATE_INTERVAL_SECONDS, terminate_timeout = TERMINATE_TIMEOUT_SECONDS)
-        deadline = Gitlab::Metrics::System.monotonic_time + terminate_timeout
-        sleep(check_interval) while continue_waiting?(deadline)
+      def wait_for_termination
+        deadline = monotonic_time + TERMINATE_TIMEOUT_SECONDS
+        sleep(CHECK_TERMINATE_INTERVAL_SECONDS) while continue_waiting?(deadline)
 
         hard_stop_stuck_pids
       end
