@@ -1,17 +1,14 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { Accordion } from 'ee/vue_shared/components/accordion';
 
 import { uniqueId } from 'underscore';
 
 jest.mock('underscore');
 
-const localVue = createLocalVue();
-
 describe('Accordion component', () => {
   let wrapper;
   const factory = ({ defaultSlot = '' } = {}) => {
     wrapper = shallowMount(Accordion, {
-      localVue,
       sync: false,
       scopedSlots: {
         default: defaultSlot,
