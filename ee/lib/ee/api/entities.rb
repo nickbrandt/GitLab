@@ -886,7 +886,7 @@ module EE
 
         expose :created_at
         expose :project_id, if: ->(_, opts) { opts[:group] }
-        expose :project_path, if: ->(_, opts) { opts[:group] }
+        expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
 
         private
 
