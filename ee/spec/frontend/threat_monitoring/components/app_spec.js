@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlAlert, GlEmptyState } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/threat_monitoring/store';
@@ -8,7 +8,6 @@ import WafLoadingSkeleton from 'ee/threat_monitoring/components/waf_loading_skel
 import WafStatisticsHistory from 'ee/threat_monitoring/components/waf_statistics_history.vue';
 import WafStatisticsSummary from 'ee/threat_monitoring/components/waf_statistics_summary.vue';
 
-const localVue = createLocalVue();
 const defaultEnvironmentId = 3;
 const documentationPath = '/docs';
 const emptyStateSvgPath = '/svgs';
@@ -29,7 +28,6 @@ describe('ThreatMonitoringApp component', () => {
     jest.spyOn(store, 'dispatch').mockImplementation();
 
     wrapper = shallowMount(ThreatMonitoringApp, {
-      localVue,
       propsData,
       store,
       sync: false,
