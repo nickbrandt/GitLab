@@ -11,6 +11,12 @@ describe EE::Ci::JobArtifact do
 
       it { is_expected.to eq([artifact]) }
     end
+
+    context 'when there is a license scanning report' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :license_scanning) }
+
+      it { is_expected.to eq([artifact]) }
+    end
   end
 
   describe '.metrics_reports' do
