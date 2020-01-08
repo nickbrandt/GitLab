@@ -19,18 +19,34 @@ module API
       def find_personal_access_token_from_http_basic_auth
         return unless headers
 
-        encoded_credentials = headers['Authorization'].to_s.split('Basic ', 2).second
-        token = Base64.decode64(encoded_credentials || '').split(':', 2).second
+        token = decode_token
 
         return unless token
 
         PersonalAccessToken.find_by_token(token)
       end
 
+      def find_job_from_http_basic_auth
+        return unless headers
+
+        token = decode_token
+
+        return unless token
+
+        ::Ci::Build.find_by_token(token)
+      end
+
       def uploaded_package_file
         uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
         bad_request!('Missing package file!') unless uploaded_file
         uploaded_file
+      end
+
+      private
+
+      def decode_token
+        encoded_credentials = headers['Authorization'].to_s.split('Basic ', 2).second
+        Base64.decode64(encoded_credentials || '').split(':', 2).second
       end
     end
   end
