@@ -1,12 +1,10 @@
 import _ from 'underscore';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/approvals_list.vue';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-
-const localVue = createLocalVue();
 
 const testSuggestedApprovers = () => _.range(1, 11).map(id => ({ id }));
 const testApprovalRules = () => [{ name: 'Lorem' }, { name: 'Ipsum' }];
@@ -15,13 +13,12 @@ describe('EE MRWidget approvals footer', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(ApprovalsFooter), {
+    wrapper = shallowMount(ApprovalsFooter, {
       propsData: {
         suggestedApprovers: testSuggestedApprovers(),
         approvalRules: testApprovalRules(),
         ...props,
       },
-      localVue,
       sync: false,
     });
   };
@@ -190,8 +187,8 @@ describe('EE MRWidget approvals footer', () => {
 
         button.vm.$emit('click');
 
-        localVue
-          .nextTick()
+        wrapper.vm
+          .$nextTick()
           .then(() => {
             expect(wrapper.emittedByOrder()).toEqual([{ name: 'input', args: [true] }]);
           })
