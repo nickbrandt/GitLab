@@ -18,7 +18,7 @@ describe('DependencyLicenseLinks component', () => {
     const licenses = addUrls(createLicenses(numLicenses), numLicensesWithUrl);
 
     const localVue = createLocalVue();
-    wrapper = shallowMount(localVue.extend(DependenciesLicenseLinks), {
+    wrapper = shallowMount(DependenciesLicenseLinks, {
       sync: false,
       attachToDocument: true,
       localVue,

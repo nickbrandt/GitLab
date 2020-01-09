@@ -16,7 +16,7 @@ describe('PaginatedDependenciesTable component', () => {
 
     store = createStore();
 
-    wrapper = shallowMount(localVue.extend(PaginatedDependenciesTable), {
+    wrapper = shallowMount(PaginatedDependenciesTable, {
       localVue,
       store,
       sync: false,

@@ -8,7 +8,7 @@ describe('DependencyListIncompleteAlert component', () => {
   const factory = (options = {}) => {
     const localVue = createLocalVue();
 
-    wrapper = shallowMount(localVue.extend(DependencyListIncompleteAlert), {
+    wrapper = shallowMount(DependencyListIncompleteAlert, {
       localVue,
       sync: false,
       ...options,
