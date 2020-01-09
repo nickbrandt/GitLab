@@ -9,6 +9,7 @@ import {
   GlTable,
 } from '@gitlab/ui';
 import _ from 'underscore';
+import Tracking from '~/tracking';
 import PackageInformation from './information.vue';
 import NpmInstallation from './npm_installation.vue';
 import MavenInstallation from './maven_installation.vue';
@@ -17,7 +18,8 @@ import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
 import { __, s__, sprintf } from '~/locale';
-import { PackageType } from '../constants';
+import { PackageType, TrackingActions } from '../../shared/constants';
+import { packageTypeToTrackCategory } from '../../shared/utils';
 
 export default {
   name: 'PackagesApp',
@@ -36,7 +38,8 @@ export default {
     GlTooltip: GlTooltipDirective,
     GlModal: GlModalDirective,
   },
-  mixins: [timeagoMixin],
+  mixins: [timeagoMixin, Tracking.mixin()],
+  trackingActions: { ...TrackingActions },
   props: {
     packageEntity: {
       type: Object,
@@ -145,6 +148,11 @@ export default {
         created: x.created_at,
       }));
     },
+    tracking() {
+      return {
+        category: packageTypeToTrackCategory(this.packageEntity.package_type),
+      };
+    },
   },
   methods: {
     formatSize(size) {
@@ -233,9 +241,13 @@ export default {
     >
       <template #name="items">
         <icon name="doc-code" class="space-right" />
-        <gl-link :href="items.item.downloadPath" class="js-file-download">{{
-          items.item.name
-        }}</gl-link>
+        <gl-link
+          :href="items.item.downloadPath"
+          class="js-file-download"
+          @click="track($options.trackingActions.PULL_PACKAGE)"
+        >
+          {{ items.item.name }}
+        </gl-link>
       </template>
 
       <template #created="items">
@@ -253,10 +265,12 @@ export default {
         <div class="float-right">
           <gl-button @click="cancelDelete()">{{ __('Cancel') }}</gl-button>
           <gl-button
+            ref="modal-delete-button"
             data-method="delete"
             :to="destroyPath"
             variant="danger"
             data-qa-selector="delete_modal_button"
+            @click="track($options.trackingActions.DELETE_PACKAGE)"
             >{{ __('Delete') }}</gl-button
           >
         </div>

@@ -1,9 +1,10 @@
 <script>
 import { mapState } from 'vuex';
 import { GlTable, GlPagination, GlButton, GlSorting, GlSortingItem, GlModal } from '@gitlab/ui';
+import Tracking from '~/tracking';
+import { s__, sprintf } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { s__, sprintf } from '~/locale';
 import {
   LIST_KEY_NAME,
   LIST_KEY_PROJECT,
@@ -18,6 +19,8 @@ import {
   LIST_LABEL_CREATED_AT,
   LIST_LABEL_ACTIONS,
 } from '../constants';
+import { TrackingActions } from '../../shared/constants';
+import { packageTypeToTrackCategory } from '../../shared/utils';
 
 export default {
   components: {
@@ -30,6 +33,7 @@ export default {
     GlModal,
     Icon,
   },
+  mixins: [Tracking.mixin()],
   data() {
     return {
       modalId: 'confirm-delete-pacakge',
@@ -126,6 +130,14 @@ export default {
         false,
       );
     },
+    tracking() {
+      const category = this.itemToBeDeleted
+        ? packageTypeToTrackCategory(this.itemToBeDeleted.package_type)
+        : undefined;
+      return {
+        category,
+      };
+    },
   },
   methods: {
     onDirectionChange() {
@@ -140,6 +152,7 @@ export default {
     },
     deleteItemConfirmation() {
       this.$emit('package:delete', this.itemToBeDeleted.id);
+      this.track(TrackingActions.DELETE_PACKAGE);
       this.itemToBeDeleted = null;
     },
     deleteItemCanceled() {
