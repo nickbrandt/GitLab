@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 describe Security::StoreReportsService do
+  let(:user) { create(:user) }
   let(:group)   { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
@@ -12,10 +13,12 @@ describe Security::StoreReportsService do
 
     context 'when there are reports' do
       before do
-        stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true)
+        stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true, security_dashboard: true)
         create(:ee_ci_build, :sast, pipeline: pipeline)
         create(:ee_ci_build, :dependency_scanning, pipeline: pipeline)
         create(:ee_ci_build, :container_scanning, pipeline: pipeline)
+        project.add_developer(user)
+        allow(pipeline).to receive(:user).and_return(user)
       end
 
       it 'initializes and execute a StoreReportService for each report' do
