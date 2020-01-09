@@ -7,8 +7,6 @@ module Geo
     private
 
     def sync_repository
-      return if Feature.disabled?(:enable_geo_design_sync)
-
       start_registry_sync!
       fetch_repository
       mark_sync_as_successful

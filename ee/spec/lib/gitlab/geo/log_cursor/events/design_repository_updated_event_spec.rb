@@ -36,53 +36,31 @@ describe Gitlab::Geo::LogCursor::Events::DesignRepositoryUpdatedEvent, :clean_gi
   end
 
   describe '#process' do
-    context 'when the feature flag is disabled' do
+    context 'when the associated shard is healthy' do
       before do
-        stub_feature_flags(enable_geo_design_sync: false)
+        allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
       end
 
-      it 'does not create a design registry' do
-        expect { subject.process }.not_to change(Geo::DesignRegistry, :count)
-      end
+      it_behaves_like 'DesignRepositoryUpdatedEvent'
 
-      it 'does not schedule a Geo::DesignRepositorySyncWorker job' do
-        expect(Geo::DesignRepositorySyncWorker).not_to receive(:perform_async).with(project.id)
+      it 'schedules a Geo::DesignRepositorySyncWorker' do
+        expect(Geo::DesignRepositorySyncWorker).to receive(:perform_async).with(project.id).once
 
         subject.process
       end
     end
 
-    context 'when the feature flag is disabled' do
+    context 'when associated shard is unhealthy' do
       before do
-        stub_feature_flags(enable_geo_design_sync: true)
+        allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(false)
       end
 
-      context 'when the associated shard is healthy' do
-        before do
-          allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(true)
-        end
+      it_behaves_like 'DesignRepositoryUpdatedEvent'
 
-        it_behaves_like 'DesignRepositoryUpdatedEvent'
+      it 'does not schedule a Geo::DesignRepositorySyncWorker job' do
+        expect(Geo::DesignRepositorySyncWorker).not_to receive(:perform_async).with(project.id)
 
-        it 'schedules a Geo::DesignRepositorySyncWorker' do
-          expect(Geo::DesignRepositorySyncWorker).to receive(:perform_async).with(project.id).once
-
-          subject.process
-        end
-      end
-
-      context 'when associated shard is unhealthy' do
-        before do
-          allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('default').and_return(false)
-        end
-
-        it_behaves_like 'DesignRepositoryUpdatedEvent'
-
-        it 'does not schedule a Geo::DesignRepositorySyncWorker job' do
-          expect(Geo::DesignRepositorySyncWorker).not_to receive(:perform_async).with(project.id)
-
-          subject.process
-        end
+        subject.process
       end
     end
   end

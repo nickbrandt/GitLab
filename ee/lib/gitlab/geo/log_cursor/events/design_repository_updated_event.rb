@@ -29,10 +29,6 @@ module Gitlab
             end
           end
 
-          def skippable?
-            Feature.disabled?(:enable_geo_design_sync)
-          end
-
           def log_event(job_id)
             logger.event_info(
               created_at,

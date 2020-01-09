@@ -94,12 +94,6 @@ describe Geo::RepositoryUpdatedService do
       it 'creates a design repository updated event' do
         expect { subject.execute }.to change(Geo::RepositoryUpdatedEvent, :count).by(1)
       end
-
-      it 'does not create a design repository updated event when feature is disabled' do
-        stub_feature_flags(enable_geo_design_sync: false)
-
-        expect { subject.execute }.not_to change(Geo::RepositoryUpdatedEvent, :count)
-      end
     end
   end
 end
