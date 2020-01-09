@@ -14,7 +14,8 @@ module EE
           geo_enable_hashed_storage: 5,
           geo_migrate_hashed_storage: 6,
           canary_deployment: 7,
-          gold_trial_billings: 8
+          gold_trial_billings: 8,
+          threat_monitoring_info: 11
         )
       end
     end

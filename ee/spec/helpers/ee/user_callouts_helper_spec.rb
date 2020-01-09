@@ -268,4 +268,26 @@ describe EE::UserCalloutsHelper do
       end
     end
   end
+
+  describe '.show_threat_monitoring_info?' do
+    subject { helper.show_threat_monitoring_info? }
+
+    let(:user) { create(:user) }
+
+    before do
+      expect(helper).to receive(:current_user).and_return(user)
+    end
+
+    context 'when the threat monitoring info has not been dismissed' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when the threat monitoring info was dismissed' do
+      before do
+        create(:user_callout, user: user, feature_name: described_class::THREAT_MONITORING_INFO)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
 end
