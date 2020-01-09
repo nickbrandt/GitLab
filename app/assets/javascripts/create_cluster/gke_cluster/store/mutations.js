@@ -25,4 +25,10 @@ export default {
   [types.SET_MACHINE_TYPES](state, machineTypes) {
     Object.assign(state, { machineTypes });
   },
+  [types.SET_NETWORK](state, selectedNetwork) {
+    Object.assign(state, { selectedNetwork });
+  },
+  [types.SET_SUBNETWORK](state, selectedSubnetwork) {
+    Object.assign(state, { selectedSubnetwork });
+  },
 };

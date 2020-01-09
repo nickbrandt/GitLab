@@ -6,3 +6,5 @@ export const SET_MACHINE_TYPE = 'SET_MACHINE_TYPE';
 export const SET_PROJECTS = 'SET_PROJECTS';
 export const SET_ZONES = 'SET_ZONES';
 export const SET_MACHINE_TYPES = 'SET_MACHINE_TYPES';
+export const SET_NETWORK = 'SET_NETWORK';
+export const SET_SUBNETWORK = 'SET_SUBNETWORK';

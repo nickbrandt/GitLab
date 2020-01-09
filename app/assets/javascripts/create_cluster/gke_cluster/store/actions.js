@@ -27,6 +27,14 @@ export const setZone = ({ commit }, selectedZone) => {
   commit(types.SET_ZONE, selectedZone);
 };
 
+export const setNetwork = ({ commit }, selectedNetwork) => {
+  commit(types.SET_NETWORK, selectedNetwork);
+};
+
+export const setSubnetwork = ({ commit }, selectedSubnetwork) => {
+  commit(types.SET_SUBNETWORK, selectedSubnetwork);
+};
+
 export const setMachineType = ({ commit }, selectedMachineType) => {
   commit(types.SET_MACHINE_TYPE, selectedMachineType);
 };

@@ -8,6 +8,13 @@ export const selectedProjectMock = {
   name: 'gcp-project',
 };
 
+export const selectedNetworkMock = {
+  selfLink: 'networks/123456',
+  id: '123456',
+};
+
+export const selectedSubnetworkMock = 'subnetwork-1';
+
 export const selectedZoneMock = 'us-central1-a';
 
 export const selectedMachineTypeMock = 'n1-standard-2';

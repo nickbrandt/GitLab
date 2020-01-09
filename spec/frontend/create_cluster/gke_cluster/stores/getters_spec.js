@@ -3,8 +3,16 @@ import {
   hasZone,
   hasMachineType,
   hasValidData,
+  hasNetwork,
+  hasSubnetwork,
 } from '~/create_cluster/gke_cluster/store/getters';
-import { selectedProjectMock, selectedZoneMock, selectedMachineTypeMock } from '../mock_data';
+import {
+  selectedProjectMock,
+  selectedZoneMock,
+  selectedNetworkMock,
+  selectedSubnetworkMock,
+  selectedMachineTypeMock,
+} from '../mock_data';
 
 describe('GCP Cluster Dropdown Store Getters', () => {
   let state;
@@ -16,6 +24,8 @@ describe('GCP Cluster Dropdown Store Getters', () => {
         selectedProject: selectedProjectMock,
         selectedZone: selectedZoneMock,
         selectedMachineType: selectedMachineTypeMock,
+        selectedNetwork: selectedNetworkMock,
+        selectedSubnetwork: selectedSubnetworkMock,
       };
     });
 
@@ -42,6 +52,18 @@ describe('GCP Cluster Dropdown Store Getters', () => {
         expect(hasValidData(state, { hasZone: true, hasMachineType: true })).toEqual(true);
       });
     });
+
+    describe('hasNetwork', () => {
+      it('should return true when network is selected', () => {
+        expect(getters.hasNetwork(state)).toEqual(true);
+      });
+    });
+
+    describe('hasSubnetwork', () => {
+      it('should return true when subnetwork is selected', () => {
+        expect(getters.hasSubnetwork(state)).toEqual(true);
+      });
+    });
   });
 
   describe('invalid states', () => {
@@ -53,6 +75,10 @@ describe('GCP Cluster Dropdown Store Getters', () => {
         },
         selectedZone: '',
         selectedMachineType: '',
+        selectedNetwork: {
+          selfLink: '',
+        },
+        selectedSubnetwork: '',
       };
     });
 
@@ -97,6 +123,18 @@ describe('GCP Cluster Dropdown Store Getters', () => {
         getters.hasMachineType = false;
 
         expect(hasValidData(state, getters)).toEqual(false);
+      });
+    });
+
+    describe('hasNetwork', () => {
+      it('should return true when subnetwork is selected', () => {
+        expect(getters.hasNetwork(state)).toEqual(false);
+      });
+    });
+
+    describe('hasSubnetwork', () => {
+      it('should return true when subnetwork is selected', () => {
+        expect(getters.hasSubnetwork(state)).toEqual(false);
       });
     });
   });

@@ -3,6 +3,8 @@ import * as types from '~/create_cluster/gke_cluster/store/mutation_types';
 import mutations from '~/create_cluster/gke_cluster/store/mutations';
 import {
   gapiProjectsResponseMock,
+  selectedNetworkMock,
+  selectedSubnetworkMock,
   gapiZonesResponseMock,
   gapiMachineTypesResponseMock,
 } from '../mock_data';

@@ -7,6 +7,8 @@ import {
   selectedProjectMock,
   selectedZoneMock,
   selectedMachineTypeMock,
+  selectedNetworkMock,
+  selectedSubnetworkMock,
   gapiProjectsResponseMock,
   gapiZonesResponseMock,
   gapiMachineTypesResponseMock,
@@ -33,6 +35,32 @@ describe('GCP Cluster Dropdown Store Actions', () => {
         selectedZoneMock,
         { selectedZone: '' },
         [{ type: 'SET_ZONE', payload: selectedZoneMock }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setNetwork', () => {
+    it('should set network', done => {
+      testAction(
+        actions.setNetwork,
+        selectedNetworkMock,
+        { selectedNetwork: '' },
+        [{ type: 'SET_NETWORK', payload: selectedNetworkMock }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setSubnetwork', () => {
+    it('should set network', done => {
+      testAction(
+        actions.setSubnetwork,
+        selectedSubnetworkMock,
+        { selectedNetwork: '' },
+        [{ type: 'SET_SUBNETWORK', payload: selectedSubnetworkMock }],
         [],
         done,
       );

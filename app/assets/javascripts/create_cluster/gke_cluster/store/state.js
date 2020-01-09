@@ -5,6 +5,11 @@ export default () => ({
   },
   selectedZone: '',
   selectedMachineType: '',
+  selectedNetwork: {
+    id: '',
+    selfLink: '',
+  },
+  selectedSubnetwork: '',
   isValidatingProjectBilling: null,
   projectHasBillingEnabled: null,
   projects: [],
