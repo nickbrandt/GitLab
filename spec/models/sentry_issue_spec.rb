@@ -37,4 +37,20 @@ describe SentryIssue do
 
     it { is_expected.to eq(sentry_issue) }
   end
+
+  describe 'scopes' do
+    describe '#for_identifier' do
+      let(:sentry_issue) { create(:sentry_issue) }
+      let(:identifier) { sentry_issue.sentry_issue_identifier }
+
+      before do
+        # create second sentry_issue
+        create(:sentry_issue)
+      end
+
+      subject { described_class.for_identifier(identifier) }
+
+      it { is_expected.to contain_exactly(sentry_issue) }
+    end
+  end
 end
