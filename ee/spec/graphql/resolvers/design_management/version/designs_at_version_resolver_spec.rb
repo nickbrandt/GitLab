@@ -60,20 +60,6 @@ describe Resolvers::DesignManagement::Version::DesignsAtVersionResolver do
   end
 
   describe ::Resolvers::DesignManagement::Version::DesignsAtVersionResolver.single do
-    describe 'passing plural arguments' do
-      context 'passing ids' do
-        let(:args) { { ids: [design_a, design_b].map { |d| global_id_of(d) } } }
-
-        it_behaves_like 'a bad argument'
-      end
-
-      context 'passing filenames' do
-        let(:args) { { filenames: [design_a, design_b].map(&:filename) } }
-
-        it_behaves_like 'a bad argument'
-      end
-    end
-
     describe 'passing combinations of arguments' do
       context 'passing no arguments' do
         let(:args) { {} }
@@ -170,16 +156,6 @@ describe Resolvers::DesignManagement::Version::DesignsAtVersionResolver do
 
         it "resolves to just the relevant design, ignoring objects on other issues" do
           expect(resolve_objects).to contain_exactly(dav(design_a))
-        end
-      end
-
-      describe 'passing singular arguments' do
-        %i[design_at_version_id design_id filename].each do |k|
-          context "passing #{k}" do
-            let(:args) { all_singular_args.slice(k) }
-
-            it_behaves_like 'a bad argument'
-          end
         end
       end
     end
