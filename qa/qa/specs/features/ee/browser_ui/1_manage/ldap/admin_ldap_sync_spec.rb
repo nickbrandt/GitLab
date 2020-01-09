@@ -53,7 +53,7 @@ module QA
         Page::Main::Login.perform do |login_page|
           user = Struct.new(:ldap_username, :ldap_password).new('adminuser1', 'password')
 
-          QA::Support::Retrier.retry_until(exit_on_failure: true, sleep_interval: 3, max_attempts: 5) do
+          QA::Support::Retrier.retry_until(raise_on_failure: true, sleep_interval: 3, max_attempts: 5) do
             login_page.sign_in_using_ldap_credentials(user: user)
           end
         end
