@@ -276,8 +276,8 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def kubernetes_cluster_anchor_data
-    if can_cluster_be_created?
-      if clusters_empty?
+    if can_instantiate_cluster?
+      if clusters.empty?
         AnchorData.new(false,
                        statistic_icon + _('Add Kubernetes cluster'),
                        new_project_cluster_path(project))
@@ -327,25 +327,25 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
 
   def can_setup_review_app?
     strong_memoize(:can_setup_review_app) do
-      cicd_missing? || (can_cluster_be_created? && clusters_empty?)
+      (can_instantiate_cluster? && all_clusters_empty?) || cicd_missing?
     end
   end
 
-  def can_cluster_be_created?
-    current_user && can?(current_user, :create_cluster, project)
+  def all_clusters_empty?
+    strong_memoize(:all_clusters_empty) do
+      project.all_clusters.empty?
+    end
   end
+
+  private
 
   def cicd_missing?
     current_user && can_current_user_push_code? && repository.gitlab_ci_yml.blank? && !auto_devops_enabled?
   end
 
-  def clusters_empty?
-    strong_memoize(:cluster_missing) do
-      project.clusters.empty?
-    end
+  def can_instantiate_cluster?
+    current_user && can?(current_user, :create_cluster, project)
   end
-
-  private
 
   def filename_path(filename)
     if blob = repository.public_send(filename) # rubocop:disable GitlabSecurity/PublicSend

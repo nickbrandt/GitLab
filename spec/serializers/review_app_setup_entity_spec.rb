@@ -17,8 +17,8 @@ describe ReviewAppSetupEntity do
   subject { entity.as_json }
 
   describe '#as_json' do
-    it 'contains can_setup_review_app?' do
-      expect(subject).to include(:can_setup_review_app?)
+    it 'contains can_setup_review_app' do
+      expect(subject).to include(:can_setup_review_app)
     end
 
     context 'when the user can setup a review app' do
@@ -27,19 +27,17 @@ describe ReviewAppSetupEntity do
       end
 
       it 'contains relevant fields' do
-        expect(subject.keys).to include(:clusters_empty?, :review_snippet)
+        expect(subject.keys).to include(:all_clusters_empty, :review_snippet)
       end
 
       it 'exposes the relevant review snippet' do
-        review_app_snippet = YAML.safe_load(File.read(Rails.root.join('lib', 'gitlab', 'ci', 'snippets', 'review_app_default.yml'))).inspect
+        review_app_snippet = YAML.safe_load(File.read(Rails.root.join('lib', 'gitlab', 'ci', 'snippets', 'review_app_default.yml'))).to_s
 
         expect(subject[:review_snippet]).to eq(review_app_snippet)
       end
 
       it 'exposes whether the project has associated clusters' do
-        allow(project).to receive(:clusters).and_return([])
-
-        expect(subject[:clusters_empty?]).to be_truthy
+        expect(subject[:all_clusters_empty]).to be_truthy
       end
     end
 
@@ -49,7 +47,7 @@ describe ReviewAppSetupEntity do
       end
 
       it 'does not expose certain fields' do
-        expect(subject.keys).not_to include(:clusters_empty?, :review_snippet)
+        expect(subject.keys).not_to include(:all_clusters_empty, :review_snippet)
       end
     end
   end
