@@ -2,6 +2,7 @@
 import _ from 'underscore';
 import Vue from 'vue';
 import {
+  GlLink,
   GlButton,
   GlButtonGroup,
   GlFormGroup,
@@ -13,8 +14,9 @@ import {
 } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Translate from '~/vue_shared/translate';
-import { alertsValidator, queriesValidator } from '../validators';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
 import Icon from '~/vue_shared/components/icon.vue';
+import { alertsValidator, queriesValidator } from '../validators';
 
 Vue.use(Translate);
 
@@ -45,10 +47,12 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlModal,
+    GlLink,
     Icon,
   },
   directives: {
-    GlTooltipDirective,
+    GlTooltip: GlTooltipDirective,
+    TrackEvent: TrackEventDirective,
   },
   props: {
     disabled: {
@@ -177,6 +181,14 @@ export default {
       this.prometheusMetricId = null;
       this.selectedAlert = {};
     },
+    getAlertFormActionTrackingOption() {
+      const label = `${this.submitAction}_alert`;
+      return {
+        category: document.body.dataset.page,
+        action: 'click_button',
+        label,
+      };
+    },
   },
   alertQueryText: {
     label: __('Query'),
@@ -195,7 +207,6 @@ export default {
     :title="dropdownTitle"
     :modal-id="modalId"
     :ok-variant="submitAction === 'delete' ? 'danger' : 'success'"
-    :ok-title="submitActionText"
     :ok-disabled="formDisabled"
     @ok="handleSubmit"
     @hidden="handleHidden"
@@ -215,7 +226,7 @@ export default {
           <div class="d-flex align-items-center">
             {{ __('Single or combined queries') }}
             <icon
-              v-gl-tooltip-directive="$options.alertQueryText.descriptionTooltip"
+              v-gl-tooltip="$options.alertQueryText.descriptionTooltip"
               name="question"
               class="prepend-left-4"
             />
@@ -272,5 +283,13 @@ export default {
         />
       </gl-form-group>
     </div>
+    <template #modal-ok>
+      <gl-link
+        v-track-event="getAlertFormActionTrackingOption()"
+        class="text-reset text-decoration-none"
+      >
+        {{ submitActionText }}
+      </gl-link>
+    </template>
   </gl-modal>
 </template>
