@@ -149,6 +149,7 @@ export default {
       'loadRecentSearches',
       'setIndexPath',
       'fetchPaginatedResults',
+      'updateStatus',
     ]),
     setSearchText(text) {
       this.errorSearchQuery = text;
@@ -170,6 +171,9 @@ export default {
     },
     isCurrentSortField(field) {
       return field === this.sortField;
+    },
+    updateIssueStatus(status) {
+      this.updateStatus({ endpoint: this.issueUpdatePath, redirectUrl: this.listPath, status });
     },
   },
 };
