@@ -81,14 +81,10 @@ export default {
 
         this.updateListWipLimit({ maxIssueCount: this.currentWipLimit, id: this.activeListId })
           .then(({ config }) => {
-            /*
-              Move to BoardsStore bc we are consolidating all List
-              Model code and then moving it from BoardsStore to Vuex.
-            */
-
-            boardsStoreEE.store.findList('id', this.activeListId).maxIssueCount = JSON.parse(
-              config.data,
-            ).list.max_issue_count;
+            boardsStoreEE.setMaxIssueCountOnList(
+              this.activeListId,
+              JSON.parse(config.data).list.max_issue_count,
+            );
             this.resetStateAfterUpdate();
           })
           .catch(() => {
