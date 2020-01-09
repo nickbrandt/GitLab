@@ -9,13 +9,13 @@ describe Sentry::Client::Issue do
   let(:client) { Sentry::Client.new(sentry_url, token) }
 
   describe '#list_issues' do
-    shared_examples 'issues has correct return type' do |klass|
+    shared_examples 'issues have correct return type' do |klass|
       it "returns objects of type #{klass}" do
         expect(subject[:issues]).to all( be_a(klass) )
       end
     end
 
-    shared_examples 'issues has correct length' do |length|
+    shared_examples 'issues have correct length' do |length|
       it { expect(subject[:issues].length).to eq(length) }
     end
 
@@ -46,8 +46,8 @@ describe Sentry::Client::Issue do
 
     it_behaves_like 'calls sentry api'
 
-    it_behaves_like 'issues has correct return type', Gitlab::ErrorTracking::Error
-    it_behaves_like 'issues has correct length', 1
+    it_behaves_like 'issues have correct return type', Gitlab::ErrorTracking::Error
+    it_behaves_like 'issues have correct length', 1
 
     shared_examples 'has correct external_url' do
       context 'external_url' do
@@ -168,8 +168,8 @@ describe Sentry::Client::Issue do
 
       it_behaves_like 'calls sentry api'
 
-      it_behaves_like 'issues has correct return type', Gitlab::ErrorTracking::Error
-      it_behaves_like 'issues has correct length', 1
+      it_behaves_like 'issues have correct return type', Gitlab::ErrorTracking::Error
+      it_behaves_like 'issues have correct length', 1
 
       it_behaves_like 'has correct external_url'
     end
@@ -203,8 +203,8 @@ describe Sentry::Client::Issue do
 
       it_behaves_like 'calls sentry api'
 
-      it_behaves_like 'issues has correct return type', Gitlab::ErrorTracking::Error
-      it_behaves_like 'issues has correct length', 1
+      it_behaves_like 'issues have correct return type', Gitlab::ErrorTracking::Error
+      it_behaves_like 'issues have correct length', 1
     end
 
     context 'when cursor is present' do
@@ -213,8 +213,8 @@ describe Sentry::Client::Issue do
 
       it_behaves_like 'calls sentry api'
 
-      it_behaves_like 'issues has correct return type', Gitlab::ErrorTracking::Error
-      it_behaves_like 'issues has correct length', 1
+      it_behaves_like 'issues have correct return type', Gitlab::ErrorTracking::Error
+      it_behaves_like 'issues have correct length', 1
     end
   end
 
