@@ -49,8 +49,8 @@ module Resolvers
         end
 
         def specific_design_at_version(id)
-          obj = GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::DesignAtVersion)
-          GitlabSchema.after_lazy(obj) { |dav| consistent?(dav) ? dav : nil }
+          dav = GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::DesignAtVersion)
+          consistent?(dav) ? dav : nil
         end
 
         # Test that the DAV found by ID actually belongs on this version, and

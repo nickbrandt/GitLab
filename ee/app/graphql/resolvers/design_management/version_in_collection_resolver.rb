@@ -38,7 +38,7 @@ module Resolvers
       def check_args(id, sha)
         return if id.present? || sha.present?
 
-        raise ::Gitlab::Graphql::Errors::ArgumentError, 'id or sha is required'
+        raise ::Gitlab::Graphql::Errors::ArgumentError, 'one of id or sha is required'
       end
     end
   end

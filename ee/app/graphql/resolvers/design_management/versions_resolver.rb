@@ -22,13 +22,12 @@ module Resolvers
       end
 
       def resolve(parent: nil, id: nil, sha: nil)
-        GitlabSchema.after_lazy(cutoff(parent, id, sha)) do |version|
-          raise ::Gitlab::Graphql::Errors::ResourceNotAvailable, 'cutoff not found' unless version
+        version = cutoff(parent, id, sha)
 
-          next find if version == :unconstrained
+        raise ::Gitlab::Graphql::Errors::ResourceNotAvailable, 'cutoff not found' unless version.present?
+        return find if version == :unconstrained
 
-          find(earlier_or_equal_to: version)
-        end
+        find(earlier_or_equal_to: version)
       end
 
       private
@@ -56,7 +55,7 @@ module Resolvers
       end
 
       def by_id(id)
-        GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::Version)
+        GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::Version).sync
       end
 
       # Find an `at_version` argument passed to a parent node.
