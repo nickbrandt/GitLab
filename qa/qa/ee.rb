@@ -160,7 +160,6 @@ module QA
         module Epic
           autoload :Index, 'qa/ee/page/group/epic/index'
           autoload :Show, 'qa/ee/page/group/epic/show'
-          autoload :Edit, 'qa/ee/page/group/epic/edit'
         end
 
         module Secure

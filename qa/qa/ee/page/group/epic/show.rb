@@ -54,12 +54,6 @@ module QA
               click_element :edit_button
             end
 
-            def delete_epic
-              page.accept_alert("Epic will be removed! Are you sure?") do
-                click_element :delete_epic_button
-              end
-            end
-
             def close_reopen_epic
               click_element :close_reopen_epic_button
             end
