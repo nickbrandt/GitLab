@@ -8,23 +8,26 @@ module Issues
     # Target attachment size before base64 encoding
     TARGET_FILESIZE = 15000000
 
-    def initialize(issues_relation)
+    attr_reader :project
+
+    def initialize(issues_relation, project)
       @issues = issues_relation
       @labels = @issues.labels_hash
+      @project = project
     end
 
     def csv_data
       csv_builder.render(TARGET_FILESIZE)
     end
 
-    def email(user, project)
+    def email(user)
       Notify.issues_csv_email(user, project, csv_data, csv_builder.status).deliver_now
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
     def csv_builder
       @csv_builder ||=
-        CsvBuilder.new(@issues.preload(:author, :assignees, :timelogs), header_to_value_hash)
+        CsvBuilder.new(@issues.preload(:author, :assignees, :timelogs, :epic), header_to_value_hash)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -49,10 +52,25 @@ module Issues
        'Closed At (UTC)' => -> (issue) { issue.closed_at&.to_s(:csv) },
        'Milestone' => -> (issue) { issue.milestone&.title },
        'Weight' => -> (issue) { issue.weight },
-       'Labels' => -> (issue) { @labels[issue.id].sort.join(',').presence },
+       'Labels' => -> (issue) { issue_labels(issue) },
        'Time Estimate' => ->(issue) { issue.time_estimate.to_s(:csv) },
-       'Time Spent' => -> (issue) { issue.timelogs.map(&:time_spent).inject(0, :+)}
-      }
+       'Time Spent' => -> (issue) { issue_time_spent(issue) }
+      }.tap do |hash|
+        if project.group&.feature_available?(:epics)
+          hash['Epic ID'] = -> (issue) { issue.epic&.id }
+          hash['Epic Title'] = -> (issue) { issue.epic&.title }
+        end
+      end
     end
+
+    def issue_labels(issue)
+      @labels[issue.id].sort.join(',').presence
+    end
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def issue_time_spent(issue)
+      issue.timelogs.map(&:time_spent).sum
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
