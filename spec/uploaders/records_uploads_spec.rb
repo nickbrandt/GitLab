@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe RecordsUploads do
-  let!(:uploader) do
+  let_it_be(:uploader) do
     class RecordsUploadsExampleUploader < GitlabUploader
       include RecordsUploads::Concern
 
@@ -19,6 +19,23 @@ describe RecordsUploads do
 
   def upload_fixture(filename)
     fixture_file_upload(File.join('spec', 'fixtures', filename))
+  end
+
+  shared_examples 'creates a new record and assigns size, path, model, and uploader' do
+    specify do
+      uploader.store!(upload_fixture('rails_sample.jpg'))
+
+      upload = uploader.upload
+
+      aggregate_failures do
+        expect(upload).to be_persisted
+        expect(upload.size).to eq uploader.file.size
+        expect(upload.path).to eq uploader.upload_path
+        expect(upload.model_id).to eq uploader.model.id
+        expect(upload.model_type).to eq uploader.model.class.to_s
+        expect(upload.uploader).to eq uploader.class.to_s
+      end
+    end
   end
 
   describe 'callbacks' do
@@ -47,19 +64,7 @@ describe RecordsUploads do
       expect { uploader.store!(upload_fixture('rails_sample.jpg')) }.to change { Upload.count }.by(1)
     end
 
-    it 'creates a new record and assigns size, path, model, and uploader' do
-      uploader.store!(upload_fixture('rails_sample.jpg'))
-
-      upload = uploader.upload
-      aggregate_failures do
-        expect(upload).to be_persisted
-        expect(upload.size).to eq uploader.file.size
-        expect(upload.path).to eq uploader.upload_path
-        expect(upload.model_id).to eq uploader.model.id
-        expect(upload.model_type).to eq uploader.model.class.to_s
-        expect(upload.uploader).to eq uploader.class.to_s
-      end
-    end
+    include_examples 'creates a new record and assigns size, path, model, and uploader'
 
     it "does not create an Upload record when the file doesn't exist" do
       allow(uploader).to receive(:file).and_return(double(exists?: false))
@@ -115,6 +120,46 @@ describe RecordsUploads do
       uploader.store!(upload_fixture('rails_sample.jpg'))
 
       expect { uploader.remove! }.to change { Upload.count }.from(1).to(0)
+    end
+  end
+
+  context 'an uploader that has multiple image versions' do
+    let_it_be(:uploader) do
+      class ExampleVersionsUploader < RecordsUploadsExampleUploader
+        include CarrierWave::MiniMagick
+
+        version :thumb do
+          process resize_to_fit: [25, 25]
+        end
+      end
+
+      ExampleVersionsUploader.new(build_stubbed(:user))
+    end
+    let(:file) { upload_fixture('rails_sample.jpg') }
+
+    include_examples 'creates a new record and assigns size, path, model, and uploader'
+
+    it 'creates only one Upload record when store! is called on the main uploader' do
+      expect do
+        uploader.store!(file)
+      end.to change { Upload.count }.by(1)
+    end
+
+    it 'does not create an Upload record when store! is called on the version uploader' do
+      expect { uploader.thumb.store!(file) }
+        .not_to change { Upload.count }
+    end
+
+    it 'destroys the Upload record after the main file is removed' do
+      uploader.store!(file)
+
+      expect { uploader.remove! }.to change { Upload.count }.from(1).to(0)
+    end
+
+    it 'does not destroy the Upload record after the version is removed' do
+      uploader.store!(file)
+
+      expect { uploader.thumb.remove! }.not_to change { Upload.count }
     end
   end
 

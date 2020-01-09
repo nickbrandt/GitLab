@@ -21,6 +21,7 @@ module RecordsUploads
     # rubocop: disable CodeReuse/ActiveRecord
     def record_upload(_tempfile = nil)
       return unless model
+      return if parent_version
       return unless file && file.exists?
 
       Upload.transaction { readd_upload }
@@ -65,6 +66,7 @@ module RecordsUploads
     # Called `before :remove`
     # rubocop: disable CodeReuse/ActiveRecord
     def destroy_upload(*args)
+      return if parent_version
       return unless file && file.exists?
 
       self.upload = nil
