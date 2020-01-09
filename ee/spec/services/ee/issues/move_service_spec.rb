@@ -28,6 +28,21 @@ describe Issues::MoveService do
           .not_to raise_error # Sidekiq::Worker::EnqueueFromTransactionError
       end
     end
+
+    context 'resource weight events' do
+      let!(:event1) { create(:resource_weight_event, issue: old_issue, weight: 1) }
+      let!(:event2) { create(:resource_weight_event, issue: old_issue, weight: 42) }
+      let!(:event3) { create(:resource_weight_event, issue: old_issue, weight: 5) }
+
+      let!(:another_old_issue) { create(:issue, project: new_project, author: user) }
+      let!(:event4) { create(:resource_weight_event, issue: another_old_issue, weight: 2) }
+
+      it 'creates expected resource weight events' do
+        new_issue = move_service.execute(old_issue, new_project)
+
+        expect(new_issue.resource_weight_events.map(&:weight)).to contain_exactly(1, 42, 5)
+      end
+    end
   end
 
   describe '#rewrite_related_issues' do
