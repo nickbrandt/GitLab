@@ -105,41 +105,4 @@ describe Gitlab::Auth::AuthFinders do
       it { is_expected.to eq user }
     end
   end
-
-  describe '#find_user_from_job_token' do
-    let(:job) { create(:ci_build, user: user) }
-
-    subject { find_user_from_job_token }
-
-    shared_examples 'job token disabled' do
-      context 'when route is not allowed to be authenticated' do
-        let(:route_authentication_setting) { { job_token_allowed: false } }
-
-        it "sets current_user to nil" do
-          set_token(job.token)
-          allow_any_instance_of(Gitlab::UserAccess).to receive(:allowed?).and_return(true)
-
-          expect(subject).to be_nil
-        end
-      end
-    end
-
-    context 'when the job token is in the headers' do
-      def set_token(token)
-        env[described_class::JOB_TOKEN_HEADER] = token
-      end
-
-      it_behaves_like 'find user from job token'
-      it_behaves_like 'job token disabled'
-    end
-
-    context 'when the job token is in the params' do
-      def set_token(token)
-        set_param(described_class::JOB_TOKEN_PARAM, token)
-      end
-
-      it_behaves_like 'find user from job token'
-      it_behaves_like 'job token disabled'
-    end
-  end
 end
