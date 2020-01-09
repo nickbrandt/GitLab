@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_row.vue';
 import DependencyVulnerability from 'ee/dependencies/components/dependency_vulnerability.vue';
 import { MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY } from 'ee/dependencies/components/constants';
@@ -9,11 +9,8 @@ describe('DependenciesTableRow component', () => {
   let wrapper;
 
   const factory = ({ propsData, ...options } = {}) => {
-    const localVue = createLocalVue();
-
     wrapper = shallowMount(DependenciesTableRow, {
       ...options,
-      localVue,
       sync: false,
       propsData: { ...propsData },
     });

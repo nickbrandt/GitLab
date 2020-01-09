@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlModal, GlLink, GlIntersperse } from '@gitlab/ui';
 
 import DependenciesLicenseLinks from 'ee/dependencies/components/dependency_license_links.vue';
@@ -17,11 +17,9 @@ describe('DependencyLicenseLinks component', () => {
   const factory = ({ numLicenses, numLicensesWithUrl = 0, title = 'test-dependency' } = {}) => {
     const licenses = addUrls(createLicenses(numLicenses), numLicensesWithUrl);
 
-    const localVue = createLocalVue();
     wrapper = shallowMount(DependenciesLicenseLinks, {
       sync: false,
       attachToDocument: true,
-      localVue,
       propsData: {
         licenses,
         title,
