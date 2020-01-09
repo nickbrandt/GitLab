@@ -191,7 +191,6 @@ describe('boardsStore', () => {
   });
 
   describe('saveList', () => {
-    let requestSpy;
     let mock;
     let list;
 
