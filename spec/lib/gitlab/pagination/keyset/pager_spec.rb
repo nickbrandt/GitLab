@@ -21,7 +21,11 @@ describe Gitlab::Pagination::Keyset::Pager do
       end.not_to exceed_query_limit(0)
     end
 
-    it 'returns a limited relation' do
+    it 'applies a LIMIT' do
+      expect(subject.limit_value).to eq(page.per_page)
+    end
+
+    it 'returns the limited relation' do
       expect(subject).to eq(relation.limit(page.per_page))
     end
 
