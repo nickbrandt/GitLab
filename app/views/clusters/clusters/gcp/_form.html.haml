@@ -3,6 +3,8 @@
 - zones_link_url = 'https://cloud.google.com/compute/docs/regions-zones/regions-zones'
 - machine_type_link_url = 'https://cloud.google.com/compute/docs/machine-types'
 - pricing_link_url = 'https://cloud.google.com/compute/pricing#machinetype'
+- networks_link_url = 'https://cloud.google.com/compute/docs/networks'
+- subnetworks_link_url = 'https://cloud.google.com/compute/docs/subnetworks'
 - kubernetes_integration_url = help_page_path('user/project/clusters/index')
 - help_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe
 - help_link_end = ' %{external_link_icon}</a>'.html_safe % { external_link_icon: external_link_icon }
@@ -47,6 +49,30 @@
             = icon('chevron-down')
       %p.form-text.text-muted
         = s_('ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}.').html_safe % { help_link_start: help_link_start % { url: zones_link_url }, help_link_end: help_link_end }
+
+    .form-group
+      = provider_gcp_field.label :network, s_('ClusterIntegration|Network'), class: 'label-bold'
+      .js-gcp-network-dropdown-entry-point
+        = provider_gcp_field.hidden_field :zone
+        .dropdown
+          %button.dropdown-menu-toggle.dropdown-menu-full-width{ type: 'button', disabled: true }
+            %span.dropdown-toggle-text
+              = _('Select zone to choose network')
+            = icon('chevron-down')
+      %p.form-text.text-muted
+        = s_('ClusterIntegration|Learn more about %{help_link_start}networks%{help_link_end}.').html_safe % { help_link_start: help_link_start % { url: networks_link_url }, help_link_end: help_link_end }
+
+    .form-group
+      = provider_gcp_field.label :subnetwork, s_('ClusterIntegration|Subnetwork'), class: 'label-bold'
+      .js-gcp-subnetwork-dropdown-entry-point
+        = provider_gcp_field.hidden_field :zone
+        .dropdown
+          %button.dropdown-menu-toggle.dropdown-menu-full-width{ type: 'button', disabled: true }
+            %span.dropdown-toggle-text
+              = _('Select network to choose subnetwork')
+            = icon('chevron-down')
+      %p.form-text.text-muted
+        = s_('ClusterIntegration|Learn more about %{help_link_start}subnetworks%{help_link_end}.').html_safe % { help_link_start: help_link_start % { url: subnetworks_link_url }, help_link_end: help_link_end }
 
     = provider_gcp_field.number_field :num_nodes, required: true, placeholder: '3',
       title: s_('ClusterIntegration|Number of nodes must be a numerical value.'),

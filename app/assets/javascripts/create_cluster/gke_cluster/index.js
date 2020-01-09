@@ -5,10 +5,12 @@ import GkeProjectIdDropdown from './components/gke_project_id_dropdown.vue';
 import GkeZoneDropdown from './components/gke_zone_dropdown.vue';
 import GkeMachineTypeDropdown from './components/gke_machine_type_dropdown.vue';
 import GkeSubmitButton from './components/gke_submit_button.vue';
-
-import store from './store';
+import GkeNetworkDropdown from './components/gke_network_dropdown.vue';
+import GkeSubnetworkDropdown from './components/gke_subnetwork_dropdown.vue';
 
 import * as CONSTANTS from './constants';
+
+import store from './store';
 
 const mountComponent = (entryPoint, component, componentName, extraProps = {}) => {
   const el = document.querySelector(entryPoint);
@@ -59,6 +61,22 @@ const mountGkeSubmitButton = () => {
   mountComponent('.js-gke-cluster-creation-submit-container', GkeSubmitButton, 'gke-submit-button');
 };
 
+const mountGkeNetworkDropdown = () => {
+  mountComponent(
+    '.js-gcp-network-dropdown-entry-point',
+    GkeNetworkDropdown,
+    'gke-network-dropdown',
+  );
+};
+
+const mountGkeSubnetworkDropdown = () => {
+  mountComponent(
+    '.js-gcp-subnetwork-dropdown-entry-point',
+    GkeSubnetworkDropdown,
+    'gke-subnetwork-dropdown',
+  );
+};
+
 const gkeDropdownErrorHandler = () => {
   Flash(CONSTANTS.GCP_API_ERROR);
 };
@@ -82,6 +100,8 @@ const initializeGapiClient = () => {
       mountGkeZoneDropdown();
       mountGkeMachineTypeDropdown();
       mountGkeSubmitButton();
+      mountGkeNetworkDropdown();
+      mountGkeSubnetworkDropdown();
     })
     .catch(gkeDropdownErrorHandler);
 };
