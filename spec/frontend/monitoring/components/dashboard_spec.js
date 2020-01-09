@@ -10,7 +10,6 @@ import DateTimePicker from '~/monitoring/components/date_time_picker/date_time_p
 import GroupEmptyState from '~/monitoring/components/group_empty_state.vue';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
-import * as monitoringUtils from '~/monitoring/utils';
 import { setupComponentStore, propsData } from '../init_utils';
 import {
   metricsGroupsAPIResponse,
@@ -137,7 +136,6 @@ describe('Dashboard', () => {
     });
 
     it('fetches the metrics data with proper time window', done => {
-      const getTimeDiffSpy = jest.spyOn(monitoringUtils, 'getTimeDiff');
       jest.spyOn(store, 'dispatch');
 
       createMountedWrapper(
@@ -154,7 +152,6 @@ describe('Dashboard', () => {
         .$nextTick()
         .then(() => {
           expect(store.dispatch).toHaveBeenCalled();
-          expect(getTimeDiffSpy).toHaveBeenCalled();
 
           done();
         })
