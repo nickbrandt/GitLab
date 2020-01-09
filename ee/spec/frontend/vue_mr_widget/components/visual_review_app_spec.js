@@ -1,13 +1,10 @@
-import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
 import { GlButton, GlModal } from '@gitlab/ui';
 import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 
-const localVue = createLocalVue();
-
 describe('Visual Review App Link', () => {
-  const Component = localVue.extend(VisualReviewAppLink);
   let wrapper;
   let propsData;
 
@@ -30,9 +27,8 @@ describe('Visual Review App Link', () => {
 
   describe('renders link and text', () => {
     beforeEach(() => {
-      wrapper = mount(Component, {
+      wrapper = mount(VisualReviewAppLink, {
         propsData,
-        localVue,
       });
     });
 
@@ -49,9 +45,8 @@ describe('Visual Review App Link', () => {
 
   describe('renders the modal', () => {
     beforeEach(() => {
-      wrapper = shallowMount(Component, {
+      wrapper = shallowMount(VisualReviewAppLink, {
         propsData,
-        localVue,
       });
     });
     it('with expected project Id', () => {

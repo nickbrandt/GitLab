@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
 import {
   OPTIONAL,
@@ -6,18 +6,15 @@ import {
 } from 'ee/vue_merge_request_widget/components/approvals/messages';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
 
-const localVue = createLocalVue();
-
 const TEST_HELP_PATH = 'help/path';
 
 describe('EE MRWidget approvals summary optional', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(ApprovalsSummaryOptional), {
+    wrapper = shallowMount(ApprovalsSummaryOptional, {
       propsData: props,
       sync: false,
-      localVue,
       attachToDocument: true,
     });
   };

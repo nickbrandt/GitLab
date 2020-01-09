@@ -1,17 +1,15 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import ApprovedIcon from 'ee/vue_merge_request_widget/components/approvals/approved_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
-const localVue = createLocalVue();
 const EXPECTED_SIZE = 16;
 
 describe('EE MRWidget approved icon', () => {
   let wrapper;
 
   const createComponent = (props = {}) => {
-    wrapper = shallowMount(localVue.extend(ApprovedIcon), {
+    wrapper = shallowMount(ApprovedIcon, {
       propsData: props,
-      localVue,
       sync: false,
     });
   };

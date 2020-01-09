@@ -43,7 +43,7 @@ describe('ReadyToMerge', () => {
   };
 
   const factory = (mrUpdates = {}) => {
-    wrapper = shallowMount(localVue.extend(ReadyToMerge), {
+    wrapper = shallowMount(ReadyToMerge, {
       propsData: {
         mr: { ...mr, ...mrUpdates },
         service,

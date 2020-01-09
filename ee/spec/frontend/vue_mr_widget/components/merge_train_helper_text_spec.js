@@ -1,16 +1,14 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
 import { trimText } from 'helpers/text_helper';
 import MergeTrainHelperText from 'ee/vue_merge_request_widget/components/merge_train_helper_text.vue';
 
 describe('MergeTrainHelperText', () => {
-  const localVue = createLocalVue();
   let wrapper;
 
   const factory = propsData => {
-    wrapper = shallowMount(localVue.extend(MergeTrainHelperText), {
+    wrapper = shallowMount(MergeTrainHelperText, {
       propsData,
-      localVue,
       sync: false,
     });
   };
