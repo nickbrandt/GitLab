@@ -50,8 +50,6 @@ export const npmFiles = [
   },
 ];
 
-export const packageList = [mavenPackage, npmPackage];
-
 export const conanPackage = {
   conan_metadatum: {
     package_channel: 'stable',
@@ -67,3 +65,5 @@ export const conanPackage = {
   updated_at: '',
   version: '1.0.0',
 };
+
+export const packageList = [mavenPackage, npmPackage, conanPackage];

@@ -1,9 +1,3 @@
-export const PackageType = {
-  CONAN: 'conan',
-  MAVEN: 'maven',
-  NPM: 'npm',
-};
-
 export const TrackingLabels = {
   CODE_INSTRUCTION: 'code_instruction',
   MAVEN_INSTALLATION: 'maven_installation',

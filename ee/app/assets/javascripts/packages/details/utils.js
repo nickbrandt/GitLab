@@ -1,6 +1,7 @@
 import { __ } from '~/locale';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import { PackageType, TrackingActions } from './constants';
+import { TrackingActions } from './constants';
+import { PackageType } from '../shared/constants';
 
 export const trackInstallationTabChange = {
   methods: {

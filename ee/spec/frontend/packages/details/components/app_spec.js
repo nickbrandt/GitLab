@@ -1,10 +1,13 @@
 import { mount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
+import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
-import { mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
+import * as SharedUtils from 'ee/packages/shared/utils';
+import { TrackingActions } from 'ee/packages/shared/constants';
+import { mavenPackage, mavenFiles, npmPackage, npmFiles, conanPackage } from '../../mock_data';
 
 describe('PackagesApp', () => {
   let wrapper;
@@ -44,6 +47,7 @@ describe('PackagesApp', () => {
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
   const deleteModal = () => wrapper.find(GlModal);
+  const modalDeleteButton = () => wrapper.find({ ref: 'modal-delete-button' });
 
   afterEach(() => {
     wrapper.destroy();
@@ -134,6 +138,46 @@ describe('PackagesApp', () => {
 
     it('shows the delete confirmation modal when delete is clicked', () => {
       expect(deleteModal()).toExist();
+    });
+  });
+
+  describe('tracking', () => {
+    let eventSpy;
+    let utilSpy;
+    const category = 'foo';
+
+    beforeEach(() => {
+      eventSpy = jest.spyOn(Tracking, 'event');
+      utilSpy = jest.spyOn(SharedUtils, 'packageTypeToTrackCategory').mockReturnValue(category);
+    });
+
+    it('tracking category calls packageTypeToTrackCategory', () => {
+      createComponent({ packageEntity: conanPackage });
+      expect(wrapper.vm.tracking.category).toBe(category);
+      expect(utilSpy).toHaveBeenCalledWith('conan');
+    });
+
+    it(`delete button on delete modal call event with ${TrackingActions.DELETE_PACKAGE}`, () => {
+      createComponent({ packageEntity: conanPackage, canDelete: true, destroyPath: 'foo' });
+      deleteButton().trigger('click');
+      return wrapper.vm.$nextTick().then(() => {
+        modalDeleteButton().trigger('click');
+        expect(eventSpy).toHaveBeenCalledWith(
+          category,
+          TrackingActions.DELETE_PACKAGE,
+          expect.any(Object),
+        );
+      });
+    });
+
+    it(`file download link call event with ${TrackingActions.PULL_PACKAGE}`, () => {
+      createComponent({ packageEntity: conanPackage });
+      firstFileDownloadLink().trigger('click');
+      expect(eventSpy).toHaveBeenCalledWith(
+        category,
+        TrackingActions.PULL_PACKAGE,
+        expect.any(Object),
+      );
     });
   });
 });
