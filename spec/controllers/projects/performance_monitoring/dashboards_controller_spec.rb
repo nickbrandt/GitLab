@@ -37,29 +37,23 @@ describe Projects::PerformanceMonitoring::DashboardsController do
           end
 
           context 'valid parameters' do
-            ['config/prometheus/common_metrics.yml', 'ee/config/prometheus/cluster_metrics.yml'].each do |dashboard_template|
-              context "dashboard template #{dashboard_template}" do
-                let(:dashboard) { dashboard_template }
+            it 'delegates commit creation to service' do
+              allow(controller).to receive(:repository).and_return(repository)
+              allow(repository).to receive(:find_branch).and_return(branch)
+              dashboard_attrs = {
+                commit_message: commit_message,
+                branch_name: branch_name,
+                start_branch: 'master',
+                encoding: 'text',
+                file_path: '.gitlab/dashboards/custom_dashboard.yml',
+                file_content: File.read('config/prometheus/common_metrics.yml')
+              }
 
-                it 'delegates commit creation to service' do
-                  allow(controller).to receive(:repository).and_return(repository)
-                  allow(repository).to receive(:find_branch).and_return(branch)
-                  dashboard_attrs = {
-                    commit_message: commit_message,
-                    branch_name: branch_name,
-                    start_branch: 'master',
-                    encoding: 'text',
-                    file_path: '.gitlab/dashboards/custom_dashboard.yml',
-                    file_content: File.read(dashboard)
-                  }
+              service_instance = instance_double(::Files::CreateService)
+              expect(::Files::CreateService).to receive(:new).with(project, user, dashboard_attrs).and_return(service_instance)
+              expect(service_instance).to receive(:execute).and_return(status: :success)
 
-                  service_instance = instance_double(::Files::CreateService)
-                  expect(::Files::CreateService).to receive(:new).with(project, user, dashboard_attrs).and_return(service_instance)
-                  expect(service_instance).to receive(:execute).and_return(status: :success)
-
-                  post :create, params: params
-                end
-              end
+              post :create, params: params
             end
 
             it 'extends dashboard template path to absolute url' do
@@ -127,6 +121,8 @@ describe Projects::PerformanceMonitoring::DashboardsController do
               context 'files create service failure' do
                 it 'redirects back and sets alert' do
                   allow(::Files::CreateService).to receive(:new).and_return(double(execute: { status: false, message: 'something went wrong' }))
+                  allow(controller).to receive(:repository).and_return(repository)
+                  allow(repository).to receive(:find_branch).and_return(branch)
 
                   post :create, params: params
 

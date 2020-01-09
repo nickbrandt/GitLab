@@ -60,10 +60,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :subscriptions, only: [:create, :destroy]
 
-        namespace :performance_monitoring do
-          resources :dashboards, only: [:create]
-        end
-
         resources :licenses, only: [:index, :create, :update]
 
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring
