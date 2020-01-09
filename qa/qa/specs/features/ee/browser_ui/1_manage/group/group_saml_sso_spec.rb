@@ -75,7 +75,7 @@ module QA
         end
       end
 
-      context 'Enforced SSO' do
+      context 'Enforced SSO', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/39607' do
         let(:developer_user) { Resource::User.fabricate_via_api! }
         let(:owner_user) { Resource::User.fabricate_via_api! }
 
