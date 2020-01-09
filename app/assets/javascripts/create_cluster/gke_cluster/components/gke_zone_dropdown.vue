@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import { sprintf, s__ } from '~/locale';
 
 import gkeDropdownMixin from './gke_dropdown_mixin';
@@ -16,6 +16,7 @@ export default {
       'projectHasBillingEnabled',
     ]),
     ...mapState({ items: 'zones' }),
+    ...mapGetters(['projectId', 'region']),
     isDisabled() {
       return this.isLoading || this.isValidatingProjectBilling || !this.projectHasBillingEnabled;
     },
@@ -53,8 +54,15 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['fetchZones']),
-    ...mapActions({ setItem: 'setZone' }),
+    ...mapActions(['fetchZones', 'setZone', 'setNetwork']),
+    ...mapActions({ fetchNetworks: 'networks/fetchItems' }),
+    setItem(zone) {
+      const { region, projectId: project } = this;
+
+      this.setNetwork('');
+      this.setZone(zone);
+      this.fetchNetworks({ region, project });
+    },
   },
 };
 </script>
