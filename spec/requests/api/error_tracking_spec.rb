@@ -16,7 +16,6 @@ describe API::ErrorTracking do
       create(:project, :repository, error_tracking_setting: project_error_tracking_setting)
     end
 
-
     context 'when project has no settings' do
       it 'returns 404' do
         get api("/projects/#{project.id}/error_tracking/sentry_project_settings", project.creator)
