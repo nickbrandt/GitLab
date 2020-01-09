@@ -555,6 +555,22 @@ describe MergeTrain do
     end
   end
 
+  describe '#active?' do
+    subject { merge_train.active? }
+
+    context 'when status is created' do
+      let(:merge_train) { create(:merge_train, :created) }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when status is merged' do
+      let(:merge_train) { create(:merge_train, :merged) }
+
+      it { is_expected.to eq(false) }
+    end
+  end
+
   def create_merge_request_on_train(target_project: project, target_branch: 'master', source_project: project, source_branch: 'feature')
     create(:merge_request,
       :on_train,
