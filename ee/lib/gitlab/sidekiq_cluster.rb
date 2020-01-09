@@ -137,10 +137,24 @@ module Gitlab
     # Returns true if all the processes are alive.
     def self.all_alive?(pids)
       pids.each do |pid|
-        return false unless signal(pid, 0)
+        return false unless process_alive?(pid)
       end
 
       true
+    end
+
+    def self.any_alive?(pids)
+      pids_alive(pids).any?
+    end
+
+    def self.pids_alive(pids)
+      pids.select { |pid| process_alive?(pid) }
+    end
+
+    def self.process_alive?(pid)
+      # Signal 0 tests whether the process exists and we have access to send signals
+      # but is otherwise a noop (doesn't actually send a signal to the process)
+      signal(pid, 0)
     end
 
     def self.write_pid(path)
