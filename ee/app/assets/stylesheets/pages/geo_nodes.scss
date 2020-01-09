@@ -10,74 +10,16 @@
   }
 }
 
-.geo-admin-projects,
-.geo-admin-uploads,
-.admin-projects {
-  .card-header {
-    .header-text-primary {
-      line-height: 28px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-  }
-
+.project-card-errors {
   .btn-card-header {
-    &:hover,
-    &:focus {
-      text-decoration: none;
-    }
-
     &.collapsed {
       .card-collapse-icon {
         display: none;
       }
-    }
 
-    &:not(.collapsed) {
       .card-expand-icon {
-        display: none;
+        display: block;
       }
-    }
-  }
-
-  .card-body {
-    .project-container,
-    .upload-container {
-      margin-left: 0;
-      padding-left: 0;
-    }
-
-    .geo-status-content {
-      &.status-type-success {
-        color: $green-600;
-      }
-
-      &.status-type-failure {
-        color: $red-500;
-      }
-    }
-
-    @include media-breakpoint-down(xs) {
-      .project-status-container + .project-status-container,
-      .upload-status-container + .upload-status-container {
-        margin-top: 15px;
-      }
-    }
-  }
-
-  .errors-list {
-    li + li {
-      margin-top: 5px;
-    }
-
-    .error-icon,
-    .error-text {
-      color: $red-500;
-    }
-
-    .error-text {
-      line-height: 18px;
     }
   }
 }
