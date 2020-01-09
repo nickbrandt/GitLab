@@ -12,7 +12,7 @@ describe('noteActions', () => {
   let props;
 
   const createWrapper = propsData =>
-    shallowMount(localVue.extend(noteActions), {
+    shallowMount(noteActions, {
       store,
       propsData,
       localVue,

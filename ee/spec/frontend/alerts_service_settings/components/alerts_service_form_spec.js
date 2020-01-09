@@ -23,7 +23,7 @@ describe('AlertsServiceForm', () => {
   let mockAxios;
 
   const createComponent = (props = defaultProps, { methods } = {}) => {
-    wrapper = shallowMount(localVue.extend(AlertsServiceForm), {
+    wrapper = shallowMount(AlertsServiceForm, {
       localVue,
       propsData: {
         ...defaultProps,

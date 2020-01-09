@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import ResetKey from 'ee/prometheus_alerts/components/reset_key.vue';
 import { GlModal } from '@gitlab/ui';
@@ -7,10 +7,8 @@ import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import axios from '~/lib/utils/axios_utils';
 
 describe('ResetKey', () => {
-  let Component;
   let mock;
   let vm;
-  const localVue = createLocalVue();
 
   const propsData = {
     initialAuthorizationKey: 'abcd1234',
@@ -21,7 +19,6 @@ describe('ResetKey', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-    Component = localVue.extend(ResetKey);
     setFixtures('<div class="flash-container"></div><div id="reset-key"></div>');
   });
 
@@ -33,7 +30,7 @@ describe('ResetKey', () => {
   describe('authorization key exists', () => {
     beforeEach(() => {
       propsData.initialAuthorizationKey = 'abcd1234';
-      vm = shallowMount(Component, {
+      vm = shallowMount(ResetKey, {
         propsData,
       });
     });
@@ -85,7 +82,7 @@ describe('ResetKey', () => {
   describe('authorization key has not been set', () => {
     beforeEach(() => {
       propsData.initialAuthorizationKey = '';
-      vm = shallowMount(Component, {
+      vm = shallowMount(ResetKey, {
         propsData,
       });
     });

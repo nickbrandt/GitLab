@@ -6,7 +6,7 @@ describe('Progress Bar', () => {
   let wrapper;
 
   const factory = propsData => {
-    wrapper = shallowMount(localVue.extend(component), {
+    wrapper = shallowMount(component, {
       propsData,
       localVue,
       sync: false,
