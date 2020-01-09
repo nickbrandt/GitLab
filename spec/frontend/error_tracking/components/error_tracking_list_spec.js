@@ -31,6 +31,8 @@ describe('ErrorTrackingList', () => {
       store,
       propsData: {
         indexPath: '/path',
+        listPath: '/error_tracking',
+        projectPath: 'project/test',
         enableErrorTrackingLink: '/link',
         userCanEnableErrorTracking,
         errorTrackingEnabled,
@@ -136,6 +138,14 @@ describe('ErrorTrackingList', () => {
         expect(errorTitle.at(index).attributes('href')).toEqual(
           expect.stringMatching(/error_tracking\/\d+\/details$/),
         );
+      });
+    });
+
+    it('each error in the list should have an ignore button', () => {
+      const error = wrapper.findAll('tbody tr');
+
+      error.wrappers.forEach((_, index) => {
+        expect(error.at(index).exists('glicon-stub[name="eye-slash"]')).toBe(true);
       });
     });
 
