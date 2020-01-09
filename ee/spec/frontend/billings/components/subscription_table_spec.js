@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/billings/stores';
@@ -18,14 +18,11 @@ describe('SubscriptionTable component', () => {
     wrapper.findAll('a').wrappers.map(x => ({ text: x.text(), href: x.attributes('href') }));
 
   const factory = (options = {}) => {
-    const localVue = createLocalVue();
-
     store = createStore();
     jest.spyOn(store, 'dispatch').mockImplementation();
 
-    wrapper = shallowMount(localVue.extend(SubscriptionTable), {
+    wrapper = shallowMount(SubscriptionTable, {
       ...options,
-      localVue,
       store,
       sync: false,
     });
