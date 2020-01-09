@@ -171,7 +171,7 @@ describe License do
 
           context 'but active users exceeds restricted user count' do
             it 'is invalid' do
-              6.times { create(:user) }
+              create_list(:user, 6)
 
               expect(license).not_to be_valid
             end
@@ -192,14 +192,14 @@ describe License do
           end
 
           it 'uses current active user count to calculate the expected true-up' do
-            3.times { create(:user) }
+            create_list(:user, 3)
 
             expect(license).to be_valid
           end
 
           context 'with wrong true-up quantity' do
             it 'is invalid' do
-              2.times { create(:user) }
+              create_list(:user, 2)
 
               expect(license).not_to be_valid
             end

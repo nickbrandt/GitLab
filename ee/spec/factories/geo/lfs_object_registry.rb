@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :geo_lfs_object_registry, class: Geo::LfsObjectRegistry do
+  factory :geo_lfs_object_registry, class: 'Geo::LfsObjectRegistry' do
     sequence(:lfs_object_id)
     success { true }
 

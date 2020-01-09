@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :design_at_version, class: DesignManagement::DesignAtVersion do
+  factory :design_at_version, class: 'DesignManagement::DesignAtVersion' do
     skip_create # This is not an Active::Record model.
 
     design { nil }

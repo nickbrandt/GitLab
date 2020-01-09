@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :alerting_alert, class: Gitlab::Alerting::Alert do
+  factory :alerting_alert, class: 'Gitlab::Alerting::Alert' do
     project
     payload { {} }
 

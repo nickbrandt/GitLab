@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :spdx_license, class: ::Gitlab::SPDX::License do
+  factory :spdx_license, class: '::Gitlab::SPDX::License' do
     id { |n| "License-#{n}" }
     name { |n| "License #{n}" }
 
