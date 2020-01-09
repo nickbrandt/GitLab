@@ -106,7 +106,7 @@ module QA
 
           def approvers
             within_element :approver_list do
-              all_elements(:approver).map { |item| item.find('img')['title'] }
+              all_elements(:approver, minimum: 1).map { |item| item.find('img')['title'] }
             end
           end
 

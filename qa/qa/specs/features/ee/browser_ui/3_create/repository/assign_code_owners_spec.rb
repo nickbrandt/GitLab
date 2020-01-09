@@ -73,6 +73,7 @@ module QA
           show.edit!
           approvers = show.approvers
 
+          expect(approvers.size).to eq(1)
           expect(approvers).to include(approver.name)
           expect(approvers).not_to include(non_approver.name)
         end

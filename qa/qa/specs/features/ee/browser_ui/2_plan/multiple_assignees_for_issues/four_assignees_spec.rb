@@ -38,7 +38,7 @@ module QA
         Page::Project::Menu.perform(&:click_issues)
 
         Page::Project::Issue::Index.perform do |index|
-          expect(index.assignee_link_count).to be 4
+          expect(index).to have_assignee_link_count(4)
         end
       end
     end

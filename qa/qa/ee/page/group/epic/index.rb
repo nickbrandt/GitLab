@@ -29,7 +29,7 @@ module QA
             end
 
             def click_first_epic(page = nil)
-              all_elements(:epic_title_text).first.click
+              all_elements(:epic_title_text, minimum: 1).first.click
               page.validate_elements_present! if page
             end
 

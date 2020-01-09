@@ -46,7 +46,7 @@ module QA
         Page::Project::Menu.perform(&:click_issues)
 
         Page::Project::Issue::Index.perform do |index|
-          expect(index.assignee_link_count).to be 3
+          expect(index).to have_assignee_link_count(3)
           expect(index.avatar_counter).to be_visible
           expect(index.avatar_counter).to have_content('+3')
         end
@@ -56,13 +56,13 @@ module QA
         @issue.visit!
 
         Page::Project::Issue::Show.perform do |show|
-          expect(show.avatar_image_count).to be 5
+          expect(show).to have_avatar_image_count(5)
           expect(show.more_assignees_link).to be_visible
           expect(show.more_assignees_link).to have_content('+ 1 more')
 
           show.toggle_more_assignees_link
 
-          expect(show.avatar_image_count).to be 6
+          expect(show).to have_avatar_image_count(6)
           expect(show.more_assignees_link).to have_content('- show less')
         end
       end
