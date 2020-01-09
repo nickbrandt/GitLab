@@ -875,6 +875,10 @@ module EE
         include ::API::Helpers::RelatedResourcesHelpers
         extend EntityHelpers
 
+        class BuildInfo < Grape::Entity
+          expose :pipeline_id
+        end
+
         expose :id
         expose :name
         expose :version
@@ -893,6 +897,7 @@ module EE
         expose :created_at
         expose :project_id, if: ->(_, opts) { opts[:group] }
         expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
+        expose :build_info, using: BuildInfo
 
         private
 

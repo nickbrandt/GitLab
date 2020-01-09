@@ -28,6 +28,12 @@ FactoryBot.define do
       after :create do |package|
         create :package_file, :npm, package: package
       end
+
+      trait :with_build do
+        after :create do |package|
+          create :package_build_info, package: package, pipeline: create(:ci_build, user: package.project.creator).pipeline
+        end
+      end
     end
 
     factory :nuget_package do
@@ -57,6 +63,9 @@ FactoryBot.define do
         create :conan_package_file, :conan_package, package: package
       end
     end
+  end
+
+  factory :package_build_info, class: Packages::BuildInfo do
   end
 
   factory :package_file, class: Packages::PackageFile do
