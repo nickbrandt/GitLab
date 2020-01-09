@@ -21,17 +21,6 @@ module EE
           def use_elasticsearch?(resource)
             ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: resource)
           end
-
-          override :process_results
-          def process_results(results)
-            return [] if results.empty?
-
-            if results.any? { |result| result.is_a?(::Elasticsearch::Model::Response::Result) && result.respond_to?(:blob) }
-              return paginate(results).map { |blob| ::Gitlab::Elastic::SearchResults.parse_search_result(blob) }
-            end
-
-            super
-          end
         end
       end
     end
