@@ -5,6 +5,7 @@ module Types
   # This is a subclass of `IssueType` which has authorization
   class EpicIssueType < IssueType
     graphql_name 'EpicIssue'
+    description 'Relationship between an epic and an issue'
 
     present_using EpicIssuePresenter
 
