@@ -5,7 +5,7 @@ module Epics
     include ApplicationWorker
 
     queue_namespace :epics
-    feature_category :agile_portfolio_management
+    feature_category :epics
 
     def perform(epic_ids)
       return if epic_ids.blank?
