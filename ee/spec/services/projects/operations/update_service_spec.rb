@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::Operations::UpdateService do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   let(:project) { create(:project) }
   let(:result) { subject.execute }
