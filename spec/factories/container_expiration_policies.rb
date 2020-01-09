@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :container_expiration_policy, class: ContainerExpirationPolicy do
+  factory :container_expiration_policy, class: 'ContainerExpirationPolicy' do
     association :project, factory: [:project, :without_container_expiration_policy]
     cadence { '1d' }
     enabled { true }
