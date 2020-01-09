@@ -4,13 +4,30 @@ module EpicLinks
   class CreateService < IssuableLinks::CreateService
     def execute
       if issuable.max_hierarchy_depth_achieved?
-        return error('Epic hierarchy level too deep', 409)
+        return error("This epic can't be added because the parent is already at the maximum depth from its most distant ancestor", 409)
       end
 
-      super
+      if referenced_issuables.count == 1
+        create_single_link
+      else
+        super
+      end
     end
 
     private
+
+    def create_single_link
+      child_epic = referenced_issuables.first
+
+      if linkable_epic?(child_epic)
+        set_child_epic!(child_epic)
+
+        create_notes(child_epic, nil)
+        success
+      else
+        error(child_epic.errors.messages[:parent].first, 409)
+      end
+    end
 
     def affected_epics(epics)
       [issuable, epics].flatten.uniq
