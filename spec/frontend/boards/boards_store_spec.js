@@ -191,14 +191,11 @@ describe('boardsStore', () => {
   });
 
   describe('saveList', () => {
-    const id = 'TOO-MUCH';
-
     let requestSpy;
     let mock;
     let list;
 
     beforeEach(() => {
-      requestSpy = jest.fn();
       mock = new AxiosMockAdapter(axios);
       list = new List(listObj);
     });
