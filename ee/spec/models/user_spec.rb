@@ -700,4 +700,32 @@ describe User do
       end
     end
   end
+
+  describe '#security_dashboard_project_ids' do
+    let(:project) { create(:project) }
+
+    context 'when the user can read all resources' do
+      it "returns the ids for all of the user's security dashboard projects" do
+        admin = create(:admin)
+        auditor = create(:auditor)
+
+        admin.security_dashboard_projects << project
+        auditor.security_dashboard_projects << project
+
+        expect(admin.security_dashboard_project_ids).to eq([project.id])
+        expect(auditor.security_dashboard_project_ids).to eq([project.id])
+      end
+    end
+
+    context 'when the user cannot read all resources' do
+      it 'returns the ids for security dashboard projects visible to the user' do
+        user = create(:user)
+        member_project = create(:project)
+        member_project.add_developer(user)
+        user.security_dashboard_projects << [project, member_project]
+
+        expect(user.security_dashboard_project_ids).to eq([member_project.id])
+      end
+    end
+  end
 end

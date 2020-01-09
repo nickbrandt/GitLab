@@ -1,12 +1,4 @@
 - page_title _('Security Dashboard')
 - @hide_breadcrumbs = true
 
-#js-security{ data: { vulnerabilities_endpoint: '/groups/gitlab-org/-/security/vulnerabilities',
-  vulnerabilities_count_endpoint: '/groups/gitlab-org/-/security/vulnerabilities/summary',
-  vulnerabilities_history_endpoint: '/groups/gitlab-org/-/security/vulnerabilities/history',
-  project_add_endpoint: security_projects_path,
-  project_list_endpoint: security_projects_path,
-  vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities'),
-  empty_state_svg_path: image_path('illustrations/operations-dashboard_empty.svg'),
-  empty_dashboard_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
-  dashboard_documentation: help_page_path('user/application_security/security_dashboard/index', anchor: 'instance-security-dashboard') } }
+#js-security{ data: instance_security_dashboard_data }

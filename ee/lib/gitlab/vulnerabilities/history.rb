@@ -8,10 +8,11 @@ module Gitlab
       attr_reader :vulnerable, :filters
 
       HISTORY_RANGE = 3.months
+      NoProjectIDsError = Class.new(StandardError)
 
-      def initialize(vulnerable, filters)
+      def initialize(vulnerable, params:)
         @vulnerable = vulnerable
-        @filters = filters
+        @filters = params
       end
 
       def findings_counter
@@ -57,6 +58,10 @@ module Gitlab
         return filters[:project_id] if filters.key?('project_id')
 
         vulnerable.project_ids_with_security_reports
+      rescue NoMethodError
+        vulnerable_name = vulnerable.model_name.human.downcase
+
+        raise NoProjectIDsError, "A project_id filter must be given with this #{vulnerable_name}"
       end
     end
   end

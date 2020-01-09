@@ -332,6 +332,14 @@ module EE
       read_attribute(:support_bot)
     end
 
+    def security_dashboard_project_ids
+      if self.can?(:read_all_resources)
+        security_dashboard_projects.ids
+      else
+        security_dashboard_projects.visible_to_user(self).ids
+      end
+    end
+
     protected
 
     override :password_required?
