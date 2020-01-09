@@ -24,7 +24,7 @@ module API
       get ':id/packages' do
         packages = user_project.packages
 
-        present paginate(packages), with: EE::API::Entities::Package
+        present paginate(packages), with: EE::API::Entities::Package, user: current_user
       end
 
       desc 'Get a single project package' do

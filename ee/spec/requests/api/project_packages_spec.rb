@@ -41,6 +41,18 @@ describe API::ProjectPackages do
           it_behaves_like 'returns packages', :project, :reporter
           it_behaves_like 'rejects packages access', :project, :no_type, :not_found
           it_behaves_like 'rejects packages access', :project, :guest, :forbidden
+
+          context 'user is a maintainer' do
+            before do
+              project.add_maintainer(user)
+            end
+
+            it 'returns the destroy url' do
+              subject
+
+              expect(json_response.first['_links']).to include('delete_api_path')
+            end
+          end
         end
       end
 
