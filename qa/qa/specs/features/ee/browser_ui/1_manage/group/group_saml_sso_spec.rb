@@ -352,7 +352,7 @@ module QA
 
       page.visit Runtime::Scenario.gitlab_address
 
-      Support::Retrier.retry_until(exit_on_failure: true) do
+      Support::Retrier.retry_until(raise_on_failure: true) do
         Page::Main::Menu.perform(&:sign_out_if_signed_in)
         !Page::Main::Menu.perform(&:signed_in?)
       end
