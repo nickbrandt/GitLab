@@ -1,9 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
-import { INVALID_CURRENT_ENVIRONMENT_NAME } from 'ee/threat_monitoring/store/modules/threat_monitoring/constants';
+import { INVALID_CURRENT_ENVIRONMENT_NAME, TIME_WINDOWS } from 'ee/threat_monitoring/constants';
 import { mockEnvironmentsResponse } from '../mock_data';
+
+const mockEnvironments = mockEnvironmentsResponse.environments;
 
 describe('ThreatMonitoringFilters component', () => {
   let store;
@@ -21,21 +22,19 @@ describe('ThreatMonitoringFilters component', () => {
     });
   };
 
-  const findEnvironmentsDropdown = () => wrapper.find(GlDropdown);
-  const findEnvironmentsDropdownItems = () => wrapper.findAll(GlDropdownItem).wrappers;
+  const findEnvironmentsDropdown = () => wrapper.find({ ref: 'environmentsDropdown' });
+  const findEnvironmentsDropdownItems = () => wrapper.findAll({ ref: 'environmentsDropdownItem' });
+  const findShowLastDropdown = () => wrapper.find({ ref: 'showLastDropdown' });
+  const findShowLastDropdownItems = () => wrapper.findAll({ ref: 'showLastDropdownItem' });
 
   afterEach(() => {
     wrapper.destroy();
   });
 
-  describe('given there are no environments', () => {
-    beforeEach(() => {
-      factory();
-    });
-
-    describe('the environments dropdown', () => {
-      it('is disabled', () => {
-        expect(findEnvironmentsDropdown().attributes().disabled).toBe('true');
+  describe('the environments dropdown', () => {
+    describe('given there are no environments', () => {
+      beforeEach(() => {
+        factory();
       });
 
       it('has text set to the INVALID_CURRENT_ENVIRONMENT_NAME', () => {
@@ -46,20 +45,17 @@ describe('ThreatMonitoringFilters component', () => {
         expect(findEnvironmentsDropdownItems()).toHaveLength(0);
       });
     });
-  });
 
-  describe('given there are environments', () => {
-    const { environments } = mockEnvironmentsResponse;
-    const currentEnvironment = environments[1];
+    describe('given there are environments', () => {
+      const currentEnvironment = mockEnvironments[1];
 
-    beforeEach(() => {
-      factory({
-        environments,
-        currentEnvironmentId: currentEnvironment.id,
+      beforeEach(() => {
+        factory({
+          environments: mockEnvironments,
+          currentEnvironmentId: currentEnvironment.id,
+        });
       });
-    });
 
-    describe('the environments dropdown', () => {
       it('is not disabled', () => {
         expect(findEnvironmentsDropdown().attributes().disabled).toBe(undefined);
       });
@@ -71,16 +67,74 @@ describe('ThreatMonitoringFilters component', () => {
       it('has dropdown items for each environment', () => {
         const dropdownItems = findEnvironmentsDropdownItems();
 
-        environments.forEach((environment, i) => {
-          expect(dropdownItems[i].text()).toBe(environment.name);
+        mockEnvironments.forEach((environment, i) => {
+          const dropdownItem = dropdownItems.at(i);
+          expect(dropdownItem.text()).toBe(environment.name);
 
-          dropdownItems[i].vm.$emit('click');
+          dropdownItem.vm.$emit('click');
           expect(store.dispatch).toHaveBeenCalledWith(
             'threatMonitoring/setCurrentEnvironmentId',
             environment.id,
           );
         });
       });
+    });
+  });
+
+  describe('the "show last" dropdown', () => {
+    beforeEach(() => {
+      factory({
+        environments: mockEnvironments,
+      });
+    });
+
+    it('is not disabled', () => {
+      expect(findShowLastDropdown().attributes().disabled).toBe(undefined);
+    });
+
+    it('has text set to the current time window name', () => {
+      const currentTimeWindowName = store.getters['threatMonitoring/currentTimeWindowName'];
+      expect(findShowLastDropdown().attributes().text).toBe(currentTimeWindowName);
+    });
+
+    it('has dropdown items for each time window', () => {
+      const dropdownItems = findShowLastDropdownItems();
+
+      Object.entries(TIME_WINDOWS).forEach(([timeWindow, config], i) => {
+        const dropdownItem = dropdownItems.at(i);
+        expect(dropdownItem.text()).toBe(config.name);
+
+        dropdownItem.vm.$emit('click');
+        expect(store.dispatch).toHaveBeenCalledWith(
+          'threatMonitoring/setCurrentTimeWindow',
+          timeWindow,
+        );
+      });
+    });
+  });
+
+  describe.each`
+    context                         | isLoadingEnvironments | isLoadingWafStatistics | environments
+    ${'environments are loading'}   | ${true}               | ${false}               | ${mockEnvironments}
+    ${'WAF statistics are loading'} | ${false}              | ${true}                | ${mockEnvironments}
+    ${'there are no environments'}  | ${false}              | ${false}               | ${[]}
+  `('given $context', ({ isLoadingEnvironments, isLoadingWafStatistics, environments }) => {
+    beforeEach(() => {
+      factory({
+        environments,
+        isLoadingEnvironments,
+        isLoadingWafStatistics,
+      });
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('disables the environments dropdown', () => {
+      expect(findEnvironmentsDropdown().attributes('disabled')).toBe('true');
+    });
+
+    it('disables the "show last" dropdown', () => {
+      expect(findShowLastDropdown().attributes('disabled')).toBe('true');
     });
   });
 });
