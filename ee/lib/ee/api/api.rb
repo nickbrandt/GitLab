@@ -49,6 +49,7 @@ module EE
         mount ::API::ProjectAliases
         mount ::API::Dependencies
         mount ::API::VisualReviewDiscussions
+        mount ::API::Analytics::CodeReviewAnalytics
 
         version 'v3', using: :path do
           # Although the following endpoints are kept behind V3 namespace,
