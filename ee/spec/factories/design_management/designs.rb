@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :design, class: DesignManagement::Design do
+  factory :design, class: 'DesignManagement::Design' do
     issue { create(:issue) }
     project { issue&.project || create(:project) }
     sequence(:filename) { |n| "homescreen-#{n}.jpg" }

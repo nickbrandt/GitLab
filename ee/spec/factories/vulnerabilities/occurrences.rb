@@ -5,7 +5,7 @@ FactoryBot.define do
     Digest::SHA1.hexdigest("uuid-#{n}")[0..35]
   end
 
-  factory :vulnerabilities_occurrence, class: Vulnerabilities::Occurrence, aliases: [:vulnerabilities_finding] do
+  factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
     name { 'Cipher with no integrity' }
     project
     sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }

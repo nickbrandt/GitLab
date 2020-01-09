@@ -2375,15 +2375,9 @@ describe Project do
       group2.update(custom_project_templates_group_id: group2_sub2.id)
       create(:project, group: group1)
 
-      2.times do
-        create(:project, group: group2)
-      end
-      3.times do
-        create(:project, group: group2_sub1)
-      end
-      4.times do
-        create(:project, group: group2_sub2)
-      end
+      create_list(:project, 2, group: group2)
+      create_list(:project, 3, group: group2_sub1)
+      create_list(:project, 4, group: group2_sub2)
     end
 
     it 'counts instance level templates' do

@@ -13,9 +13,7 @@ describe ElasticNamespaceRolloutWorker do
 
   before_all do
     Plan::PAID_HOSTED_PLANS.each do |plan|
-      4.times do
-        create(:gitlab_subscription, hosted_plan: public_send("#{plan}_plan"))
-      end
+      create_list(:gitlab_subscription, 4, hosted_plan: public_send("#{plan}_plan"))
     end
   end
 

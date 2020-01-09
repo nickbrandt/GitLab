@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :geo_project_registry, class: Geo::ProjectRegistry do
+  factory :geo_project_registry, class: 'Geo::ProjectRegistry' do
     project
     last_repository_synced_at { nil }
     last_repository_successful_sync_at { nil }

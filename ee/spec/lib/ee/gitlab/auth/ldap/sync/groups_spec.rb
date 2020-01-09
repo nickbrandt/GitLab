@@ -14,7 +14,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Groups do
       allow(EE::Gitlab::Auth::LDAP::Sync::AdminUsers).to receive(:execute)
       allow(EE::Gitlab::Auth::LDAP::Sync::ExternalUsers).to receive(:execute)
 
-      2.times { create(:group_with_ldap_group_link) }
+      create_list(:group_with_ldap_group_link, 2)
     end
 
     after do

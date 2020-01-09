@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :geo_upload_registry, class: Geo::UploadRegistry do
+  factory :geo_upload_registry, class: 'Geo::UploadRegistry' do
     sequence(:file_id)
     file_type { :file }
     success { true }

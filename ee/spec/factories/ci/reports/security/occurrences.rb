@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ci_reports_security_occurrence, class: ::Gitlab::Ci::Reports::Security::Occurrence do
+  factory :ci_reports_security_occurrence, class: '::Gitlab::Ci::Reports::Security::Occurrence' do
     compare_key { "#{identifiers.first.external_type}:#{identifiers.first.external_id}:#{location.fingerprint}" }
     confidence { :medium }
     identifiers { Array.new(1) { FactoryBot.build(:ci_reports_security_identifier) } }

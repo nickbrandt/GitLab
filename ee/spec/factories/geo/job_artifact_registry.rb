@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :geo_job_artifact_registry, class: Geo::JobArtifactRegistry do
+  factory :geo_job_artifact_registry, class: 'Geo::JobArtifactRegistry' do
     sequence(:artifact_id)
     success { true }
 

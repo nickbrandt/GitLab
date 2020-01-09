@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ci_reports_security_report, class: ::Gitlab::Ci::Reports::Security::Report do
+  factory :ci_reports_security_report, class: '::Gitlab::Ci::Reports::Security::Report' do
     type { :sast }
     commit_sha { Digest::SHA1.hexdigest(SecureRandom.hex) }
     created_at { 2.weeks.ago }
