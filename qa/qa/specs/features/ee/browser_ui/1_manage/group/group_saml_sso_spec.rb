@@ -21,7 +21,7 @@ module QA
       end
 
       context 'Non enforced SSO' do
-        it 'User logs in to group with SAML SSO' do
+        it 'User logs in to group with SAML SSO', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/55242' do
           Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
           managed_group_url = EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
