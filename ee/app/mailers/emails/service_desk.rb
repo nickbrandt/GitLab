@@ -11,13 +11,26 @@ module Emails
     def service_desk_thank_you_email(issue_id)
       setup_service_desk_mail(issue_id)
 
-      mail_new_thread(@issue, service_desk_options(@support_bot.id).merge(subject: "Re: #{@issue.title} (##{@issue.iid})"))
+      options = {
+        from: sender(@support_bot.id, send_from_user_email: false, sender_name: @project.service_desk_setting&.outgoing_name),
+        to: @issue.service_desk_reply_to,
+        subject: "Re: #{@issue.title} (##{@issue.iid})"
+      }
+
+      mail_new_thread(@issue, options)
     end
 
     def service_desk_new_note_email(issue_id, note_id)
       @note = Note.find(note_id)
       setup_service_desk_mail(issue_id)
-      mail_answer_thread(@issue, service_desk_options(@note.author_id).merge(subject: "#{@issue.title} (##{@issue.iid})"))
+
+      options = {
+        from: sender(@note.author_id),
+        to: @issue.service_desk_reply_to,
+        subject: "#{@issue.title} (##{@issue.iid})"
+      }
+
+      mail_answer_thread(@issue, options)
     end
 
     private
@@ -28,13 +41,6 @@ module Emails
       @support_bot = User.support_bot
 
       @sent_notification = SentNotification.record(@issue, @support_bot.id, reply_key)
-    end
-
-    def service_desk_options(author_id)
-      {
-        from: sender(author_id),
-        to: @issue.service_desk_reply_to
-      }
     end
   end
 end

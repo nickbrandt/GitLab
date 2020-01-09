@@ -3,8 +3,12 @@
 require 'spec_helper'
 
 describe Projects::ServiceDeskController do
-  let(:project) { create(:project_empty_repo, :private, service_desk_enabled: true) }
-  let(:user)    { create(:user) }
+  let_it_be(:project) do
+    create(:project, :private, :custom_repo, service_desk_enabled: true,
+           files: { '.gitlab/issue_templates/service_desk.md' => 'template' })
+  end
+
+  let_it_be(:user) { create(:user) }
 
   before do
     allow(License).to receive(:feature_available?).and_call_original
@@ -40,9 +44,7 @@ describe Projects::ServiceDeskController do
 
     context 'when issue template is present' do
       it 'returns template_file_missing as false' do
-        template_path = '.gitlab/issue_templates/service_desk.md'
-        project.repository.create_file(user, template_path, 'text from template', message: 'message', branch_name: 'master')
-        ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: 'service_desk')
+        create(:service_desk_setting, project: project, issue_template_key: 'service_desk')
 
         get :show, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
 
@@ -67,7 +69,9 @@ describe Projects::ServiceDeskController do
     it 'toggles services desk incoming email' do
       project.update!(service_desk_enabled: false)
 
-      put :update, params: { namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true }, format: :json
+      put :update, params: { namespace_id: project.namespace.to_param,
+                             project_id: project,
+                             service_desk_enabled: true }, format: :json
 
       expect(json_response["service_desk_address"]).to be_present
       expect(json_response["service_desk_enabled"]).to be_truthy
@@ -75,17 +79,24 @@ describe Projects::ServiceDeskController do
     end
 
     it 'sets issue_template_key' do
-      template_path = '.gitlab/issue_templates/service_desk.md'
-      project.repository.create_file(user, template_path, 'template text', message: 'message', branch_name: 'master')
-      ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: 'service_desk')
-
-      put :update, params: { namespace_id: project.namespace.to_param, project_id: project, issue_template_key: 'service_desk' }, format: :json
+      put :update, params: { namespace_id: project.namespace.to_param,
+                             project_id: project,
+                             issue_template_key: 'service_desk' }, format: :json
 
       settings = project.service_desk_setting
       expect(settings).to be_present
       expect(settings.issue_template_key).to eq('service_desk')
       expect(json_response['template_file_missing']).to eq(false)
       expect(json_response['issue_template_key']).to eq('service_desk')
+    end
+
+    it 'returns an error when update of service desk settings fails' do
+      put :update, params: { namespace_id: project.namespace.to_param,
+                             project_id: project,
+                             issue_template_key: 'invalid key' }, format: :json
+
+      expect(response.status).to eq(422)
+      expect(json_response['message']).to eq('Issue template key is empty or does not exist')
     end
 
     context 'when user cannot admin the project' do

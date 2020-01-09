@@ -10,12 +10,20 @@ class Projects::ServiceDeskController < Projects::ApplicationController
   def update
     Projects::UpdateService.new(project, current_user, { service_desk_enabled: params[:service_desk_enabled] }).execute
 
-    ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: params[:issue_template_key])
+    result = ServiceDeskSettings::UpdateService.new(project, current_user, setting_params).execute
 
-    json_response
+    if result[:status] == :success
+      json_response
+    else
+      render json: { message: result[:message] }, status: :unprocessable_entity
+    end
   end
 
   private
+
+  def setting_params
+    params.permit(:issue_template_key, :outgoing_name)
+  end
 
   def json_response
     respond_to do |format|
@@ -26,7 +34,8 @@ class Projects::ServiceDeskController < Projects::ApplicationController
           service_desk_address: project.service_desk_address,
           service_desk_enabled: project.service_desk_enabled,
           issue_template_key: service_desk_settings&.issue_template_key,
-          template_file_missing: service_desk_settings&.issue_template_missing?
+          template_file_missing: service_desk_settings&.issue_template_missing?,
+          outgoing_name: service_desk_settings&.outgoing_name
         }
 
       format.json { render json: service_desk_attributes }

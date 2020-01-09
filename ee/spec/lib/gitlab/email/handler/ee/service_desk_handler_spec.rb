@@ -61,10 +61,12 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         end
 
         context 'and template is present' do
+          let_it_be(:settings) { create(:service_desk_setting, project: project) }
+
           def set_template_file(file_name, content)
             file_path = ".gitlab/issue_templates/#{file_name}.md"
             project.repository.create_file(user, file_path, content, message: 'message', branch_name: 'master')
-            ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: file_name)
+            settings.update!(issue_template_key: file_name)
           end
 
           it 'appends template text to issue description' do
