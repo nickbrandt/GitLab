@@ -5,7 +5,7 @@ require 'spec_helper'
 shared_examples_for Vulnerable do
   include VulnerableHelpers
 
-  let(:external_project) { create(:project) }
+  let(:external_project) { as_external_vulnerable_project(vulnerable) }
   let(:failed_pipeline) { create(:ci_pipeline, :failed, project: vulnerable_project) }
 
   let!(:old_vuln) { create_vulnerability(vulnerable_project) }
@@ -20,8 +20,10 @@ shared_examples_for Vulnerable do
   end
 
   def create_vulnerability(project, pipeline = nil)
-    pipeline ||= create(:ci_pipeline, :success, project: project)
-    create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    if project
+      pipeline ||= create(:ci_pipeline, :success, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    end
   end
 
   describe '#latest_vulnerabilities' do
