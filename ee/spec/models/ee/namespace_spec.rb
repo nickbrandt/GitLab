@@ -54,4 +54,46 @@ describe Namespace do
       expect(namespace.use_elasticsearch?).to eq(true)
     end
   end
+
+  describe '#actual_plan_name' do
+    let(:namespace) { create(:namespace, plan: :gold_plan) }
+
+    subject { namespace.actual_plan_name }
+
+    context 'when DB is read-only' do
+      before do
+        expect(Gitlab::Database).to receive(:read_only?) { true }
+      end
+
+      it 'returns free plan' do
+        is_expected.to eq('free')
+      end
+
+      it 'does not create a gitlab_subscription' do
+        expect { subject }.not_to change(GitlabSubscription, :count)
+      end
+    end
+
+    context 'when namespace is not persisted' do
+      let(:namespace) { build(:namespace, plan: :gold_plan) }
+
+      it 'returns free plan' do
+        is_expected.to eq('free')
+      end
+
+      it 'does not create a gitlab_subscription' do
+        expect { subject }.not_to change(GitlabSubscription, :count)
+      end
+    end
+
+    context 'when DB is not read-only' do
+      it 'returns gold plan' do
+        is_expected.to eq('gold')
+      end
+
+      it 'creates a gitlab_subscription' do
+        expect { subject }.to change(GitlabSubscription, :count).by(1)
+      end
+    end
+  end
 end

@@ -371,6 +371,9 @@ module EE
     end
 
     def generate_subscription
+      return unless persisted?
+      return if ::Gitlab::Database.read_only?
+
       create_gitlab_subscription(
         plan_code: plan&.name,
         trial: trial_active?,
