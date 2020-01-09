@@ -16,6 +16,11 @@ module Resolvers
                required: false,
                description: 'The Global ID of the most recent acceptable version'
 
+      # This resolver has a custom singular resolver
+      def self.single
+        ::Resolvers::DesignManagement::VersionInCollectionResolver
+      end
+
       def resolve(parent: nil, id: nil, sha: nil)
         GitlabSchema.after_lazy(cutoff(parent, id, sha)) do |version|
           raise ::Gitlab::Graphql::Errors::ResourceNotAvailable, 'cutoff not found' unless version
