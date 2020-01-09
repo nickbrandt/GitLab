@@ -4,6 +4,7 @@ module Types
   module DesignManagement
     class DesignType < BaseObject
       graphql_name 'Design'
+      description 'A single design'
 
       authorize :read_design
 

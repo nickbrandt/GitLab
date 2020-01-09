@@ -3,6 +3,7 @@
 module Types
   class EpicType < BaseObject
     graphql_name 'Epic'
+    description 'Represents an epic.'
 
     authorize :read_epic
 

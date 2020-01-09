@@ -4,7 +4,7 @@ module Types
   module DesignManagement
     class DesignVersionEventEnum < BaseEnum
       graphql_name 'DesignVersionEvent'
-      description 'Mutation event of a Design within a Version'
+      description 'Mutation event of a design within a version'
 
       NONE = 'NONE'
 
