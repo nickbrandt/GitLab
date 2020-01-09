@@ -1,9 +1,4 @@
 {
   "type": "array",
-  "items": {
-    "type": "object",
-    "properties": {
-      "$ref": "./package.json"
-    }
-  }
+  "items": { "$ref": "./package.json" }
 }
