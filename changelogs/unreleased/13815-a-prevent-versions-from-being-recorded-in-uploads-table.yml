@@ -1,0 +1,5 @@
+---
+title: Prevent versions of images from being recorded in the uploads table
+merge_request: 22735
+author:
+type: changed
