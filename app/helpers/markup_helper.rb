@@ -280,7 +280,7 @@ module MarkupHelper
     context.reverse_merge!(
       current_user: (current_user if defined?(current_user)),
 
-      # RepositoryLinkFilter
+      # RepositoryLinkFilter and UploadLinkFilter
       commit:         @commit,
       project_wiki:   @project_wiki,
       ref:            @ref,

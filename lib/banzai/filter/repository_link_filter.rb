@@ -65,7 +65,7 @@ module Banzai
             el.attribute('href')
           end
 
-          attrs += doc.search('img, video, audio').flat_map do |el|
+          attrs += doc.search('img:not(.gfm), video:not(.gfm), audio:not(.gfm)').flat_map do |el|
             [el.attribute('src'), el.attribute('data-src')]
           end
 
