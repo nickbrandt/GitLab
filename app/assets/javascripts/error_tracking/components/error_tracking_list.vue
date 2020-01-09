@@ -48,6 +48,11 @@ export default {
       tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
     },
     {
+      key: 'ignore',
+      label: '',
+      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+    },
+    {
       key: 'details',
       tdClass: 'table-col d-sm-none d-flex align-items-center',
       thClass: 'invisible w-0',
@@ -298,6 +303,11 @@ export default {
             <div class="text-md-left text-right">
               <time-ago :time="errors.item.lastSeen" class="text-secondary" />
             </div>
+          </template>
+          <template v-slot:ignore="errors">
+            <gl-button @click="updateIssueStatus('ignored')">
+              <gl-icon name="eye-slash" :size=12 />
+            </gl-button>
           </template>
           <template v-slot:details="errors">
             <gl-button
