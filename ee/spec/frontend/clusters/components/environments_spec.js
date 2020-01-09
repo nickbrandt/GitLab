@@ -1,10 +1,8 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Environments from 'ee/clusters/components/environments.vue';
 import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import environments from './mock_data';
-
-const localVue = createLocalVue();
 
 describe('Environments', () => {
   let wrapper;
@@ -21,7 +19,6 @@ describe('Environments', () => {
 
     wrapper = mount(Environments, {
       propsData,
-      localVue,
     });
   });
 
@@ -44,7 +41,6 @@ describe('Environments', () => {
     beforeAll(() => {
       wrapper = mount(Environments, {
         propsData: { ...propsData, environments },
-        localVue,
         stubs: { deploymentInstance: '<div class="js-deployment-instance"></div>' },
         sync: false,
       });

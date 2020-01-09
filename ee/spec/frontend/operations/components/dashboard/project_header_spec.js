@@ -1,10 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import { trimText } from 'helpers/text_helper';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { mockOneProject } from '../../mock_data';
-
-const localVue = createLocalVue();
 
 describe('project header component', () => {
   let wrapper;
@@ -14,7 +12,6 @@ describe('project header component', () => {
       propsData: {
         project: mockOneProject,
       },
-      localVue,
       sync: false,
       attachToDocument: true,
     });
