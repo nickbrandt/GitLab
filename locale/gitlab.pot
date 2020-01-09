@@ -269,9 +269,6 @@ msgstr ""
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
-msgid "%{from} to %{to}"
-msgstr ""
-
 msgid "%{global_id} is not a valid id for %{expected_type}."
 msgstr ""
 
@@ -368,6 +365,9 @@ msgid "%{size} bytes"
 msgstr ""
 
 msgid "%{spammable_titlecase} was submitted to Akismet successfully."
+msgstr ""
+
+msgid "%{start} to %{end}"
 msgstr ""
 
 msgid "%{state} epics"
@@ -11478,7 +11478,7 @@ msgstr ""
 msgid "Metrics|Legend label (optional)"
 msgstr ""
 
-msgid "Metrics|Link contains an invalid time window."
+msgid "Metrics|Link contains an invalid time window, please verify the link to see the requested time range."
 msgstr ""
 
 msgid "Metrics|Max"
