@@ -116,17 +116,6 @@ old job definitions are still maintained they have been deprecated and may be re
 in the next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
 configuration to reflect that change.
 
-CAUTION: **Caution:**
-Note that in these old job definitions, the Code Quality image's old versioning
-scheme (e.g. `12-5-stable`) is still being used. But in GitLab 12.6, Code Quality switched to the
-[new versioning scheme](https://gitlab.com/gitlab-org/security-products/codequality/merge_requests/38).
-It is highly recommended to use the vendored template to not worry about manually bumping the image's version,
-but for those who are not yet able to move away from the old job definition, there are [Docker images](https://gitlab.com/gitlab-org/security-products/codequality/container_registry) for
-`12-5-stable`, `12-6-stable`, `12-7-stable`, `12-8-stable`, `12-9-stable`, and `12-10-stable`. These images are just
-copies of `12-4-stable`. No fixes/changes will be backported into these images.
-All further improvements will only be in `0.85.5` onwards. Alternatively, the version (e.g `0.85.5`) can be hardcoded into
-the `SP_VERSION` variable.
-
 For GitLab 11.5 and later, the job should look like:
 
 ```yaml
@@ -139,6 +128,32 @@ code_quality:
     - docker:stable-dind
   script:
     - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+```
+
+In GitLab 12.6, Code Quality switched to the
+[new versioning scheme](https://gitlab.com/gitlab-org/security-products/codequality/merge_requests/38).
+So for the job to work on GitLab 12.11 and later, it is highly recommended to include the
+Code Quality template as shown in the [example configuration](#example-configuration). Alternatively, the `SP_VERSION`
+variable will have to be hardcoded like:
+
+```yaml
+code_quality:
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+    SP_VERSION: 0.85.6
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
     - docker run
         --env SOURCE_CODE="$PWD"
         --volume "$PWD":/code
