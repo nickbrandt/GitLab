@@ -172,6 +172,10 @@ class BoardsStoreEE {
     return parseBoolean(Cookies.get('promotion_issue_board_hidden'));
   }
 
+  setMaxIssueCountOnList(id, maxIssueCount) {
+    this.store.findList('id', id).maxIssueCount = maxIssueCount;
+  }
+
   updateWeight(newWeight, id) {
     const { issue } = this.store.detail;
     if (issue.id === id && issue.sidebarInfoEndpoint) {
