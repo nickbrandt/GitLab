@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe UsersHelper do
-  describe '#current_user_menu_items' do
-    let(:user) { create(:user) }
+  let(:user) { create(:user) }
 
+  describe '#current_user_menu_items' do
     using RSpec::Parameterized::TableSyntax
 
     where(
@@ -30,6 +30,47 @@ describe UsersHelper do
       subject { helper.current_user_menu_items.include?(:start_trial) }
 
       it { is_expected.to eq(expected_result) }
+    end
+  end
+
+  describe '#user_badges_in_admin_section' do
+    subject { helper.user_badges_in_admin_section(user) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(build(:user))
+    end
+
+    context 'with user who is using a license seat' do
+      before do
+        allow(user).to receive(:using_license_seat?).and_return(true)
+      end
+
+      context 'when user is an admin and the current_user' do
+        before do
+          allow(helper).to receive(:current_user).and_return(user)
+          allow(user).to receive(:admin?).and_return(true)
+        end
+
+        it do
+          expect(subject).to eq(
+            [
+              { text: 'Admin', variant: 'success' },
+              { text: 'Is using seat', variant: 'light' },
+              { text: "It's you!", variant: nil }
+            ]
+          )
+        end
+      end
+
+      it { expect(subject).to eq([text: 'Is using seat', variant: 'light']) }
+    end
+
+    context 'with user who is not using a license seat' do
+      before do
+        allow(user).to receive(:using_license_seat?).and_return(false)
+      end
+
+      it { expect(subject).to eq([]) }
     end
   end
 end

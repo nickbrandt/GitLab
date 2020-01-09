@@ -10,6 +10,16 @@ module EE
       new_trial_registration_path
     end
 
+    def user_badges_in_admin_section(user)
+      super(user).tap do |badges|
+        if user.using_license_seat?
+          it_s_you_index = badges.index { |badge| badge[:text] == "It's you!" } || -1
+
+          badges.insert(it_s_you_index, { text: s_('AdminUsers|Is using seat'), variant: 'light' })
+        end
+      end
+    end
+
     private
 
     def trials_allowed?(user)
