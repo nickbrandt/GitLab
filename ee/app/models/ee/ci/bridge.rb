@@ -180,7 +180,7 @@ module EE
       def cross_project_params
         {
           project: downstream_project,
-          source: :cross_project_pipeline,
+          source: :pipeline,
           target_revision: {
             ref: target_ref || downstream_project.default_branch
           },
