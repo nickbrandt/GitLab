@@ -18,19 +18,19 @@ module Resolvers
       def find_object(id:)
         obj = GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::DesignAtVersion)
 
-        inconsistent?(obj) ? nil : obj
-      end
-
-      def current_user
-        context[:current_user]
+        GitlabSchema.after_lazy(obj) { |dav| inconsistent?(dav) ? nil : dav }
       end
 
       private
 
+      # If this resolver is mounted on something that has an issue
+      # (such as design collection for instance), then we should check
+      # that the DesignAtVersion as found by its ID does in fact belong
+      # to this issue.
       def inconsistent?(dav)
         return unless dav.present?
 
-        if issue = object.try(:issue)
+        if issue = object&.issue
           dav.design.issue_id != issue.id
         end
       end
