@@ -14,6 +14,7 @@ describe API::ProjectPackages do
 
   describe 'GET /projects/:id/packages' do
     let(:url) { "/projects/#{project.id}/packages" }
+    let(:package_schema) { 'public_api/v4/packages/packages' }
 
     subject { get api(url) }
 

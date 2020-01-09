@@ -13,6 +13,7 @@ describe API::GroupPackages do
 
   describe 'GET /groups/:id/packages' do
     let(:url) { "/groups/#{group.id}/packages" }
+    let(:package_schema) { 'public_api/v4/packages/group_packages' }
 
     context 'with packages feature enabled' do
       before do
