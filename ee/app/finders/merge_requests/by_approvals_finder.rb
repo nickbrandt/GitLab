@@ -6,8 +6,8 @@ module MergeRequests
     attr_reader :usernames, :ids
 
     def initialize(usernames, ids)
-      @usernames = usernames.to_a.map(&:to_s)
-      @ids = ids
+      @usernames = Array(usernames).map(&:to_s).uniq
+      @ids = Array(ids).uniq
     end
 
     def execute(items)
@@ -37,7 +37,7 @@ module MergeRequests
     end
 
     def includes_custom_label?(label)
-      ids.to_s.downcase == label || usernames.map(&:downcase).include?(label)
+      ids.first.to_s.downcase == label || usernames.map(&:downcase).include?(label)
     end
 
     # Merge Requests without any approval
@@ -54,12 +54,12 @@ module MergeRequests
 
     # Merge Requests approved by given usernames
     def find_approved_by_names(items)
-      items.approved_by_users_with_usernames(usernames)
+      items.approved_by_users_with_usernames(*usernames)
     end
 
     # Merge Requests approved by given user IDs
     def find_approved_by_ids(items)
-      items.approved_by_users_with_ids(ids)
+      items.approved_by_users_with_ids(*ids)
     end
   end
 end

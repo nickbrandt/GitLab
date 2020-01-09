@@ -43,14 +43,14 @@ module EE
 
       scope :without_approvals, -> { left_outer_joins(:approvals).where(approvals: { id: nil }) }
       scope :with_approvals, -> { joins(:approvals) }
-      scope :approved_by_users_with_ids, -> (user_ids) do
+      scope :approved_by_users_with_ids, -> (*user_ids) do
         with_approvals
           .merge(Approval.with_user)
           .where(users: { id: user_ids })
           .group(:id)
           .having("COUNT(users.id) = ?", user_ids.size)
       end
-      scope :approved_by_users_with_usernames, -> (usernames) do
+      scope :approved_by_users_with_usernames, -> (*usernames) do
         with_approvals
           .merge(Approval.with_user)
           .where(users: { username: usernames })

@@ -27,8 +27,8 @@ describe MergeRequests::ByApprovalsFinder do
     it 'returns merge requests without approvals' do
       expected_result = [merge_request_without_approvals]
 
-      expect(merge_requests(ids: 'None')).to eq(expected_result)
-      expect(merge_requests(names: ['None'])).to eq(expected_result)
+      expect(merge_requests(ids: 'None')).to match_array(expected_result)
+      expect(merge_requests(names: ['None'])).to match_array(expected_result)
     end
   end
 
@@ -36,8 +36,8 @@ describe MergeRequests::ByApprovalsFinder do
     it 'returns merge requests approved by at least one user' do
       expected_result = [merge_request_with_first_user_approval, merge_request_with_both_approvals]
 
-      expect(merge_requests(ids: 'Any')).to eq(expected_result)
-      expect(merge_requests(names: ['Any'])).to eq(expected_result)
+      expect(merge_requests(ids: 'Any')).to match_array(expected_result)
+      expect(merge_requests(names: ['Any'])).to match_array(expected_result)
     end
   end
 
@@ -45,8 +45,8 @@ describe MergeRequests::ByApprovalsFinder do
     it 'returns merge requests approved by specific user' do
       expected_result = [merge_request_with_first_user_approval, merge_request_with_both_approvals]
 
-      expect(merge_requests(ids: [first_user.id])).to eq(expected_result)
-      expect(merge_requests(names: [first_user.username])).to eq(expected_result)
+      expect(merge_requests(ids: [first_user.id])).to match_array(expected_result)
+      expect(merge_requests(names: [first_user.username])).to match_array(expected_result)
     end
   end
 
