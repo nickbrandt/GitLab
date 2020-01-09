@@ -111,7 +111,7 @@ describe Resolvers::DesignManagement::VersionsResolver do
     end
 
     def resolve_versions(obj, context = { current_user: current_user })
-      resolve(resolver, obj: obj, args: params.merge(parent: parent), ctx: context)
+      eager_resolve(resolver, obj: obj, args: params.merge(parent: parent), ctx: context)
     end
   end
 end

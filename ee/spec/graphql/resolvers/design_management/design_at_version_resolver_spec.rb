@@ -61,6 +61,6 @@ describe Resolvers::DesignManagement::DesignAtVersionResolver do
   def resolve_design
     args = { id: global_id }
     ctx = { current_user: current_user }
-    resolve(described_class, obj: object, args: args, ctx: ctx)
+    eager_resolve(described_class, obj: object, args: args, ctx: ctx)
   end
 end
