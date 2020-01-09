@@ -28,7 +28,7 @@ module QA
           # You can't start a review immediately, so we have to add a
           # comment (or start a thread) first
           show.start_discussion("I'm starting a new discussion")
-          show.type_reply_to_discussion("Could you please check this?")
+          show.type_reply_to_discussion(1, "Could you please check this?")
           show.start_review
           show.submit_pending_reviews
 
