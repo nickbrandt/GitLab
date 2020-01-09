@@ -4,6 +4,7 @@ module EE
   module Ci
     module Bridge
       extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
 
       InvalidBridgeTypeError = Class.new(StandardError)
@@ -98,19 +99,42 @@ module EE
         self.user
       end
 
-      def target_project_path
+      def target_project
         downstream_project || upstream_project
+      end
+
+      def triggers_child_pipeline?
+        yaml_for_downstream.present?
+      end
+
+      override :yaml_for_downstream
+      def yaml_for_downstream
+        strong_memoize(:yaml_for_downstream) do
+          includes = options&.dig(:trigger, :include)
+          YAML.dump('include' => includes) if includes
+        end
+      end
+
+      def downstream_pipeline_params
+        return child_params if triggers_child_pipeline?
+        return cross_project_params if downstream_project.present?
+
+        {}
       end
 
       def downstream_project
         strong_memoize(:downstream_project) do
-          options&.dig(:trigger, :project)
+          if downstream_project_path
+            ::Project.find_by_full_path(downstream_project_path)
+          elsif triggers_child_pipeline?
+            project
+          end
         end
       end
 
       def upstream_project
         strong_memoize(:upstream_project) do
-          options&.dig(:bridge_needs, :pipeline)
+          upstream_project_path && ::Project.find_by_full_path(upstream_project_path)
         end
       end
 
@@ -137,6 +161,51 @@ module EE
             { key: hash[:key], value: ::ExpandVariables.expand(hash[:value], all_variables) }
           end
         end
+      end
+
+      def downstream_project_path
+        strong_memoize(:downstream_project_path) do
+          options&.dig(:trigger, :project)
+        end
+      end
+
+      def upstream_project_path
+        strong_memoize(:upstream_project_path) do
+          options&.dig(:bridge_needs, :pipeline)
+        end
+      end
+
+      private
+
+      def cross_project_params
+        {
+          project: downstream_project,
+          source: :cross_project_pipeline,
+          target_revision: {
+            ref: target_ref || downstream_project.default_branch
+          },
+          execute_params: { ignore_skip_ci: true }
+        }
+      end
+
+      def child_params
+        parent_pipeline = pipeline
+
+        {
+          project: project,
+          source: :parent_pipeline,
+          target_revision: {
+            ref: parent_pipeline.ref,
+            checkout_sha: parent_pipeline.sha,
+            before: parent_pipeline.before_sha,
+            source_sha: parent_pipeline.source_sha,
+            target_sha: parent_pipeline.target_sha
+          },
+          execute_params: {
+            ignore_skip_ci: true,
+            bridge: self
+          }
+        }
       end
     end
   end

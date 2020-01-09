@@ -22,19 +22,61 @@ module EE
               end
             end
 
-            class ComplexTrigger < ::Gitlab::Config::Entry::Node
-              include ::Gitlab::Config::Entry::Validatable
-              include ::Gitlab::Config::Entry::Attributable
+            class ComplexTrigger < ::Gitlab::Config::Entry::Simplifiable
+              strategy :CrossProjectTrigger, if: -> (config) { !config.key?(:include) }
 
-              ALLOWED_KEYS = %i[project branch strategy].freeze
-              attributes :project, :branch, :strategy
+              strategy :SameProjectTrigger, if: -> (config) do
+                ::Feature.enabled?(:ci_parent_child_pipeline) &&
+                  config.key?(:include)
+              end
 
-              validations do
-                validates :config, presence: true
-                validates :config, allowed_keys: ALLOWED_KEYS
-                validates :project, presence: true
-                validates :branch, type: String, allow_nil: true
-                validates :strategy, type: String, inclusion: { in: %w[depend], message: 'should be depend' }, allow_nil: true
+              class CrossProjectTrigger < ::Gitlab::Config::Entry::Node
+                include ::Gitlab::Config::Entry::Validatable
+                include ::Gitlab::Config::Entry::Attributable
+
+                ALLOWED_KEYS = %i[project branch strategy].freeze
+                attributes :project, :branch, :strategy
+
+                validations do
+                  validates :config, presence: true
+                  validates :config, allowed_keys: ALLOWED_KEYS
+                  validates :project, presence: true
+                  validates :branch, type: String, allow_nil: true
+                  validates :strategy, type: String, inclusion: { in: %w[depend], message: 'should be depend' }, allow_nil: true
+                end
+              end
+
+              class SameProjectTrigger < ::Gitlab::Config::Entry::Node
+                include ::Gitlab::Config::Entry::Validatable
+                include ::Gitlab::Config::Entry::Attributable
+                include ::Gitlab::Config::Entry::Configurable
+
+                ALLOWED_KEYS = %i[strategy include].freeze
+                attributes :strategy
+
+                validations do
+                  validates :config, presence: true
+                  validates :config, allowed_keys: ALLOWED_KEYS
+                  validates :strategy, type: String, inclusion: { in: %w[depend], message: 'should be depend' }, allow_nil: true
+                end
+
+                entry :include, ::Gitlab::Ci::Config::Entry::Includes,
+                  description: 'List of external YAML files to include.',
+                  reserved: true
+
+                def value
+                  @config
+                end
+              end
+
+              class UnknownStrategy < ::Gitlab::Config::Entry::Node
+                def errors
+                  if ::Feature.enabled?(:ci_parent_child_pipeline)
+                    ['config must specify either project or include']
+                  else
+                    ['config must specify project']
+                  end
+                end
               end
             end
 

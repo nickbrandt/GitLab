@@ -4,10 +4,10 @@ require 'spec_helper'
 
 describe Ci::CreateCrossProjectPipelineService, '#execute' do
   set(:user) { create(:user) }
-  set(:upstream_project) { create(:project, :repository) }
+  let(:upstream_project) { create(:project, :repository) }
   set(:downstream_project) { create(:project, :repository) }
 
-  set(:upstream_pipeline) do
+  let!(:upstream_pipeline) do
     create(:ci_pipeline, :running, project: upstream_project)
   end
 
@@ -30,7 +30,6 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
   let(:service) { described_class.new(upstream_project, user) }
 
   before do
-    stub_ci_pipeline_to_return_yaml_file
     upstream_project.add_developer(user)
   end
 
@@ -87,8 +86,11 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
   end
 
   context 'when user can create pipeline in a downstream project' do
+    let(:stub_config) { true }
+
     before do
       downstream_project.add_developer(user)
+      stub_ci_pipeline_yaml_file(YAML.dump(rspec: { script: 'rspec' })) if stub_config
     end
 
     it 'creates only one new pipeline' do
@@ -126,21 +128,95 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       end
     end
 
-    context 'when circular dependency is defined' do
+    context 'when downstream project is the same as the job project' do
       let(:trigger) do
         { trigger: { project: upstream_project.full_path } }
       end
 
-      it 'does not create a new pipeline' do
-        expect { service.execute(bridge) }
-          .not_to change { Ci::Pipeline.count }
+      context 'detects a circular dependency' do
+        it 'does not create a new pipeline' do
+          expect { service.execute(bridge) }
+            .not_to change { Ci::Pipeline.count }
+        end
+
+        it 'changes status of the bridge build' do
+          service.execute(bridge)
+
+          expect(bridge.reload).to be_failed
+          expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+        end
       end
 
-      it 'changes status of the bridge build' do
-        service.execute(bridge)
+      context 'when "include" is provided' do
+        shared_examples 'creates a child pipeline' do
+          it 'creates only one new pipeline' do
+            expect { service.execute(bridge) }
+              .to change { Ci::Pipeline.count }.by(1)
+          end
 
-        expect(bridge.reload).to be_failed
-        expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+          it 'creates a child pipeline in the same project' do
+            pipeline = service.execute(bridge)
+            pipeline.reload
+
+            expect(pipeline.builds.map(&:name)).to eq %w[rspec echo]
+            expect(pipeline.user).to eq bridge.user
+            expect(pipeline.project).to eq bridge.project
+            expect(bridge.sourced_pipelines.first.pipeline).to eq pipeline
+            expect(pipeline.triggered_by_pipeline).to eq upstream_pipeline
+            expect(pipeline.source_bridge).to eq bridge
+            expect(pipeline.source_bridge).to be_a ::Ci::Bridge
+          end
+
+          it 'updates bridge status when downstream pipeline gets proceesed' do
+            pipeline = service.execute(bridge)
+
+            expect(pipeline.reload).to be_pending
+            expect(bridge.reload).to be_success
+          end
+
+          it 'propagates parent pipeline settings to the child pipeline' do
+            pipeline = service.execute(bridge)
+            pipeline.reload
+
+            expect(pipeline.ref).to eq(upstream_pipeline.ref)
+            expect(pipeline.sha).to eq(upstream_pipeline.sha)
+            expect(pipeline.source_sha).to eq(upstream_pipeline.source_sha)
+            expect(pipeline.target_sha).to eq(upstream_pipeline.target_sha)
+            expect(pipeline.target_sha).to eq(upstream_pipeline.target_sha)
+
+            expect(pipeline.trigger_requests.last).to eq(bridge.trigger_request)
+          end
+        end
+
+        before do
+          file_content = YAML.dump(
+            rspec: { script: 'rspec' },
+            echo: { script: 'echo' })
+          upstream_project.repository.create_file(
+            user, 'child-pipeline.yml', file_content, message: 'message', branch_name: 'master')
+
+          upstream_pipeline.update!(sha: upstream_project.commit.id)
+        end
+
+        let(:stub_config) { false }
+
+        let(:trigger) do
+          {
+            trigger: { include: 'child-pipeline.yml' }
+          }
+        end
+
+        it_behaves_like 'creates a child pipeline'
+
+        context 'when latest sha for the ref changed in the meantime' do
+          before do
+            upstream_project.repository.create_file(
+              user, 'another-change', 'test', message: 'message', branch_name: 'master')
+          end
+
+          # it does not auto-cancel pipelines from the same family
+          it_behaves_like 'creates a child pipeline'
+        end
       end
     end
 
