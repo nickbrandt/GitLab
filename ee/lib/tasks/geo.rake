@@ -339,12 +339,10 @@ namespace :geo do
       puts using_percentage(current_node_status.container_repositories_synced_in_percentage)
     end
 
-    if Feature.enabled?(:enable_geo_design_sync)
-      print 'Design repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
-      show_failed_value(current_node_status.design_repositories_failed_count)
-      print "#{current_node_status.design_repositories_synced_count || 0}/#{current_node_status.design_repositories_count || 0} "
-      puts using_percentage(current_node_status.design_repositories_synced_in_percentage)
-    end
+    print 'Design repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
+    show_failed_value(current_node_status.design_repositories_failed_count)
+    print "#{current_node_status.design_repositories_synced_count || 0}/#{current_node_status.design_repositories_count || 0} "
+    puts using_percentage(current_node_status.design_repositories_synced_in_percentage)
 
     if Gitlab::CurrentSettings.repository_checks_enabled
       print 'Repositories Checked: '.rjust(GEO_STATUS_COLUMN_WIDTH)

@@ -3,9 +3,6 @@
 class Admin::Geo::NodesController < Admin::Geo::ApplicationController
   before_action :check_license!, except: :index
   before_action :load_node, only: [:edit, :update]
-  before_action only: [:index] do
-    push_frontend_feature_flag(:enable_geo_design_sync)
-  end
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
