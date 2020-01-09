@@ -131,42 +131,4 @@ describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidek
       it_behaves_like 'patch prometheus services post migration'
     end
   end
-
-  describe '#down' do
-    subject(:migration) { described_class.new }
-
-    let(:group) { namespaces.create!(name: 'group', path: 'gitlab-org') }
-    let(:project) { projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: namespace.id) }
-    let(:project_with_group_application) { projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: group.id) }
-    let!(:active_service_without_application_on_group_cluster) { services.create(service_params_for(project.id, active: true, title: 'to remove')) }
-    let!(:duplicated_active_service) { services.create(service_params_for(project_with_group_application.id, active: true)) }
-    let!(:inactive_service) { services.create(service_params_for(project_with_group_application.id, active: false)) }
-    let!(:manual_inactive_service) { services.create(service_params_for(project.id, active: false, properties: '{\'some\':\'param\'}')) }
-    let!(:active_service_group_application) { services.create(service_params_for(project_with_group_application.id, active: true)) }
-
-    before do
-      group_cluster = clusters.create(name: 'cluster', cluster_type: cluster_types[:group_type])
-      cluster_groups.create(group_id: group.id, cluster_id: group_cluster.id)
-      clusters_applications_prometheus.create(cluster_id: group_cluster.id, status: application_statuses[:installed], version: '123')
-    end
-
-    context 'application on group cluster' do
-      it 'removes only redundant and inconsistent entries' do
-        migration.down
-        expect(services.all.map(&method(:row_attributes))).to match_array([manual_inactive_service, active_service_group_application].map(&method(:row_attributes)))
-      end
-    end
-
-    context 'application on instance cluster' do
-      it 'removes only redundant and inconsistent entries' do
-        instance_cluster = clusters.create(name: 'cluster', cluster_type: cluster_types[:instance_type])
-        clusters_applications_prometheus.create(cluster_id: instance_cluster.id, status: application_statuses[:updated], version: '123')
-
-        migration.down
-
-        expected_rows = [active_service_without_application_on_group_cluster, manual_inactive_service, active_service_group_application].map(&method(:row_attributes))
-        expect(services.all.map(&method(:row_attributes))).to match_array(expected_rows)
-      end
-    end
-  end
 end
