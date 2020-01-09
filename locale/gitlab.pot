@@ -8136,6 +8136,9 @@ msgstr ""
 msgid "Finished"
 msgstr ""
 
+msgid "First Name is too long (maximum is %{max_length} characters)."
+msgstr ""
+
 msgid "First Seen"
 msgstr ""
 
@@ -10659,6 +10662,9 @@ msgstr ""
 msgid "Last Accessed On"
 msgstr ""
 
+msgid "Last Name is too long (maximum is %{max_length} characters)."
+msgstr ""
+
 msgid "Last Pipeline"
 msgstr ""
 
@@ -11980,9 +11986,6 @@ msgid "Name"
 msgstr ""
 
 msgid "Name has already been taken"
-msgstr ""
-
-msgid "Name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "Name new label"
@@ -20449,6 +20452,9 @@ msgstr ""
 msgid "Username is available."
 msgstr ""
 
+msgid "Username is too long (maximum is %{max_length} characters)."
+msgstr ""
+
 msgid "Username or email"
 msgstr ""
 
@@ -20823,7 +20829,7 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
-msgid "Welcome to GitLab @%{username}!"
+msgid "Welcome to GitLab %{name}!"
 msgstr ""
 
 msgid "Welcome to the Guided GitLab Tour"
