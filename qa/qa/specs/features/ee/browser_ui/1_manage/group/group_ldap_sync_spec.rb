@@ -126,7 +126,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_members_item)
         end
 
-        it 'has LDAP users synced' do
+        it 'has LDAP users synced', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/196040' do
           verify_users_synced(sync_users)
         end
       end
