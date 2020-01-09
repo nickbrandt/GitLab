@@ -2,6 +2,7 @@ import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import * as types from './mutation_types';
+import { getTimeWindowParams } from './utils';
 
 export const setEndpoints = ({ commit }, endpoints) => commit(types.SET_ENDPOINTS, endpoints);
 
@@ -49,6 +50,11 @@ export const setCurrentEnvironmentId = ({ commit, dispatch }, environmentId) => 
   return dispatch('fetchWafStatistics');
 };
 
+export const setCurrentTimeWindow = ({ commit, dispatch }, timeWindow) => {
+  commit(types.SET_CURRENT_TIME_WINDOW, timeWindow);
+  return dispatch('fetchWafStatistics');
+};
+
 export const requestWafStatistics = ({ commit }) => commit(types.REQUEST_WAF_STATISTICS);
 export const receiveWafStatisticsSuccess = ({ commit }, statistics) =>
   commit(types.RECEIVE_WAF_STATISTICS_SUCCESS, statistics);
@@ -68,6 +74,7 @@ export const fetchWafStatistics = ({ state, dispatch }) => {
     .get(state.wafStatisticsEndpoint, {
       params: {
         environment_id: state.currentEnvironmentId,
+        ...getTimeWindowParams(state.currentTimeWindow, Date.now()),
       },
     })
     .then(({ data }) => dispatch('receiveWafStatisticsSuccess', data))

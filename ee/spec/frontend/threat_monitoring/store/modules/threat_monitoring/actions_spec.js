@@ -198,6 +198,19 @@ describe('Threat Monitoring actions', () => {
       ));
   });
 
+  describe('setCurrentTimeWindow', () => {
+    const timeWindow = 'foo';
+
+    it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches fetchWafStatistics', () =>
+      testAction(
+        actions.setCurrentTimeWindow,
+        timeWindow,
+        state,
+        [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow }],
+        [{ type: 'fetchWafStatistics' }],
+      ));
+  });
+
   describe('requestWafStatistics', () => {
     it('commits the REQUEST_WAF_STATISTICS mutation', () =>
       testAction(
@@ -262,8 +275,17 @@ describe('Threat Monitoring actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
+        jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(2019, 0, 31).getTime());
+
         mock
-          .onGet(wafStatisticsEndpoint, { params: { environment_id: currentEnvironmentId } })
+          .onGet(wafStatisticsEndpoint, {
+            params: {
+              environment_id: currentEnvironmentId,
+              from: '2019-01-01T00:00:00.000Z',
+              to: '2019-01-31T00:00:00.000Z',
+              interval: 'day',
+            },
+          })
           .replyOnce(200, mockWafStatisticsResponse);
       });
 

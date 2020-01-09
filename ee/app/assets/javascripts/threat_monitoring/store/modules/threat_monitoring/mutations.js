@@ -22,6 +22,9 @@ export default {
   [types.SET_CURRENT_ENVIRONMENT_ID](state, payload) {
     state.currentEnvironmentId = payload;
   },
+  [types.SET_CURRENT_TIME_WINDOW](state, payload) {
+    state.currentTimeWindow = payload;
+  },
   [types.REQUEST_WAF_STATISTICS](state) {
     state.isLoadingWafStatistics = true;
     state.errorLoadingWafStatistics = false;
