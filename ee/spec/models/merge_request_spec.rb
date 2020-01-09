@@ -789,4 +789,15 @@ describe MergeRequest do
       end
     end
   end
+
+  describe 'review time sorting' do
+    it 'orders by first_comment_at' do
+      merge_request_1 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 1.day.ago })
+      merge_request_2 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 3.days.ago })
+      merge_request_3 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: nil })
+
+      expect(described_class.order_review_time_desc).to match([merge_request_2, merge_request_1, merge_request_3])
+      expect(described_class.sort_by_attribute('review_time_desc')).to match([merge_request_2, merge_request_1, merge_request_3])
+    end
+  end
 end
