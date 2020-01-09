@@ -8,7 +8,7 @@ RSpec.shared_examples 'executes service' do
     allow(service_class).to receive(:new) { service }
   end
 
-  it 'runs the SelfMonitoring::Project::CreateService' do
+  it 'runs the service' do
     expect(service).to receive(:execute)
 
     subject.perform
