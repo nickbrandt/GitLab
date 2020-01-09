@@ -16,6 +16,20 @@ module GraphqlHelpers
     resolver_class.new(object: obj, context: ctx).resolve(args)
   end
 
+  # Eagerly run a loader's named resolver
+  # (syncs any lazy values returned by resolve)
+  def eager_resolve(resolver_class, **opts)
+    sync(resolve(resolver_class, **opts))
+  end
+
+  def sync(value)
+    if GitlabSchema.lazy?(value)
+      GitlabSchema.sync_lazy(value)
+    else
+      value
+    end
+  end
+
   # Runs a block inside a BatchLoader::Executor wrapper
   def batch(max_queries: nil, &blk)
     wrapper = proc do
@@ -39,7 +53,7 @@ module GraphqlHelpers
   def batch_sync(max_queries: nil, &blk)
     wrapper = proc do
       lazy_vals = yield
-      lazy_vals.is_a?(Array) ? lazy_vals.map(&:sync) : lazy_vals&.sync
+      lazy_vals.is_a?(Array) ? lazy_vals.map { |val| sync(val) } : sync(lazy_vals)
     end
 
     batch(max_queries: max_queries, &wrapper)
