@@ -128,8 +128,7 @@ describe Epic do
         epic3 = create(:epic, group: group, parent: epic2)
         epic4 = create(:epic, group: group, parent: epic3)
         epic5 = create(:epic, group: group, parent: epic4)
-        epic6 = create(:epic, group: group, parent: epic5)
-        epic.parent = epic6
+        epic.parent = epic5
 
         expect(epic.valid_parent?).to be_falsey
       end
@@ -149,8 +148,7 @@ describe Epic do
       it 'returns false when total depth after adding would exceed limit' do
         child_epic2 = create(:epic, group: group, parent: child_epic1)
         child_epic3 = create(:epic, group: group, parent: child_epic2)
-        child_epic4 = create(:epic, group: group, parent: child_epic3)
-        create(:epic, group: group, parent: child_epic4)
+        create(:epic, group: group, parent: child_epic3)
 
         epic.parent = parent_epic
 

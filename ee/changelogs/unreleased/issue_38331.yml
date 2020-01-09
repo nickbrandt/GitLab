@@ -1,0 +1,5 @@
+---
+title: Fix child epics depth validation
+merge_request: 22729
+author:
+type: fixed
