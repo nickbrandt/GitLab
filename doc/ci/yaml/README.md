@@ -2662,7 +2662,7 @@ upstream_bridge:
 
 #### `trigger` syntax for child pipeline
 
-To create a [child pipeline](parent_child_pipelines.md), specify the path to the
+To create a [child pipeline](../parent_child_pipelines.md), specify the path to the
 YAML file containing the CI config of the child pipeline:
 
 ```yaml
