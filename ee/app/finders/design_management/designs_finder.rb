@@ -6,6 +6,7 @@ module DesignManagement
 
     # Params:
     # ids: integer[]
+    # filenames: string[]
     # visible_at_version: ?version
     def initialize(issue, current_user, params = {})
       @issue = issue
