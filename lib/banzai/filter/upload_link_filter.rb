@@ -11,17 +11,12 @@ module Banzai
     #   :only_path
     #   :project
     #   :system_note
-    class UploadLinkFilter < HTML::Pipeline::Filter
-      include Gitlab::Utils::StrongMemoize
-
+    class UploadLinkFilter < BaseRelativeLinkFilter
       def call
         return doc if context[:system_note]
 
         linkable_attributes.each do |attr|
-          if attr.value.start_with?('/uploads/')
-            process_link_to_upload_attr(attr)
-            attr.parent.add_class('gfm')
-          end
+          process_link_to_upload_attr(attr)
         end
 
         doc
@@ -29,25 +24,9 @@ module Banzai
 
       protected
 
-      def linkable_attributes
-        strong_memoize(:linkable_attributes) do
-          attrs = []
-
-          attrs += doc.search('a:not(.gfm)').map do |el|
-            el.attribute('href')
-          end
-
-          attrs += doc.search('img:not(.gfm), video:not(.gfm), audio:not(.gfm)').flat_map do |el|
-            [el.attribute('src'), el.attribute('data-src')]
-          end
-
-          attrs.reject do |attr|
-            attr.blank? || attr.value.start_with?('//')
-          end
-        end
-      end
-
       def process_link_to_upload_attr(html_attr)
+        return unless html_attr.value.start_with?('/uploads/')
+
         path_parts = [unescape_and_scrub_uri(html_attr.value)]
 
         if project
@@ -70,24 +49,12 @@ module Banzai
           else
             Addressable::URI.join(Gitlab.config.gitlab.base_url, path).to_s
           end
-      end
 
-      def relative_url_root
-        Gitlab.config.gitlab.relative_url_root.presence || '/'
+        html_attr.parent.add_class('gfm')
       end
 
       def group
         context[:group]
-      end
-
-      def project
-        context[:project]
-      end
-
-      private
-
-      def unescape_and_scrub_uri(uri)
-        Addressable::URI.unescape(uri).scrub
       end
     end
   end
