@@ -1357,7 +1357,7 @@ class Project < ApplicationRecord
     forked_from_project || fork_network&.root_project
   end
 
-  # TODO:  Remove this method once all LfsObjectsProject records are backfilled
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
   # for forks.
   #
   # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
@@ -1373,14 +1373,16 @@ class Project < ApplicationRecord
     end
   end
 
-  # This will return all `lfs_objects` that are accessible to the project.
-  # So this might be `self.lfs_objects` if the project is not part of a fork
-  # network, or it is the base of the fork network.
+  # This will return all `lfs_objects` that are accessible to the project and
+  # the fork source. This is needed since older forks won't have access to some
+  # LFS objects directly and have to get it from the fork source.
   #
-  # TODO: refactor this to get the correct lfs objects when implementing
-  #       https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def all_lfs_objects
-    lfs_storage_project.lfs_objects
+    LfsObject.where(id: LfsObjectsProject.select(:lfs_object_id).where(project: [self, lfs_storage_project]))
   end
 
   def personal?
