@@ -4,104 +4,19 @@ require "spec_helper"
 
 describe Resolvers::DesignManagement::Version::DesignsAtVersionResolver do
   include GraphqlHelpers
-  include DesignManagementTestHelpers
 
-  set(:issue) { create(:issue) }
-  set(:project) { issue.project }
+  include_context 'four designs in three versions'
 
-  set(:design_a) { create(:design, issue: issue) }
-  set(:design_b) { create(:design, issue: issue) }
-  set(:design_c) { create(:design, issue: issue) }
-  set(:design_d) { create(:design, issue: issue) }
-
-  set(:current_user) { create(:user) }
+  set(:current_user) { authorized_user }
   let(:gql_context) { { current_user: current_user } }
 
-  set(:first_version) do
-    create(:design_version, issue: issue,
-           created_designs: [design_a],
-           modified_designs: [],
-           deleted_designs: [])
-  end
-  set(:second_version) do
-    create(:design_version, issue: issue,
-           created_designs: [design_b, design_c, design_d],
-           modified_designs: [design_a],
-           deleted_designs: [])
-  end
-  set(:third_version) do
-    create(:design_version, issue: issue,
-           created_designs: [],
-           modified_designs: [design_a],
-           deleted_designs: [design_d])
-  end
-
   let(:version) { third_version }
-  let(:design) { design_a }
 
-  let(:all_singular_args) do
-    {
-      design_at_version_id: global_id_of(dav(design)),
-      design_id: global_id_of(design),
-      filename: design.filename
-    }
-  end
+  describe '.single' do
+    let(:single) { ::Resolvers::DesignManagement::Version::DesignAtVersionResolver }
 
-  shared_examples 'a bad argument' do
-    it 'raises an appropriate error' do
-      err_class = ::Gitlab::Graphql::Errors::ArgumentError
-      expect { resolve_objects }.to raise_error(err_class)
-    end
-  end
-
-  before do
-    enable_design_management
-    project.add_developer(current_user)
-  end
-
-  describe ::Resolvers::DesignManagement::Version::DesignsAtVersionResolver.single do
-    describe 'passing combinations of arguments' do
-      context 'passing no arguments' do
-        let(:args) { {} }
-
-        it_behaves_like 'a bad argument'
-      end
-
-      context 'passing all arguments' do
-        let(:args) { all_singular_args }
-
-        it_behaves_like 'a bad argument'
-      end
-
-      context 'passing any two arguments' do
-        let(:args) { all_singular_args.slice(*all_singular_args.keys.sample(2)) }
-
-        it_behaves_like 'a bad argument'
-      end
-    end
-
-    %i[design_at_version_id design_id filename].each do |arg|
-      describe "passing #{arg}" do
-        let(:args) { all_singular_args.slice(arg) }
-
-        it "finds the design" do
-          expect(resolve_objects).to eq(dav(design))
-        end
-      end
-    end
-
-    describe 'attempting to retrieve an object not visible at this version' do
-      let(:design) { design_d }
-
-      %i[design_at_version_id design_id filename].each do |arg|
-        describe "passing #{arg}" do
-          let(:args) { all_singular_args.slice(arg) }
-
-          it "does not find the design" do
-            expect(resolve_objects).to be_nil
-          end
-        end
-      end
+    it 'returns the single context resolver' do
+      expect(described_class.single).to eq(single)
     end
   end
 
@@ -109,7 +24,7 @@ describe Resolvers::DesignManagement::Version::DesignsAtVersionResolver do
     let(:args) { {} }
 
     context "when the user cannot see designs" do
-      let(:gql_context) { { current_user: create(:user) } }
+      let(:current_user) { create(:user) }
 
       it "returns nothing" do
         expect(resolve_objects).to be_empty
