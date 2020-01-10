@@ -26,7 +26,6 @@ export default {
       return this.chartData && this.chartData.data && this.chartData.data.length;
     },
     selectedFiltersText() {
-      // TODO: I think we should show labels that have 0 data, currently doesnt appear
       const { subject, selectedLabelIds } = this.filters;
       return sprintf(
         s__('CycleAnalyticsCharts|Showing %{subject} and %{selectedLabelsCount} labels'),
@@ -71,18 +70,10 @@ export default {
     <div class="row">
       <div class="col-12">
         <h3>{{ __('Type of work') }}</h3>
-        <p v-if="hasData">
-          {{ summaryDescription }}
-        </p>
-      </div>
-    </div>
-    <div v-if="hasData" class="row">
-      <div class="col-12">
-        <header>
+        <div v-if="hasData">
+          <p>{{ summaryDescription }}</p>
           <h4>{{ __('Tasks by type') }}</h4>
           <p>{{ selectedFiltersText }}</p>
-        </header>
-        <section>
           <gl-stacked-column-chart
             :option="$options.chartOptions"
             :data="chartData.data"
@@ -92,12 +83,8 @@ export default {
             y-axis-title="Number of tasks"
             :series-names="chartData.seriesNames"
           />
-        </section>
-      </div>
-    </div>
-    <div v-else class="row">
-      <div class="col-12">
-        <div class="bs-callout bs-callout-info">
+        </div>
+        <div v-else class="bs-callout bs-callout-info">
           <p>{{ __('There is no data available. Please change your selection.') }}</p>
         </div>
       </div>

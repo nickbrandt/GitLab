@@ -2,7 +2,6 @@ import { shallowMount } from '@vue/test-utils';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
 import { TASKS_BY_TYPE_SUBJECT_ISSUE } from 'ee/analytics/cycle_analytics/constants';
 
-// TODO: maybe move to mock data
 const seriesNames = ['Cool label', 'Normal label'];
 const data = [[0, 1, 2], [5, 2, 3], [2, 4, 1]];
 const groupBy = ['Group 1', 'Group 2', 'Group 3'];

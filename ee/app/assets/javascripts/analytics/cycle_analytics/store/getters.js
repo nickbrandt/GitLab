@@ -27,7 +27,6 @@ export const durationChartPlottableData = state => {
 };
 
 export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
-  // TODO: remove this check, return empty data if need be
   if (tasksByType && tasksByType.data.length) {
     return getTasksByTypeData({
       data: tasksByType.data,

@@ -248,7 +248,10 @@ describe('Cycle analytics utils', () => {
     let transformed = {};
 
     const groupBy = getDatesInRange(startDate, endDate, toYmd);
-    const data = transformedTasksByTypeData.map(({ series }) => Object.values(series));
+    // only return the values, drop the date which is the first paramater
+    const extractSeriesValues = ({ series }) => series.map(kv => kv[1]);
+    const data = transformedTasksByTypeData.map(extractSeriesValues);
+
     const labels = transformedTasksByTypeData.map(d => {
       const { label } = d;
       return label.title;

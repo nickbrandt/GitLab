@@ -78,18 +78,9 @@ export const transformRawStages = (stages = []) =>
     name: name.length ? name : title,
   }));
 
-// converts the series data into key value pairs
 export const transformRawTasksByTypeData = (data = []) => {
   if (!data.length) return [];
-  return data.map(({ series, ...rest }) =>
-    convertObjectPropsToCamelCase(
-      {
-        ...rest,
-        series: Object.fromEntries(series),
-      },
-      { deep: true },
-    ),
-  );
+  return data.map(d => convertObjectPropsToCamelCase(d, { deep: true }));
 };
 
 export const nestQueryStringKeys = (obj = null, targetKey = '') => {
@@ -205,24 +196,45 @@ export const getDurationChartData = (data, startDate, endDate) => {
   return eventData;
 };
 
-const toUnix = datetime => new Date(datetime).getTime();
-export const orderByDate = (a, b) => toUnix(a) - toUnix(b);
+export const orderByDate = (a, b, dateFmt = datetime => new Date(datetime).getTime()) =>
+  dateFmt(a) - dateFmt(b);
 
-// TODO: code blocks + specs
-// The api only returns datapoints with a value, 0 values are ignored
-// overwrites the default values with any value that was returned from the api
-const zeroMissingDataPoints = ({ data, defaultData }) => ({ ...defaultData, ...data });
-
-// TODO: docblocks
-// Array of values [date, value]
-// ignore the date, just return the value, default sort by ascending date
+/**
+ * Takes a dictionary of dates and the associated value, sorts them and returns just the value
+ *
+ * @param {Object.<Date, number>} series - Key value pair of dates and the value for that date
+ * @returns {number[]} The values of each key value pair
+ */
 export const flattenTaskByTypeSeries = (series = {}) =>
   Object.entries(series)
     .sort((a, b) => orderByDate(a[0], b[0]))
     .map(dataSet => dataSet[1]);
 
-// TODO: docblocks
-// GROSS
+/**
+ * @typedef {Object} RawTasksByTypeData
+ * @property {Object} label - Raw data for a group label
+ * @property {Array} series - Array of arrays with date and associated value ie [ ['2020-01-01', 10],['2020-01-02', 10] ]
+
+ * @typedef {Object} TransformedTasksByTypeData
+ * @property {Array} groupBy - The list of dates for the range of data in each data series
+ * @property {Array} data - An array of the data values for each series
+ * @property {Array} seriesNames - Names of the series to be charted ie label names
+ */
+
+/**
+ * Takes the raw tasks by type data and generates an array of data points,
+ * an array of data series and an array of data labels for the given time period.
+ *
+ * Currently the data is transformed to support use in a stacked column chart:
+ * https://gitlab-org.gitlab.io/gitlab-ui/?path=/story/charts-stacked-column-chart--stacked
+ *
+ * @param {Object} obj
+ * @param {RawTasksByTypeData[]} obj.data - array of raw data, each element contains a label and series
+ * @param {Date} obj.startDate - start date in ISO date format
+ * @param {Date} obj.endDate - end date in ISO date format
+ *
+ * @returns {TransformedTasksByTypeData} The transformed data ready for use in charts
+ */
 export const getTasksByTypeData = ({ data = [], startDate = null, endDate = null }) => {
   if (!startDate || !endDate || !data.length) {
     return {
@@ -251,7 +263,7 @@ export const getTasksByTypeData = ({ data = [], startDate = null, endDate = null
       acc.data = [
         ...acc.data,
         // adds 0 values for each data point and overrides with data from the series
-        flattenTaskByTypeSeries({ ...zeroValuesForEachDataPoint, ...series }),
+        flattenTaskByTypeSeries({ ...zeroValuesForEachDataPoint, ...Object.fromEntries(series) }),
       ];
       return acc;
     },
