@@ -4,6 +4,7 @@
 - default_environment_id = @project.default_environment&.id || -1
 
 #js-threat-monitoring-app{ data: { documentation_path: help_page_path('user/clusters/applications', anchor: 'web-application-firewall-modsecurity'),
+  chart_empty_state_svg_path: image_path('illustrations/chart-empty-state.svg'),
   empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
   waf_statistics_endpoint: 'dummy',
   environments_endpoint: project_environments_path(@project),

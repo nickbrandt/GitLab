@@ -1,5 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
+import httpStatus from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import testAction from 'helpers/vuex_action_helper';
 
@@ -105,7 +106,7 @@ describe('Threat Monitoring actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onGet(environmentsEndpoint).replyOnce(200, mockEnvironmentsResponse);
+        mock.onGet(environmentsEndpoint).replyOnce(httpStatus.OK, mockEnvironmentsResponse);
       });
 
       it('should dispatch the request and success actions', () =>
@@ -128,7 +129,7 @@ describe('Threat Monitoring actions', () => {
       beforeEach(() => {
         const oneEnvironmentPerPage = ({ totalPages }) => config => {
           const { page } = config.params;
-          const response = [200, { environments: [{ id: page }] }];
+          const response = [httpStatus.OK, { environments: [{ id: page }] }];
           if (page < totalPages) {
             response.push({ 'x-next-page': page + 1 });
           }
@@ -286,7 +287,7 @@ describe('Threat Monitoring actions', () => {
               interval: 'day',
             },
           })
-          .replyOnce(200, mockWafStatisticsResponse);
+          .replyOnce(httpStatus.OK, mockWafStatisticsResponse);
       });
 
       it('should dispatch the request and success actions', () =>
@@ -300,6 +301,34 @@ describe('Threat Monitoring actions', () => {
             {
               type: 'receiveWafStatisticsSuccess',
               payload: mockWafStatisticsResponse,
+            },
+          ],
+        ));
+    });
+
+    describe('on NOT_FOUND', () => {
+      beforeEach(() => {
+        mock.onGet(wafStatisticsEndpoint).replyOnce(httpStatus.NOT_FOUND);
+      });
+
+      it('should dispatch the request and success action with empty data', () =>
+        testAction(
+          actions.fetchWafStatistics,
+          undefined,
+          state,
+          [],
+          [
+            { type: 'requestWafStatistics' },
+            {
+              type: 'receiveWafStatisticsSuccess',
+              payload: expect.objectContaining({
+                totalTraffic: 0,
+                anomalousTraffic: 0,
+                history: {
+                  nominal: [],
+                  anomalous: [],
+                },
+              }),
             },
           ],
         ));

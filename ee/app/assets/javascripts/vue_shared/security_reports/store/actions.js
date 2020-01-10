@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
+import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import { s__, sprintf } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import toast from '~/vue_shared/plugins/global_toast';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
-import { pollUntilComplete } from './utils';
 
 /**
  * A lot of this file has duplicate actions to
