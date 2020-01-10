@@ -18,7 +18,7 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
   before do
     stub_licensed_features(merge_trains: true, merge_pipelines: true)
     project.add_maintainer(user)
-    project.update!(merge_trains_enabled: true, merge_pipelines_enabled: true)
+    project.update!(merge_pipelines_enabled: true)
     allow(AutoMergeProcessWorker).to receive(:perform_async) { }
     merge_request.update_head_pipeline
   end
