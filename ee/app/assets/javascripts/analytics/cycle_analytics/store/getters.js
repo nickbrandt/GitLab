@@ -35,5 +35,5 @@ export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
       endDate,
     });
   }
-  return null;
+  return { groupBy: [], data: [], seriesNames: [] };
 };

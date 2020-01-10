@@ -25,6 +25,13 @@ const baseStagesEndpoint = '/-/analytics/cycle_analytics/stages';
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+const defaultStubs = {
+  'summary-table': true,
+  'stage-event-list': true,
+  'stage-nav-item': true,
+  'tasks-by-type-chart': true,
+};
+
 function createComponent({
   opts = {},
   shallow = true,
@@ -321,11 +328,7 @@ describe('Cycle Analytics component', () => {
           mock = new MockAdapter(axios);
           wrapper = createComponent({
             opts: {
-              stubs: {
-                'summary-table': true,
-                'stage-event-list': true,
-                'stage-nav-item': true,
-              },
+              stubs: defaultStubs,
             },
             shallow: false,
             withStageSelected: true,
@@ -341,6 +344,53 @@ describe('Cycle Analytics component', () => {
 
         it('will display the add stage button', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
+        });
+      });
+
+      describe('with tasksByTypeChart=true', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            opts: {
+              stubs: defaultStubs,
+            },
+            shallow: false,
+            withStageSelected: true,
+            customizableCycleAnalyticsEnabled: false,
+            tasksByTypeChartEnabled: true,
+          });
+        });
+
+        afterEach(() => {
+          wrapper.destroy();
+          mock.restore();
+        });
+        it('displays the tasks by type chart', () => {
+          expect(wrapper.find('.tasks-by-type-chart').exists()).toBe(true);
+        });
+      });
+
+      describe('with tasksByTypeChart=false', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            opts: {
+              stubs: defaultStubs,
+            },
+            shallow: false,
+            withStageSelected: true,
+            customizableCycleAnalyticsEnabled: false,
+            tasksByTypeChartEnabled: false,
+          });
+        });
+
+        afterEach(() => {
+          wrapper.destroy();
+          mock.restore();
+        });
+
+        it('does not render the tasks by type chart', () => {
+          expect(wrapper.find('.tasks-by-type-chart').exists()).toBe(false);
         });
       });
     });

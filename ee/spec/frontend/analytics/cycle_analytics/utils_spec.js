@@ -15,7 +15,6 @@ import {
   getTasksByTypeData,
   flattenTaskByTypeSeries,
   orderByDate,
-  arrayToObject, // TODO: dedupe this?
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
@@ -209,7 +208,7 @@ describe('Cycle analytics utils', () => {
   });
 
   describe('flattenTaskByTypeSeries', () => {
-    const dummySeries = arrayToObject([
+    const dummySeries = Object.fromEntries([
       ['2019-01-16', 40],
       ['2019-01-14', 20],
       ['2019-01-12', 10],
@@ -248,8 +247,8 @@ describe('Cycle analytics utils', () => {
   describe('getTasksByTypeData', () => {
     let transformed = {};
 
-    const range = getDatesInRange(startDate, endDate, toYmd);
-    const seriesData = transformedTasksByTypeData.map(({ series }) => Object.values(series));
+    const groupBy = getDatesInRange(startDate, endDate, toYmd);
+    const data = transformedTasksByTypeData.map(({ series }) => Object.values(series));
     const labels = transformedTasksByTypeData.map(d => {
       const { label } = d;
       return label.title;
@@ -258,7 +257,7 @@ describe('Cycle analytics utils', () => {
     it('will return blank arrays if given no data', () => {
       [{ data: [], startDate, endDate }, [], {}].forEach(chartData => {
         transformed = getTasksByTypeData(chartData);
-        ['seriesNames', 'seriesData', 'range'].forEach(key => {
+        ['seriesNames', 'data', 'groupBy'].forEach(key => {
           expect(transformed[key]).toEqual([]);
         });
       });
@@ -270,7 +269,7 @@ describe('Cycle analytics utils', () => {
       });
 
       it('will return an object with the properties needed for the chart', () => {
-        ['seriesNames', 'seriesData', 'range'].forEach(key => {
+        ['seriesNames', 'data', 'groupBy'].forEach(key => {
           expect(transformed).toHaveProperty(key);
         });
       });
@@ -281,32 +280,32 @@ describe('Cycle analytics utils', () => {
         });
       });
 
-      describe('range', () => {
-        it('returns the date range as an array', () => {
-          expect(transformed.range).toEqual(range);
+      describe('groupBy', () => {
+        it('returns the date groupBy as an array', () => {
+          expect(transformed.groupBy).toEqual(groupBy);
         });
 
         it('the start date is the first element', () => {
-          expect(transformed.range[0]).toEqual(toYmd(startDate));
+          expect(transformed.groupBy[0]).toEqual(toYmd(startDate));
         });
 
         it('the end date is the last element', () => {
-          expect(transformed.range[transformed.range.length - 1]).toEqual(toYmd(endDate));
+          expect(transformed.groupBy[transformed.groupBy.length - 1]).toEqual(toYmd(endDate));
         });
       });
 
       describe('data', () => {
         it('returns an array of data points', () => {
-          expect(transformed.seriesData).toEqual(seriesData);
+          expect(transformed.data).toEqual(data);
         });
 
         it('contains an array of data for each label', () => {
-          expect(transformed.seriesData.length).toEqual(labels.length);
+          expect(transformed.data.length).toEqual(labels.length);
         });
 
-        it('contains a value for each day in the range', () => {
-          transformed.seriesData.forEach(d => {
-            expect(d.length).toEqual(transformed.range.length);
+        it('contains a value for each day in the groupBy', () => {
+          transformed.data.forEach(d => {
+            expect(d.length).toEqual(transformed.groupBy.length);
           });
         });
       });

@@ -16,22 +16,14 @@ export default {
       type: Object,
       required: true,
     },
-    data: {
-      type: Array,
-      required: true,
-    },
-    groupBy: {
-      type: Array,
-      required: true,
-    },
-    seriesNames: {
-      type: Array,
+    chartData: {
+      type: Object,
       required: true,
     },
   },
   computed: {
     hasData() {
-      return this.data && this.data.length;
+      return this.chartData && this.chartData.data && this.chartData.data.length;
     },
     selectedFiltersText() {
       // TODO: I think we should show labels that have 0 data, currently doesnt appear
@@ -93,14 +85,21 @@ export default {
         <section>
           <gl-stacked-column-chart
             :option="$options.chartOptions"
-            :data="data"
-            :group-by="groupBy"
+            :data="chartData.data"
+            :group-by="chartData.groupBy"
             x-axis-type="category"
             x-axis-title="Date"
             y-axis-title="Number of tasks"
-            :series-names="seriesNames"
+            :series-names="chartData.seriesNames"
           />
         </section>
+      </div>
+    </div>
+    <div v-else class="row">
+      <div class="col-12">
+        <div class="bs-callout bs-callout-info">
+          <p>{{ __('There is no data available. Please change your selection.') }}</p>
+        </div>
       </div>
     </div>
   </div>

@@ -79,7 +79,6 @@ export default {
       'errorCode',
       'startDate',
       'endDate',
-      // TODO: remove this
       'tasksByType',
       'medians',
     ]),
@@ -101,9 +100,7 @@ export default {
     shouldDisplayDurationChart() {
       return !this.isLoadingDurationChart && !this.isLoading;
     },
-    shouldDisplayTasksByTypeChart() {
-      return !this.isLoadingTasksByTypeChart && !this.isLoading && this.tasksByTypeChartData;
-    },
+
     dateRange: {
       get() {
         return { startDate: this.startDate, endDate: this.endDate };
@@ -142,9 +139,6 @@ export default {
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
       hasTasksByTypeChart: this.glFeatures.tasksByTypeChart,
     });
-
-    console.log('mounted::this.glFeatures', this.glFeatures);
-    console.log('mounted::this.featureFlags', this.featureFlags);
   },
   methods: {
     ...mapActions([
@@ -332,27 +326,17 @@ export default {
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
       </template>
       <template v-if="featureFlags.hasTasksByTypeChart">
-        <div v-if="!isLoading">
-          <gl-loading-icon v-if="isLoadingTasksByTypeChart" size="md" class="my-4 py-4" />
-          <div v-else class="tasks-by-type-chart">
+        <div class="tasks-by-type-chart">
+          <gl-loading-icon
+            v-if="isLoading || isLoadingTasksByTypeChart"
+            size="md"
+            class="my-4 py-4"
+          />
+          <div v-else>
             <tasks-by-type-chart
-              v-if="shouldDisplayTasksByTypeChart"
-              :data="tasksByTypeChartData.seriesData"
-              :group-by="tasksByTypeChartData.range"
-              :series-names="tasksByTypeChartData.seriesNames"
+              :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
             />
-            <div v-else>
-              <!-- TODO: move this inside the component -->
-              <div class="row">
-                <div class="col-12">
-                  <h3>{{ __('Type of work') }}</h3>
-                  <div class="bs-callout bs-callout-info">
-                    <p>{{ __('There is no data available. Please change your selection.') }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </template>
