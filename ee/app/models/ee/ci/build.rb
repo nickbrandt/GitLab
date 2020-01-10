@@ -120,7 +120,7 @@ module EE
       override :cross_dependencies
       def cross_dependencies
         return [] unless user_id
-        return [] unless ::Feature.enabled?(:cross_project_need_artifacts, project, default_enabled: false)
+        return [] unless ::Feature.enabled?(:cross_project_need_artifacts, project, default_enabled: true)
         return [] unless project.feature_available?(:cross_project_pipelines)
 
         cross_dependencies_relationship
