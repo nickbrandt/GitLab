@@ -11,12 +11,12 @@ describe Notify do
 
   include_context 'gitlab email notification'
 
-  set(:user) { create(:user) }
-  set(:current_user) { create(:user, email: "current@email.com") }
-  set(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
-  set(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:current_user) { create(:user, email: "current@email.com") }
+  let_it_be(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
+  let_it_be(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
 
-  set(:merge_request) do
+  let_it_be(:merge_request, reload: true) do
     create(:merge_request, source_project: project,
                            target_project: project,
                            author: current_user,
@@ -24,24 +24,24 @@ describe Notify do
                            description: 'Awesome description')
   end
 
-  set(:issue) do
+  let_it_be(:issue, reload: true) do
     create(:issue, author: current_user,
                    assignees: [assignee],
                    project: project,
                    description: 'My awesome description!')
   end
 
-  set(:project2) { create(:project, :repository) }
-  set(:merge_request_without_assignee) do
+  let_it_be(:project2, reload: true) { create(:project, :repository) }
+  let_it_be(:merge_request_without_assignee, reload: true) do
     create(:merge_request, source_project: project2,
                            author: current_user,
                            description: 'Awesome description')
   end
 
   describe '.note_design_email' do
-    set(:design) { create(:design, :with_file) }
-    set(:recipient) { create(:user) }
-    set(:note) do
+    let_it_be(:design) { create(:design, :with_file) }
+    let_it_be(:recipient) { create(:user) }
+    let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
          project: design.project,
@@ -112,7 +112,7 @@ describe Notify do
       end
 
       describe 'new note email' do
-        set(:first_note) { create(:discussion_note_on_issue, note: 'Hello world') }
+        let_it_be(:first_note) { create(:discussion_note_on_issue, note: 'Hello world') }
 
         subject { described_class.service_desk_new_note_email(issue.id, first_note.id) }
 
@@ -287,8 +287,8 @@ describe Notify do
 
   context 'for a group' do
     describe 'for epics' do
-      set(:group) { create(:group) }
-      set(:epic) { create(:epic, group: group) }
+      let_it_be(:group) { create(:group) }
+      let_it_be(:epic) { create(:epic, group: group) }
 
       context 'that are new' do
         subject { described_class.new_epic_email(recipient.id, epic.id) }
@@ -319,7 +319,7 @@ describe Notify do
       end
 
       context 'for epic notes' do
-        set(:note) { create(:note, project: nil, noteable: epic) }
+        let_it_be(:note) { create(:note, project: nil, noteable: epic) }
         let(:note_author) { note.author }
         let(:epic_note_path) { group_epic_path(group, epic, anchor: "note_#{note.id}") }
 
