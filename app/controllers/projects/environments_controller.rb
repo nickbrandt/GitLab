@@ -23,7 +23,6 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   def index
     @environments = project.environments
       .with_state(params[:scope] || :available)
-    @project = ProjectPresenter.new(project, current_user: current_user)
 
     respond_to do |format|
       format.html
@@ -245,7 +244,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def serialize_review_app
-    ReviewAppSetupSerializer.new(current_user: @current_user).represent(@project)
+    ReviewAppSetupSerializer.new(current_user: @current_user).represent(project)
   end
 
   def authorize_stop_environment!
