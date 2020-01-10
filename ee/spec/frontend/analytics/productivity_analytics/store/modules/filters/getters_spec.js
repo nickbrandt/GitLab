@@ -4,7 +4,7 @@ import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
 
 describe('Productivity analytics filter getters', () => {
   let state;
-  const currentYear = new Date().getFullYear();
+  const currentYear = '2019';
   const startDate = new Date(currentYear, 8, 1);
   const endDate = new Date(currentYear, 8, 7);
 
