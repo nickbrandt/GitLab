@@ -53,7 +53,7 @@ module DesignManagement
     scope :for_designs, -> (designs) do
       where(id: ::DesignManagement::Action.where(design_id: designs).select(:version_id)).distinct
     end
-    scope :earlier_or_equal_to, -> (version) { where('id <= ?', version) }
+    scope :earlier_or_equal_to, -> (version) { where("(#{table_name}.id) <= ?", version) }
     scope :ordered, -> { order(id: :desc) }
     scope :for_issue, -> (issue) { where(issue: issue) }
     scope :by_sha, -> (sha) { where(sha: sha) }

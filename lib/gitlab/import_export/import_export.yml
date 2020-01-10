@@ -379,3 +379,6 @@ ee:
       - protected_environments:
         - :deploy_access_levels
       - :service_desk_setting
+  excluded_attributes:
+    actions:
+      - file

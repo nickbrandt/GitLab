@@ -53,11 +53,20 @@ FactoryBot.define do
       design.clear_version_cache
     end
 
+    # Use this trait to build designs that are backed by Git LFS, committed
+    # to the repository, and with an LfsObject correctly created for it.
     trait :with_lfs_file do
       with_file
 
       transient do
-        file { Gitlab::Git::LfsPointerFile.new('').pointer }
+        raw_file { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
+        lfs_pointer { Gitlab::Git::LfsPointerFile.new(SecureRandom.random_bytes) }
+        file { lfs_pointer.pointer }
+      end
+
+      after :create do |design, evaluator|
+        lfs_object = create(:lfs_object, file: evaluator.raw_file, oid: evaluator.lfs_pointer.sha256, size: evaluator.lfs_pointer.size)
+        create(:lfs_objects_project, project: design.project, lfs_object: lfs_object, repository_type: :design)
       end
     end
 
@@ -82,8 +91,8 @@ FactoryBot.define do
       end
     end
 
-    # Use this trait if you want your designs to be as true-to-life as possible,
-    # with correctly made commits in the repository and files that can be retrieved.
+    # Use this trait to build designs that have commits in the repository
+    # and files that can be retrieved.
     trait :with_file do
       transient do
         deleted { false }

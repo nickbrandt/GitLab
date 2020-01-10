@@ -10,6 +10,7 @@ module DesignManagement
       version = DesignManagement::Version.find(version_id)
 
       add_system_note(version)
+      generate_image_versions(version)
     rescue ActiveRecord::RecordNotFound => e
       Sidekiq.logger.warn(e)
     end
@@ -18,6 +19,10 @@ module DesignManagement
 
     def add_system_note(version)
       SystemNoteService.design_version_added(version)
+    end
+
+    def generate_image_versions(version)
+      DesignManagement::GenerateImageVersionsService.new(version).execute
     end
   end
 end

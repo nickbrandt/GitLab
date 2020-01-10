@@ -56,7 +56,7 @@ describe DesignManagement::Version do
         expect(described_class.earlier_or_equal_to(version_2)).to contain_exactly(version_1, version_2)
       end
 
-      it 'can be passed either a DesignManagement::Design or an ID' do
+      it 'can be passed either a DesignManagement::Version or an ID' do
         [version_1, version_1.id].each do |arg|
           expect(described_class.earlier_or_equal_to(arg)).to eq([version_1])
         end

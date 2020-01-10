@@ -47,7 +47,7 @@ class Projects::LfsApiController < Projects::GitHttpClientController
   # rubocop: disable CodeReuse/ActiveRecord
   def existing_oids
     @existing_oids ||= begin
-      project.all_lfs_objects.where(oid: objects.map { |o| o['oid'].to_s }).pluck(:oid)
+      project.all_lfs_objects.for_oids(objects.map { |o| o['oid'].to_s }).pluck(:oid)
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord

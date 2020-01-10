@@ -15,6 +15,12 @@ describe DesignManagement::NewVersionWorker do
         worker.perform(version_id)
       end
 
+      it 'does not invoke GenerateImageVersionsService' do
+        expect(DesignManagement::GenerateImageVersionsService).not_to receive(:new)
+
+        worker.perform(version_id)
+      end
+
       it 'logs the reason for this failure' do
         expect(Sidekiq.logger).to receive(:warn)
           .with(an_instance_of(ActiveRecord::RecordNotFound))
@@ -28,6 +34,14 @@ describe DesignManagement::NewVersionWorker do
 
       it 'creates a system note' do
         expect { worker.perform(version.id) }.to change { Note.system.count }.by(1)
+      end
+
+      it 'invokes GenerateImageVersionsService' do
+        expect_next_instance_of(DesignManagement::GenerateImageVersionsService) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        worker.perform(version.id)
       end
 
       it 'does not log anything' do
