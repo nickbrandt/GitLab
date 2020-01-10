@@ -38,6 +38,7 @@ issues:
 - vulnerability_links
 - related_vulnerabilities
 - user_mentions
+- target_issue_links
 events:
 - author
 - project

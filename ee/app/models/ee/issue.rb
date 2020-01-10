@@ -42,6 +42,8 @@ module EE
       has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
+      has_many :target_issue_links, class_name: 'IssueLink', foreign_key: :target_id
+
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
       after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
