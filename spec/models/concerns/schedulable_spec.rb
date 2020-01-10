@@ -56,4 +56,19 @@ describe Schedulable do
     it_behaves_like 'before_save callback'
     it_behaves_like '.runnable_schedules'
   end
+
+  describe '#next_run_at' do
+    let(:schedulable_instance) do
+      Class.new(ActiveRecord::Base) do
+        include Schedulable
+
+        # we need a table for the dummy class to operate
+        self.table_name = 'users'
+      end.new
+    end
+
+    it 'works' do
+      expect { schedulable_instance.set_next_run_at }.to raise_error(NotImplementedError)
+    end
+  end
 end

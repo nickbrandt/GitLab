@@ -14,4 +14,8 @@ module Schedulable
   rescue ActiveRecord::RecordInvalid
     update_column(:next_run_at, nil) # update without validation
   end
+
+  def set_next_run_at
+    raise NotImplementedError
+  end
 end
