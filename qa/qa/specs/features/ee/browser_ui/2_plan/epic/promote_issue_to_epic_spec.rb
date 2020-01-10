@@ -39,12 +39,7 @@ module QA
         Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform do |index|
           expect(index).to have_epic_title(issue_title)
-
-          index.click_first_epic(QA::EE::Page::Group::Epic::Show)
         end
-
-        expect(page).to have_content(issue_title)
-        expect(page).to have_content(/promoted from issue .* \(closed\)/)
       end
     end
   end
