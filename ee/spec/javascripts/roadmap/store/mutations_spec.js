@@ -138,6 +138,54 @@ describe('Roadmap Store Mutations', () => {
     });
   });
 
+  describe('SET_MILESTONES', () => {
+    it('Should provided milestones array in state', () => {
+      const milestones = [{ id: 1 }, { id: 2 }];
+
+      mutations[types.SET_MILESTONES](state, milestones);
+
+      expect(state.milestones).toEqual(milestones);
+    });
+  });
+
+  describe('UPDATE_MILESTONE_IDS', () => {
+    it('Should update milestoneIds array', () => {
+      mutations[types.UPDATE_MILESTONE_IDS](state, [22]);
+
+      expect(state.milestoneIds.length).toBe(1);
+      expect(state.milestoneIds[0]).toBe(22);
+    });
+  });
+
+  describe('REQUEST_MILESTONES', () => {
+    it('Should set state.milestonesFetchInProgress to `true`', () => {
+      mutations[types.REQUEST_MILESTONES](state);
+
+      expect(state.milestonesFetchInProgress).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_MILESTONES_SUCCESS', () => {
+    it('Should set milestonesFetchResultEmpty, milestones in state based on provided milestones array and set milestonesFetchInProgress to `false`', () => {
+      const milestones = [{ id: 1 }, { id: 2 }];
+
+      mutations[types.RECEIVE_MILESTONES_SUCCESS](state, milestones);
+
+      expect(state.milestonesFetchResultEmpty).toBe(false);
+      expect(state.milestones).toEqual(milestones);
+      expect(state.milestonesFetchInProgress).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_MILESTONES_FAILURE', () => {
+    it('Should set milestonesFetchInProgress to false and milestonesFetchFailure to true', () => {
+      mutations[types.RECEIVE_MILESTONES_FAILURE](state);
+
+      expect(state.milestonesFetchInProgress).toBe(false);
+      expect(state.milestonesFetchFailure).toBe(true);
+    });
+  });
+
   describe('SET_BUFFER_SIZE', () => {
     it('Should set `bufferSize` in state', () => {
       const bufferSize = 10;

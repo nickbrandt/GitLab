@@ -76,7 +76,7 @@ describe('EpicItemComponent', () => {
 
   describe('timeframeString', () => {
     it('returns timeframe string correctly when both start and end dates are defined', () => {
-      expect(vm.timeframeString).toBe('Jul 10, 2017 – Jun 2, 2018');
+      expect(vm.timeframeString(mockEpic)).toBe('Jul 10, 2017 – Jun 2, 2018');
     });
 
     it('returns timeframe string correctly when only start date is defined', () => {
@@ -85,7 +85,7 @@ describe('EpicItemComponent', () => {
       });
       vm = createComponent({ epic });
 
-      expect(vm.timeframeString).toBe('Jul 10, 2017 – No end date');
+      expect(vm.timeframeString(epic)).toBe('Jul 10, 2017 – No end date');
     });
 
     it('returns timeframe string correctly when only end date is defined', () => {
@@ -94,7 +94,7 @@ describe('EpicItemComponent', () => {
       });
       vm = createComponent({ epic });
 
-      expect(vm.timeframeString).toBe('No start date – Jun 2, 2018');
+      expect(vm.timeframeString(epic)).toBe('No start date – Jun 2, 2018');
     });
 
     it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
@@ -104,7 +104,7 @@ describe('EpicItemComponent', () => {
       });
       vm = createComponent({ epic });
 
-      expect(vm.timeframeString).toBe('Jan 1 – Apr 1, 2018');
+      expect(vm.timeframeString(epic)).toBe('Jan 1 – Apr 1, 2018');
     });
   });
 

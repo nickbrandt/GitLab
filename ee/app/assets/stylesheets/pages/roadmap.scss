@@ -147,6 +147,7 @@ html.group-epics-roadmap-html {
 
 .roadmap-timeline-section .timeline-header-blank::after,
 .epics-list-section .epic-details-cell::after,
+.milestones-list-section .milestones-list-title::after,
 .skeleton-loader::after {
   content: '';
   position: absolute;
@@ -344,14 +345,6 @@ html.group-epics-roadmap-html {
   background-color: transparent;
   border-right: $border-style;
 
-  .current-day-indicator {
-    top: -1px;
-    width: 2px;
-    height: calc(100% + 1px);
-    background-color: $red-500;
-    pointer-events: none;
-  }
-
   &:last-child {
     border-right: 0;
   }
@@ -399,3 +392,154 @@ html.group-epics-roadmap-html {
   z-index: 2;
 }
 
+.epic-timeline-cell,
+.milestone-timeline-cell {
+  .current-day-indicator {
+    top: -1px;
+    width: 2px;
+    height: calc(100% + 1px);
+    background-color: $red-500;
+    pointer-events: none;
+  }
+}
+
+.milestones-list-section {
+  .milestones-list-items {
+    .milestone-timeline-cell {
+      width: $timeline-cell-width;
+    }
+
+    .timeline-bar-wrapper {
+      height: 32px;
+      color: $gray-700;
+    }
+
+    .milestone-start-and-end {
+      display: none;
+      border-left: 2px dotted $gray-900;
+      border-right: 2px dotted $gray-900;
+      opacity: 0.5;
+      top: 1px;
+    }
+
+    .milestone-item-details {
+      z-index: 1;
+
+      &:hover .milestone-start-and-end {
+        display: block;
+      }
+    }
+
+    .milestone-item-title {
+      left: $details-cell-width + $grid-size;
+      height: 30px;
+      z-index: 2;
+    }
+
+    a.milestone-url {
+      color: inherit;
+      max-width: 100%;
+
+      &:hover {
+        color: $gray-900;
+        cursor: pointer;
+
+        .timeline-bar {
+          background-color: $gray-900;
+
+          &::before {
+            background-color: $gray-900;
+          }
+
+          &::after {
+            border-color: $gray-900;
+          }
+        }
+      }
+    }
+
+    .milestone-small,
+    .milestone-minimum {
+      .milestone-item-title {
+        width: 100%;
+        text-indent: -9999px;
+
+        &::after {
+          position: absolute;
+          left: 0;
+        }
+      }
+    }
+
+    .milestone-small {
+      .milestone-item-title::after {
+        content: '...';
+        text-indent: 0;
+      }
+    }
+
+    .milestone-minimum {
+      // We need important here to overwrite inline width which depends on dates
+      width: 8px !important;
+
+      .milestone-item-title::after {
+        content: '.';
+        text-indent: 5px;
+      }
+
+      .timeline-bar {
+        height: 0;
+
+        &::before {
+          display: none;
+        }
+      }
+
+      .milestone-start-and-end {
+        border-left: 0;
+      }
+    }
+
+    .timeline-bar {
+      width: 100%;
+      background-color: $gray-700;
+      height: 2px;
+      z-index: 1;
+      bottom: 4px;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: -3px;
+        height: 8px;
+      }
+
+      &::before {
+        width: 2px;
+        background-color: $gray-700;
+      }
+
+      &::after {
+        right: -3px;
+        width: 8px;
+        border: 2px solid $gray-700;
+        border-radius: 4px;
+        background-color: $white-light;
+      }
+    }
+  }
+
+  .milestones-list-title {
+    height: 100%;
+    left: 0;
+    width: $details-cell-width;
+    font-size: $code-font-size;
+    background-color: $white-light;
+    z-index: 2;
+
+    &::after {
+      height: 100%;
+    }
+  }
+}

@@ -9937,16 +9937,28 @@ msgstr ""
 msgid "Group: %{name}"
 msgstr ""
 
+msgid "GroupRoadmap|%{dateWord} - No end date"
+msgstr ""
+
 msgid "GroupRoadmap|%{dateWord} – No end date"
 msgstr ""
 
+msgid "GroupRoadmap|%{startDateInWords} - %{endDateInWords}"
+msgstr ""
+
 msgid "GroupRoadmap|%{startDateInWords} – %{endDateInWords}"
+msgstr ""
+
+msgid "GroupRoadmap|No start date - %{dateWord}"
 msgstr ""
 
 msgid "GroupRoadmap|No start date – %{dateWord}"
 msgstr ""
 
 msgid "GroupRoadmap|Something went wrong while fetching epics"
+msgstr ""
+
+msgid "GroupRoadmap|Something went wrong while fetching milestones"
 msgstr ""
 
 msgid "GroupRoadmap|Sorry, no epics matched your search"

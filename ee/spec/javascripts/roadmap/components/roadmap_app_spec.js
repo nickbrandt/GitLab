@@ -216,6 +216,7 @@ describe('Roadmap AppComponent', () => {
       it('updates the store and refreshes roadmap with extended timeline based on provided extendType', () => {
         spyOn(vm, 'extendTimeframe');
         spyOn(vm, 'refreshEpicDates');
+        spyOn(vm, 'refreshMilestoneDates');
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -223,11 +224,13 @@ describe('Roadmap AppComponent', () => {
 
         expect(vm.extendTimeframe).toHaveBeenCalledWith({ extendAs: extendType });
         expect(vm.refreshEpicDates).toHaveBeenCalled();
+        expect(vm.refreshMilestoneDates).toHaveBeenCalled();
       });
 
       it('calls `fetchEpicsForTimeframe` with extended timeframe array', done => {
         spyOn(vm, 'extendTimeframe').and.stub();
         spyOn(vm, 'refreshEpicDates').and.stub();
+        spyOn(vm, 'refreshMilestoneDates').and.stub();
         spyOn(vm, 'fetchEpicsForTimeframeFn').and.callFake(() => new Promise(() => {}));
 
         const extendType = EXTEND_AS.PREPEND;

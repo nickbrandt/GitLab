@@ -1,4 +1,10 @@
-import { totalDaysInMonth, dayInQuarter, totalDaysInQuarter } from '~/lib/utils/datetime_utility';
+import { s__, sprintf } from '~/locale';
+import {
+  dateInWords,
+  totalDaysInMonth,
+  dayInQuarter,
+  totalDaysInQuarter,
+} from '~/lib/utils/datetime_utility';
 
 import { PRESET_TYPES, DAYS_IN_WEEK } from '../constants';
 
@@ -67,6 +73,55 @@ export default {
       return {
         left: `${left}%`,
       };
+    },
+    timeframeString(roadmapItem) {
+      if (roadmapItem.startDateUndefined) {
+        return sprintf(s__('GroupRoadmap|No start date – %{dateWord}'), {
+          dateWord: dateInWords(this.endDate, true),
+        });
+      } else if (roadmapItem.endDateUndefined) {
+        return sprintf(s__('GroupRoadmap|%{dateWord} – No end date'), {
+          dateWord: dateInWords(this.startDate, true),
+        });
+      }
+
+      // In case both start and end date fall in same year
+      // We should hide year from start date
+      const startDateInWords = dateInWords(
+        this.startDate,
+        true,
+        this.startDate.getFullYear() === this.endDate.getFullYear(),
+      );
+
+      const endDateInWords = dateInWords(this.endDate, true);
+      return sprintf(s__('GroupRoadmap|%{startDateInWords} – %{endDateInWords}'), {
+        startDateInWords,
+        endDateInWords,
+      });
+    },
+    timelineBarStyles(roadmapItem) {
+      let barStyles = {};
+
+      if (this.hasStartDate) {
+        if (this.presetTypeQuarters) {
+          // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          barStyles = `width: ${this.getTimelineBarWidthForQuarters(
+            roadmapItem,
+          )}px; ${this.getTimelineBarStartOffsetForQuarters(roadmapItem)}`;
+        } else if (this.presetTypeMonths) {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths(
+            roadmapItem,
+          )}`;
+        } else if (this.presetTypeWeeks) {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks(
+            roadmapItem,
+          )}`;
+        }
+      }
+      return barStyles;
     },
   },
 };

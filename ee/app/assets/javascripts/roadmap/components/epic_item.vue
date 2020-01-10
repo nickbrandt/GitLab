@@ -1,10 +1,10 @@
 <script>
 import _ from 'underscore';
-import { s__, sprintf } from '~/locale';
-import { dateInWords } from '~/lib/utils/datetime_utility';
 
 import epicItemDetails from './epic_item_details.vue';
 import epicItemTimeline from './epic_item_timeline.vue';
+
+import CommonMixin from '../mixins/common_mixin';
 
 import { EPIC_HIGHLIGHT_REMOVE_AFTER } from '../constants';
 
@@ -13,6 +13,7 @@ export default {
     epicItemDetails,
     epicItemTimeline,
   },
+  mixins: [CommonMixin],
   props: {
     presetType: {
       type: String,
@@ -58,35 +59,6 @@ export default {
       }
       return this.epic.endDate;
     },
-    /**
-     * Compose timeframe string to show on UI
-     * based on start and end date availability
-     */
-    timeframeString() {
-      if (this.epic.startDateUndefined) {
-        return sprintf(s__('GroupRoadmap|No start date – %{dateWord}'), {
-          dateWord: dateInWords(this.endDate, true),
-        });
-      } else if (this.epic.endDateUndefined) {
-        return sprintf(s__('GroupRoadmap|%{dateWord} – No end date'), {
-          dateWord: dateInWords(this.startDate, true),
-        });
-      }
-
-      // In case both start and end date fall in same year
-      // We should hide year from start date
-      const startDateInWords = dateInWords(
-        this.startDate,
-        true,
-        this.startDate.getFullYear() === this.endDate.getFullYear(),
-      );
-
-      const endDateInWords = dateInWords(this.endDate, true);
-      return sprintf(s__('GroupRoadmap|%{startDateInWords} – %{endDateInWords}'), {
-        startDateInWords,
-        endDateInWords,
-      });
-    },
   },
   updated() {
     this.removeHighlight();
@@ -121,7 +93,7 @@ export default {
     <epic-item-details
       :epic="epic"
       :current-group-id="currentGroupId"
-      :timeframe-string="timeframeString"
+      :timeframe-string="timeframeString(epic)"
     />
     <epic-item-timeline
       v-for="(timeframeItem, index) in timeframe"
@@ -130,7 +102,6 @@ export default {
       :timeframe="timeframe"
       :timeframe-item="timeframeItem"
       :epic="epic"
-      :timeframe-string="timeframeString"
       :client-width="clientWidth"
     />
   </div>

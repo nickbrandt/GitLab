@@ -13,6 +13,7 @@ module Groups
       push_frontend_feature_flag(:roadmap_graphql, @group)
       push_frontend_feature_flag(:unfiltered_epic_aggregates, @group)
       push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
+      push_frontend_feature_flag(:milestones_in_roadmap, @group)
     end
 
     # show roadmap for a group
