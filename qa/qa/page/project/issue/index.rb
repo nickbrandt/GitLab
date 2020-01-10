@@ -38,7 +38,7 @@ module QA
           end
 
           def has_issue?(issue)
-            has_element? :issue, issue_title: issue.to_s
+            has_element? :issue, issue_title: issue.title
           end
         end
       end
