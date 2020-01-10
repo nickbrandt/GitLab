@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::AlertsController do
-  set(:user) { create(:user) }
-  set(:project) { create(:project) }
-  set(:environment) { create(:environment, project: project) }
-  set(:metric) { create(:prometheus_metric, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:environment) { create(:environment, project: project) }
+  let_it_be(:metric) { create(:prometheus_metric, project: project) }
 
   before do
     stub_licensed_features(prometheus_alerts: true)

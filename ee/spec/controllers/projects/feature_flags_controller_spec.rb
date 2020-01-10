@@ -6,7 +6,7 @@ describe Projects::FeatureFlagsController do
   include Gitlab::Routing
   include FeatureFlagHelpers
 
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:user) { developer }
   let(:developer) { create(:user) }
   let(:reporter) { create(:user) }

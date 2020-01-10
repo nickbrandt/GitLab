@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::TracingsController do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   describe 'GET show' do
     shared_examples 'user with read access' do |visibility_level|

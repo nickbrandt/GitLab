@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Projects::FeatureFlagsClientsController do
   include Gitlab::Routing
 
-  set(:project) { create(:project) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
 
   describe 'POST reset_token.json' do
     subject(:reset_token) do

@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Projects::Alerting::NotificationsController do
-  set(:project) { create(:project) }
-  set(:environment) { create(:environment, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:environment) { create(:environment, project: project) }
 
   describe 'POST #create' do
     let(:service_response) { ServiceResponse.success }

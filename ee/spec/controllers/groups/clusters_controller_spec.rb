@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Groups::ClustersController do
   include AccessMatchersForController
 
-  set(:group) { create(:group) }
+  let_it_be(:group) { create(:group) }
 
   let(:user) { create(:user) }
 

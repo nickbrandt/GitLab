@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Groups::InsightsController do
-  set(:parent_group) { create(:group, :private) }
-  set(:nested_group) { create(:group, :private, parent: parent_group) }
-  set(:project) { create(:project, :private) }
-  set(:insight) { create(:insight, group: parent_group, project: project) }
-  set(:user) { create(:user) }
+  let_it_be(:parent_group) { create(:group, :private) }
+  let_it_be(:nested_group) { create(:group, :private, parent: parent_group) }
+  let_it_be(:project) { create(:project, :private) }
+  let_it_be(:insight) { create(:insight, group: parent_group, project: project) }
+  let_it_be(:user) { create(:user) }
   let(:query_params) { { type: 'bar', query: { issuable_type: 'issue', collection_labels: ['bug'] }, projects: projects_params } }
   let(:projects_params) { { only: [project.id, project.full_path] } }
   let(:params) { { trailing_slash: true } }
