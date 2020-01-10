@@ -11,6 +11,7 @@ class Board < ApplicationRecord
   validates :group, presence: true, unless: :project
 
   scope :with_associations, -> { preload(:destroyable_lists) }
+  scope :order_by_name_asc, -> { order(arel_table[:name].lower.asc) }
 
   def project_needed?
     !group

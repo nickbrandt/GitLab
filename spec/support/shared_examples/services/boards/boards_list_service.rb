@@ -29,3 +29,21 @@ shared_examples 'boards list service' do
     expect(service.execute).to eq [board]
   end
 end
+
+shared_examples 'multiple boards list service' do
+  let(:service) { described_class.new(parent, double) }
+  let!(:boards) { create_list(:board, 3, resource_parent: parent) }
+
+  describe '#execute' do
+    it 'returns all issue boards' do
+      expect(service.execute.size).to eq(3)
+    end
+
+    it 'returns boards ordered by name' do
+      board_names = %w[B-board c-board a-board]
+      boards.each_with_index { |board, i| board.update_column(:name, board_names[i]) }
+
+      expect(service.execute.pluck(:name)).to eq(%w[a-board B-board c-board])
+    end
+  end
+end
