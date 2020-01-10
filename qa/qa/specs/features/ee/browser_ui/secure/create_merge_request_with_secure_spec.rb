@@ -3,10 +3,7 @@
 require 'pathname'
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/37231
-  # https://gitlab.com/gitlab-org/gitlab/issues/36822
-  # https://gitlab.com/gitlab-org/gitlab/issues/36559
-  context 'Secure', :docker, :quarantine do
+  context 'Secure', :docker do
     describe 'Security Reports in a Merge Request' do
       let(:sast_vuln_count) { 5 }
       let(:dependency_scan_vuln_count) { 4 }
