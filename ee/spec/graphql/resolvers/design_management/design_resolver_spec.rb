@@ -11,11 +11,11 @@ describe Resolvers::DesignManagement::DesignResolver do
   end
 
   describe "#resolve" do
-    set(:issue) { create(:issue) }
-    set(:project) { issue.project }
-    set(:first_version) { create(:design_version) }
-    set(:first_design) { create(:design, issue: issue, versions: [first_version]) }
-    set(:current_user) { create(:user) }
+    let_it_be(:issue) { create(:issue) }
+    let_it_be(:project) { issue.project }
+    let_it_be(:first_version) { create(:design_version) }
+    let_it_be(:first_design) { create(:design, issue: issue, versions: [first_version]) }
+    let_it_be(:current_user) { create(:user) }
 
     before do
       project.add_developer(current_user)
