@@ -152,35 +152,51 @@ RSpec.describe SCA::LicenseCompliance do
     let!(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
     let!(:other_license_policy) { create(:software_license_policy, :allowed, software_license: other_license, project: project) }
 
+    def assert_matches(item, expected = {})
+      actual = expected.keys.each_with_object({}) do |attribute, memo|
+        memo[attribute] = item.public_send(attribute)
+      end
+      expect(actual).to eql(expected)
+    end
+
     context "when searching for policies for licenses that were detected in a scan report" do
       let(:results) { subject.find_policies(detected_only: true) }
 
       it 'excludes policies for licenses that do not appear in the latest license scan report' do
-        expect(results.count).to eq(3)
+        expect(results.map(&:name)).not_to include('SOFTWARE_LICENSE-2.7/example_1')
       end
 
       it 'includes a policy for an unclassified and known license that was detected in the scan report' do
-        expect(results[0].id).to be_nil
-        expect(results[0].name).to eq("BSD 3-Clause \"New\" or \"Revised\" License")
-        expect(results[0].url).to eq("http://spdx.org/licenses/BSD-3-Clause.json")
-        expect(results[0].classification).to eq("unclassified")
-        expect(results[0].spdx_identifier).to eq("BSD-3-Clause")
+        assert_matches(
+          results[0],
+          id: nil,
+          name: "BSD 3-Clause \"New\" or \"Revised\" License",
+          url: "http://spdx.org/licenses/BSD-3-Clause.json",
+          classification: "unclassified",
+          spdx_identifier: "BSD-3-Clause"
+        )
       end
 
       it 'includes an entry for a denied license found in the scan report' do
-        expect(results[1].id).to eq(mit_policy.id)
-        expect(results[1].name).to eq(mit.name)
-        expect(results[1].url).to eq("http://spdx.org/licenses/MIT.json")
-        expect(results[1].classification).to eq("denied")
-        expect(results[1].spdx_identifier).to eq("MIT")
+        assert_matches(
+          results[1],
+          id: mit_policy.id,
+          name: mit.name,
+          url: "http://spdx.org/licenses/MIT.json",
+          classification: "denied",
+          spdx_identifier: "MIT"
+        )
       end
 
       it 'includes an entry for an allowed license found in the scan report' do
-        expect(results[2].id).to be_nil
-        expect(results[2].name).to eq("unknown")
-        expect(results[2].url).to be_blank
-        expect(results[2].classification).to eq("unclassified")
-        expect(results[2].spdx_identifier).to be_nil
+        assert_matches(
+          results[2],
+          id: nil,
+          name: 'unknown',
+          url: '',
+          classification: 'unclassified',
+          spdx_identifier: nil
+        )
       end
     end
 
@@ -189,11 +205,14 @@ RSpec.describe SCA::LicenseCompliance do
 
       it 'includes an entry for each `allowed` licensed' do
         expect(results.count).to eq(1)
-        expect(results[0].id).to eql(other_license_policy.id)
-        expect(results[0].name).to eq(other_license_policy.software_license.name)
-        expect(results[0].url).to be_blank
-        expect(results[0].classification).to eq("allowed")
-        expect(results[0].spdx_identifier).to eq(other_license_policy.software_license.spdx_identifier)
+        assert_matches(
+          results[0],
+          id: other_license_policy.id,
+          name: other_license_policy.software_license.name,
+          url: nil,
+          classification: 'allowed',
+          spdx_identifier: other_license_policy.software_license.spdx_identifier
+        )
       end
     end
 
@@ -202,18 +221,22 @@ RSpec.describe SCA::LicenseCompliance do
 
       it 'includes an entry for each `allowed` and `denied` licensed' do
         expect(results.count).to eq(2)
-
-        expect(results[0].id).to eql(mit_policy.id)
-        expect(results[0].name).to eq(mit_policy.software_license.name)
-        expect(results[0].url).to be_present
-        expect(results[0].classification).to eq("denied")
-        expect(results[0].spdx_identifier).to eq(mit_policy.software_license.spdx_identifier)
-
-        expect(results[1].id).to eql(other_license_policy.id)
-        expect(results[1].name).to eq(other_license_policy.software_license.name)
-        expect(results[1].url).to be_blank
-        expect(results[1].classification).to eq("allowed")
-        expect(results[1].spdx_identifier).to eq(other_license_policy.software_license.spdx_identifier)
+        assert_matches(
+          results[0],
+          id: mit_policy.id,
+          name: mit_policy.software_license.name,
+          url: 'http://spdx.org/licenses/MIT.json',
+          classification: "denied",
+          spdx_identifier: mit_policy.software_license.spdx_identifier
+        )
+        assert_matches(
+          results[1],
+          id: other_license_policy.id,
+          name: other_license_policy.software_license.name,
+          url: nil,
+          classification: "allowed",
+          spdx_identifier: other_license_policy.software_license.spdx_identifier
+        )
       end
     end
 
@@ -222,12 +245,14 @@ RSpec.describe SCA::LicenseCompliance do
 
       it 'includes an entry for each entry that was detected in the report and matches a classification' do
         expect(results.count).to eq(1)
-
-        expect(results[0].id).to eql(mit_policy.id)
-        expect(results[0].name).to eq(mit_policy.software_license.name)
-        expect(results[0].url).to be_present
-        expect(results[0].classification).to eq("denied")
-        expect(results[0].spdx_identifier).to eq(mit_policy.software_license.spdx_identifier)
+        assert_matches(
+          results[0],
+          id: mit_policy.id,
+          name: mit_policy.software_license.name,
+          url: 'http://spdx.org/licenses/MIT.json',
+          classification: "denied",
+          spdx_identifier: mit_policy.software_license.spdx_identifier
+        )
       end
     end
   end

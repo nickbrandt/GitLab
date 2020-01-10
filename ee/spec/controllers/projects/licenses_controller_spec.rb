@@ -84,7 +84,11 @@ describe Projects::LicensesController do
 
           context "when loading all policies" do
             before do
-              get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                detected: false
+              }, format: :json
             end
 
             it { expect(response).to have_http_status(:ok) }
