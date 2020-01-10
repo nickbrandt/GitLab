@@ -68,7 +68,7 @@ class SearchController < ApplicationController
   private
 
   def search_term_valid?
-    return true if Gitlab::CurrentSettings.elasticsearch_search?
+    return true if Gitlab::CurrentSettings.elasticsearch_search? && search_service.try(:use_elasticsearch?)
 
     chars_count = params[:search].length
     if chars_count > NON_ES_SEARCH_CHAR_LIMIT
