@@ -37,7 +37,6 @@ describe('Group Security Dashboard component', () => {
     wrapper = shallowMount(GroupSecurityDashboard, {
       localVue,
       store,
-      sync: false,
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,

@@ -52,7 +52,6 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
       parentItem,
       item,
     },
-    sync: false,
   });
 };
 

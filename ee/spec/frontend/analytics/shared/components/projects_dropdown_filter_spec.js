@@ -34,7 +34,6 @@ describe('ProjectsDropdownFilter component', () => {
 
   const createComponent = (props = {}) => {
     wrapper = mount(ProjectsDropdownFilter, {
-      sync: false,
       propsData: {
         groupId: 1,
         ...props,

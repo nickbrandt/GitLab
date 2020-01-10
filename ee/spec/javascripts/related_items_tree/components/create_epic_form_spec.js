@@ -11,7 +11,6 @@ const createComponent = (isSubmitting = false) =>
     propsData: {
       isSubmitting,
     },
-    sync: false,
   });
 
 describe('RelatedItemsTree', () => {

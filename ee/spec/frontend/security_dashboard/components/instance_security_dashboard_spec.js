@@ -50,7 +50,6 @@ describe('Instance Security Dashboard component', () => {
     wrapper = shallowMount(InstanceSecurityDashboard, {
       localVue,
       store,
-      sync: false,
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,

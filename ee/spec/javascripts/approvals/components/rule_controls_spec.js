@@ -29,7 +29,6 @@ describe('EE Approvals RuleControls', () => {
       },
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
   const findButtons = () => wrapper.findAll(GlButton);

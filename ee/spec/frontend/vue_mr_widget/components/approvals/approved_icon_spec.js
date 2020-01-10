@@ -10,7 +10,6 @@ describe('EE MRWidget approved icon', () => {
   const createComponent = (props = {}) => {
     wrapper = shallowMount(ApprovedIcon, {
       propsData: props,
-      sync: false,
     });
   };
 

@@ -16,7 +16,6 @@ const createComponent = (parentItem = mockParentItem, children = []) =>
       parentItem,
       children,
     },
-    sync: false,
   });
 
 describe('RelatedItemsTree', () => {

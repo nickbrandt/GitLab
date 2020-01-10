@@ -16,7 +16,6 @@ function factory({ name, value }) {
       value,
     },
     localVue,
-    sync: false,
   });
 }
 

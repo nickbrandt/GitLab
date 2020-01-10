@@ -58,7 +58,6 @@ describe('Design management design index page', () => {
     };
 
     wrapper = shallowMount(DesignIndex, {
-      sync: false,
       propsData: { id: '1' },
       mocks: { $apollo },
       stubs: {

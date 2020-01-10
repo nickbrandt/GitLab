@@ -20,7 +20,6 @@ describe('Storage counter app', () => {
     wrapper = shallowMount(localVue.extend(StorageApp), {
       propsData: { namespacePath: 'h5bp', helpPagePath: 'help' },
       mocks: { $apollo },
-      sync: false,
       localVue,
     });
   }

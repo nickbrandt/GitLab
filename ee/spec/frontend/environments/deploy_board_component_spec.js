@@ -18,7 +18,6 @@ describe('Deploy Board', () => {
         environmentName: environment.name,
         ...props,
       },
-      sync: false,
     });
 
   describe('with valid data', () => {

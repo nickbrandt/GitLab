@@ -21,7 +21,6 @@ describe('EE MRWidget approvals summary', () => {
         rulesLeft: testRulesLeft(),
         ...props,
       },
-      sync: false,
     });
   };
 

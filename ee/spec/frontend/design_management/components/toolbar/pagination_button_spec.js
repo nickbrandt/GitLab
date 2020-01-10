@@ -11,7 +11,6 @@ describe('Design management pagination button component', () => {
 
   function createComponent(design = null) {
     wrapper = shallowMount(PaginationButton, {
-      sync: false,
       localVue,
       router,
       propsData: {

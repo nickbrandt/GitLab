@@ -6,7 +6,6 @@ describe('Design management large image component', () => {
 
   function createComponent(propsData) {
     wrapper = shallowMount(DesignImage, {
-      sync: false,
       propsData,
     });
   }

@@ -11,7 +11,6 @@ describe('Empty Rule', () => {
         rule: {},
         ...props,
       },
-      sync: false,
     });
   };
 

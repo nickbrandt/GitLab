@@ -27,7 +27,6 @@ describe('Design management toolbar component', () => {
     updatedAt.setHours(updatedAt.getHours() - 1);
 
     wrapper = shallowMount(Toolbar, {
-      sync: false,
       localVue,
       router,
       propsData: {

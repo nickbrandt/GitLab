@@ -40,7 +40,6 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   return shallowMount(localVue.extend(TreeItemRemoveModal), {
     localVue,
     store,
-    sync: false,
   });
 };
 

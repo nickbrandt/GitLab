@@ -19,7 +19,6 @@ describe('MrWidgetPipelineContainer', () => {
         ...provide,
       },
       localVue,
-      sync: false,
       attachToDocument: true,
     });
   };

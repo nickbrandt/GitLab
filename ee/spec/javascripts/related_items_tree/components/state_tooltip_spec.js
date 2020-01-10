@@ -32,7 +32,6 @@ const createComponent = ({
       createdAt,
       closedAt,
     },
-    sync: false,
   });
 
 describe('RelatedItemsTree', () => {

@@ -12,7 +12,6 @@ describe('MetricColumn component', () => {
 
   const factory = (props = defaultProps) => {
     wrapper = shallowMount(MetricColumn, {
-      sync: false,
       propsData: { ...props },
     });
   };

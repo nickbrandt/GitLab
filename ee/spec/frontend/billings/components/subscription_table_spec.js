@@ -24,7 +24,6 @@ describe('SubscriptionTable component', () => {
     wrapper = shallowMount(SubscriptionTable, {
       ...options,
       store,
-      sync: false,
     });
   };
 

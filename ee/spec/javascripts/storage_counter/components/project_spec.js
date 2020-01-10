@@ -30,7 +30,6 @@ function factory(project) {
       project,
     },
     localVue,
-    sync: false,
   });
 }
 

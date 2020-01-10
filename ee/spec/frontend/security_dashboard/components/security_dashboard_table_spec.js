@@ -27,7 +27,6 @@ describe('Security Dashboard Table', () => {
     wrapper = shallowMount(SecurityDashboardTable, {
       localVue,
       store,
-      sync: false,
     });
     store.state.vulnerabilities.vulnerabilitiesEndpoint = vulnerabilitiesEndpoint;
   });
@@ -93,7 +92,6 @@ describe('Security Dashboard Table', () => {
       wrapper = shallowMount(SecurityDashboardTable, {
         localVue,
         store,
-        sync: false,
         slots: {
           emptyState: '<div class="customEmptyState">Hello World</div>',
         },

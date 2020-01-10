@@ -41,7 +41,6 @@ describe('BoardSettingsSideBar', () => {
       data() {
         return localState;
       },
-      sync: false,
     });
   };
 

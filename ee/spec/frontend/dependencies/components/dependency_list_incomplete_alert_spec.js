@@ -7,7 +7,6 @@ describe('DependencyListIncompleteAlert component', () => {
 
   const factory = (options = {}) => {
     wrapper = shallowMount(DependencyListIncompleteAlert, {
-      sync: false,
       ...options,
     });
   };

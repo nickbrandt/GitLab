@@ -19,7 +19,6 @@ describe('CustomMetricsForm', () => {
   }) {
     wrapper = shallowMount(localVue.extend(CustomMetricsForm), {
       localVue,
-      sync: false,
       propsData: {
         customMetricsPath: '',
         editProjectServicePath: '',

@@ -22,7 +22,7 @@ describe('dismissal note', () => {
   let wrapper;
 
   const mountComponent = (options, mountFn = shallowMount) => {
-    wrapper = mountFn(component, { sync: false, attachToDocument: true, ...options });
+    wrapper = mountFn(component, { attachToDocument: true, ...options });
   };
 
   describe('with no attached project or pipeline', () => {

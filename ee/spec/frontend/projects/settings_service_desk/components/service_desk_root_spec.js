@@ -160,7 +160,6 @@ describe('ServiceDeskRoot', () => {
         selectedTemplate: 'Bug',
         templates: ['Bug', 'Documentation'],
       },
-      sync: false,
     });
 
     wrapper.find('button.btn-success').trigger('click');
@@ -184,7 +183,6 @@ describe('ServiceDeskRoot', () => {
         selectedTemplate: 'Bug',
         templates: ['Bug', 'Documentation'],
       },
-      sync: false,
     });
 
     wrapper.find('button.btn-success').trigger('click');
@@ -208,7 +206,6 @@ describe('ServiceDeskRoot', () => {
         selectedTemplate: 'Bug',
         templates: ['Bug', 'Documentation'],
       },
-      sync: false,
     });
 
     wrapper.find('button.btn-success').trigger('click');

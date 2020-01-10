@@ -65,7 +65,6 @@ describe('EE DiffLineNoteForm', () => {
         ...props,
       },
       store,
-      sync: false,
       localVue,
     });
   };

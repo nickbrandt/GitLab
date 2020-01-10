@@ -49,7 +49,6 @@ describe('ReadyToMerge', () => {
         service,
       },
       localVue,
-      sync: false,
       stubs: {
         MergeImmediatelyConfirmationDialog,
       },

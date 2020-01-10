@@ -11,7 +11,6 @@ describe('DependenciesTableRow component', () => {
   const factory = ({ propsData, ...options } = {}) => {
     wrapper = shallowMount(DependenciesTableRow, {
       ...options,
-      sync: false,
       propsData: { ...propsData },
     });
   };

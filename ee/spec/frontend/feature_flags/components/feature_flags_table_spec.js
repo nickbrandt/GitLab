@@ -41,7 +41,6 @@ describe('Feature flag table', () => {
   const createWrapper = (propsData, opts = {}) => {
     wrapper = shallowMount(FeatureFlagsTable, {
       propsData,
-      sync: false,
       ...opts,
     });
   };

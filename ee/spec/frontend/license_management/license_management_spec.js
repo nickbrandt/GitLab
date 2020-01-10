@@ -53,7 +53,6 @@ describe('LicenseManagement', () => {
         LicenseManagementRow: true,
         PaginatedList: PaginatedListMock,
       },
-      sync: false,
       store: fakeStore,
     });
   };

@@ -26,7 +26,6 @@ describe('FilterDropdowns component', () => {
     wrapper = shallowMount(FilterDropdowns, {
       localVue,
       store,
-      sync: false,
       propsData: {},
       methods: {
         ...actionSpies,

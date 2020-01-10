@@ -42,7 +42,6 @@ describe('Environments', () => {
       wrapper = mount(Environments, {
         propsData: { ...propsData, environments },
         stubs: { deploymentInstance: '<div class="js-deployment-instance"></div>' },
-        sync: false,
       });
 
       table = wrapper.find(GlTable);

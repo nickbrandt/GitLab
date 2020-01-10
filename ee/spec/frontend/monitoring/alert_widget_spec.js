@@ -54,7 +54,6 @@ describe('AlertWidget', () => {
         ...defaultProps,
         ...propsData,
       },
-      sync: false,
     });
   };
   const findWidgetForm = () => wrapper.find({ ref: 'widgetForm' });

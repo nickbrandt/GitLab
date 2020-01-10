@@ -26,7 +26,6 @@ describe('EE Approvals MRRules', () => {
     wrapper = mount(localVue.extend(MRRules), {
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
 

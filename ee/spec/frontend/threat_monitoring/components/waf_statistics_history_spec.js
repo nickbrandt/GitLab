@@ -35,7 +35,6 @@ describe('WafStatisticsHistory component', () => {
     wrapper = shallowMount(WafStatisticsHistory, {
       localVue,
       store,
-      sync: false,
       ...options,
     });
   };

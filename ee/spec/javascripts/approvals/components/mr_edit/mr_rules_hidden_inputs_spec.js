@@ -31,7 +31,6 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
     wrapper = shallowMount(localVue.extend(MRRulesHiddenInputs), {
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
 

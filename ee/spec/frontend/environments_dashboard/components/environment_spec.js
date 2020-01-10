@@ -14,7 +14,6 @@ describe('Environment', () => {
       environment,
     };
     wrapper = shallowMount(component, {
-      sync: false,
       attachToDocument: true,
       propsData,
     });
@@ -92,7 +91,6 @@ describe('Environment', () => {
       },
     };
     wrapper = shallowMount(component, {
-      sync: false,
       attachToDocument: true,
       propsData,
     });
@@ -111,7 +109,6 @@ describe('Environment', () => {
       },
     };
     wrapper = shallowMount(component, {
-      sync: false,
       attachToDocument: true,
       propsData,
     });

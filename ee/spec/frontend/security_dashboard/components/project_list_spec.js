@@ -18,7 +18,6 @@ describe('Project List component', () => {
         projects,
         showLoadingIndicator,
       },
-      sync: false,
     });
   };
 

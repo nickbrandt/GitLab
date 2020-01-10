@@ -30,7 +30,6 @@ describe('Design overlay component', () => {
 
   function createComponent(props = {}) {
     wrapper = shallowMount(DesignOverlay, {
-      sync: false,
       propsData: {
         position: {
           width: 100,

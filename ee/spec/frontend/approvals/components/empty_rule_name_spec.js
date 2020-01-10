@@ -12,7 +12,6 @@ describe('Empty Rule Name', () => {
         eligibleApproversDocsPath: 'some/path',
         ...props,
       },
-      sync: false,
     });
   };
 

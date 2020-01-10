@@ -19,7 +19,6 @@ describe('EE MRWidget approvals footer', () => {
         approvalRules: testApprovalRules(),
         ...props,
       },
-      sync: false,
     });
   };
 

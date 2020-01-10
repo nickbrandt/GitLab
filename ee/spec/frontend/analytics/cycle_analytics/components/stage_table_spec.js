@@ -51,7 +51,6 @@ function createComponent(props = {}, shallow = false) {
     stubs: {
       'gl-loading-icon': true,
     },
-    sync: false,
     attachToDocument: true,
   });
 }

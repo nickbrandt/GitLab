@@ -28,7 +28,6 @@ describe('CustomStageForm', () => {
         labels: groupLabels,
         ...props,
       },
-      sync: false,
     });
   }
 

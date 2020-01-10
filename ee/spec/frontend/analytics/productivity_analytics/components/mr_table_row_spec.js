@@ -15,7 +15,6 @@ describe('MergeRequestTableRow component', () => {
 
   const factory = (props = defaultProps) => {
     wrapper = shallowMount(MergeRequestTableRow, {
-      sync: false,
       propsData: { ...props },
     });
   };

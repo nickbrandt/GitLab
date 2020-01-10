@@ -18,7 +18,6 @@ describe('Design note component', () => {
 
   function createComponent(props = {}) {
     wrapper = shallowMount(DesignNote, {
-      sync: false,
       propsData: {
         note: {},
         ...props,

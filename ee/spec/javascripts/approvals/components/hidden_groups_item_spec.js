@@ -10,7 +10,6 @@ describe('Approvals HiddenGroupsItem', () => {
     wrapper = shallowMount(localVue.extend(HiddenGroupsItem), {
       ...options,
       localVue,
-      sync: false,
     });
   };
 

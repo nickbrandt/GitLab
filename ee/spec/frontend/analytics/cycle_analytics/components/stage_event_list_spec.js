@@ -36,7 +36,6 @@ function createComponent({ props = {}, shallow = false, Component = StageEventLi
   const func = shallow ? shallowMount : mount;
   return func(Component, {
     attachToDocument: true,
-    sync: false,
     propsData: {
       stage: issueStage,
       events: issueEvents,

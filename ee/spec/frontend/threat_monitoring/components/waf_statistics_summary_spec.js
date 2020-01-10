@@ -14,7 +14,6 @@ describe('WafStatisticsSummary component', () => {
 
     wrapper = shallowMount(WafStatisticsSummary, {
       store,
-      sync: false,
     });
   };
 

@@ -8,7 +8,6 @@ describe('LicensesTable component', () => {
 
   const factory = (propsData = {}) => {
     wrapper = shallowMount(LicensesTable, {
-      sync: false,
       propsData: { ...propsData },
     });
   };

@@ -17,7 +17,6 @@ describe('ee/ide/components/terminal_sync/terminal_sync_status_safe', () => {
 
     wrapper = shallowMount(TerminalSyncStatusSafe, {
       localVue,
-      sync: false,
       store,
     });
   };

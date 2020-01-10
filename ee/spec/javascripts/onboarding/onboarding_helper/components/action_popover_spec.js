@@ -22,7 +22,6 @@ describe('User onboarding action popover', () => {
     };
     wrapper = shallowMount(localVue.extend(component), {
       propsData: props,
-      sync: false,
       localVue,
     });
   };

@@ -23,7 +23,6 @@ describe('Approvals ApproversListItem', () => {
   const factory = (options = {}) => {
     wrapper = shallowMount(ApproversListItem, {
       ...options,
-      sync: false,
     });
   };
 

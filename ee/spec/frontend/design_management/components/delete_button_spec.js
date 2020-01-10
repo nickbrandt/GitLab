@@ -13,7 +13,6 @@ describe('Batch delete button component', () => {
       propsData: {
         isDeleting,
       },
-      sync: false,
       directives: {
         GlModalDirective,
       },

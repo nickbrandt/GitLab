@@ -16,7 +16,6 @@ describe('PaginatedDependenciesTable component', () => {
 
     wrapper = shallowMount(PaginatedDependenciesTable, {
       store,
-      sync: false,
       propsData: { ...props },
     });
   };

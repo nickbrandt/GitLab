@@ -85,7 +85,6 @@ describe('Design management index page', () => {
     };
 
     wrapper = shallowMount(Index, {
-      sync: false,
       mocks: { $apollo },
       localVue,
       router,
