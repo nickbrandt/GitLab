@@ -3,7 +3,7 @@
 module Resolvers
   module DesignManagement
     class VersionsResolver < BaseResolver
-      type Types::DesignManagement::VersionType.connection_type, null: false
+      type Types::DesignManagement::VersionType, null: false
 
       alias_method :design_or_collection, :object
 
