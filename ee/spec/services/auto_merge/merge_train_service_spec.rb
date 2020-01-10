@@ -21,7 +21,7 @@ describe AutoMerge::MergeTrainService do
     allow(AutoMergeProcessWorker).to receive(:perform_async) { }
 
     stub_licensed_features(merge_trains: true, merge_pipelines: true)
-    project.update!(merge_trains_enabled: true, merge_pipelines_enabled: true)
+    project.update!(merge_pipelines_enabled: true)
   end
 
   describe '#execute' do
