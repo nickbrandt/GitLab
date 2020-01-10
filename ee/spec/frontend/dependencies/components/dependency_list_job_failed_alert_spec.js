@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlAlert } from '@gitlab/ui';
 import DependencyListJobFailedAlert from 'ee/dependencies/components/dependency_list_job_failed_alert.vue';
 
@@ -11,10 +11,7 @@ describe('DependencyListJobFailedAlert component', () => {
   let wrapper;
 
   const factory = (options = {}) => {
-    const localVue = createLocalVue();
-
     wrapper = shallowMount(DependencyListJobFailedAlert, {
-      localVue,
       sync: false,
       ...options,
     });

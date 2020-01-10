@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import DependenciesTable from 'ee/dependencies/components/dependencies_table.vue';
 import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_row.vue';
 import { makeDependency } from './utils';
@@ -7,11 +7,8 @@ describe('DependenciesTable component', () => {
   let wrapper;
 
   const factory = ({ propsData, ...options } = {}) => {
-    const localVue = createLocalVue();
-
     wrapper = shallowMount(DependenciesTable, {
       ...options,
-      localVue,
       sync: false,
       propsData: { ...propsData },
     });
