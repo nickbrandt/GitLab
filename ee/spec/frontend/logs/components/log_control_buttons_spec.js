@@ -21,7 +21,6 @@ describe('LogControlButtons', () => {
   const initWrapper = () => {
     wrapper = shallowMount(LogControlButtons, {
       attachToDocument: true,
-      sync: false,
     });
   };
 

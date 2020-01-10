@@ -35,7 +35,6 @@ describe('Edit feature flag form', () => {
         },
       },
       store,
-      sync: false,
     });
   };
 

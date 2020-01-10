@@ -14,7 +14,6 @@ describe('Approval Check Popover', () => {
   beforeEach(() => {
     wrapper = shallowMount(component, {
       propsData: { rule: {} },
-      sync: false,
     });
   });
 

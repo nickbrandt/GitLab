@@ -18,7 +18,6 @@ describe('DependencyLicenseLinks component', () => {
     const licenses = addUrls(createLicenses(numLicenses), numLicensesWithUrl);
 
     wrapper = shallowMount(DependenciesLicenseLinks, {
-      sync: false,
       attachToDocument: true,
       propsData: {
         licenses,

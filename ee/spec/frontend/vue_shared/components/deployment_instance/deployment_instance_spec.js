@@ -11,7 +11,6 @@ describe('Deploy Board Instance', () => {
         status: 'succeeded',
         ...props,
       },
-      sync: false,
     });
 
   describe('as a non-canary deployment', () => {

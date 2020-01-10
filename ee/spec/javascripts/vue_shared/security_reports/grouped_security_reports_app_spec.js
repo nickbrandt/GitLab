@@ -26,7 +26,6 @@ describe('Grouped security reports app', () => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
       provide,
-      sync: false,
     });
   };
 

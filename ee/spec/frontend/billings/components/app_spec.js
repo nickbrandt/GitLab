@@ -20,7 +20,6 @@ describe('SubscriptionApp component', () => {
 
     wrapper = shallowMount(SubscriptionApp, {
       store,
-      sync: false,
       propsData: { ...props },
     });
   };

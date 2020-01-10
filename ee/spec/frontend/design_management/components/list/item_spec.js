@@ -22,7 +22,6 @@ describe('Design management list item component', () => {
     isLoading = false,
   } = {}) {
     wrapper = shallowMount(Item, {
-      sync: false,
       localVue,
       router,
       propsData: {

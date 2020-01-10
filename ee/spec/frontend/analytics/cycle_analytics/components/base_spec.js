@@ -36,7 +36,6 @@ function createComponent({
   const comp = func(Component, {
     localVue,
     store,
-    sync: false,
     propsData: {
       emptyStateSvgPath,
       noDataSvgPath,

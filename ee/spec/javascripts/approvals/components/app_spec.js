@@ -23,7 +23,6 @@ describe('EE Approvals App', () => {
       localVue,
       slots,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
   const findAddButton = () => wrapper.find(GlButton);

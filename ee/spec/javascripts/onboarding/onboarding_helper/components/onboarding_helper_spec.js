@@ -31,7 +31,10 @@ describe('User onboarding tour parts list', () => {
   };
 
   function createComponent(propsData) {
-    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
+    wrapper = shallowMount(localVue.extend(component), {
+      propsData,
+      localVue,
+    });
   }
 
   beforeEach(() => {

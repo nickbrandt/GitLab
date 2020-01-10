@@ -21,7 +21,6 @@ describe('Configure Feature Flags Modal', () => {
 
     wrapper = shallowMount(Component, {
       propsData,
-      sync: false,
       attachToDocument: true,
     });
   });

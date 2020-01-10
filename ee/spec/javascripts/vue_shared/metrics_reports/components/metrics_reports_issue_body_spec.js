@@ -16,7 +16,6 @@ describe('Metrics reports issue body', () => {
   describe('when metric did not change', () => {
     it('should render metric with no changes text', () => {
       wrapper = shallowMount(Component, {
-        sync: false,
         localVue,
         propsData: {
           issue: {
@@ -35,7 +34,6 @@ describe('Metrics reports issue body', () => {
   describe('when metric changed', () => {
     it('should render metric with change', () => {
       wrapper = shallowMount(Component, {
-        sync: false,
         localVue,
         propsData: {
           issue: {
@@ -55,7 +53,6 @@ describe('Metrics reports issue body', () => {
   describe('when metric is new', () => {
     it('should render metric with new badge', () => {
       wrapper = shallowMount(Component, {
-        sync: false,
         localVue,
         propsData: {
           issue: {
@@ -77,7 +74,6 @@ describe('Metrics reports issue body', () => {
   describe('when metric was removed', () => {
     it('should render metric with removed badge', () => {
       wrapper = shallowMount(Component, {
-        sync: false,
         localVue,
         propsData: {
           issue: {

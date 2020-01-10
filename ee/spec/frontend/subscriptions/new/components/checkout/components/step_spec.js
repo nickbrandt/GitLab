@@ -26,7 +26,6 @@ describe('Step', () => {
       store,
       propsData: { ...initialProps, ...propsData },
       localVue,
-      sync: false,
     });
   };
 

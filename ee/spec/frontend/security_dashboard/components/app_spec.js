@@ -40,7 +40,6 @@ describe('Security Dashboard app', () => {
     store = createStore();
     wrapper = shallowMount(SecurityDashboardApp, {
       store,
-      sync: false,
       methods: {
         lockFilter: lockFilterSpy,
         setPipelineId: setPipelineIdSpy,

@@ -46,7 +46,6 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
 
   return shallowMount(TreeItemBody, {
     attachToDocument: true,
-    sync: false,
     store,
     propsData: {
       parentItem,

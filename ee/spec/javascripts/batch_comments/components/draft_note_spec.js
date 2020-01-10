@@ -19,7 +19,6 @@ describe('Batch comments draft note component', () => {
     wrapper = shallowMount(localVue.extend(DraftNote), {
       store,
       propsData: { draft },
-      sync: false,
       localVue,
     });
 

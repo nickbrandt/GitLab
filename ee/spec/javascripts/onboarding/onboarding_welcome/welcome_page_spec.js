@@ -18,7 +18,10 @@ describe('User onboarding welcome page', () => {
   };
 
   function createComponent(propsData) {
-    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
+    wrapper = shallowMount(localVue.extend(component), {
+      propsData,
+      localVue,
+    });
   }
 
   afterEach(() => {

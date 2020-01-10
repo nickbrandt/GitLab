@@ -16,7 +16,6 @@ describe('Shared Runner Limit Block', () => {
   const factory = (options = {}) => {
     wrapper = shallowMount(Component, {
       localVue,
-      sync: false,
       ...options,
     });
   };

@@ -9,7 +9,6 @@ describe('MergeImmediatelyConfirmationDialog', () => {
   beforeEach(() => {
     wrapper = shallowMount(MergeImmediatelyConfirmationDialog, {
       propsData: { docsUrl },
-      sync: false,
     });
 
     return wrapper.vm.$nextTick();

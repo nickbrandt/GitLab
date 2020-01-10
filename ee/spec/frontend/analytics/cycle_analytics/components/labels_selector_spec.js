@@ -12,7 +12,6 @@ describe('Cycle Analytics LabelsSelector', () => {
         labels: groupLabels,
         selectedLabelId: props.selectedLabelId || null,
       },
-      sync: false,
     });
   }
 

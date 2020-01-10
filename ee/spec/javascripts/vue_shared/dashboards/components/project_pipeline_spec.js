@@ -9,7 +9,9 @@ describe('project pipeline component', () => {
   let wrapper;
 
   const mountComponent = (propsData = {}) =>
-    mount(ProjectPipelineComponent, { propsData, sync: false });
+    mount(ProjectPipelineComponent, {
+      propsData,
+    });
 
   afterEach(() => {
     wrapper.destroy();

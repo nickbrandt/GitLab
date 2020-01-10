@@ -10,7 +10,6 @@ describe('Design reply form component', () => {
 
   function createComponent(props = {}) {
     wrapper = shallowMount(DesignReplyForm, {
-      sync: false,
       propsData: {
         value: '',
         isSaving: false,

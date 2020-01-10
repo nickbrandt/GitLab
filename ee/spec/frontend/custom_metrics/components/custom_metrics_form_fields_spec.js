@@ -36,7 +36,6 @@ describe('custom metrics form fields component', () => {
         ...props,
       },
       csrfToken,
-      sync: false,
       methods,
     });
   };

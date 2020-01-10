@@ -14,7 +14,6 @@ describe('EE MRWidget approvals summary optional', () => {
   const createComponent = (props = {}) => {
     wrapper = shallowMount(ApprovalsSummaryOptional, {
       propsData: props,
-      sync: false,
       attachToDocument: true,
     });
   };

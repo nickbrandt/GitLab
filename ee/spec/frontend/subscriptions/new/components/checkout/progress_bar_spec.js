@@ -7,7 +7,6 @@ describe('Progress Bar', () => {
   const factory = propsData => {
     wrapper = shallowMount(component, {
       propsData,
-      sync: false,
     });
   };
 

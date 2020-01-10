@@ -37,7 +37,6 @@ describe('EE Approvals RuleForm', () => {
       propsData: props,
       store: new Vuex.Store(store),
       localVue,
-      sync: false,
     });
   };
   const findValidation = (node, hasProps = false) => ({

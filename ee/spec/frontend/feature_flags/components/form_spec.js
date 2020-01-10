@@ -39,7 +39,6 @@ describe('feature flag form', () => {
           featureFlagsUsersPerEnvironment: true,
         },
       },
-      sync: false,
     });
   };
 

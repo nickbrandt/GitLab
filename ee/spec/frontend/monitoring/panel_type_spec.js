@@ -26,7 +26,6 @@ describe('Panel Type', () => {
       propsData,
       store,
       localVue,
-      sync: false,
       attachToDocument: true,
     });
   };

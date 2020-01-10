@@ -37,7 +37,6 @@ describe('MRWidgetAutoMergeEnabled', () => {
         service,
       },
       localVue,
-      sync: false,
     });
 
     ({ vm } = wrapper);

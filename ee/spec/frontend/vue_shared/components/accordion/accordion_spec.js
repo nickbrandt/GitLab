@@ -9,7 +9,6 @@ describe('Accordion component', () => {
   let wrapper;
   const factory = ({ defaultSlot = '' } = {}) => {
     wrapper = shallowMount(Accordion, {
-      sync: false,
       scopedSlots: {
         default: defaultSlot,
       },

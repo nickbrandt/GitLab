@@ -26,7 +26,6 @@ describe('AccordionItem component', () => {
     };
 
     wrapper = shallowMount(AccordionItem, {
-      sync: false,
       propsData: {
         ...defaultPropsData,
         ...propsData,

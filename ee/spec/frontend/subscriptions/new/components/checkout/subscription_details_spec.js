@@ -28,7 +28,6 @@ describe('Subscription Details', () => {
   const createComponent = (opts = {}) => {
     wrapper = mount(Component, {
       localVue,
-      sync: false,
       store,
       ...opts,
     });

@@ -53,7 +53,6 @@ describe('Project Manager component', () => {
     wrapper = shallowMount(ProjectManager, {
       localVue,
       store,
-      sync: false,
     });
   };
 

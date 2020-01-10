@@ -17,7 +17,6 @@ describe('EE Approvals MREditApp', () => {
     wrapper = mount(localVue.extend(MREditApp), {
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
 

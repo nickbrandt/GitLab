@@ -22,7 +22,6 @@ describe('dashboard component', () => {
 
   const mountComponent = () =>
     mount(DashboardComponent, {
-      sync: false,
       store,
       localVue,
       propsData: {

@@ -26,7 +26,6 @@ describe('Batch comments diff file drafts component', () => {
       store,
       localVue,
       propsData: { fileHash: 'filehash' },
-      sync: false,
     });
   }
 

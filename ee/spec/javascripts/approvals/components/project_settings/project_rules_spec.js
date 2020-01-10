@@ -32,7 +32,6 @@ describe('Approvals ProjectRules', () => {
   const factory = (props = {}) => {
     wrapper = mount(localVue.extend(ProjectRules), {
       propsData: props,
-      sync: false,
       store: new Vuex.Store(store),
       localVue,
     });

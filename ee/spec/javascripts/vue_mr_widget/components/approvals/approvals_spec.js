@@ -52,7 +52,6 @@ describe('EE MRWidget approvals', () => {
         ...props,
       },
       localVue,
-      sync: false,
     });
   };
 

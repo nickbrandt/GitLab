@@ -21,7 +21,6 @@ describe('Card security reports app', () => {
   const createComponent = props => {
     wrapper = mount(CardSecurityDashboardApp, {
       store: createStore(),
-      sync: false,
       attachToDocument: true,
       stubs: ['security-dashboard-table'],
       propsData: {

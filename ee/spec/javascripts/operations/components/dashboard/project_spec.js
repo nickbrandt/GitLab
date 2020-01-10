@@ -16,7 +16,6 @@ describe('project component', () => {
 
   const createComponent = (props = {}) => {
     wrapper = shallowMount(ProjectComponent, {
-      sync: false,
       store,
       localVue,
       propsData: {

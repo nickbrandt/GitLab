@@ -15,7 +15,6 @@ describe('Feature flags > Environments dropdown ', () => {
         endpoint: `${TEST_HOST}/environments.json'`,
         ...props,
       },
-      sync: false,
     });
   };
 

@@ -57,7 +57,6 @@ describe('EE MRWidget approvals list', () => {
   const createComponent = (props = {}) => {
     wrapper = shallowMount(ApprovalsList, {
       propsData: props,
-      sync: false,
     });
   };
 

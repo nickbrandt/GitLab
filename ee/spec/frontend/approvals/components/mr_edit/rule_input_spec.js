@@ -22,7 +22,6 @@ describe('Rule Input', () => {
       },
       localVue,
       store: new Vuex.Store(store),
-      sync: false,
     });
   };
 

@@ -35,7 +35,6 @@ describe('Dashboard', () => {
         GlButton,
       },
       store,
-      sync: false,
       localVue,
     });
   };

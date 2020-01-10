@@ -9,7 +9,6 @@ describe('MergeTrainHelperText', () => {
   const factory = propsData => {
     wrapper = shallowMount(MergeTrainHelperText, {
       propsData,
-      sync: false,
     });
   };
 

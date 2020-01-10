@@ -22,7 +22,6 @@ describe('New feature flag form', () => {
         environmentsEndpoint: 'environments.json',
       },
       store,
-      sync: false,
     });
   };
 

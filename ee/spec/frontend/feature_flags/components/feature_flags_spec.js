@@ -31,7 +31,6 @@ describe('Feature flags', () => {
   const factory = (propsData = mockData) => {
     wrapper = shallowMount(FeatureFlagsComponent, {
       propsData,
-      sync: false,
     });
   };
 

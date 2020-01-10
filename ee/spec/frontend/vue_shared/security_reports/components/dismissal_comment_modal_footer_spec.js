@@ -21,7 +21,7 @@ describe('DismissalCommentModalFooter', () => {
 
   describe('with an non-dismissed vulnerability', () => {
     beforeEach(() => {
-      wrapper = mount(component, { sync: false });
+      wrapper = mount(component);
     });
 
     it('should render the "Add comment and dismiss" button', () => {

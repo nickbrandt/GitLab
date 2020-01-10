@@ -9,7 +9,6 @@ describe('time ago component', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(TimeAgoComponent, {
-      sync: false,
       localVue,
       propsData: {
         time: new Date(Date.now() - 86400000).toISOString(),

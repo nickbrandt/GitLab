@@ -20,7 +20,6 @@ describe('BoardScope', () => {
 
     wrapper = mount(BoardScope, {
       propsData,
-      sync: false,
     });
 
     ({ vm } = wrapper);

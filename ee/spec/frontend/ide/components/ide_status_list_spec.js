@@ -16,7 +16,6 @@ describe('ee/ide/components/ide_status_list', () => {
 
     wrapper = mount(IdeStatusList, {
       localVue,
-      sync: false,
       store,
     });
   };

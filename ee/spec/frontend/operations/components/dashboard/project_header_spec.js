@@ -12,7 +12,6 @@ describe('project header component', () => {
       propsData: {
         project: mockOneProject,
       },
-      sync: false,
       attachToDocument: true,
     });
   };

@@ -18,7 +18,6 @@ describe('ThreatMonitoringFilters component', () => {
 
     wrapper = shallowMount(ThreatMonitoringFilters, {
       store,
-      sync: false,
     });
   };
 

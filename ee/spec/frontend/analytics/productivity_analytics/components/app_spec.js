@@ -37,7 +37,6 @@ describe('ProductivityApp component', () => {
     wrapper = shallowMount(ProductivityApp, {
       localVue,
       store,
-      sync: false,
       propsData,
       methods: {
         ...actionSpies,

@@ -12,7 +12,6 @@ describe('DependencyListJobFailedAlert component', () => {
 
   const factory = (options = {}) => {
     wrapper = shallowMount(DependencyListJobFailedAlert, {
-      sync: false,
       ...options,
     });
   };

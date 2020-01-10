@@ -21,7 +21,6 @@ describe('Issue card component', () => {
         issueLinkBase: '/test',
         ...props,
       },
-      sync: false,
       attachToDocument: true,
     });
   };

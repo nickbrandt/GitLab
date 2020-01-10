@@ -22,7 +22,6 @@ describe('PaginatedLicensesTable component', () => {
 
     wrapper = shallowMount(PaginatedLicensesTable, {
       store,
-      sync: false,
     });
   };
 

@@ -30,7 +30,6 @@ describe('Design discussions component', () => {
 
   function createComponent(props = {}) {
     wrapper = shallowMount(DesignDiscussion, {
-      sync: false,
       propsData: {
         discussion: {
           id: '0',

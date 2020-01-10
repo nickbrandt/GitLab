@@ -14,7 +14,6 @@ describe('CreateIssueForm', () => {
 
   const createWrapper = () => {
     wrapper = shallowMount(CreateIssueForm, {
-      sync: false,
       stubs: {
         GlDropdown: GlDropdownStub,
       },

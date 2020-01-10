@@ -31,7 +31,6 @@ const createComponent = ({ slots } = {}) => {
 
   return shallowMount(RelatedItemsTreeHeader, {
     attachToDocument: true,
-    sync: false,
     store,
     slots,
   });

@@ -29,7 +29,6 @@ const createComponent = () => {
 
   return shallowMount(RelatedItemsTreeApp, {
     store,
-    sync: false,
   });
 };
 

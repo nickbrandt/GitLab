@@ -25,7 +25,6 @@ describe('MetricChart component', () => {
 
   const factory = (props = defaultProps) => {
     wrapper = shallowMount(MetricChart, {
-      sync: false,
       propsData: { ...props },
       slots: {
         default: mockChart,

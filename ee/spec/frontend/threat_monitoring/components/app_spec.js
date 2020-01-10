@@ -42,7 +42,6 @@ describe('ThreatMonitoringApp component', () => {
         ...propsData,
       },
       store,
-      sync: false,
     });
   };
 

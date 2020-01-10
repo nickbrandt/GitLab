@@ -18,7 +18,6 @@ describe('DependenciesActions component', () => {
     wrapper = shallowMount(DependenciesActions, {
       ...options,
       store,
-      sync: false,
       attachToDocument: true,
       propsData: { ...propsData },
     });

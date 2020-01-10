@@ -25,7 +25,6 @@ describe('StageDropdownFilter component', () => {
 
   const createComponent = () => {
     wrapper = shallowMount(StageDropdownFilter, {
-      sync: false,
       propsData: {
         stages,
       },

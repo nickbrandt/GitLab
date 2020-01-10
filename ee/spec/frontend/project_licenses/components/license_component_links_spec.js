@@ -24,7 +24,6 @@ describe('LicenseComponentLinks component', () => {
         components,
         title,
       },
-      sync: false,
     });
   };
 
