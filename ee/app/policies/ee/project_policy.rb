@@ -95,6 +95,11 @@ module EE
         !@subject.design_management_enabled?
       end
 
+      with_scope :subject
+      condition(:code_review_analytics_enabled) do
+        @subject.feature_available?(:code_review_analytics, @user)
+      end
+
       condition(:group_timelogs_available) do
         @subject.feature_available?(:group_timelogs)
       end
@@ -304,6 +309,8 @@ module EE
       end
 
       rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
+
+      rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
     end
 
     override :lookup_access_level!

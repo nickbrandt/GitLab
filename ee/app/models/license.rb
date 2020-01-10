@@ -12,6 +12,7 @@ class License < ApplicationRecord
     audit_events
     burndown_charts
     code_owners
+    code_review_analytics
     contribution_analytics
     description_diffs
     elastic_search

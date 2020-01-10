@@ -1,0 +1,8 @@
+- breadcrumb_title _("Code Review")
+- page_title _("Code Review")
+
+.d-flex.align-items-center
+  %h1.page-title
+    = _('Code Review')
+.text-secondary= _('Review time is defined as the time it takes from first comment until merged.')
+#js-code-review-analytics{ data: { project: @project } }

@@ -59,6 +59,10 @@ module EE
         nav_tabs << :packages
       end
 
+      if ::Feature.enabled?(:code_review_analytics, project)
+        nav_tabs << :code_review
+      end
+
       if can?(current_user, :read_feature_flag, project) && !nav_tabs.include?(:operations)
         nav_tabs << :operations
       end
