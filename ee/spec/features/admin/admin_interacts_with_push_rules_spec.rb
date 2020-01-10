@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe "Admin interacts with push rules" do
-  set(:user) { create(:admin) }
+  let_it_be(:user) { create(:admin) }
 
   before do
     sign_in(user)

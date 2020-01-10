@@ -108,9 +108,9 @@ describe 'Admin::AuditLogs', :js do
     end
 
     describe 'filter by date', js: false do
-      set(:audit_event_1) { create(:user_audit_event, created_at: 5.days.ago) }
-      set(:audit_event_2) { create(:user_audit_event, created_at: 3.days.ago) }
-      set(:audit_event_3) { create(:user_audit_event, created_at: 1.day.ago) }
+      let_it_be(:audit_event_1) { create(:user_audit_event, created_at: 5.days.ago) }
+      let_it_be(:audit_event_2) { create(:user_audit_event, created_at: 3.days.ago) }
+      let_it_be(:audit_event_3) { create(:user_audit_event, created_at: 1.day.ago) }
 
       before do
         visit admin_audit_logs_path

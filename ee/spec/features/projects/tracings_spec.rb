@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'Tracings Content Security Policy' do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:project) { create(:project) }
 
   subject { response_headers['Content-Security-Policy'] }

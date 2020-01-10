@@ -3,9 +3,9 @@
 require "spec_helper"
 
 describe "User adds hook" do
-  set(:group) { create(:group) }
-  set(:user) { create(:user) }
-  set(:url) { "http://example.org" }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:url) { "http://example.org" }
 
   before do
     group.add_owner(user)

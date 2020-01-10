@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe "Admin views license" do
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
 
   before do
     stub_feature_flags(licenses_app: false)
@@ -25,7 +25,7 @@ describe "Admin views license" do
   end
 
   context "when license is trial" do
-    set(:license) { create(:license, trial: true) }
+    let_it_be(:license) { create(:license, trial: true) }
 
     before do
       visit(admin_license_path)
@@ -38,7 +38,7 @@ describe "Admin views license" do
     end
 
     context "when license is expired" do
-      set(:license) { create(:license, trial: true, expired: true) }
+      let_it_be(:license) { create(:license, trial: true, expired: true) }
 
       it "does not mention blocking of changes" do
         page.within(".gitlab-ee-license-banner") do
@@ -50,7 +50,7 @@ describe "Admin views license" do
   end
 
   context "when license is regular" do
-    set(:license) { create(:license) }
+    let_it_be(:license) { create(:license) }
 
     before do
       visit(admin_license_path)
@@ -65,19 +65,19 @@ describe "Admin views license" do
     end
 
     context "when license expired" do
-      set(:license) { build(:license, data: build(:gitlab_license, expires_at: Date.yesterday).export).save(validate: false) }
+      let_it_be(:license) { build(:license, data: build(:gitlab_license, expires_at: Date.yesterday).export).save(validate: false) }
 
       it { expect(page).to have_content("Your license expired") }
 
       context "when license blocks changes" do
-        set(:license) { build(:license, data: build(:gitlab_license, expires_at: Date.yesterday, block_changes_at: Date.today).export).save(validate: false) }
+        let_it_be(:license) { build(:license, data: build(:gitlab_license, expires_at: Date.yesterday, block_changes_at: Date.today).export).save(validate: false) }
 
         it { expect(page).to have_content "Pushing code and creation of issues and merge requests has been disabled." }
       end
     end
 
     context "when viewing license history" do
-      set(:license) { create(:license) }
+      let_it_be(:license) { create(:license) }
 
       it "shows licensee" do
         license_history = page.find("#license_history")
@@ -90,7 +90,7 @@ describe "Admin views license" do
   end
 
   context "with limited users" do
-    set(:license) { create(:license, data: build(:gitlab_license, restrictions: { active_user_count: 2000 }).export) }
+    let_it_be(:license) { create(:license, data: build(:gitlab_license, restrictions: { active_user_count: 2000 }).export) }
 
     before do
       visit(admin_license_path)

@@ -6,8 +6,8 @@ describe 'Two merge requests on a merge train' do
   include RepoHelpers
 
   let(:project) { create(:project, :repository) }
-  set(:maintainer_1) { create(:user) }
-  set(:maintainer_2) { create(:user) }
+  let_it_be(:maintainer_1) { create(:user) }
+  let_it_be(:maintainer_2) { create(:user) }
 
   let(:merge_request_1) do
     create(:merge_request,

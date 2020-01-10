@@ -5,9 +5,9 @@ require 'spec_helper'
 describe '[EE] Internal Group access' do
   include AccessMatchers
 
-  set(:group)   { create(:group, :internal) }
-  set(:project) { create(:project, :internal, group: group) }
-  set(:project_guest) do
+  let_it_be(:group)   { create(:group, :internal) }
+  let_it_be(:project) { create(:project, :internal, group: group) }
+  let_it_be(:project_guest) do
     create(:user) do |user|
       project.add_guest(user)
     end
