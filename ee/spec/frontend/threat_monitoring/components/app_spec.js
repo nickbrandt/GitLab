@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import { GlAlert, GlEmptyState } from '@gitlab/ui';
+import { GlAlert } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringApp from 'ee/threat_monitoring/components/app.vue';
@@ -9,9 +9,11 @@ import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_moni
 import WafLoadingSkeleton from 'ee/threat_monitoring/components/waf_loading_skeleton.vue';
 import WafStatisticsHistory from 'ee/threat_monitoring/components/waf_statistics_history.vue';
 import WafStatisticsSummary from 'ee/threat_monitoring/components/waf_statistics_summary.vue';
+import { mockWafStatisticsResponse } from '../mock_data';
 
 const defaultEnvironmentId = 3;
 const documentationPath = '/docs';
+const chartEmptyStateSvgPath = '/chart-svgs';
 const emptyStateSvgPath = '/svgs';
 const environmentsEndpoint = `${TEST_HOST}/environments`;
 const wafStatisticsEndpoint = `${TEST_HOST}/waf`;
@@ -22,11 +24,12 @@ describe('ThreatMonitoringApp component', () => {
   let store;
   let wrapper;
 
-  const factory = propsData => {
+  const factory = ({ propsData, state } = {}) => {
     store = createStore();
     Object.assign(store.state.threatMonitoring, {
       environmentsEndpoint,
       wafStatisticsEndpoint,
+      ...state,
     });
 
     jest.spyOn(store, 'dispatch').mockImplementation();
@@ -34,6 +37,7 @@ describe('ThreatMonitoringApp component', () => {
     wrapper = shallowMount(ThreatMonitoringApp, {
       propsData: {
         defaultEnvironmentId,
+        chartEmptyStateSvgPath,
         emptyStateSvgPath,
         documentationPath,
         showUserCallout: true,
@@ -46,9 +50,12 @@ describe('ThreatMonitoringApp component', () => {
   };
 
   const findAlert = () => wrapper.find(GlAlert);
+  const findFilters = () => wrapper.find(ThreatMonitoringFilters);
   const findWafLoadingSkeleton = () => wrapper.find(WafLoadingSkeleton);
   const findWafStatisticsHistory = () => wrapper.find(WafStatisticsHistory);
   const findWafStatisticsSummary = () => wrapper.find(WafStatisticsSummary);
+  const findEmptyState = () => wrapper.find({ ref: 'emptyState' });
+  const findChartEmptyState = () => wrapper.find({ ref: 'chartEmptyState' });
 
   afterEach(() => {
     wrapper.destroy();
@@ -59,7 +66,9 @@ describe('ThreatMonitoringApp component', () => {
     invalidEnvironmentId => {
       beforeEach(() => {
         factory({
-          defaultEnvironmentId: invalidEnvironmentId,
+          propsData: {
+            defaultEnvironmentId: invalidEnvironmentId,
+          },
         });
       });
 
@@ -68,7 +77,7 @@ describe('ThreatMonitoringApp component', () => {
       });
 
       it('shows only the empty state', () => {
-        const emptyState = wrapper.find(GlEmptyState);
+        const emptyState = findEmptyState();
         expect(wrapper.element).toBe(emptyState.element);
         expect(emptyState.props()).toMatchObject({
           svgPath: emptyStateSvgPath,
@@ -78,9 +87,13 @@ describe('ThreatMonitoringApp component', () => {
     },
   );
 
-  describe('given there is a default environment', () => {
+  describe('given there is a default environment with data', () => {
     beforeEach(() => {
-      factory();
+      factory({
+        state: {
+          wafStatistics: mockWafStatisticsResponse,
+        },
+      });
     });
 
     it('dispatches the setCurrentEnvironmentId and fetchEnvironments actions', () => {
@@ -95,7 +108,7 @@ describe('ThreatMonitoringApp component', () => {
     });
 
     it('shows the filter bar', () => {
-      expect(wrapper.find(ThreatMonitoringFilters).exists()).toBe(true);
+      expect(findFilters().exists()).toBe(true);
     });
 
     it('shows the summary and history statistics', () => {
@@ -135,7 +148,9 @@ describe('ThreatMonitoringApp component', () => {
   describe('given showUserCallout is false', () => {
     beforeEach(() => {
       factory({
-        showUserCallout: false,
+        propsData: {
+          showUserCallout: false,
+        },
       });
     });
 
@@ -156,6 +171,25 @@ describe('ThreatMonitoringApp component', () => {
       it('displays the loading skeleton', () => {
         expect(findWafLoadingSkeleton().exists()).toBe(true);
       });
+    });
+  });
+
+  describe('given there is a default environment with no data to display', () => {
+    beforeEach(() => {
+      factory();
+    });
+
+    it('shows the filter bar', () => {
+      expect(findFilters().exists()).toBe(true);
+    });
+
+    it('does not show the summary or history statistics', () => {
+      expect(findWafStatisticsSummary().exists()).toBe(false);
+      expect(findWafStatisticsHistory().exists()).toBe(false);
+    });
+
+    it('shows the chart empty state', () => {
+      expect(findChartEmptyState().exists()).toBe(true);
     });
   });
 });

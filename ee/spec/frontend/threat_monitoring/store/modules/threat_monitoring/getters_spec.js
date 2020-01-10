@@ -40,4 +40,17 @@ describe('threatMonitoring module getters', () => {
       expect(getters.currentTimeWindowName(state)).toBe('30 days');
     });
   });
+
+  describe('hasHistory', () => {
+    it.each(['nominal', 'anomalous'])('returns true if there is any %s history data', type => {
+      state.wafStatistics.history[type] = ['foo'];
+      expect(getters.hasHistory(state)).toBe(true);
+    });
+
+    it('returns false if there is no history', () => {
+      state.wafStatistics.history.nominal = [];
+      state.wafStatistics.history.anomalous = [];
+      expect(getters.hasHistory(state)).toBe(false);
+    });
+  });
 });

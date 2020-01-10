@@ -1,6 +1,6 @@
 import axios from '~/lib/utils/axios_utils';
+import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import * as types from './mutation_types';
-import { pollUntilComplete } from '../../utils';
 
 export const setHeadPath = ({ commit }, path) => commit(types.SET_HEAD_PATH, path);
 

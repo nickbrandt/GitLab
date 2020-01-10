@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ThreatMonitoringApp component given there is a default environment shows the alert 1`] = `
+exports[`ThreatMonitoringApp component given there is a default environment with data shows the alert 1`] = `
 <gl-alert-stub
   class="my-3"
   dismissible="true"

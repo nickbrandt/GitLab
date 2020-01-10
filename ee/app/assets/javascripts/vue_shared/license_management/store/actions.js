@@ -1,8 +1,8 @@
 import axios from '~/lib/utils/axios_utils';
+import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import * as types from './mutation_types';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 import { convertToOldReportFormat } from './utils';
-import { pollUntilComplete } from '../../security_reports/store/utils';
 
 export const setAPISettings = ({ commit }, data) => {
   commit(types.SET_API_SETTINGS, data);

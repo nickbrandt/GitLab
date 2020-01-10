@@ -8,3 +8,6 @@ export const currentEnvironmentName = ({ currentEnvironmentId, environments }) =
 
 export const currentTimeWindowName = ({ currentTimeWindow }) =>
   getTimeWindowConfig(currentTimeWindow).name;
+
+export const hasHistory = ({ wafStatistics }) =>
+  Boolean(wafStatistics.history.nominal.length || wafStatistics.history.anomalous.length);

@@ -1,7 +1,10 @@
 import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
+import pollUntilComplete from '~/lib/utils/poll_until_complete';
+import httpStatusCodes from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import * as types from './mutation_types';
+import createState from './state';
 import { getTimeWindowParams } from './utils';
 
 export const setEndpoints = ({ commit }, endpoints) => commit(types.SET_ENDPOINTS, endpoints);
@@ -70,13 +73,22 @@ export const fetchWafStatistics = ({ state, dispatch }) => {
 
   dispatch('requestWafStatistics');
 
-  return axios
-    .get(state.wafStatisticsEndpoint, {
-      params: {
-        environment_id: state.currentEnvironmentId,
-        ...getTimeWindowParams(state.currentTimeWindow, Date.now()),
-      },
-    })
+  return pollUntilComplete(state.wafStatisticsEndpoint, {
+    params: {
+      environment_id: state.currentEnvironmentId,
+      ...getTimeWindowParams(state.currentTimeWindow, Date.now()),
+    },
+  })
     .then(({ data }) => dispatch('receiveWafStatisticsSuccess', data))
-    .catch(() => dispatch('receiveWafStatisticsError'));
+    .catch(error => {
+      // A NOT_FOUND resonse from the endpoint means that there is no data for
+      // the given parameters. There are various reasons *why* there could be
+      // no data, but we can't distinguish between them, yet. So, just render
+      // no data.
+      if (error.response.status === httpStatusCodes.NOT_FOUND) {
+        dispatch('receiveWafStatisticsSuccess', createState().wafStatistics);
+      } else {
+        dispatch('receiveWafStatisticsError');
+      }
+    });
 };

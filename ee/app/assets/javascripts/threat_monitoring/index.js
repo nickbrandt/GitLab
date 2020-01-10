@@ -8,6 +8,7 @@ export default () => {
   const {
     wafStatisticsEndpoint,
     environmentsEndpoint,
+    chartEmptyStateSvgPath,
     emptyStateSvgPath,
     documentationPath,
     defaultEnvironmentId,
@@ -28,6 +29,7 @@ export default () => {
     render(createElement) {
       return createElement(ThreatMonitoringApp, {
         props: {
+          chartEmptyStateSvgPath,
           emptyStateSvgPath,
           documentationPath,
           defaultEnvironmentId: parseInt(defaultEnvironmentId, 10),
