@@ -147,7 +147,7 @@ module DesignManagement
 
     def validate_file_is_image
       unless image? || (dangerous_image? && allow_dangerous_images?)
-        message = _("Only these extensions are supported: %{extension_list}") % {
+        message = _('does not have a supported extension. Only %{extension_list} are supported') % {
           extension_list: valid_file_extensions.to_sentence
         }
         errors.add(:filename, message)
