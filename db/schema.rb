@@ -3823,6 +3823,8 @@ ActiveRecord::Schema.define(version: 2020_01_08_233040) do
     t.integer "project_id", null: false
     t.integer "software_license_id", null: false
     t.integer "classification", default: 0, null: false
+    t.datetime_with_timezone "created_at"
+    t.datetime_with_timezone "updated_at"
     t.index ["project_id", "software_license_id"], name: "index_software_license_policies_unique_per_project", unique: true
     t.index ["software_license_id"], name: "index_software_license_policies_on_software_license_id"
   end
