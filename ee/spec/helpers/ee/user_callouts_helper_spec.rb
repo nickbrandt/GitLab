@@ -173,8 +173,8 @@ describe EE::UserCalloutsHelper do
   describe '#render_dashboard_gold_trial' do
     using RSpec::Parameterized::TableSyntax
 
-    set(:namespace) { create(:namespace) }
-    set(:gold_plan) { create(:gold_plan) }
+    let_it_be(:namespace) { create(:namespace) }
+    let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
 
     where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
@@ -220,9 +220,9 @@ describe EE::UserCalloutsHelper do
     using RSpec::Parameterized::TableSyntax
 
     let(:namespace) { create(:namespace) }
-    set(:free_plan) { create(:free_plan) }
-    set(:silver_plan) { create(:silver_plan) }
-    set(:gold_plan) { create(:gold_plan) }
+    let_it_be(:free_plan) { create(:free_plan) }
+    let_it_be(:silver_plan) { create(:silver_plan) }
+    let_it_be(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
     let(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
