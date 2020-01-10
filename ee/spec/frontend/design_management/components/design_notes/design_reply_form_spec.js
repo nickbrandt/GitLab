@@ -1,7 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
-import { GlModal } from '@gitlab/ui';
-import MarkdownField from '~/vue_shared/components/markdown/field.vue';
-
+import { mount } from '@vue/test-utils';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
 
 describe('Design reply form component', () => {
@@ -13,13 +10,12 @@ describe('Design reply form component', () => {
   const findModal = () => wrapper.find({ ref: 'cancelCommentModal' });
 
   function createComponent(props = {}) {
-    wrapper = shallowMount(DesignReplyForm, {
+    wrapper = mount(DesignReplyForm, {
       propsData: {
         value: '',
         isSaving: false,
         ...props,
       },
-      stubs: { MarkdownField, GlModal },
     });
   }
 
