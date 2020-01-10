@@ -62,5 +62,9 @@ module ErrorTracking
     def can_read?
       can?(current_user, :read_sentry_issue, project)
     end
+
+    def can_update?
+      can?(current_user, :update_sentry_issue, project)
+    end
   end
 end

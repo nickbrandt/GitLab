@@ -21,10 +21,19 @@ module ErrorTracking
 
     def update_related_issue
       issue = related_issue
-      return unless issue && resolving?
+      return unless issue
+
+      @closed_issue = close_and_create_note(issue)
+    end
+
+    def close_and_create_note(issue)
+      return unless resolving? && issue.opened?
 
       processed_issue = close_issue(issue)
+      return unless processed_issue.reset.closed?
+
       create_system_note(processed_issue)
+      processed_issue
     end
 
     def close_issue(issue)
@@ -34,8 +43,6 @@ module ErrorTracking
     end
 
     def create_system_note(issue)
-      return unless issue.reset.closed?
-
       SystemNoteService.close_after_error_tracking_resolve(issue, project, current_user)
     end
 
@@ -55,7 +62,15 @@ module ErrorTracking
     end
 
     def parse_response(response)
-      { updated: response[:updated].present? }
+      {
+        updated: response[:updated].present?,
+        closed_issue_iid: @closed_issue&.iid
+      }
+    end
+
+    def check_permissions
+      return error('Error Tracking is not enabled') unless enabled?
+      return error('Access denied', :unauthorized) unless can_update?
     end
   end
 end

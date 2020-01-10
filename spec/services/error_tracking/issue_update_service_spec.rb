@@ -9,6 +9,17 @@ describe ErrorTracking::IssueUpdateService do
 
   subject { described_class.new(project, user, arguments) }
 
+  shared_examples 'does not perform close issue flow' do
+    it 'does not call the close issue service' do
+      expect(issue_close_service)
+        .not_to receive(:execute)
+    end
+
+    it 'does not create system note' do
+      expect(SystemNoteService).not_to receive(:close_after_error_tracking_resolve)
+    end
+  end
+
   describe '#execute' do
     context 'with authorized user' do
       context 'when update_issue returns success' do
@@ -20,7 +31,7 @@ describe ErrorTracking::IssueUpdateService do
         end
 
         it 'returns the response' do
-          expect(result).to eq(update_issue_response.merge(status: :success))
+          expect(result).to eq(update_issue_response.merge(status: :success, closed_issue_iid: nil))
         end
 
         it 'updates any related issue' do
@@ -40,6 +51,10 @@ describe ErrorTracking::IssueUpdateService do
             allow_any_instance_of(SentryIssuesFinder)
               .to receive(:find_by_identifier)
               .and_return(sentry_issue)
+
+            allow(Issues::CloseService)
+              .to receive(:new)
+              .and_return(issue_close_service)
           end
 
           after do
@@ -47,12 +62,7 @@ describe ErrorTracking::IssueUpdateService do
           end
 
           it 'closes the issue' do
-            close_service = spy(:close_service)
-            expect(Issues::CloseService)
-              .to receive(:new)
-              .and_return(close_service)
-
-            expect(close_service)
+            expect(issue_close_service)
               .to receive(:execute)
               .with(issue, system_note: false)
               .and_return(issue)
@@ -60,6 +70,29 @@ describe ErrorTracking::IssueUpdateService do
 
           it 'creates a system note' do
             expect(SystemNoteService).to receive(:close_after_error_tracking_resolve)
+          end
+
+          it 'returns a response with closed issue' do
+            closed_issue = create(:issue, :closed, project: project)
+
+            expect(issue_close_service)
+              .to receive(:execute)
+              .with(issue, system_note: false)
+              .and_return(closed_issue)
+
+            expect(result).to eq(status: :success, updated: true, closed_issue_iid: closed_issue.iid)
+          end
+
+          context 'issue is already closed' do
+            let(:issue) { create(:issue, :closed, project: project) }
+
+            include_examples 'does not perform close issue flow'
+          end
+
+          context 'status is not resolving' do
+            let(:arguments) { { issue_id: sentry_issue.sentry_issue_identifier, status: 'ignored' } }
+
+            include_examples 'does not perform close issue flow'
           end
         end
       end
