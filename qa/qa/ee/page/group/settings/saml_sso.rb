@@ -37,11 +37,19 @@ module QA
               end
             end
 
+            def has_enforce_sso_button?
+              has_element?(:enforced_sso_toggle_button, wait: 1.0)
+            end
+
             def disable_enforce_sso
               Support::Retrier.retry_until(sleep_interval: 1.0, raise_on_failure: true) do
                 click_element :enforced_sso_toggle_button if find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
                 !find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
               end
+            end
+
+            def has_group_managed_accounts_button?
+              has_element?(:group_managed_accounts_toggle_button, wait: 1.0)
             end
 
             def enable_group_managed_accounts
