@@ -348,24 +348,25 @@ module QA
     end
 
     def disable_enforce_sso_and_group_managed_account
-      Runtime::Logger.info('Disabling enforce sso and group managed account')
+      if Runtime::Feature.enabled?('enforced_sso') || Runtime::Feature.enabled?('group_managed_accounts')
+        Runtime::Logger.info('Disabling enforce sso and/or group managed account')
 
-      page.visit Runtime::Scenario.gitlab_address
+        page.visit Runtime::Scenario.gitlab_address
 
-      Support::Retrier.retry_until(raise_on_failure: true) do
-        Page::Main::Menu.perform(&:sign_out_if_signed_in)
-        !Page::Main::Menu.perform(&:signed_in?)
-      end
-      Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+        Support::Retrier.retry_until(raise_on_failure: true) do
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
+          !Page::Main::Menu.perform(&:signed_in?)
+        end
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
-      @group.visit!
+        @group.visit!
 
-      Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
-      EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
-        saml_sso.disable_enforce_sso if Runtime::Feature.enabled?('enforced_sso')
-        saml_sso.disable_group_managed_accounts if Runtime::Feature.enabled?('group_managed_accounts')
-
-        saml_sso.click_save_changes
+        Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
+        EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
+          saml_sso.disable_enforce_sso if saml_sso.has_enforce_sso_button?
+          saml_sso.disable_group_managed_accounts if saml_sso.has_group_managed_accounts_button?
+          saml_sso.click_save_changes
+        end
       end
     end
   end
