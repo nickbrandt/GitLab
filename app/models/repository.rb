@@ -1062,7 +1062,7 @@ class Repository
     rebase_sha
   end
 
-  def rebase(user, merge_request)
+  def rebase(user, merge_request, skip_ci: false)
     if Feature.disabled?(:two_step_rebase, default_enabled: true)
       return rebase_deprecated(user, merge_request)
     end
@@ -1073,7 +1073,8 @@ class Repository
       branch: merge_request.source_branch,
       branch_sha: merge_request.source_branch_sha,
       remote_repository: merge_request.target_project.repository.raw,
-      remote_branch: merge_request.target_branch
+      remote_branch: merge_request.target_branch,
+      skip_ci: skip_ci
     ) do |commit_id|
       merge_request.update!(rebase_commit_sha: commit_id, merge_error: nil)
     end
