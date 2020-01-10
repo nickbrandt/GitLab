@@ -38,7 +38,7 @@
       .container.m-0.p-0
         .row
           .col-sm-8
-            %ul.unstyled-list
+            %ul.unstyled-list.list-items-py-2
               - if project_registry.last_repository_sync_failure
                 %li.d-flex.text-danger-500
                   = sprite_icon('warning', size: 18)
