@@ -199,6 +199,33 @@ describe('Design management design index page', () => {
       });
   });
 
+  it('closes the form and clears the comment on canceling form', () => {
+    setDesign();
+
+    wrapper.setData({
+      design: {
+        ...design,
+        discussions: {
+          edges: [],
+        },
+      },
+      annotationCoordinates,
+      comment: newComment,
+    });
+
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findDiscussionForm().vm.$emit('cancelForm');
+
+        expect(wrapper.vm.comment).toBe('');
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        expect(findDiscussionForm().exists()).toBe(false);
+      });
+  });
+
   describe('with error', () => {
     beforeEach(() => {
       setDesign();
@@ -213,6 +240,7 @@ describe('Design management design index page', () => {
         errorMessage: 'woops',
       });
     });
+
     it('GlAlert is rendered in correct position with correct content', () => {
       expect(wrapper.element).toMatchSnapshot();
     });

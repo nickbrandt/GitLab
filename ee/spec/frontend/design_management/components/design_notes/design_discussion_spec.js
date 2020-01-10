@@ -99,4 +99,23 @@ describe('Design discussions component', () => {
         expect(findReplyForm().exists()).toBe(false);
       });
   });
+
+  it('clears the discussion comment on closing comment form', () => {
+    wrapper.setData({
+      discussionComment: 'test',
+      isFormRendered: true,
+    });
+
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findReplyForm().vm.$emit('cancelForm');
+
+        expect(wrapper.vm.discussionComment).toBe('');
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        expect(findReplyForm().exists()).toBe(false);
+      });
+  });
 });
