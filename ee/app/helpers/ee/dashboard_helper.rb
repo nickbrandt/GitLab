@@ -55,7 +55,7 @@ module EE
           links << :operations
         end
 
-        if ::Feature.enabled?(:security_dashboard) && can?(current_user, :read_security_dashboard)
+        if ::Feature.enabled?(:security_dashboard, default_enabled: true) && can?(current_user, :read_security_dashboard)
           links << :security
         end
       end
