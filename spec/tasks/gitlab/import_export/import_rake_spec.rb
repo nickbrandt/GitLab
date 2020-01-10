@@ -76,10 +76,6 @@ describe 'gitlab:import_export:import rake task', :sidekiq do
     let(:not_imported_message) { /Total number of not imported relations: 1/ }
     let(:error) { /Validation failed: Notes is invalid/ }
 
-    before do
-      stub_feature_flags(import_graceful_failures: true)
-    end
-
     it 'performs project import successfully' do
       expect { subject }.to output(not_imported_message).to_stdout
       expect { subject }.not_to raise_error
