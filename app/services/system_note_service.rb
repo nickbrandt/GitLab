@@ -99,6 +99,12 @@ module SystemNoteService
     ::SystemNotes::TimeTrackingService.new(noteable: noteable, project: project, author: author).change_time_spent
   end
 
+  def close_after_error_tracking_resolve(noteable, project, author)
+    body = 'automatically closed this as a result of resolving the corresponding Sentry error.'
+
+    create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
+  end
+
   def change_status(noteable, project, author, status, source = nil)
     ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_status(status, source)
   end
