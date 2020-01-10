@@ -9,9 +9,7 @@ module Geo
         Geo::RepositoryShardSyncWorker.perform_async(shard_name)
       end
 
-      if Feature.enabled?(:enable_geo_design_sync)
-        Geo::DesignRepositoryShardSyncWorker.perform_async(shard_name)
-      end
+      Geo::DesignRepositoryShardSyncWorker.perform_async(shard_name)
     end
   end
 end

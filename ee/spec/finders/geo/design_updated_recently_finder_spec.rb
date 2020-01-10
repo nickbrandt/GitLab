@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
+  include EE::GeoHelpers
+
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
@@ -25,13 +27,15 @@ describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
       create(:design, project: project_2)
       create(:design, project: project_3)
       create(:design, project: project_4)
+
+      stub_current_geo_node(node)
     end
 
-    subject { described_class.new(current_node: node, shard_name: 'default', batch_size: 100) }
+    subject { described_class.new(shard_name: 'default', batch_size: 100) }
 
     context 'without selective sync' do
       it 'returns desings with a dirty entry on the tracking database' do
-        expect(subject.execute).to match_ids(project_1, project_2)
+        expect(subject.execute).to match_array([project_1.id, project_2.id])
       end
     end
 
@@ -39,7 +43,7 @@ describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
       it 'returns designs that belong to the namespaces with a dirty entry on the tracking database' do
         node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
-        expect(subject.execute).to match_ids(project_1, project_2)
+        expect(subject.execute).to match_array([project_1.id, project_2.id])
       end
     end
 
@@ -49,7 +53,7 @@ describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
       end
 
       it 'does not return designs out of selected shard' do
-        subject = described_class.new(current_node: node, shard_name: 'default', batch_size: 100)
+        subject = described_class.new(shard_name: 'default', batch_size: 100)
 
         expect(subject.execute).to be_empty
       end
@@ -60,9 +64,9 @@ describe Geo::DesignUpdatedRecentlyFinder, :geo, :geo_fdw do
         create(:design, project: project_5)
         create(:geo_design_registry, :synced, project: project_5)
 
-        subject = described_class.new(current_node: node, shard_name: 'foo', batch_size: 100)
+        subject = described_class.new(shard_name: 'foo', batch_size: 100)
 
-        expect(subject.execute).to match_ids(project_4)
+        expect(subject.execute).to match_array([project_4.id])
       end
     end
   end

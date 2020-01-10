@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
+  include EE::GeoHelpers
+
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
@@ -19,15 +21,17 @@ describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
       create(:design, project: project_2)
       create(:design, project: project_3)
       create(:design, project: project_4)
+
+      stub_current_geo_node(node)
     end
 
-    subject { described_class.new(current_node: node, shard_name: 'default', batch_size: 100) }
+    subject { described_class.new(shard_name: 'default', batch_size: 100) }
 
     context 'without selective sync' do
       it 'returns designs without an entry on the tracking database' do
         create(:geo_design_registry, :synced, project: project_2)
 
-        expect(subject.execute).to match_ids(project_1, project_3)
+        expect(subject.execute).to match_array([project_1.id, project_3.id])
       end
     end
 
@@ -37,7 +41,7 @@ describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
 
         node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
 
-        expect(subject.execute).to match_ids(project_1, project_2)
+        expect(subject.execute).to match_array([project_1.id, project_2.id])
       end
     end
 
@@ -47,7 +51,7 @@ describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
       end
 
       it 'does not return designs out of synced shards' do
-        subject = described_class.new(current_node: node, shard_name: 'default', batch_size: 100)
+        subject = described_class.new(shard_name: 'default', batch_size: 100)
 
         expect(subject.execute).to be_empty
       end
@@ -58,9 +62,9 @@ describe Geo::DesignUnsyncedFinder, :geo, :geo_fdw do
         create(:design, project: project_5)
         create(:geo_design_registry, :synced, project: project_4)
 
-        subject = described_class.new(current_node: node, shard_name: 'foo', batch_size: 100)
+        subject = described_class.new(shard_name: 'foo', batch_size: 100)
 
-        expect(subject.execute).to match_ids(project_5)
+        expect(subject.execute).to match_array([project_5.id])
       end
     end
   end

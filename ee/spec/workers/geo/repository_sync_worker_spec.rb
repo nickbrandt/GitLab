@@ -108,23 +108,6 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
     include_examples '#perform', Geo::RepositoryShardSyncWorker
   end
 
-  context 'when enable_geo_design_sync flag is disabled' do
-    before do
-      stub_feature_flags(enable_geo_design_sync: false)
-    end
-
-    it 'skips calling Geo::DesignRepositoryShardSyncWorker' do
-      # Report that default shard is healthy
-      expect(Gitlab::HealthChecks::GitalyCheck).to receive(:readiness)
-        .and_return([result(true, healthy_shard_name)])
-
-      expect(Geo::Secondary::RepositoryBackfillWorker).to receive(:perform_async).with('default')
-      expect(design_worker).not_to receive(:perform_async).with('default')
-
-      subject.perform
-    end
-  end
-
   def result(success, shard)
     Gitlab::HealthChecks::Result.new('gitaly_check', success, nil, { shard: shard })
   end
