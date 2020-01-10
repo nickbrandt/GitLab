@@ -100,6 +100,9 @@ export default {
     shouldDisplayDurationChart() {
       return !this.isLoadingDurationChart && !this.isLoading;
     },
+    shouldDisplayTasksByTypeChart() {
+      return !this.isLoading && !this.isLoadingTasksByTypeChart;
+    },
 
     dateRange: {
       get() {
@@ -327,17 +330,13 @@ export default {
       </template>
       <template v-if="featureFlags.hasTasksByTypeChart">
         <div class="tasks-by-type-chart">
-          <gl-loading-icon
-            v-if="isLoading || isLoadingTasksByTypeChart"
-            size="md"
-            class="my-4 py-4"
-          />
-          <div v-else>
+          <div v-if="shouldDisplayTasksByTypeChart">
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
             />
           </div>
+          <gl-loading-icon v-else size="md" class="my-4 py-4" />
         </div>
       </template>
     </div>

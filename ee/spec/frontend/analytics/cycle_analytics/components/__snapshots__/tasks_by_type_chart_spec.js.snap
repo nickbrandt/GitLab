@@ -1,29 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`TasksByTypeChart no data available should render the no data available message 1`] = `
-"<div>
-  <div class=\\"row\\">
-    <div class=\\"col-12\\">
-      <h3>Type of work</h3>
-      <div class=\\"bs-callout bs-callout-info\\">
-        <p>There is no data available. Please change your selection.</p>
-      </div>
+"<div class=\\"row\\">
+  <div class=\\"col-12\\">
+    <h3>Type of work</h3>
+    <div class=\\"bs-callout bs-callout-info\\">
+      <p>There is no data available. Please change your selection.</p>
     </div>
   </div>
 </div>"
 `;
 
 exports[`TasksByTypeChart with data available should render the loading chart 1`] = `
-"<div>
-  <div class=\\"row\\">
-    <div class=\\"col-12\\">
-      <h3>Type of work</h3>
-      <div>
-        <p>Showing data for group 'Gitlab Org' from Dec 11, 2019 to Jan 10, 2020</p>
-        <h4>Tasks by type</h4>
-        <p>Showing Issue and 3 labels</p>
-        <gl-stacked-column-chart-stub data=\\"0,1,2,5,2,3,2,4,1\\" option=\\"[object Object]\\" presentation=\\"stacked\\" groupby=\\"Group 1,Group 2,Group 3\\" xaxistype=\\"category\\" xaxistitle=\\"Date\\" yaxistitle=\\"Number of tasks\\" seriesnames=\\"Cool label,Normal label\\" legendaveragetext=\\"Avg\\" legendmaxtext=\\"Max\\"></gl-stacked-column-chart-stub>
-      </div>
+"<div class=\\"row\\">
+  <div class=\\"col-12\\">
+    <h3>Type of work</h3>
+    <div>
+      <p>Showing data for group 'Gitlab Org' from Dec 11, 2019 to Jan 10, 2020</p>
+      <h4>Tasks by type</h4>
+      <p>Showing Issue and 3 labels</p>
+      <gl-stacked-column-chart-stub data=\\"0,1,2,5,2,3,2,4,1\\" option=\\"[object Object]\\" presentation=\\"stacked\\" groupby=\\"Group 1,Group 2,Group 3\\" xaxistype=\\"category\\" xaxistitle=\\"Date\\" yaxistitle=\\"Number of tasks\\" seriesnames=\\"Cool label,Normal label\\" legendaveragetext=\\"Avg\\" legendmaxtext=\\"Max\\"></gl-stacked-column-chart-stub>
     </div>
   </div>
 </div>"
