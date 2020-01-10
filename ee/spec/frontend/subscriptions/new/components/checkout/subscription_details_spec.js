@@ -94,7 +94,7 @@ describe('Subscription Details', () => {
         store.commit(types.UPDATE_ORGANIZATION_NAME, 'My Organization');
         store.commit(types.UPDATE_NUMBER_OF_USERS, 2);
 
-        return localVue.nextTick().then(() => {
+        return wrapper.vm.$nextTick().then(() => {
           expect(isStepValid()).toBe(true);
         });
       });

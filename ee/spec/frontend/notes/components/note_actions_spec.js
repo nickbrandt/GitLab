@@ -1,10 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { TEST_HOST } from 'spec/test_constants';
 import createStore from '~/notes/stores';
 import noteActions from '~/notes/components/note_actions.vue';
 import { userDataMock } from '../../../../spec/frontend/notes/mock_data';
-
-const localVue = createLocalVue();
 
 describe('noteActions', () => {
   let wrapper;
@@ -15,7 +13,6 @@ describe('noteActions', () => {
     shallowMount(noteActions, {
       store,
       propsData,
-      localVue,
       sync: false,
       attachToDocument: true,
     });
