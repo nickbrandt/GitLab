@@ -6156,7 +6156,13 @@ msgstr ""
 msgid "DesignManagement|Adding a design with the same filename replaces the file in a new version."
 msgstr ""
 
+msgid "DesignManagement|Are you sure you want to cancel creating this comment?"
+msgstr ""
+
 msgid "DesignManagement|Are you sure you want to delete the selected designs?"
+msgstr ""
+
+msgid "DesignManagement|Cancel comment confirmation"
 msgstr ""
 
 msgid "DesignManagement|Could not add a new comment. Please try again."
@@ -6177,6 +6183,9 @@ msgstr ""
 msgid "DesignManagement|Deselect all"
 msgstr ""
 
+msgid "DesignManagement|Discard comment"
+msgstr ""
+
 msgid "DesignManagement|Error uploading a new design. Please try again."
 msgstr ""
 
@@ -6187,6 +6196,9 @@ msgid "DesignManagement|Go to next design"
 msgstr ""
 
 msgid "DesignManagement|Go to previous design"
+msgstr ""
+
+msgid "DesignManagement|Keep comment"
 msgstr ""
 
 msgid "DesignManagement|Requested design version does not exist. Showing latest version instead"

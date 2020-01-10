@@ -86,6 +86,7 @@ export default {
     },
     hideForm() {
       this.isFormRendered = false;
+      this.discussionComment = '';
     },
     showForm() {
       this.isFormRendered = true;
