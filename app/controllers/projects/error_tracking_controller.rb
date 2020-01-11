@@ -35,7 +35,7 @@ class Projects::ErrorTrackingController < Projects::ErrorTracking::BaseControlle
     render json: {
       result: result
     }
-
+  end
   private
 
   def render_index_json
