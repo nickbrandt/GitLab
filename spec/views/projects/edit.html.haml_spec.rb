@@ -36,7 +36,8 @@ describe 'projects/edit' do
       expect(rendered).to have_content('%{project_name}')
       expect(rendered).to have_content('%{file_path}')
       expect(rendered).to have_content('%{branch_name}')
-      expect(rendered).to have_content('%{user_name}')
+      expect(rendered).to have_content('%{username}')
+      expect(rendered).to have_content('%{user_full_name}')
     end
 
     it 'displays a placeholder if none is set' do

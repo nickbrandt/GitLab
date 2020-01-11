@@ -5,17 +5,18 @@ module Suggestions
     DEFAULT_SUGGESTION_COMMIT_MESSAGE = 'Apply suggestion to %{file_path}'
 
     PLACEHOLDERS = {
-      'project_path' => ->(suggestion, user_name) { suggestion.project.path },
-      'project_name' => ->(suggestion, user_name) { suggestion.project.name },
-      'file_path' => ->(suggestion, user_name) { suggestion.file_path },
-      'branch_name' => ->(suggestion, user_name) { suggestion.branch },
-      'user_name' => ->(suggestion, user_name) { user_name }
+      'project_path' => ->(suggestion, user) { suggestion.project.path },
+      'project_name' => ->(suggestion, user) { suggestion.project.name },
+      'file_path' => ->(suggestion, user) { suggestion.file_path },
+      'branch_name' => ->(suggestion, user) { suggestion.branch },
+      'username' => ->(suggestion, user) { user.username },
+      'user_full_name' => ->(suggestion, user) { user.name }
     }.freeze
 
     # This regex is built dynamically using the keys from the PLACEHOLDER struct.
     # So, we can easily add new placeholder just by modifying the PLACEHOLDER hash.
     # This regex will build the new PLACEHOLDER_REGEX with the new information
-    PLACEHOLDERS_REGEX = /(#{PLACEHOLDERS.keys.join('|')})/.freeze
+    PLACEHOLDERS_REGEX = Regexp.union(PLACEHOLDERS.keys.map { |key| Regexp.new(Regexp.escape(key)) }).freeze
 
     attr_reader :current_user
 
@@ -102,7 +103,7 @@ module Suggestions
       message = suggestion_commit_message(suggestion.project)
 
       Gitlab::StringPlaceholderReplacer.replace_string_placeholders(message, PLACEHOLDERS_REGEX) do |key|
-        PLACEHOLDERS[key].call(suggestion, current_user.name)
+        PLACEHOLDERS[key].call(suggestion, current_user)
       end
     end
   end

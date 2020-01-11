@@ -65,17 +65,17 @@ describe Suggestions::ApplyService do
       end
 
       context 'is specified' do
-        let(:message) { 'refactor: %{project_path} %{project_name} %{file_path} %{branch_name} %{user_name}' }
+        let(:message) { 'refactor: %{project_path} %{project_name} %{file_path} %{branch_name} %{username} %{user_full_name}' }
 
         it 'sets custom commit message' do
-          expect(project.repository.commit.message).to eq("refactor: project-1 Project_1 files/ruby/popen.rb master Test User")
+          expect(project.repository.commit.message).to eq("refactor: project-1 Project_1 files/ruby/popen.rb master test.user Test User")
         end
       end
     end
   end
 
   let(:project) { create(:project, :repository, path: 'project-1', name: 'Project_1') }
-  let(:user) { create(:user, :commit_email, name: 'Test User') }
+  let(:user) { create(:user, :commit_email, name: 'Test User', username: 'test.user') }
 
   let(:position) { build_position }
 

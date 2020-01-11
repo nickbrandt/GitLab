@@ -445,7 +445,7 @@ suggestion.
 
 ### Configure the commit message for applied suggestions
 
-GitLab will use `Apply suggestion to <file-name>` by default as commit messages
+GitLab will use `Apply suggestion to %{file_path}` by default as commit messages
 when applying change suggestions. This commit message can be customized to
 follow any guidelines you might have. To do so, open the **Merge requests** tab
 within your project settings and change the **Merge suggestions** text.
@@ -458,7 +458,8 @@ You can also use following variables besides static text:
 - `%{project_name}`: The human readable name of the project. E.g: *My Project*
 - `%{file_path}`: The full path of the file the suggestion is applied to. E.g: *docs/index.md*
 - `%{branch_name}`: The name of the branch the suggestion is applied on. E.g: *my-feature-branch*
-- `%{user_name}`: The name of the user applying the suggestion. E.g: *User 1*
+- `%{username}`: The username of the user applying the suggestion. E.g: *user_1*
+- `%{user_full_name}`: The full name of the user applying the suggestion. E.g: *User 1*
 
 ## Start a thread by replying to a standard comment
 
