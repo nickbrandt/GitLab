@@ -104,7 +104,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
     it "does not mention the merge request template in the section's description text" do
       visit edit_project_path(project)
 
-      expect(page).to have_content('Choose your merge method, merge options, and merge checks.')
+      expect(page).to have_content('Choose your merge method, merge options, merge checks, and merge suggestions.')
     end
   end
 
@@ -122,7 +122,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
     it "mentions the merge request template in the section's description text" do
       visit edit_project_path(project)
 
-      expect(page).to have_content('Choose your merge method, merge options, merge checks, and set up a default description template for merge requests.')
+      expect(page).to have_content('Choose your merge method, merge options, merge checks, merge suggestions, and set up a default description template for merge requests.')
     end
   end
 end
