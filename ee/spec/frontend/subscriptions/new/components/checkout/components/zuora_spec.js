@@ -9,26 +9,32 @@ describe('Zuora', () => {
   const localVue = createLocalVue();
   localVue.use(Vuex);
 
+  let store;
   let wrapper;
-
-  const store = createStore();
-
-  const createComponent = (opts = {}) => {
-    wrapper = shallowMount(Component, {
-      localVue,
-      sync: false,
-      store,
-      ...opts,
-    });
-  };
 
   const methodMocks = {
     loadZuoraScript: jest.fn(),
     renderZuoraIframe: jest.fn(),
   };
 
+  const createComponent = (props = {}) => {
+    wrapper = shallowMount(Component, {
+      propsData: {
+        active: true,
+        ...props,
+      },
+      localVue,
+      sync: false,
+      store,
+      methods: methodMocks,
+    });
+  };
+
+  const findLoading = () => wrapper.find(GlLoadingIcon);
+  const findZuoraPayment = () => wrapper.find('#zuora_payment');
+
   beforeEach(() => {
-    createComponent({ methods: methodMocks, propsData: { active: true } });
+    store = createStore();
   });
 
   afterEach(() => {
@@ -37,38 +43,57 @@ describe('Zuora', () => {
 
   describe('mounted', () => {
     it('should call loadZuoraScript', () => {
+      createComponent();
+
       expect(methodMocks.loadZuoraScript).toHaveBeenCalled();
     });
   });
 
-  describe('when active and loading', () => {
-    it('the loading indicator should not be shown', () => {
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+  describe('when active', () => {
+    beforeEach(() => {
+      createComponent();
     });
 
-    it('the zuora_payment selector should be visible', () => {
-      expect(wrapper.find('#zuora_payment').element.style.display).toEqual('none');
+    it('shows the loading icon', () => {
+      expect(findLoading().exists()).toBe(true);
+    });
+
+    it('the zuora_payment selector should not be visible', () => {
+      expect(findZuoraPayment().element.style.display).toEqual('none');
+    });
+
+    describe.each`
+      desc                                    | commitType                          | commitPayload
+      ${'when paymentMethodId is updated'}    | ${types.UPDATE_PAYMENT_METHOD_ID}   | ${'foo'}
+      ${'when creditCardDetails are updated'} | ${types.UPDATE_CREDIT_CARD_DETAILS} | ${{}}
+    `('$desc', ({ commitType, commitPayload }) => {
+      beforeEach(() => {
+        store.commit(commitType, commitPayload);
+
+        return localVue.nextTick();
+      });
+
+      it('does not show loading icon', () => {
+        expect(findLoading().exists()).toBe(false);
+      });
+
+      it('the zuora_payment selector should be visible', () => {
+        expect(findZuoraPayment().element.style.display).toEqual('');
+      });
     });
   });
 
-  describe('when active and not loading', () => {
+  describe('when not active and not loading', () => {
     beforeEach(() => {
-      wrapper.vm.toggleLoading();
+      createComponent({ active: false });
+
+      store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'foo');
+
+      return localVue.nextTick();
     });
 
-    it('the loading indicator should not be shown', () => {
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
-    });
-
-    it('the zuora_payment selector should be visible', () => {
-      expect(wrapper.find('#zuora_payment').element.style.display).toEqual('');
-    });
-  });
-
-  describe('not active and not loading', () => {
-    beforeEach(() => {
-      createComponent({ methods: methodMocks, propsData: { active: false } });
-      wrapper.vm.toggleLoading();
+    it('does not show loading icon', () => {
+      expect(findLoading().exists()).toBe(false);
     });
 
     it('the zuora_payment selector should not be visible', () => {
@@ -76,36 +101,12 @@ describe('Zuora', () => {
     });
   });
 
-  describe('toggleLoading', () => {
-    let spy;
-
-    beforeEach(() => {
-      spy = jest.spyOn(wrapper.vm, 'toggleLoading');
-    });
-
-    afterEach(() => {
-      spy.mockClear();
-    });
-
-    it('is called when the paymentMethodId is updated', () => {
-      store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'foo');
-
-      return localVue.nextTick().then(() => {
-        expect(spy).toHaveBeenCalled();
-      });
-    });
-
-    it('is called when the creditCardDetails are updated', () => {
-      store.commit(types.UPDATE_CREDIT_CARD_DETAILS, {});
-
-      return localVue.nextTick().then(() => {
-        expect(spy).toHaveBeenCalled();
-      });
-    });
-  });
-
   describe('renderZuoraIframe', () => {
     it('is called when the paymentFormParams are updated', () => {
+      createComponent();
+
+      expect(methodMocks.renderZuoraIframe).not.toHaveBeenCalled();
+
       store.commit(types.UPDATE_PAYMENT_FORM_PARAMS, {});
 
       return localVue.nextTick().then(() => {
