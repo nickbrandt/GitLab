@@ -4,7 +4,7 @@
 
 ## Error Tracking Project Settings
 
-The Sentry Project Settings API allows you to retrieve Sentry Error Tracking Settings for a Project. Only for project maintainers.
+The Project Settings API allows you to retrieve Error Tracking Settings for a Project. Only for project maintainers.
 
 ### Retrieve Error Tracking Settings
 
