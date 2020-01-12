@@ -74,3 +74,9 @@ You can take action on Sentry Errors from within the GitLab UI.
 From within the [Error Details](#error-details) page you can ignore a Sentry error by simply clicking the **Ignore** button near the top of the page.
 
 Ignoring an error will prevent it from appearing in the [Error Tracking List](#error-tracking-list), and will silence notifications that were set up within Sentry.
+
+### Resolving errors
+
+From within the [Error Details](#error-details) page you can resolve a Sentry error by simply clicking the **Resolve** button near the top of the page.
+
+Marking an error as resolved indicates that the error has stopped firing events. If another event occurs, the error reverts to unresolved.
