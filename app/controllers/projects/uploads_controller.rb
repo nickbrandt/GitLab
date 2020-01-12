@@ -31,7 +31,8 @@ class Projects::UploadsController < Projects::ApplicationController
   end
 
   # Overrides ApplicationController#build_canonical_path since there are
-  # multiple routes that match project uploads
+  # multiple routes that match project uploads:
+  # https://gitlab.com/gitlab-org/gitlab/issues/196396
   def build_canonical_path(project)
     return super unless action_name == 'show'
     return super unless params[:secret] && params[:filename]

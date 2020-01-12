@@ -21,9 +21,10 @@ scope path: :uploads do
       as: 'appearance_upload'
 
   # Project markdown uploads
-  # Consider deprecating this in GitLab 13.x because this is redundant to show_namespace_project_uploads
+  # DEPRECATED: Remove this in GitLab 13.0 because this is redundant to show_namespace_project_uploads
+  # https://gitlab.com/gitlab-org/gitlab/issues/196396
   get ":namespace_id/:project_id/:secret/:filename",
-    to:           "projects/uploads#show",
+    to: redirect("%{namespace_id}/%{project_id}/uploads/%{secret}/%{filename}"),
     constraints:  { namespace_id: /[a-zA-Z.0-9_\-]+/, project_id: /[a-zA-Z.0-9_\-]+/, filename: %r{[^/]+} }, format: false, defaults: { format: nil }
 
   # create uploads for models, snippets (notes) available for now
