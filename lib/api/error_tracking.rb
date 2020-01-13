@@ -10,6 +10,7 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get error tracking settings for the project' do
+        detail 'This feature was introduced in GitLab 12.7.'
         success Entities::ErrorTracking::ProjectSetting
       end
 

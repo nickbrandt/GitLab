@@ -29,6 +29,22 @@ describe API::ErrorTracking do
       end
     end
 
+    context 'without a project setting' do
+      let(:project) { create(:project) }
+
+      before do
+        project.add_maintainer(user)
+      end
+
+      it 'returns 404' do
+        make_request
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message'])
+          .to eq('404 Error Tracking Setting Not Found')
+      end
+    end
+
     context 'when authenticated as reporter' do
       before do
         project.add_reporter(user)

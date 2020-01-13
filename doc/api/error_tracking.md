@@ -1,12 +1,12 @@
-# Error Tracking Settings API
+# Error Tracking settings API
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34940) in GitLab 12.7.
 
-## Error Tracking Project Settings
+## Error Tracking project settings
 
-The Project Settings API allows you to retrieve Error Tracking Settings for a Project. Only for project maintainers.
+The project settings API allows you to retrieve the Error Tracking settings for a project. Only for project maintainers.
 
-### Retrieve Error Tracking Settings
+### Get Error Tracking settings
 
 ```
 GET /projects/:id/error_tracking/settings
@@ -14,7 +14,7 @@ GET /projects/:id/error_tracking/settings
 
 | Attribute | Type    | Required | Description           |
 | --------- | ------- | -------- | --------------------- |
-| `id`      | integer | yes      | The ID of the project owned by the authenticated user |
+| `id`      | integer | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/error_tracking/settings
