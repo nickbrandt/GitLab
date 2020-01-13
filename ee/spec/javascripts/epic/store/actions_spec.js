@@ -769,6 +769,13 @@ describe('Epic Store Actions', () => {
 
   describe('toggleEpicSubscription', () => {
     let mock;
+    const mockEpicSetSubscriptionRes = {
+      epicSetSubscription: {
+        clientMutationId: null,
+        errors: [],
+        __typename: 'EpicSetSubscriptionPayload',
+      },
+    };
     const stateSubscribed = {
       subscribed: false,
     };
@@ -784,6 +791,11 @@ describe('Epic Store Actions', () => {
     describe('success', () => {
       it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleSuccess with param `subscribed` when request is complete', done => {
         mock.onPost(/(.*)/).replyOnce(200, {});
+        spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+          Promise.resolve({
+            data: mockEpicSetSubscriptionRes,
+          }),
+        );
 
         testAction(
           actions.toggleEpicSubscription,
@@ -807,6 +819,16 @@ describe('Epic Store Actions', () => {
     describe('failure', () => {
       it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleFailure when request fails', done => {
         mock.onPost(/(.*)/).replyOnce(500, {});
+        spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+          Promise.resolve({
+            data: {
+              epicSetSubscription: {
+                ...mockEpicSetSubscriptionRes,
+                errors: [{ foo: 'bar' }],
+              },
+            },
+          }),
+        );
 
         testAction(
           actions.toggleEpicSubscription,

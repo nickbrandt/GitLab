@@ -8,6 +8,7 @@ import epicUtils from '../utils/epic_utils';
 import { statusType, statusEvent, dateTypes } from '../constants';
 
 import updateEpic from '../queries/updateEpic.mutation.graphql';
+import epicSetSubscription from '../queries/epicSetSubscription.mutation.graphql';
 
 import * as types from './mutation_types';
 
@@ -182,12 +183,26 @@ export const requestEpicSubscriptionToggleFailure = ({ commit, state }) => {
 };
 export const toggleEpicSubscription = ({ state, dispatch }) => {
   dispatch('requestEpicSubscriptionToggle');
-  axios
-    .post(state.toggleSubscriptionPath)
-    .then(() => {
-      dispatch('requestEpicSubscriptionToggleSuccess', {
-        subscribed: !state.subscribed,
-      });
+  epicUtils.gqClient
+    .mutate({
+      mutation: epicSetSubscription,
+      variables: {
+        epicSetSubscriptionInput: {
+          iid: `${state.epicId}`,
+          groupPath: state.groupPath,
+          subscribedState: !state.subscribed,
+        },
+      },
+    })
+    .then(({ data }) => {
+      if (!data?.epicSetSubscription?.errors.length) {
+        dispatch('requestEpicSubscriptionToggleSuccess', {
+          subscribed: !state.subscribed,
+        });
+      } else {
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        throw new Error('An error occurred while toggling to notifications.');
+      }
     })
     .catch(() => {
       dispatch('requestEpicSubscriptionToggleFailure');
