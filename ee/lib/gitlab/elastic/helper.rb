@@ -26,20 +26,29 @@ module Gitlab
         client = proxy.client
         index_name = proxy.index_name
 
-        # ES5.6 needs a setting enabled to support JOIN datatypes that ES6 does not support...
-        if Gitlab::VersionInfo.parse(client.info['version']['number']) < Gitlab::VersionInfo.new(6)
-          settings['index.mapping.single_type'] = true
+        create_index_options = {
+          index: index_name,
+          body: {
+            settings: settings.to_hash,
+            mappings: mappings.to_hash
+          }
+        }
+
+        # include_type_name defaults to false in ES7. This will ensure ES7
+        # behaves like ES6 when creating mappings. See
+        # https://www.elastic.co/blog/moving-from-types-to-typeless-apis-in-elasticsearch-7-0
+        # for more information. We also can't set this for any versions before
+        # 6.8 as this parameter was not supported. Since it defaults to true in
+        # all 6.x it's safe to only set it for 7.x.
+        if Gitlab::VersionInfo.parse(client.info['version']['number']).major == 7
+          create_index_options[:include_type_name] = true
         end
 
         if client.indices.exists? index: index_name
           client.indices.delete index: index_name
         end
 
-        client.indices.create index: index_name,
-                              body: {
-                                settings: settings.to_hash,
-                                mappings: mappings.to_hash
-                              }
+        client.indices.create create_index_options
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
