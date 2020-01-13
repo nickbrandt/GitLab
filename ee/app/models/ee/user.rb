@@ -279,7 +279,7 @@ module EE
       if License.current&.exclude_guests_from_active_count?
         highest_role > ::Gitlab::Access::GUEST
       else
-        highest_role > ::Gitlab::Access::NO_ACCESS
+        true
       end
     end
 

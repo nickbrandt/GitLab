@@ -626,9 +626,9 @@ describe User do
     end
 
     context 'when user is active' do
-      let(:project_guest_user) { create(:project_member, :guest).user }
-
       context 'user is guest' do
+        let(:project_guest_user) { create(:project_member, :guest).user }
+
         it 'returns false if license is ultimate' do
           create(:license, plan: License::ULTIMATE_PLAN)
 
@@ -639,6 +639,22 @@ describe User do
           create(:license, plan: License::STARTER_PLAN)
 
           expect(project_guest_user.using_license_seat?).to eq true
+        end
+      end
+
+      context 'user is admin without projects' do
+        let(:user) { create(:user, admin: true) }
+
+        it 'returns false if license is ultimate' do
+          create(:license, plan: License::ULTIMATE_PLAN)
+
+          expect(user.using_license_seat?).to eq false
+        end
+
+        it 'returns true if license is not ultimate' do
+          create(:license, plan: License::STARTER_PLAN)
+
+          expect(user.using_license_seat?).to eq true
         end
       end
     end
