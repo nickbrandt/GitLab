@@ -13,7 +13,7 @@ describe EE::Emails::Projects do
     end
   end
 
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   describe '#prometheus_alert_fired_email' do
     subject do

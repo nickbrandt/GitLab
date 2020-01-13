@@ -5,12 +5,12 @@ require 'spec_helper'
 describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
 
-  set(:owner) { create(:user) }
-  set(:admin) { create(:admin) }
-  set(:maintainer) { create(:user) }
-  set(:developer) { create(:user) }
-  set(:reporter) { create(:user) }
-  set(:guest) { create(:user) }
+  let_it_be(:owner) { create(:user) }
+  let_it_be(:admin) { create(:admin) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
+  let_it_be(:guest) { create(:user) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
   subject { described_class.new(current_user, project) }

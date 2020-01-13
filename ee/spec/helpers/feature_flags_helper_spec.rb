@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe FeatureFlagsHelper do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   context '#unleash_api_url' do
     subject { helper.unleash_api_url(project) }

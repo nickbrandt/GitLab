@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Ci::PipelinePresenter do
-  set(:project) { create(:project) }
-  set(:pipeline) { create(:ci_pipeline, project: project) }
+  let_it_be(:project, reload: true) { create(:project) }
+  let_it_be(:pipeline, reload: true) { create(:ci_pipeline, project: project) }
 
   subject(:presenter) do
     described_class.new(pipeline)

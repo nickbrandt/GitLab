@@ -6,9 +6,9 @@ describe EE::GitlabRoutingHelper do
   include ProjectsHelper
   include ApplicationSettingsHelper
 
-  set(:primary) { create(:geo_node, :primary, url: 'http://localhost:123/relative', clone_url_prefix: 'git@localhost:') }
-  set(:group) { create(:group, path: 'foo') }
-  set(:project) { create(:project, namespace: group, path: 'bar') }
+  let_it_be(:primary, reload: true) { create(:geo_node, :primary, url: 'http://localhost:123/relative', clone_url_prefix: 'git@localhost:') }
+  let_it_be(:group, reload: true) { create(:group, path: 'foo') }
+  let_it_be(:project, reload: true) { create(:project, namespace: group, path: 'bar') }
 
   describe '#geo_primary_web_url' do
     before do

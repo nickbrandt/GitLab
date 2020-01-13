@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::AlertPresenter do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   let(:presenter) { described_class.new(alert) }
   let(:payload) { {} }
