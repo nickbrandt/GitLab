@@ -10314,9 +10314,6 @@ msgstr ""
 msgid "Job has wrong arguments format."
 msgstr ""
 
-msgid "Job is in progress"
-msgstr ""
-
 msgid "Job is missing the `model_type` argument."
 msgstr ""
 
@@ -10324,6 +10321,12 @@ msgid "Job is stuck. Check runners."
 msgstr ""
 
 msgid "Job logs and artifacts"
+msgstr ""
+
+msgid "Job to create self-monitoring project is in progress"
+msgstr ""
+
+msgid "Job to delete self-monitoring project is in progress"
 msgstr ""
 
 msgid "Job was retried"
@@ -16365,6 +16368,12 @@ msgid "Self-monitoring is not enabled on this GitLab server, contact your admini
 msgstr ""
 
 msgid "Self-monitoring project does not exist. Please check logs for any error messages"
+msgstr ""
+
+msgid "Self-monitoring project has been successfully deleted"
+msgstr ""
+
+msgid "Self-monitoring project was not deleted. Please check logs for any error messages"
 msgstr ""
 
 msgid "Send a separate email notification to Developers."
