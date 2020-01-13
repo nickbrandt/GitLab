@@ -9,6 +9,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
+import { s__, sprintf } from '~/locale';
 
 export default {
   store: createStore(),
@@ -36,6 +37,11 @@ export default {
       default: null,
     },
     sourceBranch: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    targetBranch: {
       type: String,
       required: false,
       default: null,
@@ -169,6 +175,7 @@ export default {
       'sastContainerStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
+      'isBaseSecurityReportOutOfDate',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
     securityTab() {
@@ -190,6 +197,25 @@ export default {
     },
     hasSastReports() {
       return this.hasReportsType('sast');
+    },
+    subHeadingText() {
+      const mrDivergedCommitsCount =
+        (gl && gl.mrWidgetData && gl.mrWidgetData.diverged_commits_count) || 0;
+      const isMRBranchOutdated = mrDivergedCommitsCount > 0;
+
+      if (isMRBranchOutdated) {
+        return sprintf(
+          s__(
+            'Security report is out of date. Please incorporate latest changes from %{targetBranchName}',
+          ),
+          {
+            targetBranchName: this.targetBranch,
+          },
+        );
+      }
+      return sprintf(
+        s__('Security report is out of date. Retry the pipeline for the target branch.'),
+      );
     },
   },
 
@@ -356,6 +382,10 @@ export default {
         <span>{{ s__('ciReport|View full report') }}</span>
         <icon :size="16" name="external-link" />
       </a>
+    </div>
+
+    <div v-if="isBaseSecurityReportOutOfDate" slot="subHeading" class="text-secondary-700 text-1">
+      <span>{{ subHeadingText }}</span>
     </div>
 
     <div slot="body" class="mr-widget-grouped-section report-block">

@@ -130,5 +130,11 @@ export const anyReportHasIssues = state =>
   state.sastContainer.newIssues.length > 0 ||
   state.dependencyScanning.newIssues.length > 0;
 
+export const isBaseSecurityReportOutOfDate = state =>
+  state.sast.baseReportOutofDate ||
+  state.dast.baseReportOutofDate ||
+  state.sastContainer.baseReportOutofDate ||
+  state.dependencyScanning.baseReportOutofDate;
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

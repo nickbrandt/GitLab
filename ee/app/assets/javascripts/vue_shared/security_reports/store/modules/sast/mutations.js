@@ -61,11 +61,13 @@ export default {
 
   [types.RECEIVE_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
+    const baseReportOutofDate = diff.base_report_out_of_date || false;
 
     state.isLoading = false;
     state.newIssues = added;
     state.resolvedIssues = fixed;
     state.allIssues = existing;
+    state.baseReportOutofDate = baseReportOutofDate;
   },
 
   [types.RECEIVE_DIFF_ERROR](state) {

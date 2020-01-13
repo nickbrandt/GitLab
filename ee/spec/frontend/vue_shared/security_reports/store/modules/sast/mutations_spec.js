@@ -197,6 +197,7 @@ describe('sast module mutations', () => {
           ],
           fixed: [createIssue({ cve: 'CVE-4' }), createIssue({ cve: 'CVE-5' })],
           existing: [createIssue({ cve: 'CVE-6' })],
+          base_report_out_of_date: true,
         },
       };
       state.isLoading = true;
@@ -205,6 +206,10 @@ describe('sast module mutations', () => {
 
     it('should set the `isLoading` status to `false`', () => {
       expect(state.isLoading).toBe(false);
+    });
+
+    it('should set the `baseReportOutofDate` status to `false`', () => {
+      expect(state.baseReportOutofDate).toBe(true);
     });
 
     it('should have the relevant `new` issues', () => {

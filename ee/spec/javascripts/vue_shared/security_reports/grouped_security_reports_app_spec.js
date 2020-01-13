@@ -478,6 +478,7 @@ describe('Grouped security reports app', () => {
         mock.onGet(dastEndpoint).reply(200, {
           added: [dockerReport.vulnerabilities[0]],
           fixed: [dockerReport.vulnerabilities[1], dockerReport.vulnerabilities[2]],
+          base_report_out_of_date: true,
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
@@ -527,6 +528,12 @@ describe('Grouped security reports app', () => {
             'DAST detected 1 new, and 2 fixed vulnerabilities',
           );
         });
+
+        it('should display out of date message', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'Security report is out of date. Retry the pipeline for the target branch',
+          );
+        });
       });
     });
 
@@ -545,6 +552,7 @@ describe('Grouped security reports app', () => {
         canCreateIssue: true,
         canCreateMergeRequest: true,
         canDismissVulnerability: true,
+        targetBranch: 'master',
       };
       const provide = {
         glFeatures: {
@@ -555,11 +563,13 @@ describe('Grouped security reports app', () => {
       beforeEach(() => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.sast_comparison_path = sastEndpoint;
+        gl.mrWidgetData.diverged_commits_count = 100;
 
         mock.onGet(sastEndpoint).reply(200, {
           added: [dockerReport.vulnerabilities[0]],
           fixed: [dockerReport.vulnerabilities[1], dockerReport.vulnerabilities[2]],
           existing: [dockerReport.vulnerabilities[2]],
+          base_report_out_of_date: true,
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
@@ -607,6 +617,12 @@ describe('Grouped security reports app', () => {
         it('should display the correct numbers of vulnerabilities', () => {
           expect(wrapper.vm.$el.textContent).toContain(
             'SAST detected 1 new, and 2 fixed vulnerabilities',
+          );
+        });
+
+        it('should display out of date message for Outdated MR ', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'Security report is out of date. Please incorporate latest changes from master',
           );
         });
       });
