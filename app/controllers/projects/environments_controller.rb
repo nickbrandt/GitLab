@@ -222,8 +222,8 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
   def metrics_dashboard_params
     params
-      .permit(:embedded, :group, :title, :y_label, :dashboard_path, :environment)
-      .merge(dashboard_path: params[:dashboard], environment: environment)
+      .permit(:embedded, :group, :title, :y_label, :dashboard_path, :environment, :sample_metrics)
+      .merge(dashboard_path: params[:dashboard], environment: environment, sample_metrics: params[:sample_metrics])
   end
 
   def include_all_dashboards?
