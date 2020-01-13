@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Projects::ThreatMonitoringController do
-  set(:project) { create(:project, :repository, :private) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository, :private) }
+  let_it_be(:user) { create(:user) }
 
   subject { get :show, params: { namespace_id: project.namespace, project_id: project } }
 

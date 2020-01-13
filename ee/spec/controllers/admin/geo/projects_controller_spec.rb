@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Admin::Geo::ProjectsController, :geo do
   include EE::GeoHelpers
 
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
   let(:synced_registry) { create(:geo_project_registry, :synced) }
 
   before do

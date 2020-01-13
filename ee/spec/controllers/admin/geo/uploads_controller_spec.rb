@@ -5,11 +5,11 @@ require 'spec_helper'
 describe Admin::Geo::UploadsController, :geo do
   include EE::GeoHelpers
 
-  set(:admin) { create(:admin) }
-  set(:secondary) { create(:geo_node) }
-  set(:synced_registry) { create(:geo_upload_registry, :with_file, :attachment, success: true) }
-  set(:failed_registry) { create(:geo_upload_registry, :failed) }
-  set(:never_registry) { create(:geo_upload_registry, :failed, retry_count: nil) }
+  let_it_be(:admin) { create(:admin) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:synced_registry) { create(:geo_upload_registry, :with_file, :attachment, success: true) }
+  let_it_be(:failed_registry) { create(:geo_upload_registry, :failed) }
+  let_it_be(:never_registry) { create(:geo_upload_registry, :failed, retry_count: nil) }
 
   def css_id(registry)
     "#upload-#{registry.id}-header"

@@ -6,7 +6,7 @@ describe Admin::Geo::SettingsController, :geo do
   include EE::GeoHelpers
   include StubENV
 
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
 
   before do
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')

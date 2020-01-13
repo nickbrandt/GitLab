@@ -12,8 +12,8 @@ describe SessionsController, :geo do
 
   describe '#new' do
     context 'on a Geo secondary node' do
-      set(:primary_node) { create(:geo_node, :primary) }
-      set(:secondary_node) { create(:geo_node) }
+      let_it_be(:primary_node) { create(:geo_node, :primary) }
+      let_it_be(:secondary_node) { create(:geo_node) }
 
       before do
         stub_current_geo_node(secondary_node)

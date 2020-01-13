@@ -5,19 +5,19 @@ require 'spec_helper'
 describe GroupsController do
   include ExternalAuthorizationServiceHelpers
 
-  set(:user) { create(:user) }
-  set(:group) { create(:group, :public) }
-  set(:project) { create(:project, :public, namespace: group) }
-  set(:subgroup) { create(:group, :private, parent: group) }
-  set(:subgroup2) { create(:group, :private, parent: subgroup) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group, :public) }
+  let_it_be(:project) { create(:project, :public, namespace: group) }
+  let_it_be(:subgroup) { create(:group, :private, parent: group) }
+  let_it_be(:subgroup2) { create(:group, :private, parent: subgroup) }
 
   describe 'GET #activity' do
     render_views
 
-    set(:event1) { create(:event, project: project) }
-    set(:event2) { create(:event, project: nil, group: group) }
-    set(:event3) { create(:event, project: nil, group: subgroup) }
-    set(:event4) { create(:event, project: nil, group: subgroup2) }
+    let_it_be(:event1) { create(:event, project: project) }
+    let_it_be(:event2) { create(:event, project: nil, group: group) }
+    let_it_be(:event3) { create(:event, project: nil, group: subgroup) }
+    let_it_be(:event4) { create(:event, project: nil, group: subgroup2) }
 
     context 'when authorized' do
       before do
