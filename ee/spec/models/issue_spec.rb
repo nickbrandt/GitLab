@@ -127,6 +127,8 @@ describe Issue do
     it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
     it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
     it { is_expected.to have_many(:resource_weight_events) }
+    it { is_expected.to have_many(:blocked_by_issue_links) }
+    it { is_expected.to have_many(:blocked_by_issues).through(:blocked_by_issue_links).source(:source) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do

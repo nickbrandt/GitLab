@@ -7,7 +7,7 @@ module EE
 
       override :associations_to_preload
       def associations_to_preload
-        super << { target_issue_links: { source: { project: :project_feature } } }
+        super << { blocked_by_issues: { project: :project_feature } }
       end
     end
   end
