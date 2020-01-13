@@ -72,8 +72,7 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/34342
-      it 'displays security reports in the project security dashboard', :quarantine do
+      it 'displays security reports in the project security dashboard' do
         Page::Project::Menu.perform(&:click_project)
         Page::Project::Menu.perform(&:click_on_security_dashboard)
 
