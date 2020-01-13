@@ -256,7 +256,8 @@ module Gitlab
               branch: encode_binary(branch),
               branch_sha: branch_sha,
               remote_repository: remote_repository.gitaly_repository,
-              remote_branch: encode_binary(remote_branch)
+              remote_branch: encode_binary(remote_branch),
+              skip_ci: skip_ci
             )
           )
         )
