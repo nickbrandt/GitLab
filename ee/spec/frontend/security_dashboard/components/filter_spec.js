@@ -24,8 +24,12 @@ describe('Filter component', () => {
     });
   };
 
+  const findSearchInput = () =>
+    wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
+  const findDropdownToggle = () => wrapper.find('.dropdown-toggle');
+
   function isDropdownOpen() {
-    const toggleButton = wrapper.find('.dropdown-toggle');
+    const toggleButton = findDropdownToggle();
     return toggleButton.attributes('aria-expanded') === 'true';
   }
 
@@ -40,9 +44,6 @@ describe('Filter component', () => {
       options: projects,
     });
   }
-
-  const findSearchInput = () =>
-    wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
 
   beforeEach(() => {
     store = createStore();
@@ -79,7 +80,7 @@ describe('Filter component', () => {
 
     describe('when the dropdown is open', () => {
       beforeEach(done => {
-        wrapper.find('.dropdown-toggle').trigger('click');
+        findDropdownToggle().trigger('click');
         wrapper.vm.$root.$on('bv::dropdown::shown', () => {
           done();
         });
