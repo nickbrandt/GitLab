@@ -8,12 +8,9 @@ module QA
       it 'user promotes issue to an epic' do
         Flow::Login.sign_in
 
-        group = Resource::Group.fabricate_via_api!
-
         project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'promote-issue-to-epic'
           project.description = 'Project to promote issue to epic'
-          project.group = group
         end
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
@@ -35,7 +32,7 @@ module QA
           show.comment('/promote ')
         end
 
-        group.visit!
+        project.group.visit!
         Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform do |index|
           expect(index).to have_epic_title(issue_title)
