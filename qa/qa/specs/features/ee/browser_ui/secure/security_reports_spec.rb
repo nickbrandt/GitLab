@@ -11,17 +11,14 @@ module QA
     let(:dast_scan_example_vuln) { 'Cookie Without SameSite Attribute' }
 
     describe 'Security Reports' do
-      after do
+      after(:all) do
         Service::DockerRun::GitlabRunner.new(@executor).remove!
-
-        Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
       end
 
-      before do
+      before(:all) do
         @executor = "qa-runner-#{Time.now.to_i}"
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @project = Resource::Project.fabricate_via_api! do |p|
           p.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'
@@ -45,6 +42,11 @@ module QA
 
         Page::Project::Menu.perform(&:click_ci_cd_pipelines)
         Page::Project::Pipeline::Index.perform(&:wait_for_latest_pipeline_success)
+      end
+
+      before do
+        Flow::Login.sign_in_unless_signed_in
+        @project.visit!
       end
 
       it 'displays security reports in the pipeline' do
