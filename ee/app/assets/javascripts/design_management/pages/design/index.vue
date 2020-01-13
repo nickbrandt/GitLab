@@ -238,12 +238,14 @@ export default {
             />
           </template>
         </design-destroyer>
+
+        <div v-if="errorMessage" class="p-3">
+          <gl-alert variant="danger" @dismiss="errorMessage = null">
+            {{ errorMessage }}
+          </gl-alert>
+        </div>
+
         <div class="d-flex flex-column h-100 mh-100 position-relative">
-          <div class="p-3">
-            <gl-alert v-if="errorMessage" variant="danger" @dismiss="errorMessage = null">
-              {{ errorMessage }}
-            </gl-alert>
-          </div>
           <design-image
             :image="design.image"
             :name="design.filename"
