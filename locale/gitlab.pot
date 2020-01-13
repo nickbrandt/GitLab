@@ -3824,9 +3824,6 @@ msgstr ""
 msgid "ClusterIntegration|Copy Jupyter Hostname"
 msgstr ""
 
-msgid "ClusterIntegration|Copy Kibana Hostname"
-msgstr ""
-
 msgid "ClusterIntegration|Copy Knative Endpoint"
 msgstr ""
 
@@ -4041,9 +4038,6 @@ msgid "ClusterIntegration|JupyterHub, a multi-user Hub, spawns, manages, and pro
 msgstr ""
 
 msgid "ClusterIntegration|Key pair name"
-msgstr ""
-
-msgid "ClusterIntegration|Kibana Hostname"
 msgstr ""
 
 msgid "ClusterIntegration|Knative"
