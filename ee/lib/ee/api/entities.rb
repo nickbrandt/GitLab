@@ -114,6 +114,11 @@ module EE
         end
       end
 
+      class ProtectedEnvironment < Grape::Entity
+        expose :name
+        expose :deploy_access_levels, using: ::API::Entities::ProtectedRefAccess
+      end
+
       module IssueBasic
         extend ActiveSupport::Concern
 
