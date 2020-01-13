@@ -189,7 +189,7 @@ describe('Cycle Analytics component', () => {
             expect.objectContaining({
               queryParams: wrapper.vm.$options.projectsQueryParams,
               groupId: mockData.group.id,
-              multiSelect: wrapper.vm.multiProjectSelect,
+              multiSelect: wrapper.vm.$options.multiProjectSelect,
             }),
           );
         });

@@ -43,20 +43,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      multiProjectSelect: true,
-      dateOptions: [7, 30, 90],
-      groupsQueryParams: {
-        min_access_level: featureAccessLevel.EVERYONE,
-      },
-      projectsQueryParams: {
-        per_page: PROJECTS_PER_PAGE,
-        with_shared: false,
-        order_by: 'last_activity_at',
-      },
-    };
-  },
   computed: {
     ...mapState([
       'featureFlags',
@@ -200,6 +186,8 @@ export default {
       this.updateSelectedDurationChartStages(stages);
     },
   },
+  multiProjectSelect: true,
+  dateOptions: [7, 30, 90],
   groupsQueryParams: {
     min_access_level: featureAccessLevel.EVERYONE,
   },
@@ -231,7 +219,7 @@ export default {
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
           :query-params="$options.projectsQueryParams"
-          :multi-select="multiProjectSelect"
+          :multi-select="$options.multiProjectSelect"
           @selected="onProjectsSelect"
         />
         <div
