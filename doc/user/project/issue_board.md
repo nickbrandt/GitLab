@@ -281,11 +281,16 @@ As on another list types, click on the trash icon to remove it.
 
 ![Milestone lists](img/issue_board_milestone_lists.png)
 
-## Work-in-progress limits
+## Work In Progress limits
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.6
 
-To limit the amount of work in progress at one time, you can set a soft limit on the maximum number of issues per list. The limit can be set either per group, or per project. If you exceed the limit, the current number of issues is shown in red. For example, if you have set the limit to `5`, and you move another issue to a list, the title displays `6/5`, with the `6` shown in red.
+You can set Work In Progress (WIP) limits per issues list. When a limit is set, the list's header shows the number of issues in the list and the soft limit of issues. For example, for a list with 4 issues, and a limit of 5, the header will show `4/5`. If you exceed the limit, the current number of issues is shown in red. For example, you have a list with 5 issues with a limit of 5. When you move another issue to that list, the list's header displays `6/5`, with the `6` shown in red.
+
+To set a WIP limit for a list:
+
+1. Click on the Settings icon (gear).
+1. Enter the desired limit.
 
 ### Summary of features per tier
 
