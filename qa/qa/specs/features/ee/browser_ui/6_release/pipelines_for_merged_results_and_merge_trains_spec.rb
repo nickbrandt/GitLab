@@ -104,26 +104,24 @@ module QA
         end.visit!
 
         Page::MergeRequest::Show.perform do |show|
-          pipeline_passed = Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
+          pipeline_passed = show.retry_until(max_attempts: 5, sleep_interval: 5) do
             show.has_pipeline_status?(/Merged result pipeline #\d+ passed/)
           end
 
           expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           show.merge_via_merge_train
+
+          # It's faster to refresh the page than to wait for the UI to
+          # automatically refresh, so we reload if the merge status
+          # doesn't update quickly.
+          merged = show.retry_until(max_attempts: 5, reload: true, sleep_interval: 5) do
+            show.merged?
+          end
+
+          expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
+          expect(show).to have_pipeline_status(/Merge train pipeline #\d+ passed/)
         end
-
-        expect(page).to have_content('Added to the merge train', wait: 60)
-        expect(page).to have_content('The changes will be merged into master')
-
-        # It's faster to refresh the page than to wait for the UI to
-        # automatically refresh, so we reload if the merge status
-        # doesn't update quickly.
-        merged = Support::Retrier.retry_until(reload_page: page) do
-          Page::MergeRequest::Show.perform(&:merged?)
-        end
-
-        expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
       end
     end
   end
