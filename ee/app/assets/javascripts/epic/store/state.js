@@ -8,7 +8,6 @@ export default () => ({
   labelsPath: '',
   todoPath: '',
   todoDeletePath: '',
-  toggleSubscriptionPath: '',
 
   // URLs to use with links
   epicsWebUrl: '',
