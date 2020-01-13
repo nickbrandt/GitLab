@@ -3854,6 +3854,9 @@ msgstr ""
 msgid "ClusterIntegration|Could not load instance types"
 msgstr ""
 
+msgid "ClusterIntegration|Could not load networks"
+msgstr ""
+
 msgid "ClusterIntegration|Could not load regions from your AWS account"
 msgstr ""
 
@@ -3861,6 +3864,9 @@ msgid "ClusterIntegration|Could not load security groups for the selected VPC"
 msgstr ""
 
 msgid "ClusterIntegration|Could not load subnets for the selected VPC"
+msgstr ""
+
+msgid "ClusterIntegration|Could not load subnetworks"
 msgstr ""
 
 msgid "ClusterIntegration|Create Kubernetes cluster"
@@ -4127,10 +4133,16 @@ msgstr ""
 msgid "ClusterIntegration|Loading instance types"
 msgstr ""
 
+msgid "ClusterIntegration|Loading networks"
+msgstr ""
+
 msgid "ClusterIntegration|Loading security groups"
 msgstr ""
 
 msgid "ClusterIntegration|Loading subnets"
+msgstr ""
+
+msgid "ClusterIntegration|Loading subnetworks"
 msgstr ""
 
 msgid "ClusterIntegration|Machine type"
@@ -4157,6 +4169,9 @@ msgstr ""
 msgid "ClusterIntegration|No machine types matched your search"
 msgstr ""
 
+msgid "ClusterIntegration|No networks found"
+msgstr ""
+
 msgid "ClusterIntegration|No projects found"
 msgstr ""
 
@@ -4170,6 +4185,9 @@ msgid "ClusterIntegration|No security group found"
 msgstr ""
 
 msgid "ClusterIntegration|No subnet found"
+msgstr ""
+
+msgid "ClusterIntegration|No subnetworks found"
 msgstr ""
 
 msgid "ClusterIntegration|No zones matched your search"
@@ -4268,6 +4286,9 @@ msgstr ""
 msgid "ClusterIntegration|Search machine types"
 msgstr ""
 
+msgid "ClusterIntegration|Search networks"
+msgstr ""
+
 msgid "ClusterIntegration|Search projects"
 msgstr ""
 
@@ -4278,6 +4299,9 @@ msgid "ClusterIntegration|Search security groups"
 msgstr ""
 
 msgid "ClusterIntegration|Search subnets"
+msgstr ""
+
+msgid "ClusterIntegration|Search subnetworks"
 msgstr ""
 
 msgid "ClusterIntegration|Search zones"
@@ -4298,6 +4322,9 @@ msgstr ""
 msgid "ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}."
 msgstr ""
 
+msgid "ClusterIntegration|Select a network to choose a subnetwork"
+msgstr ""
+
 msgid "ClusterIntegration|Select a region to choose a Key Pair"
 msgstr ""
 
@@ -4305,6 +4332,9 @@ msgid "ClusterIntegration|Select a region to choose a VPC"
 msgstr ""
 
 msgid "ClusterIntegration|Select a stack to install Crossplane."
+msgstr ""
+
+msgid "ClusterIntegration|Select a zone to choose a network"
 msgstr ""
 
 msgid "ClusterIntegration|Select machine type"
@@ -4484,6 +4514,9 @@ msgstr ""
 msgid "ClusterIntergation|Select a VPC"
 msgstr ""
 
+msgid "ClusterIntergation|Select a network"
+msgstr ""
+
 msgid "ClusterIntergation|Select a region"
 msgstr ""
 
@@ -4491,6 +4524,9 @@ msgid "ClusterIntergation|Select a security group"
 msgstr ""
 
 msgid "ClusterIntergation|Select a subnet"
+msgstr ""
+
+msgid "ClusterIntergation|Select a subnetwork"
 msgstr ""
 
 msgid "ClusterIntergation|Select an instance type"
