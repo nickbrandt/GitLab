@@ -7,7 +7,7 @@ class PodLogsService < ::BaseService
 
   K8S_NAME_MAX_LENGTH = 253
 
-  PARAMS = %w(pod_name container_name search).freeze
+  PARAMS = %w(pod_name container_name search start end).freeze
 
   SUCCESS_RETURN_KEYS = [:status, :logs, :pod_name, :container_name, :pods, :enable_advanced_querying].freeze
 
@@ -78,7 +78,9 @@ class PodLogsService < ::BaseService
       result[:pod_name],
       namespace,
       container: result[:container_name],
-      search: params['search']
+      search: params['search'],
+      start_time: params['start'],
+      end_time: params['end']
     )
 
     return { status: :processing } unless response
