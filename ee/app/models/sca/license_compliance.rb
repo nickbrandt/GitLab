@@ -52,7 +52,7 @@ module SCA
 
     def pipeline
       strong_memoize(:pipeline) do
-        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_management_reports)
+        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_scanning_reports)
       end
     end
 

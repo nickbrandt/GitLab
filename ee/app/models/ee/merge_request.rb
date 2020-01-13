@@ -155,7 +155,7 @@ module EE
     end
 
     def has_license_management_reports?
-      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports))
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_scanning_reports))
     end
 
     def has_container_scanning_reports?
