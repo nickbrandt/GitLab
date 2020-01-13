@@ -89,15 +89,17 @@ export default {
 </script>
 
 <template>
-  <div ref="presentationViewport" class="d-flex flex-column h-100 mh-100 position-relative">
-    <design-image v-if="image" :image="image" :name="imageName" @resize="onImageResize" />
-    <design-overlay
-      v-if="overlayDimensions && overlayPosition"
-      :dimensions="overlayDimensions"
-      :position="overlayPosition"
-      :notes="discussionStartingNotes"
-      :current-comment-form="currentCommentForm"
-      @openCommentForm="openCommentForm"
-    />
+  <div ref="presentationViewport" class="h-100 w-100 p-3 overflow-auto">
+    <div class="h-100 w-100 d-flex align-items-center position-relative">
+      <design-image v-if="image" :image="image" :name="imageName" @resize="onImageResize" />
+      <design-overlay
+        v-if="overlayDimensions && overlayPosition"
+        :dimensions="overlayDimensions"
+        :position="overlayPosition"
+        :notes="discussionStartingNotes"
+        :current-comment-form="currentCommentForm"
+        @openCommentForm="openCommentForm"
+      />
+    </div>
   </div>
 </template>
