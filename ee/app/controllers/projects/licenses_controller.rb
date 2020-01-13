@@ -72,9 +72,13 @@ module Projects
     def matching_policies_from(license_compliance)
       filters = matching_policies_params
       license_compliance.find_policies(
-        detected_only: filters[:detected] == 'true',
+        detected_only: truthy?(filters[:detected]),
         classification: filters[:classification]
       )
+    end
+
+    def truthy?(value)
+      value.in?(%w[true 1])
     end
   end
 end
