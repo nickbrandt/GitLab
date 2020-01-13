@@ -28,7 +28,7 @@ describe "User manages members" do
       visit(project_project_members_path(project))
     end
 
-    it { expect(page).to have_no_button("Add members").and have_no_link("Import members") }
+    it { expect(page).to have_no_selector(".invite-users-form") }
   end
 
   context "as project maintainer" do
