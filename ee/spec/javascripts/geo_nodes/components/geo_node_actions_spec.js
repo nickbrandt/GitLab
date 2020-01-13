@@ -91,7 +91,7 @@ describe('GeoNodeActionsComponent', () => {
           node: vm.node,
           modalKind: 'danger',
           modalMessage:
-            'Removing a Geo primary node stops the synchronization to that node. Are you sure?',
+            'Removing a Geo primary node stops the synchronization to all nodes. Are you sure?',
           modalActionLabel: 'Remove node',
           modalTitle: 'Remove primary node',
         });

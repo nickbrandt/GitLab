@@ -8330,7 +8330,7 @@ msgstr ""
 msgid "GeoNodes|Pausing replication stops the sync process. Are you sure?"
 msgstr ""
 
-msgid "GeoNodes|Removing a Geo primary node stops the synchronization to that node. Are you sure?"
+msgid "GeoNodes|Removing a Geo primary node stops the synchronization to all nodes. Are you sure?"
 msgstr ""
 
 msgid "GeoNodes|Removing a Geo secondary node stops the synchronization to that node. Are you sure?"

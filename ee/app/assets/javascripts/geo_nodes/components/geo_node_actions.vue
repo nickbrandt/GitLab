@@ -68,7 +68,7 @@ export default {
         node: this.node,
         modalKind: 'danger',
         modalMessage: s__(
-          'GeoNodes|Removing a Geo primary node stops the synchronization to that node. Are you sure?',
+          'GeoNodes|Removing a Geo primary node stops the synchronization to all nodes. Are you sure?',
         ),
         modalActionLabel: __('Remove node'),
         modalTitle: __('Remove primary node'),
