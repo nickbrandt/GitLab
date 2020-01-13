@@ -195,6 +195,8 @@ export default {
         >
           <gl-dropdown
             id="time-window-dropdown"
+            ref="time-window-dropdown"
+            :disabled="environments.isLoading"
             :text="timeWindow.options[timeWindow.current].label"
             class="d-flex"
             toggle-class="dropdown-menu-toggle"

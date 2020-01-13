@@ -44,6 +44,8 @@ describe('EnvironmentLogs', () => {
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
   const findSearchBar = () => wrapper.find('.js-logs-search');
+  const findTimeWindowDropdown = () => wrapper.find({ ref: 'time-window-dropdown' });
+
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
 
@@ -140,6 +142,10 @@ describe('EnvironmentLogs', () => {
       expect(findSearchBar().attributes('disabled')).toEqual('true');
     });
 
+    it('displays a disabled time window dropdown', () => {
+      expect(findTimeWindowDropdown().attributes('disabled')).toEqual('true');
+    });
+
     it('does not update buttons state', () => {
       expect(updateControlBtnsMock).not.toHaveBeenCalled();
     });
@@ -162,8 +168,10 @@ describe('EnvironmentLogs', () => {
       initWrapper();
     });
 
-    it("doesn't display the search bar", () => {
+    it("doesn't display the search bar or time windows dropdown", () => {
       expect(findSearchBar().exists()).toEqual(false);
+      expect(findTimeWindowDropdown().exists()).toEqual(false);
+
       expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-6');
       expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-6');
     });
@@ -263,6 +271,11 @@ describe('EnvironmentLogs', () => {
       expect(findSearchBar().exists()).toEqual(true);
       expect(findSearchBar().attributes('disabled')).toEqual(undefined);
       expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-3');
+    });
+
+    it('displays and enables the time window dropdown', () => {
+      expect(findTimeWindowDropdown().exists()).toEqual(true);
+      expect(findTimeWindowDropdown().attributes('disabled')).toEqual(undefined);
     });
 
     it('update control buttons state', () => {
