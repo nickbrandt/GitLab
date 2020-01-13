@@ -162,15 +162,15 @@ RSpec.describe SCA::LicenseCompliance do
     context "when searching for policies for licenses that were detected in a scan report" do
       let(:results) { subject.find_policies(detected_only: true) }
 
-      it 'excludes policies for licenses that do not appear in the latest license scan report' do
-        expect(results.map(&:name)).not_to include('SOFTWARE_LICENSE-2.7/example_1')
+      it 'only includes licenses that appear in the latest license scan report' do
+        expect(results.count).to be(3)
       end
 
       it 'includes a policy for an unclassified and known license that was detected in the scan report' do
         assert_matches(
           results[0],
           id: nil,
-          name: "BSD 3-Clause \"New\" or \"Revised\" License",
+          name: 'BSD 3-Clause "New" or "Revised" License',
           url: "http://spdx.org/licenses/BSD-3-Clause.json",
           classification: "unclassified",
           spdx_identifier: "BSD-3-Clause"
