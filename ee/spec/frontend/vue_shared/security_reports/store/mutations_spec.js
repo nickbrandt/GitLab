@@ -816,6 +816,7 @@ describe('security reports mutations', () => {
           { name: 'added vuln 2', report_type: 'container_scanning' },
         ],
         fixed: [{ name: 'fixed vuln 1', report_type: 'container_scanning' }],
+        base_report_out_of_date: true,
       },
     };
 
@@ -825,6 +826,10 @@ describe('security reports mutations', () => {
 
     it('should set isLoading to false', () => {
       expect(stateCopy.sastContainer.isLoading).toBe(false);
+    });
+
+    it('should set baseReportOutofDate to true', () => {
+      expect(stateCopy.sastContainer.baseReportOutofDate).toBe(true);
     });
 
     it('should parse and set the added vulnerabilities', () => {
@@ -885,6 +890,7 @@ describe('security reports mutations', () => {
           ],
           fixed: [{ name: 'fixed vuln 1', report_type: 'dependency_scanning' }],
           existing: [{ name: 'existing vuln 1', report_type: 'dependency_scanning' }],
+          base_report_out_of_date: true,
         },
       };
       mutations[types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS](stateCopy, reports);
@@ -892,6 +898,10 @@ describe('security reports mutations', () => {
 
     it('should set isLoading to false', () => {
       expect(stateCopy.dependencyScanning.isLoading).toBe(false);
+    });
+
+    it('should set baseReportOutofDate to true', () => {
+      expect(stateCopy.dependencyScanning.baseReportOutofDate).toBe(true);
     });
 
     it('should parse and set the added vulnerabilities', () => {
@@ -952,6 +962,7 @@ describe('security reports mutations', () => {
           ],
           fixed: [{ name: 'fixed vuln 1', report_type: 'dast' }],
           existing: [{ name: 'existing vuln 1', report_type: 'dast' }],
+          base_report_out_of_date: true,
         },
       };
       mutations[types.RECEIVE_DAST_DIFF_SUCCESS](stateCopy, reports);
@@ -959,6 +970,10 @@ describe('security reports mutations', () => {
 
     it('should set isLoading to false', () => {
       expect(stateCopy.dast.isLoading).toBe(false);
+    });
+
+    it('should set baseReportOutofDate to true', () => {
+      expect(stateCopy.dast.baseReportOutofDate).toBe(true);
     });
 
     it('should parse and set the added vulnerabilities', () => {

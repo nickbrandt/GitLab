@@ -274,6 +274,7 @@ export default {
         v-if="shouldRenderSecurityReport"
         :head-blob-path="mr.headBlobPath"
         :source-branch="mr.sourceBranch"
+        :target-branch="mr.targetBranch"
         :base-blob-path="mr.baseBlobPath"
         :enabled-reports="mr.enabledSecurityReports"
         :sast-head-path="mr.sast.head_path"

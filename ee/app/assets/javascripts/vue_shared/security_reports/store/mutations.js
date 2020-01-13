@@ -108,11 +108,13 @@ export default {
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
+    const baseReportOutofDate = diff.base_report_out_of_date || false;
 
     Vue.set(state.sastContainer, 'isLoading', false);
     Vue.set(state.sastContainer, 'newIssues', added);
     Vue.set(state.sastContainer, 'resolvedIssues', fixed);
     Vue.set(state.sastContainer, 'allIssues', existing);
+    Vue.set(state.sastContainer, 'baseReportOutofDate', baseReportOutofDate);
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](state) {
@@ -164,11 +166,13 @@ export default {
 
   [types.RECEIVE_DAST_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
+    const baseReportOutofDate = diff.base_report_out_of_date || false;
 
     Vue.set(state.dast, 'isLoading', false);
     Vue.set(state.dast, 'newIssues', added);
     Vue.set(state.dast, 'resolvedIssues', fixed);
     Vue.set(state.dast, 'allIssues', existing);
+    Vue.set(state.dast, 'baseReportOutofDate', baseReportOutofDate);
   },
 
   [types.RECEIVE_DAST_DIFF_ERROR](state) {
@@ -251,11 +255,13 @@ export default {
 
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
+    const baseReportOutofDate = diff.base_report_out_of_date || false;
 
     Vue.set(state.dependencyScanning, 'isLoading', false);
     Vue.set(state.dependencyScanning, 'newIssues', added);
     Vue.set(state.dependencyScanning, 'resolvedIssues', fixed);
     Vue.set(state.dependencyScanning, 'allIssues', existing);
+    Vue.set(state.dependencyScanning, 'baseReportOutofDate', baseReportOutofDate);
   },
 
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR](state) {

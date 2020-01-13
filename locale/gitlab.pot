@@ -16100,6 +16100,12 @@ msgstr ""
 msgid "Security dashboard"
 msgstr ""
 
+msgid "Security report is out of date. Please incorporate latest changes from %{targetBranchName}"
+msgstr ""
+
+msgid "Security report is out of date. Retry the pipeline for the target branch."
+msgstr ""
+
 msgid "SecurityConfiguration|Configured"
 msgstr ""
 

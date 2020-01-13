@@ -28,6 +28,7 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
+    baseReportOutofDate: false,
   },
   dast: {
     paths: {
@@ -41,6 +42,7 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
+    baseReportOutofDate: false,
   },
 
   dependencyScanning: {
@@ -56,6 +58,7 @@ export default () => ({
     newIssues: [],
     resolvedIssues: [],
     allIssues: [],
+    baseReportOutofDate: false,
   },
 
   modal: {

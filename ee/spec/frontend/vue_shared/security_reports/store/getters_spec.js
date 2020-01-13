@@ -13,6 +13,7 @@ import {
   dependencyScanningStatusIcon,
   anyReportHasError,
   summaryCounts,
+  isBaseSecurityReportOutOfDate,
 } from 'ee/vue_shared/security_reports/store/getters';
 
 const BASE_PATH = 'fake/base/path.json';
@@ -528,6 +529,17 @@ describe('Security reports getters', () => {
       state.dast.paths.base = BASE_PATH;
 
       expect(noBaseInAllReports(state)).toEqual(false);
+    });
+  });
+
+  describe('isBaseSecurityReportOutOfDate', () => {
+    it('returns false when none reports are out of date', () => {
+      expect(isBaseSecurityReportOutOfDate(state)).toEqual(false);
+    });
+
+    it('returns true when any of the reports is out of date', () => {
+      state.dast.baseReportOutofDate = true;
+      expect(isBaseSecurityReportOutOfDate(state)).toEqual(true);
     });
   });
 });
