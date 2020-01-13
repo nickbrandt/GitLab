@@ -5,10 +5,10 @@ require 'spec_helper'
 describe Gitlab::SidekiqConfig do
   describe '.workers' do
     it 'includes EE workers' do
-      workers = described_class.workers
+      worker_classes = described_class.workers.map(&:klass)
 
-      expect(workers).to include(RepositoryUpdateMirrorWorker)
-      expect(workers).to include(LdapGroupSyncWorker)
+      expect(worker_classes).to include(RepositoryUpdateMirrorWorker)
+      expect(worker_classes).to include(LdapGroupSyncWorker)
     end
   end
 
@@ -39,6 +39,44 @@ describe Gitlab::SidekiqConfig do
       queues = described_class.expand_queues(%w[unknown])
 
       expect(queues).to include('unknown')
+    end
+  end
+
+  describe '.workers_for_all_queues_yml' do
+    it 'returns a tuple with EE workers second' do
+      expect(described_class.workers_for_all_queues_yml.second)
+        .to include(an_object_having_attributes(queue: 'repository_update_mirror'))
+    end
+  end
+
+  describe '.all_queues_yml_outdated?' do
+    before do
+      workers = [
+        LdapGroupSyncWorker,
+        RepositoryUpdateMirrorWorker
+      ].map { |worker| described_class::Worker.new(worker, ee: true) }
+
+      allow(described_class).to receive(:workers).and_return(workers)
+
+      allow(File).to receive(:read)
+                       .with(described_class::FOSS_QUEUE_CONFIG_PATH)
+                       .and_return(YAML.dump([]))
+    end
+
+    it 'returns true if the YAML file does not match the application code' do
+      allow(File).to receive(:read)
+                       .with(described_class::EE_QUEUE_CONFIG_PATH)
+                       .and_return(YAML.dump(['ldap_group_sync']))
+
+      expect(described_class.all_queues_yml_outdated?).to be(true)
+    end
+
+    it 'returns false if the YAML file matches the application code' do
+      allow(File).to receive(:read)
+                       .with(described_class::EE_QUEUE_CONFIG_PATH)
+                       .and_return(YAML.dump(%w[ldap_group_sync repository_update_mirror]))
+
+      expect(described_class.all_queues_yml_outdated?).to be(false)
     end
   end
 end
