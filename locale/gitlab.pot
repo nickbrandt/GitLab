@@ -12639,12 +12639,6 @@ msgstr ""
 msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
-msgid "Option 1"
-msgstr ""
-
-msgid "Option 2"
-msgstr ""
-
 msgid "Optional"
 msgstr ""
 
@@ -15784,9 +15778,6 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-msgid "Save Expiration Policy"
-msgstr ""
-
 msgid "Save anyway"
 msgstr ""
 
@@ -15800,6 +15791,9 @@ msgid "Save changes before testing"
 msgstr ""
 
 msgid "Save comment"
+msgstr ""
+
+msgid "Save expiration policy"
 msgstr ""
 
 msgid "Save password"
