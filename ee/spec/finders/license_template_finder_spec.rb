@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe LicenseTemplateFinder do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   let(:params) { {} }
   let(:fake_template_source) { double(::Gitlab::CustomFileTemplates) }

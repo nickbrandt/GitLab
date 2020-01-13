@@ -5,11 +5,11 @@ require 'spec_helper'
 describe DesignManagement::VersionsFinder do
   include DesignManagementTestHelpers
 
-  set(:user) { create(:user) }
-  set(:project) { create(:project, :private) }
-  set(:issue) { create(:issue, project: project) }
-  set(:design_1) { create(:design, :with_file, issue: issue, versions_count: 1) }
-  set(:design_2) { create(:design, :with_file, issue: issue, versions_count: 1) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :private) }
+  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:design_1) { create(:design, :with_file, issue: issue, versions_count: 1) }
+  let_it_be(:design_2) { create(:design, :with_file, issue: issue, versions_count: 1) }
   let(:version_1) { design_1.versions.first }
   let(:version_2) { design_2.versions.first }
   let(:design_or_collection) { issue.design_collection }

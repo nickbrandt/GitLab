@@ -4,9 +4,9 @@ require 'spec_helper'
 
 describe AuditLogFinder do
   describe '#execute' do
-    set(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
-    set(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
-    set(:group_audit_event) { create(:group_audit_event, created_at: 1.day.ago) }
+    let_it_be(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
+    let_it_be(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
+    let_it_be(:group_audit_event) { create(:group_audit_event, created_at: 1.day.ago) }
 
     subject { described_class.new(params).execute }
 

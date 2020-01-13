@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 describe GroupsWithTemplatesFinder do
-  set(:group_1) { create(:group, name: 'group-1') }
-  set(:group_2) { create(:group, name: 'group-2') }
-  set(:group_3) { create(:group, name: 'group-3') }
-  set(:group_4) { create(:group, name: 'group-4') }
+  let_it_be(:group_1, reload: true) { create(:group, name: 'group-1') }
+  let_it_be(:group_2, reload: true) { create(:group, name: 'group-2') }
+  let_it_be(:group_3, reload: true) { create(:group, name: 'group-3') }
+  let_it_be(:group_4, reload: true) { create(:group, name: 'group-4') }
 
-  set(:subgroup_1) { create(:group, parent: group_1, name: 'subgroup-1') }
-  set(:subgroup_2) { create(:group, parent: group_2, name: 'subgroup-2') }
-  set(:subgroup_3) { create(:group, parent: group_3, name: 'subgroup-3') }
+  let_it_be(:subgroup_1) { create(:group, parent: group_1, name: 'subgroup-1') }
+  let_it_be(:subgroup_2) { create(:group, parent: group_2, name: 'subgroup-2') }
+  let_it_be(:subgroup_3) { create(:group, parent: group_3, name: 'subgroup-3') }
 
-  set(:subgroup_4) { create(:group, parent: group_1, name: 'subgroup-4') }
-  set(:subgroup_5) { create(:group, parent: subgroup_4, name: 'subgroup-5') }
+  let_it_be(:subgroup_4, reload: true) { create(:group, parent: group_1, name: 'subgroup-4') }
+  let_it_be(:subgroup_5) { create(:group, parent: subgroup_4, name: 'subgroup-5') }
 
   before do
     group_1.update!(custom_project_templates_group_id: subgroup_1.id)

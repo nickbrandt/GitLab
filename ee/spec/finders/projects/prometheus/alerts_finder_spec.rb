@@ -7,15 +7,15 @@ describe Projects::Prometheus::AlertsFinder do
   let(:params) { {} }
 
   describe 'with params' do
-    set(:project) { create(:project) }
-    set(:other_project) { create(:project) }
-    set(:other_env) { create(:environment, project: other_project) }
-    set(:production) { create(:environment, project: project) }
-    set(:staging) { create(:environment, project: project) }
-    set(:alert) { create_alert(project, production) }
-    set(:alert2) { create_alert(project, production) }
-    set(:stg_alert) { create_alert(project, staging) }
-    set(:other_alert) { create_alert(other_project, other_env) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:other_project) { create(:project) }
+    let_it_be(:other_env) { create(:environment, project: other_project) }
+    let_it_be(:production) { create(:environment, project: project) }
+    let_it_be(:staging) { create(:environment, project: project) }
+    let_it_be(:alert) { create_alert(project, production) }
+    let_it_be(:alert2) { create_alert(project, production) }
+    let_it_be(:stg_alert) { create_alert(project, staging) }
+    let_it_be(:other_alert) { create_alert(other_project, other_env) }
 
     describe '#execute' do
       subject { finder.execute }
