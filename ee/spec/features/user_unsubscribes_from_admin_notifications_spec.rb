@@ -3,8 +3,8 @@
 require "spec_helper"
 
 describe "Admin unsubscribes from notification" do
-  set(:user) { create(:user) }
-  set(:urlsafe_email) { Base64.urlsafe_encode64(user.email) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:urlsafe_email) { Base64.urlsafe_encode64(user.email) }
 
   before do
     sign_in(user)

@@ -5,7 +5,7 @@ require 'spec_helper'
 describe '[EE] Public Project Access' do
   include AccessMatchers
 
-  set(:project) { create(:project, :public, :repository) }
+  let_it_be(:project) { create(:project, :public, :repository) }
 
   describe 'GET /:project_path/insights' do
     before do

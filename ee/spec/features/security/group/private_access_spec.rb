@@ -5,9 +5,9 @@ require 'spec_helper'
 describe '[EE] Private Group access' do
   include AccessMatchers
 
-  set(:group)   { create(:group, :private) }
-  set(:project) { create(:project, :private, group: group) }
-  set(:project_guest) do
+  let_it_be(:group)   { create(:group, :private) }
+  let_it_be(:project) { create(:project, :private, group: group) }
+  let_it_be(:project_guest) do
     create(:user) do |user|
       project.add_guest(user)
     end

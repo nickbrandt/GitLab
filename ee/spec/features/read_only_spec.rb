@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'Geo read-only message', :geo do
   include ::EE::GeoHelpers
 
-  set(:user) { create(:user) }
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   before do
     sign_in(user)

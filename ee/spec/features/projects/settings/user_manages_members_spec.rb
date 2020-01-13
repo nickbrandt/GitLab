@@ -3,9 +3,9 @@
 require "spec_helper"
 
 describe "User manages members" do
-  set(:group) { create(:group) }
-  set(:project) { create(:project, namespace: group) }
-  set(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, namespace: group) }
+  let_it_be(:user) { create(:user) }
 
   before do
     sign_in(user)

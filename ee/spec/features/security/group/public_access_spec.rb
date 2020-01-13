@@ -5,9 +5,9 @@ require 'spec_helper'
 describe '[EE] Public Group access' do
   include AccessMatchers
 
-  set(:group)   { create(:group, :public) }
-  set(:project) { create(:project, :public, group: group) }
-  set(:project_guest) do
+  let_it_be(:group)   { create(:group, :public) }
+  let_it_be(:project) { create(:project, :public, group: group) }
+  let_it_be(:project_guest) do
     create(:user) do |user|
       project.add_guest(user)
     end
