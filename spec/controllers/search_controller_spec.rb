@@ -106,8 +106,8 @@ describe SearchController do
 
       context 'check search term length' do
         let(:search_queries) do
-          char_limit = controller.class::NON_ES_SEARCH_CHAR_LIMIT
-          term_limit = controller.class::NON_ES_SEARCH_TERM_LIMIT
+          char_limit = SearchService::SEARCH_CHAR_LIMIT
+          term_limit = SearchService::SEARCH_TERM_LIMIT
           {
             chars_under_limit: ('a' * (char_limit - 1)),
             chars_over_limit: ('a' * (char_limit + 1)),
