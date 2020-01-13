@@ -14130,10 +14130,10 @@ msgstr ""
 msgid "ProjectSettings|Build, test, and deploy your changes"
 msgstr ""
 
-msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
+msgid "ProjectSettings|Choose your merge method, merge options, merge checks, and merge suggestions."
 msgstr ""
 
-msgid "ProjectSettings|Choose your merge method, merge options, merge checks, and set up a default description template for merge requests."
+msgid "ProjectSettings|Choose your merge method, merge options, merge checks, merge suggestions, and set up a default description template for merge requests."
 msgstr ""
 
 msgid "ProjectSettings|Contact an admin to change this setting."
@@ -14217,6 +14217,9 @@ msgstr ""
 msgid "ProjectSettings|Merge requests"
 msgstr ""
 
+msgid "ProjectSettings|Merge suggestions"
+msgstr ""
+
 msgid "ProjectSettings|No merge commits are created"
 msgstr ""
 
@@ -14266,6 +14269,12 @@ msgid "ProjectSettings|Snippets"
 msgstr ""
 
 msgid "ProjectSettings|Submit changes to be merged upstream"
+msgstr ""
+
+msgid "ProjectSettings|The commit message used to apply merge request suggestions"
+msgstr ""
+
+msgid "ProjectSettings|The variables GitLab supports:"
 msgstr ""
 
 msgid "ProjectSettings|These checks must pass before merge requests can be merged"
