@@ -71,6 +71,23 @@ FactoryBot.define do
       version.actions.reset
     end
 
+    # Use this trait to build versions with designs that are backed by Git LFS, committed
+    # to the repository, and with an LfsObject correctly created for it.
+    trait :with_lfs_file do
+      committed
+
+      transient do
+        raw_file { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
+        lfs_pointer { Gitlab::Git::LfsPointerFile.new(SecureRandom.random_bytes) }
+        file { lfs_pointer.pointer }
+      end
+
+      after :create do |version, evaluator|
+        lfs_object = create(:lfs_object, file: evaluator.raw_file, oid: evaluator.lfs_pointer.sha256, size: evaluator.lfs_pointer.size)
+        create(:lfs_objects_project, project: version.project, lfs_object: lfs_object, repository_type: :design)
+      end
+    end
+
     # This trait is for versions that must be present in the git repository.
     trait :committed do
       transient do

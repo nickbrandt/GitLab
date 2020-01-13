@@ -14,7 +14,7 @@ describe LfsObject do
       end
     end
 
-    describe 'for_oids' do
+    describe '.for_oids' do
       it 'returns the correct LfsObjects' do
         lfs_object_1, lfs_object_2 = create_list(:lfs_object, 2)
 
