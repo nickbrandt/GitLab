@@ -196,4 +196,34 @@ describe Clusters::Applications::Knative do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:hostname) }
   end
+
+  describe '#available_domains' do
+    let!(:domain) { create(:pages_domain, :instance_serverless) }
+
+    it 'returns all instance serverless domains' do
+      expect(PagesDomain).to receive(:instance_serverless).and_call_original
+
+      domains = subject.available_domains
+
+      expect(domains.length).to eq(1)
+      expect(domains).to include(domain)
+    end
+  end
+
+  describe '#find_available_domain' do
+    let!(:domain) { create(:pages_domain, :instance_serverless) }
+
+    it 'returns the domain scoped to available domains' do
+      expect(subject).to receive(:available_domains).and_call_original
+      expect(subject.find_available_domain(domain.id)).to eq(domain)
+    end
+  end
+
+  describe '#pages_domain' do
+    let!(:sdc) { create(:serverless_domain_cluster, knative: knative) }
+
+    it 'returns the the associated pages domain' do
+      expect(knative.reload.pages_domain).to eq(sdc.pages_domain)
+    end
+  end
 end
