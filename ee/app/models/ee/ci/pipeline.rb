@@ -51,7 +51,7 @@ module EE
 
         state_machine :status do
           after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
-            next unless pipeline.has_reports?(::Ci::JobArtifact.security_reports.or(::Ci::JobArtifact.license_management_reports))
+            next unless pipeline.has_reports?(::Ci::JobArtifact.security_reports.or(::Ci::JobArtifact.license_scanning_reports))
 
             pipeline.run_after_commit do
               StoreSecurityReportsWorker.perform_async(pipeline.id) if pipeline.default_branch?
@@ -134,7 +134,7 @@ module EE
 
       def license_scanning_report
         ::Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |license_management_report|
-          builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
+          builds.latest.with_reports(::Ci::JobArtifact.license_scanning_reports).each do |build|
             build.collect_license_scanning_reports!(license_management_report)
           end
         end
@@ -145,7 +145,7 @@ module EE
           builds.latest.with_reports(::Ci::JobArtifact.dependency_list_reports).each do |build|
             build.collect_dependency_list_reports!(dependency_list_report)
           end
-          builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
+          builds.latest.with_reports(::Ci::JobArtifact.license_scanning_reports).each do |build|
             build.collect_licenses_for_dependency_list!(dependency_list_report)
           end
         end
