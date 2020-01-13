@@ -60,9 +60,24 @@ describe LicenseHelper do
     end
   end
 
-  describe '#active_user_count' do
-    it 'returns the number of active users' do
-      expect(active_user_count).to eq(User.active.count)
+  describe '#current_active_user_count' do
+    let(:license) { create(:license) }
+
+    context 'when there is a license' do
+      it 'returns License#current_active_users_count' do
+        allow(License).to receive(:current).and_return(license)
+
+        expect(license).to receive(:current_active_users_count).and_return(311)
+        expect(current_active_user_count).to eq(311)
+      end
+    end
+
+    context 'when there is NOT a license' do
+      it 'returns the number of active users' do
+        allow(License).to receive(:current).and_return(nil)
+
+        expect(current_active_user_count).to eq(User.active.count)
+      end
     end
   end
 
