@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Ci::Bridge do
   set(:project) { create(:project) }
+  set(:target_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'my')) }
   set(:pipeline) { create(:ci_pipeline, project: project) }
 
   let(:bridge) do
@@ -157,10 +158,10 @@ describe Ci::Bridge do
     end
   end
 
-  describe '#target_project_path' do
+  describe '#target_project' do
     context 'when trigger is defined' do
       it 'returns a full path of a project' do
-        expect(bridge.target_project_path).to eq 'my/project'
+        expect(bridge.target_project).to eq target_project
       end
     end
 
@@ -168,7 +169,7 @@ describe Ci::Bridge do
       let(:options) { { trigger: {} } }
 
       it 'returns nil' do
-        expect(bridge.target_project_path).to be_nil
+        expect(bridge.target_project).to be_nil
       end
     end
   end
@@ -287,6 +288,63 @@ describe Ci::Bridge do
       expect(bridge.metadata).to be_a Ci::BuildMetadata
       expect(bridge.read_attribute(:options)).to be_nil
       expect(bridge.metadata.config_options).to be bridge.options
+    end
+  end
+
+  describe '#triggers_child_pipeline?' do
+    subject { bridge.triggers_child_pipeline? }
+
+    context 'when bridge defines a downstream YAML' do
+      let(:options) do
+        {
+          trigger: {
+            include: 'path/to/child.yml'
+          }
+        }
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when bridge does not define a downstream YAML' do
+      let(:options) do
+        {
+          trigger: {
+            project: project.full_path
+          }
+        }
+      end
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#yaml_for_downstream' do
+    subject { bridge.yaml_for_downstream }
+
+    context 'when bridge defines a downstream YAML' do
+      let(:options) do
+        {
+          trigger: {
+            include: 'path/to/child.yml'
+          }
+        }
+      end
+
+      let(:yaml) do
+        <<~EOY
+          ---
+          include: path/to/child.yml
+        EOY
+      end
+
+      it { is_expected.to eq yaml }
+    end
+
+    context 'when bridge does not define a downstream YAML' do
+      let(:options) { {} }
+
+      it { is_expected.to be_nil }
     end
   end
 end
