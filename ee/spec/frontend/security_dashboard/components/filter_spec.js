@@ -86,21 +86,19 @@ describe('Filter component', () => {
         });
       });
 
-      it('should keep the menu open after clicking on an item', done => {
+      it('should keep the menu open after clicking on an item', () => {
         expect(isDropdownOpen()).toBe(true);
         wrapper.find('.dropdown-item').trigger('click');
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick().then(() => {
           expect(isDropdownOpen()).toBe(true);
-          done();
         });
       });
 
-      it('should close the menu when the close button is clicked', done => {
+      it('should close the menu when the close button is clicked', () => {
         expect(isDropdownOpen()).toBe(true);
         wrapper.find({ ref: 'close' }).trigger('click');
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick().then(() => {
           expect(isDropdownOpen()).toBe(false);
-          done();
         });
       });
     });
@@ -109,10 +107,10 @@ describe('Filter component', () => {
   describe('Project', () => {
     describe('when there are lots of projects', () => {
       const lots = 30;
-      beforeEach(done => {
+      beforeEach(() => {
         createWrapper({ filterId: 'project_id', dashboardDocumentation: '' });
         setProjectsCount(lots);
-        wrapper.vm.$nextTick(done);
+        return wrapper.vm.$nextTick();
       });
 
       it('should display a search box', () => {
@@ -123,13 +121,12 @@ describe('Filter component', () => {
         expect(wrapper.findAll('.dropdown-item').length).toBe(lots);
       });
 
-      it('should show only matching projects when a search term is entered', done => {
+      it('should show only matching projects when a search term is entered', () => {
         const input = findSearchInput();
         input.vm.$el.value = '0';
         input.vm.$el.dispatchEvent(new Event('input'));
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick().then(() => {
           expect(wrapper.findAll('.dropdown-item').length).toBe(3);
-          done();
         });
       });
     });
