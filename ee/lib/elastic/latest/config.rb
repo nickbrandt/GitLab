@@ -21,7 +21,7 @@ module Elastic
             analyzer: {
               default: {
                 tokenizer: 'standard',
-                filter: %w(standard lowercase my_stemmer)
+                filter: %w(lowercase my_stemmer)
               },
               my_ngram_analyzer: {
                 tokenizer: 'my_ngram_tokenizer',
