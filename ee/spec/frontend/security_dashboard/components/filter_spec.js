@@ -2,6 +2,7 @@ import Vuex from 'vuex';
 import Filter from 'ee/security_dashboard/components/filter.vue';
 import createStore from 'ee/security_dashboard/store';
 import { mount, createLocalVue } from '@vue/test-utils';
+import stubChildren from 'helpers/stub_children';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -11,7 +12,16 @@ describe('Filter component', () => {
   let store;
 
   const createWrapper = propsData => {
-    wrapper = mount(Filter, { attachToDocument: true, propsData, store });
+    wrapper = mount(Filter, {
+      stubs: {
+        ...stubChildren(Filter),
+        GlDropdown: false,
+        GlSearchBoxByType: false,
+      },
+      attachToDocument: true,
+      propsData,
+      store,
+    });
   };
 
   function isDropdownOpen() {
