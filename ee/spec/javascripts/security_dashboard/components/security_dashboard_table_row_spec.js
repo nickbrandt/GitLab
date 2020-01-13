@@ -3,11 +3,12 @@ import component from 'ee/security_dashboard/components/security_dashboard_table
 import createStore from 'ee/security_dashboard/store';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import mockDataVulnerabilities from '../store/vulnerabilities/data/mock_data_vulnerabilities.json';
+import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 
 describe('Security Dashboard Table Row', () => {
   let vm;
   let props;
-  const store = createStore();
+  let store = createStore();
   const Component = Vue.extend(component);
 
   describe('when loading', () => {
@@ -40,7 +41,7 @@ describe('Security Dashboard Table Row', () => {
   });
 
   describe('when loaded', () => {
-    const vulnerability = mockDataVulnerabilities[0];
+    let vulnerability = mockDataVulnerabilities[0];
 
     beforeEach(() => {
       props = { vulnerability };
@@ -76,7 +77,7 @@ describe('Security Dashboard Table Row', () => {
 
       it('should render the project namespace', () => {
         expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
-          props.vulnerability.project.full_name,
+          props.vulnerability.location.file,
         );
       });
 
@@ -88,6 +89,46 @@ describe('Security Dashboard Table Row', () => {
         expect(vm.$store.dispatch).toHaveBeenCalledWith('vulnerabilities/openModal', {
           vulnerability,
         });
+      });
+    });
+
+    describe('Group Security Dashboard', () => {
+      beforeEach(() => {
+        store = createStore({
+          dashboardType: DASHBOARD_TYPES.GROUP,
+        });
+        props = { vulnerability };
+        vm = mountComponentWithStore(Component, { store, props });
+      });
+
+      afterEach(() => {
+        vm.$destroy();
+      });
+
+      it('should contain project name as the namespace', () => {
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+          props.vulnerability.project.full_name,
+        );
+      });
+    });
+
+    describe('Non-group Security Dashboard', () => {
+      beforeEach(() => {
+        store = createStore();
+        // eslint-disable-next-line prefer-destructuring
+        vulnerability = mockDataVulnerabilities[7];
+        props = { vulnerability };
+        vm = mountComponentWithStore(Component, { store, props });
+      });
+
+      afterEach(() => {
+        vm.$destroy();
+      });
+
+      it('should contain container image as the namespace', () => {
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+          props.vulnerability.location.image,
+        );
       });
     });
   });

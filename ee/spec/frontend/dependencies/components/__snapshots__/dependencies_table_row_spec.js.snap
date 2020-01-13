@@ -163,7 +163,7 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
             size="16"
           />
           
-          7 vulnerabilities
+          8 vulnerabilities
         
         </gl-button-stub>
       </div>

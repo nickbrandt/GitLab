@@ -28,3 +28,10 @@ export const REPORT_TYPES = {
   dependency_scanning: s__('ciReport|Dependency Scanning'),
   sast: s__('ciReport|SAST'),
 };
+
+export const DASHBOARD_TYPES = {
+  PROJECT: 'project',
+  PIPELINE: 'pipeline',
+  GROUP: 'group',
+  INSTANCE: 'instance',
+};
