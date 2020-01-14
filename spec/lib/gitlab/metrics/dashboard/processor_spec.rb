@@ -87,7 +87,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
         end
       end
 
-      context 'when sample metrics are present' do
+      context 'when sample_metrics are requested' do
         let(:process_params) { [project, dashboard_yml, sequence, { environment: environment, sample_metrics: true }] }
 
         it 'includes a sample metrics path for the prometheus endpoint with each metric' do
