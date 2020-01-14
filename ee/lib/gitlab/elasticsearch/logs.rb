@@ -90,7 +90,7 @@ module Gitlab
 
       def filter_times(query, start_time, end_time)
         return unless start_time && end_time
-        
+
         query[:bool][:filter] = [
           range: {
            :@timestamp => {
