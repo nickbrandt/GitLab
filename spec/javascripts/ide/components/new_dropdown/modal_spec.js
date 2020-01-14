@@ -132,9 +132,19 @@ describe('new file modal component', () => {
 
       vm = createComponentWithStore(Component, store).$mount();
       const flashSpy = spyOnDependency(modal, 'flash');
+
+      expect(flashSpy).not.toHaveBeenCalled();
+
       vm.submitForm();
 
-      expect(flashSpy).toHaveBeenCalled();
+      expect(flashSpy).toHaveBeenCalledWith(
+        'The name "test-path/test" is already taken in this directory.',
+        'alert',
+        jasmine.anything(),
+        null,
+        false,
+        true,
+      );
     });
   });
 });

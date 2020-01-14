@@ -356,7 +356,9 @@ describe('Multi-file store actions', () => {
             type: 'blob',
           })
           .then(() => {
-            expect(document.querySelector('.flash-alert')).not.toBeNull();
+            expect(document.querySelector('.flash-alert')?.textContent.trim()).toEqual(
+              `The name "${f.name}" is already taken in this directory.`,
+            );
 
             done();
           })

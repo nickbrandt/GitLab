@@ -67,8 +67,8 @@ export default {
       if (this.entryModal.type === modalTypes.rename) {
         if (this.entries[this.entryName] && !this.entries[this.entryName].deleted) {
           flash(
-            sprintf(s__('The name %{entryName} is already taken in this directory.'), {
-              entryName: this.entryName,
+            sprintf(s__('The name "%{name}" is already taken in this directory.'), {
+              name: this.entryName,
             }),
             'alert',
             document,

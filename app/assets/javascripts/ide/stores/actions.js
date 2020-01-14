@@ -72,7 +72,9 @@ export const createTempEntry = (
 
   if (state.entries[name] && !state.entries[name].deleted) {
     flash(
-      `The name "${name.split('/').pop()}" is already taken in this directory.`,
+      sprintf(__('The name "%{name}" is already taken in this directory.'), {
+        name: name.split('/').pop(),
+      }),
       'alert',
       document,
       null,
