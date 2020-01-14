@@ -796,6 +796,7 @@ A footnote reference tag looks like this:[^1]
 Reference tags can use letters and other characters.[^footnote-note]
 
 [^footnote-note]: Avoid using lowercase `w` or an underscore (`_`) in your tag name until until an [upstream bug](https://gitlab.com/gitlab-org/gitlab/issues/24423) is resolved.
+
 ### Headers
 
 ```markdown
