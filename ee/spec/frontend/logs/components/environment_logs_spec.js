@@ -14,6 +14,7 @@ import {
   mockTrace,
   mockPodName,
   mockEnvironmentsEndpoint,
+  mockDocumentationPath,
 } from '../mock_data';
 
 jest.mock('~/lib/utils/scroll_utils');
@@ -28,6 +29,7 @@ describe('EnvironmentLogs', () => {
     projectFullPath: mockProjectPath,
     environmentName: mockEnvName,
     environmentsPath: mockEnvironmentsEndpoint,
+    clusterApplicationsDocumentationPath: mockDocumentationPath,
   };
 
   const actionMocks = {
@@ -168,12 +170,37 @@ describe('EnvironmentLogs', () => {
     });
   });
 
+  describe('ES enabled and legacy environment', () => {
+    beforeEach(() => {
+      state.pods.options = [];
+
+      state.logs.lines = [];
+      state.logs.isLoading = false;
+
+      state.environments.options = [];
+      state.environments.isLoading = false;
+
+      state.enableAdvancedQuerying = false;
+
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = true;
+
+      initWrapper();
+    });
+
+    it('displays a disabled search bar', () => {
+      expect(findSearchBar().exists()).toEqual(true);
+      expect(findSearchBar().attributes('disabled')).toEqual('true');
+    });
+  });
+
   describe('state with data', () => {
     beforeEach(() => {
       actionMocks.setInitData.mockImplementation(() => {
         state.pods.options = mockPods;
         state.environments.current = mockEnvName;
         [state.pods.current] = state.pods.options;
+        state.enableAdvancedQuerying = true;
 
         state.logs.isComplete = false;
         state.logs.lines = mockLogsResult;
@@ -233,7 +260,7 @@ describe('EnvironmentLogs', () => {
       expect(trace.text().split('\n')).toEqual(mockTrace);
     });
 
-    it('displays the search bar', () => {
+    it('displays an enabled search bar', () => {
       expect(findSearchBar().exists()).toEqual(true);
       expect(findSearchBar().attributes('disabled')).toEqual(undefined);
       expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-4');

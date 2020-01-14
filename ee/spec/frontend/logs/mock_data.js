@@ -2,6 +2,8 @@ export const mockProjectPath = 'root/autodevops-deploy';
 export const mockEnvName = 'production';
 export const mockEnvironmentsEndpoint = `${mockProjectPath}/environments.json`;
 export const mockEnvId = '99';
+export const mockEnableAdvancedQuerying = true;
+export const mockDocumentationPath = '/documentation.md';
 
 const makeMockEnvironment = (id, name) => ({
   id,

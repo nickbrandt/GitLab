@@ -85,7 +85,8 @@ module EE
         private
 
         def pod_logs(pod_name, namespace, container: nil, search: nil)
-          logs = if ::Feature.enabled?(:enable_cluster_application_elastic_stack) && elastic_stack_client
+          enable_advanced_querying = ::Feature.enabled?(:enable_cluster_application_elastic_stack) && !!elastic_stack_client
+          logs = if enable_advanced_querying
                    elastic_stack_pod_logs(namespace, pod_name, container, search)
                  else
                    platform_pod_logs(namespace, pod_name, container)
@@ -95,7 +96,8 @@ module EE
             logs: logs,
             status: :success,
             pod_name: pod_name,
-            container_name: container
+            container_name: container,
+            enable_advanced_querying: enable_advanced_querying
           }
         end
 

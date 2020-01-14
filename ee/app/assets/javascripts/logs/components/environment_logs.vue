@@ -1,11 +1,12 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
 import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
 export default {
   components: {
+    GlAlert,
     GlDropdown,
     GlDropdownItem,
     GlFormGroup,
@@ -32,20 +33,35 @@ export default {
       required: false,
       default: '',
     },
+    clusterApplicationsDocumentationPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       searchQuery: '',
+      isElasticStackCalloutDismissed: false,
     };
   },
   computed: {
-    ...mapState('environmentLogs', ['environments', 'logs', 'pods']),
+    ...mapState('environmentLogs', ['environments', 'logs', 'pods', 'enableAdvancedQuerying']),
     ...mapGetters('environmentLogs', ['trace']),
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
     },
     featureElasticEnabled() {
       return gon.features && gon.features.enableClusterApplicationElasticStack;
+    },
+    advancedFeaturesEnabled() {
+      return this.featureElasticEnabled && this.enableAdvancedQuerying;
+    },
+    shouldShowElasticStackCallout() {
+      return (
+        !this.isElasticStackCalloutDismissed &&
+        !this.environments.isLoading &&
+        !this.advancedFeaturesEnabled
+      );
     },
   },
   watch: {
@@ -80,6 +96,22 @@ export default {
 </script>
 <template>
   <div class="build-page-pod-logs mt-3">
+    <gl-alert
+      v-if="shouldShowElasticStackCallout"
+      class="mb-3"
+      @dismiss="isElasticStackCalloutDismissed = true"
+    >
+      {{
+        s__(
+          'Environments|Install Elastic Stack on your cluster to enable advanced querying capabilities such as full text search.',
+        )
+      }}
+      <a :href="clusterApplicationsDocumentationPath">
+        <strong>
+          {{ s__('View Documentation') }}
+        </strong>
+      </a>
+    </gl-alert>
     <div class="top-bar js-top-bar d-flex">
       <div class="row">
         <gl-form-group
@@ -138,7 +170,7 @@ export default {
         >
           <gl-search-box-by-click
             v-model.trim="searchQuery"
-            :disabled="environments.isLoading"
+            :disabled="environments.isLoading || !advancedFeaturesEnabled"
             :placeholder="s__('Environments|Search')"
             class="js-logs-search"
             type="search"

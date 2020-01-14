@@ -6999,6 +6999,9 @@ msgstr ""
 msgid "Environments|Environments are places where code gets deployed, such as staging or production."
 msgstr ""
 
+msgid "Environments|Install Elastic Stack on your cluster to enable advanced querying capabilities such as full text search."
+msgstr ""
+
 msgid "Environments|Job"
 msgstr ""
 
@@ -20365,6 +20368,9 @@ msgid "Version"
 msgstr ""
 
 msgid "Very helpful"
+msgstr ""
+
+msgid "View Documentation"
 msgstr ""
 
 msgid "View app"

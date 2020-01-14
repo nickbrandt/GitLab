@@ -14,6 +14,7 @@ describe PodLogsService do
     let(:pods) { [pod_name] }
     let(:container_name) { 'container-1' }
     let(:search) { nil }
+    let(:enable_advanced_querying) { false }
     let(:logs) { ['Log 1', 'Log 2', 'Log 3'] }
     let(:result) { subject.execute }
 
@@ -36,6 +37,7 @@ describe PodLogsService do
         expect(result[:pods]).to eq(pods)
         expect(result[:pod_name]).to eq(response_pod_name)
         expect(result[:container_name]).to eq(container_name)
+        expect(result[:enable_advanced_querying]).to eq(enable_advanced_querying)
       end
     end
 
@@ -61,7 +63,8 @@ describe PodLogsService do
             status: :error,
             error: message,
             pod_name: response_pod_name,
-            container_name: container_name
+            container_name: container_name,
+            enable_advanced_querying: enable_advanced_querying
           })
       end
     end
@@ -74,7 +77,8 @@ describe PodLogsService do
             status: :success,
             logs: ["Log 1", "Log 2", "Log 3"],
             pod_name: response_pod_name,
-            container_name: container_name
+            container_name: container_name,
+            enable_advanced_querying: enable_advanced_querying
           })
       end
     end

@@ -10,6 +10,11 @@ export default () => ({
   search: '',
 
   /**
+   * True if log source is elasticsearch
+   */
+  enableAdvancedQuerying: false,
+
+  /**
    * Environments list information
    */
   environments: {

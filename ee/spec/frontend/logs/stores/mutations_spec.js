@@ -10,6 +10,7 @@ import {
   mockPodName,
   mockLogsResult,
   mockSearch,
+  mockEnableAdvancedQuerying,
 } from '../mock_data';
 
 describe('Logs Store Mutations', () => {
@@ -124,6 +125,17 @@ describe('Logs Store Mutations', () => {
       expect(state.pods.current).toEqual(mockPodName);
     });
   });
+
+  describe('ENABLE_ADVANCED_QUERYING', () => {
+    it('set advanced querying toggle', () => {
+      state.enableAdvancedQuerying = !mockEnableAdvancedQuerying;
+
+      mutations[types.ENABLE_ADVANCED_QUERYING](state, mockEnableAdvancedQuerying);
+
+      expect(state.enableAdvancedQuerying).toEqual(mockEnableAdvancedQuerying);
+    });
+  });
+
   describe('REQUEST_PODS_DATA', () => {
     it('receives log data error and stops loading', () => {
       mutations[types.REQUEST_PODS_DATA](state);
