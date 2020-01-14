@@ -30,6 +30,7 @@
 
 .right-sidebar-collapsed {
   padding-right: 0;
+  width: fit-content;
 
   @include media-breakpoint-up(sm) {
     &:not(.wiki-sidebar):not(.build-sidebar):not(.issuable-bulk-update-sidebar) .content-wrapper {
