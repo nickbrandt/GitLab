@@ -568,6 +568,24 @@ module Ci
           expect(pending_job).to be_running
         end
       end
+
+      context 'when a deployment is invalid' do
+        let!(:pending_job) { create(:ci_build, :pending, pipeline: pipeline) }
+
+        subject { described_class.new(specific_runner).execute }
+
+        before do
+          allow_any_instance_of(Ci::Build).to receive(:has_valid_deployment?).and_return(false)
+        end
+        it 'returns no build and marks it as failed' do
+          expect(subject.build).to be_nil
+
+          pending_job.reload
+
+          expect(pending_job).to be_failed
+          expect(pending_job).to be_invalid_deployment_failure
+        end
+      end
     end
 
     describe '#register_success' do
