@@ -1,0 +1,5 @@
+---
+title: Fixed GitLab admin not seeing merge requests in Jira Development Panel Integration
+merge_request: 21467
+author:
+type: fixed

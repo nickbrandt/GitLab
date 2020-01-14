@@ -5,6 +5,7 @@ require 'spec_helper'
 describe API::V3::Github do
   let(:user) { create(:user) }
   let(:unauthorized_user) { create(:user) }
+  let(:admin) { create(:user, :admin) }
   let!(:project) { create(:project, :repository, creator: user) }
   let!(:project2) { create(:project, :repository, creator: user) }
 
@@ -230,11 +231,32 @@ describe API::V3::Github do
     end
 
     describe 'GET /repos/:namespace/:project/pulls/:id' do
-      it 'returns the requested merge request in github format' do
-        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
+      context 'when user has access to the merge requests' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
+      end
+
+      context 'when user has no access to the merge request' do
+        it 'returns 404' do
+          project.add_guest(unauthorized_user)
+
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", unauthorized_user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when instance admin' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", admin)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
       end
     end
   end
