@@ -502,7 +502,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       end
 
       it_behaves_like 'restores project successfully',
-                      issues: 2,
+                      issues: 3,
                       labels: 2,
                       label_with_priorities: 'A project label',
                       milestones: 2,
@@ -515,7 +515,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
       it 'restores issue states' do
         expect(project.issues.with_state(:closed).count).to eq(1)
-        expect(project.issues.with_state(:opened).count).to eq(1)
+        expect(project.issues.with_state(:opened).count).to eq(2)
       end
     end
 
