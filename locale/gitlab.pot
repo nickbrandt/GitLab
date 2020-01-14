@@ -17338,9 +17338,6 @@ msgstr ""
 msgid "Stage all changes"
 msgstr ""
 
-msgid "Stage changes"
-msgstr ""
-
 msgid "Stage data updated"
 msgstr ""
 
@@ -19696,9 +19693,6 @@ msgid "Unstage"
 msgstr ""
 
 msgid "Unstage all changes"
-msgstr ""
-
-msgid "Unstage changes"
 msgstr ""
 
 msgid "Unstaged"
