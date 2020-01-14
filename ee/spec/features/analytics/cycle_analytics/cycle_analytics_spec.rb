@@ -274,7 +274,7 @@ describe 'Group Cycle Analytics', :js do
       end
 
       it 'will not display the tasks by type chart' do
-        expect(page).not_to have_selector('.tasks-by-type-chart')
+        expect(page).not_to have_selector('.js-tasks-by-type-chart')
 
         expect(page).not_to have_text('Tasks by type')
       end

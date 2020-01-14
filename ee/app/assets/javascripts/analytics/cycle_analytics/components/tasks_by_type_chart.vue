@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     hasData() {
-      return this.chartData && this.chartData.data && this.chartData.data.length;
+      return Boolean(this.chartData?.data?.length);
     },
     selectedFiltersText() {
       const { subject, selectedLabelIds } = this.filters;

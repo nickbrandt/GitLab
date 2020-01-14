@@ -366,7 +366,7 @@ describe('Cycle Analytics component', () => {
           mock.restore();
         });
         it('displays the tasks by type chart', () => {
-          expect(wrapper.find('.tasks-by-type-chart').exists()).toBe(true);
+          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(true);
         });
       });
 
@@ -390,7 +390,7 @@ describe('Cycle Analytics component', () => {
         });
 
         it('does not render the tasks by type chart', () => {
-          expect(wrapper.find('.tasks-by-type-chart').exists()).toBe(false);
+          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(false);
         });
       });
     });

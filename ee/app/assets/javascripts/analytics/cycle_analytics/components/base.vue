@@ -317,7 +317,7 @@ export default {
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
       </template>
       <template v-if="featureFlags.hasTasksByTypeChart">
-        <div class="tasks-by-type-chart">
+        <div class="js-tasks-by-type-chart">
           <div v-if="shouldDisplayTasksByTypeChart">
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
