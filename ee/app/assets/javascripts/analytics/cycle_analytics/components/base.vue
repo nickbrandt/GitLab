@@ -1,5 +1,5 @@
 <script>
-import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
@@ -9,6 +9,7 @@ import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
 import { LAST_ACTIVITY_AT, dateFormats } from '../../shared/constants';
+import DateRange from '../../shared/components/daterange.vue';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
@@ -17,13 +18,13 @@ import TasksByTypeChart from './tasks_by_type_chart.vue';
 export default {
   name: 'CycleAnalytics',
   components: {
+    DateRange,
     GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
     StageTable,
-    GlDaterangePicker,
     StageDropdownFilter,
     Scatterplot,
     TasksByTypeChart,
@@ -88,18 +89,6 @@ export default {
     },
     shouldDisplayTasksByTypeChart() {
       return !this.isLoading && !this.isLoadingTasksByTypeChart;
-    },
-
-    dateRange: {
-      get() {
-        return { startDate: this.startDate, endDate: this.endDate };
-      },
-      set({ startDate, endDate }) {
-        this.setDateRange({
-          startDate,
-          endDate,
-        });
-      },
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -227,14 +216,11 @@ export default {
           v-if="shouldDisplayFilters"
           class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
         >
-          <gl-daterange-picker
-            v-model="dateRange"
-            class="d-flex flex-column flex-lg-row js-daterange-picker"
-            :default-start-date="startDate"
-            :default-end-date="endDate"
-            start-picker-class="d-flex flex-column flex-lg-row align-items-lg-center mr-lg-2"
-            end-picker-class="d-flex flex-column flex-lg-row align-items-lg-center"
-            theme="animate-picker"
+          <date-range
+            :start-date="startDate"
+            :end-date="endDate"
+            class="js-daterange-picker"
+            @change="setDateRange"
           />
         </div>
       </div>
