@@ -773,7 +773,7 @@ do*this*and*do*that*and*another thing
 
 ### Footnotes
 
-Footnotes add a link to a note that  will be rendered at the end of a Markdown file.
+Footnotes add a link to a note that will be rendered at the end of a Markdown file.
 
 To make a footnote, you need both a reference tag and a separate line (anywhere in the file) with the note content.
 
@@ -786,7 +786,7 @@ A footnote reference tag looks like this:[^1]
 
 Reference tags can use letters and other characters.[^footnote-note]
 
-[^footnote-note]: Unfortunately, an upstream bug causes rendering failure for tags that include lowercase 'w' (see issue #24423).
+[^footnote-note]: Avoid using lowercase `w` or an underscore (`_`) in your tag name until until an [upstream bug](https://gitlab.com/gitlab-org/gitlab/issues/24423) is resolved.
 ```
 
 A footnote reference tag looks like this:[^1]
@@ -795,8 +795,7 @@ A footnote reference tag looks like this:[^1]
 
 Reference tags can use letters and other characters.[^footnote-note]
 
-[^footnote-note]: Unfortunately, an upstream bug causes rendering failure for tags that include lowercase 'w' (see issue #24423).
-
+[^footnote-note]: Avoid using lowercase `w` or an underscore (`_`) in your tag name until until an [upstream bug](https://gitlab.com/gitlab-org/gitlab/issues/24423) is resolved.
 ### Headers
 
 ```markdown
