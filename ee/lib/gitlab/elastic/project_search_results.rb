@@ -24,9 +24,9 @@ module Gitlab
         when 'notes'
           notes.page(page).per(per_page).records
         when 'blobs'
-          blobs.page(page).per(per_page)
+          blobs(page: page, per_page: per_page)
         when 'wiki_blobs'
-          wiki_blobs.page(page).per(per_page)
+          wiki_blobs(page: page, per_page: per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
         when 'users'
@@ -42,7 +42,7 @@ module Gitlab
 
       private
 
-      def blobs
+      def blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :download_code, project)
 
         if project.empty_repo? || query.blank?
@@ -50,11 +50,11 @@ module Gitlab
         else
           # We use elastic for default branch only
           if root_ref?
-            project.repository.elastic_search(
+            project.repository.__elasticsearch__.elastic_search_as_found_blob(
               query,
-              type: :blob,
-              options: { highlight: true }
-            )[:blobs][:results].response
+              page: (page || 1).to_i,
+              per: per_page
+            )
           else
             Kaminari.paginate_array(
               Gitlab::FileFinder.new(project, repository_ref).find(query)
@@ -63,15 +63,15 @@ module Gitlab
         end
       end
 
-      def wiki_blobs
+      def wiki_blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :read_wiki, project)
 
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
-          project.wiki.elastic_search(
+          project.wiki.__elasticsearch__.elastic_search_as_wiki_page(
             query,
-            type: :wiki_blob,
-            options: { highlight: true }
-          )[:wiki_blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page
+          )
         else
           Kaminari.paginate_array([])
         end
