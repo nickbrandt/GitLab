@@ -1,0 +1,6 @@
+---
+title: Pending (unsubmitted) review comments with multiple lines now display whitespace
+  before being submitted
+merge_request: 21435
+author:
+type: fixed
