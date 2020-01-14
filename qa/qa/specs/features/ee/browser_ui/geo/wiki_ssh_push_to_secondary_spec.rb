@@ -47,7 +47,7 @@ module QA
 
           Page::Profile::SSHKeys.perform do |ssh|
             expect(ssh.keys_list).to have_content(key_title)
-            expect(ssh.keys_list).to have_content(key.fingerprint)
+            expect(ssh.keys_list).to have_content(key.md5_fingerprint)
           end
 
           Page::Main::Menu.perform(&:go_to_projects)
