@@ -303,7 +303,7 @@ describe('Design management index page', () => {
     });
   });
 
-  describe('on latest version', () => {
+  describe('on latest version when has designs', () => {
     beforeEach(() => {
       createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
     });
@@ -312,13 +312,10 @@ describe('Design management index page', () => {
       expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
     });
 
-    it('renders Delete selected button', () => {
-      expect(findDeleteButton().exists()).toBe(true);
-    });
-
-    it('renders a button with Select all text', () => {
-      expect(findSelectAllButton().exists()).toBe(true);
-      expect(findSelectAllButton().text()).toBe('Select all');
+    it('renders toolbar buttons', () => {
+      expect(findToolbar().exists()).toBe(true);
+      expect(findToolbar().classes()).toContain('d-flex');
+      expect(findToolbar().classes()).not.toContain('d-none');
     });
 
     it('adds two designs to selected designs when their checkboxes are checked', () => {
@@ -373,6 +370,11 @@ describe('Design management index page', () => {
           expect(wrapper.vm.selectedDesigns).toEqual([]);
         });
     });
+  });
+
+  it('on latest version when has no designs does not render toolbar buttons', () => {
+    createComponent({ designs: [], allVersions: [mockVersion] });
+    expect(findToolbar().exists()).toBe(false);
   });
 
   describe('on non-latest version', () => {

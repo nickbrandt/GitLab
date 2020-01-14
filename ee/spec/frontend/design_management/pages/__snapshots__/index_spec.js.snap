@@ -69,7 +69,7 @@ exports[`Design management index page designs renders designs list and header wi
       <design-version-dropdown-stub />
        
       <div
-        class="d-flex qa-selector-toolbar"
+        class="qa-selector-toolbar d-flex"
       >
         <gl-button-stub
           class="mr-2 js-select-all"
