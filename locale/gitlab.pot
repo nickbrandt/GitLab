@@ -332,6 +332,12 @@ msgstr ""
 msgid "%{openOrClose} %{noteable}"
 msgstr ""
 
+msgid "%{openedEpics} open, %{closedEpics} closed"
+msgstr ""
+
+msgid "%{openedIssues} open, %{closedIssues} closed"
+msgstr ""
+
 msgid "%{percent}%% complete"
 msgstr ""
 
@@ -7120,9 +7126,6 @@ msgid "Epics and Issues"
 msgstr ""
 
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
-msgstr ""
-
-msgid "Epics|%{epicsCount} epics and %{issuesCount} issues"
 msgstr ""
 
 msgid "Epics|Add an epic"

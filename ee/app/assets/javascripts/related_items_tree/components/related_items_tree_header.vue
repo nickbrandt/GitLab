@@ -1,10 +1,9 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlTooltip } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
-import { sprintf, s__ } from '~/locale';
 
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -14,19 +13,11 @@ export default {
   components: {
     Icon,
     GlButton,
+    GlTooltip,
     EpicActionsSplitButton,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
   },
   computed: {
     ...mapState(['parentItem', 'descendantCounts']),
-    badgeTooltip() {
-      return sprintf(s__('Epics|%{epicsCount} epics and %{issuesCount} issues'), {
-        epicsCount: this.totalEpicsCount,
-        issuesCount: this.totalIssuesCount,
-      });
-    },
     totalEpicsCount() {
       return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
     },
@@ -59,11 +50,31 @@ export default {
 <template>
   <div class="card-header d-flex px-2">
     <div class="d-inline-flex flex-grow-1 lh-100 align-middle">
-      <div
-        v-gl-tooltip.hover:tooltipcontainer.bottom
-        class="issue-count-badge"
-        :title="badgeTooltip"
-      >
+      <gl-tooltip :target="() => $refs.countBadge">
+        <p class="font-weight-bold m-0">
+          {{ __('Epics') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openedEpics} open, %{closedEpics} closed'), {
+                openedEpics: descendantCounts.openedEpics,
+                closedEpics: descendantCounts.closedEpics,
+              })
+            }}
+          </span>
+        </p>
+        <p class="font-weight-bold m-0">
+          {{ __('Issues') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openedIssues} open, %{closedIssues} closed'), {
+                openedIssues: descendantCounts.openedIssues,
+                closedIssues: descendantCounts.closedIssues,
+              })
+            }}
+          </span>
+        </p>
+      </gl-tooltip>
+      <div ref="countBadge" class="issue-count-badge">
         <span class="d-inline-flex align-items-center">
           <icon :size="16" name="epic" class="text-secondary mr-1" />
           {{ totalEpicsCount }}
