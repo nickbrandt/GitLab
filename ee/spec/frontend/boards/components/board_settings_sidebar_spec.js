@@ -110,6 +110,20 @@ describe('BoardSettingsSideBar', () => {
     });
 
     describe('when activeListId is greater than zero', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          list_type: 'label',
+        });
+      });
+
+      afterEach(() => {
+        boardsStore.store.removeList(listId);
+      });
+
       it('renders GlDrawer with open false', () => {
         createComponent({ activeListId: 1 });
 
@@ -156,12 +170,8 @@ describe('BoardSettingsSideBar', () => {
         mock.restore();
       });
 
-      it('renders label title', () => {
-        expect(wrapper.find(GlLabel).props('title')).toEqual('');
-      });
-
-      it('renders label background color', () => {
-        expect(wrapper.find(GlLabel).props('backgroundColor')).toEqual('');
+      it('does not render GlLabel', () => {
+        expect(wrapper.find(GlLabel).exists()).toBe(false);
       });
     });
   });

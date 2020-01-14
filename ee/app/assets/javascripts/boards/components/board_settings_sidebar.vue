@@ -44,20 +44,12 @@ export default {
       return this.activeListId > 0;
     },
     activeListLabel() {
-      if (this.activeList) {
-        return this.activeList.label;
-      }
-
-      return { color: '', title: '' };
+      return this.activeList.label;
     },
     activeListWipLimit() {
-      if (this.activeList) {
-        return this.activeList.maxIssueCount === 0
-          ? this.$options.noneText
-          : this.activeList.maxIssueCount;
-      }
-
-      return this.$options.noneText;
+      return this.activeList.maxIssueCount === 0
+        ? this.$options.noneText
+        : this.activeList.maxIssueCount;
     },
   },
   methods: {
@@ -111,7 +103,7 @@ export default {
     @close="closeSidebar"
   >
     <template #header>{{ $options.listSettingsText }}</template>
-    <template>
+    <template v-if="isSidebarOpen">
       <div class="d-flex flex-column align-items-start">
         <label>{{ $options.labelListText }}</label>
         <gl-label
@@ -136,9 +128,9 @@ export default {
           />
           <p v-else class="js-wip-limit bold">{{ activeListWipLimit }}</p>
         </div>
-        <gl-button class="h-100 border-0 gl-line-height-14" variant="link" @click="showInput">
-          {{ $options.editLinkText }}
-        </gl-button>
+        <gl-button class="h-100 border-0 gl-line-height-14" variant="link" @click="showInput">{{
+          $options.editLinkText
+        }}</gl-button>
       </div>
     </template>
   </gl-drawer>
