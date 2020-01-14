@@ -10,6 +10,7 @@ Gitlab.ee do
   ### Monkey patches
 
   Elasticsearch::Model::Response::Records.prepend GemExtensions::Elasticsearch::Model::Response::Records
+  Elasticsearch::Model::Response::Results.prepend GemExtensions::Elasticsearch::Model::Response::Results
   Elasticsearch::Model::Adapter::Multiple::Records.prepend GemExtensions::Elasticsearch::Model::Adapter::Multiple::Records
   Elasticsearch::Model::Indexing::InstanceMethods.prepend GemExtensions::Elasticsearch::Model::Indexing::InstanceMethods
   Elasticsearch::Model::Adapter::ActiveRecord::Importing.prepend GemExtensions::Elasticsearch::Model::Adapter::ActiveRecord::Importing
