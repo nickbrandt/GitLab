@@ -11,6 +11,11 @@ export default {
     state.search = searchQuery;
   },
 
+  /** Log source supports advanced features */
+  [types.ENABLE_ADVANCED_QUERYING](state, enableAdvancedQuerying) {
+    state.enableAdvancedQuerying = enableAdvancedQuerying;
+  },
+
   /** Environments data */
   [types.SET_PROJECT_ENVIRONMENT](state, environmentName) {
     state.environments.current = environmentName;

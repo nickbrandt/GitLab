@@ -23,6 +23,7 @@ import {
   mockLogsResult,
   mockEnvName,
   mockSearch,
+  mockEnableAdvancedQuerying,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -143,6 +144,7 @@ describe('Logs Store actions', () => {
           pod_name: mockPodName,
           pods: mockPods,
           logs: mockLogsResult,
+          enable_advanced_querying: mockEnableAdvancedQuerying,
         });
 
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
@@ -154,6 +156,7 @@ describe('Logs Store actions', () => {
         [
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
+          { type: types.ENABLE_ADVANCED_QUERYING, payload: mockEnableAdvancedQuerying },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
@@ -180,6 +183,7 @@ describe('Logs Store actions', () => {
           pod_name: mockPodName,
           pods: mockPods,
           logs: mockLogsResult,
+          enable_advanced_querying: mockEnableAdvancedQuerying,
         });
 
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
@@ -191,6 +195,7 @@ describe('Logs Store actions', () => {
         [
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
+          { type: types.ENABLE_ADVANCED_QUERYING, payload: mockEnableAdvancedQuerying },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
@@ -210,6 +215,7 @@ describe('Logs Store actions', () => {
         pod_name: mockPodName,
         pods: mockPods,
         logs: mockLogsResult,
+        enable_advanced_querying: mockEnableAdvancedQuerying,
       });
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
@@ -220,6 +226,7 @@ describe('Logs Store actions', () => {
         [
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
+          { type: types.ENABLE_ADVANCED_QUERYING, payload: mockEnableAdvancedQuerying },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },

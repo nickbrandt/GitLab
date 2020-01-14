@@ -71,7 +71,8 @@ export const fetchLogs = ({ commit, state }) => {
 
   return requestLogsUntilData(params)
     .then(({ data }) => {
-      const { pod_name, pods, logs } = data;
+      const { pod_name, pods, logs, enable_advanced_querying } = data;
+      commit(types.ENABLE_ADVANCED_QUERYING, enable_advanced_querying);
       commit(types.SET_CURRENT_POD_NAME, pod_name);
 
       commit(types.RECEIVE_PODS_DATA_SUCCESS, pods);

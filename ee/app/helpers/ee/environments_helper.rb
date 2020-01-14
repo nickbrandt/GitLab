@@ -35,7 +35,8 @@ module EE
         "environment-name": environment.name,
         "environments-path": project_environments_path(project, format: :json),
         "project-full-path": project.full_path,
-        "environment-id": environment.id
+        "environment-id": environment.id,
+        "cluster-applications-documentation-path" => help_page_path('user/clusters/applications.md', anchor: 'elastic-stack')
       }
     end
 
