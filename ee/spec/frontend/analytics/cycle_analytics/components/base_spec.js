@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import Vue from 'vue';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
-import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
+import { GlEmptyState } from '@gitlab/ui';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
@@ -13,6 +13,7 @@ import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue'
 import 'bootstrap';
 import '~/gl_dropdown';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
+import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as mockData from '../mock_data';
@@ -89,7 +90,7 @@ describe('Cycle Analytics component', () => {
   };
 
   const displaysDateRangePicker = flag => {
-    expect(wrapper.find(GlDaterangePicker).exists()).toBe(flag);
+    expect(wrapper.find(Daterange).exists()).toBe(flag);
   };
 
   const displaysSummaryTable = flag => {
