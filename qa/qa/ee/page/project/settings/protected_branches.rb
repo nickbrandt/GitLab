@@ -35,7 +35,7 @@ module QA
               end
 
               # Click the select element again to close the dropdown
-              click_element :protected_branch_select
+              click_element :"allowed_to_#{action}_select"
             end
           end
         end
