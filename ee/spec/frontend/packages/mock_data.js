@@ -1,5 +1,5 @@
 export const mavenPackage = {
-  created_at: '',
+  created_at: '2015-12-10',
   id: 1,
   maven_metadatum: {
     app_group: 'com.test.app',
@@ -9,20 +9,20 @@ export const mavenPackage = {
   name: 'Test package',
   package_type: 'maven',
   project_id: 1,
-  updated_at: '',
+  updated_at: '2015-12-10',
   version: '1.0.0',
 };
 
 export const mavenFiles = [
   {
-    created_at: '',
+    created_at: '2015-12-10',
     file_name: 'File one',
     id: 1,
     size: 100,
     download_path: '/-/package_files/1/download',
   },
   {
-    created_at: '',
+    created_at: '2015-12-10',
     file_name: 'File two',
     id: 2,
     size: 200,
@@ -31,18 +31,18 @@ export const mavenFiles = [
 ];
 
 export const npmPackage = {
-  created_at: '',
+  created_at: '2015-12-10',
   id: 2,
   name: '@Test/package',
   package_type: 'npm',
   project_id: 1,
-  updated_at: '',
+  updated_at: '2015-12-10',
   version: '',
 };
 
 export const npmFiles = [
   {
-    created_at: '',
+    created_at: '2015-12-10',
     file_name: '@test/test-package-1.0.0.tgz',
     id: 2,
     size: 200,
@@ -55,14 +55,14 @@ export const conanPackage = {
     package_channel: 'stable',
     package_username: 'conan+conan-package',
   },
-  created_at: '',
+  created_at: '2015-12-10',
   id: 3,
   name: 'conan-package',
   package_files: [],
   package_type: 'conan',
   project_id: 1,
   recipe: 'conan-package/1.0.0@conan+conan-package/stable',
-  updated_at: '',
+  updated_at: '2015-12-10',
   version: '1.0.0',
 };
 
