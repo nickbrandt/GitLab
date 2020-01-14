@@ -8,8 +8,8 @@ describe Note, :elastic do
   end
 
   it_behaves_like 'limited indexing is enabled' do
-    set(:object) { create :note, project: project }
-    set(:group) { create(:group) }
+    let_it_be(:object) { create :note, project: project }
+    let_it_be(:group) { create(:group) }
     let(:group_object) do
       project = create :project, name: 'test1', group: group
       create :note, project: project

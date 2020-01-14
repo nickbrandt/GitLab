@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Burndown do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:start_date) { "2017-03-01" }
   let(:due_date) { "2017-03-03" }
 
@@ -35,7 +35,7 @@ describe Burndown do
     end
 
     context 'when issues belong to a public project' do
-      set(:non_member) { create(:user) }
+      let_it_be(:non_member) { create(:user) }
 
       subject do
         project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)

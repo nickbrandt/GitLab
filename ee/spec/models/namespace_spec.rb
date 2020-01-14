@@ -139,7 +139,7 @@ describe Namespace do
         end
 
         context 'when group is subgroup' do
-          set(:root_ancestor) { create(:group) }
+          let_it_be(:root_ancestor) { create(:group) }
           let(:namespace) { create(:namespace, parent: root_ancestor) }
 
           it 'is invalid' do
@@ -159,8 +159,8 @@ describe Namespace do
 
   describe '#move_dir' do
     context 'when running on a primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
+      let_it_be(:primary) { create(:geo_node, :primary) }
+      let_it_be(:secondary) { create(:geo_node) }
       let(:gitlab_shell) { Gitlab::Shell.new }
       let(:parent_group) { create(:group) }
       let(:child_group) { create(:group, name: 'child', path: 'child', parent: parent_group) }

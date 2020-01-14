@@ -11,8 +11,8 @@ describe Issue, :elastic do
   let(:admin) { create :user, :admin }
 
   context 'when limited indexing is on' do
-    set(:project) { create :project, name: 'test1' }
-    set(:issue) { create :issue, project: project}
+    let_it_be(:project) { create :project, name: 'test1' }
+    let_it_be(:issue) { create :issue, project: project}
 
     before do
       stub_ee_application_setting(elasticsearch_limit_indexing: true)
@@ -39,7 +39,7 @@ describe Issue, :elastic do
     end
 
     context 'when a group is enabled' do
-      set(:group) { create(:group) }
+      let_it_be(:group) { create(:group) }
 
       before do
         create :elasticsearch_indexed_namespace, namespace: group

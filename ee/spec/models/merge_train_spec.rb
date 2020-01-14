@@ -5,7 +5,7 @@ require "spec_helper"
 describe MergeTrain do
   include ProjectForksHelper
 
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
 
   it { is_expected.to belong_to(:merge_request) }
   it { is_expected.to belong_to(:user) }

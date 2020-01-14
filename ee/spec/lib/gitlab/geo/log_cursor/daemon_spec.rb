@@ -6,8 +6,8 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  let_it_be(:primary) { create(:geo_node, :primary) }
-  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:primary, reload: true) { create(:geo_node, :primary) }
+  let_it_be(:secondary, reload: true) { create(:geo_node) }
   let(:options) { {} }
 
   subject(:daemon) { described_class.new(options) }

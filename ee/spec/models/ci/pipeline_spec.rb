@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Ci::Pipeline do
   let(:user) { create(:user) }
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   let(:pipeline) do
     create(:ci_empty_pipeline, status: :created, project: project)

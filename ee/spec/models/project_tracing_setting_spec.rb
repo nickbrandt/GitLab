@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ProjectTracingSetting do
   describe '#external_url' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     let(:tracing_setting) { project.build_tracing_setting }
 

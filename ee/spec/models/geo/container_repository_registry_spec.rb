@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Geo::ContainerRepositoryRegistry, :geo do
-  set(:registry) { create(:container_repository_registry) }
+  let_it_be(:registry) { create(:container_repository_registry) }
 
   describe 'relationships' do
     it { is_expected.to belong_to(:container_repository) }

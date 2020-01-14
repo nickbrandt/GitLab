@@ -423,7 +423,7 @@ describe Project do
   end
 
   describe '#environments_for_scope' do
-    set(:project) { create(:project) }
+    let_it_be(:project, reload: true) { create(:project) }
 
     before do
       create_list(:environment, 2, project: project)
@@ -784,8 +784,8 @@ describe Project do
   end
 
   describe '#shared_runners_limit_namespace' do
-    set(:root_ancestor) { create(:group) }
-    set(:group) { create(:group, parent: root_ancestor) }
+    let_it_be(:root_ancestor) { create(:group) }
+    let_it_be(:group) { create(:group, parent: root_ancestor) }
     let(:project) { create(:project, namespace: group) }
 
     subject { project.shared_runners_limit_namespace }

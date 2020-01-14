@@ -281,8 +281,8 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '.undismissed' do
-    set(:project) { create(:project) }
-    set(:project2) { create(:project) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:project2) { create(:project) }
     let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
     let!(:finding2) { create(:vulnerabilities_occurrence, project: project, report_type: :dast) }
     let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
@@ -419,7 +419,7 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe 'feedback' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
     let(:occurrence) do
       create(
         :vulnerabilities_occurrence,

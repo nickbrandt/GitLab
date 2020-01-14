@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe ScopedLabelSet do
-  set(:kv_label1) { create(:label, title: 'key::label1') }
-  set(:kv_label2) { create(:label, title: 'key::label2') }
-  set(:kv_label3) { create(:label, title: 'key::label3') }
+  let_it_be(:kv_label1) { create(:label, title: 'key::label1') }
+  let_it_be(:kv_label2) { create(:label, title: 'key::label2') }
+  let_it_be(:kv_label3) { create(:label, title: 'key::label3') }
 
   describe '.from_label_ids' do
     def get_labels(sets, key)

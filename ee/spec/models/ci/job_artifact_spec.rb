@@ -6,8 +6,8 @@ describe Ci::JobArtifact do
   include EE::GeoHelpers
 
   describe '#destroy' do
-    set(:primary) { create(:geo_node, :primary) }
-    set(:secondary) { create(:geo_node) }
+    let_it_be(:primary) { create(:geo_node, :primary) }
+    let_it_be(:secondary) { create(:geo_node) }
 
     it 'creates a JobArtifactDeletedEvent' do
       stub_current_geo_node(primary)
