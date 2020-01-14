@@ -52,7 +52,7 @@ describe 'Mark snippet as spam' do
       end
 
       it 'marks snippet as spam' do
-        expect_next_instance_of(SpamService) do |instance|
+        expect_next_instance_of(Spam::MarkAsSpamService) do |instance|
           expect(instance).to receive(:mark_as_spam!)
         end
 
