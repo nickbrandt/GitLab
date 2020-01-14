@@ -924,6 +924,24 @@ module Ci
         failure_reason: :data_integrity_failure)
     end
 
+    def has_valid_deployment?
+      environment = persisted_environment
+      return true unless environment
+
+      last_deployment = environment.last_deployment
+      return true unless last_deployment
+
+      if starts_environment?
+        # if our deployment is later than last successful deployment
+        # it should fullfil the rule of being a forward deployment
+        # if this is incremental deployment it will always be later in the pipeline
+        deployment.id >= last_deployment.id
+      elsif stops_environment?
+        # if we want to stop, we require that stop action is for the same SHA
+        deployment.sha == last_deployment.sha
+      end
+    end
+
     private
 
     def build_data

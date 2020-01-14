@@ -4270,4 +4270,83 @@ describe Ci::Build do
       it { is_expected.to be_nil }
     end
   end
+
+  describe '#has_valid_deployment?' do
+    let(:environment) { create(:environment, project: project) }
+
+    subject { build.has_valid_deployment? }
+
+    context 'when there is no related persisted environment' do
+      it 'is true' do
+        allow(build).to receive(:persisted_environment).and_return(nil)
+
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when there is no existing deployment' do
+      it 'is true' do
+        expect(environment.last_deployment).to be_nil
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when there is a persisted environment and a last deployment' do
+      let(:last_deployment) { create(:deployment, :success, environment: environment, project: project) }
+      let(:build) do
+        create(:ci_build,
+               pipeline: pipeline,
+               environment: environment,
+               project: project,
+               options: options)
+      end
+      let(:build_deployment) { create(:deployment, :success, environment: environment, deployable: build) }
+
+      context 'and this job has a start environment' do
+        let(:options) { { environment: { action: 'start' } } }
+
+        context 'and the current deployment is later than the last successful deployment' do
+          it 'is true' do
+            last_deployment
+            build_deployment
+
+            is_expected.to be_truthy
+          end
+        end
+
+        context 'and the current deployment is not later than the last successful deployment' do
+          it 'is false' do
+            build_deployment
+            last_deployment
+
+            is_expected.to be_falsy
+          end
+        end
+      end
+
+      context 'and this job has a stop environment' do
+        let(:options) { { environment: { action: 'stop' } } }
+
+        before do
+          last_deployment
+          build_deployment
+        end
+        context 'and the current sha is the same as the one from the latest deployment' do
+          it 'is true' do
+            allow(build.deployment).to receive(:sha).and_return(last_deployment.sha)
+
+            is_expected.to be_truthy
+          end
+        end
+
+        context 'and the current sha is not the same as the one from the latest deployment' do
+          it 'is false' do
+            allow(build.deployment).to receive(:sha).and_return('othersha12345')
+
+            is_expected.to be_falsy
+          end
+        end
+      end
+    end
+  end
 end

@@ -17,7 +17,8 @@ module CommitStatusEnums
       archived_failure: 9,
       unmet_prerequisites: 10,
       scheduler_failure: 11,
-      data_integrity_failure: 12
+      data_integrity_failure: 12,
+      invalid_deployment_failure: 13
     }
   end
 end

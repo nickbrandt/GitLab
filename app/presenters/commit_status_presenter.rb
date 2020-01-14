@@ -13,7 +13,8 @@ class CommitStatusPresenter < Gitlab::View::Presenter::Delegated
     archived_failure: 'The job is archived and cannot be run',
     unmet_prerequisites: 'The job failed to complete prerequisite tasks',
     scheduler_failure: 'The scheduler failed to assign job to the runner, please try again or contact system administrator',
-    data_integrity_failure: 'There has been a structural integrity problem detected, please contact system administrator'
+    data_integrity_failure: 'There has been a structural integrity problem detected, please contact system administrator',
+    invalid_deployment_failure: 'The job deployment is older than the previous one'
   }.freeze
 
   private_constant :CALLOUT_FAILURE_MESSAGES

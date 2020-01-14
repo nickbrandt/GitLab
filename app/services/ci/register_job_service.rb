@@ -101,6 +101,11 @@ module Ci
         return false
       end
 
+      unless build.has_valid_deployment?
+        build.drop!(:invalid_deployment_failure)
+        return false
+      end
+
       unless build.supported_runner?(params.dig(:info, :features))
         build.drop!(:runner_unsupported)
         return false
