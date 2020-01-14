@@ -641,6 +641,9 @@ msgstr ""
 msgid "2 days"
 msgstr ""
 
+msgid "2 weeks"
+msgstr ""
+
 msgid "20-29 contributions"
 msgstr ""
 
@@ -13089,9 +13092,6 @@ msgid "Password was successfully updated. Please login with it"
 msgstr ""
 
 msgid "Past due"
-msgstr ""
-
-msgid "Past month"
 msgstr ""
 
 msgid "Past week"

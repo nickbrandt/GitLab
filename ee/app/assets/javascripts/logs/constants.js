@@ -24,7 +24,7 @@ export const timeWindows = {
     seconds: 60 * 60 * 24 * 7,
   },
   pastMonth: {
-    label: __('Past month'),
-    seconds: 60 * 60 * 24 * 30,
+    label: __('2 weeks'),
+    seconds: 60 * 60 * 24 * 15,
   },
 };
