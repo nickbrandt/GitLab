@@ -193,6 +193,7 @@ describe('Logs Store actions', () => {
         .reply(200, {
           pod_name: mockPodName,
           pods: mockPods,
+          enable_advanced_querying: true,
           logs: mockLogsResult,
         });
 
@@ -203,6 +204,7 @@ describe('Logs Store actions', () => {
         [
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
+          { type: types.ENABLE_ADVANCED_QUERYING, payload: true },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },

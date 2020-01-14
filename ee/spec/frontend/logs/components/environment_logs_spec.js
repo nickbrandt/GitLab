@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByClick } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 
@@ -89,12 +89,16 @@ describe('EnvironmentLogs', () => {
 
     expect(wrapper.isVueInstance()).toBe(true);
     expect(wrapper.isEmpty()).toBe(false);
-    expect(findLogTrace().isEmpty()).toBe(false);
 
+    // top bar
     expect(findEnvironmentsDropdown().is(GlDropdown)).toBe(true);
     expect(findPodsDropdown().is(GlDropdown)).toBe(true);
-
+    expect(findSearchBar().is(GlSearchBoxByClick)).toBe(true);
+    expect(findTimeWindowDropdown().is(GlDropdown)).toBe(true);
     expect(findLogControlButtons().exists()).toBe(true);
+
+    // log trace
+    expect(findLogTrace().isEmpty()).toBe(false);
   });
 
   it('mounted inits data', () => {
@@ -120,9 +124,6 @@ describe('EnvironmentLogs', () => {
 
       state.environments.options = [];
       state.environments.isLoading = true;
-
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
 
       initWrapper();
     });
@@ -160,24 +161,7 @@ describe('EnvironmentLogs', () => {
     });
   });
 
-  describe('elastic stack disabled', () => {
-    beforeEach(() => {
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = false;
-
-      initWrapper();
-    });
-
-    it("doesn't display the search bar or time windows dropdown", () => {
-      expect(findSearchBar().exists()).toEqual(false);
-      expect(findTimeWindowDropdown().exists()).toEqual(false);
-
-      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-6');
-      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-6');
-    });
-  });
-
-  describe('ES enabled and legacy environment', () => {
+  describe('when advanced querying is disabled', () => {
     beforeEach(() => {
       state.pods.options = [];
 
@@ -189,15 +173,12 @@ describe('EnvironmentLogs', () => {
 
       state.enableAdvancedQuerying = false;
 
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
-
       initWrapper();
     });
 
-    it('displays a disabled search bar', () => {
-      expect(findSearchBar().exists()).toEqual(true);
+    it('search bar and time window dropdown are disabled', () => {
       expect(findSearchBar().attributes('disabled')).toEqual('true');
+      expect(findTimeWindowDropdown().attributes('disabled')).toEqual('true');
     });
   });
 
@@ -223,9 +204,6 @@ describe('EnvironmentLogs', () => {
         state.environments.options = mockEnvironments;
       });
 
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
-
       initWrapper();
     });
 
@@ -246,7 +224,6 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(env.name);
       });
-      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-3');
     });
 
     it('populates pods dropdown', () => {
@@ -258,7 +235,6 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(pod);
       });
-      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-3');
     });
 
     it('populates logs trace', () => {
@@ -268,14 +244,11 @@ describe('EnvironmentLogs', () => {
     });
 
     it('displays an enabled search bar', () => {
-      expect(findSearchBar().exists()).toEqual(true);
-      expect(findSearchBar().attributes('disabled')).toEqual(undefined);
-      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-3');
+      expect(findSearchBar().attributes('disabled')).toBeFalsy();
     });
 
-    it('displays and enables the time window dropdown', () => {
-      expect(findTimeWindowDropdown().exists()).toEqual(true);
-      expect(findTimeWindowDropdown().attributes('disabled')).toEqual(undefined);
+    it('displays an enabled time window dropdown', () => {
+      expect(findTimeWindowDropdown().attributes('disabled')).toBeFalsy();
     });
 
     it('update control buttons state', () => {
