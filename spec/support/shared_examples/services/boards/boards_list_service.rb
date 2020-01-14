@@ -31,8 +31,10 @@ shared_examples 'boards list service' do
 end
 
 shared_examples 'multiple boards list service' do
-  let(:service) { described_class.new(parent, double) }
-  let!(:boards) { create_list(:board, 3, resource_parent: parent) }
+  let(:service)  { described_class.new(parent, double) }
+  let!(:board_B) { create(:board, resource_parent: parent, name: 'B-board') }
+  let!(:board_c) { create(:board, resource_parent: parent, name: 'c-board') }
+  let!(:board_a) { create(:board, resource_parent: parent, name: 'a-board') }
 
   describe '#execute' do
     it 'returns all issue boards' do
@@ -40,10 +42,7 @@ shared_examples 'multiple boards list service' do
     end
 
     it 'returns boards ordered by name' do
-      board_names = %w[B-board c-board a-board]
-      boards.each_with_index { |board, i| board.update_column(:name, board_names[i]) }
-
-      expect(service.execute.pluck(:name)).to eq(%w[a-board B-board c-board])
+      expect(service.execute).to eq [board_a, board_B, board_c]
     end
   end
 end

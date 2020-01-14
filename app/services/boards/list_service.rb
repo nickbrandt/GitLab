@@ -20,12 +20,9 @@ module Boards
       parent.boards.order_by_name_asc
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def first_board
-      # We could use just one query but MySQL does not support nested queries using LIMIT
-      boards.where(id: boards.first).reorder(nil)
+      parent.boards.first_board
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def create_board!
       Boards::CreateService.new(parent, current_user).execute
