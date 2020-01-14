@@ -36,10 +36,6 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     end
 
     context 'JSON' do
-      before do
-        stub_feature_flags(use_legacy_pipeline_triggers: false)
-      end
-
       it 'restores models based on JSON' do
         expect(@restored_project_json).to be_truthy
       end
