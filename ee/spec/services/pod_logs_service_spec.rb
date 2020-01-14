@@ -197,6 +197,26 @@ describe PodLogsService do
         it_behaves_like 'success'
       end
 
+      context 'when start and end time is specified' do
+        let(:pod_name) { 'some-pod' }
+        let(:container_name) { nil }
+        let(:start_time) { '2019-12-13T14:35:34.034Z' }
+        let(:end_time) { '2019-12-13T14:35:34.034Z' }
+
+        include_context 'return success'
+
+        it_behaves_like 'success'
+      end
+
+      context 'when start and end time are invalid' do
+        let(:pod_name) { 'some-pod' }
+        let(:container_name) { nil }
+        let(:start_time) { '1' }
+        let(:end_time) { '2' }
+
+        it_behaves_like 'error', 'Invalid start or end time format'
+      end
+
       context 'when error is returned' do
         include_context 'return error', 'Kubernetes API returned status code: 400'
 

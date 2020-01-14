@@ -15,6 +15,7 @@ class PodLogsService < ::BaseService
     :check_deployment_platform,
     :check_pod_names,
     :check_pod_name,
+    :check_times,
     :pod_logs,
     :filter_return_keys
 
@@ -70,6 +71,17 @@ class PodLogsService < ::BaseService
     end
 
     success(result)
+  end
+
+  def check_times(result)
+    if params['start'] && params['end']
+      Time.iso8601(params['start'])
+      Time.iso8601(params['end'])
+    end
+
+    success(result)
+  rescue ArgumentError
+    error(_('Invalid start or end time format'))
   end
 
   def pod_logs(result)
