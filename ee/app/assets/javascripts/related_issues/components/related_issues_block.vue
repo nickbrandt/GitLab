@@ -1,29 +1,24 @@
 <script>
-import Sortable from 'sortablejs';
-import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
-import sortableConfig from 'ee/sortable/sortable_config';
-import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
-import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
-import IssueDueDate from '~/boards/components/issue_due_date.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AddIssuableForm from './add_issuable_form.vue';
-import { issuableIconMap, issuableQaClassMap } from '../constants';
+import RelatedIssuesList from './related_issues_list.vue';
+import {
+  issuableIconMap,
+  issuableQaClassMap,
+  linkedIssueTypesMap,
+  linkedIssueTypesTextMap,
+} from '../constants';
 
 export default {
   name: 'RelatedIssuesBlock',
-  directives: {
-    tooltip,
-  },
   components: {
     Icon,
     AddIssuableForm,
-    RelatedIssuableItem,
-    GlLoadingIcon,
-    IssueWeight,
-    IssueDueDate,
+    RelatedIssuesList,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     isFetching: {
       type: Boolean,
@@ -79,11 +74,6 @@ export default {
       required: false,
       default: () => ({}),
     },
-    title: {
-      type: String,
-      required: false,
-      default: __('Related issues'),
-    },
     issuableType: {
       type: String,
       required: true,
@@ -92,6 +82,22 @@ export default {
   computed: {
     hasRelatedIssues() {
       return this.relatedIssues.length > 0;
+    },
+    categorisedIssues() {
+      if (this.glFeatures.issueLinkTypes) {
+        return Object.values(linkedIssueTypesMap)
+          .map(linkType => ({
+            linkType,
+            issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
+          }))
+          .filter(obj => obj.issues.length > 0);
+      }
+      return [
+        {
+          linkType: linkedIssueTypesMap.RELATES_TO,
+          issues: this.relatedIssues,
+        },
+      ];
     },
     shouldShowTokenBody() {
       return this.hasRelatedIssues || this.isFetching;
@@ -111,57 +117,32 @@ export default {
     qaClass() {
       return issuableQaClassMap[this.issuableType];
     },
-    validIssueWeight() {
-      if (this.issue) {
-        return this.issue.weight >= 0;
+    cardBodyCssClass() {
+      return this.glFeatures.issueLinkTypes
+        ? {
+            'linked-issues-card-body': true,
+            'bg-gray-light': true,
+            'gl-p-3': this.isFormVisible || this.shouldShowTokenBody,
+          }
+        : {};
+    },
+    formCssClass() {
+      if (this.glFeatures.issueLinkTypes) {
+        return ['bordered-box', 'bg-white'];
       }
-
-      return false;
+      if (this.hasRelatedIssues) {
+        return [
+          'border-bottom-width-1px',
+          'border-bottom-style-solid',
+          'border-bottom-color-default',
+        ];
+      }
+      return [];
     },
   },
-  mounted() {
-    if (this.canReorder) {
-      this.sortable = Sortable.create(
-        this.$refs.list,
-        Object.assign({}, sortableConfig, {
-          onStart: this.addDraggingCursor,
-          onEnd: this.reordered,
-        }),
-      );
-    }
-  },
-  methods: {
-    getBeforeAfterId(itemEl) {
-      const prevItemEl = itemEl.previousElementSibling;
-      const nextItemEl = itemEl.nextElementSibling;
-
-      return {
-        beforeId: prevItemEl && parseInt(prevItemEl.dataset.orderingId, 0),
-        afterId: nextItemEl && parseInt(nextItemEl.dataset.orderingId, 0),
-      };
-    },
-    reordered(event) {
-      this.removeDraggingCursor();
-      const { beforeId, afterId } = this.getBeforeAfterId(event.item);
-      const { oldIndex, newIndex } = event;
-
-      this.$emit('saveReorder', {
-        issueId: parseInt(event.item.dataset.key, 10),
-        oldIndex,
-        newIndex,
-        afterId,
-        beforeId,
-      });
-    },
-    addDraggingCursor() {
-      document.body.classList.add('is-dragging');
-    },
-    removeDraggingCursor() {
-      document.body.classList.remove('is-dragging');
-    },
-    issuableOrderingId({ epic_issue_id: epicIssueId, id }) {
-      return this.issuableType === 'issue' ? epicIssueId : id;
-    },
+  created() {
+    this.linkedIssueTypesTextMap = linkedIssueTypesTextMap;
+    this.title = this.glFeatures.issueLinkTypes ? __('Linked issues') : __('Related issues');
   },
 };
 </script>
@@ -203,88 +184,41 @@ export default {
           </div>
         </h3>
       </div>
-      <div
-        v-if="isFormVisible"
-        :class="{
-          'related-issues-add-related-issues-form-with-break': hasRelatedIssues,
-        }"
-        class="js-add-related-issues-form-area card-body"
-      >
-        <add-issuable-form
-          :is-submitting="isSubmitting"
-          :issuable-type="issuableType"
-          :input-value="inputValue"
-          :pending-references="pendingReferences"
-          :auto-complete-sources="autoCompleteSources"
-          :path-id-separator="pathIdSeparator"
-          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event)"
-          @addIssuableFormInput="$emit('addIssuableFormInput', $event)"
-          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event)"
-          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event)"
-          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event)"
-        />
-      </div>
-      <div
-        v-if="shouldShowTokenBody"
-        :class="{ 'sortable-container': canReorder }"
-        class="related-issues-token-body"
-      >
-        <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
-          <gl-loading-icon
-            ref="loadingIcon"
-            label="Fetching related issues"
-            class="prepend-top-5"
+      <div :class="cardBodyCssClass">
+        <div
+          v-if="isFormVisible"
+          class="js-add-related-issues-form-area card-body"
+          :class="formCssClass"
+        >
+          <add-issuable-form
+            :is-submitting="isSubmitting"
+            :issuable-type="issuableType"
+            :input-value="inputValue"
+            :pending-references="pendingReferences"
+            :auto-complete-sources="autoCompleteSources"
+            :path-id-separator="pathIdSeparator"
+            @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event)"
+            @addIssuableFormInput="$emit('addIssuableFormInput', $event)"
+            @addIssuableFormBlur="$emit('addIssuableFormBlur', $event)"
+            @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event)"
+            @addIssuableFormCancel="$emit('addIssuableFormCancel', $event)"
           />
         </div>
-        <ul ref="list" :class="{ 'content-list': !canReorder }" class="related-items-list">
-          <li
-            v-for="issue in relatedIssues"
-            :key="issue.id"
-            :class="{
-              'user-can-drag': canReorder,
-              'sortable-row': canReorder,
-              'card card-slim': canReorder,
-            }"
-            :data-key="issue.id"
-            :data-ordering-id="issuableOrderingId(issue)"
-            class="js-related-issues-token-list-item list-item pt-0 pb-0"
-          >
-            <related-issuable-item
-              :id-key="issue.id"
-              :display-reference="issue.reference"
-              :confidential="issue.confidential"
-              :title="issue.title"
-              :path="issue.path"
-              :state="issue.state"
-              :milestone="issue.milestone"
-              :assignees="issue.assignees"
-              :created-at="issue.created_at"
-              :closed-at="issue.closed_at"
-              :can-remove="canAdmin"
-              :can-reorder="canReorder"
-              :path-id-separator="pathIdSeparator"
-              event-namespace="relatedIssue"
-              class="qa-related-issuable-item"
-              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
-            >
-              <span v-if="validIssueWeight" slot="weight" class="order-md-1">
-                <issue-weight
-                  :weight="issue.weight"
-                  class="item-weight d-flex align-items-center"
-                  tag-name="span"
-                />
-              </span>
-
-              <span v-if="issue.due_date" slot="dueDate" class="order-md-1">
-                <issue-due-date
-                  :date="issue.due_date"
-                  tooltip-placement="top"
-                  css-class="item-due-date d-flex align-items-center"
-                />
-              </span>
-            </related-issuable-item>
-          </li>
-        </ul>
+        <template v-if="shouldShowTokenBody">
+          <related-issues-list
+            v-for="category in categorisedIssues"
+            :key="category.linkType"
+            :heading="linkedIssueTypesTextMap[category.linkType]"
+            :can-admin="canAdmin"
+            :can-reorder="canReorder"
+            :is-fetching="isFetching"
+            :issuable-type="issuableType"
+            :path-id-separator="pathIdSeparator"
+            :related-issues="category.issues"
+            @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
+            @saveReorder="$emit('saveReorder', $event)"
+          />
+        </template>
       </div>
     </div>
   </div>

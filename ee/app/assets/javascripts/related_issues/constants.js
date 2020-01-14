@@ -6,6 +6,18 @@ export const issuableTypesMap = {
   MERGE_REQUEST: 'merge_request',
 };
 
+export const linkedIssueTypesMap = {
+  BLOCKS: 'blocks',
+  IS_BLOCKED_BY: 'is_blocked_by',
+  RELATES_TO: 'relates_to',
+};
+
+export const linkedIssueTypesTextMap = {
+  [linkedIssueTypesMap.RELATES_TO]: __('Relates to'),
+  [linkedIssueTypesMap.BLOCKS]: __('Blocks'),
+  [linkedIssueTypesMap.IS_BLOCKED_BY]: __('Is blocked by'),
+};
+
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),

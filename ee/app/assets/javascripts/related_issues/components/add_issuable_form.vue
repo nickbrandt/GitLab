@@ -1,10 +1,12 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import RelatedIssuableInput from './related_issuable_input.vue';
 import {
   issuableTypesMap,
   itemAddFailureTypesMap,
+  linkedIssueTypesMap,
   addRelatedIssueErrorMap,
   addRelatedItemErrorMap,
 } from '../constants';
@@ -12,9 +14,12 @@ import {
 export default {
   name: 'AddIssuableForm',
   components: {
+    GlFormGroup,
+    GlFormRadioGroup,
     GlLoadingIcon,
     RelatedIssuableInput,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     inputValue: {
       type: String,
@@ -55,6 +60,25 @@ export default {
       default: itemAddFailureTypesMap.NOT_FOUND,
     },
   },
+  data() {
+    return {
+      linkedIssueType: linkedIssueTypesMap.RELATES_TO,
+      linkedIssueTypes: [
+        {
+          text: __('relates to'),
+          value: linkedIssueTypesMap.RELATES_TO,
+        },
+        {
+          text: __('blocks'),
+          value: linkedIssueTypesMap.BLOCKS,
+        },
+        {
+          text: __('is blocked by'),
+          value: linkedIssueTypesMap.IS_BLOCKED_BY,
+        },
+      ],
+    };
+  },
   computed: {
     isSubmitButtonDisabled() {
       return (
@@ -74,7 +98,10 @@ export default {
       this.$emit('pendingIssuableRemoveRequest', params);
     },
     onFormSubmit() {
-      this.$emit('addIssuableFormSubmit', this.$refs.relatedIssuableInput.$refs.input.value);
+      this.$emit('addIssuableFormSubmit', {
+        pendingReferences: this.$refs.relatedIssuableInput.$refs.input.value,
+        linkedIssueType: this.linkedIssueType,
+      });
     },
     onFormCancel() {
       this.$emit('addIssuableFormCancel');
@@ -91,6 +118,24 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
+    <template v-if="glFeatures.issueLinkTypes">
+      <gl-form-group
+        :label="__('The current issue')"
+        label-for="linked-issue-type-radio"
+        label-class="label-bold"
+        class="mb-2"
+      >
+        <gl-form-radio-group
+          id="linked-issue-type-radio"
+          v-model="linkedIssueType"
+          :options="linkedIssueTypes"
+          :checked="linkedIssueType"
+        />
+      </gl-form-group>
+      <p class="bold">
+        {{ __('the following issue(s)') }}
+      </p>
+    </template>
     <related-issuable-input
       ref="relatedIssuableInput"
       :focus-on-mount="true"
@@ -116,7 +161,7 @@ export default {
         class="js-add-issuable-form-add-button btn btn-success float-left qa-add-issue-button"
         :class="{ disabled: isSubmitButtonDisabled }"
       >
-        Add
+        {{ __('Add') }}
         <gl-loading-icon v-if="isSubmitting" ref="loadingIcon" :inline="true" />
       </button>
       <button type="button" class="btn btn-default float-right" @click="onFormCancel">
