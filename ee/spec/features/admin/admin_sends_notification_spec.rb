@@ -47,7 +47,6 @@ describe "Admin sends notification", :js, :sidekiq_might_not_need_inline do
 
     emails = ActionMailer::Base.deliveries
 
-    expect(find(".flash-notice")).to have_content("Email sent")
     expect(emails.count).to eql(group.users.count)
     expect(emails.last.text_part.body.decoded).to include(NOTIFICATION_TEXT)
   end
