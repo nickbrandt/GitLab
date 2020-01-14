@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Ci::CreatePipelineService do
   subject(:execute) { service.execute(:push) }
 
-  set(:downstream_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'some'))}
+  let_it_be(:downstream_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'some')) }
   let(:project) { create(:project, :repository) }
   let(:user) { create(:admin) }
   let(:service) { described_class.new(project, user, { ref: 'refs/heads/master' }) }

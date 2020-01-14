@@ -6,8 +6,8 @@ describe MergeTrains::RefreshMergeRequestsService do
   include ExclusiveLeaseHelpers
 
   let(:project) { create(:project) }
-  set(:maintainer_1) { create(:user) }
-  set(:maintainer_2) { create(:user) }
+  let_it_be(:maintainer_1) { create(:user) }
+  let_it_be(:maintainer_2) { create(:user) }
   let(:service) { described_class.new(project, maintainer_1) }
 
   before do

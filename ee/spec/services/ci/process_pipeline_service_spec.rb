@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Ci::ProcessPipelineService, '#execute' do
-  set(:user) { create(:user) }
-  set(:project) { create(:project, :repository) }
-  set(:downstream) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:downstream) { create(:project, :repository) }
 
-  set(:pipeline) do
+  let_it_be(:pipeline) do
     create(:ci_empty_pipeline, ref: 'master', project: project, user: user)
   end
 

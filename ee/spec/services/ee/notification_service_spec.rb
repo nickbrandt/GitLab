@@ -12,11 +12,11 @@ describe EE::NotificationService, :mailer do
   let(:mailer) { double(deliver_later: true) }
 
   context 'when notified of a new design diff note' do
-    set(:design) { create(:design, :with_file) }
-    set(:project) { design.project }
-    set(:dev) { create(:user) }
-    set(:stranger) { create(:user) }
-    set(:note) do
+    let_it_be(:design) { create(:design, :with_file) }
+    let_it_be(:project) { design.project }
+    let_it_be(:dev) { create(:user) }
+    let_it_be(:stranger) { create(:user) }
+    let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
          project: project,
@@ -412,8 +412,8 @@ describe EE::NotificationService, :mailer do
   end
 
   describe 'epics' do
-    set(:group) { create(:group, :private) }
-    set(:epic) { create(:epic, group: group) }
+    let_it_be(:group) { create(:group, :private) }
+    let_it_be(:epic) { create(:epic, group: group) }
 
     around do |example|
       perform_enqueued_jobs do

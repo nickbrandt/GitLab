@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::HashedStorageMigratedEventStore do
   include EE::GeoHelpers
 
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:project) { create(:project, :design_repo, path: 'bar') }
   let(:old_disk_path) { "#{project.namespace.full_path}/foo" }

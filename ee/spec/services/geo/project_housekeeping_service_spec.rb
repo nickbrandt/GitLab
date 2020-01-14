@@ -8,7 +8,7 @@ describe Geo::ProjectHousekeepingService do
 
   subject(:service) { described_class.new(project) }
 
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
   let(:registry) { service.registry }
 
   before do

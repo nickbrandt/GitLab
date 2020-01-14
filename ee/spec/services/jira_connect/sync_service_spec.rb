@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe JiraConnect::SyncService do
   describe '#execute' do
-    set(:project) { create(:project, :repository) }
+    let_it_be(:project) { create(:project, :repository) }
     let(:branches) { [project.repository.find_branch('master')] }
     let(:commits) { project.commits_by(oids: %w[b83d6e3 5a62481]) }
     let(:merge_requests) { [create(:merge_request, source_project: project, target_project: project)] }

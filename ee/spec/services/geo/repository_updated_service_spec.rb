@@ -5,10 +5,10 @@ require 'spec_helper'
 describe Geo::RepositoryUpdatedService do
   include ::EE::GeoHelpers
 
-  set(:project) { create(:project) }
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:repository_state) { create(:repository_state, :repository_verified, :wiki_verified, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:repository_state) { create(:repository_state, :repository_verified, :wiki_verified, project: project) }
 
   before do
     stub_current_geo_node(primary)

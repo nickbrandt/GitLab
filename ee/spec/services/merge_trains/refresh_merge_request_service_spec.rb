@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe MergeTrains::RefreshMergeRequestService do
-  set(:project) { create(:project, :repository) }
-  set(:maintainer) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer, require_recreate: require_recreate) }
   let(:require_recreate) { false }
 

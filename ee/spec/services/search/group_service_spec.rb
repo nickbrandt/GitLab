@@ -70,7 +70,7 @@ describe Search::GroupService, :elastic do
   context 'visibility', :sidekiq_inline do
     include_context 'ProjectPolicyTable context'
 
-    set(:group) { create(:group) }
+    let_it_be(:group) { create(:group) }
     let!(:project) { create(:project, project_level, namespace: group) }
     let!(:project2) { create(:project, project_level) }
     let(:user) { create_user_from_membership(project, membership) }

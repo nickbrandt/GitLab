@@ -6,9 +6,9 @@ describe Geo::DesignRepositorySyncService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:project) { create(:project_empty_repo) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:project) { create(:project_empty_repo) }
 
   let(:repository) { project.design_repository }
   let(:lease_key) { "geo_sync_service:design:#{project.id}" }

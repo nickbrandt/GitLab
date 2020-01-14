@@ -5,11 +5,11 @@ require 'spec_helper'
 describe Git::BranchPushService do
   include RepoHelpers
 
-  set(:user)     { create(:user) }
-  let(:blankrev) { Gitlab::Git::BLANK_SHA }
-  let(:oldrev)   { sample_commit.parent_id }
-  let(:newrev)   { sample_commit.id }
-  let(:ref)      { 'refs/heads/master' }
+  let_it_be(:user) { create(:user) }
+  let(:blankrev)   { Gitlab::Git::BLANK_SHA }
+  let(:oldrev)     { sample_commit.parent_id }
+  let(:newrev)     { sample_commit.id }
+  let(:ref)        { 'refs/heads/master' }
 
   let(:params) do
     { change: { oldrev: oldrev, newrev: newrev, ref: ref } }
@@ -20,7 +20,7 @@ describe Git::BranchPushService do
   end
 
   context 'with pull project' do
-    set(:project) { create(:project, :repository, :mirror) }
+    let_it_be(:project) { create(:project, :repository, :mirror) }
 
     before do
       allow(project.repository).to receive(:commit).and_call_original
@@ -152,7 +152,7 @@ describe Git::BranchPushService do
   end
 
   context 'Jira Connect hooks' do
-    set(:project) { create(:project, :repository) }
+    let_it_be(:project) { create(:project, :repository) }
     let(:branch_to_sync) { nil }
     let(:commits_to_sync) { [] }
 

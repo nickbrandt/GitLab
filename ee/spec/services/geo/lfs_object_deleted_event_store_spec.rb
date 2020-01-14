@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::LfsObjectDeletedEventStore do
   include EE::GeoHelpers
 
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:lfs_object) { create(:lfs_object, :with_file, oid: 'b68143e6463773b1b6c6fd009a76c32aeec041faff32ba2ed42fd7f708a00004') }
 
