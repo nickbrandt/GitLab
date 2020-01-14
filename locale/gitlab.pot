@@ -5217,6 +5217,9 @@ msgstr ""
 msgid "Create New Domain"
 msgstr ""
 
+msgid "Create Project"
+msgstr ""
+
 msgid "Create a GitLab account first, and then connect it to your %{label} account."
 msgstr ""
 
@@ -5847,6 +5850,9 @@ msgid "Delete list"
 msgstr ""
 
 msgid "Delete pipeline"
+msgstr ""
+
+msgid "Delete project"
 msgstr ""
 
 msgid "Delete snippet"
@@ -16409,6 +16415,30 @@ msgstr ""
 msgid "Self-monitoring project was not deleted. Please check logs for any error messages"
 msgstr ""
 
+msgid "SelfMonitoring|Disable self monitoring?"
+msgstr ""
+
+msgid "SelfMonitoring|Disabling this feature will delete the self monitoring project. Are you sure you want to delete the project?"
+msgstr ""
+
+msgid "SelfMonitoring|Enable or disable instance self monitoring"
+msgstr ""
+
+msgid "SelfMonitoring|Enabling this feature creates a %{projectLinkStart}project%{projectLinkEnd} that can be used to monitor the health of your instance."
+msgstr ""
+
+msgid "SelfMonitoring|Enabling this feature creates a project that can be used to monitor the health of your instance."
+msgstr ""
+
+msgid "SelfMonitoring|Self monitoring"
+msgstr ""
+
+msgid "SelfMonitoring|Self monitoring project has been successfully created."
+msgstr ""
+
+msgid "SelfMonitoring|Self monitoring project has been successfully deleted."
+msgstr ""
+
 msgid "Send a separate email notification to Developers."
 msgstr ""
 
@@ -20439,6 +20469,9 @@ msgid "View open merge request"
 msgstr ""
 
 msgid "View previous app"
+msgstr ""
+
+msgid "View project"
 msgstr ""
 
 msgid "View project labels"
