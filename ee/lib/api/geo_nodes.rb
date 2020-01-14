@@ -9,6 +9,37 @@ module API
     before { authenticated_as_admin! }
 
     resource :geo_nodes do
+      # Add a new Geo node
+      #
+      # Example request:
+      #   POST /geo_nodes
+      desc 'Create a new Geo node' do
+        success EE::API::Entities::GeoNode
+      end
+      params do
+        requires :primary, type: Boolean, desc: 'Specifying whether this node will be primary. Defaults to false.'
+        optional :enabled, type: Boolean, desc: 'Specifying whether this node will be enabled. Defaults to true.'
+        requires :name, type: String, desc: 'The unique identifier for the Geo node. Must match `geo_node_name` if it is set in `gitlab.rb`, otherwise it must match `external_url`'
+        requires :url, type: String, desc: 'The user-facing URL for the Geo node'
+        requires :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set.'
+        optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node. Defaults to 10.'
+        optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node. Defaults to 25.'
+        optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node. Defaults to 100.'
+        optional :container_repositories_max_capacity, type: Integer, desc: 'Control the maximum concurrency of container repository sync for this node. Defaults to 10.'
+        optional :sync_object_storage, type: Boolean, desc: 'Flag indicating if the secondary Geo node will replicate blobs in Object Storage. Defaults to false.'
+      end
+      post do
+        create_params = declared_params(include_missing: false)
+
+        new_geo_node = ::Geo::NodeCreateService.new(create_params).execute
+
+        if new_geo_node.persisted?
+          present new_geo_node, with: EE::API::Entities::GeoNode
+        else
+          render_validation_error!(new_geo_node)
+        end
+      end
+
       # Get all Geo node information
       #
       # Example request:
@@ -142,7 +173,7 @@ module API
           optional :enabled, type: Boolean, desc: 'Flag indicating if the Geo node is enabled'
           optional :name, type: String, desc: 'The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url`'
           optional :url, type: String, desc: 'The user-facing URL of the Geo node'
-          optional :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Defaults to url'
+          optional :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set.'
           optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node'
           optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node'
           optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node'
