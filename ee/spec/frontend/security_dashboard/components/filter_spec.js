@@ -27,6 +27,7 @@ describe('Filter component', () => {
   const findSearchInput = () =>
     wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
   const findDropdownToggle = () => wrapper.find('.dropdown-toggle');
+  const dropdownItemsCount = () => wrapper.findAll('.dropdown-item').length;
 
   function isDropdownOpen() {
     const toggleButton = findDropdownToggle();
@@ -59,7 +60,7 @@ describe('Filter component', () => {
     });
 
     it('should display all 8 severity options', () => {
-      expect(wrapper.findAll('.dropdown-item').length).toEqual(8);
+      expect(dropdownItemsCount()).toEqual(8);
     });
 
     it('should display a check next to only the selected item', () => {
@@ -118,7 +119,7 @@ describe('Filter component', () => {
       });
 
       it(`should show all projects`, () => {
-        expect(wrapper.findAll('.dropdown-item').length).toBe(lots);
+        expect(dropdownItemsCount()).toBe(lots);
       });
 
       it('should show only matching projects when a search term is entered', () => {
@@ -126,7 +127,7 @@ describe('Filter component', () => {
         input.vm.$el.value = '0';
         input.vm.$el.dispatchEvent(new Event('input'));
         return wrapper.vm.$nextTick().then(() => {
-          expect(wrapper.findAll('.dropdown-item').length).toBe(3);
+          expect(dropdownItemsCount()).toBe(3);
         });
       });
     });
