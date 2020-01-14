@@ -379,6 +379,9 @@ msgstr ""
 msgid "%{spanStart}in%{spanEnd} %{errorFn}"
 msgstr ""
 
+msgid "%{staged} staged and %{unstaged} unstaged changes"
+msgstr ""
+
 msgid "%{start} to %{end}"
 msgstr ""
 
@@ -698,6 +701,9 @@ msgid "<strong>%{group_name}</strong> group members"
 msgstr ""
 
 msgid "<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors."
+msgstr ""
+
+msgid "<strong>%{stagedFilesLength} staged</strong> and <strong>%{changedFilesLength} unstaged</strong> changes"
 msgstr ""
 
 msgid "<strong>Deletes</strong> source branch"
