@@ -19,9 +19,12 @@ module QA
                 end
 
                 view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
+                  element :related_issues_plus_button
+                end
+
+                view 'ee/app/assets/javascripts/related_issues/components/related_issues_list.vue' do
                   element :related_issuable_item
                   element :related_issues_loading_icon
-                  element :related_issues_plus_button
                 end
 
                 view 'ee/app/assets/javascripts/sidebar/components/weight/weight.vue' do

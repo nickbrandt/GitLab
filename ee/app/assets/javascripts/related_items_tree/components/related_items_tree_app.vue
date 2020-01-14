@@ -118,8 +118,8 @@ export default {
       this.addPendingReferences(this.getRawRefs(newValue));
       this.setItemInputValue('');
     },
-    handleAddItemFormSubmit(newValue) {
-      this.handleAddItemFormBlur(newValue);
+    handleAddItemFormSubmit(event) {
+      this.handleAddItemFormBlur(event.pendingReferences);
 
       if (this.pendingReferences.length > 0) {
         this.addItem();

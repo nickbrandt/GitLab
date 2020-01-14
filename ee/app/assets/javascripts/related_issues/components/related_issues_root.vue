@@ -23,7 +23,6 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
    and hide the `AddIssuableForm` area.
 
 */
-import _ from 'underscore';
 import Flash from '~/flash';
 import { __ } from '~/locale';
 import RelatedIssuesBlock from './related_issues_block.vue';
@@ -61,11 +60,6 @@ export default {
       type: String,
       required: false,
       default: '',
-    },
-    title: {
-      type: String,
-      required: false,
-      default: __('Related issues'),
     },
     issuableType: {
       type: String,
@@ -110,11 +104,14 @@ export default {
     this.fetchRelatedIssues();
   },
   methods: {
+    findRelatedIssueById(id) {
+      return this.state.relatedIssues.find(issue => issue.id === id);
+    },
     onRelatedIssueRemoveRequest(idToRemove) {
-      const issueToRemove = _.find(this.state.relatedIssues, issue => issue.id === idToRemove);
+      const issueToRemove = this.findRelatedIssueById(idToRemove);
 
       if (issueToRemove) {
-        RelatedIssuesService.remove(issueToRemove.relation_path)
+        RelatedIssuesService.remove(issueToRemove.relationPath)
           .then(({ data }) => {
             this.store.setRelatedIssues(data.issuables);
           })
@@ -133,13 +130,13 @@ export default {
     onPendingIssueRemoveRequest(indexToRemove) {
       this.store.removePendingRelatedIssue(indexToRemove);
     },
-    onPendingFormSubmit(newValue) {
-      this.processAllReferences(newValue);
+    onPendingFormSubmit(event) {
+      this.processAllReferences(event.pendingReferences);
 
       if (this.state.pendingReferences.length > 0) {
         this.isSubmitting = true;
         this.service
-          .addRelatedIssues(this.state.pendingReferences)
+          .addRelatedIssues(this.state.pendingReferences, event.linkedIssueType)
           .then(({ data }) => {
             // We could potentially lose some pending issues in the interim here
             this.store.setPendingReferences([]);
@@ -179,11 +176,11 @@ export default {
         });
     },
     saveIssueOrder({ issueId, beforeId, afterId, oldIndex, newIndex }) {
-      const issueToReorder = _.find(this.state.relatedIssues, issue => issue.id === issueId);
+      const issueToReorder = this.findRelatedIssueById(issueId);
 
       if (issueToReorder) {
         RelatedIssuesService.saveOrder({
-          endpoint: issueToReorder.relation_path,
+          endpoint: issueToReorder.relationPath,
           move_before_id: beforeId,
           move_after_id: afterId,
         })
@@ -227,7 +224,6 @@ export default {
     :is-form-visible="isFormVisible"
     :input-value="inputValue"
     :auto-complete-sources="autoCompleteSources"
-    :title="title"
     :issuable-type="issuableType"
     :path-id-separator="pathIdSeparator"
     @saveReorder="saveIssueOrder"

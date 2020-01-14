@@ -1,6 +1,6 @@
-import Vue from 'vue';
-import { PathIdSeparator } from 'ee/related_issues/constants';
-import addIssuableForm from 'ee/related_issues/components/add_issuable_form.vue';
+import { mount } from '@vue/test-utils';
+import { linkedIssueTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import AddIssuableForm from 'ee/related_issues/components/add_issuable_form.vue';
 
 const issuable1 = {
   id: 200,
@@ -22,56 +22,49 @@ const issuable2 = {
 
 const pathIdSeparator = PathIdSeparator.Issue;
 
-describe('AddIssuableForm', () => {
-  let AddIssuableForm;
-  let vm;
+const findFormInput = wrapper => wrapper.find('.js-add-issuable-form-input').element;
 
-  beforeEach(() => {
-    AddIssuableForm = Vue.extend(addIssuableForm);
-  });
+const findRadioInput = (inputs, value) => inputs.filter(input => input.element.value === value)[0];
+
+describe('AddIssuableForm', () => {
+  let wrapper;
 
   afterEach(() => {
-    if (vm) {
-      // Avoid any NPE errors from `@blur` being called
-      // after `vm.$destroy` in tests, https://github.com/vuejs/vue/issues/5829
-      document.activeElement.blur();
-
-      vm.$destroy();
-    }
+    wrapper.destroy();
   });
 
   describe('with data', () => {
     describe('without references', () => {
       describe('without any input text', () => {
         beforeEach(() => {
-          vm = new AddIssuableForm({
+          wrapper = mount(AddIssuableForm, {
             propsData: {
               inputValue: '',
               pendingReferences: [],
               pathIdSeparator,
             },
-          }).$mount();
+          });
         });
 
         it('should have disabled submit button', () => {
-          expect(vm.$refs.addButton.disabled).toBe(true);
-          expect(vm.$refs.loadingIcon).toBeUndefined();
+          expect(wrapper.vm.$refs.addButton.disabled).toBe(true);
+          expect(wrapper.vm.$refs.loadingIcon).toBeUndefined();
         });
       });
 
       describe('with input text', () => {
         beforeEach(() => {
-          vm = new AddIssuableForm({
+          wrapper = mount(AddIssuableForm, {
             propsData: {
               inputValue: 'foo',
               pendingReferences: [],
               pathIdSeparator,
             },
-          }).$mount();
+          });
         });
 
         it('should not have disabled submit button', () => {
-          expect(vm.$refs.addButton.disabled).toBe(false);
+          expect(wrapper.vm.$refs.addButton.disabled).toBe(false);
         });
       });
     });
@@ -80,52 +73,142 @@ describe('AddIssuableForm', () => {
       const inputValue = 'foo #123';
 
       beforeEach(() => {
-        vm = new AddIssuableForm({
+        wrapper = mount(AddIssuableForm, {
           propsData: {
             inputValue,
             pendingReferences: [issuable1.reference, issuable2.reference],
             pathIdSeparator,
           },
-        }).$mount();
+        });
       });
 
       it('should put input value in place', () => {
-        expect(vm.$el.querySelector('.js-add-issuable-form-input').value).toEqual(inputValue);
+        expect(findFormInput(wrapper).value).toEqual(inputValue);
       });
 
       it('should render pending issuables items', () => {
-        expect(vm.$el.querySelectorAll('.js-add-issuable-form-token-list-item').length).toEqual(2);
+        expect(wrapper.findAll('.js-add-issuable-form-token-list-item').length).toEqual(2);
       });
 
       it('should not have disabled submit button', () => {
-        expect(vm.$refs.addButton.disabled).toBe(false);
+        expect(wrapper.vm.$refs.addButton.disabled).toBe(false);
       });
     });
 
-    it('when submitting pending issues', () => {
-      vm = new AddIssuableForm({
+    it('should emit the `addIssuableFormSubmit` event when submitting pending issues', () => {
+      wrapper = mount(AddIssuableForm, {
         propsData: {
           inputValue: 'foo #123',
           pendingReferences: [issuable1.reference, issuable2.reference],
           pathIdSeparator,
         },
       });
-      vm.$mount();
 
-      spyOn(vm, '$emit');
+      spyOn(wrapper.vm, '$emit');
       const newInputValue = 'filling in things';
-      const inputEl = vm.$el.querySelector('.js-add-issuable-form-input');
+      const inputEl = findFormInput(wrapper);
       inputEl.value = newInputValue;
-      vm.onFormSubmit();
+      wrapper.vm.onFormSubmit();
 
-      expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', newInputValue);
+      expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', {
+        pendingReferences: newInputValue,
+        linkedIssueType: linkedIssueTypesMap.RELATES_TO,
+      });
     });
 
-    it('when canceling form to collapse', () => {
-      spyOn(vm, '$emit');
-      vm.onFormCancel();
+    it('should emit the `addIssuableFormCancel` event when canceling form to collapse', () => {
+      spyOn(wrapper.vm, '$emit');
+      wrapper.vm.onFormCancel();
 
-      expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormCancel');
+      expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormCancel');
+    });
+  });
+
+  describe('with :issue_link_types feature flag on', () => {
+    beforeEach(() => {
+      wrapper = mount(AddIssuableForm, {
+        propsData: {
+          inputValue: '',
+          pendingReferences: [],
+          pathIdSeparator,
+        },
+        provide: {
+          glFeatures: {
+            issueLinkTypes: true,
+          },
+        },
+      });
+    });
+
+    describe('radio buttons', () => {
+      let radioInputs;
+
+      beforeEach(() => {
+        radioInputs = wrapper.findAll('[name="linked-issue-type-radio"]');
+      });
+
+      it('shows "relates to" option', () => {
+        expect(findRadioInput(radioInputs, linkedIssueTypesMap.RELATES_TO)).not.toBeNull();
+      });
+
+      it('shows "blocks" option', () => {
+        expect(findRadioInput(radioInputs, linkedIssueTypesMap.BLOCKS)).not.toBeNull();
+      });
+
+      it('shows "is blocked by" option', () => {
+        expect(findRadioInput(radioInputs, linkedIssueTypesMap.IS_BLOCKED_BY)).not.toBeNull();
+      });
+
+      it('shows 3 options in total', () => {
+        expect(radioInputs.length).toBe(3);
+      });
+    });
+
+    describe('when the form is submitted', () => {
+      it('emits an event with a "relates_to" link type when the "relates to" radio input selected', done => {
+        spyOn(wrapper.vm, '$emit');
+
+        wrapper.vm.linkedIssueType = linkedIssueTypesMap.RELATES_TO;
+        wrapper.vm.onFormSubmit();
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', {
+            pendingReferences: '',
+            linkedIssueType: linkedIssueTypesMap.RELATES_TO,
+          });
+          done();
+        });
+      });
+
+      it('emits an event with a "blocks" link type when the "blocks" radio input selected', done => {
+        spyOn(wrapper.vm, '$emit');
+
+        wrapper.vm.linkedIssueType = linkedIssueTypesMap.BLOCKS;
+        wrapper.vm.onFormSubmit();
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', {
+            pendingReferences: '',
+            linkedIssueType: linkedIssueTypesMap.BLOCKS,
+          });
+          done();
+        });
+      });
+
+      it('emits an event with a "is_blocked_by" link type when the "is blocked by" radio input selected', done => {
+        spyOn(wrapper.vm, '$emit');
+
+        wrapper.vm.linkedIssueType = linkedIssueTypesMap.IS_BLOCKED_BY;
+        wrapper.vm.onFormSubmit();
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', {
+            pendingReferences: '',
+            linkedIssueType: linkedIssueTypesMap.IS_BLOCKED_BY,
+          });
+          done();
+        });
+      });
     });
   });
 });
