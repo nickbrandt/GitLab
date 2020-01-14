@@ -125,12 +125,12 @@ module EE
 
       override :internal
       def internal
-        super.or(where.not(bot_type: nil))
+        super.or(bots)
       end
 
       override :non_internal
       def non_internal
-        super.where(bot_type: nil)
+        super.humans
       end
 
       def non_ldap
