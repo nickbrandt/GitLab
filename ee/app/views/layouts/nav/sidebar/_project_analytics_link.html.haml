@@ -1,5 +1,5 @@
 - if Feature.enabled?(:code_review_analytics) && can?(current_user, :read_code_review_analytics, @project)
-  - project_analytics_link = namespace_project_analytics_code_reviews_path(@project.namespace, @project)
+  - project_analytics_link = project_analytics_code_reviews_path(@project)
 
   = nav_link controller: :code_review do
     = link_to project_analytics_link, data: { qa_selector: 'project_analytics_link' } do

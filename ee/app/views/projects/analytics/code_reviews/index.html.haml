@@ -1,8 +1,9 @@
 - breadcrumb_title _("Code Review")
 - page_title _("Code Review")
 
-.d-flex.align-items-center
-  %h1.page-title
+.mb-3
+  %h3
     = _('Code Review')
-.text-secondary= _('Review time is defined as the time it takes from first comment until merged.')
+  %span.text-secondary= _('Review time is defined as the time it takes from first comment until merged.')
+= render 'shared/issuable/search_bar', type: :issues_analytics, show_sorting_dropdown: false
 #js-code-review-analytics{ data: { project: @project } }
