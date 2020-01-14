@@ -52,7 +52,7 @@ module QA
             end
 
             expect(page).to have_content(key_title)
-            expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)
@@ -140,7 +140,7 @@ module QA
             end
 
             expect(page).to have_content(key_title)
-            expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)
