@@ -47,6 +47,17 @@ filebeat:
             when:
               equals:
                 kubernetes.container.name: "modsecurity-log"
+    setup.template.settings:
+      index:
+        analysis:
+          analyzer:
+            squarecapture_analyzer:
+              tokenizer: "squarecapture_tokenizer"
+          tokenizer:
+            squarecapture_tokenizer:
+              type: "pattern"
+              pattern: "\\[(?:[^\\]]+)\\]"
+              group: 0
 
 fluentd:
   enabled: false
