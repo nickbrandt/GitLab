@@ -112,7 +112,7 @@ module Gitlab
         false
       end
 
-      def self.parse_search_result(result)
+      def self.parse_search_result(result, project)
         ref = result["_source"]["blob"]["commit_sha"]
         path = result["_source"]["blob"]["path"]
         extname = File.extname(path)
@@ -156,6 +156,7 @@ module Gitlab
           ref: ref,
           startline: from + 1,
           data: data.join,
+          project: project,
           project_id: project_id
         )
       end

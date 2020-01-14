@@ -67,6 +67,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
   end
 
   describe 'parse_search_result' do
+    let(:project) { double(:project) }
     let(:blob) do
       {
         'blob' => {
@@ -78,11 +79,12 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     end
 
     it 'returns an unhighlighted blob when no highlight data is present' do
-      parsed = described_class.parse_search_result('_source' => blob)
+      parsed = described_class.parse_search_result({ '_source' => blob }, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         startline: 1,
+        project: project,
         data: "foo\n"
       )
     end
@@ -95,7 +97,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         }
       }
 
-      parsed = described_class.parse_search_result(result)
+      parsed = described_class.parse_search_result(result, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
@@ -104,6 +106,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         basename: 'path/file',
         ref: 'sha',
         startline: 2,
+        project: project,
         data: "bar\n"
       )
     end

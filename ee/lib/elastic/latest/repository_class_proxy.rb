@@ -9,30 +9,9 @@ module Elastic
         'blob'
       end
 
+      # @return [Kaminari::PaginatableArray]
       def find_commits_by_message_with_elastic(query, page: 1, per_page: 20, options: {})
-        response = elastic_search(
-          query,
-          type: :commit,
-          page: page,
-          per: per_page,
-          options: options
-        )[:commits][:results]
-
-        response_count = response.total_count
-
-        # Avoid one SELECT per result by loading all projects into a hash
-        project_ids = response.map {|result| result["_source"]["commit"]["rid"] }.uniq
-        projects = Project.with_route.id_in(project_ids).index_by(&:id)
-
-        commits = response.map do |result|
-          project_id = result["_source"]["commit"]["rid"].to_i
-          project = projects[project_id]
-
-          if project.nil? || project.pending_delete?
-            response_count -= 1
-            next
-          end
-
+        elastic_search_and_wrap(query, type: :commit, page: page, per: per_page, options: options) do |result, project|
           raw_commit = Gitlab::Git::Commit.new(
             project.repository.raw,
             prepare_commit(result['_source']['commit']),
@@ -40,13 +19,6 @@ module Elastic
           )
           Commit.new(raw_commit, project)
         end
-
-        # Remove results for deleted projects
-        commits.compact!
-
-        # Before "map" we had a paginated array so we need to recover it
-        offset = per_page * ((page || 1) - 1)
-        Kaminari.paginate_array(commits, total_count: response_count, limit: per_page, offset: offset)
       end
 
       private
