@@ -37,6 +37,7 @@ module EE
         mount ::API::NpmPackages
         mount ::API::ProjectPackages
         mount ::API::GroupPackages
+        mount ::API::GroupHooks
         mount ::API::PackageFiles
         mount ::API::Scim
         mount ::API::ManagedLicenses
