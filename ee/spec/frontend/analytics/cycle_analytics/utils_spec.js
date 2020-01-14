@@ -10,6 +10,7 @@ import {
   nestQueryStringKeys,
   flattenDurationChartData,
   getDurationChartData,
+  getDurationChartMedianData,
   transformRawStages,
   isPersistedStage,
   getTasksByTypeData,
@@ -23,8 +24,10 @@ import {
   labelStopEvent,
   customStageStartEvents as startEvents,
   transformedDurationData,
+  transformedDurationMedianData,
   flattenedDurationData,
   durationChartPlottableData,
+  durationChartPlottableMedianData,
   startDate,
   endDate,
   issueStage,
@@ -162,6 +165,18 @@ describe('Cycle analytics utils', () => {
       const plottableData = getDurationChartData(transformedDurationData, startDate, endDate);
 
       expect(plottableData).toStrictEqual(durationChartPlottableData);
+    });
+  });
+
+  describe('getDurationChartMedianData', () => {
+    it('computes the plottable data as expected', () => {
+      const plottableData = getDurationChartMedianData(
+        transformedDurationMedianData,
+        startDate,
+        endDate,
+      );
+
+      expect(plottableData).toStrictEqual(durationChartPlottableMedianData);
     });
   });
 

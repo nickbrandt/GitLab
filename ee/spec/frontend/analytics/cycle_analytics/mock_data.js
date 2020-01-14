@@ -174,3 +174,29 @@ export const durationChartPlottableData = [
   ['2019-01-01', 29, '2019-01-01'],
   ['2019-01-02', 100, '2019-01-02'],
 ];
+
+export const rawDurationMedianData = [
+  {
+    duration_in_seconds: 1234000,
+    finished_at: '2018-12-01T00:00:00.000Z',
+  },
+  {
+    duration_in_seconds: 4321000,
+    finished_at: '2018-12-02T00:00:00.000Z',
+  },
+];
+
+export const transformedDurationMedianData = [
+  {
+    slug: 1,
+    selected: true,
+    data: rawDurationMedianData,
+  },
+  {
+    slug: 2,
+    selected: true,
+    data: rawDurationMedianData,
+  },
+];
+
+export const durationChartPlottableMedianData = [['2018-12-31', 29], ['2019-01-01', 100]];
