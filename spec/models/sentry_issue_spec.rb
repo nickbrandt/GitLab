@@ -37,16 +37,4 @@ describe SentryIssue do
 
     it { is_expected.to eq(sentry_issue) }
   end
-
-  describe 'scopes' do
-    describe 'for_identifier' do
-      let!(:sentry_issue) { create(:sentry_issue) }
-      let(:identifier) { sentry_issue.sentry_issue_identifier }
-      let!(:second_sentry_issue) { create(:sentry_issue) }
-
-      subject { described_class.for_identifier(identifier) }
-
-      it { is_expected.to eq(sentry_issue) }
-    end
-  end
 end
