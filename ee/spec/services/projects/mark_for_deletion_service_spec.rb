@@ -18,13 +18,11 @@ describe Projects::MarkForDeletionService do
     end
 
     context 'marking project for deletion' do
-      before do
-        described_class.new(project, user).execute
-      end
-
       it 'marks project as archived and marked for deletion' do
-        expect(Project.unscoped.all).to include(project)
+        result = described_class.new(project, user).execute
 
+        expect(result[:status]).to eq(:success)
+        expect(Project.unscoped.all).to include(project)
         expect(project.archived).to eq(true)
         expect(project.marked_for_deletion_at).not_to be_nil
         expect(project.deleting_user).to eq(user)
@@ -34,11 +32,10 @@ describe Projects::MarkForDeletionService do
     context 'marking project for deletion once again' do
       let(:marked_for_deletion_at) { 2.days.ago }
 
-      before do
-        described_class.new(project, user).execute
-      end
-
       it 'does not change original date' do
+        result = described_class.new(project, user).execute
+
+        expect(result[:status]).to eq(:success)
         expect(project.marked_for_deletion_at).to eq(marked_for_deletion_at.to_date)
       end
     end
@@ -58,6 +55,9 @@ describe Projects::MarkForDeletionService do
       end
 
       it 'does not change project attributes' do
+        result = described_class.new(project, user).execute
+
+        expect(result[:status]).to eq(:error)
         expect(Project.all).to include(project)
 
         expect(project.archived).to eq(false)
