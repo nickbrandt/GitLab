@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
   include ::EE::GeoHelpers
 
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
-  set(:job_artifact) { create(:ci_job_artifact, :archive, :correct_checksum) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
+  let_it_be(:job_artifact) { create(:ci_job_artifact, :archive, :correct_checksum) }
 
   subject do
     described_class.new(job_artifact)

@@ -12,8 +12,8 @@ describe Gitlab::Geo::CronManager, :geo do
   subject(:manager) { described_class.new }
 
   describe '#execute' do
-    set(:primary) { create(:geo_node, :primary) }
-    set(:secondary) { create(:geo_node) }
+    let_it_be(:primary) { create(:geo_node, :primary) }
+    let_it_be(:secondary) { create(:geo_node) }
 
     def init_cron_job(job_name, class_name)
       job = Sidekiq::Cron::Job.new(

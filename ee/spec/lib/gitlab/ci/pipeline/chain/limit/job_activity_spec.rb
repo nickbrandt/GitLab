@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe ::Gitlab::Ci::Pipeline::Chain::Limit::JobActivity do
-  set(:namespace) { create(:namespace) }
-  set(:project) { create(:project, namespace: namespace) }
-  set(:user) { create(:user) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:project) { create(:project, namespace: namespace) }
+  let_it_be(:user) { create(:user) }
 
   let(:command) do
     double('command', project: project, current_user: user)

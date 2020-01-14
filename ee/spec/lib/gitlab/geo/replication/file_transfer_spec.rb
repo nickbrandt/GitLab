@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::FileTransfer do
   include ::EE::GeoHelpers
 
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
   let(:user) { create(:user, :with_avatar) }
   let(:upload) { Upload.find_by(model: user, uploader: 'AvatarUploader') }
 

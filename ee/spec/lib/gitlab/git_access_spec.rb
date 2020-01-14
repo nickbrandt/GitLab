@@ -6,7 +6,7 @@ describe Gitlab::GitAccess do
   include GitHelpers
   include EE::GeoHelpers
 
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   let(:actor) { user }
   let(:project) { create(:project, :repository) }

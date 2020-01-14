@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::BaseTransfer do
   include ::EE::GeoHelpers
 
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   describe '#can_transfer?' do
     subject do

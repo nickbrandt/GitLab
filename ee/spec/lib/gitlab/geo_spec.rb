@@ -6,8 +6,8 @@ describe Gitlab::Geo, :geo, :request_store do
   using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 
-  set(:primary_node)   { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node)   { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   shared_examples 'a Geo cached value' do |method, key|
     it 'includes GitLab version and Rails.version in the cache key' do

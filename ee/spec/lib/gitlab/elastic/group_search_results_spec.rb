@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Gitlab::Elastic::GroupSearchResults do
-  set(:user) { create(:user) }
-  set(:group) { create(:group) }
-  set(:guest) { create(:user).tap { |u| group.add_user(u, Gitlab::Access::GUEST) } }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:guest) { create(:user).tap { |u| group.add_user(u, Gitlab::Access::GUEST) } }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)

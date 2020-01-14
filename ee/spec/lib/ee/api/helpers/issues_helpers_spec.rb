@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe API::Helpers::IssuesHelpers do
-  set(:group) { create(:group) }
-  set(:project) { create(:project, group: group) }
-  set(:user) { create(:user) }
-  set(:epic) { create(:epic, group: group) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:epic) { create(:epic, group: group) }
 
   subject(:issues_helpers) { Class.new.include(described_class).new }
 
