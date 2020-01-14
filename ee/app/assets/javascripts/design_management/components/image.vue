@@ -52,7 +52,7 @@ export default {
 </script>
 
 <template>
-  <div class="m-auto js-design-image">
+  <div class="m-auto h-100 w-100 d-flex-center js-design-image">
     <img ref="contentImg" :src="image" :alt="name" class="img-fluid mh-100" @load="onImgLoad" />
   </div>
 </template>
