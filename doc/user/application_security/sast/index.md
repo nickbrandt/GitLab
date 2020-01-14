@@ -62,25 +62,27 @@ is **not** `19.03.00`. See [troubleshooting information](#error-response-from-da
 
 The following table shows which languages, package managers and frameworks are supported and which tools are used.
 
-| Language (package managers) / framework                                     | Scan tool                                                                              | Introduced in GitLab Version |
-|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------|------------------------------|
-| .NET                                                                        | [Security Code Scan](https://security-code-scan.github.io)                             | 11.0                         |
-| Any                                                                         | [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) | 11.9    |
-| Apex (Salesforce)                                                           | [pmd](https://pmd.github.io/pmd/index.html)                                            | 12.1                         |
-| C/C++                                                                       | [Flawfinder](https://dwheeler.com/flawfinder/)                                         | 10.7                         |
-| Elixir (Phoenix)                                                            | [Sobelow](https://github.com/nccgroup/sobelow)                                         | 11.10                        |
-| Go                                                                          | [Gosec](https://github.com/securego/gosec)                                             | 10.7                         |
-| Groovy ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin | 11.3 (Gradle) & 11.9 (Ant, Maven, SBT) |
-| Java ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin | 10.6 (Maven), 10.8 (Gradle) & 11.9 (Ant, SBT) |
-| JavaScript                                                                  | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       | 11.8                         |
-| Kubernetes manifests                                                        | [Kubesec](https://github.com/controlplaneio/kubesec)                                   | 12.6                         |
-| Node.js                                                                     | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                | 11.1                         |
-| PHP                                                                         | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) | 10.8                         |
-| Python ([pip](https://pip.pypa.io/en/stable/))                              | [bandit](https://github.com/PyCQA/bandit)                                              | 10.3                         |
-| React                                                                       | [ESLint react plugin](https://github.com/yannickcr/eslint-plugin-react)                | 12.5                         |
-| Ruby on Rails                                                               | [brakeman](https://brakemanscanner.org)                                                | 10.3                         |
-| Scala ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin | 11.0 (SBT) & 11.9 (Ant, Gradle, Maven) |
-| TypeScript                                                                  | [TSLint config security](https://github.com/webschik/tslint-config-security/)          | 11.9                         |
+| Language (package managers) / framework                                     | Scan tool                                                                              |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| .NET                                                                        | [Security Code Scan](https://security-code-scan.github.io)                             |
+| Any                                                                         | [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) |
+| Apex (Salesforce)                                                           | [pmd](https://pmd.github.io/pmd/index.html)                                            |
+| C/C++                                                                       | [Flawfinder](https://dwheeler.com/flawfinder/)                                         |
+| Elixir (Phoenix)                                                            | [Sobelow](https://github.com/nccgroup/sobelow)                                         |
+| Go                                                                          | [Gosec](https://github.com/securego/gosec)                                             |
+| Groovy ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin |
+| Java ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin |
+| JavaScript                                                                  | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       |
+| Kubernetes manifests                                                        | [Kubesec](https://github.com/controlplaneio/kubesec)                                   |
+| Node.js                                                                     | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                |
+| PHP                                                                         | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) |
+| Python ([pip](https://pip.pypa.io/en/stable/))                              | [bandit](https://github.com/PyCQA/bandit)                                              |
+| React                                                                       | [ESLint react plugin](https://github.com/yannickcr/eslint-plugin-react)                |
+| Ruby on Rails                                                               | [brakeman](https://brakemanscanner.org)                                                |
+| Scala ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin |
+| TypeScript                                                                  | [TSLint config security](https://github.com/webschik/tslint-config-security/)          |
+
+See [histroy of the analyzers](#history-of-the-analyzers) for the release notes.
 
 NOTE: **Note:**
 The Java analyzers can also be used for variants like the
