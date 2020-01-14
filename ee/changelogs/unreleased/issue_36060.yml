@@ -1,0 +1,5 @@
+---
+title: Fix reply emails with attachments for epics
+merge_request: 22547
+author:
+type: fixed

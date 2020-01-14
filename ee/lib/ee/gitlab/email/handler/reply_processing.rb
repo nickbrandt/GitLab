@@ -24,6 +24,16 @@ module EE
           def process_message(**kwargs)
             strip_quick_actions(super(kwargs))
           end
+
+          override :upload_params
+          def upload_params
+            return super unless try(:noteable)&.is_a?(Epic)
+
+            {
+              upload_parent: noteable.group,
+              uploader_class: NamespaceFileUploader
+            }
+          end
         end
       end
     end
