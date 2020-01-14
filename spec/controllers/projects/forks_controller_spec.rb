@@ -13,18 +13,17 @@ describe Projects::ForksController do
   end
 
   shared_examples 'forking disabled' do
-    let(:project) { create(:project, :private, :repository) }
+    let(:project) { create(:project, :private, :repository, :forking_disabled) }
 
     before do
-      create(:project_setting, { project: project, forking_enabled: false })
       project.add_developer(user)
       sign_in(user)
     end
 
-    it 'returns with 403' do
+    it 'returns with 404' do
       subject
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(404)
     end
   end
 
@@ -157,8 +156,8 @@ describe Projects::ForksController do
     subject do
       get :new,
           params: {
-              namespace_id: project.namespace,
-              project_id: project
+            namespace_id: project.namespace,
+            project_id: project
           }
     end
 
@@ -188,9 +187,9 @@ describe Projects::ForksController do
   describe 'POST create' do
     let(:params) do
       {
-          namespace_id: project.namespace,
-          project_id: project,
-          namespace_key: user.namespace.id
+        namespace_id: project.namespace,
+        project_id: project,
+        namespace_key: user.namespace.id
       }
     end
 
@@ -213,16 +212,16 @@ describe Projects::ForksController do
       context 'continue params' do
         let(:params) do
           {
-              namespace_id: project.namespace,
-              project_id: project,
-              namespace_key: user.namespace.id,
-              continue: continue_params
+            namespace_id: project.namespace,
+            project_id: project,
+            namespace_key: user.namespace.id,
+            continue: continue_params
           }
         end
         let(:continue_params) do
           {
-              to: '/-/ide/project/path',
-              notice: 'message'
+            to: '/-/ide/project/path',
+            notice: 'message'
           }
         end
 

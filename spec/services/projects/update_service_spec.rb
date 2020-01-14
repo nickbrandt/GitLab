@@ -8,11 +8,8 @@ describe Projects::UpdateService do
 
   let(:user) { create(:user) }
   let(:project) do
-    create(:project, { creator: user,
-                       namespace: user.namespace,
-                       visibility_level: project_visibility_level })
+    create(:project, creator: user, namespace: user.namespace)
   end
-  let(:project_visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
 
   describe '#execute' do
     let(:gitlab_shell) { Gitlab::Shell.new }
@@ -154,40 +151,6 @@ describe Projects::UpdateService do
           expect(result).to eq({ status: :error, message: 'Visibility level public is not allowed in a internal group.' })
           expect(project.reload).to be_internal
         end
-      end
-    end
-
-    context 'when changing forking enabled' do
-      subject do
-        update_project(project, user,
-                       project_setting_attributes: { forking_enabled: forking_enabled } )
-      end
-
-      shared_examples 'valid forking_enabled change' do
-        it 'succeeds' do
-          expect(subject).to eq({ status: :success })
-        end
-
-        it 'updates the project' do
-          expect { subject }.to change(project, :forking_enabled).to(forking_enabled)
-        end
-      end
-
-      context 'enables forking' do
-        let(:forking_enabled) { true }
-
-        before do
-          create(:project_setting,
-                 { project: project, forking_enabled: false })
-        end
-
-        it_behaves_like 'valid forking_enabled change'
-      end
-
-      context 'disables forking' do
-        let(:forking_enabled) { false }
-
-        it_behaves_like 'valid forking_enabled change'
       end
     end
 

@@ -28,18 +28,13 @@ describe 'Project fork' do
   end
 
   context 'forking enabled / disabled in project settings' do
-    let(:project) { create(:project, :private, :repository) }
-
     before do
-      project.add_developer(user)
-
-      create(:project_setting,
-             { project: project,
-               forking_enabled: forking_enabled })
+      project.project_feature.update_attribute(
+        :forking_access_level, forking_access_level)
     end
 
     context 'forking is enabled' do
-      let(:forking_enabled) { true }
+      let(:forking_access_level) { ProjectFeature::ENABLED }
 
       it 'enables fork button' do
         visit project_path(project)
@@ -57,7 +52,7 @@ describe 'Project fork' do
     end
 
     context 'forking is disabled' do
-      let(:forking_enabled) { false }
+      let(:forking_access_level) { ProjectFeature::DISABLED }
 
       it 'does not render fork button' do
         visit project_path(project)
@@ -68,8 +63,49 @@ describe 'Project fork' do
       it 'does not render new project fork page' do
         visit new_project_fork_path(project)
 
-        expect(page.status_code).to eq(403)
-        expect(page).to have_text('Forking is disabled for this project')
+        expect(page.status_code).to eq(404)
+      end
+    end
+
+    context 'forking is private' do
+      let(:forking_access_level) { ProjectFeature::PRIVATE }
+
+      before do
+        project.update(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+      end
+
+      context 'user is not a team member' do
+        it 'does not render fork button' do
+          visit project_path(project)
+
+          expect(page).not_to have_css('a', text: 'Fork')
+        end
+
+        it 'does not render new project fork page' do
+          visit new_project_fork_path(project)
+
+          expect(page.status_code).to eq(404)
+        end
+      end
+
+      context 'user is a team member' do
+        before do
+          project.add_developer(user)
+        end
+
+        it 'enables fork button' do
+          visit project_path(project)
+
+          expect(page).to have_css('a', text: 'Fork')
+          expect(page).not_to have_css('a.disabled', text: 'Fork')
+        end
+
+        it 'renders new project fork page' do
+          visit new_project_fork_path(project)
+
+          expect(page.status_code).to eq(200)
+          expect(page).to have_text(' Select a namespace to fork the project ')
+        end
       end
     end
   end

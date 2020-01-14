@@ -8285,9 +8285,6 @@ msgstr ""
 msgid "Forking in progress"
 msgstr ""
 
-msgid "Forking is disabled for this project."
-msgstr ""
-
 msgid "Forking repository"
 msgstr ""
 

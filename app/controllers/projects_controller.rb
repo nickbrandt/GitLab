@@ -391,15 +391,12 @@ class ProjectsController < Projects::ApplicationController
       project_feature_attributes: %i[
         builds_access_level
         issues_access_level
+        forking_access_level
         merge_requests_access_level
         repository_access_level
         snippets_access_level
         wiki_access_level
         pages_access_level
-      ],
-
-      project_setting_attributes: %i[
-        forking_enabled
       ]
     ]
   end

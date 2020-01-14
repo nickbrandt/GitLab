@@ -83,8 +83,10 @@ class ProjectPolicy < BasePolicy
     project.merge_requests_allowing_push_to_user(user).any?
   end
 
-  desc "Project allows forking"
-  condition(:forking_allowed) { @subject.forking_enabled }
+  with_scope :subject
+  condition(:forking_allowed) do
+    @subject.feature_available?(:forking, @user)
+  end
 
   with_scope :global
   condition(:mirror_available, score: 0) do

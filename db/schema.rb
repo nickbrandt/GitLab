@@ -3166,6 +3166,7 @@ ActiveRecord::Schema.define(version: 2020_01_14_204949) do
     t.datetime "updated_at"
     t.integer "repository_access_level", default: 20, null: false
     t.integer "pages_access_level", null: false
+    t.integer "forking_access_level"
     t.index ["project_id"], name: "index_project_features_on_project_id", unique: true
   end
 
@@ -3251,12 +3252,6 @@ ActiveRecord::Schema.define(version: 2020_01_14_204949) do
     t.index ["project_id", "last_wiki_verification_ran_at"], name: "idx_repository_states_on_last_wiki_verification_ran_at", where: "((wiki_verification_checksum IS NOT NULL) AND (last_wiki_verification_failure IS NULL))"
     t.index ["project_id"], name: "idx_repository_states_outdated_checksums", where: "(((repository_verification_checksum IS NULL) AND (last_repository_verification_failure IS NULL)) OR ((wiki_verification_checksum IS NULL) AND (last_wiki_verification_failure IS NULL)))"
     t.index ["project_id"], name: "index_project_repository_states_on_project_id", unique: true
-  end
-
-  create_table "project_settings", primary_key: "project_id", id: :serial, force: :cascade do |t|
-    t.boolean "forking_enabled", default: true, null: false
-    t.datetime_with_timezone "updated_at", null: false
-    t.index ["project_id"], name: "index_project_settings_on_project_id", unique: true
   end
 
   create_table "project_statistics", id: :serial, force: :cascade do |t|
@@ -4782,7 +4777,6 @@ ActiveRecord::Schema.define(version: 2020_01_14_204949) do
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
-  add_foreign_key "project_settings", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify

@@ -38,10 +38,10 @@ describe 'Projects settings' do
     it 'toggles forking enabled / disabled' do
       visit edit_project_path(project)
 
-      forking_enabled_input = find('input[name="project[project_setting_attributes][forking_enabled]"]', visible: :hidden)
-      forking_enabled_button = find('input[name="project[project_setting_attributes][forking_enabled]"] + button')
+      forking_enabled_input = find('input[name="project[project_feature_attributes][forking_access_level]"]', visible: :hidden)
+      forking_enabled_button = find('input[name="project[project_feature_attributes][forking_access_level]"] + label > button')
 
-      expect(forking_enabled_input.value).to eq('true')
+      expect(forking_enabled_input.value).to eq('20')
 
       # disable by clicking toggle
       forking_enabled_button.click
@@ -50,7 +50,7 @@ describe 'Projects settings' do
       end
       wait_for_requests
 
-      expect(forking_enabled_input.value).to eq('false')
+      expect(forking_enabled_input.value).to eq('0')
     end
   end
 

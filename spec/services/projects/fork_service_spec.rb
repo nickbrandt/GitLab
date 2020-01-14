@@ -227,8 +227,8 @@ describe Projects::ForkService do
 
       context 'when forking is disabled' do
         before do
-          create(:project_setting,
-                 { project: @from_project, forking_enabled: false })
+          @from_project.project_feature.update_attribute(
+            :forking_access_level, ProjectFeature::DISABLED)
         end
 
         it 'fails' do

@@ -2861,8 +2861,8 @@ describe API::Projects do
 
     context 'forking disabled' do
       before do
-        create(:project_setting,
-               { project: project, forking_enabled: false })
+        project.project_feature.update_attribute(
+          :forking_access_level, ProjectFeature::DISABLED)
       end
 
       it 'denies project to be forked' do
