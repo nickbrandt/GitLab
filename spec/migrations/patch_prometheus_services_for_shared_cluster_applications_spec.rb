@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'post_migrate', '20191220102807_patch_prometheus_services_for_shared_cluster_applications.rb')
+require Rails.root.join('db', 'post_migrate', '20200114113341_patch_prometheus_services_for_shared_cluster_applications.rb')
 
 describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidekiq do
   include MigrationHelpers::PrometheusServiceHelpers
