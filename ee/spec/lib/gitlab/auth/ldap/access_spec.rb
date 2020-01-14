@@ -32,6 +32,86 @@ describe Gitlab::Auth::LDAP::Access do
 
         expect(access.allowed?).to be_falsey
       end
+
+      context 'when exists in LDAP/AD' do
+        before do
+          allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_dn).and_return(user)
+        end
+
+        context 'user blocked in LDAP/AD' do
+          before do
+            allow(Gitlab::Auth::LDAP::Person).to receive(:disabled_via_active_directory?).and_return(true)
+          end
+
+          it 'blocks user in GitLab' do
+            expect(access.allowed?).to be_falsey
+            expect(user.blocked?).to be_truthy
+            expect(user.ldap_blocked?).to be_truthy
+          end
+
+          context 'on a read-only instance' do
+            before do
+              allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+            end
+
+            it 'does not block user in GitLab' do
+              expect(access.allowed?).to be_falsey
+              expect(user.blocked?).to be_falsey
+              expect(user.ldap_blocked?).to be_falsey
+            end
+          end
+        end
+
+        context 'user unblocked in LDAP/AD' do
+          before do
+            user.update_column(:state, :ldap_blocked)
+            allow(Gitlab::Auth::LDAP::Person).to receive(:disabled_via_active_directory?).and_return(false)
+          end
+
+          it 'unblocks user in GitLab' do
+            expect(access.allowed?).to be_truthy
+            expect(user.blocked?).to be_falsey
+            expect(user.ldap_blocked?).to be_falsey
+          end
+
+          context 'on a read-only instance' do
+            before do
+              allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+            end
+
+            it 'does not unblock user in GitLab' do
+              expect(access.allowed?).to be_truthy
+              expect(user.blocked?).to be_truthy
+              expect(user.ldap_blocked?).to be_truthy
+            end
+          end
+        end
+      end
+
+      context 'when no longer exist in LDAP/AD' do
+        before do
+          stub_ldap_person_find_by_dn(nil)
+          stub_ldap_person_find_by_email(user.email, nil)
+        end
+
+        it 'blocks user in GitLab' do
+          expect(access.allowed?).to be_falsey
+          expect(user.blocked?).to be_truthy
+          expect(user.ldap_blocked?).to be_truthy
+        end
+
+        context 'on a read-only instance' do
+          before do
+            allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+          end
+
+          it 'does not block user in GitLab' do
+            expect(access.allowed?).to be_falsey
+            expect(user.blocked?).to be_falsey
+            expect(user.ldap_blocked?).to be_falsey
+          end
+        end
+      end
     end
   end
 
