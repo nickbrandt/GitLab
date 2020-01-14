@@ -14,6 +14,7 @@ import 'bootstrap';
 import '~/gl_dropdown';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
+import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as mockData from '../mock_data';
@@ -103,6 +104,10 @@ describe('Cycle Analytics component', () => {
 
   const displaysDurationScatterPlot = flag => {
     expect(wrapper.find(Scatterplot).exists()).toBe(flag);
+  };
+
+  const displaysTasksByType = flag => {
+    expect(wrapper.find(TasksByTypeChart).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -289,11 +294,10 @@ describe('Cycle Analytics component', () => {
       describe('the user does not have access to the group', () => {
         beforeEach(() => {
           mock = new MockAdapter(axios);
-          wrapper.vm.$store.dispatch('setSelectedGroup', {
-            ...mockData.group,
-          });
+          mock.onAny().reply(403);
 
-          wrapper.vm.$store.state.errorCode = 403;
+          wrapper.vm.onGroupSelect(mockData.group);
+          return waitForPromises();
         });
 
         it('renders the no access information', () => {
@@ -321,6 +325,14 @@ describe('Cycle Analytics component', () => {
 
         it('does not display the add stage button', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(false);
+        });
+
+        it('does not display the tasks by type chart', () => {
+          displaysTasksByType(false);
+        });
+
+        it('does not display the duration chart', () => {
+          displaysDurationScatterPlot(false);
         });
       });
 
@@ -366,6 +378,7 @@ describe('Cycle Analytics component', () => {
           wrapper.destroy();
           mock.restore();
         });
+
         it('displays the tasks by type chart', () => {
           expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(true);
         });

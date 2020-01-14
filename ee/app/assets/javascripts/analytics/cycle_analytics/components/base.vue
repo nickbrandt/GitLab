@@ -85,9 +85,15 @@ export default {
       return this.selectedGroup && !this.errorCode;
     },
     shouldDisplayDurationChart() {
-      return !this.isLoadingDurationChart && !this.isLoading;
+      return this.featureFlags.hasDurationChart && !this.hasNoAccessError;
     },
     shouldDisplayTasksByTypeChart() {
+      return this.featureFlags.hasTasksByTypeChart && !this.hasNoAccessError;
+    },
+    isDurationChartLoaded() {
+      return !this.isLoadingDurationChart && !this.isLoading;
+    },
+    isTasksByTypeChartLoaded() {
       return !this.isLoading && !this.isLoadingTasksByTypeChart;
     },
     hasDateRangeSet() {
@@ -280,8 +286,8 @@ export default {
           />
         </div>
       </div>
-      <template v-if="featureFlags.hasDurationChart">
-        <template v-if="shouldDisplayDurationChart">
+      <template v-if="shouldDisplayDurationChart">
+        <template v-if="isDurationChartLoaded">
           <div class="mt-3 d-flex">
             <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
             <stage-dropdown-filter
@@ -304,9 +310,9 @@ export default {
         </template>
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
       </template>
-      <template v-if="featureFlags.hasTasksByTypeChart">
+      <template v-if="shouldDisplayTasksByTypeChart">
         <div class="js-tasks-by-type-chart">
-          <div v-if="shouldDisplayTasksByTypeChart">
+          <div v-if="isTasksByTypeChartLoaded">
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
