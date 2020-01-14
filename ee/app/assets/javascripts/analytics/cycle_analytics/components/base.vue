@@ -8,10 +8,10 @@ import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
+import { LAST_ACTIVITY_AT, dateFormats } from '../../shared/constants';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
-import { LAST_ACTIVITY_AT } from '../../shared/constants';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
 
 export default {
@@ -196,6 +196,7 @@ export default {
     with_shared: false,
     order_by: LAST_ACTIVITY_AT,
   },
+  durationChartTooltipDateFormat: dateFormats.defaultDate,
 };
 </script>
 
@@ -308,6 +309,7 @@ export default {
             v-if="durationChartPlottableData"
             :x-axis-title="s__('CycleAnalytics|Date')"
             :y-axis-title="s__('CycleAnalytics|Total days to completion')"
+            :tooltip-date-format="$options.durationChartTooltipDateFormat"
             :scatter-data="durationChartPlottableData"
           />
           <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">

@@ -25,6 +25,11 @@ export default {
       required: false,
       default: () => [],
     },
+    tooltipDateFormat: {
+      type: String,
+      required: false,
+      default: dateFormats.defaultDateTime,
+    },
   },
   data() {
     return {
@@ -69,7 +74,7 @@ export default {
   methods: {
     renderTooltip({ data }) {
       const [, metric, dateTime] = data;
-      this.tooltipTitle = dateFormat(dateTime, dateFormats.defaultDateTime);
+      this.tooltipTitle = dateFormat(dateTime, this.tooltipDateFormat);
       this.tooltipContent = metric;
     },
   },
@@ -86,7 +91,7 @@ export default {
   >
     <div slot="tooltipTitle">{{ tooltipTitle }} ({{ xAxisTitle }})</div>
     <div slot="tooltipContent" class="d-flex">
-      <div class="flex-grow-1">{{ yAxisTitle }}</div>
+      <div class="flex-grow-1">{{ yAxisTitle }}:&nbsp;</div>
       <div class="font-weight-bold">{{ tooltipContent }}</div>
     </div>
   </gl-discrete-scatter-chart>
