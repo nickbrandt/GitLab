@@ -11346,6 +11346,9 @@ msgstr ""
 msgid "Merge Requests created"
 msgstr ""
 
+msgid "Merge Requests in Review"
+msgstr ""
+
 msgid "Merge commit message"
 msgstr ""
 
