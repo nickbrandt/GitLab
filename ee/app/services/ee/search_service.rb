@@ -53,6 +53,18 @@ module EE
       )
     end
 
+    def valid_query_length?
+      return true if use_elasticsearch?
+
+      super
+    end
+
+    def valid_terms_count?
+      return true if use_elasticsearch?
+
+      super
+    end
+
     private
 
     def logger
