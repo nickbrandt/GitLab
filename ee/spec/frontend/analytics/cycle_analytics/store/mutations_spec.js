@@ -18,6 +18,7 @@ import {
   customizableStagesAndEvents,
   tasksByTypeData,
   transformedDurationData,
+  transformedTasksByTypeData,
 } from '../mock_data';
 
 let state = null;
@@ -32,34 +33,34 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                       | stateKey                    | value
-    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}  | ${false}
-    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}  | ${true}
-    ${types.EDIT_CUSTOM_STAGE}                     | ${'isEditingCustomStage'}   | ${true}
-    ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}         | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}           | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}         | ${false}
-    ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}              | ${true}
-    ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                 | ${[]}
-    ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                 | ${[]}
-    ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                | ${[]}
-    ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                | ${[]}
-    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                 | ${[]}
-    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                 | ${[]}
-    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}  | ${[]}
-    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'}  | ${[]}
-    ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}    | ${true}
-    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}    | ${false}
-    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingChartData'}     | ${true}
-    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingChartData'}     | ${false}
-    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}              | ${true}
-    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}              | ${false}
-    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}              | ${true}
-    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}              | ${false}
-    ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'} | ${true}
-    ${types.RECEIVE_DURATION_DATA_ERROR}           | ${'isLoadingDurationChart'} | ${false}
-    ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                | ${{}}
-    ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                | ${{}}
+    mutation                                       | stateKey                       | value
+    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}     | ${false}
+    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}     | ${true}
+    ${types.EDIT_CUSTOM_STAGE}                     | ${'isEditingCustomStage'}      | ${true}
+    ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}            | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}              | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}            | ${false}
+    ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                 | ${true}
+    ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                    | ${[]}
+    ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                    | ${[]}
+    ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                   | ${[]}
+    ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                   | ${[]}
+    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                    | ${[]}
+    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                    | ${[]}
+    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}     | ${[]}
+    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'}     | ${[]}
+    ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}       | ${true}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}       | ${false}
+    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'} | ${true}
+    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'} | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                 | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}                 | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}                 | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}                 | ${false}
+    ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'}    | ${true}
+    ${types.RECEIVE_DURATION_DATA_ERROR}           | ${'isLoadingDurationChart'}    | ${false}
+    ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                   | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                   | ${{}}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -189,17 +190,17 @@ describe('Cycle analytics mutations', () => {
   });
 
   describe(`${types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS}`, () => {
-    it('sets isLoadingChartData to false', () => {
+    it('sets isLoadingTasksByTypeChart to false', () => {
       mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, {});
 
-      expect(state.isLoadingChartData).toEqual(false);
+      expect(state.isLoadingTasksByTypeChart).toEqual(false);
     });
 
     it('sets tasksByType.data to the raw returned chart data', () => {
       state = { tasksByType: { data: null } };
       mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, tasksByTypeData);
 
-      expect(state.tasksByType.data).toEqual(tasksByTypeData);
+      expect(state.tasksByType.data).toEqual(transformedTasksByTypeData);
     });
   });
 

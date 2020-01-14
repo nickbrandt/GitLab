@@ -246,13 +246,15 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
 
-export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
+export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
+};
 
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
   createFlash(__('There was an error fetching data for the tasks by type chart'));
 };
+
 export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
 export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
@@ -279,7 +281,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
     dispatch('requestTasksByTypeData');
 
     return Api.cycleAnalyticsTasksByType(params)
-      .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
+      .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
   return Promise.resolve();

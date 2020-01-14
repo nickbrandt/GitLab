@@ -12,6 +12,7 @@ import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import { LAST_ACTIVITY_AT } from '../../shared/constants';
+import TasksByTypeChart from './tasks_by_type_chart.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -25,6 +26,7 @@ export default {
     GlDaterangePicker,
     StageDropdownFilter,
     Scatterplot,
+    TasksByTypeChart,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -41,24 +43,19 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      multiProjectSelect: true,
-      dateOptions: [7, 30, 90],
-    };
-  },
   computed: {
     ...mapState([
       'featureFlags',
       'isLoading',
       'isLoadingStage',
-      'isLoadingChartData',
+      'isLoadingTasksByTypeChart',
       'isLoadingDurationChart',
       'isEmptyStage',
       'isSavingCustomStage',
       'isCreatingCustomStage',
       'isEditingCustomStage',
       'selectedGroup',
+      'selectedProjectIds',
       'selectedStage',
       'stages',
       'summary',
@@ -71,7 +68,12 @@ export default {
       'tasksByType',
       'medians',
     ]),
-    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
+    ...mapGetters([
+      'hasNoAccessError',
+      'currentGroupPath',
+      'durationChartPlottableData',
+      'tasksByTypeChartData',
+    ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -84,6 +86,10 @@ export default {
     shouldDisplayDurationChart() {
       return !this.isLoadingDurationChart && !this.isLoading;
     },
+    shouldDisplayTasksByTypeChart() {
+      return !this.isLoading && !this.isLoadingTasksByTypeChart;
+    },
+
     dateRange: {
       get() {
         return { startDate: this.startDate, endDate: this.endDate };
@@ -94,6 +100,26 @@ export default {
           endDate,
         });
       },
+    },
+    hasDateRangeSet() {
+      return this.startDate && this.endDate;
+    },
+    selectedTasksByTypeFilters() {
+      const {
+        selectedGroup,
+        startDate,
+        endDate,
+        selectedProjectIds,
+        tasksByType: { subject, labelIds: selectedLabelIds },
+      } = this;
+      return {
+        selectedGroup,
+        selectedProjectIds,
+        startDate,
+        endDate,
+        subject,
+        selectedLabelIds,
+      };
     },
   },
   mounted() {
@@ -160,6 +186,8 @@ export default {
       this.updateSelectedDurationChartStages(stages);
     },
   },
+  multiProjectSelect: true,
+  dateOptions: [7, 30, 90],
   groupsQueryParams: {
     min_access_level: featureAccessLevel.EVERYONE,
   },
@@ -191,7 +219,7 @@ export default {
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
           :query-params="$options.projectsQueryParams"
-          :multi-select="multiProjectSelect"
+          :multi-select="$options.multiProjectSelect"
           @selected="onProjectsSelect"
         />
         <div
@@ -287,6 +315,17 @@ export default {
           </div>
         </template>
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
+      </template>
+      <template v-if="featureFlags.hasTasksByTypeChart">
+        <div class="js-tasks-by-type-chart">
+          <div v-if="shouldDisplayTasksByTypeChart">
+            <tasks-by-type-chart
+              :chart-data="tasksByTypeChartData"
+              :filters="selectedTasksByTypeFilters"
+            />
+          </div>
+          <gl-loading-icon v-else size="md" class="my-4 py-4" />
+        </div>
       </template>
     </div>
   </div>

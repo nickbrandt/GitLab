@@ -1,6 +1,6 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
-import { transformRawStages } from '../utils';
+import { transformRawStages, transformRawTasksByTypeData } from '../utils';
 
 export default {
   [types.SET_FEATURE_FLAGS](state, featureFlags) {
@@ -133,16 +133,16 @@ export default {
     );
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
-    state.isLoadingChartData = true;
+    state.isLoadingTasksByTypeChart = true;
   },
   [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
-    state.isLoadingChartData = false;
+    state.isLoadingTasksByTypeChart = false;
   },
   [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data) {
-    state.isLoadingChartData = false;
+    state.isLoadingTasksByTypeChart = false;
     state.tasksByType = {
       ...state.tasksByType,
-      data,
+      data: transformRawTasksByTypeData(data),
     };
   },
   [types.REQUEST_CREATE_CUSTOM_STAGE](state) {

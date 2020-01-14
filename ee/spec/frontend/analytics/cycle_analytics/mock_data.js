@@ -4,8 +4,10 @@ import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
+import { toYmd } from 'ee/analytics/shared/utils';
+import { transformRawTasksByTypeData } from 'ee/analytics/cycle_analytics/utils';
 
 const endpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/cycle_analytics/stages.json', // customizable stages and events endpoint
@@ -121,7 +123,21 @@ export const customStageEvents = [
   labelStopEvent,
 ];
 
-export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json');
+const dateRange = getDatesInRange(startDate, endDate, toYmd);
+
+export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
+  labelData => {
+    // add data points for our mock date range
+    const maxValue = 10;
+    const series = dateRange.map(date => [date, Math.floor(Math.random() * Math.floor(maxValue))]);
+    return {
+      ...labelData,
+      series,
+    };
+  },
+);
+
+export const transformedTasksByTypeData = transformRawTasksByTypeData(tasksByTypeData);
 
 export const rawDurationData = [
   {

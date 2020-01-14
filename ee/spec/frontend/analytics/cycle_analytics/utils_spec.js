@@ -1,3 +1,5 @@
+import { isNumber } from 'underscore';
+import { getDatesInRange } from '~/lib/utils/datetime_utility';
 import {
   isStartEvent,
   isLabelEvent,
@@ -10,7 +12,11 @@ import {
   getDurationChartData,
   transformRawStages,
   isPersistedStage,
+  getTasksByTypeData,
+  flattenTaskByTypeSeries,
+  orderByDate,
 } from 'ee/analytics/cycle_analytics/utils';
+import { toYmd } from 'ee/analytics/shared/utils';
 import {
   customStageEvents as events,
   labelStartEvent,
@@ -23,6 +29,7 @@ import {
   endDate,
   issueStage,
   rawCustomStage,
+  transformedTasksByTypeData,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -197,6 +204,114 @@ describe('Cycle analytics utils', () => {
       ${false} | ${'this-is-a-string'} | ${false}
     `('with custom=$custom and id=$id', ({ custom, id, expected }) => {
       expect(isPersistedStage({ custom, id })).toEqual(expected);
+    });
+  });
+
+  describe('flattenTaskByTypeSeries', () => {
+    const dummySeries = Object.fromEntries([
+      ['2019-01-16', 40],
+      ['2019-01-14', 20],
+      ['2019-01-12', 10],
+      ['2019-01-15', 30],
+    ]);
+
+    let transformedDummySeries = [];
+
+    beforeEach(() => {
+      transformedDummySeries = flattenTaskByTypeSeries(dummySeries);
+    });
+
+    it('extracts the value from an array of datetime / value pairs', () => {
+      expect(transformedDummySeries.every(isNumber)).toEqual(true);
+      Object.values(dummySeries).forEach(v => {
+        expect(transformedDummySeries.includes(v)).toBeTruthy();
+      });
+    });
+
+    it('sorts the items by the datetime parameter', () => {
+      expect(transformedDummySeries).toEqual([10, 20, 30, 40]);
+    });
+  });
+
+  describe('orderByDate', () => {
+    it('sorts dates from the earliest to latest', () => {
+      expect(['2019-01-14', '2019-01-12', '2019-01-16', '2019-01-15'].sort(orderByDate)).toEqual([
+        '2019-01-12',
+        '2019-01-14',
+        '2019-01-15',
+        '2019-01-16',
+      ]);
+    });
+  });
+
+  describe('getTasksByTypeData', () => {
+    let transformed = {};
+
+    const groupBy = getDatesInRange(startDate, endDate, toYmd);
+    // only return the values, drop the date which is the first paramater
+    const extractSeriesValues = ({ series }) => series.map(kv => kv[1]);
+    const data = transformedTasksByTypeData.map(extractSeriesValues);
+
+    const labels = transformedTasksByTypeData.map(d => {
+      const { label } = d;
+      return label.title;
+    });
+
+    it('will return blank arrays if given no data', () => {
+      [{ data: [], startDate, endDate }, [], {}].forEach(chartData => {
+        transformed = getTasksByTypeData(chartData);
+        ['seriesNames', 'data', 'groupBy'].forEach(key => {
+          expect(transformed[key]).toEqual([]);
+        });
+      });
+    });
+
+    describe('with data', () => {
+      beforeEach(() => {
+        transformed = getTasksByTypeData({ data: transformedTasksByTypeData, startDate, endDate });
+      });
+
+      it('will return an object with the properties needed for the chart', () => {
+        ['seriesNames', 'data', 'groupBy'].forEach(key => {
+          expect(transformed).toHaveProperty(key);
+        });
+      });
+
+      describe('seriesNames', () => {
+        it('returns the names of all the labels in the dataset', () => {
+          expect(transformed.seriesNames).toEqual(labels);
+        });
+      });
+
+      describe('groupBy', () => {
+        it('returns the date groupBy as an array', () => {
+          expect(transformed.groupBy).toEqual(groupBy);
+        });
+
+        it('the start date is the first element', () => {
+          expect(transformed.groupBy[0]).toEqual(toYmd(startDate));
+        });
+
+        it('the end date is the last element', () => {
+          expect(transformed.groupBy[transformed.groupBy.length - 1]).toEqual(toYmd(endDate));
+        });
+      });
+
+      describe('data', () => {
+        it('returns an array of data points', () => {
+          expect(transformed.data).toEqual(data);
+        });
+
+        it('contains an array of data for each label', () => {
+          expect(transformed.data.length).toEqual(labels.length);
+        });
+
+        it('contains a value for each day in the groupBy', () => {
+          transformed.data.forEach(d => {
+            expect(d.length).toEqual(transformed.groupBy.length);
+          });
+        });
+      });
     });
   });
 });

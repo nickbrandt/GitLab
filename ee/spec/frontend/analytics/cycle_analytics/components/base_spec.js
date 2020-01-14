@@ -25,12 +25,20 @@ const baseStagesEndpoint = '/-/analytics/cycle_analytics/stages';
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+const defaultStubs = {
+  'summary-table': true,
+  'stage-event-list': true,
+  'stage-nav-item': true,
+  'tasks-by-type-chart': true,
+};
+
 function createComponent({
   opts = {},
   shallow = true,
   withStageSelected = false,
   scatterplotEnabled = true,
   tasksByTypeChartEnabled = true,
+  customizableCycleAnalyticsEnabled = false,
 } = {}) {
   const func = shallow ? shallowMount : mount;
   const comp = func(Component, {
@@ -46,6 +54,7 @@ function createComponent({
       glFeatures: {
         cycleAnalyticsScatterplotEnabled: scatterplotEnabled,
         tasksByTypeChart: tasksByTypeChartEnabled,
+        customizableCycleAnalytics: customizableCycleAnalyticsEnabled,
       },
     },
     ...opts,
@@ -166,7 +175,7 @@ describe('Cycle Analytics component', () => {
     describe('after a filter has been selected', () => {
       describe('the user has access to the group', () => {
         beforeEach(() => {
-          wrapper = createComponent({ withStageSelected: true });
+          wrapper = createComponent({ withStageSelected: true, tasksByTypeChartEnabled: false });
         });
 
         it('hides the empty state', () => {
@@ -180,7 +189,7 @@ describe('Cycle Analytics component', () => {
             expect.objectContaining({
               queryParams: wrapper.vm.$options.projectsQueryParams,
               groupId: mockData.group.id,
-              multiSelect: wrapper.vm.multiProjectSelect,
+              multiSelect: wrapper.vm.$options.multiProjectSelect,
             }),
           );
         });
@@ -218,6 +227,7 @@ describe('Cycle Analytics component', () => {
 
         describe('with durationData', () => {
           beforeEach(() => {
+            mock = new MockAdapter(axios);
             wrapper.vm.$store.dispatch('setDateRange', {
               skipFetch: true,
               startDate: mockData.startDate,
@@ -248,12 +258,8 @@ describe('Cycle Analytics component', () => {
               },
               shallow: false,
               withStageSelected: true,
+              tasksByTypeChartEnabled: false,
             });
-          });
-
-          afterEach(() => {
-            wrapper.destroy();
-            mock.restore();
           });
 
           it('has the first stage selected by default', () => {
@@ -281,6 +287,7 @@ describe('Cycle Analytics component', () => {
 
       describe('the user does not have access to the group', () => {
         beforeEach(() => {
+          mock = new MockAdapter(axios);
           wrapper.vm.$store.dispatch('setSelectedGroup', {
             ...mockData.group,
           });
@@ -321,19 +328,12 @@ describe('Cycle Analytics component', () => {
           mock = new MockAdapter(axios);
           wrapper = createComponent({
             opts: {
-              stubs: {
-                'summary-table': true,
-                'stage-event-list': true,
-                'stage-nav-item': true,
-              },
-              provide: {
-                glFeatures: {
-                  customizableCycleAnalytics: true,
-                },
-              },
+              stubs: defaultStubs,
             },
             shallow: false,
             withStageSelected: true,
+            customizableCycleAnalyticsEnabled: true,
+            tasksByTypeChartEnabled: false,
           });
         });
 
@@ -344,6 +344,53 @@ describe('Cycle Analytics component', () => {
 
         it('will display the add stage button', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
+        });
+      });
+
+      describe('with tasksByTypeChart=true', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            opts: {
+              stubs: defaultStubs,
+            },
+            shallow: false,
+            withStageSelected: true,
+            customizableCycleAnalyticsEnabled: false,
+            tasksByTypeChartEnabled: true,
+          });
+        });
+
+        afterEach(() => {
+          wrapper.destroy();
+          mock.restore();
+        });
+        it('displays the tasks by type chart', () => {
+          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(true);
+        });
+      });
+
+      describe('with tasksByTypeChart=false', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            opts: {
+              stubs: defaultStubs,
+            },
+            shallow: false,
+            withStageSelected: true,
+            customizableCycleAnalyticsEnabled: false,
+            tasksByTypeChartEnabled: false,
+          });
+        });
+
+        afterEach(() => {
+          wrapper.destroy();
+          mock.restore();
+        });
+
+        it('does not render the tasks by type chart', () => {
+          expect(wrapper.find('.js-tasks-by-type-chart').exists()).toBe(false);
         });
       });
     });
@@ -357,6 +404,7 @@ describe('Cycle Analytics component', () => {
       mockFetchStageData = true,
       mockFetchStageMedian = true,
       mockFetchDurationData = true,
+      mockFetchTasksByTypeData = true,
     }) {
       const defaultStatus = 200;
       const defaultRequests = {
@@ -375,13 +423,14 @@ describe('Cycle Analytics component', () => {
           endpoint: `/groups/${groupId}/-/labels`,
           response: [...mockData.groupLabels],
         },
-        fetchTasksByTypeData: {
-          status: defaultStatus,
-          endpoint: '/-/analytics/type_of_work/tasks_by_type',
-          response: { ...mockData.tasksByTypeData },
-        },
         ...overrides,
       };
+
+      if (mockFetchTasksByTypeData) {
+        mock
+          .onGet(/analytics\/type_of_work\/tasks_by_type/)
+          .reply(defaultStatus, { ...mockData.tasksByTypeData });
+      }
 
       if (mockFetchDurationData) {
         mock
@@ -491,15 +540,7 @@ describe('Cycle Analytics component', () => {
     it('will display an error if the fetchTasksByTypeData request fails', () => {
       expect(findFlashError()).toBeNull();
 
-      mockRequestCycleAnalyticsData({
-        overrides: {
-          fetchTasksByTypeData: {
-            endPoint: '/-/analytics/type_of_work/tasks_by_type',
-            status: httpStatusCodes.BAD_REQUEST,
-            response: { response: { status: httpStatusCodes.BAD_REQUEST } },
-          },
-        },
-      });
+      mockRequestCycleAnalyticsData({ mockFetchTasksByTypeData: false });
 
       return selectGroupAndFindError(
         'There was an error fetching data for the tasks by type chart',

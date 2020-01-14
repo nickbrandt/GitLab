@@ -8,7 +8,7 @@ export default () => ({
 
   isLoading: false,
   isLoadingStage: false,
-  isLoadingChartData: false,
+  isLoadingTasksByTypeChart: false,
   isLoadingDurationChart: false,
 
   isEmptyStage: false,

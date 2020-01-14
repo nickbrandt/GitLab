@@ -2,9 +2,10 @@ import { isString, isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
-import { newDate, dayAfter, secondsToDays } from '~/lib/utils/datetime_utility';
+import { newDate, dayAfter, secondsToDays, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
 import { STAGE_NAME } from './constants';
+import { toYmd } from '../shared/utils';
 
 const EVENT_TYPE_LABEL = 'label';
 
@@ -76,6 +77,11 @@ export const transformRawStages = (stages = []) =>
     // the name field is used to create a stage, but the get request returns title
     name: name.length ? name : title,
   }));
+
+export const transformRawTasksByTypeData = (data = []) => {
+  if (!data.length) return [];
+  return data.map(d => convertObjectPropsToCamelCase(d, { deep: true }));
+};
 
 export const nestQueryStringKeys = (obj = null, targetKey = '') => {
   if (!obj || !isString(targetKey) || !targetKey.length) return {};
@@ -188,4 +194,87 @@ export const getDurationChartData = (data, startDate, endDate) => {
   }
 
   return eventData;
+};
+
+export const orderByDate = (a, b, dateFmt = datetime => new Date(datetime).getTime()) =>
+  dateFmt(a) - dateFmt(b);
+
+/**
+ * Takes a dictionary of dates and the associated value, sorts them and returns just the value
+ *
+ * @param {Object.<Date, number>} series - Key value pair of dates and the value for that date
+ * @returns {number[]} The values of each key value pair
+ */
+export const flattenTaskByTypeSeries = (series = {}) =>
+  Object.entries(series)
+    .sort((a, b) => orderByDate(a[0], b[0]))
+    .map(dataSet => dataSet[1]);
+
+/**
+ * @typedef {Object} RawTasksByTypeData
+ * @property {Object} label - Raw data for a group label
+ * @property {Array} series - Array of arrays with date and associated value ie [ ['2020-01-01', 10],['2020-01-02', 10] ]
+
+ * @typedef {Object} TransformedTasksByTypeData
+ * @property {Array} groupBy - The list of dates for the range of data in each data series
+ * @property {Array} data - An array of the data values for each series
+ * @property {Array} seriesNames - Names of the series to be charted ie label names
+ */
+
+/**
+ * Takes the raw tasks by type data and generates an array of data points,
+ * an array of data series and an array of data labels for the given time period.
+ *
+ * Currently the data is transformed to support use in a stacked column chart:
+ * https://gitlab-org.gitlab.io/gitlab-ui/?path=/story/charts-stacked-column-chart--stacked
+ *
+ * @param {Object} obj
+ * @param {RawTasksByTypeData[]} obj.data - array of raw data, each element contains a label and series
+ * @param {Date} obj.startDate - start date in ISO date format
+ * @param {Date} obj.endDate - end date in ISO date format
+ *
+ * @returns {TransformedTasksByTypeData} The transformed data ready for use in charts
+ */
+export const getTasksByTypeData = ({ data = [], startDate = null, endDate = null }) => {
+  if (!startDate || !endDate || !data.length) {
+    return {
+      groupBy: [],
+      data: [],
+      seriesNames: [],
+    };
+  }
+
+  const groupBy = getDatesInRange(startDate, endDate, toYmd).sort(orderByDate);
+  const zeroValuesForEachDataPoint = groupBy.reduce(
+    (acc, date) => ({
+      ...acc,
+      [date]: 0,
+    }),
+    {},
+  );
+
+  const transformed = data.reduce(
+    (acc, curr) => {
+      const {
+        label: { title },
+        series,
+      } = curr;
+      acc.seriesNames = [...acc.seriesNames, title];
+      acc.data = [
+        ...acc.data,
+        // adds 0 values for each data point and overrides with data from the series
+        flattenTaskByTypeSeries({ ...zeroValuesForEachDataPoint, ...Object.fromEntries(series) }),
+      ];
+      return acc;
+    },
+    {
+      data: [],
+      seriesNames: [],
+    },
+  );
+
+  return {
+    ...transformed,
+    groupBy,
+  };
 };

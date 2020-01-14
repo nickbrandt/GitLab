@@ -9,6 +9,8 @@ describe 'Group Cycle Analytics', :js do
   let(:milestone) { create(:milestone, project: project) }
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
+  let(:label) { create(:group_label, group: group) }
+  let(:label2) { create(:group_label, group: group) }
 
   stage_nav_selector = '.stage-nav'
 
@@ -18,6 +20,7 @@ describe 'Group Cycle Analytics', :js do
 
   before do
     stub_licensed_features(cycle_analytics_for_groups: true)
+
     group.add_owner(user)
     project.add_maintainer(user)
 
@@ -213,6 +216,67 @@ describe 'Group Cycle Analytics', :js do
         select_stage(stage[:title])
 
         expect(page.find('.stage-nav .active .stage-name').text).to eq(stage[:title])
+      end
+    end
+  end
+
+  describe 'Tasks by type chart', :js do
+    context 'enabled' do
+      before do
+        stub_licensed_features(cycle_analytics_for_groups: true, type_of_work_analytics: true)
+
+        sign_in(user)
+      end
+
+      context 'with data available' do
+        before do
+          3.times do |i|
+            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label])
+            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [label2])
+          end
+
+          visit analytics_cycle_analytics_path
+          select_group
+        end
+
+        it 'displays the chart' do
+          expect(page).to have_text('Type of work')
+
+          expect(page).to have_text('Tasks by type')
+        end
+
+        it 'has 2 labels selected' do
+          expect(page).to have_text('Showing Issue and 2 labels')
+        end
+      end
+
+      context 'no data available' do
+        before do
+          visit analytics_cycle_analytics_path
+
+          select_group
+        end
+
+        it 'shows the no data available message' do
+          expect(page).to have_text('Type of work')
+
+          expect(page).to have_text('There is no data available. Please change your selection.')
+        end
+      end
+    end
+
+    context 'not enabled' do
+      before do
+        stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => false)
+        visit analytics_cycle_analytics_path
+
+        select_group
+      end
+
+      it 'will not display the tasks by type chart' do
+        expect(page).not_to have_selector('.js-tasks-by-type-chart')
+
+        expect(page).not_to have_text('Tasks by type')
       end
     end
   end
