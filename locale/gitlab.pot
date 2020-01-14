@@ -847,6 +847,9 @@ msgstr ""
 msgid "Access to '%{classification_label}' not allowed"
 msgstr ""
 
+msgid "Access to Pages websites are controlled based on the user's membership to a given project. By checking this box, users will be required to be logged in to have access to all Pages websites in your instance."
+msgstr ""
+
 msgid "AccessDropdown|Groups"
 msgstr ""
 
@@ -6322,6 +6325,9 @@ msgid "Disable for this project"
 msgstr ""
 
 msgid "Disable group Runners"
+msgstr ""
+
+msgid "Disable public access to Pages sites"
 msgstr ""
 
 msgid "Disable shared Runners"
