@@ -9760,6 +9760,9 @@ msgstr ""
 msgid "Iglu registry URL (optional)"
 msgstr ""
 
+msgid "Image %{imageName} was scheduled for deletion from the registry."
+msgstr ""
+
 msgid "ImageDiffViewer|2-up"
 msgstr ""
 
@@ -18633,9 +18636,6 @@ msgid "This commit was signed with a verified signature, but the committer email
 msgstr ""
 
 msgid "This commit was signed with an <strong>unverified</strong> signature."
-msgstr ""
-
-msgid "This container registry has been scheduled for deletion."
 msgstr ""
 
 msgid "This date is after the due date, so this epic won't appear in the roadmap."
