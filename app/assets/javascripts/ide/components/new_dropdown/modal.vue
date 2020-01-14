@@ -81,22 +81,11 @@ export default {
           const entryName = parentPath.pop();
           parentPath = parentPath.join('/');
 
-          const createPromise =
-            parentPath && !this.entries[parentPath]
-              ? this.createTempEntry({ name: parentPath, type: 'tree' })
-              : Promise.resolve();
-
-          createPromise
-            .then(() =>
-              this.renameEntry({
-                path: this.entryModal.entry.path,
-                name: entryName,
-                parentPath,
-              }),
-            )
-            .catch(() =>
-              flash(__('Error creating a new path'), 'alert', document, null, false, true),
-            );
+          this.renameEntry({
+            path: this.entryModal.entry.path,
+            name: entryName,
+            parentPath,
+          });
         }
       } else {
         this.createTempEntry({

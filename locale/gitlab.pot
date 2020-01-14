@@ -7176,9 +7176,6 @@ msgstr ""
 msgid "Error Tracking"
 msgstr ""
 
-msgid "Error creating a new path"
-msgstr ""
-
 msgid "Error creating epic"
 msgstr ""
 
