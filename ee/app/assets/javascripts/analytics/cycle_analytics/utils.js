@@ -2,7 +2,15 @@ import { isString, isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
-import { newDate, dayAfter, secondsToDays, getDatesInRange } from '~/lib/utils/datetime_utility';
+import {
+  newDate,
+  dayAfter,
+  secondsToDays,
+  getDatesInRange,
+  getDayDifference,
+  getDateInPast,
+  getDateInFuture,
+} from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
 import { STAGE_NAME } from './constants';
 import { toYmd } from '../shared/utils';
@@ -173,7 +181,7 @@ export const flattenDurationChartData = data =>
  *
  * @param {Array} data - The duration data for selected stages
  * @param {Date} startDate - The globally selected cycle analytics start date
- * @param {Date} endDate - The globally selected cycle analytics stendart date
+ * @param {Date} endDate - The globally selected cycle analytics end date
  * @returns {Array} An array with each item being another arry of three items (plottable date, computed total, tooltip display date)
  */
 export const getDurationChartData = (data, startDate, endDate) => {
@@ -194,6 +202,42 @@ export const getDurationChartData = (data, startDate, endDate) => {
   }
 
   return eventData;
+};
+
+/**
+ * Takes the offset duration data for selected stages and calls getDurationChartData to compute the totals.
+ * The data is then transformed into a format expected by the scatterplot;
+ *
+ * [
+ *   ['2019-09-02', 7],
+ *   ...
+ * ]
+ *
+ * The transformation works by calling getDateInPast on the provided startDate and endDate in order to match
+ * the startDate and endDate fetched when making the API call to fetch the data.
+ *
+ * In order to map the offset data to plottable points within the chart's range, getDateInFuture is called
+ * on the data series with the same offest used for getDateInPast. This creates plottable data that matches up
+ * with the data being displayed on the chart.
+ *
+ * @param {Array} data - The computed, plottable duration chart data
+ * @param {Date} startDate - The globally selected cycle analytics start date
+ * @param {Date} endDate - The globally selected cycle analytics end date
+ * @returns {Array} An array with each item being another arry of two items (date, computed total)
+ */
+export const getDurationChartMedianData = (data, startDate, endDate) => {
+  const offsetValue = getDayDifference(startDate, endDate);
+  const offsetEndDate = getDateInPast(endDate, offsetValue);
+  const offsetStartDate = getDateInPast(startDate, offsetValue);
+
+  const offsetDurationData = getDurationChartData(data, offsetStartDate, offsetEndDate);
+
+  const result = offsetDurationData.map(event => [
+    dateFormat(getDateInFuture(new Date(event[0]), offsetValue), dateFormats.isoDate),
+    event[1],
+  ]);
+
+  return result;
 };
 
 export const orderByDate = (a, b, dateFmt = datetime => new Date(datetime).getTime()) =>
