@@ -32,7 +32,7 @@ describe Gitlab::SidekiqCluster::CLI do
 
       context 'with --negate flag' do
         it 'starts Sidekiq workers for all queues in all_queues.yml except the ones in argv' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(['baz'])
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(['baz'])
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([['baz']], default_options)
                                               .and_return([])
@@ -43,7 +43,7 @@ describe Gitlab::SidekiqCluster::CLI do
 
       context 'with --max-concurrency flag' do
         it 'starts Sidekiq workers for specified queues with a max concurrency' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(%w(foo bar baz))
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(%w(foo bar baz))
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([%w(foo bar baz), %w(solo)], default_options.merge(max_concurrency: 2))
                                               .and_return([])
@@ -54,7 +54,7 @@ describe Gitlab::SidekiqCluster::CLI do
 
       context 'queue namespace expansion' do
         it 'starts Sidekiq workers for all queues in all_queues.yml with a namespace in argv' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(['cronjob:foo', 'cronjob:bar'])
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(['cronjob:foo', 'cronjob:bar'])
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([['cronjob', 'cronjob:foo', 'cronjob:bar']], default_options)
                                               .and_return([])
