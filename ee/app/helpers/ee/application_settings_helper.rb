@@ -93,6 +93,9 @@ module EE
         default_project_deletion_protection
         deletion_adjourned_period
         updating_name_disabled_for_users
+        disable_overriding_approvers_per_merge_request
+        prevent_merge_requests_author_approval
+        prevent_merge_requests_committers_approval
       ]
     end
   end

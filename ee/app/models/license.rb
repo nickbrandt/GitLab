@@ -80,6 +80,7 @@ class License < ApplicationRecord
     ldap_group_sync_filter
     merge_pipelines
     merge_request_performance_metrics
+    merge_request_approvers_rules
     merge_trains
     metrics_reports
     multiple_approval_rules
