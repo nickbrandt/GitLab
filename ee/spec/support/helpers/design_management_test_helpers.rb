@@ -19,9 +19,14 @@ module DesignManagementTestHelpers
     act_on_designs(designs) { ::DesignManagement::Action.modification }
   end
 
-  def url_for_design(design)
+  def path_for_design(design)
     path_options = { vueroute: design.filename }
     Gitlab::Routing.url_helpers.designs_project_issue_path(design.project, design.issue, path_options)
+  end
+
+  def url_for_design(design)
+    path_options = { vueroute: design.filename }
+    Gitlab::Routing.url_helpers.designs_project_issue_url(design.project, design.issue, path_options)
   end
 
   private
