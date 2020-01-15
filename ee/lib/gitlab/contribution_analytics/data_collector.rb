@@ -45,7 +45,7 @@ module Gitlab
       end
 
       def total_events_by_author_count
-        all_counts.each_with_object({}) do |((author_id, target_type, action), count), hash|
+        all_counts.each_with_object({}) do |((author_id, _target_type, _action), count), hash|
           hash[author_id] ||= 0
           hash[author_id] += count
         end
