@@ -21,9 +21,9 @@ module SystemCheck
 
       def check?
         case self.class.current_version.major
-        when 5
-          !(1..5).cover?(self.class.current_version.minor)
         when 6
+          true
+        when 7
           true
         else
           false
