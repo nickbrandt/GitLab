@@ -156,4 +156,11 @@ describe API::Settings, 'EE Settings' do
 
     it_behaves_like 'settings for licensed features'
   end
+
+  context 'updating name disabled for users' do
+    let(:settings) { { updating_name_disabled_for_users: true } }
+    let(:feature) { :disable_name_update_for_users }
+
+    it_behaves_like 'settings for licensed features'
+  end
 end
