@@ -6,7 +6,6 @@ describe('Design management upload button component', () => {
 
   function createComponent(isSaving = false, isInverted = false) {
     wrapper = shallowMount(UploadButton, {
-      attachToDocument: true,
       propsData: {
         isSaving,
         isInverted,
