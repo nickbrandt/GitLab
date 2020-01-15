@@ -81,7 +81,6 @@ Example response:
     },
     "created_at": "2019-11-27T03:37:38.711Z",
     "build_info": {
-      "pipeline_id": 123,
       "pipeline": {
         "id": 123,
         "status": "pending",
@@ -104,7 +103,6 @@ Example response:
     },
     "created_at": "2019-11-27T03:37:38.711Z",
     "build_info": {
-      "pipeline_id": 123,
       "pipeline": {
         "id": 123,
         "status": "pending",
@@ -159,7 +157,6 @@ Example response:
   },
   "created_at": "2019-11-27T03:37:38.711Z",
   "build_info": {
-    "pipeline_id": 123,
     "pipeline": {
       "id": 123,
       "status": "pending",
