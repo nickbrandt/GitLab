@@ -4550,9 +4550,6 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Code Analytics"
-msgstr ""
-
 msgid "Code Owners"
 msgstr ""
 

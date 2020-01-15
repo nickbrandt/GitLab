@@ -29,7 +29,6 @@ module EE
 
       rule { ~anonymous }.policy do
         enable :view_productivity_analytics
-        enable :view_code_analytics
       end
     end
   end

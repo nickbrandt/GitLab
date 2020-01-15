@@ -493,10 +493,6 @@ describe GroupPolicy do
     end
   end
 
-  describe 'view_code_analytics' do
-    include_examples 'analytics policy', :view_code_analytics
-  end
-
   describe 'view_productivity_analytics' do
     include_examples 'analytics policy', :view_productivity_analytics
   end
