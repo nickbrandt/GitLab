@@ -105,7 +105,7 @@ module EE
         return unless group.allowed_email_domain.present?
         return unless allowed_domain_params
 
-        if allowed_domain_params[:domain]&.blank?
+        if allowed_domain_params[:domain].blank?
           allowed_domain_params[:_destroy] = 1
         end
       end
