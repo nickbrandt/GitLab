@@ -69,16 +69,17 @@ module Banzai
 
       def self.parse_symbol(raw, match_data)
         filename = parse_filename(raw, match_data)
-        Identifier.new(filename: filename, issue_iid: match_data[:issue].to_i)
+        iid = match_data[:issue].to_i
+        Identifier.new(filename: filename, issue_iid: iid)
       end
 
       def self.parse_filename(raw, match_data)
-        if efn = match_data[:escaped_filename]
+        if name = match_data[:simple_file_name]
+          name
+        elsif efn = match_data[:escaped_filename]
           efn.gsub(/(\\ \\ | \\ ")/x) { |x| x[1] }
         elsif b64_name = match_data[:base_64_encoded_name]
           Base64.decode64(b64_name)
-        elsif name = match_data[:simple_file_name]
-          name
         else
           raise "Unexpected name format: #{raw}"
         end
