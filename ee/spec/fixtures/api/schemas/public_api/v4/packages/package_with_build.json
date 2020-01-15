@@ -7,9 +7,9 @@
     "package_type": { "type": "string" },
     "build_info": {
       "type": "object",
-      "required": ["pipeline_id"],
+      "required": ["pipeline"],
       "properties": {
-        "pipeline_id": { "type": "integer" }
+        "pipeline": { "$ref": "../pipeline.json" }
       }
     }
   }

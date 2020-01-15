@@ -880,7 +880,7 @@ module EE
         extend EntityHelpers
 
         class BuildInfo < Grape::Entity
-          expose :pipeline_id
+          expose :pipeline, using: ::API::Entities::PipelineBasic
         end
 
         expose :id
