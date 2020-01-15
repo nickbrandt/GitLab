@@ -11,6 +11,14 @@ const removeError = () => {
     hideFlash(flashEl);
   }
 };
+
+const handleErrorOrRethrow = ({ action, error }) => {
+  if (error?.response?.status === httpStatus.FORBIDDEN) {
+    throw error;
+  }
+  action();
+};
+
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
@@ -85,7 +93,12 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 
   return Promise.all(stageIds.map(stageId => fetchStageMedian(currentGroupPath, stageId, params)))
     .then(data => dispatch('receiveStageMedianValuesSuccess', data))
-    .catch(err => dispatch('receiveStageMedianValuesError', err));
+    .catch(error =>
+      handleErrorOrRethrow({
+        error,
+        action: () => dispatch('receiveStageMedianValuesError', error),
+      }),
+    );
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
@@ -150,7 +163,9 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
 
   return Api.cycleAnalyticsSummaryData({ group_id: fullPath, created_after, created_before })
     .then(({ data }) => dispatch('receiveSummaryDataSuccess', data))
-    .catch(error => dispatch('receiveSummaryDataError', error));
+    .catch(error =>
+      handleErrorOrRethrow({ error, action: () => dispatch('receiveSummaryDataError', error) }),
+    );
 };
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
@@ -174,7 +189,9 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
 
   return Api.groupLabels(fullPath)
     .then(data => dispatch('receiveGroupLabelsSuccess', data))
-    .catch(error => dispatch('receiveGroupLabelsError', error));
+    .catch(error =>
+      handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
+    );
 };
 
 export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
@@ -209,7 +226,12 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
     nestQueryStringKeys({ start_date: created_after, project_ids }, 'cycle_analytics'),
   )
     .then(({ data }) => dispatch('receiveGroupStagesAndEventsSuccess', data))
-    .catch(error => dispatch('receiveGroupStagesAndEventsError', error));
+    .catch(error =>
+      handleErrorOrRethrow({
+        error,
+        action: () => dispatch('receiveGroupStagesAndEventsError', error),
+      }),
+    );
 };
 
 export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);

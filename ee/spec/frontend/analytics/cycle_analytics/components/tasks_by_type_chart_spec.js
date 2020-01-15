@@ -60,6 +60,7 @@ describe('TasksByTypeChart', () => {
         },
       });
     });
+
     it('should render the no data available message', () => {
       expect(wrapper.html()).toMatchSnapshot();
     });
