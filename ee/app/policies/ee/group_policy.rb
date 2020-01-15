@@ -57,7 +57,6 @@ module EE
         enable :admin_list
         enable :admin_board
         enable :read_prometheus
-        enable :view_code_analytics
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
         enable :read_group_timelogs

@@ -24,8 +24,4 @@ namespace :analytics do
       resource :tasks_by_type, controller: :tasks_by_type, only: :show
     end
   end
-
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CODE_ANALYTICS_FEATURE_FLAG)) do
-    resource :code_analytics, only: :show
-  end
 end
