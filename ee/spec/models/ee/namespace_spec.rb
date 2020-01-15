@@ -54,4 +54,40 @@ describe Namespace do
       expect(namespace.use_elasticsearch?).to eq(true)
     end
   end
+
+  describe '#trial_active?' do
+    subject { create(:namespace) }
+
+    where(:trial, :trial_ends_on, :return_result) do
+      now = Date.new(2000, 5, 5)
+
+      [
+        [nil,   now + 1.day, false],
+        [nil,   now,         false],
+        [nil,   now - 1.day, false],
+        [true,  now + 1.day, true],
+        [true,  now,         true],
+        [true,  now - 1.day, false],
+        [false, now + 1.day, false],
+        [false, now,         false],
+        [false, now - 1.day, false],
+      ]
+    end
+
+    it 'returns false if no GitlabSubscription' do
+      expect(subject.trial_active?).to eq(false)
+    end
+
+    with_them do
+      before do
+        create(:gitlab_subscription, namespace_id: subject.id, trial: trial, trial_ends_on: trial_ends_on)
+      end
+
+      it 'returns true if GitlabSubscription is on trial' do
+        Timecop.freeze(Date.new(2000, 5, 5)) do
+          expect(subject.trial_active?).to eq(return_result)
+        end
+      end
+    end
+  end
 end
