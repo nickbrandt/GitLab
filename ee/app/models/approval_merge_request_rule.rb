@@ -70,6 +70,14 @@ class ApprovalMergeRequestRule < ApplicationRecord
     retry
   end
 
+  def self.applicable_to_branch(branch)
+    includes(approval_project_rule: :protected_branches).select do |rule|
+      next true unless rule.approval_project_rule.present?
+
+      rule.approval_project_rule.applies_to_branch?(branch)
+    end
+  end
+
   def project
     merge_request.target_project
   end

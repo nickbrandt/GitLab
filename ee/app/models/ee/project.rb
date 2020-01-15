@@ -323,6 +323,10 @@ module EE
       feature_available?(:code_owner_approval_required)
     end
 
+    def scoped_approval_rules_enabled?
+      ::Feature.enabled?(:scoped_approval_rules, self, default_enabled: true)
+    end
+
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end
@@ -408,14 +412,11 @@ module EE
       end
     end
 
-    def visible_user_defined_rules
-      strong_memoize(:visible_user_defined_rules) do
-        rules = approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
+    def visible_user_defined_rules(branch: nil)
+      return user_defined_rules.take(1) unless multiple_approval_rules_available?
+      return user_defined_rules unless branch
 
-        next rules.take(1) unless multiple_approval_rules_available?
-
-        rules
-      end
+      user_defined_rules.applicable_to_branch(branch)
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
@@ -769,6 +770,12 @@ module EE
 
       unless ::Gitlab::GitRefValidator.validate("#{pull_mirror_branch_prefix}master")
         errors.add(:pull_mirror_branch_prefix, _('Invalid Git ref'))
+      end
+    end
+
+    def user_defined_rules
+      strong_memoize(:user_defined_rules) do
+        approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
       end
     end
   end

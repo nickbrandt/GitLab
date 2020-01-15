@@ -420,6 +420,10 @@ module EE
         expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
+      class ProjectApprovalRule < ApprovalRule
+        expose :protected_branches, using: ::API::Entities::ProtectedBranch, if: -> (rule, _) { rule.project.multiple_approval_rules_available? }
+      end
+
       class MergeRequestApprovalRule < ApprovalRule
         class SourceRule < Grape::Entity
           expose :approvals_required
@@ -446,7 +450,7 @@ module EE
       # This overrides the `eligible_approvers` to be exposed as `approvers`.
       #
       # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class ApprovalSettingRule < ApprovalRule
+      class ProjectApprovalSettingRule < ProjectApprovalRule
         expose :approvers, using: ::API::Entities::UserBasic, override: true
       end
 
@@ -454,7 +458,7 @@ module EE
       #
       # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class ProjectApprovalSettings < Grape::Entity
-        expose :visible_approval_rules, as: :rules, using: ApprovalSettingRule
+        expose :visible_approval_rules, as: :rules, using: ProjectApprovalSettingRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
       end
 
