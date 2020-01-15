@@ -53,7 +53,6 @@ describe('packages_list', () => {
         ...mountOptions,
         computed: {
           ...mountOptions.computed,
-          canDestroyPackage: () => false,
           isGroupPage: () => true,
         },
       });
@@ -62,6 +61,11 @@ describe('packages_list', () => {
     it('has project field', () => {
       const projectColumn = findFirstProjectColumn();
       expect(projectColumn.exists()).toBe(true);
+    });
+
+    it('does not show the action column', () => {
+      const action = findFirstActionColumn();
+      expect(action.exists()).toBe(false);
     });
   });
 
@@ -82,20 +86,6 @@ describe('packages_list', () => {
   it('contains a modal component', () => {
     const sorting = findPackageListDeleteModal();
     expect(sorting.exists()).toBe(true);
-  });
-
-  describe('when user can not destroy the package', () => {
-    beforeEach(() => {
-      wrapper = mount(PackagesList, {
-        ...mountOptions,
-        computed: { ...mountOptions.computed, canDestroyPackage: () => false },
-      });
-    });
-
-    it('does not show the action column', () => {
-      const action = findFirstActionColumn();
-      expect(action.exists()).toBe(false);
-    });
   });
 
   describe('when the user can destroy the package', () => {
@@ -131,10 +121,11 @@ describe('packages_list', () => {
     });
 
     it('deleteItemConfirmation emit package:delete', () => {
-      wrapper.setData({ itemToBeDeleted: { id: 2 } });
+      const itemToBeDeleted = { id: 2 };
+      wrapper.setData({ itemToBeDeleted });
       wrapper.vm.deleteItemConfirmation();
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.emitted('package:delete')).toEqual([[2]]);
+        expect(wrapper.emitted('package:delete')[0]).toEqual([itemToBeDeleted]);
       });
     });
 

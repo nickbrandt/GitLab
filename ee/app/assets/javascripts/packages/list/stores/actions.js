@@ -1,4 +1,5 @@
 import Api from 'ee/api';
+import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import * as types from './mutation_types';
 import {
@@ -7,6 +8,7 @@ import {
   DELETE_PACKAGE_SUCCESS_MESSAGE,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  MISSING_DELETE_PATH_ERROR,
 } from '../constants';
 
 export const setInitialState = ({ commit }, data) => commit(types.SET_INITIAL_STATE, data);
@@ -34,9 +36,16 @@ export const requestPackagesList = ({ dispatch, state }, pagination = {}) => {
     });
 };
 
-export const requestDeletePackage = ({ dispatch }, { projectId, packageId }) => {
+export const requestDeletePackage = ({ dispatch }, { _links }) => {
+  if (!_links || !_links.delete_api_path) {
+    createFlash(DELETE_PACKAGE_ERROR_MESSAGE);
+    const error = new Error(MISSING_DELETE_PATH_ERROR);
+    return Promise.reject(error);
+  }
+
   dispatch('setLoading', true);
-  return Api.deleteProjectPackage(projectId, packageId)
+  return axios
+    .delete(_links.delete_api_path)
     .then(() => {
       dispatch('requestPackagesList');
       createFlash(DELETE_PACKAGE_SUCCESS_MESSAGE, 'success');

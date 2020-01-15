@@ -8,7 +8,6 @@ export default () => ({
    * {
    *  resourceId: String,
    *  pageType: String,
-   *  userCanDelete: Boolean,
    *  emptyListIllustration: String,
    *  emptyListHelpUrl: String
    * }
