@@ -61,7 +61,7 @@ describe('Dashboard', () => {
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(statusCodes.OK, metricsGroupsAPIResponse);
 
-      createShallowWrapper({}, { attachToDocument: true });
+      createShallowWrapper();
     });
 
     afterEach(() => {
@@ -77,7 +77,7 @@ describe('Dashboard', () => {
     beforeEach(done => {
       mock.onGet(mockApiEndpoint).reply(statusCodes.OK, metricsGroupsAPIResponse);
 
-      createShallowWrapper({}, { attachToDocument: true });
+      createShallowWrapper();
 
       wrapper.vm.$nextTick(done);
     });
@@ -97,7 +97,7 @@ describe('Dashboard', () => {
     });
 
     it('shows up a loading state', done => {
-      createShallowWrapper({ hasMetrics: true }, { attachToDocument: true });
+      createShallowWrapper({ hasMetrics: true });
 
       wrapper.vm
         .$nextTick()
@@ -112,7 +112,7 @@ describe('Dashboard', () => {
     it('hides the group panels when showPanels is false', done => {
       createMountedWrapper(
         { hasMetrics: true, showPanels: false },
-        { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
+        { stubs: ['graph-group', 'panel-type'] },
       );
 
       setupComponentStore(wrapper);
@@ -134,10 +134,7 @@ describe('Dashboard', () => {
     it('fetches the metrics data with proper time window', done => {
       jest.spyOn(store, 'dispatch');
 
-      createMountedWrapper(
-        { hasMetrics: true },
-        { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
-      );
+      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
       wrapper.vm.$store.commit(
         `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
@@ -159,10 +156,7 @@ describe('Dashboard', () => {
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(statusCodes.OK, metricsGroupsAPIResponse);
 
-      createMountedWrapper(
-        { hasMetrics: true },
-        { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
-      );
+      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
       setupComponentStore(wrapper);
     });
@@ -214,10 +208,7 @@ describe('Dashboard', () => {
   });
 
   it('hides the environments dropdown list when there is no environments', done => {
-    createMountedWrapper(
-      { hasMetrics: true },
-      { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
-    );
+    createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
     wrapper.vm.$store.commit(
       `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
@@ -242,10 +233,7 @@ describe('Dashboard', () => {
   });
 
   it('renders the datetimepicker dropdown', done => {
-    createMountedWrapper(
-      { hasMetrics: true },
-      { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
-    );
+    createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
     setupComponentStore(wrapper);
 
@@ -262,7 +250,7 @@ describe('Dashboard', () => {
     beforeEach(done => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
 
-      createShallowWrapper({ hasMetrics: true }, { attachToDocument: true });
+      createShallowWrapper({ hasMetrics: true });
       setupComponentStore(wrapper);
 
       wrapper.vm.$nextTick(done);
@@ -296,7 +284,7 @@ describe('Dashboard', () => {
     });
 
     beforeEach(done => {
-      createShallowWrapper({ hasMetrics: true }, { attachToDocument: true });
+      createShallowWrapper({ hasMetrics: true });
 
       setupComponentStore(wrapper);
 
@@ -413,7 +401,7 @@ describe('Dashboard', () => {
     beforeEach(done => {
       mock.onGet(mockApiEndpoint).reply(statusCodes.OK, metricsGroupsAPIResponse);
 
-      createShallowWrapper({ hasMetrics: true }, { attachToDocument: true });
+      createShallowWrapper({ hasMetrics: true });
 
       wrapper.vm.$store.commit(
         `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
@@ -450,10 +438,7 @@ describe('Dashboard', () => {
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
 
-      createMountedWrapper(
-        { hasMetrics: true },
-        { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
-      );
+      createMountedWrapper({ hasMetrics: true }, { stubs: ['graph-group', 'panel-type'] });
 
       wrapper.vm.$store.commit(
         `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
@@ -485,7 +470,7 @@ describe('Dashboard', () => {
           showTimeWindowDropdown: false,
           externalDashboardUrl: '/mockUrl',
         },
-        { attachToDocument: true, stubs: ['graph-group', 'panel-type'] },
+        { stubs: ['graph-group', 'panel-type'] },
       );
     });
 
@@ -515,7 +500,7 @@ describe('Dashboard', () => {
     beforeEach(done => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
 
-      createShallowWrapper({ hasMetrics: true, currentDashboard }, { attachToDocument: true });
+      createShallowWrapper({ hasMetrics: true, currentDashboard });
 
       setTimeout(done);
     });
