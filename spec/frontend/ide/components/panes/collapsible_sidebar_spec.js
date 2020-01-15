@@ -151,6 +151,17 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
         });
       });
 
+      it('renders loading icon component when loading', done => {
+        store.state.loading = true;
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.find('.multi-file-loading-container')).not.toBeNull();
+          expect(wrapper.findAll('.multi-file-loading-container').length).toBe(3);
+
+          done();
+        });
+      });
+
       it('shows header-icon', () => {
         expect(wrapper.find('.header-icon-slot')).not.toBeNull();
       });

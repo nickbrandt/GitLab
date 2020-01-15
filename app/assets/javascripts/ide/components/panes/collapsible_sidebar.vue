@@ -102,28 +102,39 @@ export default {
     :data-qa-selector="`ide_${side}_sidebar`"
     class="multi-file-commit-panel ide-sidebar"
   >
-    <resizable-panel
-      v-show="isOpen"
-      :collapsible="false"
-      :initial-width="width"
-      :min-size="width"
-      :class="`ide-${side}-sidebar-${currentView}`"
-      :side="side"
-      class="multi-file-commit-panel-inner"
-    >
-      <div class="h-100 d-flex flex-column align-items-stretch">
-        <slot v-if="isOpen" name="header"></slot>
-        <div
-          v-for="tabView in aliveTabViews"
-          v-show="isActiveView(tabView.name)"
-          :key="tabView.name"
-          class="flex-fill js-tab-view"
-        >
-          <component :is="tabView.component" />
+    <template v-if="loading">
+      <resizable-panel :collapsible="false" :initial-width="width" :min-size="width" :side="side">
+        <div class="multi-file-commit-panel-inner">
+          <div v-for="n in 3" :key="n" class="multi-file-loading-container">
+            <gl-skeleton-loading />
+          </div>
         </div>
-        <slot name="footer"></slot>
-      </div>
-    </resizable-panel>
+      </resizable-panel>
+    </template>
+    <template v-else>
+      <resizable-panel
+        v-show="isOpen"
+        :collapsible="false"
+        :initial-width="width"
+        :min-size="width"
+        :class="`ide-${side}-sidebar-${currentView}`"
+        :side="side"
+        class="multi-file-commit-panel-inner"
+      >
+        <div class="h-100 d-flex flex-column align-items-stretch">
+          <slot v-if="isOpen" name="header"></slot>
+          <div
+            v-for="tabView in aliveTabViews"
+            v-show="isActiveView(tabView.name)"
+            :key="tabView.name"
+            class="flex-fill js-tab-view"
+          >
+            <component :is="tabView.component" />
+          </div>
+          <slot name="footer"></slot>
+        </div>
+      </resizable-panel>
+    </template>
     <nav class="ide-activity-bar">
       <ul class="list-unstyled">
         <li>
