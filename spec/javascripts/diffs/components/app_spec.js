@@ -77,6 +77,7 @@ describe('diffs/components/app', () => {
     beforeEach(done => {
       const fetchResolver = () => {
         store.state.diffs.retrievingBatches = false;
+        store.state.notes.discussions = 'test';
         return Promise.resolve({ real_size: 100 });
       };
       spyOn(window, 'requestIdleCallback').and.callFake(fn => fn());
