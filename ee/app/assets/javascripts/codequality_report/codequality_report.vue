@@ -1,8 +1,9 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
+import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 import { n__, s__, sprintf } from '~/locale';
 
 import createStore from './store';
@@ -11,6 +12,7 @@ export default {
   store: createStore(),
   components: {
     ReportSection,
+    PaginationLinks,
   },
   mixins: [reportsMixin],
   componentNames,
@@ -25,27 +27,23 @@ export default {
     },
   },
   computed: {
-    ...mapState([
-      'isLoadingCodequality',
-      'loadingCodequalityFailed',
-      'codeQualityIssues',
-      'endpoint',
-    ]),
+    ...mapState(['isLoadingCodequality', 'loadingCodequalityFailed', 'endpoint', 'pageInfo']),
+    ...mapGetters(['codequalityIssues', 'codequalityIssueTotal']),
     hasCodequalityIssues() {
-      return this.codeQualityIssues.length > 0;
+      return this.codequalityIssueTotal > 0;
     },
     codequalityText() {
       const text = [];
-      const { codeQualityIssues } = this;
+      const { codequalityIssueTotal } = this;
 
-      if (!codeQualityIssues.length) {
+      if (codequalityIssueTotal === 0) {
         return s__('ciReport|No code quality issues found');
-      } else if (codeQualityIssues.length) {
+      } else if (codequalityIssueTotal > 0) {
         return sprintf(s__('ciReport|Found %{issuesWithCount}'), {
           issuesWithCount: n__(
             '%d code quality issue',
             '%d code quality issues',
-            codeQualityIssues.length,
+            codequalityIssueTotal,
           ),
         });
       }
@@ -62,7 +60,7 @@ export default {
     this.fetchReport();
   },
   methods: {
-    ...mapActions(['setEndpoint', 'setBlobPath', 'fetchReport']),
+    ...mapActions(['setEndpoint', 'setBlobPath', 'setPage', 'fetchReport']),
     translateText(type) {
       return {
         error: sprintf(s__('ciReport|Failed to load %{reportName} report'), {
@@ -85,11 +83,16 @@ export default {
       :loading-text="translateText('codeclimate').loading"
       :error-text="translateText('codeclimate').error"
       :success-text="codequalityText"
-      :unresolved-issues="codeQualityIssues"
+      :unresolved-issues="codequalityIssues"
       :resolved-issues="[]"
       :has-issues="hasCodequalityIssues"
       :component="$options.componentNames.CodequalityIssueBody"
       class="codequality-report"
+    />
+    <pagination-links
+      :change="setPage"
+      :page-info="pageInfo"
+      class="d-flex justify-content-center prepend-top-default"
     />
   </div>
 </template>
