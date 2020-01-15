@@ -9,6 +9,8 @@ export default () => {
   if (data.pathLocksAvailable) {
     const toggleBtn = document.querySelector('.js-path-lock');
 
+    if (!toggleBtn) return;
+
     toggleBtn.addEventListener('click', e => {
       e.preventDefault();
 
