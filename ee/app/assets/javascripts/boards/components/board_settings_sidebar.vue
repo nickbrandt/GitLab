@@ -1,5 +1,13 @@
 <script>
-import { GlDrawer, GlLabel, GlButton, GlFormInput } from '@gitlab/ui';
+import {
+  GlDrawer,
+  GlLabel,
+  GlButton,
+  GlFormInput,
+  GlAvatarLink,
+  GlAvatarLabeled,
+  GlLink,
+} from '@gitlab/ui';
 import { mapActions, mapState } from 'vuex';
 import { __ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
@@ -10,7 +18,12 @@ import flash from '~/flash';
 export default {
   headerHeight: process.env.NODE_ENV === 'development' ? '75px' : '40px',
   listSettingsText: __('List Settings'),
-  labelListText: __('List Label'),
+  assignee: 'assignee',
+  milestone: 'milestone',
+  label: 'label',
+  labelListText: __('Label'),
+  labelMilestoneText: __('Milestone'),
+  labelAssigneeText: __('Assignee'),
   editLinkText: __('Edit'),
   noneText: __('None'),
   wipLimitText: __('Work in Progress Limit'),
@@ -19,6 +32,9 @@ export default {
     GlLabel,
     GlButton,
     GlFormInput,
+    GlAvatarLink,
+    GlAvatarLabeled,
+    GlLink,
   },
   directives: {
     autofocusonshow,
@@ -46,10 +62,35 @@ export default {
     activeListLabel() {
       return this.activeList.label;
     },
+    activeListMilestone() {
+      return this.activeList.milestone;
+    },
+    activeListAssignee() {
+      return this.activeList.assignee;
+    },
     activeListWipLimit() {
       return this.activeList.maxIssueCount === 0
         ? this.$options.noneText
         : this.activeList.maxIssueCount;
+    },
+    boardListType() {
+      return this.activeList.type || null;
+    },
+    listTypeTitle() {
+      switch (this.boardListType) {
+        case this.$options.milestone: {
+          return this.$options.labelMilestoneText;
+        }
+        case this.$options.label: {
+          return this.$options.labelListText;
+        }
+        case this.$options.assignee: {
+          return this.$options.labelAssigneeText;
+        }
+        default: {
+          return '';
+        }
+      }
     },
   },
   methods: {
@@ -105,12 +146,29 @@ export default {
     <template #header>{{ $options.listSettingsText }}</template>
     <template v-if="isSidebarOpen">
       <div class="d-flex flex-column align-items-start">
-        <label>{{ $options.labelListText }}</label>
-        <gl-label
-          :title="activeListLabel.title"
-          :background-color="activeListLabel.color"
-          color="light"
-        />
+        <label class="js-list-label">{{ listTypeTitle }}</label>
+        <template v-if="boardListType === $options.label">
+          <gl-label
+            :title="activeListLabel.title"
+            :background-color="activeListLabel.color"
+            color="light"
+          />
+        </template>
+        <template v-else-if="boardListType === $options.assignee">
+          <gl-avatar-link class="js-assignee" :href="activeListAssignee.webUrl">
+            <gl-avatar-labeled
+              :size="32"
+              :label="activeListAssignee.name"
+              :sub-label="`@${activeListAssignee.username}`"
+              :src="activeListAssignee.avatar"
+            />
+          </gl-avatar-link>
+        </template>
+        <template v-else-if="boardListType === $options.milestone">
+          <gl-link class="js-milestone" :href="activeListMilestone.webUrl">{{
+            activeListMilestone.title
+          }}</gl-link>
+        </template>
       </div>
       <div class="d-flex justify-content-between">
         <div>
@@ -128,9 +186,9 @@ export default {
           />
           <p v-else class="js-wip-limit bold">{{ activeListWipLimit }}</p>
         </div>
-        <gl-button class="h-100 border-0 gl-line-height-14" variant="link" @click="showInput">{{
-          $options.editLinkText
-        }}</gl-button>
+        <gl-button class="h-100 border-0 gl-line-height-14" variant="link" @click="showInput">
+          {{ $options.editLinkText }}
+        </gl-button>
       </div>
     </template>
   </gl-drawer>
