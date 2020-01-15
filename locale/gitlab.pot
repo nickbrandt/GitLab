@@ -23145,6 +23145,9 @@ msgstr ""
 msgid "ciReport|There was an error dismissing the vulnerability. Please try again."
 msgstr ""
 
+msgid "ciReport|There was an error fetching the codequality report."
+msgstr ""
+
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
 msgstr ""
 

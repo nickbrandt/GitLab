@@ -1,18 +1,16 @@
 <script>
-import axios from 'axios';
+import { mapActions, mapState } from 'vuex';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
-import CodequalityIssueBody from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
 import { n__, s__, sprintf } from '~/locale';
 
-import MergeRequestStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
+import createStore from './store';
 
 export default {
-  name: 'CodequalityReport',
+  store: createStore(),
   components: {
     ReportSection,
-    CodequalityIssueBody,
   },
   mixins: [reportsMixin],
   componentNames,
@@ -26,24 +24,29 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      issues: [],
-    };
-  },
   computed: {
+    ...mapState([
+      'isLoadingCodequality',
+      'loadingCodequalityFailed',
+      'codeQualityIssues',
+      'endpoint',
+    ]),
     hasCodequalityIssues() {
-      return this.issues.length > 0;
+      return this.codeQualityIssues.length > 0;
     },
     codequalityText() {
       const text = [];
-      const { issues } = this;
+      const { codeQualityIssues } = this;
 
-      if (!issues.length) {
+      if (!codeQualityIssues.length) {
         return s__('ciReport|No code quality issues found');
-      } else if (issues.length) {
+      } else if (codeQualityIssues.length) {
         return sprintf(s__('ciReport|Found %{issuesWithCount}'), {
-          issuesWithCount: n__('%d code quality issue', '%d code quality issues', issues.length),
+          issuesWithCount: n__(
+            '%d code quality issue',
+            '%d code quality issues',
+            codeQualityIssues.length,
+          ),
         });
       }
 
@@ -54,11 +57,12 @@ export default {
     },
   },
   created() {
-    return axios.get(this.codequalityReportDownloadPath).then(res => {
-      this.issues = MergeRequestStore.parseCodeclimateMetrics(res.data, this.blobPath);
-    });
+    this.setEndpoint(this.codequalityReportDownloadPath);
+    this.setBlobPath(this.blobPath);
+    this.fetchReport();
   },
   methods: {
+    ...mapActions(['setEndpoint', 'setBlobPath', 'fetchReport']),
     translateText(type) {
       return {
         error: sprintf(s__('ciReport|Failed to load %{reportName} report'), {
@@ -81,9 +85,9 @@ export default {
       :loading-text="translateText('codeclimate').loading"
       :error-text="translateText('codeclimate').error"
       :success-text="codequalityText"
-      :unresolved-issues="issues"
+      :unresolved-issues="codeQualityIssues"
       :resolved-issues="[]"
-      :has-issues="true"
+      :has-issues="hasCodequalityIssues"
       :component="$options.componentNames.CodequalityIssueBody"
       class="codequality-report"
     />
