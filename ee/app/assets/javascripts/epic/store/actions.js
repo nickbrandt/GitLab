@@ -129,7 +129,7 @@ export const requestEpicDateSaveFailure = ({ commit }, data) => {
 };
 export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDate }) => {
   const updateEpicInput = {
-    iid: `${state.epicId}`,
+    iid: `${state.epicIid}`,
     groupPath: state.groupPath,
     [dateType === dateTypes.start ? 'startDateIsFixed' : 'dueDateIsFixed']: dateTypeIsFixed,
   };
@@ -188,7 +188,7 @@ export const toggleEpicSubscription = ({ state, dispatch }) => {
       mutation: epicSetSubscription,
       variables: {
         epicSetSubscriptionInput: {
-          iid: `${state.epicId}`,
+          iid: `${state.epicIid}`,
           groupPath: state.groupPath,
           subscribedState: !state.subscribed,
         },
