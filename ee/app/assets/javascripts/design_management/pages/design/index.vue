@@ -5,12 +5,11 @@ import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
-import DesignImage from '../../components/image.vue';
-import DesignOverlay from '../../components/design_overlay.vue';
 import DesignDiscussion from '../../components/design_notes/design_discussion.vue';
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import DesignDestroyer from '../../components/design_destroyer.vue';
 import Participants from '~/sidebar/components/participants/participants.vue';
+import DesignPresentation from '../../components/design_presentation.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
@@ -30,8 +29,7 @@ import {
 export default {
   components: {
     ApolloMutation,
-    DesignImage,
-    DesignOverlay,
+    DesignPresentation,
     DesignDiscussion,
     DesignDestroyer,
     Toolbar,
@@ -52,10 +50,6 @@ export default {
       design: {},
       comment: '',
       annotationCoordinates: null,
-      overlayDimensions: {
-        width: 0,
-        height: 0,
-      },
       projectPath: '',
       errorMessage: '',
       issueIid: '',
@@ -96,9 +90,6 @@ export default {
     },
     discussions() {
       return extractDiscussions(this.design.discussions);
-    },
-    discussionStartingNotes() {
-      return this.discussions.map(discussion => discussion.notes[0]);
     },
     discussionParticipants() {
       return extractParticipants(this.design.issue.participants);
@@ -145,6 +136,9 @@ export default {
         webPath: this.design.issue.webPath.substr(1),
       };
     },
+    isAnnotating() {
+      return Boolean(this.annotationCoordinates);
+    },
   },
   mounted() {
     Mousetrap.bind('esc', this.closeDesign);
@@ -180,24 +174,12 @@ export default {
       this.errorMessage = designDeletionError({ singular: true });
       throw e;
     },
-    openCommentForm(position) {
-      const { x, y } = position;
-      const { width, height } = this.overlayDimensions;
-      this.annotationCoordinates = {
-        ...this.annotationCoordinates,
-        x,
-        y,
-        width,
-        height,
-      };
+    openCommentForm(annotationCoordinates) {
+      this.annotationCoordinates = annotationCoordinates;
     },
     closeCommentForm() {
       this.comment = '';
       this.annotationCoordinates = null;
-    },
-    setOverlayDimensions(position) {
-      this.overlayDimensions.width = position.width;
-      this.overlayDimensions.height = position.height;
     },
     closeDesign() {
       this.$router.push({
@@ -245,19 +227,13 @@ export default {
           </gl-alert>
         </div>
 
-        <div class="d-flex flex-column h-100 mh-100 position-relative">
-          <design-image
-            :image="design.image"
-            :name="design.filename"
-            @setOverlayDimensions="setOverlayDimensions"
-          />
-          <design-overlay
-            :position="overlayDimensions"
-            :notes="discussionStartingNotes"
-            :current-comment-form="annotationCoordinates"
-            @openCommentForm="openCommentForm"
-          />
-        </div>
+        <design-presentation
+          :image="design.image"
+          :image-name="design.filename"
+          :discussions="discussions"
+          :is-annotating="isAnnotating"
+          @openCommentForm="openCommentForm"
+        />
       </div>
       <div class="image-notes">
         <h2 class="gl-font-size-20 font-weight-bold mt-0">{{ issue.title }}</h2>
