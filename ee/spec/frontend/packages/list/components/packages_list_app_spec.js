@@ -77,10 +77,7 @@ describe('packages_list_app', () => {
 
   it('call requestDeletePackage on package:delete', () => {
     const list = findListComponent();
-    list.vm.$emit('package:delete', 1);
-    expect(componentConfig.methods.requestDeletePackage).toHaveBeenCalledWith({
-      projectId: 'project_id',
-      packageId: 1,
-    });
+    list.vm.$emit('package:delete', 'foo');
+    expect(componentConfig.methods.requestDeletePackage).toHaveBeenCalledWith('foo');
   });
 });

@@ -25,3 +25,6 @@ export const LIST_LABEL_VERSION = __('Version');
 export const LIST_LABEL_PACKAGE_TYPE = __('Type');
 export const LIST_LABEL_CREATED_AT = __('Created');
 export const LIST_LABEL_ACTIONS = '';
+
+// The following is not translated because it is used to build a JavaScript exception error message
+export const MISSING_DELETE_PATH_ERROR = 'Missing delete_api_path link';

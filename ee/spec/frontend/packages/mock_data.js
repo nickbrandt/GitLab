@@ -1,3 +1,8 @@
+const _links = {
+  web_path: 'foo',
+  delete_api_path: 'bar',
+};
+
 export const mavenPackage = {
   created_at: '2015-12-10',
   id: 1,
@@ -11,6 +16,7 @@ export const mavenPackage = {
   project_id: 1,
   updated_at: '2015-12-10',
   version: '1.0.0',
+  _links,
 };
 
 export const mavenFiles = [
@@ -38,6 +44,7 @@ export const npmPackage = {
   project_id: 1,
   updated_at: '2015-12-10',
   version: '',
+  _links,
 };
 
 export const npmFiles = [
@@ -64,6 +71,7 @@ export const conanPackage = {
   recipe: 'conan-package/1.0.0@conan+conan-package/stable',
   updated_at: '2015-12-10',
   version: '1.0.0',
+  _links,
 };
 
 export const packageList = [mavenPackage, npmPackage, conanPackage];

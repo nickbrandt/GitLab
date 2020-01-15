@@ -38,8 +38,8 @@ export default {
     onPageChanged(page) {
       return this.requestPackagesList({ page });
     },
-    onPackageDeleteRequest(packageId) {
-      return this.requestDeletePackage({ projectId: this.resourceId, packageId });
+    onPackageDeleteRequest(item) {
+      return this.requestDeletePackage(item);
     },
   },
 };

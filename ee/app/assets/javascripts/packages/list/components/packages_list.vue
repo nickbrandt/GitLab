@@ -46,7 +46,6 @@ export default {
       perPage: state => state.pagination.perPage,
       totalItems: state => state.pagination.total,
       page: state => state.pagination.page,
-      canDestroyPackage: state => state.config.canDestroyPackage,
       isGroupPage: state => state.config.isGroupPage,
     }),
     currentPage: {
@@ -75,7 +74,7 @@ export default {
       return !this.list || this.list.length === 0;
     },
     showActions() {
-      return this.canDestroyPackage;
+      return !this.isGroupPage;
     },
     sortableFields() {
       // This list is filtered in the case of the project page, and the project column is removed
@@ -151,7 +150,7 @@ export default {
       this.$refs.packageListDeleteModal.show();
     },
     deleteItemConfirmation() {
-      this.$emit('package:delete', this.itemToBeDeleted.id);
+      this.$emit('package:delete', this.itemToBeDeleted);
       this.track(TrackingActions.DELETE_PACKAGE);
       this.itemToBeDeleted = null;
     },
@@ -191,9 +190,13 @@ export default {
         :no-local-sorting="true"
         stacked="md"
       >
-        <template #name="{value}">
+        <template #name="{value, item}">
           <div ref="col-name" class="flex-truncate-parent">
-            <a href="#" class="flex-truncate-child" data-qa-selector="package_link">
+            <a
+              :href="item._links.web_path"
+              class="flex-truncate-child"
+              data-qa-selector="package_link"
+            >
               {{ value }}
             </a>
           </div>
@@ -219,6 +222,7 @@ export default {
             variant="danger"
             :title="s__('PackageRegistry|Remove package')"
             :aria-label="s__('PackageRegistry|Remove package')"
+            :disabled="!item._links.delete_api_path"
             @click="setItemToBeDeleted(item)"
           >
             <icon name="remove" />
