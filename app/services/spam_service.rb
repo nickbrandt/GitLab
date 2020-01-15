@@ -46,15 +46,6 @@ class SpamService
     true
   end
 
-  def akismet
-    @akismet ||= AkismetService.new(
-      spammable_owner.name,
-      spammable_owner.email,
-      spammable.spammable_text,
-      options
-    )
-  end
-
   def check_for_spam?
     spammable.check_for_spam?
   end

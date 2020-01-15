@@ -9,42 +9,42 @@ describe Spam::MarkAsSpamService do
 
   subject { described_class.new(spammable: spammable) }
 
-  describe '#mark_as_spam!' do
+  describe '#execute' do
     before do
       allow(subject).to receive(:akismet).and_return(fake_akismet_service)
     end
 
-    context 'the spammable is not submittable' do
+    context 'when the spammable object is not submittable' do
       before do
         allow(spammable).to receive(:submittable_as_spam?).and_return false
       end
 
       it 'does not submit as spam' do
-        expect(subject.mark_as_spam!).to be_falsey
+        expect(subject.execute).to be_falsey
       end
     end
 
-    context 'the spam is submitted successfully' do
+    context 'spam is submitted successfully' do
       before do
         allow(spammable).to receive(:submittable_as_spam?).and_return true
         allow(fake_akismet_service).to receive(:submit_spam).and_return true
       end
 
       it 'submits as spam' do
-        expect(subject.mark_as_spam!).to be_truthy
+        expect(subject.execute).to be_truthy
       end
 
       it "updates the spammable object's user agent detail as being submitted as spam" do
         expect(user_agent_detail).to receive(:update_attribute)
 
-        subject.mark_as_spam!
+        subject.execute
       end
 
-      context 'if Akismet does not consider it spam' do
-        it "does not update the spammable object as spam" do
+      context 'when Akismet does not consider it spam' do
+        it 'does not update the spammable object as spam' do
           allow(fake_akismet_service).to receive(:submit_spam).and_return false
 
-          expect(subject.mark_as_spam!).to be_falsey
+          expect(subject.execute).to be_falsey
         end
       end
     end

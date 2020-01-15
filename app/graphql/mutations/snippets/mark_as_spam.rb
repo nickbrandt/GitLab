@@ -24,7 +24,7 @@ module Mutations
       private
 
       def mark_as_spam(snippet)
-        Spam::MarkAsSpamService.new(spammable: snippet).mark_as_spam!
+        Spam::MarkAsSpamService.new(spammable: snippet).execute
       end
 
       def authorized_resource?(snippet)

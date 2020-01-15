@@ -53,7 +53,7 @@ describe 'Mark snippet as spam' do
 
       it 'marks snippet as spam' do
         expect_next_instance_of(Spam::MarkAsSpamService) do |instance|
-          expect(instance).to receive(:mark_as_spam!)
+          expect(instance).to receive(:execute)
         end
 
         post_graphql_mutation(mutation, current_user: current_user)

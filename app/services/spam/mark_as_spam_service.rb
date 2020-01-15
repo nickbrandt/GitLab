@@ -14,14 +14,11 @@ module Spam
       @options[:user_agent] = @spammable.user_agent
     end
 
-    def mark_as_spam!
-      return false unless spammable.submittable_as_spam?
+    def execute
+      return unless spammable.submittable_as_spam?
+      return unless akismet.submit_spam
 
-      if akismet.submit_spam
-        spammable.user_agent_detail.update_attribute(:submitted, true)
-      else
-        false
-      end
+      spammable.user_agent_detail.update_attribute(:submitted, true)
     end
   end
 end
