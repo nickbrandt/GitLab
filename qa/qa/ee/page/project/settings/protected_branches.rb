@@ -24,15 +24,7 @@ module QA
             private
 
             def select_allowed(action, allowed)
-              click_element :"allowed_to_#{action}_select"
-
-              allowed[:roles] = QA::Resource::ProtectedBranch::Roles::NO_ONE unless allowed.key?(:roles)
-
-              within_element(:"allowed_to_#{action}_dropdown") do
-                click_on allowed[:roles]
-                allowed[:users].each { |user| click_on user.username } if allowed.key?(:users)
-                allowed[:groups].each { |group| click_on group.name } if allowed.key?(:groups)
-              end
+              super
 
               # Click the select element again to close the dropdown
               click_element :"allowed_to_#{action}_select"
