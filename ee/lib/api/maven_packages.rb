@@ -66,7 +66,7 @@ module API
 
       authorize_read_package!(project)
 
-      package = ::Packages::MavenPackageFinder
+      package = ::Packages::Maven::PackageFinder
         .new(params[:path], current_user, project: project).execute!
 
       authorize_packages_feature!(package.project)
@@ -103,7 +103,7 @@ module API
 
         not_found!('Group') unless can?(current_user, :read_group, group)
 
-        package = ::Packages::MavenPackageFinder
+        package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, group: group).execute!
 
         authorize_packages_feature!(package.project)
@@ -144,7 +144,7 @@ module API
 
         file_name, format = extract_format(params[:file_name])
 
-        package = ::Packages::MavenPackageFinder
+        package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, project: user_project).execute!
 
         package_file = ::Packages::PackageFileFinder
@@ -203,7 +203,7 @@ module API
         uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
         bad_request!('Missing package file!') unless uploaded_file
 
-        package = ::Packages::FindOrCreateMavenPackageService
+        package = ::Packages::Maven::FindOrCreatePackageService
           .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
 
         case format

@@ -39,10 +39,10 @@ module API
       authorize_read_package!(project_by_package_name)
       authorize_packages_feature!(project_by_package_name)
 
-      packages = ::Packages::NpmPackagesFinder.new(project_by_package_name, package_name)
+      packages = ::Packages::Npm::PackageFinder.new(project_by_package_name, package_name)
                                               .execute
 
-      present NpmPackagePresenter.new(package_name, packages),
+      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
               with: EE::API::Entities::NpmPackageTag
     end
 
@@ -65,7 +65,7 @@ module API
 
         authorize_create_package!(project_by_package_name)
 
-        package = ::Packages::NpmPackagesFinder
+        package = ::Packages::Npm::PackageFinder
           .new(project_by_package_name, package_name)
           .find_by_version(version)
         not_found!('Package') unless package
@@ -112,10 +112,10 @@ module API
       authorize_read_package!(project_by_package_name)
       authorize_packages_feature!(project_by_package_name)
 
-      packages = ::Packages::NpmPackagesFinder
+      packages = ::Packages::Npm::PackageFinder
         .new(project_by_package_name, package_name).execute
 
-      present NpmPackagePresenter.new(package_name, packages),
+      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
         with: EE::API::Entities::NpmPackage
     end
 

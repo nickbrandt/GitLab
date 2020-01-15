@@ -236,7 +236,7 @@ describe API::ConanPackages do
       end
 
       it 'returns not found' do
-        allow(ConanPackagePresenter).to receive(:new)
+        allow(::Packages::Conan::PackagePresenter).to receive(:new)
           .with(
             'aa/bb@%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) },
             user,
@@ -292,10 +292,10 @@ describe API::ConanPackages do
     let(:jwt) { build_jwt(personal_access_token) }
     let(:headers) { build_token_auth_header(jwt.encoded) }
     let(:conan_package_reference) { '123456789' }
-    let(:presenter) { double('ConanPackagePresenter') }
+    let(:presenter) { double('::Packages::Conan::PackagePresenter') }
 
     before do
-      allow(ConanPackagePresenter).to receive(:new)
+      allow(::Packages::Conan::PackagePresenter).to receive(:new)
         .with(package.conan_recipe, user, package.project)
         .and_return(presenter)
     end

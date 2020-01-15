@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::CreateMavenPackageService do
+describe Packages::Maven::CreatePackageService do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:app_name) { 'my-app'.freeze }
-  let(:version) { '1.0-SNAPSHOT'.freeze }
+  let(:app_name) { 'my-app' }
+  let(:version) { '1.0-SNAPSHOT' }
   let(:path) { "my/company/app/#{app_name}" }
   let(:path_with_version) { "#{path}/#{version}" }
 

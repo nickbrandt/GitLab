@@ -509,7 +509,7 @@ describe API::NpmPackages do
     expect(response).to match_response_schema('public_api/v4/packages/npm_package', dir: 'ee')
     expect(json_response['name']).to eq(package.name)
     expect(json_response['versions'][package.version]).to match_schema('public_api/v4/packages/npm_package_version', dir: 'ee')
-    NpmPackagePresenter::NPM_VALID_DEPENDENCY_TYPES.each do |dependency_type|
+    ::Packages::Npm::PackagePresenter::NPM_VALID_DEPENDENCY_TYPES.each do |dependency_type|
       expect(json_response.dig('versions', package.version, dependency_type.to_s)).to be_any
     end
     expect(json_response['dist-tags']).to match_schema('public_api/v4/packages/npm_package_tags', dir: 'ee')

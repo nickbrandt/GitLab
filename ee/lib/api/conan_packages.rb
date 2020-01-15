@@ -101,7 +101,7 @@ module API
         get 'packages/:conan_package_reference' do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanPackageSnapshot
         end
@@ -113,7 +113,7 @@ module API
         get do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeSnapshot
         end
@@ -297,7 +297,7 @@ module API
       def present_package_download_urls
         authorize!(:read_package, project)
 
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
+        presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
         render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
 
@@ -307,7 +307,7 @@ module API
       def present_recipe_download_urls
         authorize!(:read_package, project)
 
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
+        presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
         render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
 
