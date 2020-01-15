@@ -1067,6 +1067,9 @@ class Repository
       return rebase_deprecated(user, merge_request)
     end
 
+    push_options = []
+    push_options << 'ci.skip' if skip_ci
+
     raw.rebase(
       user,
       merge_request.id,
@@ -1074,7 +1077,7 @@ class Repository
       branch_sha: merge_request.source_branch_sha,
       remote_repository: merge_request.target_project.repository.raw,
       remote_branch: merge_request.target_branch,
-      skip_ci: skip_ci
+      push_options: push_options
     ) do |commit_id|
       merge_request.update!(rebase_commit_sha: commit_id, merge_error: nil)
     end

@@ -853,7 +853,7 @@ module Gitlab
         end
       end
 
-      def rebase(user, rebase_id, branch:, branch_sha:, remote_repository:, remote_branch:, skip_ci: false, &block)
+      def rebase(user, rebase_id, branch:, branch_sha:, remote_repository:, remote_branch:, push_options: [], &block)
         wrapped_gitaly_errors do
           gitaly_operation_client.rebase(
             user,
@@ -862,7 +862,7 @@ module Gitlab
             branch_sha: branch_sha,
             remote_repository: remote_repository,
             remote_branch: remote_branch,
-            skip_ci: skip_ci,
+            push_options: push_options,
             &block
           )
         end
