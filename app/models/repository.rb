@@ -1068,7 +1068,7 @@ class Repository
     end
 
     push_options = []
-    push_options << 'ci.skip' if skip_ci
+    push_options << Gitlab::PushOptions::CI_SKIP if skip_ci
 
     raw.rebase(
       user,
