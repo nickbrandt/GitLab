@@ -7,7 +7,7 @@ exports[`CustomStageForm Editing a custom stage isSavingCustomStage=true display
 `;
 
 exports[`CustomStageForm Empty form Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `
-"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__122\\">
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__123\\">
   <option value=\\"\\">Select start event</option>
   <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
   <option value=\\"merge_request_created\\">Merge request created</option>
@@ -46,7 +46,7 @@ exports[`CustomStageForm Empty form Start event with events does not select even
 `;
 
 exports[`CustomStageForm Empty form Start event with events selects events with canBeStartEvent=true for the start events dropdown 1`] = `
-"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__94\\">
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__95\\">
   <option value=\\"\\">Select start event</option>
   <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
   <option value=\\"merge_request_created\\">Merge request created</option>
