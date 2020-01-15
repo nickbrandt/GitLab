@@ -34,7 +34,7 @@ module QA
             end
 
             def has_epic_title?(title)
-              wait do
+              wait_until do
                 has_element?(:epic_title_text, text: title)
               end
             end

@@ -335,7 +335,7 @@ module QA
       Runtime::Logger.debug(%Q[Visiting IDP url at "#{EE::Runtime::Saml.idp_sso_url}"])
 
       page.visit EE::Runtime::Saml.idp_sso_url
-      Support::Waiter.wait { current_url == EE::Runtime::Saml.idp_sso_url }
+      Support::Waiter.wait_until { current_url == EE::Runtime::Saml.idp_sso_url }
 
       Capybara.current_session.reset!
     end
@@ -344,7 +344,7 @@ module QA
       Runtime::Logger.debug(%Q[Visiting managed_group_url at "#{@managed_group_url}"])
 
       page.visit @managed_group_url
-      Support::Waiter.wait { current_url == @managed_group_url }
+      Support::Waiter.wait_until { current_url == @managed_group_url }
     end
 
     def disable_enforce_sso_and_group_managed_account

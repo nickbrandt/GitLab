@@ -25,13 +25,11 @@ module QA
             end
 
             def has_finished_loading?
-              wait(reload: false) do
-                has_no_element? :loading_container
-              end
+              has_no_element?(:loading_container, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
             end
 
             def has_terminal_screen?
-              wait(reload: false) do
+              wait_until(reload: false) do
                 within_element :terminal_screen do
                   # The DOM initially just includes the :terminal_screen element
                   # and then the xterm package dynamically loads when the user

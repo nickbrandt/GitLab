@@ -15,7 +15,7 @@ module QA
               # right away so a refresh may be needed.
               # https://gitlab.com/gitlab-org/gitlab/issues/119203
               # TODO: https://gitlab.com/gitlab-org/gitlab/issues/195424
-              wait(reload: true) do
+              wait_until(reload: true) do
                 has_element?(:admin_audit_log_row_content, text: text)
               end
             end

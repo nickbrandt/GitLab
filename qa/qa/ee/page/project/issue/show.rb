@@ -68,9 +68,7 @@ module QA
             end
 
             def wait_for_related_issues_to_load
-              wait(reload: false) do
-                has_no_element?(:related_issues_loading_icon)
-              end
+              has_no_element?(:related_issues_loading_icon, wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
             end
 
             def weight_label_value

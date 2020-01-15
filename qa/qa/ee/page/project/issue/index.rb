@@ -45,7 +45,7 @@ module QA
             end
 
             def wait_for_issue_replication(issue)
-              wait do
+              wait_until do
                 filter_by_title(issue.title)
 
                 page.has_content?(issue.title)
