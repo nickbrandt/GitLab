@@ -44,7 +44,7 @@ export default {
           height: contentImg.clientHeight,
         };
 
-        this.$emit('setOverlayDimensions', position);
+        this.$emit('resize', position);
       });
     },
   },

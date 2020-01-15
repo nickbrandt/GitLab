@@ -15,19 +15,11 @@ exports[`Design management design index page renders design index 1`] = `
      
     <!---->
      
-    <div
-      class="d-flex flex-column h-100 mh-100 position-relative"
-    >
-      <design-image-stub
-        image="test.jpg"
-        name="test.jpg"
-      />
-       
-      <design-overlay-stub
-        notes="[object Object]"
-        position="[object Object]"
-      />
-    </div>
+    <design-presentation-stub
+      discussions="[object Object]"
+      image="test.jpg"
+      imagename="test.jpg"
+    />
   </div>
    
   <div
@@ -110,19 +102,11 @@ exports[`Design management design index page with error GlAlert is rendered in c
       </gl-alert-stub>
     </div>
      
-    <div
-      class="d-flex flex-column h-100 mh-100 position-relative"
-    >
-      <design-image-stub
-        image="test.jpg"
-        name="test.jpg"
-      />
-       
-      <design-overlay-stub
-        notes=""
-        position="[object Object]"
-      />
-    </div>
+    <design-presentation-stub
+      discussions=""
+      image="test.jpg"
+      imagename="test.jpg"
+    />
   </div>
    
   <div
