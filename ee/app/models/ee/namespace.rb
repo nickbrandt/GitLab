@@ -366,13 +366,18 @@ module EE
       # Hosted subscriptions are only available for root groups for now.
       return if parent_id
 
-      gitlab_subscription || generate_subscription
+      gitlab_subscription || generate_subscription_from_legacy_data
     end
 
-    def generate_subscription
+    # namespaces table's trial_ends_on is a legacy column,
+    # which should be used to generate subscription if it is missing.
+    def generate_subscription_from_legacy_data
+      trial_ends_on = read_attribute(:trial_ends_on)
+      trial_active = trial_ends_on.present? && trial_ends_on >= Date.today
+
       create_gitlab_subscription(
         plan_code: plan&.name,
-        trial: trial_active?,
+        trial: trial_active,
         start_date: created_at,
         seats: 0
       )

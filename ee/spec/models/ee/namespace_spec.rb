@@ -55,6 +55,52 @@ describe Namespace do
     end
   end
 
+  describe '#actual_plan' do
+    let(:plan) { create(:bronze_plan) }
+    let(:namespace) { create(:namespace, plan_id: plan.id) }
+    let(:child_namespace) { create(:namespace, parent: namespace) }
+
+    context 'when not root namespace' do
+      it 'returns root namespace plan' do
+        expect(child_namespace.actual_plan).to eq(plan)
+      end
+    end
+
+    context 'when root namespace' do
+      context 'when subscription record does not exist' do
+        let(:namespace) { create(:namespace, plan_id: plan.id, trial_ends_on: trial_ends_on) }
+
+        where(:trial_ends_on, :expected_trial_value) do
+          now = Date.new(2000, 5, 5)
+
+          [
+            [nil,         false],
+            [now + 1.day, true],
+            [now,         true],
+            [now - 1.day, false],
+          ]
+        end
+
+        with_them do
+          it 'creates subscription record and return plan' do
+            Timecop.freeze(Date.new(2000, 5, 5)) do
+              expect do
+                expect(namespace.actual_plan).to eq(plan)
+              end.to change { GitlabSubscription.count }.by(1)
+
+              subscription = namespace.reload.gitlab_subscription
+
+              expect(subscription.trial?).to eq(expected_trial_value)
+              expect(subscription.hosted_plan).to eq(plan)
+              expect(subscription.start_date).to eq(namespace.created_at.to_date)
+              expect(subscription.seats).to eq(0)
+            end
+          end
+        end
+      end
+    end
+  end
+
   describe '#trial_active?' do
     subject { create(:namespace) }
 
@@ -70,7 +116,7 @@ describe Namespace do
         [true,  now - 1.day, false],
         [false, now + 1.day, false],
         [false, now,         false],
-        [false, now - 1.day, false],
+        [false, now - 1.day, false]
       ]
     end
 
