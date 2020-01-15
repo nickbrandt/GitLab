@@ -577,13 +577,31 @@ module Ci
         before do
           allow_any_instance_of(Ci::Build).to receive(:has_valid_deployment?).and_return(false)
         end
-        it 'returns no build and marks it as failed' do
-          expect(subject.build).to be_nil
 
-          pending_job.reload
+        context 'and the only_forward_deployment feature flag is turned on' do
+          before do
+            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, default_enabled: false).and_return(true)
+          end
+          it 'returns no build and marks it as failed' do
+            expect(subject.build).to be_nil
 
-          expect(pending_job).to be_failed
-          expect(pending_job).to be_invalid_deployment_failure
+            pending_job.reload
+
+            expect(pending_job).to be_failed
+            expect(pending_job).to be_invalid_deployment_failure
+          end
+        end
+        context 'and the only_forward_deployment feature flag is turned off' do
+          before do
+            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, default_enabled: false).and_return(false)
+          end
+          it 'picks the build' do
+            expect(subject.build).to eq(pending_job)
+
+            pending_job.reload
+
+            expect(pending_job).to be_running
+          end
         end
       end
     end
