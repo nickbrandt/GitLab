@@ -133,12 +133,16 @@ describe API::NpmPackages do
     end
 
     context 'a public project' do
+      subject { get_file(package_file) }
+
       it 'returns the file with no token needed' do
-        get_file(package_file)
+        subject
 
         expect(response).to have_gitlab_http_status(200)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
+
+      it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
     end
 
     context 'private project' do
@@ -230,13 +234,19 @@ describe API::NpmPackages do
         let(:package_name) { "@#{group.path}/my_package_name" }
         let(:params) { upload_params(package_name) }
 
-        it 'creates npm package with file with access token' do
-          expect { upload_package_with_token(package_name, params) }
-            .to change { project.packages.count }.by(1)
-            .and change { Packages::PackageFile.count }.by(1)
-            .and change { Packages::Tag.count }.by(1)
+        context 'with access token' do
+          subject { upload_package_with_token(package_name, params) }
 
-          expect(response).to have_gitlab_http_status(200)
+          it_behaves_like 'a gitlab tracking event', described_class.name, 'push_package'
+
+          it 'creates npm package with file' do
+            expect { subject }
+              .to change { project.packages.count }.by(1)
+              .and change { Packages::PackageFile.count }.by(1)
+              .and change { Packages::Tag.count }.by(1)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
         end
 
         it 'creates npm package with file with job token' do
