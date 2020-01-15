@@ -24,25 +24,25 @@ module API
         segment 'rules' do
           desc 'Create new approval rule' do
             detail 'Private API subject to change'
-            success EE::API::Entities::ApprovalSettingRule
+            success EE::API::Entities::ProjectApprovalSettingRule
           end
           params do
             use :create_project_approval_rule
           end
           post do
-            create_project_approval_rule(present_with: EE::API::Entities::ApprovalSettingRule)
+            create_project_approval_rule(present_with: EE::API::Entities::ProjectApprovalSettingRule)
           end
 
           segment ':approval_rule_id' do
             desc 'Update approval rule' do
               detail 'Private API subject to change'
-              success EE::API::Entities::ApprovalSettingRule
+              success EE::API::Entities::ProjectApprovalSettingRule
             end
             params do
               use :update_project_approval_rule
             end
             put do
-              update_project_approval_rule(present_with: EE::API::Entities::ApprovalSettingRule)
+              update_project_approval_rule(present_with: EE::API::Entities::ProjectApprovalSettingRule)
             end
 
             desc 'Delete an approval rule' do

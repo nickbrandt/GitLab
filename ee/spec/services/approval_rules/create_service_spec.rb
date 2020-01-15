@@ -83,6 +83,60 @@ describe ApprovalRules::CreateService do
 
     it_behaves_like "creatable"
 
+    context 'when protected_branch_ids param is present' do
+      let(:protected_branch) { create(:protected_branch, project: target) }
+
+      subject do
+        described_class.new(
+          target,
+          user,
+          name: 'developers',
+          approvals_required: 1,
+          protected_branch_ids: [protected_branch.id]
+        ).execute
+      end
+
+      context 'and multiple approval rules is enabled' do
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+        end
+
+        it 'associates the approval rule to the protected branch' do
+          expect(subject[:status]).to eq(:success)
+          expect(subject[:rule].protected_branches).to eq([protected_branch])
+        end
+
+        context 'but user cannot administer project' do
+          before do
+            allow(Ability).to receive(:allowed?).and_call_original
+            allow(Ability).to receive(:allowed?).with(user, :admin_project, target).and_return(false)
+          end
+
+          it 'does not associate the approval rule to the protected branch' do
+            expect(subject[:status]).to eq(:success)
+            expect(subject[:rule].protected_branches).to be_empty
+          end
+        end
+
+        context 'but protected branch is for another project' do
+          let(:another_project) { create(:project) }
+          let(:protected_branch) { create(:protected_branch, project: another_project) }
+
+          it 'does not associate the approval rule to the protected branch' do
+            expect(subject[:status]).to eq(:success)
+            expect(subject[:rule].protected_branches).to be_empty
+          end
+        end
+      end
+
+      context 'and multiple approval rules is disabled' do
+        it 'does not associate the approval rule to the protected branch' do
+          expect(subject[:status]).to eq(:success)
+          expect(subject[:rule].protected_branches).to be_empty
+        end
+      end
+    end
+
     ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
       context "when the rule name is `#{rule_name}`" do
         subject { described_class.new(target, user, { name: rule_name, approvals_required: 1 }) }

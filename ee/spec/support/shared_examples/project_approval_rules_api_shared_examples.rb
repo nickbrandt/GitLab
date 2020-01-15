@@ -45,6 +45,22 @@ shared_examples_for 'an API endpoint for creating project approval rule' do
       expect(json_response.symbolize_keys).to include(params)
     end
 
+    context 'when protected_branch_ids param is present' do
+      let(:protected_branches) { Array.new(2).map { create(:protected_branch, project: project) } }
+
+      before do
+        stub_licensed_features(multiple_approval_rules: true)
+        post api(url, current_user), params: params.merge(protected_branch_ids: protected_branches.map(&:id))
+      end
+
+      it 'creates approval rule associated to specified protected branches' do
+        expect(json_response['protected_branches']).to contain_exactly(
+          a_hash_including('id' => protected_branches.first.id),
+          a_hash_including('id' => protected_branches.last.id)
+        )
+      end
+    end
+
     ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
       context "when creating a '#{rule_name}' approval rule" do
         it 'specifies a `rule_type` of `report_approver`' do
@@ -63,6 +79,22 @@ shared_examples_for 'an API endpoint for updating project approval rule' do
   shared_examples_for 'a user with access' do
     before do
       project.add_developer(approver)
+    end
+
+    context 'when protected_branch_ids param is present' do
+      let(:protected_branches) { Array.new(2).map { create(:protected_branch, project: project) } }
+
+      before do
+        stub_licensed_features(multiple_approval_rules: true)
+        put api(url, current_user), params: { protected_branch_ids: protected_branches.map(&:id) }
+      end
+
+      it 'associates approval rule to specified protected branches' do
+        expect(json_response['protected_branches']).to contain_exactly(
+          a_hash_including('id' => protected_branches.first.id),
+          a_hash_including('id' => protected_branches.last.id)
+        )
+      end
     end
 
     context 'when approver already exists' do
