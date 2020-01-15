@@ -51,7 +51,7 @@ module QA
 
           Page::Project::Issue::Show.perform do |show|
             # Wait for attachment replication
-            found = show.wait(reload: false) do
+            found = show.wait_until(reload: false) do
               show.asset_exists?(image_url)
             end
 

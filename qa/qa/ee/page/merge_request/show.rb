@@ -91,9 +91,7 @@ module QA
           end
 
           def wait_for_license_compliance_report
-            wait(reload: false) do
-              has_no_text?('Loading License Compliance report')
-            end
+            has_no_text?('Loading License Compliance report', wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
           end
 
           def approvals_required_from
@@ -192,7 +190,7 @@ module QA
               click_on name
             end
 
-            wait(reload: false) do
+            wait_until(reload: false) do
               find_element(:vulnerability_modal_content)[:class].include? 'show'
             end
           end
@@ -204,7 +202,7 @@ module QA
             find_element(:dismiss_comment_field).fill_in with: reason
             click_element :add_and_dismiss_button
 
-            wait(reload: false) do
+            wait_until(reload: false) do
               has_no_element?(:vulnerability_modal_content)
             end
           end
@@ -216,7 +214,7 @@ module QA
             previous_page = page.current_url
             click_element :resolve_split_button
 
-            wait(max: 15, reload: false) do
+            wait_until(max_duration: 15, reload: false) do
               page.current_url != previous_page
             end
           end
@@ -228,13 +226,13 @@ module QA
             previous_page = page.current_url
             click_element(:create_issue_button)
 
-            wait(max: 15, reload: false) do
+            wait_until(max_duration: 15, reload: false) do
               page.current_url != previous_page
             end
           end
 
           def has_vulnerability_report?(timeout: 60)
-            wait(reload: true, max: timeout, interval: 1) do
+            wait_until(reload: true, max_duration: timeout, sleep_interval: 1) do
               finished_loading?
               has_element?(:vulnerability_report_grouped, wait: 10)
             end
@@ -310,7 +308,7 @@ module QA
             sleep 1
 
             text = nil
-            wait(reload: false) do
+            wait_until(reload: false) do
               text = find_element(:approvals_summary_content).text
               text =~ /Requires|approved/
             end

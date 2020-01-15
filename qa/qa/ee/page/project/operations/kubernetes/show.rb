@@ -16,7 +16,7 @@ module QA
               end
 
               def wait_for_cluster_health
-                wait(max: 120, interval: 3, reload: true) do
+                wait_until(max_duration: 120, sleep_interval: 3, reload: true) do
                   has_cluster_health_graphs?
                 end
               end
