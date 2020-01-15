@@ -72,7 +72,6 @@ describe('Dashboard', () => {
         createComponent({
           hasMetrics: true,
           customMetricsPath: '/endpoint',
-          customMetricsAvailable: false,
         });
       });
       it('does not render add button on the dashboard', () => {
