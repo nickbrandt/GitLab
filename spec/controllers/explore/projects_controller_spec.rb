@@ -59,6 +59,75 @@ describe Explore::ProjectsController do
     end
   end
 
+  shared_examples "blocks high page numbers" do
+    let(:page_limit) { Explore::ProjectsController::PAGE_LIMIT }
+
+    context "page number is too high" do
+      [:index, :trending, :starred].each do |endpoint|
+        describe "GET #{endpoint}" do
+          render_views
+
+          before do
+            get endpoint, params: { page: page_limit + 1 }
+          end
+
+          it { is_expected.to respond_with(:bad_request) }
+          it { is_expected.to render_template("explore/projects/page_out_of_bounds") }
+        end
+
+        describe "GET #{endpoint}.json" do
+          render_views
+
+          before do
+            get endpoint, params: { page: page_limit + 1 }, format: :json
+          end
+
+          it { is_expected.to respond_with(:bad_request) }
+        end
+
+        describe "metrics recording" do
+          after do
+            get endpoint, params: { page: page_limit + 1 }
+          end
+
+          it "records the interception" do
+            expect(Gitlab::Metrics).to receive(:counter).with(
+              :gitlab_page_out_of_bounds,
+              controller: "explore/projects",
+              action: endpoint.to_s,
+              agent: "Rails Testing"
+            )
+          end
+        end
+      end
+    end
+
+    context "page number is acceptable" do
+      [:index, :trending, :starred].each do |endpoint|
+        describe "GET #{endpoint}" do
+          render_views
+
+          before do
+            get endpoint, params: { page: page_limit }
+          end
+
+          it { is_expected.to respond_with(:success) }
+          it { is_expected.to render_template("explore/projects/#{endpoint}") }
+        end
+
+        describe "GET #{endpoint}.json" do
+          render_views
+
+          before do
+            get endpoint, params: { page: page_limit }, format: :json
+          end
+
+          it { is_expected.to respond_with(:success) }
+        end
+      end
+    end
+  end
+
   context 'when user is signed in' do
     let(:user) { create(:user) }
 
@@ -67,6 +136,7 @@ describe Explore::ProjectsController do
     end
 
     include_examples 'explore projects'
+    include_examples "blocks high page numbers"
 
     context 'user preference sorting' do
       let(:project) { create(:project) }
@@ -79,6 +149,7 @@ describe Explore::ProjectsController do
 
   context 'when user is not signed in' do
     include_examples 'explore projects'
+    include_examples "blocks high page numbers"
 
     context 'user preference sorting' do
       let(:project) { create(:project) }
@@ -90,5 +161,12 @@ describe Explore::ProjectsController do
         get :index, params: { sort: sorting_param }
       end
     end
+  end
+
+  describe "#max_page_number" do
+    subject { controller.send(:max_page_number) }
+
+    it { is_expected.to eq(Explore::ProjectsController::PAGE_LIMIT) }
+    it { is_expected.to be_an(Integer) }
   end
 end

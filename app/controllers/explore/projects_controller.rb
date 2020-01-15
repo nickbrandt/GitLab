@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
 class Explore::ProjectsController < Explore::ApplicationController
+  include PageLimiter
   include ParamsBackwardCompatibility
   include RendersMemberAccess
   include SortingHelper
   include SortingPreference
 
+  PAGE_LIMIT = 500
+
   before_action :set_non_archived_param
   before_action :set_sorting
+
+  limit_pages PAGE_LIMIT
+  helper_method :max_page_number
 
   def index
     @projects = load_projects
@@ -53,10 +59,14 @@ class Explore::ProjectsController < Explore::ApplicationController
 
   private
 
-  # rubocop: disable CodeReuse/ActiveRecord
-  def load_projects
+  def load_project_counts
     @total_user_projects_count = ProjectsFinder.new(params: { non_public: true }, current_user: current_user).execute
     @total_starred_projects_count = ProjectsFinder.new(params: { starred: true }, current_user: current_user).execute
+  end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def load_projects
+    load_project_counts
 
     projects = ProjectsFinder.new(current_user: current_user, params: params)
                  .execute
@@ -79,5 +89,26 @@ class Explore::ProjectsController < Explore::ApplicationController
 
   def sorting_field
     Project::SORTING_PREFERENCE_FIELD
+  end
+
+  def max_page_number
+    PAGE_LIMIT
+  end
+
+  # Overrides the default in the PageLimiter concern
+  def page_out_of_bounds
+    load_project_counts
+
+    respond_to do |format|
+      format.html do
+        render "page_out_of_bounds", status: :bad_request
+      end
+
+      format.json do
+        render json: {
+          html: view_to_html_string("explore/projects/page_out_of_bounds")
+        }, status: :bad_request
+      end
+    end
   end
 end

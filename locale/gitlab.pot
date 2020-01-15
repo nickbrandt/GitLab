@@ -2480,6 +2480,9 @@ msgstr ""
 msgid "Average per day: %{average}"
 msgstr ""
 
+msgid "Back to page %{number}"
+msgstr ""
+
 msgid "Background Color"
 msgstr ""
 
@@ -11310,6 +11313,9 @@ msgstr ""
 msgid "Maximum number of mirrors that can be synchronizing at the same time."
 msgstr ""
 
+msgid "Maximum page reached"
+msgstr ""
+
 msgid "Maximum push size (MB)"
 msgstr ""
 
@@ -17150,6 +17156,9 @@ msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sorry, no projects matched your search"
+msgstr ""
+
+msgid "Sorry, you have exceeded the maximum browsable page number. Please use the API to explore further."
 msgstr ""
 
 msgid "Sorry, your filter produced no results"
