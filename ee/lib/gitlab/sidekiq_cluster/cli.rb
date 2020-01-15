@@ -42,10 +42,10 @@ module Gitlab
 
         queue_groups = SidekiqCluster.parse_queues(argv)
 
-        all_queues = SidekiqConfig.worker_queues(@rails_path)
+        all_queues = SidekiqConfig::CliMethods.worker_queues(@rails_path)
 
         queue_groups.map! do |queues|
-          SidekiqConfig.expand_queues(queues, all_queues)
+          SidekiqConfig::CliMethods.expand_queues(queues, all_queues)
         end
 
         if @negate_queues
