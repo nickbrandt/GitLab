@@ -150,7 +150,13 @@ module DesignManagement
     end
 
     def self.link_reference_pattern
-      nil
+      @link_reference_pattern ||= begin
+        exts = SAFE_IMAGE_EXT + DANGEROUS_IMAGE_EXT
+        path_segment = %r{issues/(?<issue>\d+)/designs}
+        filename_pattern = %r{(?<simple_file_name>[a-z0-9_=-]+\.(#{exts.join('|')}))}i
+
+        super(path_segment, filename_pattern)
+      end
     end
 
     def to_ability_name
