@@ -5,7 +5,7 @@ describe('Event Item', () => {
   let wrapper;
 
   const mountComponent = (options, mountFn = shallowMount) => {
-    wrapper = mountFn(Component, { attachToDocument: true, ...options });
+    wrapper = mountFn(Component, options);
   };
 
   describe('initial state', () => {
