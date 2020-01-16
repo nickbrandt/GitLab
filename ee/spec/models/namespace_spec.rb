@@ -77,6 +77,24 @@ describe Namespace do
         end
       end
     end
+
+    describe '.join_gitlab_subscription' do
+      subject { described_class.join_gitlab_subscription.select('gitlab_subscriptions.hosted_plan_id').first.hosted_plan_id }
+
+      context 'when there is no subscription' do
+        it 'returns namespace with nil subscription' do
+          is_expected.to be_nil
+        end
+      end
+
+      context 'when there is a subscription' do
+        let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan_id: gold_plan.id) }
+
+        it 'returns namespace with subscription set' do
+          is_expected.to eq(gold_plan.id)
+        end
+      end
+    end
   end
 
   context 'validation' do
