@@ -47,9 +47,9 @@ module ErrorTracking
     end
 
     def related_issue
-      SentryIssuesFinder
-        .new(project, current_user)
-        .find_by_identifier(params[:issue_id])
+      SentryIssueFinder
+        .new(project, current_user: current_user)
+        .execute(params[:issue_id])
         &.issue
     end
 

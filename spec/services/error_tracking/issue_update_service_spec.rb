@@ -48,8 +48,8 @@ describe ErrorTracking::IssueUpdateService do
           let(:issue_close_service) { spy(:issue_close_service) }
 
           before do
-            allow_any_instance_of(SentryIssuesFinder)
-              .to receive(:find_by_identifier)
+            allow_any_instance_of(SentryIssueFinder)
+              .to receive(:execute)
               .and_return(sentry_issue)
 
             allow(Issues::CloseService)
