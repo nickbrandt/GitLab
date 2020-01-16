@@ -301,6 +301,18 @@ RSpec/AnyInstanceOf:
   Enabled: false
 
 # Cops for upgrade to gitlab-styles 3.1.0
+Rails/ApplicationController: # needs refactor
+  Enabled: false
+
+Rails/ApplicationMailer: # needs refactor
+  Enabled: false
+
+Rails/RakeEnvironment: # needs refactor
+  Enabled: false
+
+Rails/HelperInstanceVariable: # needs refactor
+  Enabled: false
+
 RSpec/ReceiveCounts:
   Enabled: false
 
@@ -351,16 +363,4 @@ Style/MultilineWhenThen:
 
 Style/FloatDivision:
   Enabled: false
-
-# Cops that require refactoring
-Rails/ApplicationController:
-  Enabled: false
-
-Rails/ApplicationMailer:
-  Enabled: false
-
-Rails/RakeEnvironment:
-  Enabled: false
-
-Rails/HelperInstanceVariable:
-  Enabled: false
+  
