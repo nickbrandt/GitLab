@@ -117,10 +117,10 @@ module API
           namespace = Namespace.find_by_full_path(params[:namespace])
           not_found!('Namespace') unless namespace && licensed?(namespace)
 
-          projects = Project.public_or_visible_to_user(current_user)
-                            .in_namespace(namespace.self_and_descendants)
-                            .eager_load_namespace_and_owner
-                            .with_route
+          projects = current_user.can_read_all_resources? ? Project.all : current_user.authorized_projects
+          projects = projects.in_namespace(namespace.self_and_descendants)
+                             .eager_load_namespace_and_owner
+                             .with_route
 
           present paginate(projects),
                   with: ::API::Github::Entities::Repository,
