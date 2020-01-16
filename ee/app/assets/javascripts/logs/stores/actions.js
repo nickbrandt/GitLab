@@ -7,6 +7,7 @@ import { s__ } from '~/locale';
 import * as types from './mutation_types';
 
 import { getTimeRange } from '../utils';
+import { timeWindows } from '../constants';
 
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
@@ -40,8 +41,8 @@ export const setSearch = ({ dispatch, commit }, searchQuery) => {
   dispatch('fetchLogs');
 };
 
-export const setTimeWindow = ({ dispatch, commit }, timeWindow) => {
-  commit(types.SET_TIME_WINDOW, timeWindow);
+export const setTimeWindow = ({ dispatch, commit }, timeWindowKey) => {
+  commit(types.SET_TIME_WINDOW, timeWindowKey);
   dispatch('fetchLogs');
 };
 
@@ -74,7 +75,9 @@ export const fetchLogs = ({ commit, state }) => {
   };
 
   if (state.timeWindow.current) {
-    const { start, end } = getTimeRange(state.timeWindow.current.seconds);
+    const { current } = state.timeWindow;
+    const { start, end } = getTimeRange(timeWindows[current].seconds);
+
     params.start = start;
     params.end = end;
   }

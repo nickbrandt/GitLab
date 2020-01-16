@@ -1,13 +1,13 @@
 import { __ } from '~/locale';
 
-export const defaultTimeWindow = 'thirtyMinutes';
+export const defaultTimeWindow = 'oneHour';
 
 export const timeWindows = {
-  thirtyMinutes: {
+  oneHour: {
     label: __('1 hour'),
     seconds: 60 * 60,
   },
-  threeHours: {
+  fourHours: {
     label: __('4 hours'),
     seconds: 60 * 60 * 4,
   },
@@ -23,7 +23,7 @@ export const timeWindows = {
     label: __('Past week'),
     seconds: 60 * 60 * 24 * 7,
   },
-  pastMonth: {
+  twoWeeks: {
     label: __('2 weeks'),
     seconds: 60 * 60 * 24 * 15,
   },

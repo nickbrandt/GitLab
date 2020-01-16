@@ -11,6 +11,7 @@ import {
   fetchLogs,
 } from 'ee/logs/stores/actions';
 import { getTimeRange } from 'ee/logs/utils';
+import { timeWindows } from 'ee/logs/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
@@ -34,6 +35,7 @@ describe('Logs Store actions', () => {
   let state;
   let mock;
 
+  const mockThirtyMinutesSeconds = 3600;
   const mockThirtyMinutes = {
     start: '2020-01-09T18:06:20.000Z',
     end: '2020-01-09T18:36:20.000Z',
@@ -172,17 +174,26 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
-        done,
+        () => {
+          expect(getTimeRange).toHaveBeenCalledWith(mockThirtyMinutesSeconds);
+          done();
+        },
       );
     });
 
     it('should commit logs and pod data when there is pod name defined and a non-default date range', done => {
-      const mockOneDay = { start: '2020-01-08T18:41:39.000Z', end: '2020-01-09T18:41:39.000Z' };
+      const mockOneDaySeconds = timeWindows.oneDay.seconds;
+      const mockOneDay = {
+        start: '2020-01-08T18:41:39.000Z',
+        end: '2020-01-09T18:41:39.000Z',
+      };
+
       getTimeRange.mockReturnValueOnce(mockOneDay);
 
       state.projectPath = mockProjectPath;
       state.environments.current = mockEnvName;
       state.pods.current = mockPodName;
+      state.timeWindow.current = 'oneDay';
 
       const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
 
@@ -210,7 +221,10 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
-        done,
+        () => {
+          expect(getTimeRange).toHaveBeenCalledWith(mockOneDaySeconds);
+          done();
+        },
       );
     });
 
