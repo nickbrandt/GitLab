@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlIcon, GlEmptyState, GlLoadingIcon, GlFormInput, GlPagination } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlFormInput, GlPagination } from '@gitlab/ui';
 import stubChildren from 'helpers/stub_children';
 import ErrorTrackingList from '~/error_tracking/components/error_tracking_list.vue';
 import errorsList from './list_mock.json';
@@ -230,7 +230,7 @@ describe('ErrorTrackingList', () => {
       });
     });
 
-    it('sends the status and error ID', () => {
+    it('sends the "ignored" status and error ID', () => {
       const ignoreButton = wrapper.find({ ref: 'ignoreError' });
       ignoreButton.trigger('click');
       expect(actions.updateStatus).toHaveBeenCalledWith(
