@@ -5187,9 +5187,6 @@ msgstr ""
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
-msgid "Could not delete project ID"
-msgstr ""
-
 msgid "Could not fetch projects"
 msgstr ""
 
