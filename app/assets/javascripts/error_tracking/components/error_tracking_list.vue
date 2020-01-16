@@ -102,7 +102,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    projectPath:  {
+    projectPath: {
       type: String,
       required: true,
     },
@@ -184,7 +184,11 @@ export default {
       return `/${this.projectPath}/-/error_tracking/${errorId}.json`;
     },
     updateIssueStatus(errorId, status) {
-      this.updateStatus({ endpoint: this.getIssueUpdatePath(errorId), redirectUrl: this.listPath, status });
+      this.updateStatus({
+        endpoint: this.getIssueUpdatePath(errorId),
+        redirectUrl: this.listPath,
+        status,
+      });
     },
   },
 };
@@ -321,7 +325,7 @@ export default {
           </template>
           <template v-slot:ignore="errors">
             <gl-button @click="updateIssueStatus(errors.item.id, 'ignored')">
-              <gl-icon name="eye-slash" :size=12 />
+              <gl-icon name="eye-slash" :size="12" />
             </gl-button>
           </template>
           <template v-slot:details="errors">
