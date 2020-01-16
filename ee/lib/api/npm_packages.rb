@@ -144,6 +144,8 @@ module API
         package_file = ::Packages::PackageFileFinder
           .new(package, params[:file_name]).execute!
 
+        track_event('pull_package')
+
         present_carrierwave_file!(package_file.file)
       end
 
@@ -157,6 +159,8 @@ module API
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!(user_project)
+
+        track_event('push_package')
 
         created_package = ::Packages::Npm::CreatePackageService
           .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
