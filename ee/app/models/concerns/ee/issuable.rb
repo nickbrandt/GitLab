@@ -11,7 +11,7 @@ module EE
 
         relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
         relation.pluck(:id, 'labels.title').each do |issue_id, label|
-          issue_labels[issue_id] << label
+          issue_labels[issue_id] << label if label.present?
         end
 
         issue_labels
