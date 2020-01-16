@@ -38,7 +38,7 @@ class GithubService < Service
 
   def fields
     [
-      { type: 'text',
+      { type: 'password',
         name: "token",
         required: true,
         placeholder: "e.g. 8d3f016698e...",
