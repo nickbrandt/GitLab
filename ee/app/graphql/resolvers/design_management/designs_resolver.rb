@@ -25,6 +25,8 @@ module Resolvers
         find_designs(args)
       end
 
+      private
+
       def version(args)
         args[:at_version] ? GitlabSchema.object_from_id(args[:at_version])&.sync : nil
       end
