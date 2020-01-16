@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ConanPackagePresenter do
+describe ::Packages::Conan::PackagePresenter do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
 

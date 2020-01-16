@@ -37,7 +37,7 @@ module Packages
       end
 
       def search_packages(query)
-        Packages::ConanPackageFinder.new(current_user, query: query).execute.map(&:conan_recipe)
+        ::Packages::Conan::PackageFinder.new(current_user, query: query).execute.map(&:conan_recipe)
       end
 
       def search_for_single_package(query)

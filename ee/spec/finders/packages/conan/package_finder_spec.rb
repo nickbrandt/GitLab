@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Packages::ConanPackageFinder do
+describe ::Packages::Conan::PackageFinder do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, :public) }
 
