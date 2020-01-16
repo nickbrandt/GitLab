@@ -14,6 +14,10 @@ module EE
       ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, expose_path(api_v4_packages_npm_package_name_path))
     end
 
+    def conan_package_registry_url
+      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, "api/#{::API::API.version}/packages/conan")
+    end
+
     def package_registry_project_url(project_id, registry_type = :maven)
       project_api_path = expose_path(api_v4_projects_path(id: project_id))
       package_registry_project_path = "#{project_api_path}/packages/#{registry_type}"

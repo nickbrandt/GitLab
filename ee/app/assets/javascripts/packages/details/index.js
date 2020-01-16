@@ -26,6 +26,8 @@ export default () =>
         npmHelpPath: dataset.npmHelpPath,
         mavenPath: dataset.mavenPath,
         mavenHelpPath: dataset.mavenHelpPath,
+        conanPath: dataset.conanPath,
+        conanHelpPath: dataset.conanHelpPath,
       };
     },
     render(createElement) {
@@ -40,6 +42,8 @@ export default () =>
           npmHelpPath: this.npmHelpPath,
           mavenPath: this.mavenPath,
           mavenHelpPath: this.mavenHelpPath,
+          conanPath: this.conanPath,
+          conanHelpPath: this.conanHelpPath,
         },
       });
     },

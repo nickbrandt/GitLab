@@ -7,7 +7,8 @@ import NpmInstallation from 'ee/packages/details/components/npm_installation.vue
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
-import { mavenPackage, mavenFiles, npmPackage, npmFiles, conanPackage } from '../../mock_data';
+import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
+import { conanPackage, mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
 
 describe('PackagesApp', () => {
   let wrapper;
@@ -22,6 +23,8 @@ describe('PackagesApp', () => {
     npmHelpPath: 'foo',
     mavenPath: 'foo',
     mavenHelpPath: 'foo',
+    conanPath: 'foo',
+    conanHelpPath: 'foo',
   };
 
   function createComponent(props = {}) {
@@ -42,6 +45,7 @@ describe('PackagesApp', () => {
   const packageInformation = index => allPackageInformation().at(index);
   const npmInstallation = () => wrapper.find(NpmInstallation);
   const mavenInstallation = () => wrapper.find(MavenInstallation);
+  const conanInstallation = () => wrapper.find(ConanInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -178,5 +182,13 @@ describe('PackagesApp', () => {
         expect.any(Object),
       );
     });
+  });
+
+  it('renders package installation instructions for conan packages', () => {
+    createComponent({
+      packageEntity: conanPackage,
+    });
+
+    expect(conanInstallation()).toExist();
   });
 });

@@ -13,6 +13,7 @@ import Tracking from '~/tracking';
 import PackageInformation from './information.vue';
 import NpmInstallation from './npm_installation.vue';
 import MavenInstallation from './maven_installation.vue';
+import ConanInstallation from './conan_installation.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -33,6 +34,7 @@ export default {
     PackageInformation,
     NpmInstallation,
     MavenInstallation,
+    ConanInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -80,6 +82,14 @@ export default {
       type: String,
       required: true,
     },
+    conanPath: {
+      type: String,
+      required: true,
+    },
+    conanHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     isNpmPackage() {
@@ -87,6 +97,9 @@ export default {
     },
     isMavenPackage() {
       return this.packageEntity.package_type === PackageType.MAVEN;
+    },
+    isConanPackage() {
+      return this.packageEntity.package_type === PackageType.CONAN;
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
@@ -230,6 +243,13 @@ export default {
           :maven-metadata="packageEntity.maven_metadatum"
           :registry-url="mavenPath"
           :help-url="mavenHelpPath"
+        />
+
+        <conan-installation
+          v-else-if="isConanPackage"
+          :package-entity="packageEntity"
+          :registry-url="conanPath"
+          :help-url="conanHelpPath"
         />
       </div>
     </div>
