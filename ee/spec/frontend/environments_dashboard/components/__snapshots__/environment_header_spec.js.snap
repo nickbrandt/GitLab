@@ -24,7 +24,7 @@ exports[`Environment Header has a failed pipeline matches the snapshot 1`] = `
    
   <review-app-link-stub
     cssclass="btn btn-default btn-sm"
-    iscurrent="true"
+    display="[object Object]"
     link="http://example.com"
   />
 </div>
@@ -54,7 +54,7 @@ exports[`Environment Header has errors matches the snapshot 1`] = `
    
   <review-app-link-stub
     cssclass="btn btn-default btn-sm"
-    iscurrent="true"
+    display="[object Object]"
     link="http://example.com"
   />
 </div>
@@ -67,8 +67,8 @@ exports[`Environment Header renders name and link to app matches the snapshot 1`
   <div
     class="flex-grow-1 block-truncated"
   >
-    <gl-link-stub
-      class="js-environment-link cgray"
+    <a
+      class="gl-link js-environment-link cgray"
       href="/enivronment/1"
       title="staging"
     >
@@ -77,16 +77,31 @@ exports[`Environment Header renders name and link to app matches the snapshot 1`
       >
          staging
       </span>
-    </gl-link-stub>
+    </a>
      
     <!---->
   </div>
    
-  <review-app-link-stub
-    cssclass="btn btn-default btn-sm"
-    iscurrent="true"
-    link="http://example.com"
-  />
+  <a
+    class="btn btn-default btn-sm"
+    data-track-event="open_review_app"
+    data-track-label="review_app"
+    href="http://example.com"
+    rel="noopener noreferrer nofollow"
+    target="_blank"
+    title=""
+  >
+    
+  View app 
+    <svg
+      aria-hidden="true"
+      class="fgray s16 ic-external-link"
+    >
+      <use
+        xlink:href="#external-link"
+      />
+    </svg>
+  </a>
 </div>
 `;
 
