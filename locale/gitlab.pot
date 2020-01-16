@@ -742,6 +742,9 @@ msgstr ""
 msgid "A deleted user"
 msgstr ""
 
+msgid "A file with '%{file_name}' already exists in %{branch} branch"
+msgstr ""
+
 msgid "A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project."
 msgstr ""
 
@@ -15542,6 +15545,9 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
+msgid "Request parameter %{param} is missing."
+msgstr ""
+
 msgid "Request to link SAML account must be authorized"
 msgstr ""
 
@@ -18289,6 +18295,9 @@ msgstr ""
 msgid "The file has been successfully deleted."
 msgstr ""
 
+msgid "The file name should have a .yml extension"
+msgstr ""
+
 msgid "The following items will NOT be exported:"
 msgstr ""
 
@@ -18598,6 +18607,12 @@ msgid "There was an error %{message} todo."
 msgstr ""
 
 msgid "There was an error adding a To Do."
+msgstr ""
+
+msgid "There was an error creating the dashboard, branch name is invalid."
+msgstr ""
+
+msgid "There was an error creating the dashboard, branch named: %{branch} already exists."
 msgstr ""
 
 msgid "There was an error creating the issue"
@@ -21167,6 +21182,9 @@ msgstr ""
 msgid "You can try again using %{begin_link}basic search%{end_link}"
 msgstr ""
 
+msgid "You can't commit to this project"
+msgstr ""
+
 msgid "You cannot access the raw file. Please wait a minute."
 msgstr ""
 
@@ -21492,6 +21510,9 @@ msgid "Your comment could not be submitted! Please check your network connection
 msgstr ""
 
 msgid "Your comment could not be updated! Please check your network connection and try again."
+msgstr ""
+
+msgid "Your dashboard has been copied. You can %{web_ide_link_start}edit it here%{web_ide_link_end}."
 msgstr ""
 
 msgid "Your deployment services will be broken, you will need to manually fix the services after renaming."

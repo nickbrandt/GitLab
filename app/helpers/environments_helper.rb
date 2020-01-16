@@ -31,6 +31,7 @@ module EnvironmentsHelper
       "metrics-endpoint" => additional_metrics_project_environment_path(project, environment, format: :json),
       "dashboard-endpoint" => metrics_dashboard_project_environment_path(project, environment, format: :json),
       "deployments-endpoint" => project_environment_deployments_path(project, environment, format: :json),
+      "default-branch" => project.default_branch,
       "environments-endpoint": project_environments_path(project, format: :json),
       "project-path" => project_path(project),
       "tags-path" => project_tags_path(project),
