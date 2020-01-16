@@ -3,6 +3,7 @@
 class Admin::Geo::NodesController < Admin::Geo::ApplicationController
   before_action :check_license!, except: :index
   before_action :load_node, only: [:edit, :update]
+  before_action :push_feature_flag, except: :index
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
@@ -65,5 +66,9 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
 
   def load_node
     @node = GeoNode.find(params[:id])
+  end
+
+  def push_feature_flag
+    push_frontend_feature_flag(:enable_geo_node_form_js)
   end
 end
