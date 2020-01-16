@@ -4,6 +4,14 @@ module Elastic
   module Latest
     class ApplicationClassProxy < Elasticsearch::Model::Proxy::ClassMethodsProxy
       include ClassProxyUtil
+      include Elastic::Latest::Routing
+
+      def search(query, search_options = {})
+        es_options = routing_options(search_options)
+
+        # Calling elasticsearch-ruby method
+        super(query, es_options)
+      end
 
       def es_type
         target.name.underscore

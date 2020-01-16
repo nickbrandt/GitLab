@@ -226,9 +226,12 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:blobs) do
-          opt = {
-            additional_filter: repository_filter
-          }
+          project_ids = visible_project_ids
+
+          opt = base_options.merge(
+            additional_filter: repository_filter(project_ids),
+            project_ids: project_ids
+          )
 
           Repository.elastic_search(
             query,
@@ -242,9 +245,12 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:wiki_blobs) do
-          opt = {
-            additional_filter: wiki_filter
-          }
+          project_ids = visible_project_ids(visible_for_guests: true)
+
+          opt = base_options.merge(
+            additional_filter: wiki_filter(project_ids),
+            project_ids: project_ids
+          )
 
           ProjectWiki.elastic_search(
             query,
@@ -264,9 +270,12 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:commits) do
-          options = {
-            additional_filter: repository_filter
-          }
+          project_ids = visible_project_ids
+
+          options = base_options.merge(
+            additional_filter: repository_filter(project_ids),
+            project_ids: project_ids
+          )
 
           Repository.find_commits_by_message_with_elastic(
             query,
@@ -277,16 +286,19 @@ module Gitlab
         end
       end
 
-      def wiki_filter
-        blob_filter(:wiki, visible_for_guests: true)
+      def wiki_filter(project_ids)
+        blob_filter(:wiki, project_ids)
       end
 
-      def repository_filter
-        blob_filter(:repository)
+      def repository_filter(project_ids)
+        blob_filter(:repository, project_ids)
       end
 
-      def blob_filter(feature, visible_for_guests: false)
-        project_ids = visible_for_guests ? limit_project_ids : non_guest_project_ids
+      def visible_project_ids(visible_for_guests: false)
+        visible_for_guests ? limit_project_ids : non_guest_project_ids
+      end
+
+      def blob_filter(feature, project_ids)
         key_name = "#{feature}_access_level"
 
         conditions =

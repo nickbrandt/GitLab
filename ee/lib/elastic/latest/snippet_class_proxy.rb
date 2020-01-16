@@ -7,14 +7,14 @@ module Elastic
         query_hash = basic_query_hash(%w(title file_name), query)
         query_hash = filter(query_hash, options)
 
-        search(query_hash)
+        search(query_hash, options)
       end
 
       def elastic_search_code(query, options: {})
         query_hash = basic_query_hash(%w(content), query)
         query_hash = filter(query_hash, options)
 
-        search(query_hash)
+        search(query_hash, options)
       end
 
       def es_type
