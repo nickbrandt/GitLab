@@ -1,21 +1,18 @@
 {
   "type": "object",
-  "required": ["name", "identifier", "type", "can_be_start_event", "allowed_end_events", "label_based"],
+  "required": ["name", "identifier", "type", "can_be_start_event", "allowed_end_events"],
   "properties": {
     "name": { 
       "type": "string" 
     },
     "identifier": { 
-      "type": "string" 
+      "type": "string"
     },
     "type": { 
-      "type": "string" ,
-      "enum": ["simple"]
+      "type": "string",
+      "enum": ["simple", "label"]
     },
     "can_be_start_event": {
-      "type": "boolean"
-    },
-    "label_based": {
       "type": "boolean"
     },
     "allowed_end_events": {

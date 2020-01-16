@@ -161,8 +161,9 @@ describe('CustomStageForm', () => {
     });
 
     describe('Stop event', () => {
-      const index = 2;
-      const currAllowed = startEvents[index].allowedEndEvents;
+      const startEventArrayIndex = 2;
+      const startEventDropdownIndex = 1;
+      const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
 
       beforeEach(() => {
         wrapper = createComponent({}, false);
@@ -173,7 +174,7 @@ describe('CustomStageForm', () => {
       });
 
       it('clears notification when a start event is selected', done => {
-        selectDropdownOption(wrapper, sel.startEvent, 1);
+        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
         Vue.nextTick(() => {
           expect(wrapper.text()).not.toContain('Please select a start event first');
           done();
@@ -184,7 +185,7 @@ describe('CustomStageForm', () => {
         const el = wrapper.find(sel.endEvent);
         expect(el.attributes('disabled')).toEqual('disabled');
 
-        selectDropdownOption(wrapper, sel.startEvent, 1);
+        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
         Vue.nextTick(() => {
           expect(el.attributes('disabled')).toBeUndefined();
           done();
@@ -193,11 +194,10 @@ describe('CustomStageForm', () => {
 
       it('will update the list of stop events when a start event is changed', done => {
         let stopOptions = wrapper.find(sel.endEvent).findAll('option');
-        const selectedStartEventIndex = 1;
-        const selectedStartEvent = startEvents[selectedStartEventIndex];
+        const selectedStartEvent = startEvents[startEventDropdownIndex];
         expect(stopOptions.length).toEqual(1);
 
-        selectDropdownOption(wrapper, sel.startEvent, selectedStartEventIndex);
+        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
 
         Vue.nextTick(() => {
           stopOptions = wrapper.find(sel.endEvent);
@@ -214,7 +214,7 @@ describe('CustomStageForm', () => {
 
         expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-        selectDropdownOption(wrapper, sel.startEvent, index);
+        selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
 
         Vue.nextTick(() => {
           stopOptions = wrapper.find(sel.endEvent);
@@ -232,7 +232,7 @@ describe('CustomStageForm', () => {
 
         expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-        selectDropdownOption(wrapper, sel.startEvent, index);
+        selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
 
         Vue.nextTick(() => {
           stopOptions = wrapper.find(sel.endEvent);
@@ -386,13 +386,14 @@ describe('CustomStageForm', () => {
       });
 
       describe('with all fields set', () => {
-        const startEventIndex = 2;
+        const startEventDropdownIndex = 2;
+        const startEventArrayIndex = startEventDropdownIndex - 1;
         const stopEventIndex = 1;
 
         beforeEach(() => {
           wrapper = createComponent({}, false);
 
-          selectDropdownOption(wrapper, sel.startEvent, startEventIndex);
+          selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
 
           return Vue.nextTick()
             .then(() => {
@@ -424,9 +425,8 @@ describe('CustomStageForm', () => {
         });
 
         it(`${STAGE_ACTIONS.CREATE} event receives the latest data`, () => {
-          const startEv = startEvents[startEventIndex];
+          const startEv = startEvents[startEventArrayIndex];
           const selectedStopEvent = getDropdownOption(wrapper, sel.endEvent, stopEventIndex);
-
           let event = findEvent(STAGE_ACTIONS.CREATE);
           expect(event).toBeUndefined();
 

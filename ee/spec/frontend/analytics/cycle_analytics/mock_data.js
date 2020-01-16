@@ -1,3 +1,4 @@
+import { uniq } from 'underscore';
 import { TEST_HOST } from 'helpers/test_constants';
 import { getJSONFixture } from 'helpers/fixtures';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
@@ -97,31 +98,25 @@ export const medians = stageMedians;
 const { events: rawCustomStageEvents } = customizableStagesAndEvents;
 const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
 
+export const customStageLabelEvents = camelCasedStageEvents.filter(ev => ev.type === 'label');
 export const customStageStartEvents = camelCasedStageEvents.filter(ev => ev.canBeStartEvent);
 
-// find get all the possible stop events
+// get all the possible stop events
 const allowedEndEventIds = new Set(customStageStartEvents.flatMap(e => e.allowedEndEvents));
-
 export const customStageStopEvents = camelCasedStageEvents.filter(ev =>
   allowedEndEventIds.has(ev.identifier),
 );
 
-// TODO: the shim below should be removed once we have label events seeding
-// https://gitlab.com/gitlab-org/gitlab/issues/33112
-export const labelStartEvent = { ...customStageStartEvents[0], type: 'label' };
-const firstAllowedStopEvent = labelStartEvent.allowedEndEvents[0];
-// We need to enusre that the stop event can be applied to the start event
-export const labelStopEvent = {
-  ...customStageStopEvents.find(ev => ev.identifier === firstAllowedStopEvent),
-  type: 'label',
-};
+export const customStageEvents = uniq(
+  [...customStageStartEvents, ...customStageStopEvents],
+  false,
+  ev => ev.identifier,
+);
 
-export const customStageEvents = [
-  ...customStageStartEvents.filter(ev => ev.identifier !== labelStartEvent.identifier),
-  ...customStageStopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
-  labelStartEvent,
-  labelStopEvent,
-];
+export const labelStartEvent = customStageLabelEvents[0];
+export const labelStopEvent = customStageLabelEvents.find(
+  ev => ev.identifier === labelStartEvent.allowedEndEvents[0],
+);
 
 const dateRange = getDatesInRange(startDate, endDate, toYmd);
 

@@ -16,6 +16,8 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   let(:issue_2) { create(:issue, project: project, created_at: 4.days.ago) }
   let(:issue_3) { create(:issue, project: project, created_at: 3.days.ago) }
 
+  let(:label) { create(:group_label, name: 'in-code-review', group: group) }
+
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:mr_1) { create(:merge_request, source_project: project, allow_broken: true, created_at: 20.days.ago) }
   let(:mr_2) { create(:merge_request, source_project: project, allow_broken: true, created_at: 19.days.ago) }
@@ -28,6 +30,17 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   let(:build_1) { create(:ci_build, :success, pipeline: pipeline_1, author: user) }
   let(:build_2) { create(:ci_build, :success, pipeline: pipeline_2, author: user) }
   let(:build_3) { create(:ci_build, :success, pipeline: pipeline_3, author: user) }
+
+  let(:label_based_stage) do
+    create(:cycle_analytics_group_stage, {
+      name: 'label-based-stage',
+      parent: group,
+      start_event_identifier: :issue_label_added,
+      start_event_label_id: label.id,
+      end_event_identifier: :issue_label_removed,
+      end_event_label_id: label.id
+    })
+  end
 
   def prepare_cycle_analytics_data
     group.add_maintainer(user)
@@ -79,6 +92,32 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     create_cycle(user, project, issue_2, mr_2, milestone, pipeline_2)
     create_cycle(user, project, issue_3, mr_3, milestone, pipeline_3)
     deploy_master(user, project, environment: 'staging')
+  end
+
+  def create_label_based_cycle_analytics_stage
+    label_based_stage
+
+    issue = create(:issue, project: project, created_at: 20.days.ago, author: user)
+
+    Timecop.travel(5.days.ago) do
+      Issues::UpdateService.new(
+        project,
+        user,
+        label_ids: [label.id]
+      ).execute(issue)
+    end
+
+    Timecop.travel(2.days.ago) do
+      Issues::UpdateService.new(
+        project,
+        user,
+        label_ids: []
+      ).execute(issue)
+    end
+  end
+
+  around do |example|
+    Timecop.freeze { example.run }
   end
 
   before(:all) do
@@ -145,6 +184,8 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
         group.cycle_analytics_stages.build(params).save!
       end
 
+      create_label_based_cycle_analytics_stage
+
       prepare_cycle_analytics_data
       create_deployment
 
@@ -173,6 +214,18 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
         expect(response).to be_successful
       end
+    end
+
+    it "analytics/cycle_analytics/stages/label-based-stage/records.json" do
+      get(:records, params: params.merge({ id: label_based_stage.id }), format: :json)
+
+      expect(response).to be_successful
+    end
+
+    it "analytics/cycle_analytics/stages/label-based-stage/median.json" do
+      get(:median, params: params.merge({ id: label_based_stage.id }), format: :json)
+
+      expect(response).to be_successful
     end
   end
 
