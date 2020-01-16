@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Groups::AnalyticsController < Groups::ApplicationController
+class Groups::ContributionAnalyticsController < Groups::ApplicationController
   before_action :group
   before_action :check_contribution_analytics_available!
 

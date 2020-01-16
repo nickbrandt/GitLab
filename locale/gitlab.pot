@@ -691,16 +691,7 @@ msgstr ""
 msgid "<strong>%{changedFilesLength} unstaged</strong> and <strong>%{stagedFilesLength} staged</strong> changes"
 msgstr ""
 
-msgid "<strong>%{created_count}</strong> created, <strong>%{accepted_count}</strong> accepted."
-msgstr ""
-
-msgid "<strong>%{created_count}</strong> created, <strong>%{closed_count}</strong> closed."
-msgstr ""
-
 msgid "<strong>%{group_name}</strong> group members"
-msgstr ""
-
-msgid "<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors."
 msgstr ""
 
 msgid "<strong>%{stagedFilesLength} staged</strong> and <strong>%{changedFilesLength} unstaged</strong> changes"
@@ -5050,6 +5041,42 @@ msgid "Contribution Analytics"
 msgstr ""
 
 msgid "Contribution Charts"
+msgstr ""
+
+msgid "ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{accepted_count}</strong> accepted."
+msgstr ""
+
+msgid "ContributionAnalytics|<strong>%{created_count}</strong> created, <strong>%{closed_count}</strong> closed."
+msgstr ""
+
+msgid "ContributionAnalytics|<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors."
+msgstr ""
+
+msgid "ContributionAnalytics|Contribution analytics for issues, merge requests and push events since %{start_date}"
+msgstr ""
+
+msgid "ContributionAnalytics|Issues"
+msgstr ""
+
+msgid "ContributionAnalytics|Last 3 months"
+msgstr ""
+
+msgid "ContributionAnalytics|Last month"
+msgstr ""
+
+msgid "ContributionAnalytics|Last week"
+msgstr ""
+
+msgid "ContributionAnalytics|Merge Requests"
+msgstr ""
+
+msgid "ContributionAnalytics|No issues for the selected time period."
+msgstr ""
+
+msgid "ContributionAnalytics|No merge requests for the selected time period."
+msgstr ""
+
+msgid "ContributionAnalytics|No pushes for the selected time period."
 msgstr ""
 
 msgid "Contributions for <strong>%{calendar_date}</strong>"
@@ -12257,9 +12284,6 @@ msgstr ""
 msgid "No forks are available to you."
 msgstr ""
 
-msgid "No issues for the selected time period."
-msgstr ""
-
 msgid "No job log"
 msgstr ""
 
@@ -12276,9 +12300,6 @@ msgid "No licenses found."
 msgstr ""
 
 msgid "No matching results"
-msgstr ""
-
-msgid "No merge requests for the selected time period."
 msgstr ""
 
 msgid "No merge requests found"
@@ -12306,9 +12327,6 @@ msgid "No prioritized labels with such name or description"
 msgstr ""
 
 msgid "No public groups"
-msgstr ""
-
-msgid "No pushes for the selected time period."
 msgstr ""
 
 msgid "No repository"
