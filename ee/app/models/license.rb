@@ -64,6 +64,7 @@ class License < ApplicationRecord
     dependency_proxy
     deploy_board
     design_management
+    disable_name_update_for_users
     email_additional_text
     extended_audit_events
     external_authorization_service_api_management

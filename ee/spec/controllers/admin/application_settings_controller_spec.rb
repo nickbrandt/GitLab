@@ -104,6 +104,13 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating name disabled for users setting' do
+      let(:settings) { { updating_name_disabled_for_users: true } }
+      let(:feature) { :disable_name_update_for_users }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
       let(:feature) { :marking_project_for_deletion }

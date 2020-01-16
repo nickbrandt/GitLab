@@ -31,6 +31,21 @@ module EE
         @user
       end
 
+      override :discard_read_only_attributes
+      def discard_read_only_attributes
+        super
+
+        discard_name unless name_updatable?
+      end
+
+      def discard_name
+        params.delete(:name)
+      end
+
+      def name_updatable?
+        can?(current_user, :update_name, model)
+      end
+
       override :identity_params
       def identity_params
         if group_id_for_saml.present?

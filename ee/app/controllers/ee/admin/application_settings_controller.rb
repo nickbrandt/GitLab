@@ -46,6 +46,10 @@ module EE
           attrs << :required_instance_ci_template
         end
 
+        if License.feature_available?(:disable_name_update_for_users)
+          attrs << :updating_name_disabled_for_users
+        end
+
         attrs
       end
 
