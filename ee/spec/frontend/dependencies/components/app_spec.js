@@ -34,7 +34,6 @@ describe('DependenciesApp component', () => {
 
     wrapper = mount(DependenciesApp, {
       store,
-      attachToDocument: true,
       propsData: { ...props },
       stubs,
     });
