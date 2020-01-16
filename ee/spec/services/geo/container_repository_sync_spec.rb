@@ -84,5 +84,20 @@ describe Geo::ContainerRepositorySync, :geo do
 
       described_class.new(container_repository).execute
     end
+
+    context 'when primary repository has no tags' do
+      it 'considers the primary repository empty and does not fail' do
+        stub_request(:get, "http://primary.registry.gitlab/v2/group/test/my_image/tags/list")
+          .with(
+            headers: { 'Authorization' => 'bearer pull-token' })
+          .to_return(
+            status: 200,
+            headers: { 'Content-Type' => 'application/json' })
+
+        expect(container_repository).to receive(:delete_tag_by_digest).with('sha256:aaaaa')
+
+        described_class.new(container_repository).execute
+      end
+    end
   end
 end
