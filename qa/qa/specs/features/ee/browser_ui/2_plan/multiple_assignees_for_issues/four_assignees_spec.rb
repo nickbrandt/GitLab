@@ -21,7 +21,6 @@ module QA
         project.add_member(user_4)
 
         Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = issue.title = 'issue-to-test-multiple-assignees'
           issue.project = project
           issue.assignee_ids = [
             user_1.id,

@@ -17,7 +17,6 @@ module QA
         2.times do
           Resource::Issue.fabricate_via_api! do |issue|
             issue.project = project
-            issue.title = "Issue-#{SecureRandom.hex(4)}"
           end
         end
 

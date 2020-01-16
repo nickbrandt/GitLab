@@ -4,9 +4,7 @@ module QA
   context 'Plan' do
     describe 'Issues analytics' do
       let(:issue) do
-        Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'Issue to test Issues Analytics'
-        end
+        Resource::Issue.fabricate_via_api!
       end
 
       before do
