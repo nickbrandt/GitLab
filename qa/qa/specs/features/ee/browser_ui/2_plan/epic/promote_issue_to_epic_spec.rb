@@ -3,8 +3,6 @@
 module QA
   context 'Plan' do
     describe 'promote issue to epic' do
-      let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
-
       it 'user promotes issue to an epic' do
         Flow::Login.sign_in
 
@@ -14,7 +12,6 @@ module QA
         end
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = issue_title
           issue.project = project
         end
 
@@ -35,7 +32,7 @@ module QA
         project.group.visit!
         Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform do |index|
-          expect(index).to have_epic_title(issue_title)
+          expect(index).to have_epic_title(issue.title)
         end
       end
     end

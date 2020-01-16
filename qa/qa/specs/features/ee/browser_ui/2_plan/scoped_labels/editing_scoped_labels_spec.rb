@@ -15,7 +15,6 @@ module QA
         Flow::Login.sign_in
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'Issue to test scoped labels'
           issue.labels = [initial_label, initial_label_multi_colon]
         end
 

@@ -12,14 +12,12 @@ module QA
       let(:issue_1) do
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-          issue.title = 'Issue 1'
         end
       end
 
       let(:issue_2) do
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-          issue.title = 'Issue 2'
         end
       end
 

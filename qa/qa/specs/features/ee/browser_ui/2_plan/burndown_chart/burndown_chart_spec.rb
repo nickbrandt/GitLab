@@ -18,8 +18,8 @@ module QA
 
         weight_of_two = 2
 
-        create_issue('Issue 1', milestone.project, milestone, weight_of_two)
-        create_issue('Issue 2', milestone.project, milestone, weight_of_two)
+        create_issue(milestone.project, milestone, weight_of_two)
+        create_issue(milestone.project, milestone, weight_of_two)
       end
 
       it 'shows burndown chart on milestone page' do
@@ -35,10 +35,9 @@ module QA
         end
       end
 
-      def create_issue(title, project, milestone, weight)
+      def create_issue(project, milestone, weight)
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = project
-          issue.title = title
           issue.milestone = milestone
           issue.weight = weight
         end

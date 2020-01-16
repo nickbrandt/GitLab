@@ -16,14 +16,12 @@ module QA
 
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = label_board_list.project
-          issue.title = 'Issue 1'
           issue.labels = [label]
           issue.weight = weight_for_issue_1
         end
 
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = label_board_list.project
-          issue.title = 'Issue 2'
           issue.labels = [label]
           issue.weight = weight_for_issue_2
         end
