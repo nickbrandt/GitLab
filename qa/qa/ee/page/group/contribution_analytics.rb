@@ -5,7 +5,7 @@ module QA
     module Page
       module Group
         class ContributionAnalytics < QA::Page::Base
-          view 'ee/app/views/groups/analytics/show.html.haml' do
+          view 'ee/app/views/groups/contribution_analytics/show.html.haml' do
             element :push_content
             element :merge_request_content
             element :issue_content

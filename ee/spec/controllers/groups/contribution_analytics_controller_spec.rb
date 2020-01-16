@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Groups::AnalyticsController do
+describe Groups::ContributionAnalyticsController do
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }

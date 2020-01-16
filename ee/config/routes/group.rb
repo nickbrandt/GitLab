@@ -17,7 +17,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       patch :override, on: :member
     end
 
-    resource :analytics, only: [:show]
+    get '/analytics', to: redirect('groups/%{group_id}/-/contribution_analytics')
+    resource :contribution_analytics, only: [:show]
     resource :cycle_analytics, only: [:show]
     namespace :cycle_analytics do
       scope :events, controller: 'events' do
