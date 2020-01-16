@@ -1,5 +1,6 @@
 export const TrackingLabels = {
   CODE_INSTRUCTION: 'code_instruction',
+  CONAN_INSTALLATION: 'conan_installation',
   MAVEN_INSTALLATION: 'maven_installation',
   NPM_INSTALLATION: 'npm_installation',
 };
@@ -7,6 +8,9 @@ export const TrackingLabels = {
 export const TrackingActions = {
   INSTALLATION: 'installation',
   REGISTRY_SETUP: 'registry_setup',
+
+  COPY_CONAN_COMMAND: 'copy_conan_command',
+  COPY_CONAN_SETUP_COMMAND: 'copy_conan_setup_command',
 
   COPY_MAVEN_XML: 'copy_maven_xml',
   COPY_MAVEN_COMMAND: 'copy_maven_command',
