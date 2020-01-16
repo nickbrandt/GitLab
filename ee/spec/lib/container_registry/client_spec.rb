@@ -146,7 +146,7 @@ describe ContainerRegistry::Client do
           .to_return(status: 302, headers: { "Location" => 'http://download-link.com' })
     end
 
-    it 'GET "/v2/:name/blobs/:reference' do
+    it 'downloads file successfully when' do
       stub_request(:get, "http://download-link.com/")
         .to_return(status: 200)
 
@@ -172,6 +172,31 @@ describe ContainerRegistry::Client do
           .to_return(status: 401)
 
       expect { client.pull_blob('group/test', 'e2312abc') }.to raise_error(EE::ContainerRegistry::Client::Error)
+    end
+
+    context 'when primary_api_url is specified with trailing slash' do
+      let(:client) { described_class.new("http://registry/", options) }
+
+      it 'builds correct URL' do
+        stub_request(:get, "http://registry//v2/group/test/blobs/e2312abc")
+          .with(headers: auth_headers)
+          .to_return(status: 500)
+
+        stub_request(:get, "http://download-link.com/")
+          .to_return(status: 200)
+
+        expect(client.pull_blob('group/test', 'e2312abc')).to be_a_kind_of(Tempfile)
+      end
+    end
+
+    context 'direct link to download, no redirect' do
+      it 'downloads blob successfully' do
+        stub_request(:get, "http://registry/v2/group/test/blobs/e2312abc")
+            .with(headers: auth_headers)
+            .to_return(status: 200)
+
+        expect(client.pull_blob('group/test', 'e2312abc')).to be_a_kind_of(Tempfile)
+      end
     end
   end
 end

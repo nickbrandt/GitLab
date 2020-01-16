@@ -42,13 +42,16 @@ module EE
       def pull_blob(name, digest)
         file = Tempfile.new("blob-#{digest}")
 
+        blob_url = "/v2/#{name}/blobs/#{digest}"
+
         response = HTTP
           .headers({ "Authorization" => "Bearer #{@options[:token]}" }) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-          .get("#{@base_uri}/v2/#{name}/blobs/#{digest}") # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          .get(::Gitlab::Utils.append_path(@base_uri, blob_url)) # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
-        raise Error.new("Pull Blob error: #{response.body}") unless response.status.redirect?
+        if response.status.redirect?
+          response = HTTP.get(response['Location'])
+        end
 
-        response = HTTP.get(response['Location'])
         response.body.each do |chunk|
           file.binmode
           file.write(chunk)
