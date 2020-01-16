@@ -4675,6 +4675,9 @@ msgstr ""
 msgid "Commit message"
 msgstr ""
 
+msgid "Commit message (optional)"
+msgstr ""
+
 msgid "Commit statistics for %{ref} %{start_time} - %{end_time}"
 msgstr ""
 
@@ -8014,6 +8017,9 @@ msgid "File mode changed from %{a_mode} to %{b_mode}"
 msgstr ""
 
 msgid "File moved"
+msgstr ""
+
+msgid "File name"
 msgstr ""
 
 msgid "File templates"
@@ -11608,6 +11614,9 @@ msgstr ""
 msgid "Metrics|Check out the CI/CD documentation on deploying to an environment"
 msgstr ""
 
+msgid "Metrics|Create custom dashboard %{fileName}"
+msgstr ""
+
 msgid "Metrics|Create metric"
 msgstr ""
 
@@ -11615,6 +11624,15 @@ msgid "Metrics|Delete metric"
 msgstr ""
 
 msgid "Metrics|Delete metric?"
+msgstr ""
+
+msgid "Metrics|Duplicate"
+msgstr ""
+
+msgid "Metrics|Duplicate dashboard"
+msgstr ""
+
+msgid "Metrics|Duplicating..."
 msgstr ""
 
 msgid "Metrics|Edit metric"
@@ -11651,6 +11669,12 @@ msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
 msgid "Metrics|Show last"
+msgstr ""
+
+msgid "Metrics|There was an error creating the dashboard."
+msgstr ""
+
+msgid "Metrics|There was an error creating the dashboard. %{error}"
 msgstr ""
 
 msgid "Metrics|There was an error fetching the environments data, please try again"
@@ -11690,6 +11714,9 @@ msgid "Metrics|Validating query"
 msgstr ""
 
 msgid "Metrics|Y-axis label"
+msgstr ""
+
+msgid "Metrics|You can save a copy of this dashboard to your repository so it can be customized. Select a file name and branch to save it."
 msgstr ""
 
 msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
