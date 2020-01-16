@@ -56,15 +56,18 @@ export default {
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
     },
-    advancedControlsDisabled() {
-      return this.environments.isLoading || !this.enableAdvancedQuerying;
+    featureElasticEnabled() {
+      return gon.features && gon.features.enableClusterApplicationElasticStack;
+    },
+    advancedFeaturesEnabled() {
+      return this.featureElasticEnabled && this.enableAdvancedQuerying;
     },
     shouldShowElasticStackCallout() {
       return (
         !this.isElasticStackCalloutDismissed &&
         !this.environments.isLoading &&
         !this.logs.isLoading &&
-        !this.enableAdvancedQuerying
+        !this.advancedFeaturesEnabled
       );
     },
   },
@@ -124,7 +127,8 @@ export default {
           :label="s__('Environments|Environment')"
           label-size="sm"
           label-for="environments-dropdown"
-          class="col-3 px-1"
+          class="px-1"
+          :class="featureElasticEnabled ? 'col-3' : 'col-6'"
         >
           <gl-dropdown
             id="environments-dropdown"
@@ -147,7 +151,8 @@ export default {
           :label="s__('Environments|Pod logs from')"
           label-size="sm"
           label-for="pods-dropdown"
-          class="col-3 px-1"
+          class="px-1"
+          :class="featureElasticEnabled ? 'col-3' : 'col-6'"
         >
           <gl-dropdown
             id="pods-dropdown"
@@ -165,47 +170,52 @@ export default {
             </gl-dropdown-item>
           </gl-dropdown>
         </gl-form-group>
-        <gl-form-group
-          id="dates-fg"
-          :label="s__('Environments|Show last')"
-          label-size="sm"
-          label-for="time-window-dropdown"
-          class="col-3 px-1"
-        >
-          <gl-dropdown
-            id="time-window-dropdown"
-            ref="time-window-dropdown"
-            :disabled="advancedControlsDisabled"
-            :text="timeWindow.options[timeWindow.current].label"
-            class="d-flex gl-h-32"
-            toggle-class="dropdown-menu-toggle"
+
+        <template v-if="featureElasticEnabled">
+          <gl-form-group
+            id="dates-fg"
+            :label="s__('Environments|Show last')"
+            label-size="sm"
+            label-for="time-window-dropdown"
+            class="col-3 px-1"
           >
-            <gl-dropdown-item
-              v-for="(option, key) in timeWindow.options"
-              :key="key"
-              @click="setTimeWindow(key)"
+            <gl-dropdown
+              id="time-window-dropdown"
+              ref="time-window-dropdown"
+              :disabled="environments.isLoading || !advancedFeaturesEnabled"
+              :text="timeWindow.options[timeWindow.current].label"
+              class="d-flex gl-h-32"
+              toggle-class="dropdown-menu-toggle"
             >
-              {{ option.label }}
-            </gl-dropdown-item>
-          </gl-dropdown>
-        </gl-form-group>
-        <gl-form-group
-          id="search-fg"
-          :label="s__('Environments|Search')"
-          label-size="sm"
-          label-for="search"
-          class="col-3 px-1"
-        >
-          <gl-search-box-by-click
-            v-model.trim="searchQuery"
-            :disabled="advancedControlsDisabled"
-            :placeholder="s__('Environments|Search')"
-            class="js-logs-search"
-            type="search"
-            autofocus
-            @submit="!advancedControlsDisabled && setSearch(searchQuery)"
-          />
-        </gl-form-group>
+              <gl-dropdown-item
+                v-for="(option, key) in timeWindow.options"
+                :key="key"
+                @click="setTimeWindow(key)"
+              >
+                {{ option.label }}
+              </gl-dropdown-item>
+            </gl-dropdown>
+          </gl-form-group>
+          <gl-form-group
+            id="search-fg"
+            :label="s__('Environments|Search')"
+            label-size="sm"
+            label-for="search"
+            class="col-3 px-1"
+          >
+            <gl-search-box-by-click
+              v-model.trim="searchQuery"
+              :disabled="environments.isLoading || !advancedFeaturesEnabled"
+              :placeholder="s__('Environments|Search')"
+              class="js-logs-search"
+              type="search"
+              autofocus
+              @submit="
+                (environments.isLoading || !advancedFeaturesEnabled) && setSearch(searchQuery)
+              "
+            />
+          </gl-form-group>
+        </template>
       </div>
 
       <log-control-buttons
