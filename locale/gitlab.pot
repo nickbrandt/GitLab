@@ -2417,6 +2417,9 @@ msgstr ""
 msgid "AutoDevOps|Auto DevOps"
 msgstr ""
 
+msgid "AutoDevOps|Auto DevOps can automatically build, test, and deploy applications based on predefined continuous integration and delivery configuration. %{auto_devops_start}Learn more about Auto DevOps%{auto_devops_end} or use our %{quickstart_start}quick start guide%{quickstart_end} to get started right away."
+msgstr ""
+
 msgid "AutoDevOps|Auto DevOps documentation"
 msgstr ""
 
@@ -2993,9 +2996,6 @@ msgstr ""
 msgid "CICD|Auto DevOps"
 msgstr ""
 
-msgid "CICD|Auto DevOps will automatically build, test, and deploy your application based on a predefined Continuous Integration and Delivery configuration."
-msgstr ""
-
 msgid "CICD|Automatic deployment to staging, manual deployment to production"
 msgstr ""
 
@@ -3015,9 +3015,6 @@ msgid "CICD|Deployment strategy"
 msgstr ""
 
 msgid "CICD|Jobs"
-msgstr ""
-
-msgid "CICD|Learn more about Auto DevOps"
 msgstr ""
 
 msgid "CICD|The Auto DevOps pipeline will run if no alternative CI configuration file is found."
@@ -9379,9 +9376,6 @@ msgid "GroupSAML|should be a random persistent ID, emails are discouraged"
 msgstr ""
 
 msgid "GroupSettings|Auto DevOps pipeline was updated for the group"
-msgstr ""
-
-msgid "GroupSettings|Auto DevOps will automatically build, test and deploy your application based on a predefined Continuous Integration and Delivery configuration. %{auto_devops_start}Learn more about Auto DevOps%{auto_devops_end}"
 msgstr ""
 
 msgid "GroupSettings|Badges"
