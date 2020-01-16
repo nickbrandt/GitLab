@@ -33,6 +33,12 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     end
 
     context 'epics relation' do
+      let(:epic_json) do
+        saved_group_json['epics'].find do |attrs|
+          attrs['id'] == epic.id
+        end
+      end
+
       it 'saves top level epics' do
         expect_successful_save(group_tree_saver)
         expect(saved_group_json['epics'].size).to eq(2)
@@ -41,7 +47,7 @@ describe Gitlab::ImportExport::GroupTreeSaver do
       it 'saves parent of epic' do
         expect_successful_save(group_tree_saver)
 
-        parent = saved_group_json['epics'].first['parent']
+        parent = epic_json['parent']
 
         expect(parent).not_to be_empty
         expect(parent['id']).to eq(parent_epic.id)
@@ -50,7 +56,7 @@ describe Gitlab::ImportExport::GroupTreeSaver do
       it 'saves epic notes' do
         expect_successful_save(group_tree_saver)
 
-        notes = saved_group_json['epics'].first['notes']
+        notes = epic_json['notes']
 
         expect(notes).not_to be_empty
         expect(notes.first['note']).to eq(note.note)
