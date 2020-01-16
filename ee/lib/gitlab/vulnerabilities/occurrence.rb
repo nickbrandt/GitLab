@@ -53,11 +53,19 @@ module Gitlab
 
       def paginate(occurrences)
         page = params[:page].nil? ? 1 : params[:page].to_i
-        per_page = ::Vulnerabilities::Occurrence.page(1).limit_value
+        per_page = params[:per_page] || ::Vulnerabilities::Occurrence.page(1).limit_value
+
         first_index = (page - 1) * per_page
         last_index = (page * per_page) - 1
 
-        order(occurrences)[first_index..last_index]
+        Gitlab::Serializer::Pagination
+          .new(request, response)
+          .paginate(
+            Kaminari.paginate_array(
+              order(occurrences)[first_index..last_index],
+              total_count: occurrences.count
+            )
+          )
       end
 
       def order(vulnerabilities)
