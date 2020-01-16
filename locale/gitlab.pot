@@ -6930,9 +6930,6 @@ msgstr ""
 msgid "Enter zen mode"
 msgstr ""
 
-msgid "EnviornmentDashboard|You are looking at the last updated environment"
-msgstr ""
-
 msgid "Environment"
 msgstr ""
 
@@ -6949,6 +6946,9 @@ msgid "EnvironmentDashboard|API"
 msgstr ""
 
 msgid "EnvironmentDashboard|Created through the Deployment API"
+msgstr ""
+
+msgid "EnvironmentDashboard|You are looking at the last updated environment"
 msgstr ""
 
 msgid "Environments"
@@ -15728,6 +15728,12 @@ msgstr ""
 msgid "Review"
 msgstr ""
 
+msgid "Review App|View app"
+msgstr ""
+
+msgid "Review App|View latest app"
+msgstr ""
+
 msgid "Review the process for configuring service providers in your identity provider — in this case, GitLab is the \"service provider\" or \"relying party\"."
 msgstr ""
 
@@ -20485,9 +20491,6 @@ msgstr ""
 msgid "View Documentation"
 msgstr ""
 
-msgid "View app"
-msgstr ""
-
 msgid "View blame prior to this change"
 msgstr ""
 
@@ -20547,9 +20550,6 @@ msgstr ""
 msgid "View open merge request"
 msgstr ""
 
-msgid "View previous app"
-msgstr ""
-
 msgid "View project"
 msgstr ""
 
@@ -20560,6 +20560,9 @@ msgid "View replaced file @ "
 msgstr ""
 
 msgid "View the documentation"
+msgstr ""
+
+msgid "View the latest successful deployment to this environment"
 msgstr ""
 
 msgid "Viewing commit"
