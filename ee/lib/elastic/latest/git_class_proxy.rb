@@ -22,6 +22,10 @@ module Elastic
 
       private
 
+      def extract_repository_ids(options)
+        [options[:repository_id]].flatten
+      end
+
       def search_commit(query, page: 1, per: 20, options: {})
         page ||= 1
 
@@ -49,10 +53,11 @@ module Elastic
           query_hash[:track_scores] = true
         end
 
-        if options[:repository_id]
+        repository_ids = extract_repository_ids(options)
+        if repository_ids.any?
           query_hash[:query][:bool][:filter] << {
             terms: {
-              'commit.rid' => [options[:repository_id]].flatten
+              'commit.rid' => repository_ids
             }
           }
         end
@@ -77,7 +82,7 @@ module Elastic
 
         query_hash[:sort] = [:_score]
 
-        res = search(query_hash)
+        res = search(query_hash, options)
         {
           results: res.results,
           total_count: res.size
@@ -114,10 +119,11 @@ module Elastic
 
         query_hash[:query][:bool][:filter] += query.elasticsearch_filters(:blob)
 
-        if options[:repository_id]
+        repository_ids = extract_repository_ids(options)
+        if repository_ids.any?
           query_hash[:query][:bool][:filter] << {
             terms: {
-              'blob.rid' => [options[:repository_id]].flatten
+              'blob.rid' => repository_ids
             }
           }
         end
@@ -150,7 +156,9 @@ module Elastic
           }
         end
 
-        res = search(query_hash)
+        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type == :wiki_blob && repository_ids.any?
+
+        res = search(query_hash, options)
 
         {
           results: res.results,
