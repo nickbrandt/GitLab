@@ -108,3 +108,41 @@ Example:
 -# Good :)
 #js-foo{ data: { foo_path: some_rails_foo_path } }
 ```
+
+### 6. How should the Frontend reference Backend paths?
+
+We prefer not to add extra coupling by hardcoding paths. If possible,
+add these paths as data attributes to the DOM element being referenced in the JavaScript.
+
+Example:
+
+```javascript
+// Bad :(
+// Here's a Vuex action that hardcodes a path :(
+export const fetchFoos = ({ state }) => {
+  return axios.get(joinPaths(gon.relative_url_root, '-', 'foo'));
+};
+
+// Good :)
+function initFoo() {
+  const el = document.getElementById('js-foo');
+
+  // Path comes from our root element's data which is used to initialize the store :)
+  const store = createStore({
+    fooPath: el.dataset.fooPath
+  });
+
+  Vue.extend({
+    store,
+    el,
+    render(h) {
+      return h(Component);
+    },
+  });
+}
+
+// Vuex action can now reference the path from it's state :)
+export const fetchFoos = ({ state }) => {
+  return axios.get(state.settings.fooPath);
+};
+```
