@@ -7,6 +7,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
+  scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.now))) }
@@ -22,7 +23,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     end
 
     before_transition any => :pending do |registry, _|
-      registry.retry_at    = 0
+      registry.retry_at    = nil
       registry.retry_count = 0
     end
 
@@ -48,6 +49,10 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     designs_repositories = designs_repositories.with_state(params[:sync_status]) if params[:sync_status].present?
     designs_repositories = designs_repositories.with_search_by_project(params[:search]) if params[:search].present?
     designs_repositories
+  end
+
+  def self.updated_recently
+    pending.or(failed.retry_due)
   end
 
   def fail_sync!(message, error, attrs = {})

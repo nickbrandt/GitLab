@@ -42,6 +42,7 @@
 - geo:geo_repository_cleanup
 - geo:geo_repository_destroy
 - geo:geo_repository_shard_sync
+- geo:geo_design_repository_shard_sync
 - geo:geo_repository_verification_primary_shard
 - geo:geo_repository_verification_primary_single
 - geo:geo_repository_verification_secondary_single

@@ -8,6 +8,8 @@ module Geo
       else
         Geo::RepositoryShardSyncWorker.perform_async(shard_name)
       end
+
+      Geo::DesignRepositoryShardSyncWorker.perform_async(shard_name)
     end
   end
 end
