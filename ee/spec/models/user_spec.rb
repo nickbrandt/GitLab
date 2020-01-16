@@ -638,6 +638,16 @@ describe User do
     end
 
     context 'when user is active' do
+      context 'when license is nil (core/free/default)' do
+        before do
+          allow(License).to receive(:current).and_return(nil)
+        end
+
+        it 'returns false if license is nil (core/free/default)' do
+          expect(user.using_license_seat?).to eq false
+        end
+      end
+
       context 'user is guest' do
         let(:project_guest_user) { create(:project_member, :guest).user }
 
@@ -647,7 +657,7 @@ describe User do
           expect(project_guest_user.using_license_seat?).to eq false
         end
 
-        it 'returns true if license is not ultimate' do
+        it 'returns true if license is not ultimate and not nil' do
           create(:license, plan: License::STARTER_PLAN)
 
           expect(project_guest_user.using_license_seat?).to eq true
@@ -663,7 +673,7 @@ describe User do
           expect(user.using_license_seat?).to eq false
         end
 
-        it 'returns true if license is not ultimate' do
+        it 'returns true if license is not ultimate and not nil' do
           create(:license, plan: License::STARTER_PLAN)
 
           expect(user.using_license_seat?).to eq true
