@@ -1,0 +1,6 @@
+---
+title: >
+    #42671: Project and group storage statistics now support values larger than 4GiB
+merge_request: 23131
+author: Matthias van de Meent
+type: fixed
