@@ -89,16 +89,14 @@ module Gitlab
       end
 
       def filter_times(query, start_time, end_time)
-        return unless start_time && end_time
+        return unless start_time || end_time
 
-        query[:bool][:filter] = [
-          range: {
-           :@timestamp => {
-              gte: start_time,
-              lt: end_time
-            }
-          }
-        ]
+        time_range = { range: { :@timestamp => {} } }.tap do |tr|
+          tr[:range][:@timestamp][:gte] = start_time if start_time
+          tr[:range][:@timestamp][:lt] = end_time if end_time
+        end
+
+        query[:bool][:filter] = [time_range]
       end
 
       def format_response(response)

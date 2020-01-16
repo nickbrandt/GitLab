@@ -74,10 +74,8 @@ class PodLogsService < ::BaseService
   end
 
   def check_times(result)
-    if params['start'] && params['end']
-      Time.iso8601(params['start'])
-      Time.iso8601(params['end'])
-    end
+    Time.iso8601(params['start']) if params['start']
+    Time.iso8601(params['end']) if params['end']
 
     success(result)
   rescue ArgumentError

@@ -25,6 +25,8 @@ describe Gitlab::Elasticsearch::Logs do
   let(:body_with_container) { JSON.parse(fixture_file('lib/elasticsearch/query_with_container.json', dir: 'ee')) }
   let(:body_with_search) { JSON.parse(fixture_file('lib/elasticsearch/query_with_search.json', dir: 'ee')) }
   let(:body_with_times) { JSON.parse(fixture_file('lib/elasticsearch/query_with_times.json', dir: 'ee')) }
+  let(:body_with_start_time) { JSON.parse(fixture_file('lib/elasticsearch/query_with_start_time.json', dir: 'ee')) }
+  let(:body_with_end_time) { JSON.parse(fixture_file('lib/elasticsearch/query_with_end_time.json', dir: 'ee')) }
 
   RSpec::Matchers.define :a_hash_equal_to_json do |expected|
     match do |actual|
@@ -58,6 +60,20 @@ describe Gitlab::Elasticsearch::Logs do
       expect(client).to receive(:search).with(body: a_hash_equal_to_json(body_with_times)).and_return(es_response)
 
       result = subject.pod_logs(namespace, pod_name, nil, nil, start_time, end_time)
+      expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
+    end
+
+    it 'can further filter the logs by only start_time' do
+      expect(client).to receive(:search).with(body: a_hash_equal_to_json(body_with_start_time)).and_return(es_response)
+
+      result = subject.pod_logs(namespace, pod_name, nil, nil, start_time)
+      expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
+    end
+
+    it 'can further filter the logs by only end_time' do
+      expect(client).to receive(:search).with(body: a_hash_equal_to_json(body_with_end_time)).and_return(es_response)
+
+      result = subject.pod_logs(namespace, pod_name, nil, nil, nil, end_time)
       expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
     end
   end
