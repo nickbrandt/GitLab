@@ -31,9 +31,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     it 'delegates the creation of the Geo node to Geo::NodeCreateService' do
       geo_node_params = {
         name: 'Test Node 1',
-        url: 'http://example.com',
-        internal_url: 'http://internal.example.com',
-        primary: false
+        url: 'http://example.com'
       }
       expect_any_instance_of(Geo::NodeCreateService).to receive(:execute).once.and_call_original
       post api('/geo_nodes', admin), params: geo_node_params
