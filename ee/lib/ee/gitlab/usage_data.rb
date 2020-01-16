@@ -32,6 +32,7 @@ module EE
         def features_usage_data_ee
           {
             elasticsearch_enabled: ::Gitlab::CurrentSettings.elasticsearch_search?,
+            license_trial_ends_on: License.trial_ends_on,
             geo_enabled: ::Gitlab::Geo.enabled?
           }
         end
