@@ -1,0 +1,5 @@
+---
+title: DAST vendored template pins DAST to latest major version
+merge_request: 22371
+author:
+type: changed
