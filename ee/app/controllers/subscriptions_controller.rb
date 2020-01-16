@@ -2,9 +2,17 @@
 
 class SubscriptionsController < ApplicationController
   layout 'checkout'
+  skip_before_action :authenticate_user!, only: :new
 
   def new
-    return redirect_to dashboard_projects_path unless Feature.enabled?(:paid_signup_flow)
+    if experiment_enabled?(:paid_signup_flow)
+      return if current_user
+
+      store_location_for :user, request.fullpath
+      redirect_to new_user_registration_path
+    else
+      redirect_to customer_portal_new_subscription_url
+    end
   end
 
   def payment_form
@@ -21,5 +29,9 @@ class SubscriptionsController < ApplicationController
 
   def client
     Gitlab::SubscriptionPortal::Client
+  end
+
+  def customer_portal_new_subscription_url
+    "#{EE::SUBSCRIPTIONS_URL}/subscriptions/new?plan_id=#{params[:plan_id]}&transaction=create_subscription"
   end
 end
