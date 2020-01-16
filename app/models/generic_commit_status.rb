@@ -34,7 +34,7 @@ class GenericCommitStatus < CommitStatus
   def name_uniqueness_across_types
     return if !pipeline || name.blank?
 
-    if pipeline.statuses.by_name(name).where.not(type: type).exists?
+    if pipeline.statuses.where(name: name).where.not(type: type).exists?
       errors.add(:name, :taken)
     end
   end
