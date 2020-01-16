@@ -1,8 +1,11 @@
+import dateFormat from 'dateformat';
 import Api from 'ee/api';
+import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
+import { dateFormats } from '../../shared/constants';
 import { nestQueryStringKeys } from '../utils';
 
 const removeError = () => {
@@ -375,8 +378,12 @@ export const removeStage = ({ dispatch, state }, stageId) => {
 
 export const requestDurationData = ({ commit }) => commit(types.REQUEST_DURATION_DATA);
 
-export const receiveDurationDataSuccess = ({ commit }, data) =>
+export const receiveDurationDataSuccess = ({ commit, state, dispatch }, data) => {
   commit(types.RECEIVE_DURATION_DATA_SUCCESS, data);
+
+  const { featureFlags: { hasDurationChartMedian = false } = {} } = state;
+  if (hasDurationChartMedian) dispatch('fetchDurationMedianData');
+};
 
 export const receiveDurationDataError = ({ commit }) => {
   commit(types.RECEIVE_DURATION_DATA_ERROR);
@@ -417,18 +424,73 @@ export const fetchDurationData = ({ state, dispatch, getters }) => {
     .catch(() => dispatch('receiveDurationDataError'));
 };
 
+export const requestDurationMedianData = ({ commit }) => commit(types.REQUEST_DURATION_MEDIAN_DATA);
+
+export const receiveDurationMedianDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_DURATION_MEDIAN_DATA_SUCCESS, data);
+
+export const receiveDurationMedianDataError = ({ commit }) => {
+  commit(types.RECEIVE_DURATION_MEDIAN_DATA_ERROR);
+  createFlash(__('There was an error while fetching cycle analytics duration median data.'));
+};
+
+export const fetchDurationMedianData = ({ state, dispatch }) => {
+  dispatch('requestDurationMedianData');
+
+  const {
+    stages,
+    selectedGroup: { fullPath },
+    startDate,
+    endDate,
+    selectedProjectIds,
+  } = state;
+
+  const offsetValue = getDayDifference(new Date(startDate), new Date(endDate));
+  const offsetCreatedAfter = getDateInPast(new Date(startDate), offsetValue);
+  const offsetCreatedBefore = getDateInPast(new Date(endDate), offsetValue);
+
+  return Promise.all(
+    stages.map(stage => {
+      const { slug } = stage;
+
+      return Api.cycleAnalyticsDurationChart(slug, {
+        group_id: fullPath,
+        created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
+        created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
+        project_ids: selectedProjectIds,
+      }).then(({ data }) => ({
+        slug,
+        selected: true,
+        data,
+      }));
+    }),
+  )
+    .then(data => {
+      dispatch('receiveDurationMedianDataSuccess', data);
+    })
+    .catch(() => dispatch('receiveDurationMedianDataError'));
+};
+
 export const updateSelectedDurationChartStages = ({ state, commit }, stages) => {
-  const updatedDurationStageData = state.durationData.map(stage => {
-    const selected = stages.reduce((result, object) => {
-      if (object.slug === stage.slug) return true;
-      return result;
-    }, false);
+  const setSelectedPropertyOnStages = data =>
+    data.map(stage => {
+      const selected = stages.reduce((result, object) => {
+        if (object.slug === stage.slug) return true;
+        return result;
+      }, false);
 
-    return {
-      ...stage,
-      selected,
-    };
+      return {
+        ...stage,
+        selected,
+      };
+    });
+
+  const { durationData, durationMedianData } = state;
+  const updatedDurationStageData = setSelectedPropertyOnStages(durationData);
+  const updatedDurationStageMedianData = setSelectedPropertyOnStages(durationMedianData);
+
+  commit(types.UPDATE_SELECTED_DURATION_CHART_STAGES, {
+    updatedDurationStageData,
+    updatedDurationStageMedianData,
   });
-
-  commit(types.UPDATE_SELECTED_DURATION_CHART_STAGES, updatedDurationStageData);
 };
