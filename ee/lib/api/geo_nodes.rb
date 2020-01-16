@@ -17,11 +17,11 @@ module API
         success EE::API::Entities::GeoNode
       end
       params do
-        requires :primary, type: Boolean, desc: 'Specifying whether this node will be primary. Defaults to false.'
+        optional :primary, type: Boolean, desc: 'Specifying whether this node will be primary. Defaults to false.'
         optional :enabled, type: Boolean, desc: 'Specifying whether this node will be enabled. Defaults to true.'
         requires :name, type: String, desc: 'The unique identifier for the Geo node. Must match `geo_node_name` if it is set in `gitlab.rb`, otherwise it must match `external_url`'
         requires :url, type: String, desc: 'The user-facing URL for the Geo node'
-        requires :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set.'
+        optional :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set.'
         optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node. Defaults to 10.'
         optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node. Defaults to 25.'
         optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node. Defaults to 100.'
