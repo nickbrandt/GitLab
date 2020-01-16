@@ -112,6 +112,7 @@ export default {
           axisLabel: {
             formatter: value => value,
           },
+          minInterval: 1,
         },
         ...this.getColumnChartDatazoomOption(chartKey),
       };
