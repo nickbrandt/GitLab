@@ -38,6 +38,7 @@ export default ({ planData = '[]', planId, setupForCompany, fullName }) => {
     paymentFormParams: {},
     paymentMethodId: null,
     creditCardDetails: {},
+    isLoadingPaymentMethod: false,
     taxRate: TAX_RATE,
     startDate: new Date(Date.now()),
   };

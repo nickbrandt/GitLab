@@ -12,6 +12,14 @@ constants.STEPS = ['firstStep', 'secondStep'];
 let mock;
 
 describe('Subscriptions Actions', () => {
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+  });
+
+  afterEach(() => {
+    mock.restore();
+  });
+
   describe('activateStep', () => {
     it('set the currentStep to the provided value', done => {
       testAction(
@@ -110,14 +118,6 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('fetchCountries', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('calls fetchCountriesSuccess with the returned data on success', done => {
       mock.onGet(constants.COUNTRIES_URL).replyOnce(200, ['Netherlands', 'NL']);
 
@@ -172,14 +172,6 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('fetchStates', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('calls resetStates and fetchStatesSuccess with the returned data on success', done => {
       mock
         .onGet(constants.STATES_URL, { params: { country: 'NL' } })
@@ -342,15 +334,20 @@ describe('Subscriptions Actions', () => {
     });
   });
 
+  describe('startLoadingZuoraScript', () => {
+    it('updates isLoadingPaymentMethod to true', done => {
+      testAction(
+        actions.startLoadingZuoraScript,
+        undefined,
+        {},
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: true }],
+        [],
+        done,
+      );
+    });
+  });
+
   describe('fetchPaymentFormParams', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('fetches paymentFormParams and calls fetchPaymentFormParamsSuccess with the returned data on success', done => {
       mock
         .onGet(constants.PAYMENT_FORM_URL, { params: { id: constants.PAYMENT_FORM_ID } })
@@ -420,14 +417,27 @@ describe('Subscriptions Actions', () => {
     });
   });
 
+  describe('zuoraIframeRendered', () => {
+    it('updates isLoadingPaymentMethod to false', done => {
+      testAction(
+        actions.zuoraIframeRendered,
+        undefined,
+        {},
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
+        [],
+        done,
+      );
+    });
+  });
+
   describe('paymentFormSubmitted', () => {
     describe('on success', () => {
-      it('calls paymentFormSubmittedSuccess with the refID from the response', done => {
+      it('calls paymentFormSubmittedSuccess with the refID from the response and updates isLoadingPaymentMethod to true', done => {
         testAction(
           actions.paymentFormSubmitted,
           { success: true, refId: 'id' },
           {},
-          [],
+          [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: true }],
           [{ type: 'paymentFormSubmittedSuccess', payload: 'id' }],
           done,
         );
@@ -480,15 +490,7 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('fetchPaymentMethodDetails', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
-    it('fetches paymentMethodDetails and calls fetchPaymentMethodDetailsSuccess with the returned data on success', done => {
+    it('fetches paymentMethodDetails and calls fetchPaymentMethodDetailsSuccess with the returned data on success and updates isLoadingPaymentMethod to false', done => {
       mock
         .onGet(constants.PAYMENT_METHOD_URL, { params: { id: 'paymentMethodId' } })
         .replyOnce(200, { token: 'x' });
@@ -497,20 +499,20 @@ describe('Subscriptions Actions', () => {
         actions.fetchPaymentMethodDetails,
         null,
         { paymentMethodId: 'paymentMethodId' },
-        [],
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
         [{ type: 'fetchPaymentMethodDetailsSuccess', payload: { token: 'x' } }],
         done,
       );
     });
 
-    it('calls fetchPaymentMethodDetailsError on error', done => {
+    it('calls fetchPaymentMethodDetailsError on error and updates isLoadingPaymentMethod to false', done => {
       mock.onGet(constants.PAYMENT_METHOD_URL).replyOnce(500);
 
       testAction(
         actions.fetchPaymentMethodDetails,
         null,
         {},
-        [],
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
         [{ type: 'fetchPaymentMethodDetailsError' }],
         done,
       );
@@ -523,7 +525,7 @@ describe('Subscriptions Actions', () => {
         actions.fetchPaymentMethodDetailsSuccess,
         {
           credit_card_type: 'cc_type',
-          credit_card_mask_number: '4242424242424242',
+          credit_card_mask_number: '************4242',
           credit_card_expiration_month: 12,
           credit_card_expiration_year: 2019,
         },
@@ -532,10 +534,10 @@ describe('Subscriptions Actions', () => {
           {
             type: 'UPDATE_CREDIT_CARD_DETAILS',
             payload: {
-              cardType: 'cc_type',
-              lastFourDigits: '4242',
-              expirationMonth: 12,
-              expirationYear: 19,
+              credit_card_type: 'cc_type',
+              credit_card_mask_number: '************4242',
+              credit_card_expiration_month: 12,
+              credit_card_expiration_year: 2019,
             },
           },
         ],

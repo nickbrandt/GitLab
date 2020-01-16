@@ -64,4 +64,8 @@ export default {
   [types.UPDATE_CREDIT_CARD_DETAILS](state, creditCardDetails) {
     state.creditCardDetails = creditCardDetails;
   },
+
+  [types.UPDATE_IS_LOADING_PAYMENT_METHOD](state, isLoadingPaymentMethod) {
+    state.isLoadingPaymentMethod = isLoadingPaymentMethod;
+  },
 };

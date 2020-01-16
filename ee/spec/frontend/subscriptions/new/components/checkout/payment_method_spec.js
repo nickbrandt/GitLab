@@ -9,20 +9,28 @@ describe('Payment Method', () => {
   const localVue = createLocalVue();
   localVue.use(Vuex);
 
+  let store;
   let wrapper;
-
-  const store = createStore();
 
   const createComponent = (opts = {}) => {
     wrapper = mount(Component, {
       localVue,
-      sync: false,
       store,
       ...opts,
     });
   };
 
   beforeEach(() => {
+    store = createStore();
+
+    store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'paymentMethodId');
+    store.commit(types.UPDATE_CREDIT_CARD_DETAILS, {
+      credit_card_type: 'Visa',
+      credit_card_mask_number: '************4242',
+      credit_card_expiration_month: 12,
+      credit_card_expiration_year: 2009,
+    });
+
     createComponent();
   });
 
@@ -34,11 +42,7 @@ describe('Payment Method', () => {
     const isStepValid = () => wrapper.find(Step).props('isValid');
 
     it('should be valid when paymentMethodId is defined', () => {
-      store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'paymentMethodId');
-
-      return localVue.nextTick().then(() => {
-        expect(isStepValid()).toBe(true);
-      });
+      expect(isStepValid()).toBe(true);
     });
 
     it('should be invalid when paymentMethodId is undefined', () => {
@@ -51,16 +55,6 @@ describe('Payment Method', () => {
   });
 
   describe('showing the summary', () => {
-    beforeEach(() => {
-      store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'paymentMethodId');
-      store.commit(types.UPDATE_CREDIT_CARD_DETAILS, {
-        cardType: 'Visa',
-        lastFourDigits: '4242',
-        expirationMonth: 12,
-        expirationYear: 19,
-      });
-    });
-
     it('should show the entered credit card details', () => {
       expect(
         wrapper
@@ -71,7 +65,7 @@ describe('Payment Method', () => {
     });
 
     it('should show the entered credit card expiration date', () => {
-      expect(wrapper.find('.js-summary-line-2').text()).toEqual('Exp 12/19');
+      expect(wrapper.find('.js-summary-line-2').text()).toEqual('Exp 12/09');
     });
   });
 });

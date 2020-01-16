@@ -54,42 +54,34 @@ describe('Zuora', () => {
       createComponent();
     });
 
-    it('shows the loading icon', () => {
-      expect(findLoading().exists()).toBe(true);
+    it('does not show the loading icon', () => {
+      expect(findLoading().exists()).toBe(false);
     });
 
-    it('the zuora_payment selector should not be visible', () => {
-      expect(findZuoraPayment().element.style.display).toEqual('none');
+    it('the zuora_payment selector should be visible', () => {
+      expect(findZuoraPayment().element.style.display).toEqual('');
     });
 
-    describe.each`
-      desc                                    | commitType                          | commitPayload
-      ${'when paymentMethodId is updated'}    | ${types.UPDATE_PAYMENT_METHOD_ID}   | ${'foo'}
-      ${'when creditCardDetails are updated'} | ${types.UPDATE_CREDIT_CARD_DETAILS} | ${{}}
-    `('$desc', ({ commitType, commitPayload }) => {
+    describe('when toggling the loading indicator', () => {
       beforeEach(() => {
-        store.commit(commitType, commitPayload);
+        store.commit(types.UPDATE_IS_LOADING_PAYMENT_METHOD, true);
 
         return localVue.nextTick();
       });
 
-      it('does not show loading icon', () => {
-        expect(findLoading().exists()).toBe(false);
+      it('shows the loading icon', () => {
+        expect(findLoading().exists()).toBe(true);
       });
 
-      it('the zuora_payment selector should be visible', () => {
-        expect(findZuoraPayment().element.style.display).toEqual('');
+      it('the zuora_payment selector should not be visible', () => {
+        expect(findZuoraPayment().element.style.display).toEqual('none');
       });
     });
   });
 
-  describe('when not active and not loading', () => {
+  describe('when not active', () => {
     beforeEach(() => {
       createComponent({ active: false });
-
-      store.commit(types.UPDATE_PAYMENT_METHOD_ID, 'foo');
-
-      return localVue.nextTick();
     });
 
     it('does not show loading icon', () => {
@@ -97,7 +89,7 @@ describe('Zuora', () => {
     });
 
     it('the zuora_payment selector should not be visible', () => {
-      expect(wrapper.find('#zuora_payment').element.style.display).toEqual('none');
+      expect(findZuoraPayment().element.style.display).toEqual('none');
     });
   });
 

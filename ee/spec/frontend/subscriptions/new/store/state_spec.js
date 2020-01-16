@@ -149,4 +149,8 @@ describe('projectsSelector default state', () => {
   it('sets the creditCardDetails to an empty object', () => {
     expect(state.creditCardDetails).toEqual({});
   });
+
+  it('sets isLoadingPaymentMethod to false', () => {
+    expect(state.isLoadingPaymentMethod).toEqual(false);
+  });
 });

@@ -43,12 +43,11 @@ export const updateOrganizationName = ({ commit }, organizationName) => {
   commit(types.UPDATE_ORGANIZATION_NAME, organizationName);
 };
 
-export const fetchCountries = ({ dispatch }) => {
+export const fetchCountries = ({ dispatch }) =>
   axios
     .get(COUNTRIES_URL)
     .then(({ data }) => dispatch('fetchCountriesSuccess', data))
     .catch(() => dispatch('fetchCountriesError'));
-};
 
 export const fetchCountriesSuccess = ({ commit }, data = []) => {
   const countries = data.map(country => ({ text: country[0], value: country[1] }));
@@ -112,12 +111,14 @@ export const updateZipCode = ({ commit }, zipCode) => {
   commit(types.UPDATE_ZIP_CODE, zipCode);
 };
 
-export const fetchPaymentFormParams = ({ dispatch }) => {
+export const startLoadingZuoraScript = ({ commit }) =>
+  commit(types.UPDATE_IS_LOADING_PAYMENT_METHOD, true);
+
+export const fetchPaymentFormParams = ({ dispatch }) =>
   axios
     .get(PAYMENT_FORM_URL, { params: { id: PAYMENT_FORM_ID } })
     .then(({ data }) => dispatch('fetchPaymentFormParamsSuccess', data))
     .catch(() => dispatch('fetchPaymentFormParamsError'));
-};
 
 export const fetchPaymentFormParamsSuccess = ({ commit }, data) => {
   if (data.errors) {
@@ -135,8 +136,13 @@ export const fetchPaymentFormParamsError = () => {
   createFlash(s__('Checkout|Credit card form failed to load. Please try again.'));
 };
 
-export const paymentFormSubmitted = ({ dispatch }, response) => {
+export const zuoraIframeRendered = ({ commit }) =>
+  commit(types.UPDATE_IS_LOADING_PAYMENT_METHOD, false);
+
+export const paymentFormSubmitted = ({ dispatch, commit }, response) => {
   if (response.success) {
+    commit(types.UPDATE_IS_LOADING_PAYMENT_METHOD, true);
+
     dispatch('paymentFormSubmittedSuccess', response.refId);
   } else {
     dispatch('paymentFormSubmittedError', response);
@@ -160,21 +166,14 @@ export const paymentFormSubmittedError = (_, response) => {
   );
 };
 
-export const fetchPaymentMethodDetails = ({ state, dispatch }) => {
+export const fetchPaymentMethodDetails = ({ state, dispatch, commit }) =>
   axios
     .get(PAYMENT_METHOD_URL, { params: { id: state.paymentMethodId } })
     .then(({ data }) => dispatch('fetchPaymentMethodDetailsSuccess', data))
-    .catch(() => dispatch('fetchPaymentMethodDetailsError'));
-};
+    .catch(() => dispatch('fetchPaymentMethodDetailsError'))
+    .finally(() => commit(types.UPDATE_IS_LOADING_PAYMENT_METHOD, false));
 
-export const fetchPaymentMethodDetailsSuccess = ({ commit, dispatch }, data) => {
-  const creditCardDetails = {
-    cardType: data.credit_card_type,
-    lastFourDigits: data.credit_card_mask_number.slice(-4),
-    expirationMonth: data.credit_card_expiration_month,
-    expirationYear: data.credit_card_expiration_year % 100,
-  };
-
+export const fetchPaymentMethodDetailsSuccess = ({ commit, dispatch }, creditCardDetails) => {
   commit(types.UPDATE_CREDIT_CARD_DETAILS, creditCardDetails);
 
   dispatch('activateNextStep');

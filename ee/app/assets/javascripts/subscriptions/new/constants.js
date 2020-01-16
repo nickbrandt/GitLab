@@ -1,3 +1,4 @@
+// The order of the steps in this array determines the flow of the application
 export const STEPS = ['subscriptionDetails', 'billingAddress', 'paymentMethod'];
 
 export const COUNTRIES_URL = '/-/countries';
@@ -11,5 +12,11 @@ export const PAYMENT_FORM_URL = '/-/subscriptions/payment_form';
 export const PAYMENT_FORM_ID = 'paid_signup_flow';
 
 export const PAYMENT_METHOD_URL = '/-/subscriptions/payment_method';
+
+export const ZUORA_IFRAME_OVERRIDE_PARAMS = {
+  style: 'inline',
+  submitEnabled: 'true',
+  retainValues: 'true',
+};
 
 export const TAX_RATE = 0;

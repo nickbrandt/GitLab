@@ -1,7 +1,7 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
-import { ZUORA_SCRIPT_URL } from 'ee/subscriptions/new/constants';
+import { ZUORA_SCRIPT_URL, ZUORA_IFRAME_OVERRIDE_PARAMS } from 'ee/subscriptions/new/constants';
 
 export default {
   components: {
@@ -13,40 +13,34 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      loading: true,
-      overrideParams: {
-        style: 'inline',
-        submitEnabled: 'true',
-        retainValues: 'true',
-      },
-    };
-  },
   computed: {
-    ...mapState(['paymentFormParams', 'paymentMethodId', 'creditCardDetails']),
+    ...mapState([
+      'paymentFormParams',
+      'paymentMethodId',
+      'creditCardDetails',
+      'isLoadingPaymentMethod',
+    ]),
   },
   watch: {
     // The Zuora script has loaded and the parameters for rendering the iframe have been fetched.
     paymentFormParams() {
       this.renderZuoraIframe();
     },
-    // The Zuora form has been submitted successfully and credit card details are being fetched.
-    paymentMethodId() {
-      this.toggleLoading();
-    },
-    // The credit card details have been fetched.
-    creditCardDetails() {
-      this.toggleLoading();
-    },
   },
   mounted() {
     this.loadZuoraScript();
   },
   methods: {
-    ...mapActions(['fetchPaymentFormParams', 'paymentFormSubmitted']),
+    ...mapActions([
+      'startLoadingZuoraScript',
+      'fetchPaymentFormParams',
+      'zuoraIframeRendered',
+      'paymentFormSubmitted',
+    ]),
     loadZuoraScript() {
-      if (typeof window.Z === 'undefined') {
+      this.startLoadingZuoraScript();
+
+      if (!window.Z) {
         const zuoraScript = document.createElement('script');
         zuoraScript.type = 'text/javascript';
         zuoraScript.async = true;
@@ -58,19 +52,16 @@ export default {
       }
     },
     renderZuoraIframe() {
-      const params = { ...this.paymentFormParams, ...this.overrideParams };
-      window.Z.runAfterRender(this.toggleLoading);
+      const params = { ...this.paymentFormParams, ...ZUORA_IFRAME_OVERRIDE_PARAMS };
+      window.Z.runAfterRender(this.zuoraIframeRendered);
       window.Z.render(params, {}, this.paymentFormSubmitted);
-    },
-    toggleLoading() {
-      this.loading = !this.loading;
     },
   },
 };
 </script>
 <template>
   <div>
-    <gl-loading-icon v-if="loading" size="lg" />
-    <div v-show="active && !loading" id="zuora_payment"></div>
+    <gl-loading-icon v-if="isLoadingPaymentMethod" size="lg" />
+    <div v-show="active && !isLoadingPaymentMethod" id="zuora_payment"></div>
   </div>
 </template>

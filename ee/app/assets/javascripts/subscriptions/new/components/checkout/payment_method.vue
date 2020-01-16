@@ -1,7 +1,6 @@
 <script>
-import _ from 'underscore';
 import { GlSprintf } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import { mapState } from 'vuex';
 import Step from './components/step.vue';
 import Zuora from './components/zuora.vue';
@@ -15,7 +14,13 @@ export default {
   computed: {
     ...mapState(['paymentMethodId', 'creditCardDetails']),
     isValid() {
-      return !_.isEmpty(this.paymentMethodId);
+      return Boolean(this.paymentMethodId);
+    },
+    expirationDate() {
+      return sprintf(this.$options.i18n.expirationDate, {
+        expirationMonth: this.creditCardDetails.credit_card_expiration_month,
+        expirationYear: this.creditCardDetails.credit_card_expiration_year.toString(10).slice(-2),
+      });
     },
   },
   i18n: {
@@ -34,20 +39,15 @@ export default {
       <div class="js-summary-line-1">
         <gl-sprintf :message="$options.i18n.creditCardDetails">
           <template #cardType>
-            {{ creditCardDetails.cardType }}
+            {{ creditCardDetails.credit_card_type }}
           </template>
           <template #lastFourDigits>
-            <strong>{{ creditCardDetails.lastFourDigits }}</strong>
+            <strong>{{ creditCardDetails.credit_card_mask_number.slice(-4) }}</strong>
           </template>
         </gl-sprintf>
       </div>
       <div class="js-summary-line-2">
-        {{
-          sprintf($options.i18n.expirationDate, {
-            expirationMonth: creditCardDetails.expirationMonth,
-            expirationYear: creditCardDetails.expirationYear,
-          })
-        }}
+        {{ expirationDate }}
       </div>
     </template>
   </step>
