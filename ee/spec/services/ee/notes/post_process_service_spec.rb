@@ -30,5 +30,20 @@ describe Notes::PostProcessService do
         end
       end
     end
+
+    context 'analytics' do
+      subject { described_class.new(note) }
+
+      let(:note) { create(:note) }
+      let(:analytics_mock) { instance_double('Analytics::RefreshCommentsData') }
+
+      it 'invokes Analytics::RefreshCommentsData' do
+        allow(Analytics::RefreshCommentsData).to receive(:for_note).with(note).and_return(analytics_mock)
+
+        expect(analytics_mock).to receive(:execute)
+
+        subject.execute
+      end
+    end
   end
 end

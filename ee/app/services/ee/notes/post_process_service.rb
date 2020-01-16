@@ -9,9 +9,10 @@ module EE
       override :execute
       def execute
         super
-        return unless create_design_discussion_system_note?
 
-        ::SystemNoteService.design_discussion_added(note)
+        Analytics::RefreshCommentsData.for_note(note)&.execute
+
+        ::SystemNoteService.design_discussion_added(note) if create_design_discussion_system_note?
       end
 
       private
