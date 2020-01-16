@@ -5,9 +5,7 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
   before_action :authorize_compliance_dashboard!
 
   def show
-    preload_for_collection = [:approved_by_users, :metrics, source_project: :route, target_project: :namespace]
-
-    @merge_requests = MergeRequestsComplianceFinder.new(current_user, { group_id: @group.id, preloads: preload_for_collection })
+    @merge_requests = MergeRequestsComplianceFinder.new(current_user, { group_id: @group.id })
       .execute
     @merge_requests = Kaminari.paginate_array(@merge_requests).page(params[:page])
   end

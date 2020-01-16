@@ -1,8 +1,8 @@
 - return unless @group.feature_available?(:group_level_compliance_dashboard) || @group.feature_available?(:security_dashboard)
 
-- main_path = @group.feature_available?(:group_level_compliance_dashboard) ? 'groups/security/compliance_dashboards#show' : 'groups/security/dashboard#show'
-= nav_link(path: main_path) do
-  = link_to group_security_compliance_dashboard_path(@group), data: { qa_selector: 'security_dashboard_link' } do
+- main_path = @group.feature_available?(:group_level_compliance_dashboard) ?  group_security_compliance_dashboard_path(@group) : group_security_dashboard_path(@group)
+= nav_link(path: %w[groups/security/compliance_dashboard#show groups/security/dashboard#show]) do
+  = link_to main_path, data: { qa_selector: 'security_dashboard_link' } do
     .nav-icon-container
       = sprite_icon('shield')
     %span.nav-item-name

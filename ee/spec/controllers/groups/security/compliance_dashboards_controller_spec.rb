@@ -19,18 +19,16 @@ describe Groups::Security::ComplianceDashboardsController do
       end
 
       context 'and user is allowed to access group compliance dashboard' do
-        render_views
-
         before do
           group.add_owner(user)
         end
 
-        it { is_expected.to have_gitlab_http_status(200) }
+        it { is_expected.to have_gitlab_http_status(:success) }
 
         context 'when there are no merge requests' do
-          it 'renders empty state' do
+          it 'does not receive merge request collection' do
             subject
-            expect(response.body).to have_css("div.empty-state")
+            expect(assigns(:merge_requests)).to be_empty
           end
         end
 
@@ -44,20 +42,20 @@ describe Groups::Security::ComplianceDashboardsController do
             create(:event, :merged, project: project, target: mr_1, author: user)
           end
 
-          it 'renders merge request' do
+          it 'receives merge requests collection' do
             subject
-            expect(response.body).to have_css(".merge-request-title.title")
+            expect(assigns(:merge_requests)).not_to be_empty
           end
         end
       end
 
       context 'when user is not allowed to access group compliance dashboard' do
-        it { is_expected.to have_gitlab_http_status(404) }
+        it { is_expected.to have_gitlab_http_status(:not_found) }
       end
     end
 
     context 'when compliance dashboard feature is disabled' do
-      it { is_expected.to have_gitlab_http_status(404) }
+      it { is_expected.to have_gitlab_http_status(:not_found) }
     end
   end
 end

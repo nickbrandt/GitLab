@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-
-# Finders::MergeRequest class
 #
 # Used to filter MergeRequests collections for compliance dashboard
 #
 # Arguments:
-#   current_user - which user use
+#   current_user - which user calls a class
 #   params:
 #     group_id: integer
 #     preloads: array of associations to preload
@@ -22,7 +20,10 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
       .to_sql
 
     sql = find_group_projects.as('projects').to_sql
-    records = Project.select('projects.id, events.target_id as merge_request_id').from([Arel.sql("#{sql} JOIN LATERAL (#{lateral}) #{Event.table_name} ON true")]).order('events.created_at DESC')
+    records = Project
+      .select('projects.id, events.target_id as merge_request_id')
+      .from([Arel.sql("#{sql} JOIN LATERAL (#{lateral}) #{Event.table_name} ON true")])
+      .order('events.created_at DESC')
     select_sorted_mrs(records)
     # rubocop: enable CodeReuse/ActiveRecord
   end
@@ -40,11 +41,15 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
   def select_sorted_mrs(records)
     hash = {}
     records.each { |row| hash[row['merge_request_id']] = nil }
-    mrs = MergeRequest.where(id: hash.keys).preload(params[:preloads]) # rubocop: disable CodeReuse/ActiveRecord
+    mrs = MergeRequest.where(id: hash.keys).preload(preloads) # rubocop: disable CodeReuse/ActiveRecord
 
     mrs.each { |mr| hash[mr.id] = mr }
 
     hash.compact!
     hash.values # sorted MRs
+  end
+
+  def preloads
+    [:approved_by_users, :metrics, source_project: :route, target_project: :namespace]
   end
 end
