@@ -249,7 +249,7 @@ describe API::Scim do
           end
 
           it 'responds with an empty response' do
-            expect(json_response).to eq({})
+            expect(response.body).to eq('')
           end
         end
 
@@ -322,7 +322,7 @@ describe API::Scim do
         end
 
         it 'responds with an empty response' do
-          expect(json_response).to eq({})
+          expect(response.body).to eq('')
         end
       end
 

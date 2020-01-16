@@ -58,7 +58,7 @@ module API
       delete ':name' do
         project_alias.destroy
 
-        status 204
+        no_content!
       end
     end
   end
