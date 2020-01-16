@@ -15,7 +15,7 @@ module EE
           unprotect_access_levels: 'ProtectedBranch::UnprotectAccessLevel'
         }.freeze
 
-        EE_EXISTING_OBJECT_CHECK = %i[DesignManagement::Design].freeze
+        EE_EXISTING_OBJECT_RELATIONS = %i[DesignManagement::Design].freeze
 
         class_methods do
           extend ::Gitlab::Utils::Override
@@ -25,9 +25,9 @@ module EE
             super.merge(EE_OVERRIDES)
           end
 
-          override :existing_object_check
-          def existing_object_check
-            super + EE_EXISTING_OBJECT_CHECK
+          override :existing_object_relations
+          def existing_object_relations
+            super + EE_EXISTING_OBJECT_RELATIONS
           end
         end
       end
