@@ -11,7 +11,7 @@ module EE
     private
 
     def push_wip_limits
-      push_frontend_feature_flag(:wip_limits, parent)
+      push_frontend_feature_flag(:wip_limits, parent) if License.feature_available?(:wip_limits)
     end
   end
 end
