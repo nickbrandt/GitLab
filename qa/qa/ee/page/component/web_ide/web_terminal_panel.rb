@@ -8,8 +8,8 @@ module QA
           module WebTerminalPanel
             def self.prepended(page)
               page.module_eval do
-                view 'app/assets/javascripts/ide/components/panes/right.vue' do
-                  element :ide_right_sidebar
+                view 'app/assets/javascripts/ide/components/panes/collapsible_sidebar.vue' do
+                  element :ide_right_sidebar, %q(:data-qa-selector="`ide_${side}_sidebar`") # rubocop:disable QA/ElementWithPattern
                   element :terminal_tab_button, %q(:data-qa-selector="`${tab.title.toLowerCase()}_tab_button`") # rubocop:disable QA/ElementWithPattern
                 end
 
