@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlEmptyState, GlLoadingIcon, GlFormInput, GlPagination } from '@gitlab/ui';
+import { GlIcon, GlEmptyState, GlLoadingIcon, GlFormInput, GlPagination } from '@gitlab/ui';
 import stubChildren from 'helpers/stub_children';
 import ErrorTrackingList from '~/error_tracking/components/error_tracking_list.vue';
 import errorsList from './list_mock.json';
@@ -61,6 +61,7 @@ describe('ErrorTrackingList', () => {
       searchByQuery: jest.fn(),
       sortByField: jest.fn(),
       fetchPaginatedResults: jest.fn(),
+      updateStatus: jest.fn(),
     };
 
     const state = {
@@ -212,6 +213,35 @@ describe('ErrorTrackingList', () => {
       expect(findLoadingIcon().exists()).toBe(false);
       expect(findErrorListTable().exists()).toBe(false);
       expect(findSortDropdown().exists()).toBe(false);
+    });
+  });
+
+  describe('When the ignore button on an error is clicked', () => {
+    beforeEach(() => {
+      store.state.list.loading = false;
+      store.state.list.errors = errorsList;
+
+      mountComponent({
+        stubs: {
+          GlTable: false,
+          GlLink: false,
+          GlButton: false,
+        },
+      });
+    });
+
+    it('sends the status and error ID', () => {
+      const ignoreButton = wrapper.find({ ref: 'ignoreError' });
+      ignoreButton.trigger('click');
+      expect(actions.updateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          endpoint: '/project/test/-/error_tracking/3.json',
+          redirectUrl: '/error_tracking',
+          status: 'ignored',
+        },
+        undefined,
+      );
     });
   });
 

@@ -324,7 +324,7 @@ export default {
             </div>
           </template>
           <template v-slot:ignore="errors">
-            <gl-button @click="updateIssueStatus(errors.item.id, 'ignored')">
+            <gl-button ref="ignoreError" @click="updateIssueStatus(errors.item.id, 'ignored')">
               <gl-icon name="eye-slash" :size="12" />
             </gl-button>
           </template>
