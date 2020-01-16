@@ -13,7 +13,6 @@ describe('noteActions', () => {
     shallowMount(noteActions, {
       store,
       propsData,
-      attachToDocument: true,
     });
 
   beforeEach(() => {
