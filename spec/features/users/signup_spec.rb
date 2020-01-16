@@ -440,7 +440,7 @@ describe 'With original flow' do
   end
 
   it_behaves_like 'Signup'
-  it_behaves_like 'Signup name validation', 'new_user_name', 128
+  it_behaves_like 'Signup name validation', 'new_user_name', 255
 end
 
 describe 'With experimental flow' do
@@ -450,8 +450,8 @@ describe 'With experimental flow' do
   end
 
   it_behaves_like 'Signup'
-  it_behaves_like 'Signup name validation', 'new_user_first_name', 63
-  it_behaves_like 'Signup name validation', 'new_user_last_name', 63
+  it_behaves_like 'Signup name validation', 'new_user_first_name', 127
+  it_behaves_like 'Signup name validation', 'new_user_last_name', 127
 
   describe 'when role is required' do
     it 'after registering, it redirects to step 2 of the signup process, sets the name and role and then redirects to the original requested url' do
