@@ -5,9 +5,6 @@ import { s__ } from '~/locale';
 
 import MergeRequestStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 
-export const setEndpoint = ({ commit }, data) => commit(types.SET_ENDPOINT, data);
-export const setBlobPath = ({ commit }, data) => commit(types.SET_BLOB_PATH, data);
-
 export const setPage = ({ commit }, page) => commit(types.SET_PAGE, page);
 
 export const requestReport = ({ commit }) => commit(types.REQUEST_REPORT);

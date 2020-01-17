@@ -13,20 +13,6 @@ describe('Codequality report mutations', () => {
     state = defaultState;
   });
 
-  describe('set endpoint', () => {
-    it('should set endpoint', () => {
-      mutations[types.SET_ENDPOINT](state, 'endpoint');
-      expect(state.endpoint).toBe('endpoint');
-    });
-  });
-
-  describe('set blob path', () => {
-    it('should set blob path', () => {
-      mutations[types.SET_BLOB_PATH](state, 'blobPath');
-      expect(state.blobPath).toBe('blobPath');
-    });
-  });
-
   describe('set page', () => {
     it('should set page', () => {
       mutations[types.SET_PAGE](state, 4);

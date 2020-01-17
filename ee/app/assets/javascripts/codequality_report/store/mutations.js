@@ -1,12 +1,6 @@
 import * as types from './mutation_types';
 
 export default {
-  [types.SET_ENDPOINT](state, endpoint) {
-    Object.assign(state, { endpoint });
-  },
-  [types.SET_BLOB_PATH](state, blobPath) {
-    Object.assign(state, { blobPath });
-  },
   [types.SET_PAGE](state, page) {
     Object.assign(state, {
       pageInfo: Object.assign(state.pageInfo, {

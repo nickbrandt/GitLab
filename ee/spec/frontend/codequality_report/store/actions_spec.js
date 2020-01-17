@@ -27,32 +27,6 @@ describe('Codequality report actions', () => {
     mock.restore();
   });
 
-  describe('setEndpoint', () => {
-    it('sets the endpoint', done => {
-      testAction(
-        actions.setEndpoint,
-        'endpoint',
-        state,
-        [{ type: types.SET_ENDPOINT, payload: 'endpoint' }],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setBlobPath', () => {
-    it('sets the blob path', done => {
-      testAction(
-        actions.setBlobPath,
-        'blobPath',
-        state,
-        [{ type: types.SET_BLOB_PATH, payload: 'blobPath' }],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('setPage', () => {
     it('sets the page number', done => {
       testAction(actions.setPage, 12, state, [{ type: types.SET_PAGE, payload: 12 }], [], done);

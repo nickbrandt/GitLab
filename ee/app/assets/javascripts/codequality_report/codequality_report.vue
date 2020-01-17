@@ -6,28 +6,15 @@ import ReportSection from '~/reports/components/report_section.vue';
 import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 import { n__, s__, sprintf } from '~/locale';
 
-import createStore from './store';
-
 export default {
-  store: createStore(),
   components: {
     ReportSection,
     PaginationLinks,
   },
   mixins: [reportsMixin],
   componentNames,
-  props: {
-    codequalityReportDownloadPath: {
-      type: String,
-      required: true,
-    },
-    blobPath: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
-    ...mapState(['isLoadingCodequality', 'loadingCodequalityFailed', 'endpoint', 'pageInfo']),
+    ...mapState(['isLoadingCodequality', 'loadingCodequalityFailed', 'pageInfo']),
     ...mapGetters(['codequalityIssues', 'codequalityIssueTotal']),
     hasCodequalityIssues() {
       return this.codequalityIssueTotal > 0;
@@ -54,13 +41,8 @@ export default {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
   },
-  created() {
-    this.setEndpoint(this.codequalityReportDownloadPath);
-    this.setBlobPath(this.blobPath);
-    this.fetchReport();
-  },
   methods: {
-    ...mapActions(['setEndpoint', 'setBlobPath', 'setPage', 'fetchReport']),
+    ...mapActions(['setPage']),
     translateText(type) {
       return {
         error: sprintf(s__('ciReport|Failed to load %{reportName} report'), {

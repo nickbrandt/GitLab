@@ -1,5 +1,3 @@
-export const SET_ENDPOINT = 'SET_ENDPOINT';
-export const SET_BLOB_PATH = 'SET_BLOB_PATH';
 export const SET_PAGE = 'SET_PAGE';
 export const REQUEST_REPORT = 'REQUEST_REPORT';
 export const RECEIVE_REPORT_SUCCESS = 'RECEIVE_REPORT_SUCCESS';
