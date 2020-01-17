@@ -141,10 +141,12 @@ describe ApprovalProjectRule do
     let(:project) { create(:project) }
     let(:rule) { build(:approval_project_rule, project: project, rule_type: :any_approver) }
 
-    it 'creating more than one any_approver rule raises an error' do
+    it 'creating only one any_approver rule is allowed' do
       create(:approval_project_rule, project: project, rule_type: :any_approver)
 
-      expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      expect(rule).not_to be_valid
+      expect(rule.errors.messages).to eq(rule_type: ['any-approver for the project already exists'])
+      expect { rule.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 
