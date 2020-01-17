@@ -1,0 +1,5 @@
+---
+title: Fix access to horizontal scrollbar when zooming in on a design
+merge_request:
+author:
+type: fixed
