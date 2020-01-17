@@ -16,6 +16,23 @@ describe Ci::Build do
   let(:job) { create(:ci_build, pipeline: pipeline) }
   let(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
 
+  describe '.license_scan' do
+    subject(:build) { described_class.license_scan.first }
+    let(:artifact) { build.job_artifacts.first }
+
+    context 'with old license_management artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_management' }
+    end
+
+    context 'with new license_scanning artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_scanning' }
+    end
+  end
+
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 
