@@ -140,6 +140,13 @@ module ErrorTracking
       Addressable::URI.join(api_url, '/').to_s
     end
 
+    def clear_cache(key_prefix)
+      return unless key_prefix
+
+      klass_key = self.class.reactive_cache_key.call(self).join(':')
+      Rails.cache.delete_matched("#{klass_key}:#{key_prefix}*")
+    end
+
     private
 
     def add_gitlab_issue_details(issue)

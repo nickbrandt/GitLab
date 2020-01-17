@@ -440,4 +440,18 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
       end
     end
   end
+
+  describe '#clear_cache' do
+    let(:key_prefix) { 'list_issues' }
+
+    it 'clears the cache' do
+      klass_key = subject.class.reactive_cache_key.call(subject).join(':')
+
+      expect(Rails.cache)
+        .to receive(:delete_matched)
+        .with("#{klass_key}:#{key_prefix}*")
+
+      subject.clear_cache(key_prefix)
+    end
+  end
 end
