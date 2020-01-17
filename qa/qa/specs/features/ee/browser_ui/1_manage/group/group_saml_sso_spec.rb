@@ -184,6 +184,9 @@ module QA
             end
 
             @managed_group_url = setup_and_enable_group_managed_accounts
+
+            Page::Main::Menu.perform(&:sign_out_if_signed_in)
+            logout_from_idp
           end
 
           it 'removes existing users from the group, forces existing users to create a new account and allows to leave group' do
@@ -203,7 +206,7 @@ module QA
 
             new_username = EE::Page::Group::SamlSSOSignUp.perform(&:current_username)
 
-            EE::Page::Group::SamlSSOSignUp.perform(&:click_signout_and_register_button)
+            EE::Page::Group::SamlSSOSignUp.perform(&:click_register_button)
 
             expect(page).to have_text("Sign up was successful! Please confirm your email to sign in.")
 
@@ -298,19 +301,21 @@ module QA
     end
 
     def setup_and_enable_group_managed_accounts
-      Page::Main::Login.perform(&:sign_in_using_credentials) unless Page::Main::Menu.perform(&:signed_in?)
+      setup_and_enable_enforce_sso
 
       Support::Retrier.retry_on_exception do
-        @group.visit!
+        # We must sign in with SAML before enabling Group Managed Accounts
+        EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
+          saml_sso.click_user_login_url_link
+        end
+
+        EE::Page::Group::SamlSSOSignIn.perform(&:click_sign_in)
+        login_to_idp_if_required_and_expect_success('user1', 'user1pass')
 
         Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
         EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
-          saml_sso.enforce_sso
           saml_sso.enable_group_managed_accounts
-
-          saml_sso.set_id_provider_sso_url(EE::Runtime::Saml.idp_sso_url)
-          saml_sso.set_cert_fingerprint(EE::Runtime::Saml.idp_certificate_fingerprint)
 
           saml_sso.click_save_changes
 
@@ -329,6 +334,11 @@ module QA
 
     def create_a_user_via_api
       Resource::User.fabricate_via_api!
+    end
+
+    def logout_from_idp
+      page.visit EE::Runtime::Saml.idp_sign_out_url
+      Support::Waiter.wait { current_url == EE::Runtime::Saml.idp_signed_out_url }
     end
 
     def reset_idp_session

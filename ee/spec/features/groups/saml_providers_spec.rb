@@ -117,6 +117,10 @@ describe 'SAML provider settings' do
       end
 
       context 'enforced_group_managed_accounts enabled', :js do
+        before do
+          create(:group_saml_identity, saml_provider: saml_provider, user: user)
+        end
+
         it 'updates the flag' do
           stub_feature_flags(group_managed_accounts: true)
 
