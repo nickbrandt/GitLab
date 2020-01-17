@@ -191,23 +191,21 @@ describe('boardsStore', () => {
   });
 
   describe('saveList', () => {
-    let mock;
     let list;
 
     beforeEach(() => {
-      mock = new AxiosMockAdapter(axios);
-      list = new List(listObj);
+     list = new List(listObj);
+      setupDefaultResponses();
     });
 
     it('makes a request to save a list', () => {
-      mock.onPost(endpoints.listsEndpoint).reply(200, listObj);
-      mock
-        .onGet(`${endpoints.listsEndpoint}/${listObj.id}/issues?id=${listObj.id}&page=1`)
-        .reply(200, { issues: [createTestIssue()] });
-
+      
       const expectedResponse = expect.objectContaining({ issues: [createTestIssue()] });
+      expect(list.id).toBe(listObj.id);
+      expect(list.position).toBe(listObj.position);
 
       return expect(boardsStore.saveList(list)).resolves.toEqual(expectedResponse);
+
     });
   });
 
