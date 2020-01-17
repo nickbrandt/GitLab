@@ -297,106 +297,70 @@ describe SystemNoteService do
   end
 
   describe '.merge_train' do
-    subject { described_class.merge_train(noteable, project, author, noteable.merge_train) }
+    let(:merge_train) { double }
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('started a merge train')
-    end
-
-    context 'when index of the merge request is not zero' do
-      before do
-        allow(noteable.merge_train).to receive(:index) { 1 }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:enqueue).with(merge_train)
       end
 
-      it "posts the 'merge train' system note" do
-        expect(subject.note).to eq('added this merge request to the merge train at position 2')
-      end
+      described_class.merge_train(noteable, project, author, merge_train)
     end
   end
 
   describe '.cancel_merge_train' do
-    subject { described_class.cancel_merge_train(noteable, project, author) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:cancel)
+      end
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-    let(:reason) { }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('removed this merge request from the merge train')
+      described_class.cancel_merge_train(noteable, project, author)
     end
   end
 
   describe '.abort_merge_train' do
-    subject { described_class.abort_merge_train(noteable, project, author, 'source branch was updated') }
+    let(:message) { double }
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-    let(:reason) { }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:abort).with(message)
+      end
 
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('removed this merge request from the merge train because source branch was updated')
+      described_class.abort_merge_train(noteable, project, author, message)
     end
   end
 
   describe '.add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, pipeline.sha) }
+    let(:sha) { double }
 
-    let(:pipeline) { build(:ci_pipeline) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:add_when_pipeline_succeeds).with(sha)
+      end
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
-    end
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to match(%r{enabled automatic add to merge train when the pipeline for (\w+/\w+@)?\h{40} succeeds})
+      described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, sha)
     end
   end
 
   describe '.cancel_add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:cancel_add_when_pipeline_succeeds)
+      end
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
-    end
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to eq 'cancelled automatic add to merge train'
+      described_class.cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author)
     end
   end
 
   describe '.abort_add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, 'target branch was changed') }
+    let(:message) { double }
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
-    end
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:abort_add_when_pipeline_succeeds).with(message)
+      end
 
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to eq 'aborted automatic add to merge train because target branch was changed'
+      described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, message)
     end
   end
 end
