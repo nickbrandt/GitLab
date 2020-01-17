@@ -37,6 +37,10 @@ describe ScimFinder do
           expect(finder.search(filter: "id eq #{identity.extern_uid}").first).to eq identity
           expect(finder.search(filter: "externalId eq #{identity.extern_uid}").first).to eq identity
         end
+
+        it 'allows lookup by userName' do
+          expect(finder.search(filter: "userName eq \"#{identity.user.username}\"").first).to eq identity
+        end
       end
 
       it 'returns all related identities if there is no filter' do
@@ -50,7 +54,7 @@ describe ScimFinder do
       end
 
       it 'raises an error if the attribute path is unsupported' do
-        expect { finder.search(filter: 'userName eq "name"').count }.to raise_error(ScimFinder::UnsupportedFilter)
+        expect { finder.search(filter: 'displayName eq "name"').count }.to raise_error(ScimFinder::UnsupportedFilter)
       end
     end
   end
