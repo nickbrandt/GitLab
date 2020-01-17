@@ -401,6 +401,11 @@ msgstr[1] ""
 msgid "%{strong_start}%{human_size}%{strong_end} Files"
 msgstr ""
 
+msgid "%{strong_start}%{release_count}%{strong_end} Release"
+msgid_plural "%{strong_start}%{release_count}%{strong_end} Releases"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{strong_start}%{tag_count}%{strong_end} Tag"
 msgid_plural "%{strong_start}%{tag_count}%{strong_end} Tags"
 msgstr[0] ""
