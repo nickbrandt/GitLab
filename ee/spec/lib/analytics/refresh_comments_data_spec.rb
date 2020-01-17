@@ -25,6 +25,19 @@ describe Analytics::RefreshCommentsData do
         end.to change { noteable.metrics.first_comment_at }.from(nil).to(be_like_time(note.created_at))
       end
 
+      context 'when no merge request metric is present' do
+        before do
+          noteable.metrics.destroy
+          noteable.reload
+        end
+
+        it 'creates a new metric and updates the first_comment_at' do
+          subject.execute
+
+          expect(noteable.metrics.reload.first_comment_at).to(be_like_time(note.created_at))
+        end
+      end
+
       context 'and first_comment_at is already filled' do
         before do
           noteable.metrics.update(first_comment_at: 3.days.ago.beginning_of_day)
