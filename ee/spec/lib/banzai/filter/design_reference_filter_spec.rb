@@ -43,6 +43,22 @@ describe Banzai::Filter::DesignReferenceFilter do
     end
   end
 
+  shared_examples 'a good link reference' do
+    let(:link) { doc.css('a').first }
+    let(:href) { path_for_design(design) }
+    let(:title) { design.filename }
+
+    it 'produces a good link', :aggregate_failures do
+      expect(link.attr('href')).to eq(href)
+      expect(link.attr('title')).to eq(title)
+      expect(link.attr('class')).to eq('gfm gfm-design has-tooltip')
+      expect(link.attr('data-project')).to eq(project.id.to_s)
+      expect(link.attr('data-issue')).to eq(issue.id.to_s)
+      expect(link.attr('data-original')).to eq(reference)
+      expect(link.text).to eq(design.to_reference)
+    end
+  end
+
   describe '.call' do
     it 'requires project context' do
       expect { described_class.call('') }.to raise_error(ArgumentError, /:project/)
@@ -151,7 +167,7 @@ describe Banzai::Filter::DesignReferenceFilter do
 
     it 'links to the design' do
       expect(doc.css('a').first.attr('href'))
-        .to eq url_for_design(design)
+        .to eq path_for_design(design)
     end
   end
 
@@ -166,16 +182,7 @@ describe Banzai::Filter::DesignReferenceFilter do
       end
 
       context 'the user has permission' do
-        it 'produces a good link', :aggregate_failures do
-          link = doc.css('a').first
-
-          expect(link.attr('href')).to eq(url_for_design(design))
-          expect(link.attr('title')).to eq(design.filename)
-          expect(link.attr('class')).to eq('gfm gfm-design has-tooltip')
-          expect(link.attr('data-project')).to eq(project.id.to_s)
-          expect(link.attr('data-issue')).to eq(issue.id.to_s)
-          expect(link.attr('data-original')).to eq(reference)
-        end
+        it_behaves_like 'a good link reference'
       end
 
       context 'the filename needs to be escaped' do
@@ -206,6 +213,28 @@ describe Banzai::Filter::DesignReferenceFilter do
     end
   end
 
+  context 'URL reference' do
+    let(:reference) { url_for_design(design) }
+
+    it 'matches the link_reference_pattern' do
+      expect(reference).to match(DesignManagement::Design.link_reference_pattern)
+    end
+
+    it 'constructs the appropriate references_per_parent structure' do
+      filter = filter_instance
+
+      filter.call
+
+      expect(filter.references_per_parent).to eq({
+        project.full_path => [filter.record_identifier(design)].to_set
+      })
+    end
+
+    it_behaves_like 'a good link reference' do
+      let(:href) { reference }
+    end
+  end
+
   context 'cross-project / cross-namespace complete reference' do
     let(:reference) { x_project_design.to_reference(project) }
 
@@ -213,7 +242,7 @@ describe Banzai::Filter::DesignReferenceFilter do
 
     it 'links to a valid reference' do
       expect(doc.css('a').first.attr('href'))
-        .to eq url_for_design(x_project_design)
+        .to eq path_for_design(x_project_design)
     end
 
     context 'the current user does not have access to that project' do
