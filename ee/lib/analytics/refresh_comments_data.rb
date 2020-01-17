@@ -22,9 +22,11 @@ module Analytics
 
     def execute(force: false)
       merge_requests.each do |mr|
-        next if !force && mr.metrics.first_comment_at
+        metrics = mr.ensure_metrics
 
-        mr.metrics.update!(first_comment_at: ProductivityCalculator.new(mr).first_comment_at)
+        next if !force && metrics.first_comment_at
+
+        metrics.update!(first_comment_at: ProductivityCalculator.new(mr).first_comment_at)
       end
     end
 
