@@ -7313,9 +7313,6 @@ msgstr ""
 msgid "Error deleting project. Check logs for error details."
 msgstr ""
 
-msgid "Error details"
-msgstr ""
-
 msgid "Error fetching diverging counts for branches. Please try again."
 msgstr ""
 
@@ -8877,6 +8874,9 @@ msgid "GitLab User"
 msgstr ""
 
 msgid "GitLab allows you to continue using your license even if you exceed the number of seats you purchased. You will be required to pay for these seats when you renew your license."
+msgstr ""
+
+msgid "GitLab commit"
 msgstr ""
 
 msgid "GitLab for Slack"
