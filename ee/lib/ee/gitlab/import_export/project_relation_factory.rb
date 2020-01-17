@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module ImportExport
-      module RelationFactory
+      module ProjectRelationFactory
         extend ActiveSupport::Concern
 
         EE_OVERRIDES = {
