@@ -15,6 +15,7 @@ module QA
       module Component
         autoload :DesignManagement, 'qa/ee/page/component/design_management'
         autoload :LicenseManagement, 'qa/ee/page/component/license_management'
+        autoload :SecureReport, 'qa/ee/page/component/secure_report'
 
         module IssueBoard
           autoload :Show, 'qa/ee/page/component/issue_board/show'
