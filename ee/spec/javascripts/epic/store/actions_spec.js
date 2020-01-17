@@ -777,6 +777,9 @@ describe('Epic Store Actions', () => {
       },
     };
     const stateSubscribed = {
+      epicIid: 123,
+      groupPath: 'charts',
+      fullPath: 'gitlab-org/charts',
       subscribed: false,
     };
 
@@ -813,6 +816,19 @@ describe('Epic Store Actions', () => {
           ],
           done,
         );
+
+        const tester = {
+          asymmetricMatch(actual) {
+            const variables = actual.variables.epicSetSubscriptionInput;
+
+            return (
+              variables.iid === `${stateSubscribed.epicIid}` &&
+              variables.groupPath === stateSubscribed.fullPath
+            );
+          },
+        };
+
+        expect(epicUtils.gqClient.mutate).toHaveBeenCalledWith(tester);
       });
     });
 

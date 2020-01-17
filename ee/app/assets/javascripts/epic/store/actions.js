@@ -189,7 +189,7 @@ export const toggleEpicSubscription = ({ state, dispatch }) => {
       variables: {
         epicSetSubscriptionInput: {
           iid: `${state.epicIid}`,
-          groupPath: state.groupPath,
+          groupPath: state.fullPath,
           subscribedState: !state.subscribed,
         },
       },
