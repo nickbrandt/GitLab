@@ -289,7 +289,7 @@ You can set Work In Progress (WIP) limits per issues list. When a limit is set, 
 
 To set a WIP limit for a list:
 
-1. Click on the Settings icon (gear) in the list's header.
+1. Navigate to a Project or Group board for which you have membership and click on the Settings icon (gear) in a list's header.
 1. Enter the desired limit.
 
 ### Summary of features per tier
