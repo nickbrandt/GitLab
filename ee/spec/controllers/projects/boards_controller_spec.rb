@@ -25,6 +25,11 @@ describe Projects::BoardsController do
     end
 
     it_behaves_like 'redirects to last visited board'
+
+    it_behaves_like 'pushes wip limits to frontend' do
+      let(:parent) { project }
+      let(:params) { { namespace_id: parent.namespace, project_id: parent } }
+    end
   end
 
   describe 'GET recent' do

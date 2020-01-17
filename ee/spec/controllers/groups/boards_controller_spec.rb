@@ -47,6 +47,11 @@ describe Groups::BoardsController do
       let(:parent) { group }
     end
 
+    it_behaves_like 'pushes wip limits to frontend' do
+      let(:params) { { group_id: group } }
+      let(:parent) { group }
+    end
+
     def list_boards(format: :html)
       get :index, params: { group_id: group }, format: format
     end
