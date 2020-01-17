@@ -29,7 +29,7 @@ module EE
           ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods, legacy_deployments: legacy_deployments)
         end
 
-        def read_pod_logs(environment_id, pod_name, namespace, container: nil, search: nil)
+        def read_pod_logs(environment_id, pod_name, namespace, container: nil, search: nil, start_time: nil, end_time: nil)
           # environment_id is required for use in reactive_cache_updated(),
           # to invalidate the ETag cache.
           with_reactive_cache(
@@ -38,7 +38,9 @@ module EE
             'pod_name' => pod_name,
             'namespace' => namespace,
             'container' => container,
-            'search' => search
+            'search' => search,
+            "start_time" => start_time,
+            "end_time" => end_time
           ) do |result|
             result
           end
@@ -51,11 +53,13 @@ module EE
             pod_name = opts['pod_name']
             namespace = opts['namespace']
             search = opts['search']
+            start_time = opts['start_time']
+            end_time = opts['end_time']
 
-            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container, search: search) do
+            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container, search: search, start_time: start_time, end_time: end_time) do
               container ||= container_names_of(pod_name, namespace).first
 
-              pod_logs(pod_name, namespace, container: container, search: search)
+              pod_logs(pod_name, namespace, container: container, search: search, start_time: start_time, end_time: end_time)
             end
           end
         end
@@ -84,10 +88,10 @@ module EE
 
         private
 
-        def pod_logs(pod_name, namespace, container: nil, search: nil)
+        def pod_logs(pod_name, namespace, container: nil, search: nil, start_time: nil, end_time: nil)
           enable_advanced_querying = ::Feature.enabled?(:enable_cluster_application_elastic_stack) && !!elastic_stack_client
           logs = if enable_advanced_querying
-                   elastic_stack_pod_logs(namespace, pod_name, container, search)
+                   elastic_stack_pod_logs(namespace, pod_name, container, search, start_time, end_time)
                  else
                    platform_pod_logs(namespace, pod_name, container)
                  end
@@ -117,11 +121,11 @@ module EE
           end
         end
 
-        def elastic_stack_pod_logs(namespace, pod_name, container_name, search)
+        def elastic_stack_pod_logs(namespace, pod_name, container_name, search, start_time, end_time)
           client = elastic_stack_client
           return [] if client.nil?
 
-          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name, search)
+          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name, search, start_time, end_time)
         end
 
         def elastic_stack_client

@@ -268,7 +268,9 @@ describe Clusters::Platforms::Kubernetes do
             'pod_name' => pod_name,
             'namespace' => namespace,
             'container' => container,
-            'search' => nil
+            'search' => nil,
+            'start_time' => nil,
+            'end_time' => nil
           }
         ]
       end
