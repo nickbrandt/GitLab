@@ -362,7 +362,7 @@ module EE
     private :validate_parent
 
     def level_depth_exceeded?(parent_epic)
-      hierarchy.max_descendants_depth.to_i + parent_epic.ancestors.count >= MAX_HIERARCHY_DEPTH
+      hierarchy.max_descendants_depth.to_i + parent_epic.base_and_ancestors.count >= MAX_HIERARCHY_DEPTH
     end
     private :level_depth_exceeded?
 
@@ -371,6 +371,5 @@ module EE
 
       hierarchy.base_and_ancestors(hierarchy_order: :asc)
     end
-    private :base_and_ancestors
   end
 end
