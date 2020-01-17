@@ -217,30 +217,50 @@ function diffFileUniqueId(file) {
   return `${file.content_sha}-${file.file_hash}`;
 }
 
-function combineDiffFilesWithPriorFiles(files, prior = []) {
-  files.forEach(file => {
-    const id = diffFileUniqueId(file);
-    const oldMatch = prior.find(oldFile => diffFileUniqueId(oldFile) === id);
+function matchFileToListOfFiles(list, file) {
+  return list.find(matched => diffFileUniqueId(matched) === diffFileUniqueId(file));
+}
 
-    if (oldMatch) {
-      const missingInline = !file.highlighted_diff_lines;
-      const missingParallel = !file.parallel_diff_lines;
+function blendTwoFiles(authoritativeFile, overwritingFile) {
+  const missingInline = !authoritativeFile.highlighted_diff_lines;
+  const missingParallel = !authoritativeFile.parallel_diff_lines;
 
-      if (missingInline) {
-        Object.assign(file, {
-          highlighted_diff_lines: oldMatch.highlighted_diff_lines,
-        });
+  if (missingInline) {
+    Object.assign(authoritativeFile, {
+      highlighted_diff_lines: overwritingFile.highlighted_diff_lines,
+    });
+  }
+
+  if (missingParallel) {
+    Object.assign(authoritativeFile, {
+      parallel_diff_lines: overwritingFile.parallel_diff_lines,
+    });
+  }
+
+  return authoritativeFile;
+}
+
+function combineDiffFilesWithPriorFiles(files, prior = [], batched) {
+  const authoritative = batched ? prior : files;
+  const overwrite = batched ? files : prior;
+
+  if (batched) {
+    files.forEach(newFile => {
+      const foundFile = matchFileToListOfFiles(authoritative, newFile);
+      if (!foundFile) {
+        authoritative.push(newFile);
+      } else {
+        blendTwoFiles(foundFile, newFile);
       }
+    });
+  } else {
+    authoritative.forEach(file => {
+      const matched = matchFileToListOfFiles(overwrite, file) || {};
+      blendTwoFiles(file, matched);
+    });
+  }
 
-      if (missingParallel) {
-        Object.assign(file, {
-          parallel_diff_lines: oldMatch.parallel_diff_lines,
-        });
-      }
-    }
-  });
-
-  return files;
+  return authoritative;
 }
 
 function ensureBasicDiffFileLines(file) {
@@ -318,8 +338,8 @@ function finalizeDiffFile(file) {
   return file;
 }
 
-export function prepareDiffData(diffData, priorFiles) {
-  return combineDiffFilesWithPriorFiles(diffData.diff_files, priorFiles)
+export function prepareDiffData({ diff, priorFiles, batched = false } = {}) {
+  return combineDiffFilesWithPriorFiles(diff.diff_files, priorFiles, batched)
     .map(ensureBasicDiffFileLines)
     .map(prepareDiffFileLines)
     .map(finalizeDiffFile);

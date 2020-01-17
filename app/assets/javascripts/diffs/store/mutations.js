@@ -51,7 +51,7 @@ export default {
       !(gon?.features?.diffsBatchLoad && window.location.search.indexOf('diff_id') === -1) &&
       data.diff_files
     ) {
-      files = prepareDiffData(data, files);
+      files = prepareDiffData({ diff: data, priorFiles: files });
     }
 
     Object.assign(state, {
@@ -61,7 +61,7 @@ export default {
   },
 
   [types.SET_DIFF_DATA_BATCH](state, data) {
-    const files = prepareDiffData(data, state.diffFiles);
+    const files = prepareDiffData({ diff: data, priorFiles: state.diffFiles, batched: true });
 
     Object.assign(state, {
       ...convertObjectPropsToCamelCase(data),
@@ -148,7 +148,7 @@ export default {
   },
 
   [types.ADD_COLLAPSED_DIFFS](state, { file, data }) {
-    prepareDiffData(data);
+    prepareDiffData({ diff: data });
     const [newFileData] = data.diff_files.filter(f => f.file_hash === file.file_hash);
     const selectedFile = state.diffFiles.find(f => f.file_hash === file.file_hash);
     Object.assign(selectedFile, { ...newFileData });

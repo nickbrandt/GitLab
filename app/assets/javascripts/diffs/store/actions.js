@@ -150,7 +150,7 @@ export const fetchDiffFilesMeta = ({ commit, state }) => {
       commit(types.SET_MERGE_REQUEST_DIFFS, data.merge_request_diffs || []);
       commit(types.SET_DIFF_DATA, strippedData);
 
-      prepareDiffData(data);
+      prepareDiffData({ diff: data });
       worker.postMessage(data.diff_files);
       return data;
     })

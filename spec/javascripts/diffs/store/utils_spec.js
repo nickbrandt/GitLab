@@ -333,10 +333,10 @@ describe('DiffsStoreUtils', () => {
         diff_files: [Object.assign({}, mock, { highlighted_diff_lines: undefined })],
       };
 
-      utils.prepareDiffData(preparedDiff);
-      utils.prepareDiffData(splitInlineDiff);
-      utils.prepareDiffData(splitParallelDiff);
-      utils.prepareDiffData(completedDiff, [mock]);
+      utils.prepareDiffData({ diff: preparedDiff });
+      utils.prepareDiffData({ diff: splitInlineDiff });
+      utils.prepareDiffData({ diff: splitParallelDiff });
+      utils.prepareDiffData({ diff: completedDiff, priorFiles: [mock] });
     });
 
     it('sets the renderIt and collapsed attribute on files', () => {
