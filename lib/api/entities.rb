@@ -108,7 +108,6 @@ module API
       expose :highest_role
       expose :current_sign_in_ip
       expose :last_sign_in_ip
-      expose :email_opted_in_ip
     end
 
     class UserStatus < Grape::Entity
