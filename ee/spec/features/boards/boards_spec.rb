@@ -194,13 +194,13 @@ describe 'issue boards', :js do
       login_as(user)
     end
 
-    context 'When FF is turned on' do
+    context 'When license is available' do
       let!(:label) { create(:label, project: project, name: 'Brount') }
       let!(:list) { create(:list, board: board, label: label, position: 1) }
 
       before do
-        stub_feature_flags(wip_limits: true)
-        visit project_boards_path(project)
+        stub_licensed_features(wip_limits: true)
+        visit_board_page
       end
 
       it 'shows the list settings button' do
@@ -277,9 +277,9 @@ describe 'issue boards', :js do
       end
     end
 
-    context 'When FF is turned off' do
+    context 'When license is not available' do
       before do
-        stub_feature_flags(wip_limits: false)
+        stub_licensed_features(wip_limits: false)
         visit project_boards_path(project)
       end
 
