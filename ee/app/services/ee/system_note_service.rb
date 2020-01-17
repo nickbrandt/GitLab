@@ -195,56 +195,32 @@ module EE
 
     # Called when 'merge train' is executed
     def merge_train(noteable, project, author, merge_train)
-      index = merge_train.index
-
-      body = if index == 0
-               'started a merge train'
-             else
-               "added this merge request to the merge train at position #{index + 1}"
-             end
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).enqueue(merge_train)
     end
 
     # Called when 'merge train' is canceled
     def cancel_merge_train(noteable, project, author)
-      body = 'removed this merge request from the merge train'
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).cancel
     end
 
     # Called when 'merge train' is aborted
     def abort_merge_train(noteable, project, author, reason)
-      body = "removed this merge request from the merge train because #{reason}"
-
-      ##
-      # TODO: Abort message should be sent by the system, not a particular user.
-      # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).abort(reason)
     end
 
     # Called when 'add to merge train when pipeline succeeds' is executed
     def add_to_merge_train_when_pipeline_succeeds(noteable, project, author, sha)
-      body = "enabled automatic add to merge train when the pipeline for #{sha} succeeds"
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).add_when_pipeline_succeeds(sha)
     end
 
     # Called when 'add to merge train when pipeline succeeds' is canceled
     def cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author)
-      body = 'cancelled automatic add to merge train'
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).cancel_add_when_pipeline_succeeds
     end
 
     # Called when 'add to merge train when pipeline succeeds' is aborted
     def abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, reason)
-      body = "aborted automatic add to merge train because #{reason}"
-
-      ##
-      # TODO: Abort message should be sent by the system, not a particular user.
-      # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).abort_add_when_pipeline_succeeds(reason)
     end
 
     def auto_resolve_prometheus_alert(noteable, project, author)
