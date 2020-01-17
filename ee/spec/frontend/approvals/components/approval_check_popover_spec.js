@@ -12,7 +12,6 @@ describe('Approval Check Popover', () => {
       propsData: {
         title: 'Title',
       },
-      attachToDocument: true,
     });
   });
 

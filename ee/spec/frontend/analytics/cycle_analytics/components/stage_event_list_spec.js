@@ -35,7 +35,6 @@ const mockStubs = {
 function createComponent({ props = {}, shallow = false, Component = StageEventList, stubs }) {
   const func = shallow ? shallowMount : mount;
   return func(Component, {
-    attachToDocument: true,
     propsData: {
       stage: issueStage,
       events: issueEvents,
