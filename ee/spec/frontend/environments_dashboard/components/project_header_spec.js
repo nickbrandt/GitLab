@@ -22,7 +22,6 @@ describe('Project Header', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(component, {
-      attachToDocument: true,
       propsData,
     });
   });
