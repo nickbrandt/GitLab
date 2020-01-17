@@ -55,23 +55,12 @@ describe Gitlab::ImportExport::ImportFailureService do
       with_them do
         context 'when retry succeeds' do
           before do
-            response_values = [:raise, true]
-
-            allow(label).to receive(:save!).exactly(2).times do
-              value = response_values.shift
-              value == :raise ? raise(exception) : value
-            end
-          end
-
-          it 'retries 1 time' do
             expect(label).to receive(:save!).and_raise(exception.new)
             expect(label).to receive(:save!).and_return(true)
-
-            perform_retry
           end
 
           it 'retries and logs import failure once with correct params' do
-            expect(subject).to receive(:log_import_failure).with(relation_key, relation_index, instance_of(exception), 1)
+            expect(subject).to receive(:log_import_failure).with(relation_key, relation_index, instance_of(exception), 1).once
 
             perform_retry
           end

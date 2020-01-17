@@ -22,7 +22,7 @@ describe ImportFailure do
         allow(subject).to receive(:project).and_return(nil)
       end
 
-      it { is_expected.to validate_presence_of(:project) }
+      it { is_expected.to validate_presence_of(:group) }
     end
   end
 end
