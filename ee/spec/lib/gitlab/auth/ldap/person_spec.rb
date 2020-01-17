@@ -232,7 +232,7 @@ describe Gitlab::Auth::LDAP::Person do
     it 'gets the group cn from the memberof value' do
       person = described_class.new(entry, 'ldapmain')
 
-      expect(person.cn_from_memberof('cN=Group Policy Creator Owners,CN=Users,DC=Vosmaer,DC=com'))
+      expect(person.cn_from_memberof('CN=Group Policy Creator Owners,CN=Users,DC=Vosmaer,DC=com'))
         .to eq('Group Policy Creator Owners')
     end
 
@@ -241,6 +241,13 @@ describe Gitlab::Auth::LDAP::Person do
 
       expect(person.cn_from_memberof('DC=Vosmaer,DC=com'))
         .to be_nil
+    end
+
+    it "supports dashes in the group cn" do
+      person = described_class.new(entry, 'ldapmain')
+
+      expect(person.cn_from_memberof('CN=Group-Policy-Creator-Owners,CN=Users,DC=Vosmaer,DC=com'))
+        .to eq('Group-Policy-Creator-Owners')
     end
   end
 
