@@ -283,7 +283,7 @@ As on another list types, click on the trash icon to remove it.
 
 ## Work In Progress limits **(STARTER)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.6
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.7
 
 You can set Work In Progress (WIP) limits per issues list. When a limit is set, the list's header shows the number of issues in the list and the soft limit of issues. For example, for a list with 4 issues, and a limit of 5, the header will show `4/5`. If you exceed the limit, the current number of issues is shown in red. For example, you have a list with 5 issues with a limit of 5. When you move another issue to that list, the list's header displays `6/5`, with the `6` shown in red.
 
