@@ -14360,6 +14360,9 @@ msgstr ""
 msgid "ProjectSettings|All discussions must be resolved"
 msgstr ""
 
+msgid "ProjectSettings|Allow users to make copies of your repository to a new project"
+msgstr ""
+
 msgid "ProjectSettings|Allow users to request access"
 msgstr ""
 
@@ -14418,6 +14421,9 @@ msgid "ProjectSettings|Fast-forward merge"
 msgstr ""
 
 msgid "ProjectSettings|Fast-forward merges only"
+msgstr ""
+
+msgid "ProjectSettings|Forks"
 msgstr ""
 
 msgid "ProjectSettings|Git Large File Storage"
