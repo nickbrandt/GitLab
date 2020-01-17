@@ -136,11 +136,12 @@ describe 'issue boards', :js do
       end
 
       it 'hides weight' do
+        expect(page).not_to have_text('2 issues')
+
         backlog = board.lists.first
         badge(backlog).hover
 
-        tooltip = find("##{badge(backlog)['aria-describedby']}")
-        expect(tooltip.text).to eq('2 issues')
+        expect(page).to have_text('2 issues')
       end
     end
   end

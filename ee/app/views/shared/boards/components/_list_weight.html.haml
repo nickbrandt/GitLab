@@ -1,4 +1,5 @@
 - if (@group || @project)&.feature_available?(:issue_weights)
-  %span.d-inline-flex.ml-2
+  %gl-tooltip{ ":target" => "() => $refs.weightTooltip", ":title" => "weightCountToolTip" }
+  %span.d-inline-flex.ml-2{ "ref" => "weightTooltip" }
     %icon.mr-1{ name: "weight" }
     {{ list.totalWeight }}

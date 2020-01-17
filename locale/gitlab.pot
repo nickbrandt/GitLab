@@ -284,6 +284,12 @@ msgstr ""
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
+msgid "%{issuesSize} issues"
+msgstr ""
+
+msgid "%{issuesSize} issues with a limit of %{maxIssueCount}"
+msgstr ""
+
 msgid "%{label_for_message} unavailable"
 msgstr ""
 
@@ -438,6 +444,9 @@ msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
 msgid "%{title} changes"
+msgstr ""
+
+msgid "%{totalWeight} total weight"
 msgstr ""
 
 msgid "%{total} open issue weight"
