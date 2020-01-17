@@ -194,18 +194,16 @@ describe('boardsStore', () => {
     let list;
 
     beforeEach(() => {
-     list = new List(listObj);
+      list = new List(listObj);
       setupDefaultResponses();
     });
 
     it('makes a request to save a list', () => {
-      
       const expectedResponse = expect.objectContaining({ issues: [createTestIssue()] });
       expect(list.id).toBe(listObj.id);
       expect(list.position).toBe(listObj.position);
 
       return expect(boardsStore.saveList(list)).resolves.toEqual(expectedResponse);
-
     });
   });
 
