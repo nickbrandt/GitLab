@@ -97,16 +97,10 @@ describe Gitlab::ImportExport::ImportFailureService do
     context 'when exception is not retriable' do
       let(:exception) { StandardError.new }
 
-      before do
-        allow(label).to receive(:save!).and_raise(exception)
-      end
-
-      it 'raise the exception' do
-        aggregate_failures do
-          expect(label).to receive(:save!).once
-          expect(subject).not_to receive(:log_import_failure)
-          expect { perform_retry }.to raise_exception(exception)
-        end
+      it 'raise the exception', :aggregate_failures do
+        expect(label).to receive(:save!).once.and_raise(exception)
+        expect(subject).not_to receive(:log_import_failure)
+        expect { perform_retry }.to raise_exception(exception)
       end
     end
   end
