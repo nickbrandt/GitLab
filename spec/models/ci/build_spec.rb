@@ -4277,10 +4277,17 @@ describe Ci::Build do
     subject { build.has_valid_deployment? }
 
     context 'when there is no related persisted environment' do
-      it 'is true' do
+      before do
         allow(build).to receive(:persisted_environment).and_return(nil)
+      end
 
-        is_expected.to be_truthy
+      it { is_expected.to be_truthy }
+
+      it 'does not run any additional SQL query' do
+        env_query_count = ActiveRecord::QueryRecorder.new { build.persisted_environment }.count
+        method_query_count = ActiveRecord::QueryRecorder.new { subject }.count
+
+        expect(method_query_count).to eq(env_query_count)
       end
     end
 

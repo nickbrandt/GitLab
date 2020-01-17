@@ -925,10 +925,6 @@ module Ci
     end
 
     def has_valid_deployment?
-      environment = persisted_environment
-      return true unless environment
-
-      last_deployment = environment.last_deployment
       return true unless last_deployment
 
       if starts_environment?
@@ -943,6 +939,10 @@ module Ci
     end
 
     private
+
+    def last_deployment
+      @last_deployment ||= persisted_environment.try(:last_deployment)
+    end
 
     def build_data
       @build_data ||= Gitlab::DataBuilder::Build.build(self)
