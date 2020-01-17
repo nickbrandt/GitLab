@@ -22,6 +22,7 @@ export default {
   cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
   cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
+  codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -201,6 +202,11 @@ export default {
     return axios.get(url, {
       params,
     });
+  },
+
+  codeReviewAnalytics(params = {}) {
+    const url = Api.buildUrl(this.codeReviewAnalyticsPath);
+    return axios.get(url, { params });
   },
 
   getGeoDesigns(params = {}) {
