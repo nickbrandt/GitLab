@@ -11,6 +11,9 @@
     "epic_id": {
       "type": "integer"
     },
+    "epic_iid": {
+      "type": "integer"
+    },
     "created": {
       "type": "string"
     },
