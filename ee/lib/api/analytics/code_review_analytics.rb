@@ -29,7 +29,7 @@ module API
       end
 
       before do
-        not_found! unless Feature.enabled?(:code_review_analytics)
+        not_found! unless Feature.enabled?(:code_review_analytics, default_enabled: true)
       end
 
       resource :analytics do
