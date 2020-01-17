@@ -41,7 +41,7 @@ describe Ci::Build do
         job.runner = create(:ci_runner, :instance)
       end
 
-      it do
+      specify do
         expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
           .and_return(true)
 
