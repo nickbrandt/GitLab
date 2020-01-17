@@ -18,7 +18,7 @@ const state = {
 describe('Subscriptions Getters', () => {
   describe('currentStep', () => {
     it('returns the states currentStep', () => {
-      expect(getters.currentStep(state)).toEqual('secondStep');
+      expect(getters.currentStep(state)).toBe('secondStep');
     });
   });
 
@@ -28,7 +28,7 @@ describe('Subscriptions Getters', () => {
     });
 
     it('returns a function that returns the index of the given step', () => {
-      expect(getters.stepIndex()('secondStep')).toEqual(1);
+      expect(getters.stepIndex()('secondStep')).toBe(1);
     });
   });
 
@@ -49,7 +49,7 @@ describe('Subscriptions Getters', () => {
     it('returns the text for selectedPlan', () => {
       expect(
         getters.selectedPlanText(state, { selectedPlanDetails: { text: 'selected plan' } }),
-      ).toEqual('selected plan');
+      ).toBe('selected plan');
     });
   });
 
@@ -59,6 +59,58 @@ describe('Subscriptions Getters', () => {
         value: 'firstPlan',
         text: 'first plan',
       });
+    });
+  });
+
+  describe('endDate', () => {
+    it('returns a date 1 year after the startDate', () => {
+      expect(getters.endDate({ startDate: new Date('2020-01-07') })).toBe(
+        new Date('2021-01-07').getTime(),
+      );
+    });
+  });
+
+  describe('totalExVat', () => {
+    it('returns the number of users times the selected plan price', () => {
+      expect(getters.totalExVat({ numberOfUsers: 5 }, { selectedPlanPrice: 10 })).toBe(50);
+    });
+  });
+
+  describe('vat', () => {
+    it('returns the tax rate times the total ex vat', () => {
+      expect(getters.vat({ taxRate: 0.08 }, { totalExVat: 100 })).toBe(8);
+    });
+  });
+
+  describe('totalAmount', () => {
+    it('returns the total ex vat plus the vat', () => {
+      expect(getters.totalAmount({}, { totalExVat: 100, vat: 8 })).toBe(108);
+    });
+  });
+
+  describe('name', () => {
+    it('returns the organization name when setting up for a company and when it is present', () => {
+      expect(getters.name({ isSetupForCompany: true, organizationName: 'My organization' })).toBe(
+        'My organization',
+      );
+    });
+
+    it('returns the default text when setting up for a company and the organization name is not present', () => {
+      expect(getters.name({ isSetupForCompany: true })).toBe('Your organization');
+    });
+
+    it('returns the full name when not setting up for a company', () => {
+      expect(getters.name({ isSetupForCompany: false, fullName: 'My name' })).toBe('My name');
+    });
+  });
+
+  describe('usersPresent', () => {
+    it('returns true when the number of users is greater than zero', () => {
+      expect(getters.usersPresent({ numberOfUsers: 1 })).toBe(true);
+    });
+
+    it('returns false when the number of users is zero', () => {
+      expect(getters.usersPresent({ numberOfUsers: 0 })).toBe(false);
     });
   });
 });
