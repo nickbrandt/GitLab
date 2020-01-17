@@ -5,11 +5,11 @@ require 'spec_helper'
 describe DesignManagement::Design do
   include DesignManagementTestHelpers
 
-  set(:issue) { create(:issue) }
-  set(:design1) { create(:design, :with_versions, issue: issue, versions_count: 1) }
-  set(:design2) { create(:design, :with_versions, issue: issue, versions_count: 1) }
-  set(:design3) { create(:design, :with_versions, issue: issue, versions_count: 1) }
-  set(:deleted_design) { create(:design, :with_versions, deleted: true) }
+  let_it_be(:issue) { create(:issue) }
+  let_it_be(:design1) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  let_it_be(:design2) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  let_it_be(:design3) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  let_it_be(:deleted_design) { create(:design, :with_versions, deleted: true) }
 
   describe 'relations' do
     it { is_expected.to belong_to(:project) }
@@ -64,12 +64,13 @@ describe DesignManagement::Design do
   describe 'scopes' do
     describe '.visible_at_version' do
       let(:versions) { DesignManagement::Version.where(issue: issue).ordered }
+      let(:found) { described_class.visible_at_version(version) }
 
       context 'at oldest version' do
         let(:version) { versions.last }
 
         it 'finds the first design only' do
-          expect(described_class.visible_at_version(version)).to contain_exactly(design1)
+          expect(found).to contain_exactly(design1)
         end
       end
 
@@ -77,7 +78,7 @@ describe DesignManagement::Design do
         let(:version) { versions.second }
 
         it 'finds the first and second designs' do
-          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2)
+          expect(found).to contain_exactly(design1, design2)
         end
       end
 
@@ -85,7 +86,7 @@ describe DesignManagement::Design do
         let(:version) { versions.first }
 
         it 'finds designs' do
-          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2, design3)
+          expect(found).to contain_exactly(design1, design2, design3)
         end
       end
 
@@ -93,7 +94,7 @@ describe DesignManagement::Design do
         let(:version) { nil }
 
         it 'finds all undeleted designs' do
-          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2, design3)
+          expect(found).to contain_exactly(design1, design2, design3)
         end
       end
 
@@ -154,6 +155,18 @@ describe DesignManagement::Design do
         expect(
           described_class.with_filename([design1, design2].map(&:filename))
         ).to contain_exactly(design1, design2)
+      end
+    end
+
+    describe '.on_issue' do
+      it 'returns correct designs when passed a single issue' do
+        expect(described_class.on_issue(issue)).to match_array(issue.designs)
+      end
+
+      it 'returns correct designs when passed an Array of issues' do
+        expect(
+          described_class.on_issue([issue, deleted_design.issue])
+        ).to contain_exactly(design1, design2, design3, deleted_design)
       end
     end
 
@@ -368,6 +381,125 @@ describe DesignManagement::Design do
       expect(DesignManagement::DesignUserNotesCountService).not_to receive(:new)
 
       subject.after_note_changed(build(:note, :system))
+    end
+  end
+
+  describe '.for_reference' do
+    let_it_be(:design_a) { create(:design) }
+    let_it_be(:design_b) { create(:design) }
+
+    it 'avoids extra queries when calling to_reference' do
+      designs = described_class.for_reference.where(id: [design_a.id, design_b.id]).to_a
+
+      expect { designs.map(&:to_reference) }.not_to exceed_query_limit(0)
+    end
+  end
+
+  describe '#to_reference' do
+    let(:namespace) { build(:namespace, path: 'sample-namespace') }
+    let(:project)   { build(:project, name: 'sample-project', namespace: namespace) }
+    let(:group)     { create(:group, name: 'Group', path: 'sample-group') }
+    let(:issue)     { build(:issue, iid: 1, project: project) }
+    let(:filename)  { 'homescreen.jpg' }
+    let(:design)    { build(:design, filename: filename, issue: issue, project: project) }
+
+    context 'when nil argument' do
+      let(:reference) { design.to_reference }
+
+      it 'uses the simple format' do
+        expect(reference).to eq "#1[homescreen.jpg]"
+      end
+
+      context 'when the filename contains spaces, hyphens, periods, single-quotes, underscores and colons' do
+        let(:filename) { %q{a complex filename: containing - _ : etc., but still 'simple'.gif} }
+
+        it 'uses the simple format' do
+          expect(reference).to eq "#1[#{filename}]"
+        end
+      end
+
+      context 'when the filename contains HTML angle brackets' do
+        let(:filename) { 'a <em>great</em> filename.jpg' }
+
+        it 'uses Base64 encoding' do
+          expect(reference).to eq "#1[base64:#{Base64.strict_encode64(filename)}]"
+        end
+      end
+
+      context 'when the filename contains quotation marks' do
+        let(:filename) { %q{a "great" filename.jpg} }
+
+        it 'uses enclosing quotes, with backslash encoding' do
+          expect(reference).to eq %q{#1["a \"great\" filename.jpg"]}
+        end
+      end
+
+      context 'when the filename contains square brackets' do
+        let(:filename) { %q{a [great] filename.jpg} }
+
+        it 'uses enclosing quotes' do
+          expect(reference).to eq %q{#1["a [great] filename.jpg"]}
+        end
+      end
+    end
+
+    context 'when full is true' do
+      it 'returns complete path to the issue' do
+        refs = [
+          design.to_reference(full: true),
+          design.to_reference(project, full: true),
+          design.to_reference(group, full: true)
+        ]
+
+        expect(refs).to all(eq 'sample-namespace/sample-project#1/designs[homescreen.jpg]')
+      end
+    end
+
+    context 'when full is false' do
+      it 'returns complete path to the issue' do
+        refs = [
+          design.to_reference(build(:project), full: false),
+          design.to_reference(group, full: false)
+        ]
+
+        expect(refs).to all(eq 'sample-namespace/sample-project#1[homescreen.jpg]')
+      end
+    end
+
+    context 'when same project argument' do
+      it 'returns bare reference' do
+        expect(design.to_reference(project)).to eq("#1[homescreen.jpg]")
+      end
+    end
+  end
+
+  describe 'reference_pattern' do
+    let(:match) { described_class.reference_pattern.match(ref) }
+    let(:ref) { design.to_reference }
+    let(:design) { build(:design, filename: filename) }
+
+    context 'simple_file_name' do
+      let(:filename) { 'simple-file-name.jpg' }
+
+      it 'matches :simple_file_name' do
+        expect(match[:simple_file_name]).to eq(filename)
+      end
+    end
+
+    context 'quoted_file_name' do
+      let(:filename) { 'simple "file" name.jpg' }
+
+      it 'matches :simple_file_name' do
+        expect(match[:escaped_filename].gsub(/\\"/, '"')).to eq(filename)
+      end
+    end
+
+    context 'Base64 name' do
+      let(:filename) { '<>.png' }
+
+      it 'matches base_64_encoded_name' do
+        expect(Base64.decode64(match[:base_64_encoded_name])).to eq(filename)
+      end
     end
   end
 end
