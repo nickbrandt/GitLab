@@ -83,7 +83,7 @@ module Gitlab
       end
 
       def use_vulnerability_cache?
-        Feature.enabled?(:cache_vulnerability_occurrence, vulnerable) && !dynamic_filters_included?
+        Feature.enabled?(:cache_vulnerability_occurrence, vulnerable) && filter_params[:scope] != 'all' && !dynamic_filters_included?
       end
 
       def dynamic_filters_included?
