@@ -281,7 +281,7 @@ As on another list types, click on the trash icon to remove it.
 
 ![Milestone lists](img/issue_board_milestone_lists.png)
 
-## Work In Progress limits
+## Work In Progress limits **(STARTER)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.6
 
