@@ -94,6 +94,24 @@ describe Project, :elastic do
     end
   end
 
+  # This test is added to address the issues described in
+  context 'when projects and snippets co-exist', issue: 'https://gitlab.com/gitlab-org/gitlab/issues/36340' do
+    before do
+      create :project
+      create :snippet, :public
+    end
+
+    context 'when searching with a wildcard' do
+      it 'only returns projects', :sidekiq_inline do
+        Gitlab::Elastic::Helper.refresh_index
+        response = described_class.elastic_search('*')
+
+        expect(response.total_count).to eq(1)
+        expect(response.results.first['_source']['type']).to eq(Project.es_type)
+      end
+    end
+  end
+
   it "finds projects" do
     project_ids = []
 
