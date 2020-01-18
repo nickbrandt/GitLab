@@ -776,14 +776,15 @@ describe('Epic Store Actions', () => {
         __typename: 'EpicSetSubscriptionPayload',
       },
     };
-    const stateSubscribed = {
-      epicIid: 123,
-      groupPath: 'charts',
-      fullPath: 'gitlab-org/charts',
-      subscribed: false,
-    };
 
     beforeEach(() => {
+      Object.assign(state, {
+        epicIid: 123,
+        groupPath: 'charts',
+        fullPath: 'gitlab-org/charts',
+        subscribed: false,
+      });
+
       mock = new MockAdapter(axios);
     });
 
@@ -802,8 +803,8 @@ describe('Epic Store Actions', () => {
 
         testAction(
           actions.toggleEpicSubscription,
-          { subscribed: !stateSubscribed.subscribed },
-          stateSubscribed,
+          { subscribed: !state.subscribed },
+          state,
           [],
           [
             {
@@ -811,24 +812,25 @@ describe('Epic Store Actions', () => {
             },
             {
               type: 'requestEpicSubscriptionToggleSuccess',
-              payload: { subscribed: !stateSubscribed.subscribed },
+              payload: { subscribed: !state.subscribed },
             },
           ],
-          done,
-        );
-
-        const tester = {
-          asymmetricMatch(actual) {
-            const variables = actual.variables.epicSetSubscriptionInput;
-
-            return (
-              variables.iid === `${stateSubscribed.epicIid}` &&
-              variables.groupPath === stateSubscribed.fullPath
+          () => {
+            expect(epicUtils.gqClient.mutate).toHaveBeenCalledWith(
+              jasmine.objectContaining({
+                variables: jasmine.objectContaining({
+                  epicSetSubscriptionInput: {
+                    iid: `${state.epicIid}`,
+                    groupPath: state.fullPath,
+                    subscribedState: !state.subscribed,
+                  },
+                }),
+              }),
             );
-          },
-        };
 
-        expect(epicUtils.gqClient.mutate).toHaveBeenCalledWith(tester);
+            done();
+          },
+        );
       });
     });
 
@@ -848,8 +850,8 @@ describe('Epic Store Actions', () => {
 
         testAction(
           actions.toggleEpicSubscription,
-          { subscribed: !stateSubscribed.subscribed },
-          stateSubscribed,
+          { subscribed: !state.subscribed },
+          state,
           [],
           [
             {
