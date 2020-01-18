@@ -3,6 +3,7 @@ export default () => ({
   endpoint: '',
   updateEndpoint: '',
 
+  fullPath: '',
   groupPath: '',
   markdownPreviewPath: '',
   labelsPath: '',
