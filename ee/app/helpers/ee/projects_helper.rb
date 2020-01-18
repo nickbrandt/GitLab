@@ -59,7 +59,7 @@ module EE
         nav_tabs << :packages
       end
 
-      if ::Feature.enabled?(:code_review_analytics, project)
+      if ::Feature.enabled?(:code_review_analytics, project, default_enabled: true)
         nav_tabs << :code_review
       end
 
