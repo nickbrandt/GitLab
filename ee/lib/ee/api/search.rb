@@ -12,14 +12,14 @@ module EE
           ELASTICSEARCH_SCOPES = %w(wiki_blobs blobs commits).freeze
 
           override :verify_search_scope!
-          def verify_search_scope!
-            if ELASTICSEARCH_SCOPES.include?(params[:scope]) && !elasticsearch?
+          def verify_search_scope!(resource:)
+            if ELASTICSEARCH_SCOPES.include?(params[:scope]) && !use_elasticsearch?(resource)
               render_api_error!({ error: 'Scope not supported without Elasticsearch!' }, 400)
             end
           end
 
-          def elasticsearch?
-            ::Gitlab::CurrentSettings.elasticsearch_search?
+          def use_elasticsearch?(resource)
+            ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: resource)
           end
 
           override :process_results
