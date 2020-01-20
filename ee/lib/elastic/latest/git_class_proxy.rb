@@ -166,7 +166,7 @@ module Elastic
           }
         end
 
-        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type == :wiki_blob && repository_ids.any?
+        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type.to_sym == :wiki_blob && repository_ids.any?
 
         res = search(query_hash, options)
 
