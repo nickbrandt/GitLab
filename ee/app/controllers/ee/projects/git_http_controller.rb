@@ -20,7 +20,7 @@ module EE
         if ::Gitlab::Geo.primary?
           # This ID is used by the /internal/post_receive API call
           gl_id = ::Gitlab::GlId.gl_id(user)
-          gl_repository = repo_type.identifier_for_subject(project)
+          gl_repository = repo_type.identifier_for_repositorable(project)
           node_id = params["geo_node_id"]
           ::Gitlab::Geo::GitPushHttp.new(gl_id, gl_repository).cache_referrer_node(node_id)
         end
