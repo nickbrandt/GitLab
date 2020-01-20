@@ -32,4 +32,18 @@ describe World do
       expect(result).to be_nil
     end
   end
+
+  describe '.alpha3_from_alpha2' do
+    it 'returns the three letter abbreviated country name' do
+      result = described_class.alpha3_from_alpha2('NL')
+
+      expect(result).to eq('NLD')
+    end
+
+    it 'returns nil when given country cannot be found' do
+      result = described_class.alpha3_from_alpha2('NLX')
+
+      expect(result).to be_nil
+    end
+  end
 end
