@@ -27,7 +27,7 @@ module API
         if %w(md5 sha1).include?(format)
           [name, format]
         else
-          [file_name, nil]
+          [file_name, format]
         end
       end
 
@@ -45,6 +45,10 @@ module API
       def find_project_by_path(path)
         project_path = path.rpartition('/').first
         Project.find_by_full_path(project_path)
+      end
+
+      def jar_file?(format)
+        format == 'jar'
       end
     end
 
@@ -79,7 +83,9 @@ module API
         package_file.file_md5
       when 'sha1'
         package_file.file_sha1
-      when nil
+      else
+        track_event('pull_package') if jar_file?(format)
+
         present_carrierwave_file!(package_file.file)
       end
     end
@@ -117,7 +123,9 @@ module API
           package_file.file_md5
         when 'sha1'
           package_file.file_sha1
-        when nil
+        else
+          track_event('pull_package') if jar_file?(format)
+
           present_carrierwave_file!(package_file.file)
         end
       end
@@ -155,12 +163,14 @@ module API
           package_file.file_md5
         when 'sha1'
           package_file.file_sha1
-        when nil
+        else
+          track_event('pull_package') if jar_file?(format)
+
           present_carrierwave_file!(package_file.file)
         end
       end
 
-      desc 'Upload the maven package file' do
+      desc 'Workhorse authorize the maven package file upload' do
         detail 'This feature was introduced in GitLab 11.3'
       end
       params do
@@ -215,7 +225,11 @@ module API
             .new(package, file_name).execute!
 
           verify_package_file(package_file, uploaded_file)
-        when nil
+        when 'md5'
+          nil
+        else
+          track_event('push_package') if jar_file?(format)
+
           file_params = {
             file:      uploaded_file,
             size:      params['file.size'],
