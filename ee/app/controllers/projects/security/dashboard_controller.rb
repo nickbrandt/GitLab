@@ -23,6 +23,12 @@ module Projects
         pipeline = @vulnerability.finding.pipelines.first
         @pipeline = pipeline if Ability.allowed?(current_user, :read_pipeline, pipeline)
       end
+
+      def vulnerability_list
+        return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
+       
+        @vulnerabilities = project.vulnerabilities
+      end
     end
   end
 end
