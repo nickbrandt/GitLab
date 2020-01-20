@@ -79,7 +79,6 @@ export const issuableIconMap = {
  * them inside i18n functions.
  */
 export const issuableQaClassMap = {
-  [issuableTypesMap.ISSUE]: 'qa-add-issues-button',
   [issuableTypesMap.EPIC]: 'qa-add-epics-button',
 };
 

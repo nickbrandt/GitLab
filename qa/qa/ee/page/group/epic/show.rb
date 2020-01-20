@@ -20,6 +20,10 @@ module QA
               element :add_issue_input
             end
 
+            view 'ee/app/assets/javascripts/related_items_tree/components/issue_actions_split_button.vue' do
+              element :issue_actions_split_button
+            end
+
             view 'ee/app/assets/javascripts/related_items_tree/components/tree_item.vue' do
               element :related_issue_item
             end
@@ -28,12 +32,8 @@ module QA
               element :remove_issue_button
             end
 
-            view 'ee/app/assets/javascripts/related_issues/constants.js' do
-              element :add_issues_button
-            end
-
             def add_issue_to_epic(issue_url)
-              click_element :add_issues_button
+              find_element(:issue_actions_split_button).find_all('button').first.click
               fill_element :add_issue_input, issue_url
               click_body
               click_element :add_issue_button
