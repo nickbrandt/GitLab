@@ -170,7 +170,7 @@ describe PageLimiter do
         :gitlab_page_out_of_bounds,
         controller: "explore/projects",
         action: "index",
-        agent: "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+        bot: true
       )
 
       subject

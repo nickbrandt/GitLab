@@ -91,10 +91,12 @@ module PageLimiter
 
   # Record the page limit being hit in Prometheus
   def record_interception
+    dd = DeviceDetector.new(request.user_agent)
+
     Gitlab::Metrics.counter(:gitlab_page_out_of_bounds,
       controller: params[:controller],
       action: params[:action],
-      agent: request.user_agent
+      bot: dd.bot?
     )
   end
 end
