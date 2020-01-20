@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe API::ProtectedEnvironments do
+  include AccessMatchersForRequest
+
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
   let(:protected_environment_name) { 'production' }
@@ -12,39 +14,10 @@ describe API::ProtectedEnvironments do
   end
 
   shared_examples 'requests for non-maintainers' do
-    context 'when authenticated as a guest' do
-      before do
-        project.add_guest(user)
-      end
-
-      it_behaves_like '403 response'
-    end
-
-    context 'when authenticated as a developer' do
-      before do
-        project.add_developer(user)
-      end
-
-      it_behaves_like '403 response'
-    end
-
-    context 'when authenticated as a reporter' do
-      before do
-        project.add_reporter(user)
-      end
-
-      it_behaves_like '403 response'
-    end
-
-    context 'when user has no access to project' do
-      it_behaves_like '404 response'
-    end
-
-    context 'when unauthenticated' do
-      let(:user) { nil }
-
-      it_behaves_like '404 response'
-    end
+    it { expect { request }.to be_denied_for(:guest).of(project) }
+    it { expect { request }.to be_denied_for(:developer).of(project) }
+    it { expect { request }.to be_denied_for(:reporter).of(project) }
+    it { expect { request }.to be_denied_for(:anonymous) }
   end
 
   describe "GET /projects/:id/protected_environments" do
@@ -104,6 +77,94 @@ describe API::ProtectedEnvironments do
         it_behaves_like '404 response' do
           let(:message) { '404 Not found' }
         end
+      end
+    end
+
+    it_behaves_like 'requests for non-maintainers'
+  end
+
+  describe 'POST /projects/:id/protected_environments/' do
+    let(:api_url) { api("/projects/#{project.id}/protected_environments/", user) }
+
+    context 'when authenticated as a maintainer' do
+      before do
+        project.add_maintainer(user)
+      end
+
+      it 'protects the environment with user allowed to deploy' do
+        deployer = create(:user)
+        project.add_developer(deployer)
+
+        post api_url, params: { name: 'staging', deploy_access_levels: [{ user_id: deployer.id }] }
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
+        expect(json_response['name']).to eq('staging')
+        expect(json_response['deploy_access_levels'].first['user_id']).to eq(deployer.id)
+      end
+
+      it 'protects the environment with group allowed to deploy' do
+        group = create(:project_group_link, project: project).group
+
+        post api_url, params: { name: 'staging', deploy_access_levels: [{ group_id: group.id }] }
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
+        expect(json_response['name']).to eq('staging')
+        expect(json_response['deploy_access_levels'].first['group_id']).to eq(group.id)
+      end
+
+      it 'protects the environment with maintainers allowed to deploy' do
+        post api_url, params: { name: 'staging', deploy_access_levels: [{ access_level: Gitlab::Access::MAINTAINER }] }
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
+        expect(json_response['name']).to eq('staging')
+        expect(json_response['deploy_access_levels'].first['access_level']).to eq(Gitlab::Access::MAINTAINER)
+      end
+
+      it 'returns 409 error if environment is already protected' do
+        deployer = create(:user)
+        project.add_developer(deployer)
+
+        post api_url, params: { name: 'production', deploy_access_levels: [{ user_id: deployer.id }] }
+
+        expect(response).to have_gitlab_http_status(409)
+      end
+
+      context 'without deploy_access_levels' do
+        it_behaves_like '400 response' do
+          let(:request) { post api_url, params: { name: 'staging' } }
+        end
+      end
+
+      it 'returns error with invalid deploy access level' do
+        post api_url, params: { name: 'staging', deploy_access_levels: [{ access_level: nil }] }
+
+        expect(response).to have_gitlab_http_status(422)
+      end
+    end
+
+    it_behaves_like 'requests for non-maintainers' do
+      let(:request) { post api_url, params: { name: 'staging' } }
+    end
+  end
+
+  describe 'DELETE /projects/:id/protected_environments/:environment' do
+    let(:route) { "/projects/#{project.id}/protected_environments/production" }
+    let(:request) { delete api(route, user) }
+
+    context 'when authenticated as a maintainer' do
+      before do
+        project.add_maintainer(user)
+      end
+
+      it 'unprotects the environment' do
+        expect do
+          request
+        end.to change { project.protected_environments.count }.by(-1)
+
+        expect(response).to have_gitlab_http_status(204)
       end
     end
 
