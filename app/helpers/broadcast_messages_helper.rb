@@ -12,13 +12,7 @@ module BroadcastMessagesHelper
   def broadcast_message(message, opts = {})
     return unless message.present?
 
-    classes = "broadcast-#{message.broadcast_type}-message #{opts[:preview] && 'preview'}"
-
-    content_tag :div, dir: 'auto', class: classes, style: broadcast_message_style(message) do
-      concat sprite_icon('bullhorn', size: 16, css_class: 'vertical-align-text-top')
-      concat ' '
-      concat render_broadcast_message(message)
-    end
+    render 'shared/broadcast_message', { message: message, opts: opts }
   end
 
   def broadcast_message_style(broadcast_message)

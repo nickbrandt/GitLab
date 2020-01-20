@@ -1,0 +1,6 @@
+- classes = "broadcast-#{message.broadcast_type}-message #{opts[:preview] && 'preview'}"
+
+%div{classs: classes, style: broadcast_message_style(message), dir: 'auto'}
+  = sprite_icon('bullhorn', size: 16, css_class: 'vertical-align-text-top')
+  = ' '
+  = render_broadcast_message(message)
