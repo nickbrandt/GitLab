@@ -7,7 +7,9 @@ module ErrorTracking
     def perform
       response = fetch
 
-      update_related_issue unless parse_errors(response).present?
+      unless parse_errors(response).present?
+        response[:closed_issue_iid] = update_related_issue&.iid
+      end
 
       response
     end
@@ -23,7 +25,7 @@ module ErrorTracking
       issue = related_issue
       return unless issue
 
-      @closed_issue = close_and_create_note(issue)
+      close_and_create_note(issue)
     end
 
     def close_and_create_note(issue)
@@ -64,7 +66,7 @@ module ErrorTracking
     def parse_response(response)
       {
         updated: response[:updated].present?,
-        closed_issue_iid: @closed_issue&.iid
+        closed_issue_iid: response[:closed_issue_iid]
       }
     end
 
