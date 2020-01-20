@@ -200,8 +200,15 @@ describe('boardsStore', () => {
 
     it('makes a request to save a list', () => {
       const expectedResponse = expect.objectContaining({ issues: [createTestIssue()] });
+      const expectedListValue = {
+        id: listObj.id,
+        position: listObj.position,
+        type: listObj.list_type,
+        label: listObj.label,
+      };
       expect(list.id).toBe(listObj.id);
       expect(list.position).toBe(listObj.position);
+      expect(list).toMatchObject(expectedListValue);
 
       return expect(boardsStore.saveList(list)).resolves.toEqual(expectedResponse);
     });
