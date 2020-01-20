@@ -140,14 +140,19 @@ module ErrorTracking
       Addressable::URI.join(api_url, '/').to_s
     end
 
-    def clear_cache(key_prefix)
-      return unless key_prefix
+    def clear_cache(resource_prefix)
+      raise 'No resource prefix provided' unless resource_prefix
 
-      klass_key = self.class.reactive_cache_key.call(self).join(':')
-      Rails.cache.delete_matched("#{klass_key}:#{key_prefix}*")
+      Rails.cache.delete_matched(cache_key(resource_prefix))
     end
 
     private
+
+    def cache_key(resource_prefix)
+      klass_key = self.class.reactive_cache_key.call(self).join(':')
+
+      "#{klass_key}:#{resource_prefix}*"
+    end
 
     def add_gitlab_issue_details(issue)
       issue.gitlab_commit = match_gitlab_commit(issue.first_release_version)
