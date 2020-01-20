@@ -15,7 +15,7 @@ describe ProjectPresenter do
     let(:security_dashboard_data) do
       OpenStruct.new(is_link: false,
                      label: a_string_including('Security Dashboard'),
-                     link: project_security_dashboard_path(project),
+                     link: project_security_dashboard_index_path(project),
                      class_modifier: 'default')
     end
 
@@ -25,7 +25,7 @@ describe ProjectPresenter do
       end
 
       it 'has security dashboard link' do
-        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_path(project) }).not_to be_nil
+        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_index_path(project) }).not_to be_nil
       end
     end
 
@@ -35,7 +35,7 @@ describe ProjectPresenter do
       end
 
       it 'has no security dashboard link' do
-        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_path(project) }).to be_nil
+        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_index_path(project) }).to be_nil
       end
     end
   end

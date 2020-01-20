@@ -1,6 +1,6 @@
 - return unless any_project_nav_tab?([:security, :dependencies, :licenses])
 
-- top_level_link = project_nav_tab?(:security) ? project_security_dashboard_path(@project) : project_dependencies_path(@project)
+- top_level_link = project_nav_tab?(:security) ? project_security_dashboard_index_path(@project) : project_dependencies_path(@project)
 - top_level_qa_selector = project_nav_tab?(:security) ? 'security_dashboard_link' : 'dependency_list_link'
 
 = nav_link(path: sidebar_security_paths) do
@@ -20,7 +20,7 @@
 
     - if project_nav_tab?(:security)
       = nav_link(path: 'projects/security/dashboard#show') do
-        = link_to project_security_dashboard_path(@project), title: _('Security Dashboard') do
+        = link_to project_security_dashboard_index_path(@project), title: _('Security Dashboard') do
           %span= _('Security Dashboard')
 
     - if project_nav_tab?(:dependencies)
