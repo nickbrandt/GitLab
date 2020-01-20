@@ -1,6 +1,7 @@
 <script>
 import {
   GlButton,
+  GlIcon,
   GlModal,
   GlModalDirective,
   GlTooltipDirective,
@@ -14,7 +15,7 @@ import PackageInformation from './information.vue';
 import NpmInstallation from './npm_installation.vue';
 import MavenInstallation from './maven_installation.vue';
 import ConanInstallation from './conan_installation.vue';
-import Icon from '~/vue_shared/components/icon.vue';
+import PackageTags from './package_tags.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
@@ -30,8 +31,9 @@ export default {
     GlLink,
     GlModal,
     GlTable,
-    Icon,
+    GlIcon,
     PackageInformation,
+    PackageTags,
     NpmInstallation,
     MavenInstallation,
     ConanInstallation,
@@ -103,6 +105,9 @@ export default {
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
+    },
+    hasTagsToDisplay() {
+      return Boolean(this.packageEntity.tags && this.packageEntity.tags.length);
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
@@ -208,7 +213,11 @@ export default {
 
   <div v-else class="packages-app">
     <div class="detail-page-header d-flex justify-content-between">
-      <strong class="js-version-title">{{ packageEntity.version }}</strong>
+      <div class="d-flex align-items-center">
+        <gl-icon name="fork" class="append-right-8" />
+        <strong class="append-right-default js-version-title">{{ packageEntity.version }}</strong>
+        <package-tags v-if="hasTagsToDisplay" :tags="packageEntity.tags" />
+      </div>
       <gl-button
         v-if="canDeletePackage"
         v-gl-modal="'delete-modal'"
@@ -260,7 +269,7 @@ export default {
       tbody-tr-class="js-file-row"
     >
       <template #name="items">
-        <icon name="doc-code" class="space-right" />
+        <gl-icon name="doc-code" class="space-right" />
         <gl-link
           :href="items.item.downloadPath"
           class="js-file-download"

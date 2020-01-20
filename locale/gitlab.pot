@@ -173,6 +173,11 @@ msgid_plural "%d staged changes"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d tag"
+msgid_plural "%d tags"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d unstaged change"
 msgid_plural "%d unstaged changes"
 msgstr[0] ""
