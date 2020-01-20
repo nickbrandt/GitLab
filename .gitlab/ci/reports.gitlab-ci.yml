@@ -142,6 +142,7 @@ dependency_scanning:
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    DS_EXCLUDED_PATHS: "qa,spec,doc,ee/spec"
   allow_failure: true
   services:
     - docker:stable-dind
