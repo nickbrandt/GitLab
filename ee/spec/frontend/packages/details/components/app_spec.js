@@ -5,6 +5,7 @@ import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
+import PackageTags from 'ee/packages/details/components/package_tags.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
@@ -50,6 +51,7 @@ describe('PackagesApp', () => {
   const deleteButton = () => wrapper.find('.js-delete-button');
   const deleteModal = () => wrapper.find(GlModal);
   const modalDeleteButton = () => wrapper.find({ ref: 'modal-delete-button' });
+  const packageTags = () => wrapper.find(PackageTags);
 
   afterEach(() => {
     wrapper.destroy();
@@ -140,6 +142,25 @@ describe('PackagesApp', () => {
 
     it('shows the delete confirmation modal when delete is clicked', () => {
       expect(deleteModal()).toExist();
+    });
+  });
+
+  describe('package tags', () => {
+    it('displays the package-tags component when the package has tags', () => {
+      createComponent({
+        packageEntity: {
+          ...npmPackage,
+          tags: [{ name: 'foo' }],
+        },
+      });
+
+      expect(packageTags().exists()).toBe(true);
+    });
+
+    it('does not display the package-tags component when there are no tags', () => {
+      createComponent();
+
+      expect(packageTags().exists()).toBe(false);
     });
   });
 

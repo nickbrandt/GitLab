@@ -75,3 +75,18 @@ export const conanPackage = {
 };
 
 export const packageList = [mavenPackage, npmPackage, conanPackage];
+
+export const mockTags = [
+  {
+    name: 'foo-1',
+  },
+  {
+    name: 'foo-2',
+  },
+  {
+    name: 'foo-3',
+  },
+  {
+    name: 'foo-4',
+  },
+];
