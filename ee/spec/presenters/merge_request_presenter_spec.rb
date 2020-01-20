@@ -36,7 +36,7 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_path("/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}/approvals")) }
+    it { is_expected.to eq(expose_path("/#{merge_request.project.full_path}/-/merge_requests/#{merge_request.iid}/approvals")) }
   end
 
   describe '#api_approvals_path' do
