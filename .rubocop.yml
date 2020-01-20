@@ -344,7 +344,9 @@ RSpec/UnspecifiedException:
   Enabled: false
 
 RSpec/HaveGitlabHttpStatus:
-  Enabled: false
+  Enabled: true
+  Include:
+    - 'spec/support/shared_examples/**/*'
 
 Style/MultilineWhenThen:
   Enabled: false
