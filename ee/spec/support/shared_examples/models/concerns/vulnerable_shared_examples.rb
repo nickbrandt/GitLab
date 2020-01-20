@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
-shared_examples_for Vulnerable do
+RSpec.shared_examples Vulnerable do
   include VulnerableHelpers
 
   let(:external_project) { as_external_vulnerable_project(vulnerable) }

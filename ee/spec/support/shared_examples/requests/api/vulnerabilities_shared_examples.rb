@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'forbids access to vulnerability API endpoint in case of disabled features' do
+RSpec.shared_examples 'forbids access to vulnerability API endpoint in case of disabled features' do
   context 'when "first-class vulnerabilities" feature is disabled' do
     before do
       stub_feature_flags(first_class_vulnerabilities: false)
@@ -26,7 +26,7 @@ shared_examples 'forbids access to vulnerability API endpoint in case of disable
   end
 end
 
-shared_examples 'responds with "not found" for an unknown vulnerability ID' do
+RSpec.shared_examples 'responds with "not found" for an unknown vulnerability ID' do
   let(:vulnerability_id) { 0 }
 
   it do

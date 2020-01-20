@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
-shared_examples DescriptionDiffActions do
+RSpec.shared_examples DescriptionDiffActions do
   let(:base_params) { { namespace_id: project.namespace, project_id: project, id: issuable } }
 
   describe 'GET description_diff' do

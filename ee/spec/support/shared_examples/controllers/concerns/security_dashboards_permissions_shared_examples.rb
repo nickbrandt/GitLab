@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
-shared_examples SecurityDashboardsPermissions do
+RSpec.shared_examples SecurityDashboardsPermissions do
   include ApiHelpers
 
   let(:security_dashboard_user) { create(:user) }
