@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/118473
-  context 'Create', :quarantine do
+  context 'Create', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/118473' do
     describe 'batch comments in merge request' do
       let(:project) do
         Resource::Project.fabricate_via_api! do |project|
