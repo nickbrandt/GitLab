@@ -153,12 +153,12 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
         end
 
         context 'when quick actions are present' do
-          it 'strips quick actions from email' do
+          it 'encloses quick actions with code span markdown' do
             receiver.execute
             noteable.reload
 
-            expect(note.note).not_to include('/close')
-            expect(note.note).not_to include('/title')
+            note = Note.last
+            expect(note.note).to include("Jake out\n\n`/close`\n`/title test`")
             expect(noteable.title).to eq('service desk issue')
             expect(noteable).to be_opened
           end

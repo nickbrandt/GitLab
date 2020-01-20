@@ -22,3 +22,7 @@ Service desk stuff!
 ```
 a = b
 ```
+
+/label ~label1
+/assign @user1
+/close
