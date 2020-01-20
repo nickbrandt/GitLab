@@ -286,6 +286,10 @@ describe API::V3::Github do
     context 'when instance admin' do
       let(:project) { create(:project, group: group) }
 
+      before do
+        create(:project, :public)
+      end
+
       it 'returns an array of projects belonging to group with github format' do
         expect_project_under_namespace([project], group, create(:user, :admin))
       end
@@ -295,6 +299,7 @@ describe API::V3::Github do
       let(:project) { create(:project, group: group) }
 
       before do
+        create(:project, :public)
         group.add_maintainer(user)
       end
 
