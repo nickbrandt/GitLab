@@ -6,13 +6,16 @@ module BroadcastMessagesHelper
   end
 
   def current_broadcast_notification_message
-    BroadcastMessage.current_notification_messages(request.path).last
+    not_hidden_messages = BroadcastMessage.current_notification_messages(request.path).select do |message|
+      cookies["hide_broadcast_notification_message_#{message.id}"].blank?
+    end
+    not_hidden_messages.last
   end
 
   def broadcast_message(message, opts = {})
     return unless message.present?
 
-    render 'shared/broadcast_message', { message: message, opts: opts }
+    render "shared/broadcast_message", { message: message, opts: opts }
   end
 
   def broadcast_message_style(broadcast_message)
