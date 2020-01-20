@@ -47,15 +47,6 @@ describe RepositoryForkWorker do
         perform!
       end
 
-      it 'calls LfsObjectsProjects::BulkCreateService#execute' do
-        expect_fork_repository.and_return(true)
-        expect_next_instance_of(LfsObjectsProjects::BulkCreateService) do |service|
-          expect(service).to receive(:execute)
-        end
-
-        perform!
-      end
-
       it 'protects the default branch' do
         expect_fork_repository.and_return(true)
 
@@ -87,6 +78,15 @@ describe RepositoryForkWorker do
         expect_fork_repository.and_return(false)
 
         expect { perform! }.to raise_error(StandardError, error_message)
+      end
+
+      it 'calls Projects::LfsPointers::LfsLinkService#execute with OIDs of source project LFS objects' do
+        expect_fork_repository.and_return(true)
+        expect_next_instance_of(Projects::LfsPointers::LfsLinkService) do |service|
+          expect(service).to receive(:execute).with(project.lfs_objects.map(&:oid))
+        end
+
+        perform!
       end
     end
 

@@ -30,9 +30,9 @@ class RepositoryForkWorker
     result = gitlab_shell.fork_repository(source_project, target_project)
 
     if result
-      LfsObjectsProjects::BulkCreateService
-        .new(source_project, target_project: target_project)
-        .execute
+      Projects::LfsPointers::LfsLinkService
+        .new(target_project)
+        .execute(lfs_pointers(source_project))
     else
       raise "Unable to fork project #{target_project.id} for repository #{source_project.disk_path} -> #{target_project.disk_path}"
     end
@@ -45,5 +45,9 @@ class RepositoryForkWorker
 
     Rails.logger.info("Project #{project.full_path} was in inconsistent state (#{project.import_status}) while forking.") # rubocop:disable Gitlab/RailsLogger
     false
+  end
+
+  def lfs_pointers(project)
+    project.lfs_objects.map(&:oid)
   end
 end

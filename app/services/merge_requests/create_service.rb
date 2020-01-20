@@ -67,11 +67,7 @@ module MergeRequests
     end
 
     def link_lfs_objects(issuable)
-      return if issuable.source_project == issuable.target_project
-
-      LfsObjectsProjects::BulkCreateService
-        .new(issuable.source_project, target_project: issuable.target_project)
-        .execute
+      LinkLfsObjectsService.new(issuable.target_project).execute(issuable)
     end
   end
 end
