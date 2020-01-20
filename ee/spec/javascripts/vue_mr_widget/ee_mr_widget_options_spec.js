@@ -417,6 +417,37 @@ describe('ee merge request widget options', () => {
       });
     });
 
+    describe('with a head_path but no base_path', () => {
+      beforeEach(() => {
+        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+
+        gl.mrWidgetData.codeclimate = {
+          head_path: 'head.json',
+          base_path: null,
+        };
+        vm.mr.codeclimate = gl.mrWidgetData.codeclimate;
+      });
+
+      it('should render error indicator', done => {
+        setTimeout(() => {
+          expect(
+            removeBreakLine(
+              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
+            ),
+          ).toContain('Failed to load codeclimate report');
+          done();
+        }, 0);
+      });
+
+      it('should render a help icon with more information', done => {
+        setTimeout(() => {
+          expect(vm.$el.querySelector('.js-codequality-widget .btn-help')).not.toBeNull();
+          expect(vm.codequalityPopover.title).toBe('Base pipeline codequality artifact not found');
+          done();
+        }, 0);
+      });
+    });
+
     describe('with codeclimate comparison worker rejection', () => {
       beforeEach(() => {
         mock.onGet('head.json').reply(200, headIssues);

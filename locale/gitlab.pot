@@ -21791,6 +21791,9 @@ msgstr ""
 msgid "ciReport|%{linkStartTag}Learn more about SAST %{linkEndTag}"
 msgstr ""
 
+msgid "ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}"
+msgstr ""
+
 msgid "ciReport|%{namespace} is affected by %{vulnerability}."
 msgstr ""
 
@@ -21877,6 +21880,9 @@ msgid "ciReport|All severities"
 msgstr ""
 
 msgid "ciReport|Automatically apply the patch in a new branch"
+msgstr ""
+
+msgid "ciReport|Base pipeline codequality artifact not found"
 msgstr ""
 
 msgid "ciReport|Class"

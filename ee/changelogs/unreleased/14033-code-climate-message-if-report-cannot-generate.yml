@@ -1,0 +1,5 @@
+---
+title: Display generic error in codeclimate MR widget when base_path is null
+merge_request: 21666
+author:
+type: changed

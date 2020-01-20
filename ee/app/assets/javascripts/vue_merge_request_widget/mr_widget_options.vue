@@ -44,7 +44,7 @@ export default {
     },
     shouldRenderCodeQuality() {
       const { codeclimate } = this.mr || {};
-      return codeclimate && codeclimate.head_path && codeclimate.base_path;
+      return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
       const { licenseManagement } = this.mr;
@@ -101,6 +101,23 @@ export default {
       }
 
       return text.join('');
+    },
+    codequalityPopover() {
+      const { codeclimate } = this.mr || {};
+      if (codeclimate && !codeclimate.base_path) {
+        return {
+          title: s__('ciReport|Base pipeline codequality artifact not found'),
+          content: sprintf(
+            s__('ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}'),
+            {
+              linkStartTag: `<a href="${this.mr.codequalityHelpPath}" target="_blank" rel="noopener noreferrer">`,
+              linkEndTag: '<i class="fa fa-external-link" aria-hidden="true"></i></a>',
+            },
+            false,
+          ),
+        };
+      }
+      return {};
     },
 
     performanceText() {
@@ -174,11 +191,20 @@ export default {
       };
     },
     fetchCodeQuality() {
-      const { head_path, base_path } = this.mr.codeclimate;
+      const { codeclimate } = this.mr || {};
+
+      if (!codeclimate.base_path) {
+        this.isLoadingCodequality = false;
+        this.loadingCodequalityFailed = true;
+        return;
+      }
 
       this.isLoadingCodequality = true;
 
-      Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
+      Promise.all([
+        this.service.fetchReport(codeclimate.head_path),
+        this.service.fetchReport(codeclimate.base_path),
+      ])
         .then(values =>
           this.mr.compareCodeclimateMetrics(
             values[0],
@@ -251,6 +277,7 @@ export default {
         :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
         :has-issues="hasCodequalityIssues"
         :component="$options.componentNames.CodequalityIssueBody"
+        :popover-options="codequalityPopover"
         class="js-codequality-widget mr-widget-border-top mr-report"
       />
       <report-section
