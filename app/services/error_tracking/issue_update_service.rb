@@ -2,6 +2,8 @@
 
 module ErrorTracking
   class IssueUpdateService < ErrorTracking::BaseService
+    include ::Gitlab::Utils::StrongMemoize
+
     private
 
     def perform

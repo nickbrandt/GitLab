@@ -41,11 +41,14 @@ describe ErrorTracking::IssueUpdateService do
         end
 
         it 'clears the reactive cache' do
-          expect(error_tracking_setting)
+          allow(error_tracking_setting)
             .to receive(:clear_cache)
-            .with('list_issues')
 
           result
+
+          expect(error_tracking_setting)
+            .to have_received(:clear_cache)
+            .with('list_issues')
         end
 
         context 'related issue and resolving' do
