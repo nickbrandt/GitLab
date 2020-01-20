@@ -13,6 +13,11 @@ module Metrics
         STAGES::ClusterEndpointInserter,
         STAGES::Sorter
       ].freeze
+
+      # Permissions are handled at the controller level
+      def allowed?
+        true
+      end
     end
   end
 end
