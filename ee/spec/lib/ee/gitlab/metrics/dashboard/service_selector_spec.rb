@@ -13,5 +13,11 @@ describe Gitlab::Metrics::Dashboard::ServiceSelector do
 
       it { is_expected.to be Metrics::Dashboard::ClusterDashboardService }
     end
+
+    context 'when metrics embed is for an alert' do
+      let(:arguments) { { embedded: true, prometheus_alert_id: 5 } }
+
+      it { is_expected.to be Metrics::Dashboard::GitlabAlertEmbedService }
+    end
   end
 end
