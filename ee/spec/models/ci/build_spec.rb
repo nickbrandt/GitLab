@@ -18,6 +18,7 @@ describe Ci::Build do
 
   describe '.license_scan' do
     subject(:build) { described_class.license_scan.first }
+
     let(:artifact) { build.job_artifacts.first }
 
     context 'with old license_management artifact' do
