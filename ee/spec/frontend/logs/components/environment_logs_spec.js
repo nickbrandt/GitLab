@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByClick } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 
@@ -44,8 +44,32 @@ describe('EnvironmentLogs', () => {
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
   const findSearchBar = () => wrapper.find('.js-logs-search');
+  const findTimeWindowDropdown = () => wrapper.find({ ref: 'time-window-dropdown' });
+
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
+
+  const mockSetInitData = () => {
+    state.pods.options = mockPods;
+    state.environments.current = mockEnvName;
+    [state.pods.current] = state.pods.options;
+    state.enableAdvancedQuerying = true;
+
+    state.logs.isComplete = false;
+    state.logs.lines = mockLogsResult;
+  };
+
+  const mockShowPodLogs = podName => {
+    state.pods.options = mockPods;
+    [state.pods.current] = podName;
+
+    state.logs.isComplete = false;
+    state.logs.lines = mockLogsResult;
+  };
+
+  const mockFetchEnvs = () => {
+    state.environments.options = mockEnvironments;
+  };
 
   const initWrapper = () => {
     wrapper = shallowMount(EnvironmentLogsComponent, {
@@ -87,12 +111,21 @@ describe('EnvironmentLogs', () => {
 
     expect(wrapper.isVueInstance()).toBe(true);
     expect(wrapper.isEmpty()).toBe(false);
-    expect(findLogTrace().isEmpty()).toBe(false);
 
+    // top bar
     expect(findEnvironmentsDropdown().is(GlDropdown)).toBe(true);
     expect(findPodsDropdown().is(GlDropdown)).toBe(true);
-
     expect(findLogControlButtons().exists()).toBe(true);
+
+    expect(findSearchBar().exists()).toBe(false); // behind ff
+    expect(findTimeWindowDropdown().exists()).toBe(false); // behind ff
+
+    // log trace
+    expect(findLogTrace().isEmpty()).toBe(false);
+
+    // layout
+    expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toMatch('col-6');
+    expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toMatch('col-6');
   });
 
   it('mounted inits data', () => {
@@ -119,9 +152,6 @@ describe('EnvironmentLogs', () => {
       state.environments.options = [];
       state.environments.isLoading = true;
 
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
-
       initWrapper();
     });
 
@@ -133,11 +163,6 @@ describe('EnvironmentLogs', () => {
     it('displays a disabled pods dropdown', () => {
       expect(findPodsDropdown().attributes('disabled')).toEqual('true');
       expect(findPodsDropdown().findAll(GlDropdownItem).length).toBe(0);
-    });
-
-    it('displays a disabled search bar', () => {
-      expect(findSearchBar().exists()).toEqual(true);
-      expect(findSearchBar().attributes('disabled')).toEqual('true');
     });
 
     it('does not update buttons state', () => {
@@ -154,69 +179,11 @@ describe('EnvironmentLogs', () => {
     });
   });
 
-  describe('elastic stack disabled', () => {
-    beforeEach(() => {
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = false;
-
-      initWrapper();
-    });
-
-    it("doesn't display the search bar", () => {
-      expect(findSearchBar().exists()).toEqual(false);
-      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-6');
-      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-6');
-    });
-  });
-
-  describe('ES enabled and legacy environment', () => {
-    beforeEach(() => {
-      state.pods.options = [];
-
-      state.logs.lines = [];
-      state.logs.isLoading = false;
-
-      state.environments.options = [];
-      state.environments.isLoading = false;
-
-      state.enableAdvancedQuerying = false;
-
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
-
-      initWrapper();
-    });
-
-    it('displays a disabled search bar', () => {
-      expect(findSearchBar().exists()).toEqual(true);
-      expect(findSearchBar().attributes('disabled')).toEqual('true');
-    });
-  });
-
   describe('state with data', () => {
     beforeEach(() => {
-      actionMocks.setInitData.mockImplementation(() => {
-        state.pods.options = mockPods;
-        state.environments.current = mockEnvName;
-        [state.pods.current] = state.pods.options;
-        state.enableAdvancedQuerying = true;
-
-        state.logs.isComplete = false;
-        state.logs.lines = mockLogsResult;
-      });
-      actionMocks.showPodLogs.mockImplementation(podName => {
-        state.pods.options = mockPods;
-        [state.pods.current] = podName;
-
-        state.logs.isComplete = false;
-        state.logs.lines = mockLogsResult;
-      });
-      actionMocks.fetchEnvironments.mockImplementation(() => {
-        state.environments.options = mockEnvironments;
-      });
-
-      gon.features = gon.features || {};
-      gon.features.enableClusterApplicationElasticStack = true;
+      actionMocks.setInitData.mockImplementation(mockSetInitData);
+      actionMocks.showPodLogs.mockImplementation(mockShowPodLogs);
+      actionMocks.fetchEnvironments.mockImplementation(mockFetchEnvs);
 
       initWrapper();
     });
@@ -238,7 +205,6 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(env.name);
       });
-      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates pods dropdown', () => {
@@ -250,19 +216,12 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(pod);
       });
-      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates logs trace', () => {
       const trace = findLogTrace();
       expect(trace.text().split('\n').length).toBe(mockTrace.length);
       expect(trace.text().split('\n')).toEqual(mockTrace);
-    });
-
-    it('displays an enabled search bar', () => {
-      expect(findSearchBar().exists()).toEqual(true);
-      expect(findSearchBar().attributes('disabled')).toEqual(undefined);
-      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-4');
     });
 
     it('update control buttons state', () => {
@@ -305,6 +264,97 @@ describe('EnvironmentLogs', () => {
 
         expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(1);
         expect(actionMocks.showPodLogs).toHaveBeenLastCalledWith(mockPodName);
+      });
+    });
+  });
+
+  describe('when feature flag enable_cluster_application_elastic_stack is enabled', () => {
+    let originalGon;
+
+    beforeEach(() => {
+      originalGon = window.gon;
+      window.gon = { features: { enableClusterApplicationElasticStack: true } };
+    });
+
+    afterEach(() => {
+      window.gon = originalGon;
+    });
+
+    it('displays UI elements', () => {
+      initWrapper();
+
+      // elements
+      expect(findSearchBar().exists()).toBe(true);
+      expect(findSearchBar().is(GlSearchBoxByClick)).toBe(true);
+      expect(findTimeWindowDropdown().exists()).toBe(true);
+      expect(findTimeWindowDropdown().is(GlDropdown)).toBe(true);
+
+      // layout
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toMatch('col-3');
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toMatch('col-3');
+      expect(wrapper.find('#dates-fg').attributes('class')).toMatch('col-3');
+      expect(wrapper.find('#search-fg').attributes('class')).toMatch('col-3');
+    });
+
+    describe('loading state', () => {
+      beforeEach(() => {
+        state.pods.options = [];
+
+        state.logs.lines = [];
+        state.logs.isLoading = true;
+
+        state.environments.options = [];
+        state.environments.isLoading = true;
+
+        initWrapper();
+      });
+
+      it('displays a disabled search bar', () => {
+        expect(findSearchBar().exists()).toEqual(true);
+        expect(findSearchBar().attributes('disabled')).toEqual('true');
+      });
+
+      it('displays a disabled time window dropdown', () => {
+        expect(findTimeWindowDropdown().attributes('disabled')).toEqual('true');
+      });
+    });
+
+    describe('when advanced querying is disabled', () => {
+      beforeEach(() => {
+        state.pods.options = [];
+
+        state.logs.lines = [];
+        state.logs.isLoading = false;
+
+        state.environments.options = [];
+        state.environments.isLoading = false;
+
+        state.enableAdvancedQuerying = false;
+
+        initWrapper();
+      });
+
+      it('search bar and time window dropdown are disabled', () => {
+        expect(findSearchBar().attributes('disabled')).toEqual('true');
+        expect(findTimeWindowDropdown().attributes('disabled')).toEqual('true');
+      });
+    });
+
+    describe('state with data', () => {
+      beforeEach(() => {
+        actionMocks.setInitData.mockImplementation(mockSetInitData);
+        actionMocks.showPodLogs.mockImplementation(mockShowPodLogs);
+        actionMocks.fetchEnvironments.mockImplementation(mockFetchEnvs);
+
+        initWrapper();
+      });
+
+      it('displays an enabled search bar', () => {
+        expect(findSearchBar().attributes('disabled')).toBeFalsy();
+      });
+
+      it('displays an enabled time window dropdown', () => {
+        expect(findTimeWindowDropdown().attributes('disabled')).toBeFalsy();
       });
     });
   });

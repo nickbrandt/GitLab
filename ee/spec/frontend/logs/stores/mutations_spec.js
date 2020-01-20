@@ -136,6 +136,15 @@ describe('Logs Store Mutations', () => {
     });
   });
 
+  describe('SET_TIME_WINDOW', () => {
+    it('sets a time window Key', () => {
+      const mockKey = 'fourHours';
+      mutations[types.SET_TIME_WINDOW](state, mockKey);
+
+      expect(state.timeWindow.current).toEqual(mockKey);
+    });
+  });
+
   describe('REQUEST_PODS_DATA', () => {
     it('receives log data error and stops loading', () => {
       mutations[types.REQUEST_PODS_DATA](state);
