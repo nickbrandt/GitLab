@@ -6,51 +6,37 @@
 #   Examples:
 #     class MyController < ApplicationController
 #       include PageLimiter
-#       limit_pages 500
 #
-#       # Optionally provide a block to customize the response:
-#       limit_pages 500 do
-#         head :ok
+#       before_action only: [:index] do
+#         limit_pages(500)
 #       end
 #
-#       # Or override the default response method
-#       limit_pages 500
-#
+#       # You can override the default response
 #       def page_out_of_bounds
 #         head :ok
 #       end
+#
+#       # Or provide an entirely different handler:
+#       rescue_from PageOutOfBoundsError, with: :something
 #
 
 module PageLimiter
   extend ActiveSupport::Concern
 
-  PageLimitNotANumberError = Class.new(StandardError)
+  PageLimiterError          = Class.new(StandardError)
+  PageLimitNotANumberError  = Class.new(PageLimiterError)
+  PageLimitNotSensibleError = Class.new(PageLimiterError)
+  PageOutOfBoundsError      = Class.new(PageLimiterError)
 
   included do
-    around_action :check_page_number, if: :max_page_defined?
+    attr_accessor :max_page_number
+    helper_method :max_page_number
+    rescue_from PageOutOfBoundsError, with: :page_out_of_bounds
   end
 
-  class_methods do
-    def limit_pages(number, &block)
-      set_max_page(number)
-      @page_limiter_block = block
-    end
-
-    def max_page
-      @max_page
-    end
-
-    def page_limiter_block
-      @page_limiter_block
-    end
-
-    private
-
-    def set_max_page(value)
-      raise PageLimitNotANumberError unless value.is_a?(Integer)
-
-      @max_page = value
-    end
+  def limit_pages(number)
+    set_max_page_number(number)
+    check_page_number
   end
 
   # Override this method in your controller to customize the response
@@ -60,9 +46,11 @@ module PageLimiter
 
   private
 
-  # Used to see whether the around_action should run or not
-  def max_page_defined?
-    self.class.max_page.present? && self.class.max_page > 0
+  def set_max_page_number(value)
+    raise PageLimitNotANumberError unless value.is_a?(Integer)
+    raise PageLimitNotSensibleError unless value > 0
+
+    self.max_page_number = value
   end
 
   # If the page exceeds the defined maximum, either call the provided
@@ -71,16 +59,9 @@ module PageLimiter
   #
   # If the page doesn't exceed the limit, it yields the controller action.
   def check_page_number
-    if params[:page].present? && params[:page].to_i > self.class.max_page
+    if params[:page].present? && params[:page].to_i > max_page_number
       record_interception
-
-      if self.class.page_limiter_block.present?
-        instance_eval(&self.class.page_limiter_block)
-      else
-        page_out_of_bounds
-      end
-    else
-      yield
+      raise PageOutOfBoundsError
     end
   end
 

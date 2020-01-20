@@ -60,7 +60,7 @@ describe Explore::ProjectsController do
   end
 
   shared_examples "blocks high page numbers" do
-    let(:page_limit) { Explore::ProjectsController::PAGE_LIMIT }
+    let(:page_limit) { 200 }
 
     context "page number is too high" do
       [:index, :trending, :starred].each do |endpoint|
@@ -95,7 +95,7 @@ describe Explore::ProjectsController do
               :gitlab_page_out_of_bounds,
               controller: "explore/projects",
               action: endpoint.to_s,
-              agent: "Rails Testing"
+              bot: false
             )
           end
         end
@@ -161,12 +161,5 @@ describe Explore::ProjectsController do
         get :index, params: { sort: sorting_param }
       end
     end
-  end
-
-  describe "#max_page_number" do
-    subject { controller.send(:max_page_number) }
-
-    it { is_expected.to eq(Explore::ProjectsController::PAGE_LIMIT) }
-    it { is_expected.to be_an(Integer) }
   end
 end

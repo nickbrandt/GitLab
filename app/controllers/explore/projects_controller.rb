@@ -7,13 +7,14 @@ class Explore::ProjectsController < Explore::ApplicationController
   include SortingHelper
   include SortingPreference
 
-  PAGE_LIMIT = 500
-
   before_action :set_non_archived_param
   before_action :set_sorting
 
-  limit_pages PAGE_LIMIT
-  helper_method :max_page_number
+  before_action only: [:index, :trending, :starred] do
+    limit_pages(200)
+  end
+
+  rescue_from PageOutOfBoundsError, with: :page_out_of_bounds
 
   def index
     @projects = load_projects
@@ -89,10 +90,6 @@ class Explore::ProjectsController < Explore::ApplicationController
 
   def sorting_field
     Project::SORTING_PREFERENCE_FIELD
-  end
-
-  def max_page_number
-    PAGE_LIMIT
   end
 
   # Overrides the default in the PageLimiter concern
