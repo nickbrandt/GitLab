@@ -49,6 +49,40 @@ describe Boards::IssuesController do
           expect(json_response['issues'].length).to eq 2
           expect(development.issues.map(&:relative_position)).not_to include(nil)
         end
+
+        context 'with search param' do
+          context 'when board_search_optimization is enabled' do
+            before do
+              stub_feature_flags(board_search_optimization: true)
+            end
+
+            it 'returns matching issues using optimized search' do
+              create(:labeled_issue, project: project_1, labels: [planning], title: 'Test Issue')
+              create(:labeled_issue, project: project_1, labels: [planning], title: 'Sample Issue')
+
+              list_issues user: user, board: board, list: list1, search: 'Te'
+
+              expect(response).to match_response_schema('issues')
+              expect(json_response['issues'].length).to eq 1
+            end
+          end
+
+          context 'when board_search_optimization is disabled' do
+            before do
+              stub_feature_flags(board_search_optimization: false)
+            end
+
+            it 'returns empty result' do
+              create(:labeled_issue, project: project_1, labels: [planning], title: 'Test Issue')
+              create(:labeled_issue, project: project_1, labels: [planning], title: 'Sample Issue')
+
+              list_issues user: user, board: board, list: list1, search: 'Te'
+
+              expect(response).to match_response_schema('issues')
+              expect(json_response['issues'].length).to eq 0
+            end
+          end
+        end
       end
 
       context 'with invalid list id' do
@@ -73,6 +107,40 @@ describe Boards::IssuesController do
         expect(response).to match_response_schema('issues')
         expect(json_response['issues'].length).to eq 2
       end
+
+      context 'with search param' do
+        context 'when board_search_optimization is enabled' do
+          before do
+            stub_feature_flags(board_search_optimization: true)
+          end
+
+          it 'returns matching issues using optimized search' do
+            create(:issue, project: project_1, title: 'Issue XI')
+            create(:issue, project: project_1, title: 'Issue XX')
+
+            list_issues user: user, board: board, search: 'XI'
+
+            expect(response).to match_response_schema('issues')
+            expect(json_response['issues'].length).to eq 1
+          end
+        end
+
+        context 'when board_search_optimization is disabled' do
+          before do
+            stub_feature_flags(board_search_optimization: false)
+          end
+
+          it 'returns empty result' do
+            create(:issue, project: project_1, title: 'Issue XI')
+            create(:issue, project: project_1, title: 'Issue XX')
+
+            list_issues user: user, board: board, search: 'XI'
+
+            expect(response).to match_response_schema('issues')
+            expect(json_response['issues'].length).to eq 0
+          end
+        end
+      end
     end
 
     context 'with unauthorized user' do
@@ -87,12 +155,13 @@ describe Boards::IssuesController do
       end
     end
 
-    def list_issues(user:, board:, list: nil)
+    def list_issues(user:, board:, list: nil, search: nil)
       sign_in(user)
 
       params = {
         board_id: board.to_param,
-        list_id: list.try(:to_param)
+        list_id: list.try(:to_param),
+        search: search.try(:to_param)
       }
 
       get :index, params: params.compact
