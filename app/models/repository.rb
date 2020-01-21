@@ -41,8 +41,8 @@ class Repository
   CACHED_METHODS = %i(size commit_count rendered_readme readme_path contribution_guide
                       changelog license_blob license_key gitignore
                       gitlab_ci_yml branch_names tag_names branch_count
-                      tag_count avatar exists? root_ref has_visible_content?
-                      issue_template_names merge_request_template_names
+                      tag_count avatar exists? root_ref merged_branch_names
+                      has_visible_content? issue_template_names merge_request_template_names
                       metrics_dashboard_paths xcode_project?).freeze
 
   # Methods that use cache_method but only memoize the value
@@ -296,7 +296,7 @@ class Repository
   end
 
   def expire_branches_cache
-    expire_method_caches(%i(branch_names branch_count has_visible_content?))
+    expire_method_caches(%i(branch_names merged_branch_names branch_count has_visible_content?))
     @local_branches = nil
     @branch_exists_memo = nil
   end
@@ -914,7 +914,40 @@ class Repository
     @root_ref_sha ||= commit(root_ref).sha
   end
 
-  delegate :merged_branch_names, to: :raw_repository
+  def merged_branch_names(branch_names = [])
+    if branch_names.empty? || Feature.disabled?(:merged_branch_names_redis_caching)
+      # Currently we should skip caching if requesting all branch names
+      # This is only used in a few places, notably app/services/branches/delete_merged_service.rb,
+      # and it could potentially result in a very large cache/performance issues with the current
+      # implementation.
+      raw_repository.merged_branch_names(branch_names)
+    else
+      cached_branch_names = cache.read(:merged_branch_names)
+      merged_branch_names_hash = cached_branch_names.present? ? JSON.parse(cached_branch_names) : {}
+      missing_branch_names = branch_names.select { |bn| !merged_branch_names_hash.key?(bn) }
+
+      # Track some metrics here whilst feature flag is enabled
+      if cached_branch_names.present?
+        counter = Gitlab::Metrics.counter(
+          :gitlab_repository_merged_branch_names_cache_hit,
+          "Count of cache hits for Repository#merged_branch_names"
+        )
+        counter.increment(full_hit: missing_branch_names.empty?)
+      end
+
+      unless missing_branch_names.empty?
+        merged = raw_repository.merged_branch_names(missing_branch_names)
+
+        missing_branch_names.each do |bn|
+          merged_branch_names_hash[bn] = merged.include?(bn).to_s
+        end
+
+        cache.write(:merged_branch_names, merged_branch_names_hash.to_json, expires_in: 10.minutes)
+      end
+
+      Set.new(merged_branch_names_hash.select { |k, v| v.to_s == "true" }.keys)
+    end
+  end
 
   def merge_base(*commits_or_ids)
     commit_ids = commits_or_ids.map do |commit_or_id|
