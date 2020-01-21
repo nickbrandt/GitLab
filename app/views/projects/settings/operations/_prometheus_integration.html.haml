@@ -1,0 +1,13 @@
+- return unless can?(current_user, :read_environment, @project)
+
+- setting = error_tracking_setting
+
+%section.settings.no-animate.js-error-tracking-settings
+  .settings-header
+    %h4
+      = _('Prometheus')
+    %button.btn.js-settings-toggle{ type: 'button' }
+      = _('Expand')
+    %p
+      = _('Link Prometheus monitoring to GitLab.')
+      = link_to _('More information'), help_page_path('user/project/integrations/prometheus'), target: '_blank', rel: 'noopener noreferrer'
