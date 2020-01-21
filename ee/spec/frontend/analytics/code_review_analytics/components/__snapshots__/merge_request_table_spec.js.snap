@@ -3,10 +3,10 @@
 exports[`MergeRequestTable component template matches the snapshot 1`] = `
 <table
   aria-busy="false"
-  aria-colcount="6"
-  aria-describedby="__BVID__31__caption_"
+  aria-colcount="7"
+  aria-describedby="__BVID__33__caption_"
   class="table b-table gl-table my-3 b-table-stacked-sm"
-  id="__BVID__31"
+  id="__BVID__33"
   role="table"
 >
   <!---->
@@ -46,11 +46,11 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
       </th>
       <th
         aria-colindex="4"
-        class="text-right"
+        class=""
         role="columnheader"
         scope="col"
       >
-        Comments
+        Approvers
       </th>
       <th
         aria-colindex="5"
@@ -58,10 +58,18 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
         role="columnheader"
         scope="col"
       >
-        Commits
+        Comments
       </th>
       <th
         aria-colindex="6"
+        class="text-right"
+        role="columnheader"
+        scope="col"
+      >
+        Commits
+      </th>
+      <th
+        aria-colindex="7"
         class="text-right"
         role="columnheader"
         scope="col"
