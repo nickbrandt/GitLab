@@ -126,6 +126,10 @@ module ErrorTracking
       end
     end
 
+    def expire_issues_cache
+      Rails.cache.delete_matched(expand_cache_key('list_issues'))
+    end
+
     # http://HOST/api/0/projects/ORG/PROJECT
     # ->
     # http://HOST/ORG/PROJECT
@@ -140,15 +144,9 @@ module ErrorTracking
       Addressable::URI.join(api_url, '/').to_s
     end
 
-    def clear_cache(resource_prefix)
-      raise 'No resource prefix provided' unless resource_prefix
-
-      Rails.cache.delete_matched(cache_key(resource_prefix))
-    end
-
     private
 
-    def cache_key(resource_prefix)
+    def expand_cache_key(resource_prefix)
       klass_key = self.class.reactive_cache_key.call(self).join(':')
 
       "#{klass_key}:#{resource_prefix}*"

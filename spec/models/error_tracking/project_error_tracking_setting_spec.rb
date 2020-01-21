@@ -441,17 +441,17 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
     end
   end
 
-  describe '#clear_cache' do
-    let(:key_prefix) { 'list_issues' }
-
+  describe '#expire_issues_cache', :use_clean_rails_memory_store_caching do
     it 'clears the cache' do
       klass_key = subject.class.reactive_cache_key.call(subject).join(':')
+      key = "#{klass_key}:list_issues:some_suffix"
+      Rails.cache.write(key, 1)
 
-      expect(Rails.cache)
-        .to receive(:delete_matched)
-        .with("#{klass_key}:#{key_prefix}*")
+      expect(Rails.cache.exist?(key)).to eq(true)
 
-      subject.clear_cache(key_prefix)
+      subject.expire_issues_cache
+
+      expect(Rails.cache.exist?(key)).to eq(false)
     end
   end
 end
