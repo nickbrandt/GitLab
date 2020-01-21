@@ -4,6 +4,7 @@ import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import {
   group,
@@ -1240,6 +1241,31 @@ describe('Cycle analytics actions', () => {
         state,
         [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload: { events: [] } }],
         [],
+        done,
+      );
+    });
+  });
+
+  describe('setTasksByTypeFilters', () => {
+    const filter = TASKS_BY_TYPE_FILTERS.SUBJECT;
+    const value = 'issue';
+
+    it(`commits the ${types.SET_TASKS_BY_TYPE_FILTERS} mutation and dispatches 'fetchTasksByTypeData'`, done => {
+      testAction(
+        actions.setTasksByTypeFilters,
+        { filter, value },
+        {},
+        [
+          {
+            type: types.SET_TASKS_BY_TYPE_FILTERS,
+            payload: { filter, value },
+          },
+        ],
+        [
+          {
+            type: 'fetchTasksByTypeData',
+          },
+        ],
         done,
       );
     });

@@ -144,6 +144,7 @@ export default {
       'setFeatureFlags',
       'editCustomStage',
       'updateStage',
+      'setTasksByTypeFilters',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -319,6 +320,8 @@ export default {
             <tasks-by-type-chart
               :chart-data="tasksByTypeChartData"
               :filters="selectedTasksByTypeFilters"
+              :labels="labels"
+              @updateFilter="setTasksByTypeFilters"
             />
           </div>
           <gl-loading-icon v-else size="md" class="my-4 py-4" />
