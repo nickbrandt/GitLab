@@ -3,8 +3,7 @@
 - page_title "Vulnerabilities"
 
 .issue-details.issuable-details
-  .detail-page-description.content-block
-    %h2.title= "Vulnerabilities"
+  %h2.title= "Vulnerabilities"
 
   .ci-table.js-security-dashboard-table
     .gl-responsive-table-row.table-row-header.vulnerabilities-row-header.px-2{:role => "row"}
@@ -12,23 +11,33 @@
       .table-section.section-10.ml-md-2{:role => "rowheader"} Severity
       .table-section.flex-grow-1{:role => "rowheader"} Description
 
-    -# TODO: Empty state
-    - @vulnerabilities.each do |vulnerability|
-      .gl-responsive-table-row.vulnerabilities-row.p-2
-        .table-section.section-5
-          .table-mobile-header{:role => "rowheader"} State
-          .table-mobile-content.text-capitalize= vulnerability.state
-        .table-section.section-10.ml-md-2
-          .table-mobile-header{:role => "rowheader"} Severity
-          .table-mobile-content
-            .severity-badge{class: "severity-badge-#{vulnerability.severity}"}= vulnerability.severity
-        .table-section.flex-grow-1
-          .table-mobile-header{:role => "rowheader"} Description
-          .table-mobile-content.vulnerability-info.text-truncate
-            = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
-            - if vulnerability.finding
-              %br
-              %span.text-muted.small
-                = vulnerability.finding.description
+    - if @vulnerabilities.blank?
+      .row.empty-state
+        .col-12
+          .svg-250.svg-content
+            %img{:alt => "No vulnerabilities found for this project", :src => "/assets/illustrations/security-dashboard-empty-state-a39978771073d0bed9552aa458716aec0d47892872212599b4a4a293501932e4.svg"}
+        .col-12
+          .text-content
+            %h4.center No vulnerabilities found for this project
+            %p While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.
+
+    - else
+      - @vulnerabilities.each do |vulnerability|
+        .gl-responsive-table-row.vulnerabilities-row.p-2
+          .table-section.section-5
+            .table-mobile-header{:role => "rowheader"} State
+            .table-mobile-content.text-capitalize= vulnerability.state
+          .table-section.section-10.ml-md-2
+            .table-mobile-header{:role => "rowheader"} Severity
+            .table-mobile-content
+              .severity-badge{class: "severity-badge-#{vulnerability.severity}"}= vulnerability.severity
+          .table-section.flex-grow-1
+            .table-mobile-header{:role => "rowheader"} Description
+            .table-mobile-content.vulnerability-info.text-truncate
+              = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
+              - if vulnerability.finding
+                %br
+                %span.text-muted.small
+                  = vulnerability.finding.description
 
   = paginate @vulnerabilities, theme: "gitlab"
