@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'base SamlProvider service' do
+RSpec.shared_examples 'base SamlProvider service' do
   let(:params) do
     {
       sso_url: 'https://test',
@@ -23,7 +23,7 @@ shared_examples 'base SamlProvider service' do
   end
 end
 
-shared_examples 'SamlProvider service toggles Group Managed Accounts' do
+RSpec.shared_examples 'SamlProvider service toggles Group Managed Accounts' do
   let(:cleanup_members_service_spy) { spy('GroupSaml::GroupManagedAccounts::CleanUpMembersService') }
 
   before do

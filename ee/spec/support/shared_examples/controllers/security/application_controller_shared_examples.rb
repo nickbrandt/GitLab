@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
-shared_examples Security::ApplicationController do
+RSpec.shared_examples Security::ApplicationController do
   context 'when the user is authenticated' do
     let(:security_application_controller_user) { create(:user) }
 
