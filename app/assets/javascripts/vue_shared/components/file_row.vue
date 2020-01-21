@@ -172,6 +172,7 @@ export default {
         :file="childFile"
         :level="childFilesLevel"
         :hide-extra-on-tree="hideExtraOnTree"
+        :extra-component="extraComponent"
         :show-changed-icon="showChangedIcon"
         @toggleTreeOpen="toggleTreeOpen"
         @clickFile="clickedFile"
