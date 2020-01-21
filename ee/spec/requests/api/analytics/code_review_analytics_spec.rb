@@ -56,18 +56,6 @@ describe API::Analytics::CodeReviewAnalytics do
       end
     end
 
-    context 'when feature is disabled' do
-      before do
-        stub_feature_flags(code_review_analytics: false)
-      end
-
-      it 'is not found' do
-        api_call
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'when user has no authorization' do
       let(:current_user) { guest }
 
