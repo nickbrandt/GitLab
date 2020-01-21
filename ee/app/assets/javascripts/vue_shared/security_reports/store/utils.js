@@ -139,31 +139,6 @@ function adaptDeprecatedReportFormat(report) {
 }
 
 /**
- * Parses SAST results into a common format to allow to use the same Vue component.
- *
- * @param {Array|Object} report
- * @param {Array} feedback
- * @param {String} path
- * @returns {Array}
- */
-export const parseSastIssues = (report = [], feedback = [], path = '') =>
-  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
-    const parsed = {
-      ...adaptDeprecatedIssueFormat(issue),
-      category: 'sast',
-      project_fingerprint: sha1(issue.cve),
-      title: issue.message,
-    };
-
-    return {
-      ...parsed,
-      path: parsed.location.file,
-      urlPath: fileUrl(parsed.location, path),
-      ...enrichVulnerabilityWithFeedback(parsed, feedback),
-    };
-  });
-
-/**
  * Parses Dependency Scanning results into a common format to allow to use the same Vue component.
  *
  * @param {Array|Object} report

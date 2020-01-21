@@ -2,7 +2,6 @@ import sha1 from 'sha1';
 import {
   findIssueIndex,
   findMatchingRemediations,
-  parseSastIssues,
   parseDependencyScanningIssues,
   groupedTextBuilder,
   statusIcon,
@@ -12,10 +11,6 @@ import {
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import {
-  oldSastIssues,
-  sastIssues,
-  sastIssuesMajor2,
-  sastFeedbacks,
   dependencyScanningIssuesOld,
   dependencyScanningIssues,
   dependencyScanningIssuesMajor2,
@@ -99,57 +94,6 @@ describe('security reports utils', () => {
         remediation1,
         remediation2,
       ]);
-    });
-  });
-
-  describe('parseSastIssues', () => {
-    it('should parse the received issues with old JSON format', () => {
-      const parsed = parseSastIssues(oldSastIssues, [], 'path')[0];
-
-      expect(parsed.title).toEqual(sastIssues[0].message);
-      expect(parsed.path).toEqual(sastIssues[0].location.file);
-      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
-      expect(parsed.location.end_line).toBeUndefined();
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5');
-      expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
-    });
-
-    it('should parse the received issues with new JSON format', () => {
-      const parsed = parseSastIssues(sastIssues, [], 'path')[0];
-
-      expect(parsed.title).toEqual(sastIssues[0].message);
-      expect(parsed.path).toEqual(sastIssues[0].location.file);
-      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
-      expect(parsed.location.end_line).toEqual(sastIssues[0].location.end_line);
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
-      expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
-    });
-
-    it('should parse the received issues with new JSON format (2.0)', () => {
-      const raw = sastIssues[0];
-      const parsed = parseSastIssues(sastIssuesMajor2, [], 'path')[0];
-
-      expect(parsed.title).toEqual(raw.message);
-      expect(parsed.path).toEqual(raw.location.file);
-      expect(parsed.location.start_line).toEqual(raw.location.start_line);
-      expect(parsed.location.end_line).toEqual(raw.location.end_line);
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
-      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
-    });
-
-    it('generate correct path to file when there is no line', () => {
-      const parsed = parseSastIssues(sastIssues, [], 'path')[1];
-
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock');
-    });
-
-    it('includes vulnerability feedbacks', () => {
-      const parsed = parseSastIssues(sastIssues, sastFeedbacks, 'path')[0];
-
-      expect(parsed.hasIssue).toEqual(true);
-      expect(parsed.isDismissed).toEqual(true);
-      expect(parsed.dismissalFeedback).toEqual(sastFeedbacks[0]);
-      expect(parsed.issue_feedback).toEqual(sastFeedbacks[1]);
     });
   });
 

@@ -86,23 +86,6 @@ export const sastIssues = [
   },
 ];
 
-export const sastIssuesMajor2 = {
-  version: '2.0',
-  vulnerabilities: sastIssues,
-};
-
-export const oldSastIssues = [
-  {
-    tool: 'bundler_audit',
-    message: 'Arbitrary file existence disclosure in Action Pack',
-    url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    cve: 'CVE-2014-7829',
-    file: 'Gemfile.lock',
-    line: '5',
-    solution: 'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8',
-  },
-];
-
 export const sastIssuesBase = [
   {
     tool: 'bundler_audit',
