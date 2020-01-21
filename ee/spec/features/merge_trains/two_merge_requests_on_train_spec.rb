@@ -238,7 +238,7 @@ describe 'Two merge requests on a merge train' do
     end
 
     it 'does not recreate pipeline when merge request 1 refreshed again' do
-      expect { merge_request_1.merge_train.send(:refresh_async) }
+      expect { AutoMergeProcessWorker.perform_async(merge_request_1.id) }
         .not_to change { merge_request_1.all_pipelines.count }
     end
 

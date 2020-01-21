@@ -11,7 +11,7 @@ FactoryBot.modify do
     trait :on_train do
       transient do
         train_creator { author }
-        status { 'created' }
+        status { 'idle' }
       end
 
       auto_merge_enabled { true }
