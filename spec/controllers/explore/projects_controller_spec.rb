@@ -73,6 +73,10 @@ describe Explore::ProjectsController do
 
           it { is_expected.to respond_with(:bad_request) }
           it { is_expected.to render_template("explore/projects/page_out_of_bounds") }
+
+          it "assigns the page number" do
+            expect(assigns[:max_page_number]).to eq(page_limit.to_s)
+          end
         end
 
         describe "GET #{endpoint}.json" do

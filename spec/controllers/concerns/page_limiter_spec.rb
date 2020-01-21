@@ -57,7 +57,7 @@ describe PageLimiter do
 
       it "returns the expected result" do
         if result == PageLimiter::PageOutOfBoundsError
-          expect(instance).to receive(:record_interception)
+          expect(instance).to receive(:record_page_limit_interception)
           expect { subject }.to raise_error(result)
         elsif result&.superclass == PageLimiter::PageLimiterError
           expect { subject }.to raise_error(result)
@@ -65,18 +65,6 @@ describe PageLimiter do
           expect(subject).to eq(result)
         end
       end
-    end
-  end
-
-  describe "#page_out_of_bounds" do
-    subject { instance.page_out_of_bounds }
-
-    after do
-      subject
-    end
-
-    it "returns a bad_request header" do
-      expect(instance).to receive(:head).with(:bad_request)
     end
   end
 
@@ -92,8 +80,8 @@ describe PageLimiter do
     end
   end
 
-  describe "#record_interception" do
-    subject { instance.send(:record_interception) }
+  describe "#record_page_limit_interception" do
+    subject { instance.send(:record_page_limit_interception) }
 
     it "records a metric counter" do
       expect(Gitlab::Metrics).to receive(:counter).with(

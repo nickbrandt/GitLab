@@ -10,6 +10,7 @@ class Explore::ProjectsController < Explore::ApplicationController
   before_action :set_non_archived_param
   before_action :set_sorting
 
+  # Limit taken from https://gitlab.com/gitlab-org/gitlab/issues/38357
   before_action only: [:index, :trending, :starred] do
     limit_pages(200)
   end
@@ -92,9 +93,9 @@ class Explore::ProjectsController < Explore::ApplicationController
     Project::SORTING_PREFERENCE_FIELD
   end
 
-  # Overrides the default in the PageLimiter concern
-  def page_out_of_bounds
+  def page_out_of_bounds(error)
     load_project_counts
+    @max_page_number = error.message
 
     respond_to do |format|
       format.html do

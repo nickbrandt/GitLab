@@ -12,12 +12,12 @@
 #       end
 #
 #       # You can override the default response
-#       def page_out_of_bounds
+#       rescue_from PageOutOfBoundsError, with: :page_out_of_bounds
+#
+#       def page_out_of_bounds(error)
+#         # Page limit number is available as error.message
 #         head :ok
 #       end
-#
-#       # Or provide an entirely different handler:
-#       rescue_from PageOutOfBoundsError, with: :something
 #
 
 module PageLimiter
@@ -29,39 +29,24 @@ module PageLimiter
   PageOutOfBoundsError      = Class.new(PageLimiterError)
 
   included do
-    attr_accessor :max_page_number
-    helper_method :max_page_number
-    rescue_from PageOutOfBoundsError, with: :page_out_of_bounds
+    rescue_from PageOutOfBoundsError, with: :default_page_out_of_bounds_response
   end
 
-  def limit_pages(number)
-    set_max_page_number(number)
-    check_page_number
-  end
-
-  # Override this method in your controller to customize the response
-  def page_out_of_bounds
-    default_page_out_of_bounds_response
+  def limit_pages(max_page_number)
+    check_page_number!(max_page_number)
   end
 
   private
 
-  def set_max_page_number(value)
-    raise PageLimitNotANumberError unless value.is_a?(Integer)
-    raise PageLimitNotSensibleError unless value > 0
+  # If the page exceeds the defined maximum, raise a PageOutOfBoundsError
+  # If the page doesn't exceed the limit, it does nothing.
+  def check_page_number!(max_page_number)
+    raise PageLimitNotANumberError unless max_page_number.is_a?(Integer)
+    raise PageLimitNotSensibleError unless max_page_number > 0
 
-    self.max_page_number = value
-  end
-
-  # If the page exceeds the defined maximum, either call the provided
-  # block (if provided) or call the #page_out_of_bounds method to
-  # provide a response.
-  #
-  # If the page doesn't exceed the limit, it yields the controller action.
-  def check_page_number
     if params[:page].present? && params[:page].to_i > max_page_number
-      record_interception
-      raise PageOutOfBoundsError
+      record_page_limit_interception
+      raise PageOutOfBoundsError.new(max_page_number)
     end
   end
 
@@ -71,7 +56,7 @@ module PageLimiter
   end
 
   # Record the page limit being hit in Prometheus
-  def record_interception
+  def record_page_limit_interception
     dd = DeviceDetector.new(request.user_agent)
 
     Gitlab::Metrics.counter(:gitlab_page_out_of_bounds,
