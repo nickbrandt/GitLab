@@ -92,14 +92,12 @@ describe ApprovalMergeRequestRule do
     context 'any_approver rules' do
       let(:rule) { build(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver) }
 
-      it 'is valid' do
-        expect(rule).to be_valid
-      end
-
-      it 'creating more than one any_approver rule raises an error' do
+      it 'creating only one any_approver rule is allowed' do
         create(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver)
 
-        expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+        expect(rule).not_to be_valid
+        expect(rule.errors.messages).to eq(rule_type: ['any-approver for the merge request already exists'])
+        expect { rule.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
       end
     end
   end

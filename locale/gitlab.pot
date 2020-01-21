@@ -21766,6 +21766,12 @@ msgstr ""
 msgid "and"
 msgstr ""
 
+msgid "any-approver for the merge request already exists"
+msgstr ""
+
+msgid "any-approver for the project already exists"
+msgstr ""
+
 msgid "archived"
 msgstr ""
 
