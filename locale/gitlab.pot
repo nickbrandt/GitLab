@@ -5759,13 +5759,22 @@ msgstr ""
 msgid "CycleAnalytics|Days to completion"
 msgstr ""
 
+msgid "CycleAnalytics|Display chart filters"
+msgstr ""
+
 msgid "CycleAnalytics|No stages selected"
 msgstr ""
 
 msgid "CycleAnalytics|Number of tasks"
 msgstr ""
 
-msgid "CycleAnalytics|Showing %{subject} and %{selectedLabelsCount} labels"
+msgid "CycleAnalytics|Select labels"
+msgstr ""
+
+msgid "CycleAnalytics|Show"
+msgstr ""
+
+msgid "CycleAnalytics|Showing %{subjectFilterText} and %{selectedLabelsCount} labels"
 msgstr ""
 
 msgid "CycleAnalytics|Showing data for group '%{groupName}' and %{selectedProjectCount} projects from %{startDate} to %{endDate}"

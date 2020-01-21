@@ -246,7 +246,11 @@ describe 'Group Cycle Analytics', :js do
         end
 
         it 'has 2 labels selected' do
-          expect(page).to have_text('Showing Issue and 2 labels')
+          expect(page).to have_text('Showing Issues and 2 labels')
+        end
+
+        it 'has chart filters' do
+          expect(page).to have_css('.js-tasks-by-type-chart-filters')
         end
       end
 

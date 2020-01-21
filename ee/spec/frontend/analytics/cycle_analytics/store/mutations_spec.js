@@ -1,5 +1,6 @@
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
@@ -263,6 +264,29 @@ describe('Cycle analytics mutations', () => {
       ]);
 
       expect(stateWithData.medians).toEqual({ '1': 20, '2': 10 });
+    });
+  });
+
+  describe(`${types.SET_TASKS_BY_TYPE_FILTERS}`, () => {
+    it('will update the tasksByType state key', () => {
+      state = { tasksByType: {} };
+      const subjectFilter = { filter: TASKS_BY_TYPE_FILTERS.SUBJECT, value: 'cool-subject' };
+      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, subjectFilter);
+
+      expect(state.tasksByType).toEqual({ subject: 'cool-subject' });
+    });
+
+    it('will toggle the specified label id in the tasksByType.labelIds state key', () => {
+      state = {
+        tasksByType: { labelIds: [10, 20, 30] },
+      };
+      const labelFilter = { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: 20 };
+      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
+
+      expect(state.tasksByType).toEqual({ labelIds: [10, 30] });
+
+      mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
+      expect(state.tasksByType).toEqual({ labelIds: [10, 30, 20] });
     });
   });
 });

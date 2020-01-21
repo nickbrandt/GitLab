@@ -2,11 +2,14 @@
 import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
 import { s__, sprintf } from '~/locale';
 import { formattedDate } from '../../shared/utils';
+import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
+import TasksByTypeFilters from './tasks_by_type_filters.vue';
 
 export default {
   name: 'TasksByTypeChart',
   components: {
     GlStackedColumnChart,
+    TasksByTypeFilters,
   },
   props: {
     filters: {
@@ -17,17 +20,14 @@ export default {
       type: Object,
       required: true,
     },
+    labels: {
+      type: Array,
+      required: true,
+    },
   },
   computed: {
     hasData() {
       return Boolean(this.chartData?.data?.length);
-    },
-    selectedFiltersText() {
-      const { subject, selectedLabelIds } = this.filters;
-      return sprintf(s__('CycleAnalytics|Showing %{subject} and %{selectedLabelsCount} labels'), {
-        subject,
-        selectedLabelsCount: selectedLabelIds.length,
-      });
     },
     summaryDescription() {
       const {
@@ -53,9 +53,12 @@ export default {
         selectedProjectCount,
       });
     },
-  },
-  chartOptions: {
-    legend: false,
+    selectedSubjectFilter() {
+      const {
+        filters: { subject },
+      } = this;
+      return subject || TASKS_BY_TYPE_SUBJECT_ISSUE;
+    },
   },
 };
 </script>
@@ -65,13 +68,17 @@ export default {
       <h3>{{ s__('CycleAnalytics|Type of work') }}</h3>
       <div v-if="hasData">
         <p>{{ summaryDescription }}</p>
-        <h4>{{ s__('CycleAnalytics|Tasks by type') }}</h4>
-        <p>{{ selectedFiltersText }}</p>
+        <tasks-by-type-filters
+          :labels="labels"
+          :selected-label-ids="filters.selectedLabelIds"
+          :subject-filter="selectedSubjectFilter"
+          @updateFilter="$emit('updateFilter', $event)"
+        />
         <gl-stacked-column-chart
-          :option="$options.chartOptions"
           :data="chartData.data"
           :group-by="chartData.groupBy"
           x-axis-type="category"
+          y-axis-type="value"
           :x-axis-title="__('Date')"
           :y-axis-title="s__('CycleAnalytics|Number of tasks')"
           :series-names="chartData.seriesNames"

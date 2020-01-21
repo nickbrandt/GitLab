@@ -1,6 +1,7 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
 import { transformRawStages, transformRawTasksByTypeData } from '../utils';
+import { TASKS_BY_TYPE_FILTERS } from '../constants';
 
 export default {
   [types.SET_FEATURE_FLAGS](state, featureFlags) {
@@ -189,5 +190,26 @@ export default {
   [types.RECEIVE_DURATION_MEDIAN_DATA_ERROR](state) {
     state.durationMedianData = [];
     state.isLoadingDurationChartMedianData = false;
+  },
+  [types.SET_TASKS_BY_TYPE_FILTERS](state, { filter, value }) {
+    const {
+      tasksByType: { labelIds, ...tasksByTypeRest },
+    } = state;
+    let updatedFilter = {};
+    switch (filter) {
+      case TASKS_BY_TYPE_FILTERS.LABEL:
+        updatedFilter = {
+          labelIds: labelIds.includes(value)
+            ? labelIds.filter(v => v !== value)
+            : [...labelIds, value],
+        };
+        break;
+      case TASKS_BY_TYPE_FILTERS.SUBJECT:
+        updatedFilter = { subject: value };
+        break;
+      default:
+        break;
+    }
+    state.tasksByType = { ...tasksByTypeRest, labelIds, ...updatedFilter };
   },
 };
