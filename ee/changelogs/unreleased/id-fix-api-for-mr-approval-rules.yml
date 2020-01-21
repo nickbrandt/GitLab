@@ -1,0 +1,5 @@
+---
+title: Fix create/delete API calls for approval rules
+merge_request: 23107
+author:
+type: fixed
