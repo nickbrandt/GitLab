@@ -201,6 +201,9 @@ module EE
         enable :update_approvers
         enable :destroy_package
         enable :admin_feature_flags_client
+        enable :modify_approvers_rules
+        enable :modify_merge_request_author_setting
+        enable :modify_merge_request_commiter_setting
       end
 
       rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
@@ -286,6 +289,24 @@ module EE
           .default_project_deletion_protection
       end
 
+      condition(:owner_cannot_modify_approvers_rules) do
+        @subject.feature_available?(:merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .disable_overriding_approvers_per_merge_request
+      end
+
+      condition(:owner_cannot_modify_merge_request_author_setting) do
+        @subject.feature_available?(:merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_author_approval
+      end
+
+      condition(:owner_cannot_modify_merge_request_commiter_setting) do
+        @subject.feature_available?(:merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_committers_approval
+      end
+
       rule { needs_new_sso_session & ~admin }.policy do
         prevent :guest_access
         prevent :reporter_access
@@ -296,6 +317,18 @@ module EE
 
       rule { ip_enforcement_prevents_access }.policy do
         prevent :read_project
+      end
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_rules
+      end
+
+      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
+        prevent :modify_merge_request_author_setting
+      end
+
+      rule { owner_cannot_modify_merge_request_commiter_setting & ~admin }.policy do
+        prevent :modify_merge_request_commiter_setting
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
