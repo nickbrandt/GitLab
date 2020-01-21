@@ -154,7 +154,7 @@ module MergeRequests
       params = base_params
 
       params.merge!(
-        assignees: [current_user],
+        assignees: assignees,
         source_branch: branch,
         source_project: project,
         target_project: target_project
@@ -167,8 +167,21 @@ module MergeRequests
       params
     end
 
+    def assignees(merge_request = nil)
+      unless push_options.key?(:assignee)
+        return merge_request.assignees if merge_request
+
+        return [current_user]
+      end
+
+      usernames = push_options[:assignee].map { |username, _| username }
+      User.by_username(usernames)
+    end
+
     def update_params(merge_request)
-      base_params.merge(merge_params(merge_request.source_branch))
+      base_params
+        .merge(merge_params(merge_request.source_branch))
+        .merge(assignees: assignees(merge_request))
     end
 
     def collect_errors_from_merge_request(merge_request)

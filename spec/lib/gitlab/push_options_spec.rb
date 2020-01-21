@@ -100,4 +100,10 @@ describe Gitlab::PushOptions do
 
     expect(options.get(:merge_request, :target)).to eq('value')
   end
+
+  it 'can parse multi value options' do
+    options = described_class.new(['merge_request.assignee=alice', 'merge_request.assignee=bob'])
+
+    expect(options.get(:merge_request, :assignee)).to eq({ 'alice' => 1, 'bob' => 1 })
+  end
 end

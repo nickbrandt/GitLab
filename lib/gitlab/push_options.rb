@@ -12,7 +12,8 @@ module Gitlab
           :remove_source_branch,
           :target,
           :title,
-          :unlabel
+          :unlabel,
+          :assignee
         ]
       },
       ci: {
@@ -23,7 +24,8 @@ module Gitlab
     MULTI_VALUE_OPTIONS = [
       %w[ci variable],
       %w[merge_request label],
-      %w[merge_request unlabel]
+      %w[merge_request unlabel],
+      %w[merge_request assignee]
     ].freeze
 
     NAMESPACE_ALIASES = HashWithIndifferentAccess.new({
