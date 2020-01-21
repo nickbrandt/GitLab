@@ -95,12 +95,12 @@ export default {
         class="prepend-left-5 ide-file-modified"
       />
     </span>
-    <changed-file-icon
+    <!-- <changed-file-icon
       v-else-if="showChangedFileIcon"
       :file="file"
       :show-tooltip="true"
       :show-staged-icon="false"
-    />
+    /> -->
     <new-dropdown
       :type="file.type"
       :path="file.path"
