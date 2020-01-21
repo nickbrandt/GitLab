@@ -4,20 +4,9 @@ import * as mockData from '../../../frontend/vue_shared/security_reports/mock_da
 // https://gitlab.com/gitlab-org/gitlab/merge_requests/10466#note_156218753
 
 export const {
-  containerScanningFeedbacks,
-  dast,
-  dastBase,
-  dastFeedbacks,
-  dependencyScanningFeedbacks,
-  dockerBaseReport,
-  dockerReport,
   dockerReportParsed,
   parsedDast,
-  sastFeedbacks,
-  sastIssues,
-  sastIssuesBase,
   sastParsedIssues,
-  mockFindings,
   sastDiffSuccessMock,
   dastDiffSuccessMock,
   containerScanningDiffSuccessMock,

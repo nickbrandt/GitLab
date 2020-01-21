@@ -6,7 +6,6 @@ import {
   parseDependencyScanningIssues,
   getDastSites,
   parseDastIssues,
-  getUnapprovedVulnerabilities,
   groupedTextBuilder,
   statusIcon,
   countIssues,
@@ -14,14 +13,6 @@ import {
 } from 'ee/vue_shared/security_reports/store/utils';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
-import {
-  formatContainerScanningDescription,
-  formatContainerScanningMessage,
-  formatContainerScanningSolution,
-  parseContainerScanningSeverity,
-  parseSastContainer,
-} from 'ee/vue_shared/security_reports/store/utils/container_scanning';
-import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import {
   oldSastIssues,
   sastIssues,
@@ -31,8 +22,6 @@ import {
   dependencyScanningIssues,
   dependencyScanningIssuesMajor2,
   dependencyScanningFeedbacks,
-  dockerReport,
-  containerScanningFeedbacks,
   dast,
   multiSitesDast,
   dastFeedbacks,
@@ -228,118 +217,6 @@ describe('security reports utils', () => {
     });
   });
 
-  describe('container scanning utils', () => {
-    describe('formatContainerScanningSolution', () => {
-      it('should return false if there is no data', () => {
-        expect(formatContainerScanningSolution({})).toBe(null);
-      });
-
-      it('should return the correct sentence', () => {
-        expect(formatContainerScanningSolution({ fixedby: 'v9000' })).toBe('Upgrade to v9000.');
-        expect(
-          formatContainerScanningSolution({ fixedby: 'v9000', featurename: 'Dependency' }),
-        ).toBe('Upgrade Dependency to v9000.');
-
-        expect(
-          formatContainerScanningSolution({
-            fixedby: 'v9000',
-            featurename: 'Dependency',
-            featureversion: '1.0-beta',
-          }),
-        ).toBe('Upgrade Dependency from 1.0-beta to v9000.');
-      });
-    });
-
-    describe('formatContainerScanningMessage', () => {
-      it('should return concatenated message if vulnerability and featurename are provided', () => {
-        expect(
-          formatContainerScanningMessage({ vulnerability: 'CVE-124', featurename: 'grep' }),
-        ).toBe('CVE-124 in grep');
-      });
-
-      it('should return vulnerability if only that is provided', () => {
-        expect(formatContainerScanningMessage({ vulnerability: 'Foo' })).toBe('Foo');
-      });
-    });
-
-    describe('formatContainerScanningDescription', () => {
-      it('should return description', () => {
-        expect(formatContainerScanningDescription({ description: 'Foobar' })).toBe('Foobar');
-      });
-
-      it('should build description from available fields', () => {
-        const featurename = 'Dependency';
-        const featureversion = '1.0';
-        const namespace = 'debian:8';
-        const vulnerability = 'CVE-123';
-
-        expect(
-          formatContainerScanningDescription({
-            featurename,
-            featureversion,
-            namespace,
-            vulnerability,
-          }),
-        ).toBe('Dependency:1.0 is affected by CVE-123.');
-
-        expect(formatContainerScanningDescription({ featurename, namespace, vulnerability })).toBe(
-          'Dependency is affected by CVE-123.',
-        );
-
-        expect(formatContainerScanningDescription({ namespace, vulnerability })).toBe(
-          'debian:8 is affected by CVE-123.',
-        );
-      });
-    });
-
-    describe('parseContainerScanningSeverity', () => {
-      it('should return `Critical` for `Defcon1`', () => {
-        expect(parseContainerScanningSeverity('Defcon1')).toBe(SEVERITY_LEVELS.critical);
-      });
-
-      it('should return `Low` for `Negligible`', () => {
-        expect(parseContainerScanningSeverity('Negligible')).toBe('Low');
-      });
-
-      it('should not touch other severities', () => {
-        expect(parseContainerScanningSeverity('oxofrmbl')).toBe('oxofrmbl');
-        expect(parseContainerScanningSeverity('Medium')).toBe('Medium');
-        expect(parseContainerScanningSeverity('High')).toBe('High');
-      });
-    });
-  });
-
-  describe('parseSastContainer', () => {
-    it('parses sast container issues', () => {
-      const parsed = parseSastContainer(dockerReport.vulnerabilities)[0];
-      const issue = dockerReport.vulnerabilities[0];
-
-      expect(parsed.title).toEqual(issue.vulnerability);
-      expect(parsed.identifiers).toEqual([
-        {
-          type: 'CVE',
-          name: issue.vulnerability,
-          value: issue.vulnerability,
-          url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
-        },
-      ]);
-
-      expect(parsed.project_fingerprint).toEqual(sha1(issue.vulnerability));
-    });
-
-    it('includes vulnerability feedbacks', () => {
-      const parsed = parseSastContainer(
-        dockerReport.vulnerabilities,
-        containerScanningFeedbacks,
-      )[0];
-
-      expect(parsed.hasIssue).toEqual(true);
-      expect(parsed.isDismissed).toEqual(true);
-      expect(parsed.dismissalFeedback).toEqual(containerScanningFeedbacks[0]);
-      expect(parsed.issue_feedback).toEqual(containerScanningFeedbacks[1]);
-    });
-  });
-
   describe('getDastSites', () => {
     it.each([{}, 'site', 1, undefined])('wraps non-array argument %p into an array', arg => {
       expect(getDastSites(arg)).toEqual([arg]);
@@ -409,19 +286,6 @@ describe('security reports utils', () => {
       const result = getFileLocation(undefined);
 
       expect(result).toBeNull();
-    });
-  });
-
-  describe('getUnapprovedVulnerabilities', () => {
-    it('return unapproved vulnerabilities', () => {
-      const unapproved = getUnapprovedVulnerabilities(
-        dockerReport.vulnerabilities,
-        dockerReport.unapproved,
-      );
-
-      expect(unapproved.length).toEqual(dockerReport.unapproved.length);
-      expect(unapproved[0].vulnerability).toEqual(dockerReport.unapproved[0]);
-      expect(unapproved[1].vulnerability).toEqual(dockerReport.unapproved[1]);
     });
   });
 

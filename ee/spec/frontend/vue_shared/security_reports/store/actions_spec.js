@@ -7,12 +7,7 @@ import {
   setPipelineId,
   setCanCreateIssuePermission,
   setCanCreateFeedbackPermission,
-  setSastContainerHeadPath,
-  setSastContainerBasePath,
   requestSastContainerReports,
-  receiveSastContainerReports,
-  receiveSastContainerError,
-  fetchSastContainerReports,
   setDastHeadPath,
   setDastBasePath,
   requestDastReports,
@@ -76,8 +71,6 @@ import {
   sastIssuesBase,
   dast,
   dastBase,
-  dockerReport,
-  dockerBaseReport,
   sastFeedbacks,
   dastFeedbacks,
   containerScanningFeedbacks,
@@ -252,42 +245,6 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setSastContainerHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setSastContainerHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_SAST_CONTAINER_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setSastContainerBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setSastContainerBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_SAST_CONTAINER_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestSastContainerReports', () => {
     it('should commit request mutation', done => {
       testAction(
@@ -302,162 +259,6 @@ describe('security reports actions', () => {
         [],
         done,
       );
-    });
-  });
-
-  describe('receiveSastContainerReports', () => {
-    it('should commit sast receive mutation', done => {
-      testAction(
-        receiveSastContainerReports,
-        {},
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_SAST_CONTAINER_REPORTS,
-            payload: {},
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('receiveSastContainerError', () => {
-    it('should commit sast error mutation', done => {
-      const error = new Error('test');
-
-      testAction(
-        receiveSastContainerError,
-        error,
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_SAST_CONTAINER_ERROR,
-            payload: error,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('fetchSastContainerReports', () => {
-    describe('with head and base', () => {
-      it('should dispatch `receiveSastContainerReports`', done => {
-        mock.onGet('foo').reply(200, dockerReport);
-        mock.onGet('bar').reply(200, dockerBaseReport);
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'container_scanning',
-            },
-          })
-          .reply(200, containerScanningFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-        mockedState.sastContainer.paths.head = 'foo';
-        mockedState.sastContainer.paths.base = 'bar';
-
-        testAction(
-          fetchSastContainerReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestSastContainerReports',
-            },
-            {
-              type: 'receiveSastContainerReports',
-              payload: {
-                head: dockerReport,
-                base: dockerBaseReport,
-                enrichData: containerScanningFeedbacks,
-              },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveSastContainerError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.sastContainer.paths.head = 'foo';
-        mockedState.sastContainer.paths.base = 'bar';
-
-        testAction(
-          fetchSastContainerReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestSastContainerReports',
-            },
-            {
-              type: 'receiveSastContainerError',
-            },
-          ],
-          done,
-        );
-      });
-    });
-
-    describe('with head', () => {
-      it('should dispatch `receiveSastContainerReports`', done => {
-        mock.onGet('foo').reply(200, dockerReport);
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'container_scanning',
-            },
-          })
-          .reply(200, containerScanningFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-
-        mockedState.sastContainer.paths.head = 'foo';
-
-        testAction(
-          fetchSastContainerReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestSastContainerReports',
-            },
-            {
-              type: 'receiveSastContainerReports',
-              payload: { head: dockerReport, base: null, enrichData: containerScanningFeedbacks },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveSastContainerError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.sastContainer.paths.head = 'foo';
-
-        testAction(
-          fetchSastContainerReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestSastContainerReports',
-            },
-            {
-              type: 'receiveSastContainerError',
-            },
-          ],
-          done,
-        );
-      });
     });
   });
 

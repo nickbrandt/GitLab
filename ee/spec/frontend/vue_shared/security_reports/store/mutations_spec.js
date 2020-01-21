@@ -7,11 +7,7 @@ import {
   parsedDependencyScanningIssuesHead,
   parsedDependencyScanningBaseStore,
   parsedDependencyScanningIssuesStore,
-  parsedSastContainerBaseStore,
-  dockerReport,
-  dockerBaseReport,
-  dockerNewIssues,
-  dockerOnlyHeadParsed,
+  mockFindings,
   dast,
   dastBase,
   parsedDastNewIssues,
@@ -86,62 +82,11 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('SET_SAST_CONTAINER_HEAD_PATH', () => {
-    it('should set sast container head path', () => {
-      mutations[types.SET_SAST_CONTAINER_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.sastContainer.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_SAST_CONTAINER_BASE_PATH', () => {
-    it('should set sast container base path', () => {
-      mutations[types.SET_SAST_CONTAINER_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.sastContainer.paths.base).toEqual('base_path');
-    });
-  });
-
   describe('REQUEST_SAST_CONTAINER_REPORTS', () => {
     it('should set sast container loading flag to true', () => {
       mutations[types.REQUEST_SAST_CONTAINER_REPORTS](stateCopy);
 
       expect(stateCopy.sastContainer.isLoading).toEqual(true);
-    });
-  });
-
-  describe('RECEIVE_SAST_CONTAINER_REPORTS', () => {
-    describe('with head and base', () => {
-      it('should set new and resolved issues', () => {
-        mutations[types.RECEIVE_SAST_CONTAINER_REPORTS](stateCopy, {
-          head: dockerReport,
-          base: dockerBaseReport,
-        });
-
-        expect(stateCopy.sastContainer.isLoading).toEqual(false);
-        expect(stateCopy.sastContainer.newIssues).toEqual(dockerNewIssues);
-        expect(stateCopy.sastContainer.resolvedIssues).toEqual(parsedSastContainerBaseStore);
-      });
-    });
-
-    describe('with head', () => {
-      it('should set new issues', () => {
-        mutations[types.RECEIVE_SAST_CONTAINER_REPORTS](stateCopy, {
-          head: dockerReport,
-        });
-
-        expect(stateCopy.sastContainer.isLoading).toEqual(false);
-        expect(stateCopy.sastContainer.newIssues).toEqual(dockerOnlyHeadParsed);
-      });
-    });
-  });
-
-  describe('RECEIVE_SAST_CONTAINER_ERROR', () => {
-    it('should set sast container loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_SAST_CONTAINER_ERROR](stateCopy);
-
-      expect(stateCopy.sastContainer.isLoading).toEqual(false);
-      expect(stateCopy.sastContainer.hasError).toEqual(true);
     });
   });
 
@@ -742,10 +687,10 @@ describe('security reports mutations', () => {
 
   describe('UPDATE_CONTAINER_SCANNING_ISSUE', () => {
     it('updates issue in the new issues list', () => {
-      stateCopy.sastContainer.newIssues = dockerNewIssues;
+      stateCopy.sastContainer.newIssues = mockFindings;
       stateCopy.sastContainer.resolvedIssues = [];
       const updatedIssue = {
-        ...dockerNewIssues[0],
+        ...mockFindings[0],
         foo: 'bar',
       };
 
@@ -756,9 +701,9 @@ describe('security reports mutations', () => {
 
     it('updates issue in the resolved issues list', () => {
       stateCopy.sastContainer.newIssues = [];
-      stateCopy.sastContainer.resolvedIssues = dockerNewIssues;
+      stateCopy.sastContainer.resolvedIssues = mockFindings;
       const updatedIssue = {
-        ...dockerNewIssues[0],
+        ...mockFindings[0],
         foo: 'bar',
       };
 

@@ -1,15 +1,8 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
-import {
-  parseDependencyScanningIssues,
-  parseDastIssues,
-  getUnapprovedVulnerabilities,
-  findIssueIndex,
-  parseDiff,
-} from './utils';
+import { parseDependencyScanningIssues, parseDastIssues, findIssueIndex, parseDiff } from './utils';
 import filterByKey from './utils/filter_by_key';
 import getFileLocation from './utils/get_file_location';
-import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 
 export default {
@@ -58,52 +51,12 @@ export default {
   },
 
   // SAST CONTAINER
-  [types.SET_SAST_CONTAINER_HEAD_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'head', path);
-  },
-
-  [types.SET_SAST_CONTAINER_BASE_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'base', path);
-  },
-
   [types.SET_SAST_CONTAINER_DIFF_ENDPOINT](state, path) {
     Vue.set(state.sastContainer.paths, 'diffEndpoint', path);
   },
 
   [types.REQUEST_SAST_CONTAINER_REPORTS](state) {
     Vue.set(state.sastContainer, 'isLoading', true);
-  },
-
-  /**
-   * For sast container we only render unapproved vulnerabilities.
-   */
-  [types.RECEIVE_SAST_CONTAINER_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const headIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-      const baseIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.base.vulnerabilities, reports.enrichData, reports.base.image),
-        reports.base.unapproved,
-      );
-      const filterKey = 'vulnerability';
-
-      const newIssues = filterByKey(headIssues, baseIssues, filterKey);
-      const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    } else if (reports.head && !reports.base) {
-      const newIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    }
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
@@ -120,11 +73,6 @@ export default {
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](state) {
-    Vue.set(state.sastContainer, 'isLoading', false);
-    Vue.set(state.sastContainer, 'hasError', true);
-  },
-
-  [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
     Vue.set(state.sastContainer, 'isLoading', false);
     Vue.set(state.sastContainer, 'hasError', true);
   },

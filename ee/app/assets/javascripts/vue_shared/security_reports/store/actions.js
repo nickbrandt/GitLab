@@ -50,23 +50,12 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
 /**
  * SAST CONTAINER
  */
-export const setSastContainerHeadPath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_HEAD_PATH, path);
-
-export const setSastContainerBasePath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_BASE_PATH, path);
 
 export const setSastContainerDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
 
 export const requestSastContainerReports = ({ commit }) =>
   commit(types.REQUEST_SAST_CONTAINER_REPORTS);
-
-export const receiveSastContainerReports = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_CONTAINER_REPORTS, response);
-
-export const receiveSastContainerError = ({ commit }, error) =>
-  commit(types.RECEIVE_SAST_CONTAINER_ERROR, error);
 
 export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
@@ -93,32 +82,6 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('receiveSastContainerDiffError');
-    });
-};
-
-export const fetchSastContainerReports = ({ state, dispatch }) => {
-  const { base, head } = state.sastContainer.paths;
-
-  dispatch('requestSastContainerReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'container_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveSastContainerReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveSastContainerError');
     });
 };
 

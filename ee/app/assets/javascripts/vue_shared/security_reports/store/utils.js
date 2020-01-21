@@ -260,9 +260,6 @@ export const parseDastIssues = (sites = [], feedback = []) =>
     [],
   );
 
-export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
-  issues.filter(item => unapproved.find(el => el === item.vulnerability));
-
 export const groupedTextBuilder = ({
   reportType = '',
   paths = {},
