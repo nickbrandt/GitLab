@@ -723,6 +723,27 @@ module EE
       packages.where(package_type: package_type).exists?
     end
 
+    def disable_overriding_approvers_per_merge_request
+      return self[:disable_overriding_approvers_per_merge_request] unless License.feature_available?(:merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
+        self[:disable_overriding_approvers_per_merge_request]
+    end
+
+    def merge_requests_author_approval
+      return self[:merge_requests_author_approval] unless License.feature_available?(:merge_request_approvers_rules)
+
+      return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+      self[:merge_requests_author_approval]
+    end
+
+    def merge_requests_disable_committers_approval
+      return self[:merge_requests_disable_committers_approval] unless License.feature_available?(:merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
+        self[:merge_requests_disable_committers_approval]
+    end
+
     def license_compliance
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
     end
