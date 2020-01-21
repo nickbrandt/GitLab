@@ -190,7 +190,7 @@ describe API::Helpers do
   end
 
   describe '#order_options_with_tie_breaker' do
-    let(:subject) { Class.new.include(described_class).new.order_options_with_tie_breaker }
+    subject { Class.new.include(described_class).new.order_options_with_tie_breaker }
 
     before do
       allow_any_instance_of(described_class).to receive(:params).and_return(params)
@@ -201,7 +201,7 @@ describe API::Helpers do
         let(:params) { { order_by: 'name', sort: 'asc' } }
 
         it 'adds id based ordering with same direction as primary order' do
-          expect(subject).to eq({ 'name' => 'asc', 'id' => 'asc' })
+          is_expected.to eq({ 'name' => 'asc', 'id' => 'asc' })
         end
       end
 
@@ -209,7 +209,7 @@ describe API::Helpers do
         let(:params) { { order_by: 'name', sort: 'desc' } }
 
         it 'adds id based ordering with same direction as primary order' do
-          expect(subject).to eq({ 'name' => 'desc', 'id' => 'desc' })
+          is_expected.to eq({ 'name' => 'desc', 'id' => 'desc' })
         end
       end
     end
@@ -218,7 +218,7 @@ describe API::Helpers do
       let(:params) { { order_by: 'name' } }
 
       it 'adds ID ASC order' do
-        expect(subject).to eq({ 'name' => nil, 'id' => 'asc' })
+        is_expected.to eq({ 'name' => nil, 'id' => 'asc' })
       end
     end
 
@@ -226,7 +226,7 @@ describe API::Helpers do
       let(:params) { { order_by: 'id', sort: 'asc' } }
 
       it 'does not add an additional order' do
-        expect(subject).to eq({ 'id' => 'asc' })
+        is_expected.to eq({ 'id' => 'asc' })
       end
     end
   end
