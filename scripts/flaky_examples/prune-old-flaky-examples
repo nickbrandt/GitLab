@@ -24,5 +24,5 @@ puts "Current report has #{report.size} entries."
 
 new_report = report.prune_outdated
 
-puts "New report has #{new_report.size} entries: #{report.size - new_report.size} entries older than 90 days were removed."
+puts "New report has #{new_report.size} entries: #{report.size - new_report.size} entries older than #{RspecFlaky::Report::OUTDATED_DAYS_THRESHOLD} days were removed."
 puts "Saved #{new_report_file}." if new_report.write(new_report_file)
