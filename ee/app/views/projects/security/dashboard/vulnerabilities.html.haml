@@ -1,10 +1,10 @@
 - add_to_breadcrumbs _("Security Dashboard"), project_security_dashboard_index_path(@project)
-- breadcrumb_title "Vulnerability list"
-- page_title "Vulnerability list"
+- breadcrumb_title "Vulnerabilities"
+- page_title "Vulnerabilities"
 
 .issue-details.issuable-details
   .detail-page-description.content-block
-    %h2.title= "Vulnerability List"
+    %h2.title= "Vulnerabilities"
 
   .ci-table.js-security-dashboard-table
     .gl-responsive-table-row.table-row-header.vulnerabilities-row-header.px-2{:role => "row"}
@@ -26,6 +26,9 @@
           .table-mobile-header{:role => "rowheader"} Description
           .table-mobile-content.vulnerability-info.text-truncate
             = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
-            %br
-            %span.text-muted.small
-              = vulnerability.finding.description
+            - if vulnerability.finding
+              %br
+              %span.text-muted.small
+                = vulnerability.finding.description
+
+  = paginate @vulnerabilities, theme: "gitlab"

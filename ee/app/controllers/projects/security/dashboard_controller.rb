@@ -24,10 +24,10 @@ module Projects
         @pipeline = pipeline if Ability.allowed?(current_user, :read_pipeline, pipeline)
       end
 
-      def vulnerability_list
+      def vulnerabilities
         return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
        
-        @vulnerabilities = project.vulnerabilities
+        @vulnerabilities = Kaminari.paginate_array(project.vulnerabilities).page(params[:page])
       end
     end
   end
