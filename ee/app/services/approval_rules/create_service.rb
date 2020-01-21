@@ -14,7 +14,7 @@ module ApprovalRules
         params.reverse_merge!(rule_type: :report_approver)
       end
 
-      handle_any_approver_rule_creation(target, params) if target.is_a?(Project)
+      handle_any_approver_rule_creation(target, @rule.project, params)
       copy_approval_project_rule_properties(params) if target.is_a?(MergeRequest)
 
       super(@rule.project, user, params)
@@ -38,14 +38,14 @@ module ApprovalRules
       params[:groups] = approval_project_rule.groups
     end
 
-    def handle_any_approver_rule_creation(target, params)
+    def handle_any_approver_rule_creation(target, project, params)
       if params[:user_ids].blank? && params[:group_ids].blank?
         params.reverse_merge!(rule_type: :any_approver, name: ApprovalRuleLike::ALL_MEMBERS)
 
         return
       end
 
-      return if target.multiple_approval_rules_available?
+      return if project.multiple_approval_rules_available?
 
       target.approval_rules.any_approver.delete_all
     end
