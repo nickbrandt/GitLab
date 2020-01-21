@@ -74,8 +74,6 @@ class Issue < ApplicationRecord
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
 
-  scope :counts_by_state, -> { reorder(nil).group(:state_id).count }
-
   ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
 
   after_commit :expire_etag_cache, unless: :importing?

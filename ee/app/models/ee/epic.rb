@@ -102,8 +102,6 @@ module EE
       scope :start_date_inherited, -> { where(start_date_is_fixed: [nil, false]) }
       scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
 
-      scope :counts_by_state, -> { group(:state_id).count }
-
       MAX_HIERARCHY_DEPTH = 5
 
       def etag_caching_enabled?

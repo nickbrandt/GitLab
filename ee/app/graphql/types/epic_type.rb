@@ -121,21 +121,26 @@ module Types
           resolver: Resolvers::EpicIssuesResolver
 
     field :descendant_counts, Types::EpicDescendantCountType, null: true, complexity: 10,
-          description: 'Number of open and closed descendant epics and issues',
-          resolve: -> (epic, args, ctx) do
-            Epics::DescendantCountService.new(epic, ctx[:current_user])
-          end
+      description: 'Number of open and closed descendant epics and issues',
+      resolve: -> (epic, args, ctx) do
+        if Feature.enabled?(:unfiltered_epic_aggregates)
+          Epics::LazyEpicAggregate.new(ctx, epic.id, Epics::LazyEpicAggregate::COUNT)
+        else
+          Epics::DescendantCountService.new(epic, ctx[:current_user])
+        end
+      end
 
     field :descendant_weight_sum, Types::EpicDescendantWeightSumType, null: true, complexity: 10,
-          description: "Total weight of open and closed descendant epic's issues",
-          feature_flag: :unfiltered_epic_aggregates
+      description: "Total weight of open and closed descendant epic's issues",
+      feature_flag: :unfiltered_epic_aggregates,
+      resolve: -> (epic, args, ctx) do
+        Epics::LazyEpicAggregate.new(ctx, epic.id, Epics::LazyEpicAggregate::WEIGHT_SUM)
+      end
 
-    def descendant_weight_sum
-      OpenStruct.new(
-        # We shouldn't stop the whole query, so returning -1 for a semi-noisy error
-        opened_issues: -1,
-        closed_issues: -1
-      )
-    end
+    field :health_status,
+      ::Types::HealthStatusEnum,
+      null: true,
+      description: 'Current health status',
+      feature_flag: :save_issuable_health_status
   end
 end
