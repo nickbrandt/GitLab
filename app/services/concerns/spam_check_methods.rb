@@ -26,7 +26,8 @@ module SpamCheckMethods
     SpamCheckService.new(
       spammable: spammable,
       request: @request
-    ).execute(api: @api,
+    ).execute(
+      api: @api,
       recaptcha_verified: @recaptcha_verified,
       spam_log_id: @spam_log_id,
       user_id: user.id)

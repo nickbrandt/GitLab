@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe SpamLog do
-  let(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
 
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
@@ -33,19 +33,19 @@ describe SpamLog do
   end
 
   describe '.verify_recaptcha!' do
-    let(:spam_log) { create(:spam_log, id: 123, user: admin, recaptcha_verified: false) }
+    let_it_be(:spam_log) { create(:spam_log, user: admin, recaptcha_verified: false) }
 
     context 'the record cannot be found' do
       it 'updates nothing' do
         expect(instance_of(described_class)).not_to receive(:update!)
 
-        described_class.verify_recaptcha!(id: 9999, user_id: admin.id)
+        described_class.verify_recaptcha!(id: spam_log.id, user_id: admin.id)
 
         expect(spam_log.recaptcha_verified).to be_falsey
       end
 
       it 'does not error despite not finding a record' do
-        expect { described_class.verify_recaptcha!(id: 9999, user_id: admin.id) }.not_to raise_error
+        expect { described_class.verify_recaptcha!(id: -1, user_id: admin.id) }.not_to raise_error
       end
     end
 

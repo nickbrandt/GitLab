@@ -408,7 +408,7 @@ describe Issues::CreateService do
 
             it 'creates a new spam_log' do
               expect { issue }
-                .to log_spam(title: issue.title, description: issue.description, user_id: user.id, noteable_type: 'Issue')
+                  .to have_spam_log(title: issue.title, description: issue.description, user_id: user.id, noteable_type: 'Issue')
             end
 
             it 'assigns a spam_log to an issue' do
@@ -431,7 +431,7 @@ describe Issues::CreateService do
 
             it 'creates a new spam_log' do
               expect { issue }
-                .to log_spam(title: issue.title, description: issue.description, user_id: user.id, noteable_type: 'Issue')
+                  .to have_spam_log(title: issue.title, description: issue.description, user_id: user.id, noteable_type: 'Issue')
             end
 
             it 'assigns a spam_log to an issue' do

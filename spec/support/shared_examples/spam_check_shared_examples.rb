@@ -4,7 +4,7 @@ shared_examples 'akismet spam' do
   context 'when request is missing' do
     subject { described_class.new(spammable: issue, request: nil) }
 
-    it "doesn't check as spam when request is missing" do
+    it "doesn't check as spam" do
       subject
 
       expect(issue).not_to be_spam

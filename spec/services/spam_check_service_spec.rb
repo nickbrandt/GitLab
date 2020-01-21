@@ -51,19 +51,16 @@ describe SpamCheckService do
 
   describe '#execute' do
     let(:request) { double(:request, env: env) }
-    let(:params) do
-      { user_id: user.id, api: nil, spam_log_id: 123 }
-    end
+
+    let_it_be(:existing_spam_log) { create(:spam_log, user: user, recaptcha_verified: false) }
 
     subject do
       described_service = described_class.new(spammable: issue, request: request)
-      described_service.execute(params.merge(recaptcha_verified: recaptcha_verified, spam_log_id: 123))
+      described_service.execute(user_id: user.id, api: nil, recaptcha_verified: recaptcha_verified, spam_log_id: existing_spam_log.id)
     end
 
     context 'when recaptcha was already verified' do
       let(:recaptcha_verified) { true }
-
-      let_it_be(:existing_spam_log) { create(:spam_log, user: user, recaptcha_verified: false, id: 123) }
 
       it "updates spam log and doesn't check Akismet" do
         aggregate_failures do
