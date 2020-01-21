@@ -1,0 +1,5 @@
+---
+title: Add current and last IP to /users endpoint
+merge_request: 19781
+author:
+type: added
