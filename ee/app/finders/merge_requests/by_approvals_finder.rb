@@ -5,9 +5,12 @@ module MergeRequests
   class ByApprovalsFinder
     attr_reader :usernames, :ids
 
+    # We apply a limitation to the amount of elements that can be part of the filter condition
+    MAX_FILTER_ELEMENTS = 5
+
     def initialize(usernames, ids)
-      @usernames = Array(usernames).map(&:to_s).uniq
-      @ids = Array(ids).uniq
+      @usernames = Array(usernames).map(&:to_s).uniq.take(MAX_FILTER_ELEMENTS)
+      @ids = Array(ids).uniq.take(MAX_FILTER_ELEMENTS)
     end
 
     def execute(items)

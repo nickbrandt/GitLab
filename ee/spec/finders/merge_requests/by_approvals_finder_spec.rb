@@ -5,6 +5,7 @@ require 'spec_helper'
 describe MergeRequests::ByApprovalsFinder do
   set(:first_user) { create(:user) }
   set(:second_user) { create(:user) }
+  let(:third_user) { create(:user) }
 
   set(:merge_request_without_approvals) { create(:merge_request) }
   set(:merge_request_with_first_user_approval) do
@@ -56,6 +57,17 @@ describe MergeRequests::ByApprovalsFinder do
 
       expect(merge_requests(ids: [first_user.id, second_user.id])).to match_array(expected_result)
       expect(merge_requests(names: [first_user.username, second_user.username])).to match_array(expected_result)
+    end
+
+    context 'limiting max conditional elements' do
+      it 'returns merge requests approved by both users, considering limit of 2 being defined' do
+        stub_const('MergeRequests::ByApprovalsFinder::MAX_FILTER_ELEMENTS', 2)
+
+        expected_result = [merge_request_with_both_approvals]
+
+        expect(merge_requests(ids: [first_user.id, second_user.id, third_user.id])).to match_array(expected_result)
+        expect(merge_requests(names: [first_user.username, second_user.username, third_user.username])).to match_array(expected_result)
+      end
     end
   end
 
