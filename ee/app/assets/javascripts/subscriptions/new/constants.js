@@ -11,4 +11,10 @@ export const ZUORA_IFRAME_OVERRIDE_PARAMS = {
   retainValues: 'true',
 };
 
+export const PROGRESS_STEPS = {
+  editProfile: 1,
+  checkout: 2,
+  editGroup: 3,
+};
+
 export const TAX_RATE = 0;

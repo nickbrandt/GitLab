@@ -10,6 +10,14 @@ module SubscriptionsHelper
     }
   end
 
+  def plan_title
+    @plan_title ||= subscription.hosted_plan.title
+  end
+
+  def subscription_seats
+    @subscription_seats ||= subscription.seats
+  end
+
   private
 
   def plan_data
@@ -17,5 +25,9 @@ module SubscriptionsHelper
       .map(&:symbolize_keys)
       .reject { |plan| plan[:free] }
       .map { |plan| plan.slice(:id, :code, :price_per_year) }
+  end
+
+  def subscription
+    @subscription ||= @group.gitlab_subscription
   end
 end

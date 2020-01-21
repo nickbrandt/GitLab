@@ -98,7 +98,7 @@ describe SubscriptionsController do
       post :create,
         params: {
           setup_for_company: setup_for_company,
-          customer: { country: 'NL' },
+          customer: { company: 'My company', country: 'NL' },
           subscription: { plan_id: 'x' }
         },
         as: :json
@@ -157,7 +157,7 @@ describe SubscriptionsController do
         it 'returns the group edit location in JSON format' do
           subject
 
-          expect(response.body).to eq({ location: "/groups/#{group.path}/-/edit" }.to_json)
+          expect(response.body).to eq({ location: "/-/subscriptions/groups/#{group.path}/edit" }.to_json)
         end
       end
 
