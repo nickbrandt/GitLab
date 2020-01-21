@@ -159,6 +159,19 @@ October 07, 2014 11:25: User "Claudie Hodkiewicz" (nasir_stehr@olson.co.uk)  was
 October 07, 2014 11:25: Project "project133" was removed
 ```
 
+## `application_json.log`
+
+This file lives in `/var/log/gitlab/gitlab-rails/application_json.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/application_json.log` for
+installations from source.
+
+It contains the JSON version of the logs in `application.log` like the example below:
+
+``` json
+{"severity":"INFO","time":"2020-01-14T13:35:15.466Z","correlation_id":"3823a1550b64417f9c9ed8ee0f48087e","message":"User \"Administrator\" (admin@example.com) was created"}
+{"severity":"INFO","time":"2020-01-14T13:35:15.466Z","correlation_id":"78e3df10c9a18745243d524540bd5be4","message":"Project \"project133\" was removed"}
+```
+
 ## `integrations_json.log`
 
 This file lives in `/var/log/gitlab/gitlab-rails/integrations_json.log` for
