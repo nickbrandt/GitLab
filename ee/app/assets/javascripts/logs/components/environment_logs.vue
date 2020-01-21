@@ -2,6 +2,10 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
 import { scrollDown } from '~/lib/utils/scroll_utils';
+
+// import { getTimeRange } from '~/vue_shared/components/date_time_picker/date_time_picker_lib';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
+
 import LogControlButtons from './log_control_buttons.vue';
 
 export default {
@@ -12,6 +16,7 @@ export default {
     GlFormGroup,
     GlSearchBoxByClick,
     LogControlButtons,
+    DateTimePicker,
   },
   props: {
     projectFullPath: {
@@ -99,6 +104,14 @@ export default {
       'showEnvironment',
       'fetchEnvironments',
     ]),
+
+    // TODO Implement these methods 
+    onDateTimePickerApply(params) {
+      console.log('onDateTimePickerApply', params);
+    },
+    onDateTimePickerInvalid(params) {
+      console.log('onDateTimePickerInvalid', params);
+    },
   },
 };
 </script>
@@ -179,6 +192,22 @@ export default {
             label-for="time-window-dropdown"
             class="col-3 px-1"
           >
+            <date-time-picker
+              :start="timeWindow.start"
+              :end="timeWindow.end"
+              :time-windows="timeWindow.options"
+              @apply="onDateTimePickerApply"
+              @invalid="onDateTimePickerInvalid"
+            />
+          </gl-form-group>
+
+          <!-- <gl-form-group
+            id="dates-fg"
+            :label="s__('Environments|Show last')"
+            label-size="sm"
+            label-for="time-window-dropdown"
+            class="col-3 px-1"
+          >
             <gl-dropdown
               id="time-window-dropdown"
               ref="time-window-dropdown"
@@ -195,7 +224,7 @@ export default {
                 {{ option.label }}
               </gl-dropdown-item>
             </gl-dropdown>
-          </gl-form-group>
+          </gl-form-group> -->
           <gl-form-group
             id="search-fg"
             :label="s__('Environments|Search')"

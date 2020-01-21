@@ -1,52 +1,62 @@
-import { defaultTimeWindow, timeWindows } from '../constants';
+// import { defaultTimeWindow } from '../constants';
+import {
+  getDefaultTimeRange,
+  defaultTimeWindows,
+} from '~/vue_shared/components/date_time_picker/date_time_picker_lib';
 
-export default () => ({
-  /**
-   * Current project path
-   */
-  projectPath: '',
+export default () => {
+  const timeWindows = defaultTimeWindows;
+  const { start, end } = getDefaultTimeRange(defaultTimeWindows);
 
-  /**
-   * Full text search
-   */
-  search: '',
+  return {
+    /**
+     * Current project path
+     */
+    projectPath: '',
 
-  /**
-   * True if log source is elasticsearch
-   */
-  enableAdvancedQuerying: false,
+    /**
+     * Full text search
+     */
+    search: '',
 
-  /**
-   * Time range (Show last)
-   */
-  timeWindow: {
-    options: { ...timeWindows },
-    current: defaultTimeWindow,
-  },
+    /**
+     * True if log source is elasticsearch
+     */
+    enableAdvancedQuerying: false,
 
-  /**
-   * Environments list information
-   */
-  environments: {
-    options: [],
-    isLoading: false,
-    current: null,
-  },
+    /**
+     * Time range (Show last)
+     */
+    timeWindow: {
+      options: { ...timeWindows },
+      start,
+      end,
+    },
 
-  /**
-   * Logs including trace
-   */
-  logs: {
-    lines: [],
-    isLoading: false,
-    isComplete: true,
-  },
+    /**
+     * Environments list information
+     */
+    environments: {
+      options: [],
+      isLoading: false,
+      current: null,
+    },
 
-  /**
-   * Pods list information
-   */
-  pods: {
-    options: [],
-    current: null,
-  },
-});
+    /**
+     * Logs including trace
+     */
+    logs: {
+      lines: [],
+      isLoading: false,
+      isComplete: true,
+    },
+
+    /**
+     * Pods list information
+     */
+    pods: {
+      options: [],
+      current: null,
+    },
+  };
+};

@@ -80,7 +80,7 @@ export const isValidDate = dateString => {
  */
 export const getTimeRange = (timeWindowKey, timeWindows = defaultTimeWindows) => {
   let difference;
-  if (timeWindows[timeWindowKey]) {
+  if (timeWindowKey && timeWindows[timeWindowKey]) {
     difference = timeWindows[timeWindowKey].seconds;
   } else {
     const [defaultEntry] = Object.entries(timeWindows).filter(
@@ -98,6 +98,8 @@ export const getTimeRange = (timeWindowKey, timeWindows = defaultTimeWindows) =>
     end: new Date(secondsToMilliseconds(end)).toISOString(),
   };
 };
+
+export const getDefaultTimeRange = (timeWindows = defaultTimeWindows) => getTimeRange(null, timeWindows);
 
 export const getTimeWindowKey = ({ start, end }, timeWindows = defaultTimeWindows) =>
   Object.entries(timeWindows).reduce((acc, [timeWindowKey, timeWindow]) => {
