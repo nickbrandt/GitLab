@@ -22448,7 +22448,7 @@ msgstr ""
 msgid "mrWidget|Check out branch"
 msgstr ""
 
-msgid "mrWidget|Checking ability to merge automatically"
+msgid "mrWidget|Checking ability to merge automatically…"
 msgstr ""
 
 msgid "mrWidget|Cherry-pick"
