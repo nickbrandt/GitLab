@@ -54,7 +54,7 @@ describe 'Groups > Usage Quotas' do
       it 'renders a 404' do
         visit_pipeline_quota_page
 
-        expect(page).to have_http_status(:not_found)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -151,7 +151,7 @@ describe 'Groups > Usage Quotas' do
     it 'does not show subproject' do
       visit_pipeline_quota_page
 
-      expect(page).to have_http_status(:not_found)
+      expect(page).to have_gitlab_http_status(:not_found)
     end
   end
 
