@@ -17,6 +17,7 @@ module Gitlab
       def initialize(log_output = STDERR)
         # As recommended by https://github.com/mperham/sidekiq/wiki/Advanced-Options#concurrency
         @max_concurrency = 50
+        @min_concurrency = 0
         @environment = ENV['RAILS_ENV'] || 'development'
         @pid = nil
         @interval = 5
@@ -54,8 +55,14 @@ module Gitlab
 
         @logger.info("Starting cluster with #{queue_groups.length} processes")
 
-        @processes = SidekiqCluster.start(queue_groups, env: @environment, directory: @rails_path,
-          max_concurrency: @max_concurrency, dryrun: @dryrun)
+        @processes = SidekiqCluster.start(
+          queue_groups,
+          env: @environment,
+          directory: @rails_path,
+          max_concurrency: @max_concurrency,
+          min_concurrency: @min_concurrency,
+          dryrun: @dryrun
+        )
 
         return if @dryrun
 
@@ -126,6 +133,10 @@ module Gitlab
 
           opt.on('-m', '--max-concurrency INT', 'Maximum threads to use with Sidekiq (default: 50, 0 to disable)') do |int|
             @max_concurrency = int.to_i
+          end
+
+          opt.on('--min-concurrency INT', 'Minimum threads to use with Sidekiq (default: 0)') do |int|
+            @min_concurrency = int.to_i
           end
 
           opt.on('-e', '--environment ENV', 'The application environment') do |env|
