@@ -145,46 +145,6 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('RECEIVE_DEPENDENCY_SCANNING_REPORTS', () => {
-    describe('with head and base', () => {
-      it('should set new, fixed and all issues', () => {
-        mutations[types.SET_BASE_BLOB_PATH](stateCopy, 'path');
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-        mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssuesOld,
-          base: dependencyScanningIssuesBase,
-        });
-
-        expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-        expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesHead);
-        expect(stateCopy.dependencyScanning.resolvedIssues).toEqual(
-          parsedDependencyScanningBaseStore,
-        );
-      });
-    });
-
-    describe('with head', () => {
-      it('should set new issues', () => {
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-        mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssuesOld,
-        });
-
-        expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-        expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesStore);
-      });
-    });
-  });
-
-  describe('RECEIVE_DEPENDENCY_SCANNING_ERROR', () => {
-    it('should set dependency scanning loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_DEPENDENCY_SCANNING_ERROR](stateCopy);
-
-      expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-      expect(stateCopy.dependencyScanning.hasError).toEqual(true);
-    });
-  });
-
   describe('SET_ISSUE_MODAL_DATA', () => {
     it('has default data', () => {
       expect(stateCopy.modal.data.description.value).toEqual(null);

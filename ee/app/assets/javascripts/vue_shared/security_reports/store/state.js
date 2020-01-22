@@ -47,8 +47,6 @@ export default () => ({
 
   dependencyScanning: {
     paths: {
-      head: null,
-      base: null,
       diffEndpoint: null,
     },
 

@@ -159,56 +159,6 @@ export default {
     Vue.set(state.dependencyScanning, 'isLoading', true);
   },
 
-  /**
-   * Compares dependency scanning results and returns the formatted report
-   *
-   * Dependency report has 3 types of issues, newIssues, resolvedIssues and allIssues.
-   *
-   * When we have both base and head:
-   * - newIssues = head - base
-   * - resolvedIssues = base - head
-   * - allIssues = head - newIssues - resolvedIssues
-   *
-   * When we only have head
-   * - newIssues = head
-   * - resolvedIssues = 0
-   * - allIssues = 0
-   */
-  [types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const filterKey = 'cve';
-      const parsedHead = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      const parsedBase = parseDependencyScanningIssues(
-        reports.base,
-        reports.enrichData,
-        state.blobPath.base,
-      );
-
-      const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
-      const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
-      const allIssues = filterByKey(parsedHead, newIssues.concat(resolvedIssues), filterKey);
-
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.dependencyScanning, 'allIssues', allIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
-
-    if (reports.head && !reports.base) {
-      const newIssues = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
-  },
-
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
     const baseReportOutofDate = diff.base_report_out_of_date || false;
@@ -223,11 +173,6 @@ export default {
   },
 
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR](state) {
-    Vue.set(state.dependencyScanning, 'isLoading', false);
-    Vue.set(state.dependencyScanning, 'hasError', true);
-  },
-
-  [types.RECEIVE_DEPENDENCY_SCANNING_ERROR](state) {
     Vue.set(state.dependencyScanning, 'isLoading', false);
     Vue.set(state.dependencyScanning, 'hasError', true);
   },
