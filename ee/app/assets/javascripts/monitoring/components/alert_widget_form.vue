@@ -237,12 +237,11 @@ export default {
         <gl-dropdown
           id="alert-query-dropdown"
           :text="queryDropdownLabel"
-          toggle-class="dropdown-menu-toggle qa-alert-query-dropdown"
+          toggle-class="dropdown-menu-toggle"
         >
           <gl-dropdown-item
             v-for="query in relevantQueries"
             :key="query.metricId"
-            data-qa-selector="alert_query_option"
             @click="selectQuery(query.metricId)"
           >
             {{ query.label }}
@@ -281,7 +280,6 @@ export default {
           v-model.number="threshold"
           :disabled="formDisabled"
           type="number"
-          data-qa-selector="alert_threshold_field"
         />
       </gl-form-group>
     </div>
