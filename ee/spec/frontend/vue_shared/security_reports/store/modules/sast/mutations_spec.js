@@ -28,21 +28,6 @@ describe('sast module mutations', () => {
     });
   });
 
-  describe(types.RECEIVE_REPORTS_ERROR, () => {
-    beforeEach(() => {
-      state.isLoading = true;
-      mutations[types.RECEIVE_REPORTS_ERROR](state);
-    });
-
-    it('should set the `isLoading` status to `false`', () => {
-      expect(state.isLoading).toBe(false);
-    });
-
-    it('should set the `hasError` status to `true`', () => {
-      expect(state.hasError).toBe(true);
-    });
-  });
-
   describe(types.UPDATE_VULNERABILITY, () => {
     let newIssue;
     let resolvedIssue;
@@ -100,72 +85,6 @@ describe('sast module mutations', () => {
         expect(state.newIssues[0].changed).toBe(false);
         expect(state.resolvedIssues[0].changed).toBe(false);
         expect(state.allIssues[0].changed).toBe(false);
-      });
-    });
-  });
-
-  describe(types.RECEIVE_REPORTS, () => {
-    const head = [
-      createIssue({ cve: 'CVE-1' }),
-      createIssue({ cve: 'CVE-4' }),
-      createIssue({ cve: 'CVE-5' }),
-      createIssue({ cve: 'CVE-6' }),
-    ];
-    const base = [
-      createIssue({ cve: 'CVE-1' }),
-      createIssue({ cve: 'CVE-2' }),
-      createIssue({ cve: 'CVE-3' }),
-    ];
-    const enrichData = [];
-    const blobPath = 'blobPath';
-
-    beforeEach(() => {
-      state.isLoading = true;
-    });
-
-    describe('with only the head report', () => {
-      beforeEach(() => {
-        const reports = { head, enrichData };
-        mutations[types.RECEIVE_REPORTS](state, { reports, blobPath });
-      });
-
-      it('should set the `isLoading` status to `false`', () => {
-        expect(state.isLoading).toBe(false);
-      });
-
-      it('should have the relevant `new` issues', () => {
-        expect(state.newIssues.length).toBe(4);
-      });
-
-      it('should not have any `resolved` issues', () => {
-        expect(state.resolvedIssues.length).toBe(0);
-      });
-
-      it('should not have any `all` issues', () => {
-        expect(state.allIssues.length).toBe(0);
-      });
-    });
-
-    describe('with the base and head reports', () => {
-      beforeEach(() => {
-        const reports = { head, base, enrichData };
-        mutations[types.RECEIVE_REPORTS](state, { reports, blobPath });
-      });
-
-      it('should set the `isLoading` status to `false`', () => {
-        expect(state.isLoading).toBe(false);
-      });
-
-      it('should have the relevant `new` issues', () => {
-        expect(state.newIssues.length).toBe(3);
-      });
-
-      it('should have the relevant `resolved` issues', () => {
-        expect(state.resolvedIssues.length).toBe(2);
-      });
-
-      it('should have the relevant `all` issues', () => {
-        expect(state.allIssues.length).toBe(1);
       });
     });
   });
