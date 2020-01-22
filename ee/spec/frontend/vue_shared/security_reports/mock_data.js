@@ -1,35 +1,6 @@
 const libTiffCveFingerprint = 'e503c23a7776dd5e2c35ac63c8cce6b6468be9ba';
 const libTiffCveFingerprint2 = '29af456d1107381bc2511646e2ae488ddfe9a8ed';
 
-export const baseIssues = [
-  {
-    categories: ['Security'],
-    check_name: 'Insecure Dependency',
-    description: 'Insecure Dependency',
-    location: {
-      path: 'Gemfile.lock',
-      lines: {
-        begin: 22,
-        end: 22,
-      },
-    },
-    fingerprint: 'ca2e59451e98ae60ba2f54e3857c50e5',
-  },
-  {
-    categories: ['Security'],
-    check_name: 'Insecure Dependency',
-    description: 'Insecure Dependency',
-    location: {
-      path: 'Gemfile.lock',
-      lines: {
-        begin: 21,
-        end: 21,
-      },
-    },
-    fingerprint: 'ca2354534dee94ae60ba2f54e3857c50e5',
-  },
-];
-
 export const sastParsedIssues = [
   {
     title: 'Arbitrary file existence disclosure in Action Pack',
@@ -181,187 +152,6 @@ export const sastIssuesBase = [
         name: 'CVE-2016-0752',
         value: 'CVE-2016-0752',
         link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
-      },
-    ],
-  },
-];
-
-export const parsedSastIssuesStore = [
-  {
-    tool: 'bundler_audit',
-    message: 'Arbitrary file existence disclosure in Action Pack',
-    cve: 'CVE-2014-7829',
-    solution: 'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8',
-    title: 'Arbitrary file existence disclosure in Action Pack',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock#L5-10',
-    category: 'sast',
-    project_fingerprint: 'f55331d66fd4f3bfb4237d48e9c9fa8704bd33c6',
-    location: {
-      file: 'Gemfile.lock',
-      start_line: 5,
-      end_line: 10,
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2014-7829',
-        value: 'CVE-2014-7829',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
-      },
-    ],
-  },
-  {
-    tool: 'bundler_audit',
-    message: 'Possible Information Leak Vulnerability in Action View',
-    cve: 'CVE-2016-0752',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    title: 'Possible Information Leak Vulnerability in Action View',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock',
-    category: 'sast',
-    project_fingerprint: 'a6b61a2eba59071178d5899b26dd699fb880de1e',
-    location: {
-      file: 'Gemfile.lock',
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2016-0752',
-        value: 'CVE-2016-0752',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
-      },
-    ],
-  },
-  {
-    tool: 'bundler_audit',
-    message: 'Possible Object Leak and Denial of Service attack in Action Pack',
-    cve: 'CVE-2016-0751',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    title: 'Possible Object Leak and Denial of Service attack in Action Pack',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock',
-    category: 'sast',
-    project_fingerprint: '830f85e5fb011408bab365eb809cd97a45b0aa17',
-    location: {
-      file: 'Gemfile.lock',
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2016-0751',
-        value: 'CVE-2016-0751',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
-      },
-    ],
-  },
-];
-
-export const parsedSastIssuesHead = [
-  {
-    tool: 'bundler_audit',
-    message: 'Arbitrary file existence disclosure in Action Pack',
-    cve: 'CVE-2014-7829',
-    solution: 'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8',
-    title: 'Arbitrary file existence disclosure in Action Pack',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock#L5-10',
-    category: 'sast',
-    project_fingerprint: 'f55331d66fd4f3bfb4237d48e9c9fa8704bd33c6',
-    location: {
-      file: 'Gemfile.lock',
-      start_line: 5,
-      end_line: 10,
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2014-7829',
-        value: 'CVE-2014-7829',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
-      },
-    ],
-  },
-  {
-    tool: 'bundler_audit',
-    message: 'Possible Object Leak and Denial of Service attack in Action Pack',
-    cve: 'CVE-2016-0751',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    title: 'Possible Object Leak and Denial of Service attack in Action Pack',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock',
-    category: 'sast',
-    project_fingerprint: '830f85e5fb011408bab365eb809cd97a45b0aa17',
-    location: {
-      file: 'Gemfile.lock',
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2016-0751',
-        value: 'CVE-2016-0751',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
-      },
-    ],
-  },
-];
-
-export const parsedSastBaseStore = [
-  {
-    title: 'Test Information Leak Vulnerability in Action View',
-    tool: 'bundler_audit',
-    message: 'Test Information Leak Vulnerability in Action View',
-    cve: 'CVE-2016-9999',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock#L5-10',
-    category: 'sast',
-    project_fingerprint: '3f5608c99f0c7442ba59bc6c0c1864d0000f8e1a',
-    location: {
-      file: 'Gemfile.lock',
-      start_line: 5,
-      end_line: 10,
-    },
-    links: [
-      {
-        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-      },
-    ],
-    identifiers: [
-      {
-        type: 'CVE',
-        name: 'CVE-2016-9999',
-        value: 'CVE-2016-9999',
-        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-9999',
       },
     ],
   },
@@ -703,21 +493,6 @@ export const parsedSastContainerBaseStore = [
     project_fingerprint: 'e1f22cd89e3c306541d7c804b29255b5cc275d6d',
     title: 'CVE-2014-8130',
     vulnerability: 'CVE-2014-8130',
-  },
-];
-
-export const allIssuesParsed = [
-  {
-    title: 'Possible Information Leak Vulnerability in Action View',
-    tool: 'bundler_audit',
-    message: 'Possible Information Leak Vulnerability in Action View',
-    url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    cve: 'CVE-2016-0752',
-    file: 'Gemfile.lock',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    path: 'Gemfile.lock',
-    urlPath: 'path/Gemfile.lock',
   },
 ];
 
@@ -1287,103 +1062,6 @@ export const parsedDastNewIssues = [
   },
 ];
 
-/**
- * SAST report API response for no added & fixed issues but with security issues
- */
-export const sastHeadAllIssues = [
-  {
-    cve: 'CVE-2014-7829',
-    tool: 'retire',
-    url: 'https://github.com/jquery/jquery/issues/2432',
-    file: '/builds/gonzoyumo/test-package-lock/node_modules/tinycolor2/demo/jquery-1.9.1.js',
-    priority: 'medium',
-    message: '3rd party CORS request may execute',
-  },
-  {
-    cve: 'CVE-2014-7828',
-    tool: 'retire',
-    url: 'https://bugs.jquery.com/ticket/11974',
-    file: '/builds/gonzoyumo/test-package-lock/node_modules/tinycolor2/demo/jquery-1.9.1.js',
-    priority: 'medium',
-    message: 'parseHTML() executes scripts in event handlers',
-  },
-  {
-    cve: 'CVE-2014-7827',
-    tool: 'retire',
-    url: 'https://nodesecurity.io/advisories/146',
-    priority: 'high',
-    message: 'growl_command-injection',
-  },
-  {
-    cve: 'CVE-2014-7826',
-    tool: 'retire',
-    url: 'https://nodesecurity.io/advisories/146',
-    priority: 'high',
-    message: 'growl_command-injection',
-  },
-];
-
-export const sastBaseAllIssues = [
-  {
-    cve: 'CVE-2014-7829',
-    tool: 'gemnasium',
-    message: 'Command Injection for growl',
-    url: 'https://github.com/tj/node-growl/pull/61',
-    file: 'package-lock.json',
-  },
-  {
-    cve: 'CVE-2014-7828',
-    tool: 'gemnasium',
-    message: 'Regular Expression Denial of Service for tough-cookie',
-    url: 'https://github.com/salesforce/tough-cookie/issues/92',
-    file: 'package-lock.json',
-  },
-  {
-    cve: 'CVE-2014-7827',
-    tool: 'gemnasium',
-    message: 'Regular Expression Denial of Service for string',
-    url: 'https://github.com/jprichardson/string.js/issues/212',
-    file: 'package-lock.json',
-  },
-  {
-    cve: 'CVE-2014-7826',
-    tool: 'gemnasium',
-    message: 'Regular Expression Denial of Service for debug',
-    url: 'https://nodesecurity.io/advisories/534',
-    file: 'package-lock.json',
-  },
-  {
-    cve: 'CVE-2014-7825',
-    tool: 'retire',
-    message: '3rd party CORS request may execute',
-    url: 'https://github.com/jquery/jquery/issues/2432',
-    file: '/code/node_modules/tinycolor2/demo/jquery-1.9.1.js',
-    priority: 'medium',
-  },
-  {
-    cve: 'CVE-2014-7824',
-    tool: 'retire',
-    message: 'parseHTML() executes scripts in event handlers',
-    url: 'https://bugs.jquery.com/ticket/11974',
-    file: '/code/node_modules/tinycolor2/demo/jquery-1.9.1.js',
-    priority: 'medium',
-  },
-  {
-    cve: 'CVE-2014-7823',
-    tool: 'retire',
-    message: 'growl_command-injection',
-    url: 'https://nodesecurity.io/advisories/146',
-    priority: 'high',
-  },
-  {
-    cve: 'CVE-2014-7822',
-    tool: 'retire',
-    message: 'growl_command-injection',
-    url: 'https://nodesecurity.io/advisories/146',
-    priority: 'high',
-  },
-];
-
 export const sastFeedbacks = [
   {
     id: 3,
@@ -1483,3 +1161,336 @@ export const containerScanningFeedbacks = [
     project_fingerprint: libTiffCveFingerprint2,
   },
 ];
+
+export const mockFindings = [
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name: 'Cross-site Scripting in serialize-javascript',
+    severity: 'unknown',
+    confidence: 'undefined',
+    scanner: { external_id: 'gemnasium', name: 'Gemnasium' },
+    identifiers: [
+      {
+        external_type: 'gemnasium',
+        external_id: '58caa017-9a9a-46d6-bab2-ec930f46833c',
+        name: 'Gemnasium-58caa017-9a9a-46d6-bab2-ec930f46833c',
+        url:
+          'https://deps.sec.gitlab.com/packages/npm/serialize-javascript/versions/1.7.0/advisories',
+      },
+      {
+        external_type: 'cve',
+        external_id: 'CVE-2019-16769',
+        name: 'CVE-2019-16769',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-16769',
+      },
+    ],
+    project_fingerprint: '09df9f4d11c8deb93d81bdcc39f7667b44143298',
+    create_vulnerability_feedback_issue_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_merge_request_path:
+      '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_dismissal_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    project: {
+      id: 7071551,
+      name: 'gitlab-ui',
+      full_path: '/gitlab-org/gitlab-ui',
+      full_name: 'GitLab.org / gitlab-ui',
+    },
+    dismissal_feedback: null,
+    issue_feedback: null,
+    merge_request_feedback: null,
+    description:
+      'The serialize-javascript npm package is vulnerable to Cross-site Scripting (XSS). It does not properly mitigate against unsafe characters in serialized regular expressions. If serialized data of regular expression objects are used in an environment other than Node.js, it is affected by this vulnerability.',
+    links: [{ url: 'https://nvd.nist.gov/vuln/detail/CVE-2019-16769' }],
+    location: {
+      file: 'yarn.lock',
+      dependency: { package: { name: 'serialize-javascript' }, version: '1.7.0' },
+    },
+    remediations: [null],
+    solution: 'Upgrade to version 2.1.1 or above.',
+    state: 'opened',
+    blob_path: '/gitlab-org/gitlab-ui/blob/ad137f0a8ac59af961afe47d04e5cc062c6864a9/yarn.lock',
+  },
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name: '3rd party CORS request may execute in jquery',
+    severity: 'medium',
+    confidence: 'undefined',
+    scanner: { external_id: 'retire.js', name: 'Retire.js' },
+    identifiers: [
+      {
+        external_type: 'cve',
+        external_id: 'CVE-2015-9251',
+        name: 'CVE-2015-9251',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-9251',
+      },
+    ],
+    project_fingerprint: '1ecd3b214cf39c0b9ad23a0a9679778d7cf55876',
+    create_vulnerability_feedback_issue_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_merge_request_path:
+      '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_dismissal_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    project: {
+      id: 7071551,
+      name: 'gitlab-ui',
+      full_path: '/gitlab-org/gitlab-ui',
+      full_name: 'GitLab.org / gitlab-ui',
+    },
+    dismissal_feedback: {
+      id: 2528,
+      created_at: '2019-08-26T12:30:32.349Z',
+      project_id: 7071551,
+      author: {
+        id: 181229,
+        name: "Lukas 'Eipi' Eipert",
+        username: 'leipert',
+        state: 'active',
+        avatar_url:
+          'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+        web_url: 'https://gitlab.com/leipert',
+        status_tooltip_html: null,
+        path: '/leipert',
+      },
+      comment_details: {
+        comment: 'This particular jQuery version appears in a test path of tinycolor2.\n',
+        comment_timestamp: '2019-08-26T12:30:37.610Z',
+        comment_author: {
+          id: 181229,
+          name: "Lukas 'Eipi' Eipert",
+          username: 'leipert',
+          state: 'active',
+          avatar_url:
+            'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+          web_url: 'https://gitlab.com/leipert',
+          status_tooltip_html: null,
+          path: '/leipert',
+        },
+      },
+      pipeline: { id: 78375355, path: '/gitlab-org/gitlab-ui/pipelines/78375355' },
+      destroy_vulnerability_feedback_dismissal_path:
+        '/gitlab-org/gitlab-ui/vulnerability_feedback/2528',
+      category: 'dependency_scanning',
+      feedback_type: 'dismissal',
+      branch: 'leipert-dogfood-secure',
+      project_fingerprint: '1ecd3b214cf39c0b9ad23a0a9679778d7cf55876',
+    },
+    issue_feedback: null,
+    merge_request_feedback: null,
+    description: null,
+    links: [
+      { url: 'https://github.com/jquery/jquery/issues/2432' },
+      { url: 'http://blog.jquery.com/2016/01/08/jquery-2-2-and-1-12-released/' },
+      { url: 'https://nvd.nist.gov/vuln/detail/CVE-2015-9251' },
+      { url: 'http://research.insecurelabs.org/jquery/test/' },
+    ],
+    location: {
+      file: 'node_modules/tinycolor2/demo/jquery-1.9.1.js',
+      dependency: { package: { name: 'jquery' }, version: '1.9.1' },
+    },
+    remediations: [null],
+    solution: null,
+    state: 'dismissed',
+    blob_path:
+      '/gitlab-org/gitlab-ui/blob/ad137f0a8ac59af961afe47d04e5cc062c6864a9/node_modules/tinycolor2/demo/jquery-1.9.1.js',
+  },
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name:
+      'jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution in jquery',
+    severity: 'low',
+    confidence: 'undefined',
+    scanner: { external_id: 'retire.js', name: 'Retire.js' },
+    identifiers: [
+      {
+        external_type: 'cve',
+        external_id: 'CVE-2019-11358',
+        name: 'CVE-2019-11358',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-11358',
+      },
+    ],
+    project_fingerprint: 'aeb4b2442d92d0ccf7023f0c220bda8b4ba910e3',
+    create_vulnerability_feedback_issue_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_merge_request_path:
+      '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_dismissal_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    project: {
+      id: 7071551,
+      name: 'gitlab-ui',
+      full_path: '/gitlab-org/gitlab-ui',
+      full_name: 'GitLab.org / gitlab-ui',
+    },
+    dismissal_feedback: {
+      id: 4197,
+      created_at: '2019-11-14T11:03:18.472Z',
+      project_id: 7071551,
+      author: {
+        id: 181229,
+        name: "Lukas 'Eipi' Eipert",
+        username: 'leipert',
+        state: 'active',
+        avatar_url:
+          'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+        web_url: 'https://gitlab.com/leipert',
+        status_tooltip_html: null,
+        path: '/leipert',
+      },
+      comment_details: {
+        comment:
+          'This is a false positive, as it just part of some documentation assets of sass-true.',
+        comment_timestamp: '2019-11-14T11:03:18.464Z',
+        comment_author: {
+          id: 181229,
+          name: "Lukas 'Eipi' Eipert",
+          username: 'leipert',
+          state: 'active',
+          avatar_url:
+            'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+          web_url: 'https://gitlab.com/leipert',
+          status_tooltip_html: null,
+          path: '/leipert',
+        },
+      },
+      destroy_vulnerability_feedback_dismissal_path:
+        '/gitlab-org/gitlab-ui/vulnerability_feedback/4197',
+      category: 'dependency_scanning',
+      feedback_type: 'dismissal',
+      branch: null,
+      project_fingerprint: 'aeb4b2442d92d0ccf7023f0c220bda8b4ba910e3',
+    },
+    issue_feedback: null,
+    merge_request_feedback: null,
+    description: null,
+    links: [
+      { url: 'https://blog.jquery.com/2019/04/10/jquery-3-4-0-released/' },
+      { url: 'https://nvd.nist.gov/vuln/detail/CVE-2019-11358' },
+      { url: 'https://github.com/jquery/jquery/commit/753d591aea698e57d6db58c9f722cd0808619b1b' },
+    ],
+    location: {
+      file: 'node_modules/sass-true/docs/assets/webpack/common.min.js',
+      dependency: { package: { name: 'jquery' }, version: '3.3.1' },
+    },
+    remediations: [null],
+    solution: null,
+    state: 'dismissed',
+    blob_path:
+      '/gitlab-org/gitlab-ui/blob/ad137f0a8ac59af961afe47d04e5cc062c6864a9/node_modules/sass-true/docs/assets/webpack/common.min.js',
+  },
+  {
+    id: null,
+    report_type: 'dependency_scanning',
+    name:
+      'jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution in jquery',
+    severity: 'low',
+    confidence: 'undefined',
+    scanner: { external_id: 'retire.js', name: 'Retire.js' },
+    identifiers: [
+      {
+        external_type: 'cve',
+        external_id: 'CVE-2019-11358',
+        name: 'CVE-2019-11358',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-11358',
+      },
+    ],
+    project_fingerprint: 'eb86aa13eb9d897a083ead6e134aa78aa9cadd52',
+    create_vulnerability_feedback_issue_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_merge_request_path:
+      '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    create_vulnerability_feedback_dismissal_path: '/gitlab-org/gitlab-ui/vulnerability_feedback',
+    project: {
+      id: 7071551,
+      name: 'gitlab-ui',
+      full_path: '/gitlab-org/gitlab-ui',
+      full_name: 'GitLab.org / gitlab-ui',
+    },
+    dismissal_feedback: {
+      id: 2527,
+      created_at: '2019-08-26T12:29:43.624Z',
+      project_id: 7071551,
+      author: {
+        id: 181229,
+        name: "Lukas 'Eipi' Eipert",
+        username: 'leipert',
+        state: 'active',
+        avatar_url:
+          'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+        web_url: 'https://gitlab.com/leipert',
+        status_tooltip_html: null,
+        path: '/leipert',
+      },
+      comment_details: {
+        comment: 'This particular jQuery version appears in a test path of tinycolor2.',
+        comment_timestamp: '2019-08-26T12:30:14.840Z',
+        comment_author: {
+          id: 181229,
+          name: "Lukas 'Eipi' Eipert",
+          username: 'leipert',
+          state: 'active',
+          avatar_url:
+            'https://secure.gravatar.com/avatar/19a1f1260fa70323f35bc508927921a2?s=80\u0026d=identicon',
+          web_url: 'https://gitlab.com/leipert',
+          status_tooltip_html: null,
+          path: '/leipert',
+        },
+      },
+      pipeline: { id: 78375355, path: '/gitlab-org/gitlab-ui/pipelines/78375355' },
+      destroy_vulnerability_feedback_dismissal_path:
+        '/gitlab-org/gitlab-ui/vulnerability_feedback/2527',
+      category: 'dependency_scanning',
+      feedback_type: 'dismissal',
+      branch: 'leipert-dogfood-secure',
+      project_fingerprint: 'eb86aa13eb9d897a083ead6e134aa78aa9cadd52',
+    },
+    issue_feedback: null,
+    merge_request_feedback: null,
+    description: null,
+    links: [
+      { url: 'https://blog.jquery.com/2019/04/10/jquery-3-4-0-released/' },
+      { url: 'https://nvd.nist.gov/vuln/detail/CVE-2019-11358' },
+      { url: 'https://github.com/jquery/jquery/commit/753d591aea698e57d6db58c9f722cd0808619b1b' },
+    ],
+    location: {
+      file: 'node_modules/tinycolor2/demo/jquery-1.9.1.js',
+      dependency: { package: { name: 'jquery' }, version: '1.9.1' },
+    },
+    remediations: [null],
+    solution: null,
+    state: 'dismissed',
+    blob_path:
+      '/gitlab-org/gitlab-ui/blob/ad137f0a8ac59af961afe47d04e5cc062c6864a9/node_modules/tinycolor2/demo/jquery-1.9.1.js',
+  },
+];
+
+export const sastDiffSuccessMock = {
+  added: [mockFindings[0]],
+  fixed: [mockFindings[1], mockFindings[2]],
+  existing: [mockFindings[3]],
+  base_report_created_at: '2020-01-01T10:00:00.000Z',
+  base_report_out_of_date: false,
+  head_report_created_at: '2020-01-10T10:00:00.000Z',
+};
+
+export const dastDiffSuccessMock = {
+  added: [mockFindings[0]],
+  fixed: [mockFindings[1], mockFindings[2]],
+  base_report_created_at: '2020-01-01T10:00:00.000Z',
+  base_report_out_of_date: false,
+  head_report_created_at: '2020-01-10T10:00:00.000Z',
+};
+
+export const containerScanningDiffSuccessMock = {
+  added: [mockFindings[0], mockFindings[1]],
+  fixed: [mockFindings[2]],
+  base_report_created_at: '2020-01-01T10:00:00.000Z',
+  base_report_out_of_date: false,
+  head_report_created_at: '2020-01-10T10:00:00.000Z',
+};
+
+export const dependencyScanningDiffSuccessMock = {
+  added: [mockFindings[0], mockFindings[1]],
+  fixed: [mockFindings[2]],
+  base_report_created_at: '2020-01-01T10:00:00.000Z',
+  base_report_out_of_date: false,
+  head_report_created_at: '2020-01-10T10:00:00.000Z',
+};
