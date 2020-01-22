@@ -338,7 +338,7 @@ module QA
 
     def logout_from_idp
       page.visit EE::Runtime::Saml.idp_sign_out_url
-      Support::Waiter.wait { current_url == EE::Runtime::Saml.idp_signed_out_url }
+      Support::Waiter.wait_until { current_url == EE::Runtime::Saml.idp_signed_out_url }
     end
 
     def reset_idp_session
