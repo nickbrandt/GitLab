@@ -1282,7 +1282,7 @@ describe Project do
         :epics, # Gold only
         :service_desk, # Silver and up
         :audit_events, # Bronze and up
-        :geo, # Global feature, should not be checked at namespace level
+        :geo # Global feature, should not be checked at namespace level
       ])
     end
 
