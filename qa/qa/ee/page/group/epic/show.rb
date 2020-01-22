@@ -33,7 +33,7 @@ module QA
             end
 
             def add_issue_to_epic(issue_url)
-              find_element(:issue_actions_split_button).find_all('button').first.click
+              find_element(:issue_actions_split_button).find('button', text: 'Add an issue').click
               fill_element :add_issue_input, issue_url
               click_body
               click_element :add_issue_button
