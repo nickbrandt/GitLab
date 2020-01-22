@@ -1828,6 +1828,7 @@ module API
       expose :uid, as: :application_id
       expose :name, as: :application_name
       expose :redirect_uri, as: :callback_url
+      expose :confidential
     end
 
     # Use with care, this exposes the secret
