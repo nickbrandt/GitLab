@@ -38,9 +38,12 @@ describe UsersHelper do
 
     before do
       allow(helper).to receive(:current_user).and_return(build(:user))
+      allow(::Gitlab).to receive(:com?) { gitlab_com? }
     end
 
-    context 'with user who is using a license seat' do
+    context 'when Gitlab.com? is true' do
+      let(:gitlab_com?) { true }
+
       before do
         allow(user).to receive(:using_license_seat?).and_return(true)
       end
@@ -55,22 +58,50 @@ describe UsersHelper do
           expect(subject).to eq(
             [
               { text: 'Admin', variant: 'success' },
-              { text: 'Is using seat', variant: 'light' },
               { text: "It's you!", variant: nil }
             ]
           )
         end
       end
 
-      it { expect(subject).to eq([text: 'Is using seat', variant: 'light']) }
+      it { expect(subject).not_to eq([text: 'Is using seat', variant: 'light']) }
     end
 
-    context 'with user who is not using a license seat' do
-      before do
-        allow(user).to receive(:using_license_seat?).and_return(false)
+    context 'when Gitlab.com? is false' do
+      let(:gitlab_com?) { false }
+
+      context 'when user uses a license seat' do
+        before do
+          allow(user).to receive(:using_license_seat?).and_return(true)
+        end
+
+        context 'when user is an admin and the current_user' do
+          before do
+            allow(helper).to receive(:current_user).and_return(user)
+            allow(user).to receive(:admin?).and_return(true)
+          end
+
+          it do
+            expect(subject).to eq(
+              [
+                { text: 'Admin', variant: 'success' },
+                { text: 'Is using seat', variant: 'light' },
+                { text: "It's you!", variant: nil }
+              ]
+            )
+          end
+        end
+
+        it { expect(subject).to eq([text: 'Is using seat', variant: 'light']) }
       end
 
-      it { expect(subject).to eq([]) }
+      context 'when user does not use a license seat' do
+        before do
+          allow(user).to receive(:using_license_seat?).and_return(false)
+        end
+
+        it { expect(subject).to eq([]) }
+      end
     end
   end
 end

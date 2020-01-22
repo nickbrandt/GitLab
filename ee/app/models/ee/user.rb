@@ -275,6 +275,7 @@ module EE
 
     def using_license_seat?
       return false unless active?
+      return false if support_bot? || ghost?
       return false unless License.current
 
       if License.current.exclude_guests_from_active_count?
