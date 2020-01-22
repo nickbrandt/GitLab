@@ -64,10 +64,6 @@ module Gitlab
         def username
           ::Namespace.clean_path(ldap_user.username)
         end
-
-        def password
-          @password ||= Devise.friendly_token(8)
-        end
       end
     end
   end
