@@ -1198,12 +1198,10 @@ class MergeRequest < ApplicationRecord
   end
 
   def in_locked_state
-    begin
-      lock_mr
-      yield
-    ensure
-      unlock_mr
-    end
+    lock_mr
+    yield
+  ensure
+    unlock_mr
   end
 
   def diverged_commits_count
