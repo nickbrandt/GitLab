@@ -95,7 +95,7 @@ export default {
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
     >
-      <icon name="download" />
+      <icon name="export" />
     </gl-button>
   </div>
 </template>
