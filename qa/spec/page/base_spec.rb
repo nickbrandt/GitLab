@@ -62,7 +62,7 @@ describe QA::Page::Base do
     end
   end
 
-  describe '#wait_until' do
+  describe '#wait' do
     subject { Class.new(described_class).new }
 
     context 'when the condition is true' do

@@ -14,9 +14,11 @@ module QA
         attr_writer :logger
 
         def logger
-          @logger ||= ::Logger.new(Runtime::Env.log_destination).tap do |logger|
-            logger.level = Runtime::Env.debug? ? ::Logger::DEBUG : ::Logger::ERROR
-          end
+          return @logger if @logger
+
+          @logger = ::Logger.new Runtime::Env.log_destination
+          @logger.level = Runtime::Env.debug? ? ::Logger::DEBUG : ::Logger::ERROR
+          @logger
         end
       end
     end

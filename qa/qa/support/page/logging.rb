@@ -16,7 +16,7 @@ module QA
           super
         end
 
-        def wait_until(max_duration: 60, sleep_interval: 0.1, reload: true, raise_on_failure: false)
+        def wait_until(max_duration: 60, sleep_interval: 0.1, reload: true)
           log("next wait uses reload: #{reload}")
           # Logging of wait start/end/duration is handled by QA::Support::Waiter
 
