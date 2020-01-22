@@ -93,6 +93,9 @@ module EE
           expose :group_saml_identity,
                  using: ::API::Entities::Identity,
                  if: -> (member, options) { Ability.allowed?(options[:current_user], :read_group_saml_identity, member.source) }
+          expose :is_using_seat, if: -> (member, options) { options[:show_seat_info] } do |member, _options|
+            !!member.user&.using_license_seat?
+          end
         end
       end
 
