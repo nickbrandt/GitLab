@@ -352,6 +352,7 @@ describe('Grouped security reports app', () => {
 
       createWrapper({
         ...props,
+        divergedCommitsCount: 1,
         targetBranch: 'master',
         enabledReports: {
           sast: true,

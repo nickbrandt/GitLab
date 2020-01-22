@@ -113,6 +113,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    divergedCommitsCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   componentNames,
   computed: {
@@ -154,10 +159,7 @@ export default {
       return this.enabledReports.sast;
     },
     subHeadingText() {
-      const mrDivergedCommitsCount =
-        (gl && gl.mrWidgetData && gl.mrWidgetData.diverged_commits_count) || 0;
-      const isMRBranchOutdated = mrDivergedCommitsCount > 0;
-
+      const isMRBranchOutdated = this.divergedCommitsCount > 0;
       if (isMRBranchOutdated) {
         return sprintf(
           s__(

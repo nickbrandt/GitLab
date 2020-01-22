@@ -318,6 +318,7 @@ export default {
         :can-create-issue="mr.canCreateIssue"
         :can-create-merge-request="mr.canCreateMergeRequest"
         :can-dismiss-vulnerability="mr.canDismissVulnerability"
+        :diverged-commits-count="mr.divergedCommitsCount"
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
