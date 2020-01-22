@@ -66,23 +66,14 @@ module QA
             metadata[:type] = :feature
           end
 
-          config.before(:suite) do
+          config.before do
             unless browser.rspec_configured
               browser.rspec_configured = true
 
               ##
               # Perform before hooks, which are different for CE and EE
               #
-              begin
-                Runtime::Release.perform_before_hooks
-              rescue
-                saved = Capybara::Screenshot.screenshot_and_save_page
-
-                QA::Runtime::Logger.error("Screenshot: #{saved[:image]}") if saved&.key?(:image)
-                QA::Runtime::Logger.error("HTML capture: #{saved[:html]}") if saved&.key?(:html)
-
-                raise
-              end
+              Runtime::Release.perform_before_hooks
             end
           end
         end
