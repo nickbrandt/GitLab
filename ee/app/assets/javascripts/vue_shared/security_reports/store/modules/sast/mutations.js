@@ -4,14 +4,6 @@ import { parseSastIssues, findIssueIndex, parseDiff } from '../../utils';
 import filterByKey from '../../utils/filter_by_key';
 
 export default {
-  [types.SET_HEAD_PATH](state, path) {
-    Vue.set(state.paths, 'head', path);
-  },
-
-  [types.SET_BASE_PATH](state, path) {
-    Vue.set(state.paths, 'base', path);
-  },
-
   [types.SET_DIFF_ENDPOINT](state, path) {
     Vue.set(state.paths, 'diffEndpoint', path);
   },

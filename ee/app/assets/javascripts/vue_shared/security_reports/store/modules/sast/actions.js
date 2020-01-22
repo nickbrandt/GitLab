@@ -2,10 +2,6 @@ import axios from '~/lib/utils/axios_utils';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import * as types from './mutation_types';
 
-export const setHeadPath = ({ commit }, path) => commit(types.SET_HEAD_PATH, path);
-
-export const setBasePath = ({ commit }, path) => commit(types.SET_BASE_PATH, path);
-
 export const setDiffEndpoint = ({ commit }, path) => commit(types.SET_DIFF_ENDPOINT, path);
 
 export const requestReports = ({ commit }) => commit(types.REQUEST_REPORTS);

@@ -8,20 +8,14 @@ import actions, {
   setPipelineId,
   setCanCreateIssuePermission,
   setCanCreateFeedbackPermission,
-  setSastContainerHeadPath,
-  setSastContainerBasePath,
   requestSastContainerReports,
   receiveSastContainerReports,
   receiveSastContainerError,
   fetchSastContainerReports,
-  setDastHeadPath,
-  setDastBasePath,
   requestDastReports,
   receiveDastReports,
   receiveDastError,
   fetchDastReports,
-  setDependencyScanningHeadPath,
-  setDependencyScanningBasePath,
   requestDependencyScanningReports,
   receiveDependencyScanningError,
   receiveDependencyScanningReports,
@@ -241,42 +235,6 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setSastContainerHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setSastContainerHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_SAST_CONTAINER_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setSastContainerBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setSastContainerBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_SAST_CONTAINER_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestSastContainerReports', () => {
     it('should commit request mutation', done => {
       testAction(
@@ -450,42 +408,6 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setDastHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDastHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DAST_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setDastBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDastBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DAST_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestDastReports', () => {
     it('should commit request mutation', done => {
       testAction(
@@ -652,42 +574,6 @@ describe('security reports actions', () => {
           done,
         );
       });
-    });
-  });
-
-  describe('setDependencyScanningHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDependencyScanningHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DEPENDENCY_SCANNING_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setDependencyScanningBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDependencyScanningBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DEPENDENCY_SCANNING_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
     });
   });
 

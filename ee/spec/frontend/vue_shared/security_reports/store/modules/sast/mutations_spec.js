@@ -12,22 +12,6 @@ describe('sast module mutations', () => {
     state = createState();
   });
 
-  describe(types.SET_HEAD_PATH, () => {
-    it('should set the SAST head path', () => {
-      mutations[types.SET_HEAD_PATH](state, path);
-
-      expect(state.paths.head).toBe(path);
-    });
-  });
-
-  describe(types.SET_BASE_PATH, () => {
-    it('should set the SAST base path', () => {
-      mutations[types.SET_BASE_PATH](state, path);
-
-      expect(state.paths.base).toBe(path);
-    });
-  });
-
   describe(types.SET_DIFF_ENDPOINT, () => {
     it('should set the SAST diff endpoint', () => {
       mutations[types.SET_DIFF_ENDPOINT](state, path);

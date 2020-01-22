@@ -58,14 +58,6 @@ export default {
   },
 
   // SAST CONTAINER
-  [types.SET_SAST_CONTAINER_HEAD_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'head', path);
-  },
-
-  [types.SET_SAST_CONTAINER_BASE_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'base', path);
-  },
-
   [types.SET_SAST_CONTAINER_DIFF_ENDPOINT](state, path) {
     Vue.set(state.sastContainer.paths, 'diffEndpoint', path);
   },
@@ -131,14 +123,6 @@ export default {
 
   // DAST
 
-  [types.SET_DAST_HEAD_PATH](state, path) {
-    Vue.set(state.dast.paths, 'head', path);
-  },
-
-  [types.SET_DAST_BASE_PATH](state, path) {
-    Vue.set(state.dast.paths, 'base', path);
-  },
-
   [types.SET_DAST_DIFF_ENDPOINT](state, path) {
     Vue.set(state.dast.paths, 'diffEndpoint', path);
   },
@@ -190,14 +174,6 @@ export default {
   },
 
   // DEPENDECY SCANNING
-
-  [types.SET_DEPENDENCY_SCANNING_HEAD_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'head', path);
-  },
-
-  [types.SET_DEPENDENCY_SCANNING_BASE_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'base', path);
-  },
 
   [types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT](state, path) {
     Vue.set(state.dependencyScanning.paths, 'diffEndpoint', path);

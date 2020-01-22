@@ -50,12 +50,6 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
 /**
  * SAST CONTAINER
  */
-export const setSastContainerHeadPath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_HEAD_PATH, path);
-
-export const setSastContainerBasePath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_BASE_PATH, path);
-
 export const setSastContainerDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
 
@@ -128,10 +122,6 @@ export const updateContainerScanningIssue = ({ commit }, issue) =>
 /**
  * DAST
  */
-export const setDastHeadPath = ({ commit }, path) => commit(types.SET_DAST_HEAD_PATH, path);
-
-export const setDastBasePath = ({ commit }, path) => commit(types.SET_DAST_BASE_PATH, path);
-
 export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
 
 export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
@@ -199,12 +189,6 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 /**
  * DEPENDENCY SCANNING
  */
-export const setDependencyScanningHeadPath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_HEAD_PATH, path);
-
-export const setDependencyScanningBasePath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
-
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 

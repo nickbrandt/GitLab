@@ -28,42 +28,6 @@ describe('sast report actions', () => {
     state = createState();
   });
 
-  describe('setHeadPath', () => {
-    it(`should commit ${types.SET_HEAD_PATH} with the correct path`, done => {
-      testAction(
-        actions.setHeadPath,
-        headPath,
-        state,
-        [
-          {
-            type: types.SET_HEAD_PATH,
-            payload: headPath,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setBasePath', () => {
-    it(`should commit ${types.SET_BASE_PATH} with the correct path`, done => {
-      testAction(
-        actions.setBasePath,
-        basePath,
-        state,
-        [
-          {
-            type: types.SET_BASE_PATH,
-            payload: basePath,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('setDiffEndpoint', () => {
     it(`should commit ${types.SET_DIFF_ENDPOINT} with the correct path`, done => {
       testAction(

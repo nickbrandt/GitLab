@@ -86,22 +86,6 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('SET_SAST_CONTAINER_HEAD_PATH', () => {
-    it('should set sast container head path', () => {
-      mutations[types.SET_SAST_CONTAINER_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.sastContainer.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_SAST_CONTAINER_BASE_PATH', () => {
-    it('should set sast container base path', () => {
-      mutations[types.SET_SAST_CONTAINER_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.sastContainer.paths.base).toEqual('base_path');
-    });
-  });
-
   describe('REQUEST_SAST_CONTAINER_REPORTS', () => {
     it('should set sast container loading flag to true', () => {
       mutations[types.REQUEST_SAST_CONTAINER_REPORTS](stateCopy);
@@ -142,22 +126,6 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.sastContainer.isLoading).toEqual(false);
       expect(stateCopy.sastContainer.hasError).toEqual(true);
-    });
-  });
-
-  describe('SET_DAST_HEAD_PATH', () => {
-    it('should set dast head path', () => {
-      mutations[types.SET_DAST_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.dast.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_DAST_BASE_PATH', () => {
-    it('should set dast base path', () => {
-      mutations[types.SET_DAST_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.dast.paths.base).toEqual('base_path');
     });
   });
 
@@ -254,22 +222,6 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.dast.isLoading).toEqual(false);
       expect(stateCopy.dast.hasError).toEqual(true);
-    });
-  });
-
-  describe('SET_DEPENDENCY_SCANNING_HEAD_PATH', () => {
-    it('should set dependency scanning head path', () => {
-      mutations[types.SET_DEPENDENCY_SCANNING_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.dependencyScanning.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_DEPENDENCY_SCANNING_BASE_PATH', () => {
-    it('should set dependency scanning base path', () => {
-      mutations[types.SET_DEPENDENCY_SCANNING_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.dependencyScanning.paths.base).toEqual('base_path');
     });
   });
 
