@@ -1,0 +1,2 @@
+- if group.present? && group.has_owner?(current_user) && user.using_gitlab_com_seat?(group)
+  %span.badge.badge-light= _("Is using seat")

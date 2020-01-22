@@ -10329,6 +10329,9 @@ msgstr ""
 msgid "Is using license seat:"
 msgstr ""
 
+msgid "Is using seat"
+msgstr ""
+
 msgid "IssuableStatus|Closed"
 msgstr ""
 

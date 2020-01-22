@@ -284,6 +284,18 @@ module EE
       end
     end
 
+    def using_gitlab_com_seat?(namespace)
+      return false unless ::Gitlab.com?
+      return false unless namespace.present?
+      return false if namespace.free_plan?
+
+      if namespace.gold_plan?
+        highest_role > ::Gitlab::Access::GUEST
+      else
+        true
+      end
+    end
+
     def group_sso?(group)
       return false unless group
 
