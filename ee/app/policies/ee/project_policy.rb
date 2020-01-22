@@ -202,6 +202,7 @@ module EE
         enable :destroy_package
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
+        enable :modify_approvers_list
         enable :modify_merge_request_author_setting
         enable :modify_merge_request_commiter_setting
       end
@@ -329,6 +330,10 @@ module EE
 
       rule { owner_cannot_modify_merge_request_commiter_setting }.policy do
         prevent :modify_merge_request_commiter_setting
+      end
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_list
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal

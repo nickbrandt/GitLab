@@ -1293,4 +1293,65 @@ describe ProjectPolicy do
       let(:policy) { :modify_merge_request_commiter_setting }
     end
   end
+
+  describe ':modify_approvers_list' do
+    let(:setting_name) { :disable_overriding_approvers_per_merge_request }
+    let(:policy) { :modify_approvers_list }
+    let(:project) { create(:project, namespace: owner.namespace) }
+
+    using RSpec::Parameterized::TableSyntax
+    context 'with merge request approvers rules available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | false
+        :owner | false | true
+        :owner | true | false
+        :admin | false | true
+        :admin | true | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(merge_request_approvers_rules: true)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
+    end
+
+    context 'with merge request approvers not available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | true
+        :owner | false | true
+        :owner | true | true
+        :admin | true | true
+        :admin | false | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(merge_request_approvers_rules: false)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
+    end
+  end
 end
