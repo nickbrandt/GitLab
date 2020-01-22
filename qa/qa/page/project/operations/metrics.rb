@@ -22,12 +22,6 @@ module QA
             element :alert_widget_menu_item
           end
 
-          view 'ee/app/assets/javascripts/monitoring/components/alert_widget_form.vue' do
-            element :alert_query_dropdown
-            element :alert_query_option
-            element :alert_threshold_field
-          end
-
           def wait_for_metrics
             wait_for_data
             return if has_metrics?
