@@ -9,7 +9,7 @@ RSpec.shared_examples 'forbids access to vulnerability API endpoint in case of d
     it 'responds with "not found"' do
       subject
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -21,7 +21,7 @@ RSpec.shared_examples 'forbids access to vulnerability API endpoint in case of d
     it 'responds with 403 Forbidden' do
       subject
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 end
@@ -32,6 +32,6 @@ RSpec.shared_examples 'responds with "not found" for an unknown vulnerability ID
   it do
     subject
 
-    expect(response).to have_gitlab_http_status(404)
+    expect(response).to have_gitlab_http_status(:not_found)
   end
 end
