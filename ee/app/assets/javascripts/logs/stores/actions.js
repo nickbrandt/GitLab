@@ -6,9 +6,6 @@ import flash from '~/flash';
 import { s__ } from '~/locale';
 import * as types from './mutation_types';
 
-import { getTimeRange } from '../utils';
-import { timeWindows } from '../constants';
-
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
     Api.getPodLogs(params)
@@ -24,10 +21,15 @@ const requestLogsUntilData = params =>
       });
   });
 
-export const setInitData = ({ dispatch, commit }, { projectPath, environmentName, podName }) => {
+export const setInitData = (
+  { dispatch, commit },
+  { projectPath, environmentName, podName, start, end },
+) => {
   commit(types.SET_PROJECT_PATH, projectPath);
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
   commit(types.SET_CURRENT_POD_NAME, podName);
+  commit(types.SET_CURRENT_POD_NAME, podName);
+  commit(types.SET_TIME_RANGE, { start, end });
   dispatch('fetchLogs');
 };
 
@@ -41,8 +43,8 @@ export const setSearch = ({ dispatch, commit }, searchQuery) => {
   dispatch('fetchLogs');
 };
 
-export const setTimeWindow = ({ dispatch, commit }, timeWindowKey) => {
-  commit(types.SET_TIME_WINDOW, timeWindowKey);
+export const setTimeRange = ({ dispatch, commit }, {start, end}) => {
+  commit(types.SET_TIME_RANGE, {start, end});
   dispatch('fetchLogs');
 };
 
@@ -74,12 +76,11 @@ export const fetchLogs = ({ commit, state }) => {
     search: state.search,
   };
 
-  if (state.timeWindow.current) {
-    const { current } = state.timeWindow;
-    const { start, end } = getTimeRange(timeWindows[current].seconds);
-
-    params.start = start;
-    params.end = end;
+  if (state.timeWindow.start) {
+    params.start = state.timeWindow.start;
+  }
+  if (state.timeWindow.end) {
+    params.end = state.timeWindow.end;
   }
 
   commit(types.REQUEST_PODS_DATA);

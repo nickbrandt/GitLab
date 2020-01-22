@@ -2,7 +2,7 @@ import { __ } from '~/locale';
 
 export const defaultTimeWindow = 'oneHour';
 
-export const timeWindows = {
+export const datePickerTimeWindows = {
   oneHour: {
     label: __('1 hour'),
     seconds: 60 * 60,
@@ -10,6 +10,7 @@ export const timeWindows = {
   fourHours: {
     label: __('4 hours'),
     seconds: 60 * 60 * 4,
+    default: true,
   },
   oneDay: {
     label: __('1 day'),

@@ -107,7 +107,11 @@ export default {
       this.startDate = start;
       this.endDate = end;
 
-      this.apply();
+      this.$emit(events.apply, {
+        timeWindow: key,
+        start: this.startDate,
+        end: this.endDate,
+      });
     },
     closeDropdown() {
       this.$refs.dropdown.hide();
@@ -122,7 +126,7 @@ export default {
 };
 </script>
 <template>
-  <gl-dropdown :text="timeWindowText" class="date-time-picker" menu-class="date-time-picker-menu">
+  <gl-dropdown :text="timeWindowText" class="date-time-picker" menu-class="date-time-picker-menu" v-bind="$attrs">
     <div class="d-flex justify-content-between gl-p-2">
       <gl-form-group
         :label="__('Custom range')"

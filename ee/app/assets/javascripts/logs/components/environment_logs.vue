@@ -2,11 +2,16 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
 import { scrollDown } from '~/lib/utils/scroll_utils';
+import { getParameterValues } from '~/lib/utils/url_utility';
 
-// import { getTimeRange } from '~/vue_shared/components/date_time_picker/date_time_picker_lib';
+import { getDefaultTimeRange } from '~/vue_shared/components/date_time_picker/date_time_picker_lib';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 
 import LogControlButtons from './log_control_buttons.vue';
+
+import { datePickerTimeWindows } from '../constants';
+
+const defaultTimeRange = getDefaultTimeRange(datePickerTimeWindows);
 
 export default {
   components: {
@@ -46,6 +51,11 @@ export default {
   data() {
     return {
       searchQuery: '',
+
+      // TODO Should default come from the state or these values?
+      startDate: getParameterValues('start')[0] || defaultTimeRange.start,
+      endDate: getParameterValues('end')[0] || defaultTimeRange.end,
+
       isElasticStackCalloutDismissed: false,
     };
   },
@@ -91,6 +101,8 @@ export default {
       projectPath: this.projectFullPath,
       environmentName: this.environmentName,
       podName: this.currentPodName,
+      start: this.startDate,
+      end: this.endDate,
     });
 
     this.fetchEnvironments(this.environmentsPath);
@@ -99,15 +111,15 @@ export default {
     ...mapActions('environmentLogs', [
       'setInitData',
       'setSearch',
-      'setTimeWindow',
+      'setTimeRange',
       'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
     ]),
 
-    // TODO Implement these methods 
     onDateTimePickerApply(params) {
-      console.log('onDateTimePickerApply', params);
+      // TODO this sets absolute dates, which would break the refresh functionality
+      this.setTimeRange(params);
     },
     onDateTimePickerInvalid(params) {
       console.log('onDateTimePickerInvalid', params);
@@ -193,6 +205,8 @@ export default {
             class="col-3 px-1"
           >
             <date-time-picker
+              class="w-100"
+              toggle-class="w-100 overflow-hidden"
               :start="timeWindow.start"
               :end="timeWindow.end"
               :time-windows="timeWindow.options"
@@ -200,31 +214,6 @@ export default {
               @invalid="onDateTimePickerInvalid"
             />
           </gl-form-group>
-
-          <!-- <gl-form-group
-            id="dates-fg"
-            :label="s__('Environments|Show last')"
-            label-size="sm"
-            label-for="time-window-dropdown"
-            class="col-3 px-1"
-          >
-            <gl-dropdown
-              id="time-window-dropdown"
-              ref="time-window-dropdown"
-              :disabled="environments.isLoading || !advancedFeaturesEnabled"
-              :text="timeWindow.options[timeWindow.current].label"
-              class="d-flex gl-h-32"
-              toggle-class="dropdown-menu-toggle"
-            >
-              <gl-dropdown-item
-                v-for="(option, key) in timeWindow.options"
-                :key="key"
-                @click="setTimeWindow(key)"
-              >
-                {{ option.label }}
-              </gl-dropdown-item>
-            </gl-dropdown>
-          </gl-form-group> -->
           <gl-form-group
             id="search-fg"
             :label="s__('Environments|Search')"

@@ -99,7 +99,8 @@ export const getTimeRange = (timeWindowKey, timeWindows = defaultTimeWindows) =>
   };
 };
 
-export const getDefaultTimeRange = (timeWindows = defaultTimeWindows) => getTimeRange(null, timeWindows);
+export const getDefaultTimeRange = (timeWindows = defaultTimeWindows) =>
+  getTimeRange(null, timeWindows);
 
 export const getTimeWindowKey = ({ start, end }, timeWindows = defaultTimeWindows) =>
   Object.entries(timeWindows).reduce((acc, [timeWindowKey, timeWindow]) => {

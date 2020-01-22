@@ -16,8 +16,10 @@ export default {
     state.enableAdvancedQuerying = enableAdvancedQuerying;
   },
   /** Time Range data */
-  [types.SET_TIME_WINDOW](state, timeWindowKey) {
-    state.timeWindow.current = timeWindowKey;
+  [types.SET_TIME_RANGE](state, timeRange) {
+    // TODO This stores absolute values, and perhaps we want relative dates
+    state.timeWindow.start = timeRange.start;
+    state.timeWindow.end = timeRange.end;
   },
 
   /** Environments data */
