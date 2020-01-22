@@ -18,8 +18,6 @@ export default () => ({
 
   sastContainer: {
     paths: {
-      head: null,
-      base: null,
       diffEndpoint: null,
     },
 

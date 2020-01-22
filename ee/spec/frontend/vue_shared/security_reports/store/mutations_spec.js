@@ -94,41 +94,6 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('RECEIVE_SAST_CONTAINER_REPORTS', () => {
-    describe('with head and base', () => {
-      it('should set new and resolved issues', () => {
-        mutations[types.RECEIVE_SAST_CONTAINER_REPORTS](stateCopy, {
-          head: dockerReport,
-          base: dockerBaseReport,
-        });
-
-        expect(stateCopy.sastContainer.isLoading).toEqual(false);
-        expect(stateCopy.sastContainer.newIssues).toEqual(dockerNewIssues);
-        expect(stateCopy.sastContainer.resolvedIssues).toEqual(parsedSastContainerBaseStore);
-      });
-    });
-
-    describe('with head', () => {
-      it('should set new issues', () => {
-        mutations[types.RECEIVE_SAST_CONTAINER_REPORTS](stateCopy, {
-          head: dockerReport,
-        });
-
-        expect(stateCopy.sastContainer.isLoading).toEqual(false);
-        expect(stateCopy.sastContainer.newIssues).toEqual(dockerOnlyHeadParsed);
-      });
-    });
-  });
-
-  describe('RECEIVE_SAST_CONTAINER_ERROR', () => {
-    it('should set sast container loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_SAST_CONTAINER_ERROR](stateCopy);
-
-      expect(stateCopy.sastContainer.isLoading).toEqual(false);
-      expect(stateCopy.sastContainer.hasError).toEqual(true);
-    });
-  });
-
   describe('REQUEST_DAST_REPORTS', () => {
     it('should set dast loading flag to true', () => {
       mutations[types.REQUEST_DAST_REPORTS](stateCopy);

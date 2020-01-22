@@ -66,38 +66,6 @@ export default {
     Vue.set(state.sastContainer, 'isLoading', true);
   },
 
-  /**
-   * For sast container we only render unapproved vulnerabilities.
-   */
-  [types.RECEIVE_SAST_CONTAINER_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const headIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-      const baseIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.base.vulnerabilities, reports.enrichData, reports.base.image),
-        reports.base.unapproved,
-      );
-      const filterKey = 'vulnerability';
-
-      const newIssues = filterByKey(headIssues, baseIssues, filterKey);
-      const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    } else if (reports.head && !reports.base) {
-      const newIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    }
-  },
-
   [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
     const baseReportOutofDate = diff.base_report_out_of_date || false;
@@ -112,11 +80,6 @@ export default {
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](state) {
-    Vue.set(state.sastContainer, 'isLoading', false);
-    Vue.set(state.sastContainer, 'hasError', true);
-  },
-
-  [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
     Vue.set(state.sastContainer, 'isLoading', false);
     Vue.set(state.sastContainer, 'hasError', true);
   },
