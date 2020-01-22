@@ -131,25 +131,6 @@ export default {
     Vue.set(state.dast, 'isLoading', true);
   },
 
-  [types.RECEIVE_DAST_REPORTS](state, reports) {
-    if (reports.head && reports.base) {
-      const headIssues = parseDastIssues(reports.head.site, reports.enrichData);
-      const baseIssues = parseDastIssues(reports.base.site, reports.enrichData);
-      const filterKey = 'pluginid';
-      const newIssues = filterByKey(headIssues, baseIssues, filterKey);
-      const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
-
-      Vue.set(state.dast, 'newIssues', newIssues);
-      Vue.set(state.dast, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.dast, 'isLoading', false);
-    } else if (reports.head && reports.head.site && !reports.base) {
-      const newIssues = parseDastIssues(reports.head.site, reports.enrichData);
-
-      Vue.set(state.dast, 'newIssues', newIssues);
-      Vue.set(state.dast, 'isLoading', false);
-    }
-  },
-
   [types.RECEIVE_DAST_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
     const baseReportOutofDate = diff.base_report_out_of_date || false;
@@ -164,11 +145,6 @@ export default {
   },
 
   [types.RECEIVE_DAST_DIFF_ERROR](state) {
-    Vue.set(state.dast, 'isLoading', false);
-    Vue.set(state.dast, 'hasError', true);
-  },
-
-  [types.RECEIVE_DAST_ERROR](state) {
     Vue.set(state.dast, 'isLoading', false);
     Vue.set(state.dast, 'hasError', true);
   },

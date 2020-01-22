@@ -33,8 +33,6 @@ export default () => ({
   },
   dast: {
     paths: {
-      head: null,
-      base: null,
       diffEndpoint: null,
     },
 

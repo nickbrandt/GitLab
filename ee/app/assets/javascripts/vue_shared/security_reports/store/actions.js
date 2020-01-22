@@ -126,37 +126,6 @@ export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_D
 
 export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
 
-export const receiveDastReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DAST_REPORTS, response);
-
-export const receiveDastError = ({ commit }, error) => commit(types.RECEIVE_DAST_ERROR, error);
-
-export const fetchDastReports = ({ state, dispatch }) => {
-  const { base, head } = state.dast.paths;
-
-  dispatch('requestDastReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dast',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDastReports', {
-        head: values && values[0] ? values[0].data : null,
-        base: values && values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDastError');
-    });
-};
-
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
 export const receiveDastDiffSuccess = ({ commit }, response) =>
