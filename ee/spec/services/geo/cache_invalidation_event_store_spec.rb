@@ -30,6 +30,7 @@ describe Geo::CacheInvalidationEventStore do
 
         expected_message = {
           class: described_class.name,
+          host: "localhost",
           cache_key: '',
           message: 'Cache invalidation event could not be created',
           error: "Validation failed: Key can't be blank"
