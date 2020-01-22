@@ -900,8 +900,8 @@ end
 ### Registry Disk Space Usage by Project
 
 As a GitLab administrator, you may need to reduce disk space consumption.
-A common culprit is Docker Registry images that are no longer in use. To find 
-the storage broken down by each project, run the following in the 
+A common culprit is Docker Registry images that are no longer in use. To find
+the storage broken down by each project, run the following in the
 GitLab Rails console:
 
 ```ruby
