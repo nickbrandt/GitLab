@@ -51,6 +51,8 @@ An emoji awarded by a user.
 
 ## Board
 
+Represents a project or group board
+
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! | ID (global ID) of the board |
