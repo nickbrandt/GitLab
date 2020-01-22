@@ -1220,15 +1220,15 @@ describe ProjectPolicy do
     using RSpec::Parameterized::TableSyntax
     context 'with merge request approvers rules available in license' do
       where(:role, :setting, :allowed) do
-        :guest | true |false
+        :guest | true | false
         :reporter | true | false
         :developer | true | false
         :maintainer | false | true
         :maintainer | true | false
         :owner | false | true
         :owner | true | false
-        :admin | true | true
         :admin | false | true
+        :admin | true | false
       end
 
       with_them do
@@ -1247,7 +1247,7 @@ describe ProjectPolicy do
 
     context 'with merge request approvers not available in license' do
       where(:role, :setting, :allowed) do
-        :guest | true |false
+        :guest | true | false
         :reporter | true | false
         :developer | true | false
         :maintainer | false | true

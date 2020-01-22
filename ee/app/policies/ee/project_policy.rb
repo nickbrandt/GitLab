@@ -319,15 +319,15 @@ module EE
         prevent :read_project
       end
 
-      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+      rule { owner_cannot_modify_approvers_rules }.policy do
         prevent :modify_approvers_rules
       end
 
-      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
+      rule { owner_cannot_modify_merge_request_author_setting }.policy do
         prevent :modify_merge_request_author_setting
       end
 
-      rule { owner_cannot_modify_merge_request_commiter_setting & ~admin }.policy do
+      rule { owner_cannot_modify_merge_request_commiter_setting }.policy do
         prevent :modify_merge_request_commiter_setting
       end
 
