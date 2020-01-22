@@ -22,6 +22,7 @@ import { generatePackageInfo } from '../utils';
 import { __, s__, sprintf } from '~/locale';
 import { PackageType, TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
+import { mapState } from 'vuex';
 
 export default {
   name: 'PackagesApp',
@@ -45,15 +46,6 @@ export default {
   mixins: [timeagoMixin, Tracking.mixin()],
   trackingActions: { ...TrackingActions },
   props: {
-    packageEntity: {
-      type: Object,
-      required: true,
-    },
-    files: {
-      type: Array,
-      default: () => [],
-      required: true,
-    },
     canDelete: {
       type: Boolean,
       default: false,
@@ -94,6 +86,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['packageEntity', 'packageFiles']),
     isNpmPackage() {
       return this.packageEntity.package_type === PackageType.NPM;
     },
@@ -159,7 +152,7 @@ export default {
       }
     },
     filesTableRows() {
-      return this.files.map(x => ({
+      return this.packageFiles.map(x => ({
         name: x.file_name,
         downloadPath: x.download_path,
         size: this.formatSize(x.size),
