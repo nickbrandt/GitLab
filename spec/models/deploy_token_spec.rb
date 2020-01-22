@@ -44,6 +44,28 @@ describe DeployToken do
     end
   end
 
+  describe 'deploy_token_type validations' do
+    context 'when a deploy token is associated to a group' do
+      it 'does not allow setting a project to it' do
+        group_token = create(:deploy_token, :group)
+        group_token.projects << build(:project)
+
+        expect(group_token).not_to be_valid
+        expect(group_token.errors.full_messages).to include('Deploy token cannot have projects assigned')
+      end
+    end
+
+    context 'when a deploy token is associated to a project' do
+      it 'does not allow setting a group to it' do
+        project_token = create(:deploy_token)
+        project_token.groups << build(:group)
+
+        expect(project_token).not_to be_valid
+        expect(project_token.errors.full_messages).to include('Deploy token cannot have groups assigned')
+      end
+    end
+  end
+
   describe '#ensure_token' do
     it 'ensures a token' do
       deploy_token.token = nil
