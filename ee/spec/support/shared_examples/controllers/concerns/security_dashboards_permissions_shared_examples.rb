@@ -16,7 +16,7 @@ RSpec.shared_examples SecurityDashboardsPermissions do
 
         security_dashboard_action
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -31,7 +31,7 @@ RSpec.shared_examples SecurityDashboardsPermissions do
 
           security_dashboard_action
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -41,7 +41,7 @@ RSpec.shared_examples SecurityDashboardsPermissions do
 
           security_dashboard_action
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end

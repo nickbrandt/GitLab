@@ -13,7 +13,7 @@ RSpec.shared_examples 'multiple and scoped issue boards' do |route_definition|
       it 'creates a board' do
         post api(root_url, user), params: { name: "new board" }
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
 
         expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
       end
@@ -25,7 +25,7 @@ RSpec.shared_examples 'multiple and scoped issue boards' do |route_definition|
       it 'updates a board' do
         put api(url, user), params: { name: 'new name', weight: 4, labels: 'foo, bar' }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
 
@@ -43,14 +43,14 @@ RSpec.shared_examples 'multiple and scoped issue boards' do |route_definition|
           .and not_change { board.reload.weight }
           .and not_change { board.reload.labels.map(&:title).sort }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
       end
 
       it 'allows removing optional attributes' do
         put api(url, user), params: { name: 'new name', assignee_id: nil, milestone_id: nil, weight: nil, labels: nil }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
 
         board.reload
@@ -69,7 +69,7 @@ RSpec.shared_examples 'multiple and scoped issue boards' do |route_definition|
       it 'deletes a board' do
         delete api(url, user)
 
-        expect(response).to have_gitlab_http_status(204)
+        expect(response).to have_gitlab_http_status(:no_content)
       end
     end
   end
