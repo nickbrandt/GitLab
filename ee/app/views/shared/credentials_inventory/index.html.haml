@@ -7,19 +7,19 @@
     = icon('angle-right')
   %ul.nav-links.nav.nav-tabs.scrolling-tabs
     = nav_link(html_options: { class: active_when(show_personal_access_tokens?) }) do
-      = link_to admin_credentials_path(filter: 'personal_access_tokens') do
-        = s_('AdminCredentials|Personal Access Tokens')
+      = link_to credentials_inventory_path(filter: 'personal_access_tokens') do
+        = s_('CredentialsInventory|Personal Access Tokens')
     = nav_link(html_options: { class: active_when(show_ssh_keys?) }) do
-      = link_to admin_credentials_path(filter: 'ssh_keys') do
-        = s_('AdminCredentials|SSH Keys')
+      = link_to credentials_inventory_path(filter: 'ssh_keys') do
+        = s_('CredentialsInventory|SSH Keys')
 
 - if @credentials.empty?
   .nothing-here-block.border-top-0
-    = s_('AdminUsers|No credentials found')
+    = s_('CredentialsInventory|No credentials found')
 - else
   - if show_personal_access_tokens?
-    = render partial: 'admin/credentials/personal_access_tokens', locals: { credentials: @credentials }
+    = render 'shared/credentials_inventory/personal_access_tokens', credentials: @credentials
   - elsif show_ssh_keys?
-    = render partial: 'admin/credentials/ssh_keys', locals: { credentials: @credentials }
+    = render 'shared/credentials_inventory/ssh_keys', credentials: @credentials
 
 = paginate_without_count @credentials
