@@ -6,35 +6,44 @@ module QA
   context 'Release', :docker do
     describe 'Pipelines for merged results and merge trains' do
       before(:context) do
-        @project = Resource::Project.fabricate_via_api! do |project|
-          project.name = 'pipelines-for-merged-results-and-merge-trains'
-        end
-        @executor = "qa-runner-#{Time.now.to_i}"
+        @group = Resource::Group.fabricate_via_api!
 
         Resource::Runner.fabricate_via_api! do |runner|
-          runner.project = @project
-          runner.name = @executor
-          runner.tags = %w[qa test]
+          runner.token = @group.reload!.runners_token
+          runner.name = @group.name
+          runner.tags = [@group.name]
         end
+      end
 
-        Resource::Repository::ProjectPush.fabricate! do |project_push|
-          project_push.project = @project
-          project_push.file_name = '.gitlab-ci.yml'
-          project_push.commit_message = 'Add .gitlab-ci.yml'
-          project_push.file_content = <<~EOF
-            test:
-              tags: ["qa"]
-              script: echo 'OK'
-              only:
-              - merge_requests
-          EOF
+      let(:project) do
+        Resource::Project.fabricate_via_api! do |project|
+          project.name = 'pipelines-for-merged-results-and-merge-trains'
+          project.group = @group
         end
       end
 
       before do
-        Flow::Login.sign_in
+        Resource::Repository::Commit.fabricate_via_api! do |commit|
+          commit.project = project
+          commit.commit_message = 'Add .gitlab-ci.yml'
+          commit.add_files(
+            [
+              {
+                file_path: '.gitlab-ci.yml',
+                content:  <<~EOF
+                  test:
+                    tags: [#{@group.name}]
+                    script: echo 'OK'
+                    only:
+                    - merge_requests
+                EOF
+              }
+            ]
+          )
+        end
 
-        @project.visit!
+        Flow::Login.sign_in
+        project.visit!
 
         Page::Project::Menu.perform(&:go_to_general_settings)
         Page::Project::Settings::Main.perform do |main|
@@ -46,7 +55,7 @@ module QA
       end
 
       after(:context) do
-        Service::DockerRun::GitlabRunner.new(@executor).remove!
+        Service::DockerRun::GitlabRunner.new(@group.name).remove!
       end
 
       it 'creates a pipeline with merged results' do
@@ -54,7 +63,7 @@ module QA
 
         # Create a branch that will be merged into master
         Resource::Repository::ProjectPush.fabricate! do |project_push|
-          project_push.project = @project
+          project_push.project = project
           project_push.new_branch = true
           project_push.branch_name = branch_name
           project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
@@ -62,7 +71,7 @@ module QA
 
         # Create a merge request to merge the branch we just created
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
-          merge_request.project = @project
+          merge_request.project = project
           merge_request.source_branch = branch_name
           merge_request.no_preparation = true
         end.visit!
@@ -89,7 +98,7 @@ module QA
 
         # Create a branch that will be merged into master
         Resource::Repository::ProjectPush.fabricate! do |project_push|
-          project_push.project = @project
+          project_push.project = project
           project_push.new_branch = true
           project_push.branch_name = branch_name
           project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
@@ -98,7 +107,7 @@ module QA
 
         # Create a merge request to merge the branch we just created
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
-          merge_request.project = @project
+          merge_request.project = project
           merge_request.source_branch = branch_name
           merge_request.no_preparation = true
         end.visit!
