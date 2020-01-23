@@ -3,6 +3,7 @@
 resources :merge_requests, only: [], constraints: { id: /\d+/ } do
   member do
     get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
+    delete '/descriptions/:version_id', action: :delete_description_version, as: :delete_description_version
     get :metrics_reports
     get :license_management_reports
     get :container_scanning_reports

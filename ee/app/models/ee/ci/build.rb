@@ -24,7 +24,7 @@ module EE
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 
-        scope :license_scan, -> { joins(:job_artifacts).merge(::Ci::JobArtifact.license_management) }
+        scope :license_scan, -> { joins(:job_artifacts).merge(::Ci::JobArtifact.license_scanning_reports) }
         scope :max_build_id_by, -> (build_name, ref, project_path) do
           select('max(ci_builds.id) as id')
             .by_name(build_name)

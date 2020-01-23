@@ -119,10 +119,10 @@ export const anyReportHasError = state =>
   state.dependencyScanning.hasError;
 
 export const noBaseInAllReports = state =>
-  !state.sast.paths.base &&
-  !state.dast.paths.base &&
-  !state.sastContainer.paths.base &&
-  !state.dependencyScanning.paths.base;
+  !state.sast.hasBaseReport &&
+  !state.dast.hasBaseReport &&
+  !state.sastContainer.hasBaseReport &&
+  !state.dependencyScanning.hasBaseReport;
 
 export const anyReportHasIssues = state =>
   state.sast.newIssues.length > 0 ||

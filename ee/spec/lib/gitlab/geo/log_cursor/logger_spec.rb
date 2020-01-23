@@ -7,7 +7,7 @@ describe Gitlab::Geo::LogCursor::Logger, :geo do
 
   subject(:logger) { described_class.new(LoggerSpec) }
 
-  let(:data) { { pid: 111, class: 'LoggerSpec', message: 'Test' } }
+  let(:data) { { pid: 111, class: 'LoggerSpec', host: 'localhost', message: 'Test' } }
 
   before do
     stub_const("#{described_class.name}::PID", 111)
@@ -35,6 +35,7 @@ describe Gitlab::Geo::LogCursor::Logger, :geo do
     it 'logs an info event' do
       expect(::Gitlab::Logger).to receive(:info).with(pid: 111,
                                                       class: "LoggerSpec",
+                                                      host: 'localhost',
                                                       message: 'Test',
                                                       cursor_delay_s: 0.0)
 

@@ -1,4 +1,5 @@
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
@@ -11,12 +12,14 @@ import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
 import { conanPackage, mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('PackagesApp', () => {
   let wrapper;
+  let store;
 
   const defaultProps = {
-    packageEntity: mavenPackage,
-    files: mavenFiles,
     canDelete: true,
     destroyPath: 'destroy-package-path',
     emptySvgPath: 'empty-illustration',
@@ -28,14 +31,28 @@ describe('PackagesApp', () => {
     conanHelpPath: 'foo',
   };
 
-  function createComponent(props = {}) {
+  function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
     const propsData = {
       ...defaultProps,
-      ...props,
     };
 
+    store = new Vuex.Store({
+      state: {
+        isLoading: false,
+        packageEntity,
+        packageFiles,
+        pipelineInfo: {},
+        pipelineError: null,
+      },
+      getters: {
+        packageHasPipeline: () => packageEntity.build_info && packageEntity.build_info.pipeline_id,
+      },
+    });
+
     wrapper = mount(PackagesApp, {
+      localVue,
       propsData,
+      store,
     });
   }
 
@@ -86,20 +103,14 @@ describe('PackagesApp', () => {
   });
 
   it('does not render package metadata for npm as npm packages do not contain metadata', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(packageInformation(0)).toExist();
     expect(allPackageInformation().length).toBe(1);
   });
 
   it('renders package installation instructions for npm packages', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(npmInstallation()).toExist();
   });
@@ -111,10 +122,7 @@ describe('PackagesApp', () => {
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(allFileRows()).toExist();
     expect(allFileRows().length).toBe(1);
@@ -148,10 +156,8 @@ describe('PackagesApp', () => {
   describe('package tags', () => {
     it('displays the package-tags component when the package has tags', () => {
       createComponent({
-        packageEntity: {
-          ...npmPackage,
-          tags: [{ name: 'foo' }],
-        },
+        ...npmPackage,
+        tags: [{ name: 'foo' }],
       });
 
       expect(packageTags().exists()).toBe(true);
@@ -175,13 +181,13 @@ describe('PackagesApp', () => {
     });
 
     it('tracking category calls packageTypeToTrackCategory', () => {
-      createComponent({ packageEntity: conanPackage });
+      createComponent(conanPackage);
       expect(wrapper.vm.tracking.category).toBe(category);
       expect(utilSpy).toHaveBeenCalledWith('conan');
     });
 
     it(`delete button on delete modal call event with ${TrackingActions.DELETE_PACKAGE}`, () => {
-      createComponent({ packageEntity: conanPackage, canDelete: true, destroyPath: 'foo' });
+      createComponent(conanPackage);
       deleteButton().trigger('click');
       return wrapper.vm.$nextTick().then(() => {
         modalDeleteButton().trigger('click');
@@ -194,7 +200,7 @@ describe('PackagesApp', () => {
     });
 
     it(`file download link call event with ${TrackingActions.PULL_PACKAGE}`, () => {
-      createComponent({ packageEntity: conanPackage });
+      createComponent(conanPackage);
       firstFileDownloadLink().trigger('click');
       expect(eventSpy).toHaveBeenCalledWith(
         category,

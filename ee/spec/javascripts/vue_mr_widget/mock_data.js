@@ -11,9 +11,9 @@ export default Object.assign({}, mockData, {
   },
   vulnerability_feedback_help_path: '/help/user/application_security/index',
   enabled_reports: {
-    sast: true,
+    sast: false,
     container_scanning: false,
-    dast: true,
+    dast: false,
     dependency_scanning: false,
     license_management: true,
   },

@@ -72,10 +72,8 @@ export default {
     },
     shouldRenderSecurityReport() {
       return (
-        (this.mr.sast && this.mr.sast.head_path) ||
-        (this.mr.sastContainer && this.mr.sastContainer.head_path) ||
-        (this.mr.dast && this.mr.dast.head_path) ||
-        (this.mr.dependencyScanning && this.mr.dependencyScanning.head_path)
+        this.mr.enabledSecurityReports &&
+        Object.values(this.mr.enabledSecurityReports).some(isReportEnabled => isReportEnabled)
       );
     },
     codequalityText() {
@@ -304,17 +302,9 @@ export default {
         :target-branch="mr.targetBranch"
         :base-blob-path="mr.baseBlobPath"
         :enabled-reports="mr.enabledSecurityReports"
-        :sast-head-path="mr.sast.head_path"
-        :sast-base-path="mr.sast.base_path"
         :sast-help-path="mr.sastHelp"
-        :dast-head-path="mr.dast.head_path"
-        :dast-base-path="mr.dast.base_path"
         :dast-help-path="mr.dastHelp"
-        :sast-container-head-path="mr.sastContainer.head_path"
-        :sast-container-base-path="mr.sastContainer.base_path"
         :sast-container-help-path="mr.sastContainerHelp"
-        :dependency-scanning-head-path="mr.dependencyScanning.head_path"
-        :dependency-scanning-base-path="mr.dependencyScanning.base_path"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
