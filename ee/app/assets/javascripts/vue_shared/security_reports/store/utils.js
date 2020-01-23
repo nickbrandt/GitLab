@@ -1,5 +1,3 @@
-import sha1 from 'sha1';
-import _ from 'underscore';
 import { n__, s__, sprintf } from '~/locale';
 
 /**
@@ -9,32 +7,6 @@ import { n__, s__, sprintf } from '~/locale';
  */
 export const findIssueIndex = (issues, issue) =>
   issues.findIndex(el => el.project_fingerprint === issue.project_fingerprint);
-
-/**
- *
- * Returns whether a vulnerability has a match in an array of fixes
- *
- * @param fixes {Array} Array of fixes (vulnerability identifiers) of a remediation
- * @param vulnerability {Object} Vulnerability
- * @returns {boolean}
- */
-const hasMatchingFix = (fixes, vulnerability) =>
-  Array.isArray(fixes) ? fixes.some(fix => _.isMatch(vulnerability, fix)) : false;
-
-/**
- *
- * Returns the remediations that fix the given vulnerability
- *
- * @param {Array} remediations
- * @param {Object} vulnerability
- * @returns {Array}
- */
-export const findMatchingRemediations = (remediations, vulnerability) => {
-  if (!Array.isArray(remediations)) {
-    return [];
-  }
-  return remediations.filter(rem => hasMatchingFix(rem.fixes, vulnerability));
-};
 
 /**
  * Returns given vulnerability enriched with the corresponding
@@ -67,109 +39,6 @@ export const enrichVulnerabilityWithFeedback = (vulnerability, feedback = []) =>
       }
       return vuln;
     }, vulnerability);
-
-/**
- * Generates url to repository file and highlight section between start and end lines.
- *
- * @param {Object} location
- * @param {String} pathPrefix
- * @returns {String}
- */
-function fileUrl(location, pathPrefix) {
-  let lineSuffix = '';
-  if (location.start_line) {
-    lineSuffix += `#L${location.start_line}`;
-    if (location.end_line) {
-      lineSuffix += `-${location.end_line}`;
-    }
-  }
-  return `${pathPrefix}/${location.file}${lineSuffix}`;
-}
-
-/**
- * Parses issues with deprecated JSON format and adapts it to the new one.
- *
- * @param {Object} issue
- * @returns {Object}
- */
-function adaptDeprecatedIssueFormat(issue) {
-  // Skip issue with new format (old format does not have a location property)
-  if (issue.location) {
-    return issue;
-  }
-
-  const adapted = {
-    ...issue,
-  };
-
-  // Add the new links property
-  const links = [];
-  if (!_.isEmpty(adapted.url)) {
-    links.push({ url: adapted.url });
-  }
-
-  Object.assign(adapted, {
-    // Add the new location property
-    location: {
-      file: adapted.file,
-      start_line: adapted.line ? parseInt(adapted.line, 10) : undefined,
-    },
-    links,
-  });
-
-  return adapted;
-}
-
-/**
- *
- * Wraps old report formats (plain array of vulnerabilities).
- *
- * @param {Array|Object} report
- * @returns {Object}
- */
-function adaptDeprecatedReportFormat(report) {
-  if (Array.isArray(report)) {
-    return {
-      vulnerabilities: report,
-      remediations: [],
-    };
-  }
-
-  return report;
-}
-
-/**
- * Parses Dependency Scanning results into a common format to allow to use the same Vue component.
- *
- * @param {Array|Object} report
- * @param {Array} feedback
- * @param {String} path
- * @returns {Array}
- */
-export const parseDependencyScanningIssues = (report = [], feedback = [], path = '') => {
-  const { vulnerabilities, remediations } = adaptDeprecatedReportFormat(report);
-  return vulnerabilities.map(issue => {
-    const parsed = {
-      ...adaptDeprecatedIssueFormat(issue),
-      category: 'dependency_scanning',
-      project_fingerprint: sha1(issue.cve),
-      title: issue.message,
-    };
-
-    const matchingRemediations = findMatchingRemediations(remediations, parsed);
-
-    if (remediations) {
-      parsed.remediations = matchingRemediations;
-    }
-
-    return {
-      ...parsed,
-      path: parsed.location.file,
-      urlPath: fileUrl(parsed.location, path),
-      ...enrichVulnerabilityWithFeedback(parsed, feedback),
-    };
-  });
-};
 
 export const groupedTextBuilder = ({
   reportType = '',

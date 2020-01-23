@@ -127,23 +127,12 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 /**
  * DEPENDENCY SCANNING
  */
-export const setDependencyScanningHeadPath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_HEAD_PATH, path);
-
-export const setDependencyScanningBasePath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
 
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 
 export const requestDependencyScanningReports = ({ commit }) =>
   commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
-
-export const receiveDependencyScanningReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_REPORTS, response);
-
-export const receiveDependencyScanningError = ({ commit }, error) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_ERROR, error);
 
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
@@ -170,32 +159,6 @@ export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('receiveDependencyScanningDiffError');
-    });
-};
-
-export const fetchDependencyScanningReports = ({ state, dispatch }) => {
-  const { base, head } = state.dependencyScanning.paths;
-
-  dispatch('requestDependencyScanningReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dependency_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDependencyScanningReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDependencyScanningError');
     });
 };
 

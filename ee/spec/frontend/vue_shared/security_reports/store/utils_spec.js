@@ -1,8 +1,5 @@
-import sha1 from 'sha1';
 import {
   findIssueIndex,
-  findMatchingRemediations,
-  parseDependencyScanningIssues,
   groupedTextBuilder,
   statusIcon,
   countIssues,
@@ -10,12 +7,6 @@ import {
 } from 'ee/vue_shared/security_reports/store/utils';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
-import {
-  dependencyScanningIssuesOld,
-  dependencyScanningIssues,
-  dependencyScanningIssuesMajor2,
-  dependencyScanningFeedbacks,
-} from '../mock_data';
 
 describe('security reports utils', () => {
   describe('findIssueIndex', () => {
@@ -43,114 +34,6 @@ describe('security reports utils', () => {
       };
 
       expect(findIssueIndex(issuesList, issue)).toEqual(-1);
-    });
-  });
-
-  describe('findMatchingRemediations', () => {
-    const remediation1 = {
-      fixes: [
-        {
-          cve: '123',
-        },
-        {
-          foobar: 'baz',
-        },
-      ],
-      summary: 'Update to x.y.z',
-    };
-
-    const remediation2 = { ...remediation1, summary: 'Remediation2' };
-
-    const impossibleRemediation = {
-      fixes: [],
-      summary: 'Impossible',
-    };
-
-    const remediations = [impossibleRemediation, remediation1, remediation2];
-
-    it('returns null for empty vulnerability', () => {
-      expect(findMatchingRemediations(remediations, {})).toHaveLength(0);
-      expect(findMatchingRemediations(remediations, null)).toHaveLength(0);
-      expect(findMatchingRemediations(remediations, undefined)).toHaveLength(0);
-    });
-
-    it('returns empty arrays for empty remediations', () => {
-      expect(findMatchingRemediations([], { cve: '123' })).toHaveLength(0);
-      expect(findMatchingRemediations(null, { cve: '123' })).toHaveLength(0);
-      expect(findMatchingRemediations(undefined, { cve: '123' })).toHaveLength(0);
-    });
-
-    it('returns an empty array for vulnerabilities without a remediation', () => {
-      expect(findMatchingRemediations(remediations, { cve: 'NOT_FOUND' })).toHaveLength(0);
-    });
-
-    it('returns all matching remediations for a vulnerability', () => {
-      expect(findMatchingRemediations(remediations, { cve: '123' })).toEqual([
-        remediation1,
-        remediation2,
-      ]);
-
-      expect(findMatchingRemediations(remediations, { foobar: 'baz' })).toEqual([
-        remediation1,
-        remediation2,
-      ]);
-    });
-  });
-
-  describe('parseDependencyScanningIssues', () => {
-    it('should parse the received issues', () => {
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesOld, [], 'path')[0];
-
-      expect(parsed.title).toEqual(dependencyScanningIssuesOld[0].message);
-      expect(parsed.path).toEqual(dependencyScanningIssuesOld[0].file);
-      expect(parsed.location.start_line).toEqual(parseInt(dependencyScanningIssuesOld[0].line, 10));
-      expect(parsed.location.end_line).toBeUndefined();
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5');
-      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssuesOld[0].cve));
-    });
-
-    it('should parse the received issues with new JSON format', () => {
-      const raw = dependencyScanningIssues[0];
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[0];
-
-      expect(parsed.title).toEqual(raw.message);
-      expect(parsed.path).toEqual(raw.location.file);
-      expect(parsed.location.start_line).toBeUndefined();
-      expect(parsed.location.end_line).toBeUndefined();
-      expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
-      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
-    });
-
-    it('should parse the received issues with new JSON format (2.0)', () => {
-      const raw = dependencyScanningIssues[0];
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesMajor2, [], 'path')[0];
-
-      expect(parsed.title).toEqual(raw.message);
-      expect(parsed.path).toEqual(raw.location.file);
-      expect(parsed.location.start_line).toBeUndefined();
-      expect(parsed.location.end_line).toBeUndefined();
-      expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
-      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
-      expect(parsed.remediations).toEqual([dependencyScanningIssuesMajor2.remediations[0]]);
-    });
-
-    it('generate correct path to file when there is no line', () => {
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesOld, [], 'path')[1];
-
-      expect(parsed.urlPath).toEqual('path/Gemfile.lock');
-    });
-
-    it('includes vulnerability feedbacks', () => {
-      const parsed = parseDependencyScanningIssues(
-        dependencyScanningIssuesOld,
-        dependencyScanningFeedbacks,
-        'path',
-      )[0];
-
-      expect(parsed.hasIssue).toEqual(true);
-      expect(parsed.isDismissed).toEqual(true);
-      expect(parsed.dismissalFeedback).toEqual(dependencyScanningFeedbacks[0]);
-      expect(parsed.issue_feedback).toEqual(dependencyScanningFeedbacks[1]);
     });
   });
 

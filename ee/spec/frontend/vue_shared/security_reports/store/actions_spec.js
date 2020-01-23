@@ -9,12 +9,7 @@ import {
   setCanCreateFeedbackPermission,
   requestSastContainerReports,
   requestDastReports,
-  setDependencyScanningHeadPath,
-  setDependencyScanningBasePath,
   requestDependencyScanningReports,
-  receiveDependencyScanningError,
-  receiveDependencyScanningReports,
-  fetchDependencyScanningReports,
   openModal,
   setModalData,
   requestDismissVulnerability,
@@ -62,9 +57,6 @@ import state from 'ee/vue_shared/security_reports/store/state';
 import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 import {
-  sastIssues,
-  sastIssuesBase,
-  sastFeedbacks,
   dastFeedbacks,
   containerScanningFeedbacks,
   dependencyScanningFeedbacks,
@@ -272,42 +264,6 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setDependencyScanningHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDependencyScanningHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DEPENDENCY_SCANNING_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setDependencyScanningBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDependencyScanningBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DEPENDENCY_SCANNING_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestDependencyScanningReports', () => {
     it('should commit request mutation', done => {
       testAction(
@@ -322,157 +278,6 @@ describe('security reports actions', () => {
         [],
         done,
       );
-    });
-  });
-
-  describe('receiveDependencyScanningReports', () => {
-    it('should commit sast receive mutation', done => {
-      testAction(
-        receiveDependencyScanningReports,
-        {},
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_DEPENDENCY_SCANNING_REPORTS,
-            payload: {},
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('receiveDependencyScanningError', () => {
-    it('should commit dependency scanning error mutation', done => {
-      const error = new Error('test');
-
-      testAction(
-        receiveDependencyScanningError,
-        error,
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_DEPENDENCY_SCANNING_ERROR,
-            payload: error,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('fetchDependencyScanningReports', () => {
-    describe('with head and base', () => {
-      it('should dispatch `receiveDependencyScanningReports`', done => {
-        mock.onGet('foo').reply(200, sastIssues);
-        mock.onGet('bar').reply(200, sastIssuesBase);
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'dependency_scanning',
-            },
-          })
-          .reply(200, sastFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-        mockedState.dependencyScanning.paths.head = 'foo';
-        mockedState.dependencyScanning.paths.base = 'bar';
-
-        testAction(
-          fetchDependencyScanningReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDependencyScanningReports',
-            },
-            {
-              type: 'receiveDependencyScanningReports',
-              payload: { head: sastIssues, base: sastIssuesBase, enrichData: sastFeedbacks },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveDependencyScanningError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.dependencyScanning.paths.head = 'foo';
-        mockedState.dependencyScanning.paths.base = 'bar';
-
-        testAction(
-          fetchDependencyScanningReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDependencyScanningReports',
-            },
-            {
-              type: 'receiveDependencyScanningError',
-            },
-          ],
-          done,
-        );
-      });
-    });
-
-    describe('with head', () => {
-      it('should dispatch `receiveDependencyScanningReports`', done => {
-        mock.onGet('foo').reply(200, sastIssues);
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'dependency_scanning',
-            },
-          })
-          .reply(200, sastFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-        mockedState.dependencyScanning.paths.head = 'foo';
-
-        testAction(
-          fetchDependencyScanningReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDependencyScanningReports',
-            },
-            {
-              type: 'receiveDependencyScanningReports',
-              payload: { head: sastIssues, base: null, enrichData: sastFeedbacks },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveDependencyScanningError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.dependencyScanning.paths.head = 'foo';
-
-        testAction(
-          fetchDependencyScanningReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDependencyScanningReports',
-            },
-            {
-              type: 'receiveDependencyScanningError',
-            },
-          ],
-          done,
-        );
-      });
     });
   });
 
