@@ -1,6 +1,5 @@
 import sha1 from 'sha1';
 import _ from 'underscore';
-import { stripHtml } from '~/lib/utils/text_utility';
 import { n__, s__, sprintf } from '~/locale';
 
 /**
@@ -196,69 +195,6 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
     };
   });
 };
-
-/**
- * Forces the site property to be an Array in DAST reports.
- * We do this to also support single-site legacy DAST reports.
- *
- * @param {Object|Array} sites
- */
-export const getDastSites = sites => (Array.isArray(sites) ? sites : [sites]);
-
-/**
- * Parses DAST into a common format to allow to use the same Vue component.
- * DAST report is currently the straigh output from the underlying tool (ZAProxy)
- * hence the formatting happenning here.
- *
- * @param {Array} sites
- * @param {Array} feedback
- * @returns {Array}
- */
-export const parseDastIssues = (sites = [], feedback = []) =>
-  getDastSites(sites).reduce(
-    (acc, site) => [
-      ...acc,
-      ...(site.alerts || []).map(issue => {
-        const parsed = {
-          ...issue,
-          category: 'dast',
-          project_fingerprint: sha1(issue.pluginid),
-          title: issue.name,
-          description: stripHtml(issue.desc, ' '),
-          solution: stripHtml(issue.solution, ' '),
-        };
-
-        if (!_.isEmpty(issue.cweid)) {
-          Object.assign(parsed, {
-            identifiers: [
-              {
-                type: 'CWE',
-                name: `CWE-${issue.cweid}`,
-                value: issue.cweid,
-                url: `https://cwe.mitre.org/data/definitions/${issue.cweid}.html`,
-              },
-            ],
-          });
-        }
-
-        if (issue.riskdesc && issue.riskdesc !== '') {
-          // Split riskdesc into severity and confidence.
-          // Riskdesc format is: "severity (confidence)"
-          const [, severity, confidence] = issue.riskdesc.match(/(.*) \((.*)\)/);
-          Object.assign(parsed, {
-            severity,
-            confidence,
-          });
-        }
-
-        return {
-          ...parsed,
-          ...enrichVulnerabilityWithFeedback(parsed, feedback),
-        };
-      }),
-    ],
-    [],
-  );
 
 export const groupedTextBuilder = ({
   reportType = '',

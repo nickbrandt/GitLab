@@ -8,10 +8,6 @@ import {
   parsedDependencyScanningBaseStore,
   parsedDependencyScanningIssuesStore,
   mockFindings,
-  dast,
-  dastBase,
-  parsedDastNewIssues,
-  parsedDast,
 } from '../mock_data';
 import { visitUrl } from '~/lib/utils/url_utility';
 
@@ -90,115 +86,11 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('SET_DAST_HEAD_PATH', () => {
-    it('should set dast head path', () => {
-      mutations[types.SET_DAST_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.dast.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_DAST_BASE_PATH', () => {
-    it('should set dast base path', () => {
-      mutations[types.SET_DAST_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.dast.paths.base).toEqual('base_path');
-    });
-  });
-
   describe('REQUEST_DAST_REPORTS', () => {
     it('should set dast loading flag to true', () => {
       mutations[types.REQUEST_DAST_REPORTS](stateCopy);
 
       expect(stateCopy.dast.isLoading).toEqual(true);
-    });
-  });
-
-  describe('RECEIVE_DAST_REPORTS', () => {
-    const makeDastWithSiteArray = dastReport => ({
-      site: [dastReport.site],
-    });
-
-    describe('with head and base', () => {
-      it('sets new and resolved issues with the given data', () => {
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: dast,
-          base: dastBase,
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-
-        expect(stateCopy.dast.newIssues).toEqual(parsedDastNewIssues);
-        expect(stateCopy.dast.resolvedIssues).toEqual([]);
-      });
-
-      it("parses site property if it's an array instead of an object", () => {
-        const dastWithSiteArray = makeDastWithSiteArray(dast);
-        const dastBaseWithSiteArray = makeDastWithSiteArray(dastBase);
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: dastWithSiteArray,
-          base: dastBaseWithSiteArray,
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-
-        expect(stateCopy.dast.newIssues).toEqual(parsedDastNewIssues);
-        expect(stateCopy.dast.resolvedIssues).toEqual([]);
-      });
-
-      it('does not report any vulnerability if site is an empty array', () => {
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: { site: [] },
-          base: { site: [] },
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-
-        expect(stateCopy.dast.newIssues).toEqual([]);
-        expect(stateCopy.dast.resolvedIssues).toEqual([]);
-      });
-    });
-
-    describe('with head', () => {
-      it('sets new issues with the given data', () => {
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: dast,
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-        expect(stateCopy.dast.newIssues).toEqual(parsedDast);
-      });
-
-      it("parses site property if it's an array instead of an object", () => {
-        const dastWithSiteArray = makeDastWithSiteArray(dast);
-
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: dastWithSiteArray,
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-        expect(stateCopy.dast.newIssues).toEqual(parsedDast);
-      });
-
-      it('does not report any vulnerability if site is an empty array', () => {
-        mutations[types.RECEIVE_DAST_REPORTS](stateCopy, {
-          head: { site: [] },
-        });
-
-        expect(stateCopy.dast.isLoading).toEqual(false);
-
-        expect(stateCopy.dast.newIssues).toEqual([]);
-        expect(stateCopy.dast.resolvedIssues).toEqual([]);
-      });
-    });
-  });
-
-  describe('RECEIVE_DAST_ERROR', () => {
-    it('should set dast loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_DAST_ERROR](stateCopy);
-
-      expect(stateCopy.dast.isLoading).toEqual(false);
-      expect(stateCopy.dast.hasError).toEqual(true);
     });
   });
 
@@ -715,10 +607,10 @@ describe('security reports mutations', () => {
 
   describe('UPDATE_DAST_ISSUE', () => {
     it('updates issue in the new issues list', () => {
-      stateCopy.dast.newIssues = parsedDastNewIssues;
+      stateCopy.dast.newIssues = mockFindings;
       stateCopy.dast.resolvedIssues = [];
       const updatedIssue = {
-        ...parsedDastNewIssues[0],
+        ...mockFindings[0],
         foo: 'bar',
       };
 
@@ -729,9 +621,9 @@ describe('security reports mutations', () => {
 
     it('updates issue in the resolved issues list', () => {
       stateCopy.dast.newIssues = [];
-      stateCopy.dast.resolvedIssues = parsedDastNewIssues;
+      stateCopy.dast.resolvedIssues = mockFindings;
       const updatedIssue = {
-        ...parsedDastNewIssues[0],
+        ...mockFindings[0],
         foo: 'bar',
       };
 

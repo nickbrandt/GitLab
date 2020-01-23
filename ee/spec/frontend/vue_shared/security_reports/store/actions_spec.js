@@ -8,12 +8,7 @@ import {
   setCanCreateIssuePermission,
   setCanCreateFeedbackPermission,
   requestSastContainerReports,
-  setDastHeadPath,
-  setDastBasePath,
   requestDastReports,
-  receiveDastReports,
-  receiveDastError,
-  fetchDastReports,
   setDependencyScanningHeadPath,
   setDependencyScanningBasePath,
   requestDependencyScanningReports,
@@ -69,8 +64,6 @@ import axios from '~/lib/utils/axios_utils';
 import {
   sastIssues,
   sastIssuesBase,
-  dast,
-  dastBase,
   sastFeedbacks,
   dastFeedbacks,
   containerScanningFeedbacks,
@@ -262,42 +255,6 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setDastHeadPath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDastHeadPath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DAST_HEAD_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setDastBasePath', () => {
-    it('should commit set head blob path', done => {
-      testAction(
-        setDastBasePath,
-        'path',
-        mockedState,
-        [
-          {
-            type: types.SET_DAST_BASE_PATH,
-            payload: 'path',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestDastReports', () => {
     it('should commit request mutation', done => {
       testAction(
@@ -312,158 +269,6 @@ describe('security reports actions', () => {
         [],
         done,
       );
-    });
-  });
-
-  describe('receiveDastReports', () => {
-    it('should commit sast receive mutation', done => {
-      testAction(
-        receiveDastReports,
-        {},
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_DAST_REPORTS,
-            payload: {},
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('receiveDastError', () => {
-    it('should commit sast error mutation', done => {
-      const error = new Error('test');
-
-      testAction(
-        receiveDastError,
-        error,
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_DAST_ERROR,
-            payload: error,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('fetchDastReports', () => {
-    describe('with head and base', () => {
-      it('should dispatch `receiveDastReports`', done => {
-        mock.onGet('foo').reply(200, dast);
-        mock.onGet('bar').reply(200, dastBase);
-
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'dast',
-            },
-          })
-          .reply(200, dastFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-        mockedState.dast.paths.head = 'foo';
-        mockedState.dast.paths.base = 'bar';
-
-        testAction(
-          fetchDastReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDastReports',
-            },
-            {
-              type: 'receiveDastReports',
-              payload: { head: dast, base: dastBase, enrichData: dastFeedbacks },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveDastError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.dast.paths.head = 'foo';
-        mockedState.dast.paths.base = 'bar';
-
-        testAction(
-          fetchDastReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDastReports',
-            },
-            {
-              type: 'receiveDastError',
-            },
-          ],
-          done,
-        );
-      });
-    });
-
-    describe('with head', () => {
-      it('should dispatch `receiveSastContainerReports`', done => {
-        mock.onGet('foo').reply(200, dast);
-        mock
-          .onGet('vulnerabilities_path', {
-            params: {
-              category: 'dast',
-            },
-          })
-          .reply(200, dastFeedbacks);
-
-        mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_path';
-        mockedState.dast.paths.head = 'foo';
-
-        testAction(
-          fetchDastReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDastReports',
-            },
-            {
-              type: 'receiveDastReports',
-              payload: { head: dast, base: null, enrichData: dastFeedbacks },
-            },
-          ],
-          done,
-        );
-      });
-
-      it('should dispatch `receiveDastError`', done => {
-        mock.onGet('foo').reply(500, {});
-        mockedState.dast.paths.head = 'foo';
-
-        testAction(
-          fetchDastReports,
-          null,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestDastReports',
-            },
-            {
-              type: 'receiveDastError',
-            },
-          ],
-          done,
-        );
-      });
     });
   });
 

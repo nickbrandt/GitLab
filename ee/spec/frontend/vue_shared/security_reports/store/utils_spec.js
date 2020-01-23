@@ -4,8 +4,6 @@ import {
   findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
-  getDastSites,
-  parseDastIssues,
   groupedTextBuilder,
   statusIcon,
   countIssues,
@@ -22,11 +20,6 @@ import {
   dependencyScanningIssues,
   dependencyScanningIssuesMajor2,
   dependencyScanningFeedbacks,
-  dast,
-  multiSitesDast,
-  dastFeedbacks,
-  parsedMultiSitesDast,
-  parsedDast,
 } from '../mock_data';
 
 describe('security reports utils', () => {
@@ -214,40 +207,6 @@ describe('security reports utils', () => {
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dependencyScanningFeedbacks[0]);
       expect(parsed.issue_feedback).toEqual(dependencyScanningFeedbacks[1]);
-    });
-  });
-
-  describe('getDastSites', () => {
-    it.each([{}, 'site', 1, undefined])('wraps non-array argument %p into an array', arg => {
-      expect(getDastSites(arg)).toEqual([arg]);
-    });
-
-    it("returns argument if it's an array", () => {
-      const sites = [];
-      expect(getDastSites(sites)).toEqual(sites);
-    });
-  });
-
-  describe('parseDastIssues', () => {
-    it.each`
-      description                  | report
-      ${'multi-sites dast report'} | ${multiSitesDast}
-      ${'legacy dast report'}      | ${dast}
-    `('includes vulnerability feedbacks in $description', ({ report }) => {
-      const parsed = parseDastIssues(report.site, dastFeedbacks)[0];
-
-      expect(parsed.hasIssue).toEqual(true);
-      expect(parsed.isDismissed).toEqual(true);
-      expect(parsed.dismissalFeedback).toEqual(dastFeedbacks[0]);
-      expect(parsed.issue_feedback).toEqual(dastFeedbacks[1]);
-    });
-
-    it('parses dast report', () => {
-      expect(parseDastIssues(multiSitesDast.site)).toEqual(parsedMultiSitesDast);
-    });
-
-    it('parses legacy dast report', () => {
-      expect(parseDastIssues(dast.site)).toEqual(parsedDast);
     });
   });
 
