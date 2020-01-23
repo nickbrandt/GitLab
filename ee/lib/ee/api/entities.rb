@@ -624,6 +624,10 @@ module EE
         expose :repos_max_capacity
         expose :verification_max_capacity
         expose :container_repositories_max_capacity
+        expose :selective_sync_type
+        expose :selective_sync_shards
+        expose :namespace_ids, as: :selective_sync_namespace_ids
+        expose :minimum_reverification_interval
         expose :sync_object_storage, if: ->(geo_node, _) { geo_node.secondary? }
 
         # Retained for backwards compatibility. Remove in API v5
