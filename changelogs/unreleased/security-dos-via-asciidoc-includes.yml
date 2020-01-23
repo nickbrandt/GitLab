@@ -1,0 +1,5 @@
+---
+title: Denial of service via AsciiDoc includes
+merge_request: 133
+author:
+type: security
