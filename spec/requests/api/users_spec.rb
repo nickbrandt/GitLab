@@ -357,7 +357,7 @@ describe API::Users do
           get api("/users/#{user.id}", admin)
 
           expect(response).to match_response_schema('public_api/v4/user/admin')
-          expect(json_response).to include('current_sign_in_ip'=> nil, 'last_sign_in_ip' => nil)
+          expect(json_response).to include('current_sign_in_ip' => nil, 'last_sign_in_ip' => nil)
         end
       end
 
