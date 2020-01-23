@@ -2,7 +2,7 @@
 
 namespace :gitlab do
   namespace :license do
-    desc 'GitLab | Gather license related information'
+    desc 'GitLab | License | Gather license related information'
     task info: :gitlab_environment do
       license = Gitlab::UsageData.license_usage_data
       puts "Today's Date: #{Date.today}"
