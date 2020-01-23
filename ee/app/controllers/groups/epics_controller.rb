@@ -19,7 +19,6 @@ class Groups::EpicsController < Groups::ApplicationController
   before_action do
     push_frontend_feature_flag(:roadmap_graphql, @group)
     push_frontend_feature_flag(:vue_issuable_epic_sidebar, @group)
-    push_frontend_feature_flag(:epic_new_issue, @group, default_enabled: true)
   end
 
   def index

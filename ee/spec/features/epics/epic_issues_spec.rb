@@ -40,10 +40,6 @@ describe 'Epic Issues', :js do
     wait_for_requests
   end
 
-  before do
-    stub_feature_flags(epic_new_issue: false)
-  end
-
   context 'when user is not a group member of a public group' do
     before do
       visit_epic
@@ -203,23 +199,16 @@ describe 'Epic Issues', :js do
       end
     end
 
-    context 'with epic_new_issue feature flag enabled' do
-      before do
-        stub_feature_flags(epic_new_issue: true)
-        visit_epic
-      end
+    it 'user can add new issues to the epic' do
+      references = "#{issue_to_add.to_reference(full: true)}"
 
-      it 'user can add new issues to the epic' do
-        references = "#{issue_to_add.to_reference(full: true)}"
+      add_issues(references, button_selector: '.js-issue-actions-split-button')
 
-        add_issues(references, button_selector: '.js-issue-actions-split-button')
+      expect(page).not_to have_selector('.gl-field-error')
+      expect(page).not_to have_content("Issue cannot be found.")
 
-        expect(page).not_to have_selector('.gl-field-error')
-        expect(page).not_to have_content("Issue cannot be found.")
-
-        within('.related-items-tree-container ul.related-items-list') do
-          expect(page).to have_selector('li.js-item-type-issue', count: 3)
-        end
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-issue', count: 3)
       end
     end
 

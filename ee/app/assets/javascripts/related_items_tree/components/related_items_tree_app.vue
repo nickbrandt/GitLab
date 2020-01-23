@@ -67,9 +67,6 @@ export default {
     disableContents() {
       return this.itemAddInProgress || this.itemCreateInProgress;
     },
-    createIssueEnabled() {
-      return gon.features && gon.features.epicNewIssue;
-    },
     visibleForm() {
       if (this.showAddItemForm) {
         return FORM_SLOTS.addItem;
@@ -169,7 +166,6 @@ export default {
     >
       <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
         <issue-actions-split-button
-          v-if="createIssueEnabled"
           slot="issueActions"
           class="ml-1"
           @showAddIssueForm="showAddIssueForm"
