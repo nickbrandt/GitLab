@@ -3338,6 +3338,9 @@ msgstr ""
 msgid "Checkout|$%{selectedPlanPrice} per user per year"
 msgstr ""
 
+msgid "Checkout|%{cardType} ending in %{lastFourDigits}"
+msgstr ""
+
 msgid "Checkout|%{name}'s GitLab subscription"
 msgstr ""
 
@@ -3368,6 +3371,12 @@ msgstr ""
 msgid "Checkout|City"
 msgstr ""
 
+msgid "Checkout|Confirm purchase"
+msgstr ""
+
+msgid "Checkout|Confirming..."
+msgstr ""
+
 msgid "Checkout|Continue to billing"
 msgstr ""
 
@@ -3377,13 +3386,31 @@ msgstr ""
 msgid "Checkout|Country"
 msgstr ""
 
+msgid "Checkout|Credit card form failed to load. Please try again."
+msgstr ""
+
+msgid "Checkout|Credit card form failed to load: %{message}"
+msgstr ""
+
 msgid "Checkout|Edit"
+msgstr ""
+
+msgid "Checkout|Exp %{expirationMonth}/%{expirationYear}"
+msgstr ""
+
+msgid "Checkout|Failed to confirm your order! Please try again."
+msgstr ""
+
+msgid "Checkout|Failed to confirm your order: %{message}. Please try again."
 msgstr ""
 
 msgid "Checkout|Failed to load countries. Please try again."
 msgstr ""
 
 msgid "Checkout|Failed to load states. Please try again."
+msgstr ""
+
+msgid "Checkout|Failed to register credit card. Please try again."
 msgstr ""
 
 msgid "Checkout|GitLab plan"
@@ -3401,6 +3428,9 @@ msgstr ""
 msgid "Checkout|Number of users"
 msgstr ""
 
+msgid "Checkout|Payment method"
+msgstr ""
+
 msgid "Checkout|Please select a country"
 msgstr ""
 
@@ -3411,6 +3441,9 @@ msgid "Checkout|State"
 msgstr ""
 
 msgid "Checkout|Street address"
+msgstr ""
+
+msgid "Checkout|Submitting the credit card form failed with code %{errorCode}: %{errorMessage}"
 msgstr ""
 
 msgid "Checkout|Subscription details"

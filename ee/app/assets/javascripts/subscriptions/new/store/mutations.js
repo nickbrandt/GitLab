@@ -52,4 +52,24 @@ export default {
   [types.UPDATE_ZIP_CODE](state, zipCode) {
     state.zipCode = zipCode;
   },
+
+  [types.UPDATE_PAYMENT_FORM_PARAMS](state, paymentFormParams) {
+    state.paymentFormParams = paymentFormParams;
+  },
+
+  [types.UPDATE_PAYMENT_METHOD_ID](state, paymentMethodId) {
+    state.paymentMethodId = paymentMethodId;
+  },
+
+  [types.UPDATE_CREDIT_CARD_DETAILS](state, creditCardDetails) {
+    state.creditCardDetails = creditCardDetails;
+  },
+
+  [types.UPDATE_IS_LOADING_PAYMENT_METHOD](state, isLoadingPaymentMethod) {
+    state.isLoadingPaymentMethod = isLoadingPaymentMethod;
+  },
+
+  [types.UPDATE_IS_CONFIRMING_ORDER](state, isConfirmingOrder) {
+    state.isConfirmingOrder = isConfirmingOrder;
+  },
 };

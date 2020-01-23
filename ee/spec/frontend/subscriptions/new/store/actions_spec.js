@@ -12,6 +12,14 @@ constants.STEPS = ['firstStep', 'secondStep'];
 let mock;
 
 describe('Subscriptions Actions', () => {
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+  });
+
+  afterEach(() => {
+    mock.restore();
+  });
+
   describe('activateStep', () => {
     it('set the currentStep to the provided value', done => {
       testAction(
@@ -110,14 +118,6 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('fetchCountries', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('calls fetchCountriesSuccess with the returned data on success', done => {
       mock.onGet(constants.COUNTRIES_URL).replyOnce(200, ['Netherlands', 'NL']);
 
@@ -172,14 +172,6 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('fetchStates', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('calls resetStates and fetchStatesSuccess with the returned data on success', done => {
       mock
         .onGet(constants.STATES_URL, { params: { country: 'NL' } })
@@ -338,6 +330,324 @@ describe('Subscriptions Actions', () => {
         [{ type: 'UPDATE_ZIP_CODE', payload: 'zipCode' }],
         [],
         done,
+      );
+    });
+  });
+
+  describe('startLoadingZuoraScript', () => {
+    it('updates isLoadingPaymentMethod to true', done => {
+      testAction(
+        actions.startLoadingZuoraScript,
+        undefined,
+        {},
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: true }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentFormParams', () => {
+    it('fetches paymentFormParams and calls fetchPaymentFormParamsSuccess with the returned data on success', done => {
+      mock
+        .onGet(constants.PAYMENT_FORM_URL, { params: { id: constants.PAYMENT_FORM_ID } })
+        .replyOnce(200, { token: 'x' });
+
+      testAction(
+        actions.fetchPaymentFormParams,
+        null,
+        {},
+        [],
+        [{ type: 'fetchPaymentFormParamsSuccess', payload: { token: 'x' } }],
+        done,
+      );
+    });
+
+    it('calls fetchPaymentFormParamsError on error', done => {
+      mock.onGet(constants.PAYMENT_FORM_URL).replyOnce(500);
+
+      testAction(
+        actions.fetchPaymentFormParams,
+        null,
+        {},
+        [],
+        [{ type: 'fetchPaymentFormParamsError' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentFormParamsSuccess', () => {
+    it('updates paymentFormParams to the provided value when no errors are present', done => {
+      testAction(
+        actions.fetchPaymentFormParamsSuccess,
+        { token: 'x' },
+        {},
+        [{ type: 'UPDATE_PAYMENT_FORM_PARAMS', payload: { token: 'x' } }],
+        [],
+        done,
+      );
+    });
+
+    it('creates a flash when errors are present', done => {
+      testAction(
+        actions.fetchPaymentFormParamsSuccess,
+        { errors: 'error message' },
+        {},
+        [],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Credit card form failed to load: error message',
+          );
+          done();
+        },
+      );
+    });
+  });
+
+  describe('fetchPaymentFormParamsError', () => {
+    it('creates a flash', done => {
+      testAction(actions.fetchPaymentFormParamsError, null, {}, [], [], () => {
+        expect(createFlash).toHaveBeenCalledWith(
+          'Credit card form failed to load. Please try again.',
+        );
+        done();
+      });
+    });
+  });
+
+  describe('zuoraIframeRendered', () => {
+    it('updates isLoadingPaymentMethod to false', done => {
+      testAction(
+        actions.zuoraIframeRendered,
+        undefined,
+        {},
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('paymentFormSubmitted', () => {
+    describe('on success', () => {
+      it('calls paymentFormSubmittedSuccess with the refID from the response and updates isLoadingPaymentMethod to true', done => {
+        testAction(
+          actions.paymentFormSubmitted,
+          { success: true, refId: 'id' },
+          {},
+          [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: true }],
+          [{ type: 'paymentFormSubmittedSuccess', payload: 'id' }],
+          done,
+        );
+      });
+    });
+
+    describe('on failure', () => {
+      it('calls paymentFormSubmittedError with the response', done => {
+        testAction(
+          actions.paymentFormSubmitted,
+          { error: 'foo' },
+          {},
+          [],
+          [{ type: 'paymentFormSubmittedError', payload: { error: 'foo' } }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('paymentFormSubmittedSuccess', () => {
+    it('updates paymentMethodId to the provided value and calls fetchPaymentMethodDetails', done => {
+      testAction(
+        actions.paymentFormSubmittedSuccess,
+        'id',
+        {},
+        [{ type: 'UPDATE_PAYMENT_METHOD_ID', payload: 'id' }],
+        [{ type: 'fetchPaymentMethodDetails' }],
+        done,
+      );
+    });
+  });
+
+  describe('paymentFormSubmittedError', () => {
+    it('creates a flash', done => {
+      testAction(
+        actions.paymentFormSubmittedError,
+        { errorCode: 'codeFromResponse', errorMessage: 'messageFromResponse' },
+        {},
+        [],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Submitting the credit card form failed with code codeFromResponse: messageFromResponse',
+          );
+          done();
+        },
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetails', () => {
+    it('fetches paymentMethodDetails and calls fetchPaymentMethodDetailsSuccess with the returned data on success and updates isLoadingPaymentMethod to false', done => {
+      mock
+        .onGet(constants.PAYMENT_METHOD_URL, { params: { id: 'paymentMethodId' } })
+        .replyOnce(200, { token: 'x' });
+
+      testAction(
+        actions.fetchPaymentMethodDetails,
+        null,
+        { paymentMethodId: 'paymentMethodId' },
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
+        [{ type: 'fetchPaymentMethodDetailsSuccess', payload: { token: 'x' } }],
+        done,
+      );
+    });
+
+    it('calls fetchPaymentMethodDetailsError on error and updates isLoadingPaymentMethod to false', done => {
+      mock.onGet(constants.PAYMENT_METHOD_URL).replyOnce(500);
+
+      testAction(
+        actions.fetchPaymentMethodDetails,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_LOADING_PAYMENT_METHOD', payload: false }],
+        [{ type: 'fetchPaymentMethodDetailsError' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetailsSuccess', () => {
+    it('updates creditCardDetails to the provided data and calls activateNextStep', done => {
+      testAction(
+        actions.fetchPaymentMethodDetailsSuccess,
+        {
+          credit_card_type: 'cc_type',
+          credit_card_mask_number: '************4242',
+          credit_card_expiration_month: 12,
+          credit_card_expiration_year: 2019,
+        },
+        {},
+        [
+          {
+            type: 'UPDATE_CREDIT_CARD_DETAILS',
+            payload: {
+              credit_card_type: 'cc_type',
+              credit_card_mask_number: '************4242',
+              credit_card_expiration_month: 12,
+              credit_card_expiration_year: 2019,
+            },
+          },
+        ],
+        [{ type: 'activateNextStep' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetailsError', () => {
+    it('creates a flash', done => {
+      testAction(actions.fetchPaymentMethodDetailsError, null, {}, [], [], () => {
+        expect(createFlash).toHaveBeenCalledWith(
+          'Failed to register credit card. Please try again.',
+        );
+        done();
+      });
+    });
+  });
+
+  describe('confirmOrder', () => {
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('calls confirmOrderSuccess with a redirect location on success', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { location: 'x' });
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderSuccess', payload: 'x' }],
+        done,
+      );
+    });
+
+    it('calls confirmOrderError with the errors on error', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { errors: 'errors' });
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderError', payload: '"errors"' }],
+        done,
+      );
+    });
+
+    it('calls confirmOrderError on failure', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(500);
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderError' }],
+        done,
+      );
+    });
+  });
+
+  describe('confirmOrderSuccess', () => {
+    it('changes the window location', done => {
+      const spy = jest.spyOn(window.location, 'assign').mockImplementation();
+
+      testAction(actions.confirmOrderSuccess, 'http://example.com', {}, [], [], () => {
+        expect(spy).toHaveBeenCalledWith('http://example.com');
+        done();
+      });
+    });
+  });
+
+  describe('confirmOrderError', () => {
+    it('creates a flash with a default message when no error given', done => {
+      testAction(
+        actions.confirmOrderError,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: false }],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Failed to confirm your order! Please try again.',
+          );
+          done();
+        },
+      );
+    });
+
+    it('creates a flash with a the error message when an error is given', done => {
+      testAction(
+        actions.confirmOrderError,
+        '"Error"',
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: false }],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Failed to confirm your order: "Error". Please try again.',
+          );
+          done();
+        },
       );
     });
   });

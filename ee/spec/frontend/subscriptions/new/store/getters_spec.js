@@ -13,6 +13,15 @@ const state = {
     },
   ],
   selectedPlan: 'firstPlan',
+  country: 'Country',
+  streetAddressLine1: 'Street address line 1',
+  streetAddressLine2: 'Street address line 2',
+  city: 'City',
+  countryState: 'State',
+  zipCode: 'Zip code',
+  organizationName: 'Organization name',
+  paymentMethodId: 'Payment method ID',
+  numberOfUsers: 1,
 };
 
 describe('Subscriptions Getters', () => {
@@ -111,6 +120,28 @@ describe('Subscriptions Getters', () => {
 
     it('returns false when the number of users is zero', () => {
       expect(getters.usersPresent({ numberOfUsers: 0 })).toBe(false);
+    });
+  });
+
+  describe('confirmOrderParams', () => {
+    it('returns the params to confirm the order', () => {
+      expect(getters.confirmOrderParams(state)).toEqual({
+        setup_for_company: true,
+        customer: {
+          country: 'Country',
+          address_1: 'Street address line 1',
+          address_2: 'Street address line 2',
+          city: 'City',
+          state: 'State',
+          zip_code: 'Zip code',
+          company: 'Organization name',
+        },
+        subscription: {
+          plan_id: 'firstPlan',
+          payment_method_id: 'Payment method ID',
+          quantity: 1,
+        },
+      });
     });
   });
 });
