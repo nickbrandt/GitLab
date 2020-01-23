@@ -32,6 +32,12 @@ describe SubscriptionsController do
 
         it { is_expected.to render_template 'layouts/checkout' }
         it { is_expected.to render_template :new }
+
+        it 'tracks the event with the right parameters' do
+          expect(Gitlab::Tracking).to receive(:event).with('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start', label: nil, value: nil)
+
+          subject
+        end
       end
     end
 
@@ -96,12 +102,16 @@ describe SubscriptionsController do
   describe 'POST #create' do
     subject do
       post :create,
-        params: {
-          setup_for_company: setup_for_company,
-          customer: { company: 'My company', country: 'NL' },
-          subscription: { plan_id: 'x' }
-        },
+        params: params,
         as: :json
+    end
+
+    let(:params) do
+      {
+        setup_for_company: setup_for_company,
+        customer: { company: 'My company', country: 'NL' },
+        subscription: { plan_id: 'x', quantity: 2 }
+      }
     end
 
     let(:setup_for_company) { true }
@@ -124,13 +134,43 @@ describe SubscriptionsController do
         it 'updates the setup_for_company attribute of the current user' do
           expect { subject }.to change { user.reload.setup_for_company }.from(nil).to(true)
         end
+
+        it 'tracks the event with the right parameters' do
+          expect(Gitlab::Tracking).to receive(:event).with(
+            'Growth::Acquisition::Experiment::PaidSignUpFlow',
+            'end',
+            label: 'x',
+            value: 2
+          )
+
+          subject
+        end
       end
 
       context 'when not setting up for a company' do
+        let(:params) do
+          {
+            setup_for_company: setup_for_company,
+            customer: { country: 'NL' },
+            subscription: { plan_id: 'x', quantity: 1 }
+          }
+        end
+
         let(:setup_for_company) { false }
 
         it 'does not update the setup_for_company attribute of the current user' do
           expect { subject }.not_to change { user.reload.setup_for_company }
+        end
+
+        it 'tracks the event with the right parameters' do
+          expect(Gitlab::Tracking).to receive(:event).with(
+            'Growth::Acquisition::Experiment::PaidSignUpFlow',
+            'end',
+            label: 'x',
+            value: 1
+          )
+
+          subject
         end
       end
 
