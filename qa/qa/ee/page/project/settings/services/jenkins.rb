@@ -7,10 +7,6 @@ module QA
         module Settings
           module Services
             class Jenkins < QA::Page::Base
-              view 'app/views/shared/_service_settings.html.haml' do
-                element :active_checkbox
-              end
-
               view 'app/views/shared/_field.html.haml' do
                 element :jenkins_url_field, 'data: { qa_selector: "#{name.downcase.gsub' # rubocop:disable QA/ElementWithPattern
                 element :project_name_field, 'data: { qa_selector: "#{name.downcase.gsub' # rubocop:disable QA/ElementWithPattern
@@ -23,7 +19,6 @@ module QA
               end
 
               def setup_service_with(jenkins_url:, project_name:)
-                click_active_checkbox
                 set_jenkins_url(jenkins_url)
                 set_project_name(project_name)
                 set_username('admin')
@@ -32,10 +27,6 @@ module QA
               end
 
               private
-
-              def click_active_checkbox
-                click_element :active_checkbox
-              end
 
               def set_jenkins_url(jenkins_url)
                 fill_element(:jenkins_url_field, jenkins_url)

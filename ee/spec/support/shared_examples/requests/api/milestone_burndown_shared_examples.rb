@@ -7,7 +7,7 @@ RSpec.shared_examples 'group and project milestone burndowns' do |route_definiti
     it 'returns burndown events list' do
       get api(resource_route, user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to be_an Array
       expect(json_response.first['created_at'].to_time).to eq(Date.today.middle_of_day)
       expect(json_response.first['weight']).to eq(5)
@@ -22,7 +22,7 @@ RSpec.shared_examples 'group and project milestone burndowns' do |route_definiti
 
       get api(resource_route, outside_user)
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 end

@@ -19,9 +19,11 @@ describe NoteEntity do
       stub_licensed_features(description_diffs: true)
     end
 
-    it 'includes version id and diff path' do
+    it 'includes description versions attributes' do
       expect(subject[:description_version_id]).to eq(description_version.id)
       expect(subject[:description_diff_path]).to eq(description_diff_project_issue_path(issue.project, issue, description_version.id))
+      expect(subject[:delete_description_version_path]).to eq(delete_description_version_project_issue_path(issue.project, issue, description_version.id))
+      expect(subject[:can_delete_description_version]).to eq(true)
     end
   end
 
@@ -30,9 +32,11 @@ describe NoteEntity do
       stub_licensed_features(description_diffs: false)
     end
 
-    it 'does not include version id and diff path' do
+    it 'does not include description versions attributes' do
       expect(subject[:description_version_id]).to be_nil
       expect(subject[:description_diff_path]).to be_nil
+      expect(subject[:delete_description_version_path]).to be_nil
+      expect(subject[:can_delete_description_version]).to be_nil
     end
   end
 end

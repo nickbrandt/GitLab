@@ -13,7 +13,7 @@ RSpec.shared_examples 'an API endpoint for creating project approval rule' do
     it 'returns 400 status' do
       post api(url, current_user)
 
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
   end
 
@@ -21,7 +21,7 @@ RSpec.shared_examples 'an API endpoint for creating project approval rule' do
     it 'returns 403' do
       post api(url, user2), params: params
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.shared_examples 'an API endpoint for creating project approval rule' do
     it 'returns 201 status' do
       post api(url, current_user), params: params
 
-      expect(response).to have_gitlab_http_status(201)
+      expect(response).to have_gitlab_http_status(:created)
       expect(response).to match_response_schema(schema, dir: 'ee')
     end
 
@@ -68,7 +68,7 @@ RSpec.shared_examples 'an API endpoint for creating project approval rule' do
             post api(url, current_user), params: params.merge(name: rule_name)
           end.to change { ApprovalProjectRule.report_approver.count }.from(0).to(1)
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
         end
       end
     end
@@ -109,7 +109,7 @@ RSpec.shared_examples 'an API endpoint for updating project approval rule' do
             put api(url, current_user), params: { users: [], groups: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
           end.to change { approval_rule.users.count + approval_rule.groups.count }.from(2).to(0)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema(schema, dir: 'ee')
         end
       end
@@ -123,7 +123,7 @@ RSpec.shared_examples 'an API endpoint for updating project approval rule' do
       expect(approval_rule.users).to contain_exactly(approver)
       expect(approval_rule.groups).to be_empty
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -149,7 +149,7 @@ RSpec.shared_examples 'an API endpoint for updating project approval rule' do
         put api(url, user2), params: { users: [], groups: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
       end.not_to change { approval_rule.approvers.size }
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 end
@@ -159,7 +159,7 @@ RSpec.shared_examples 'an API endpoint for deleting project approval rule' do
     delete api(url, user)
 
     expect(ApprovalProjectRule.exists?(id: approval_rule.id)).to eq(false)
-    expect(response).to have_gitlab_http_status(204)
+    expect(response).to have_gitlab_http_status(:no_content)
   end
 
   context 'when approval rule not found' do
@@ -169,7 +169,7 @@ RSpec.shared_examples 'an API endpoint for deleting project approval rule' do
     it 'returns not found' do
       delete api(url, user)
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -177,7 +177,7 @@ RSpec.shared_examples 'an API endpoint for deleting project approval rule' do
     it 'returns forbidden' do
       delete api(url, user2)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 end

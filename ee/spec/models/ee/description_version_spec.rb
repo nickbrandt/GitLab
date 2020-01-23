@@ -32,4 +32,51 @@ describe DescriptionVersion do
       expect(current_version.previous_version).to eq(previous_version)
     end
   end
+
+  describe '#delete!' do
+    let_it_be(:issue) { create(:issue) }
+    let_it_be(:merge_request) { create(:merge_request) }
+    let_it_be(:epic) { create(:epic) }
+
+    before_all do
+      2.times do
+        create(:description_version, issue: issue)
+        create_list(:description_version, 2, epic: epic)
+        create(:description_version, merge_request: merge_request)
+      end
+    end
+
+    def deleted_count
+      DescriptionVersion
+        .where('issue_id = ? or epic_id = ? or merge_request_id = ?', issue.id, epic.id, merge_request.id)
+        .where('deleted_at IS NOT NULL')
+        .count
+    end
+
+    context 'when start_id is not present' do
+      it 'only soft deletes description_version' do
+        version = epic.description_versions.last
+
+        version.delete!
+
+        expect(version.reload.deleted_at).to be_present
+        expect(deleted_count).to eq(1)
+      end
+    end
+
+    context 'when start_id is present' do
+      it 'soft deletes description versions of same issuable up to start_id' do
+        description_version = epic.description_versions.last.previous_version
+        starting_version = epic.description_versions.second
+
+        description_version.delete!(start_id: starting_version.id)
+
+        expect(epic.description_versions.first.deleted_at).to be_nil
+        expect(epic.description_versions.second.deleted_at).to be_present
+        expect(epic.description_versions.third.deleted_at).to be_present
+        expect(epic.description_versions.fourth.deleted_at).to be_nil
+        expect(deleted_count).to eq(2)
+      end
+    end
+  end
 end

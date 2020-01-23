@@ -1410,6 +1410,7 @@ ActiveRecord::Schema.define(version: 2020_01_21_132641) do
     t.integer "merge_request_id"
     t.integer "epic_id"
     t.text "description"
+    t.datetime_with_timezone "deleted_at"
     t.index ["epic_id"], name: "index_description_versions_on_epic_id", where: "(epic_id IS NOT NULL)"
     t.index ["issue_id"], name: "index_description_versions_on_issue_id", where: "(issue_id IS NOT NULL)"
     t.index ["merge_request_id"], name: "index_description_versions_on_merge_request_id", where: "(merge_request_id IS NOT NULL)"
@@ -2852,6 +2853,7 @@ ActiveRecord::Schema.define(version: 2020_01_21_132641) do
     t.integer "owner_id"
     t.string "owner_type"
     t.boolean "trusted", default: false, null: false
+    t.boolean "confidential", default: true, null: false
     t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
@@ -3842,7 +3844,6 @@ ActiveRecord::Schema.define(version: 2020_01_21_132641) do
     t.string "encrypted_secret_token_iv", limit: 255
     t.boolean "secret", default: false, null: false
     t.string "repository_storage", limit: 255, default: "default", null: false
-    t.integer "storage_version", default: 2, null: false
     t.index ["author_id"], name: "index_snippets_on_author_id"
     t.index ["content"], name: "index_snippets_on_content_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["created_at"], name: "index_snippets_on_created_at"

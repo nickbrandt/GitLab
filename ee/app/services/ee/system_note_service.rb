@@ -56,67 +56,23 @@ module EE
     end
 
     def epic_issue(epic, issue, user, type)
-      return unless validate_epic_issue_action_type(type)
-
-      action = type == :added ? 'epic_issue_added' : 'epic_issue_removed'
-
-      body = "#{type} issue #{issue.to_reference(epic.group)}"
-
-      create_note(NoteSummary.new(epic, nil, user, body, action: action))
+      EE::SystemNotes::EpicsService.new(noteable: epic, author: user).epic_issue(issue, type)
     end
 
     def epic_issue_moved(from_epic, issue, to_epic, user)
-      epic_issue_moved_act(from_epic, issue, to_epic, user, verb: 'added', direction: 'from')
-      epic_issue_moved_act(to_epic, issue, from_epic, user, verb: 'moved', direction: 'to')
-    end
-
-    def epic_issue_moved_act(subject_epic, issue, object_epic, user, verb:, direction:)
-      action = 'epic_issue_moved'
-
-      body = "#{verb} issue #{issue.to_reference(subject_epic.group)} #{direction}" \
-             " epic #{subject_epic.to_reference(object_epic.group)}"
-
-      create_note(NoteSummary.new(object_epic, nil, user, body, action: action))
+      EE::SystemNotes::EpicsService.new(noteable: from_epic, author: user).epic_issue_moved(issue, to_epic)
     end
 
     def issue_promoted(noteable, noteable_ref, author, direction:)
-      unless [:to, :from].include?(direction)
-        raise ArgumentError, "Invalid direction `#{direction}`"
-      end
-
-      project = noteable.project
-
-      cross_reference = noteable_ref.to_reference(project || noteable.group)
-      body = "promoted #{direction} #{noteable_ref.class.to_s.downcase} #{cross_reference}"
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'moved'))
+      EE::SystemNotes::EpicsService.new(noteable: noteable, author: author).issue_promoted(noteable_ref, direction: direction)
     end
 
     def issue_on_epic(issue, epic, user, type)
-      return unless validate_epic_issue_action_type(type)
-
-      if type == :added
-        direction = 'to'
-        action = 'issue_added_to_epic'
-      else
-        direction = 'from'
-        action = 'issue_removed_from_epic'
-      end
-
-      body = "#{type} #{direction} epic #{epic.to_reference(issue.project)}"
-
-      create_note(NoteSummary.new(issue, issue.project, user, body, action: action))
+      EE::SystemNotes::EpicsService.new(noteable: epic, author: user).issue_on_epic(issue, type)
     end
 
     def issue_epic_change(issue, epic, user)
-      body = "changed epic to #{epic.to_reference(issue.project)}"
-      action = 'issue_changed_epic'
-
-      create_note(NoteSummary.new(issue, issue.project, user, body, action: action))
-    end
-
-    def validate_epic_issue_action_type(type)
-      [:added, :removed].include?(type)
+      EE::SystemNotes::EpicsService.new(noteable: epic, author: user).issue_epic_change(issue)
     end
 
     # Called when the merge request is approved by user
@@ -167,30 +123,11 @@ module EE
     #
     # Returns the created Note object
     def change_epic_date_note(noteable, author, date_type, date)
-      body = if date
-               "changed #{date_type} to #{date.strftime('%b %-d, %Y')}"
-             else
-               "removed the #{date_type}"
-             end
-
-      create_note(NoteSummary.new(noteable, nil, author, body, action: 'epic_date_changed'))
+      EE::SystemNotes::EpicsService.new(noteable: noteable, author: author).change_epic_date_note(date_type, date)
     end
 
     def change_epics_relation(epic, child_epic, user, type)
-      note_body = if type == 'relate_epic'
-                    "added epic %{target_epic_ref} as %{direction} epic"
-                  else
-                    "removed %{direction} epic %{target_epic_ref}"
-                  end
-
-      change_epics_relation_act(epic, user, type, note_body,
-                                { direction: 'child', target_epic_ref: child_epic.to_reference(epic.group) })
-      change_epics_relation_act(child_epic, user, type, note_body,
-                                { direction: 'parent', target_epic_ref: epic.to_reference(child_epic.group) })
-    end
-
-    def change_epics_relation_act(subject_epic, user, action, text, text_params)
-      create_note(NoteSummary.new(subject_epic, nil, user, text % text_params, action: action))
+      EE::SystemNotes::EpicsService.new(noteable: epic, author: user).change_epics_relation(child_epic, type)
     end
 
     # Called when 'merge train' is executed

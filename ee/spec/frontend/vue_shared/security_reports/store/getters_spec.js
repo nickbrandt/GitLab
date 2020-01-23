@@ -525,8 +525,8 @@ describe('Security reports getters', () => {
       expect(noBaseInAllReports(state)).toEqual(true);
     });
 
-    it('returns false when any of the reports has base', () => {
-      state.dast.paths.base = BASE_PATH;
+    it('returns false when any of the reports has a base', () => {
+      state.dast.hasBaseReport = true;
 
       expect(noBaseInAllReports(state)).toEqual(false);
     });

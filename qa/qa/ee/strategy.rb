@@ -6,11 +6,16 @@ module QA
       extend self
 
       def extend_autoloads!
+        require 'qa/ce/strategy'
         require 'qa/ee'
       end
 
       def perform_before_hooks
-        return unless ENV['EE_LICENSE']
+        # Without a license, perform the CE before hooks only.
+        unless ENV['EE_LICENSE']
+          QA::CE::Strategy.perform_before_hooks
+          return
+        end
 
         QA::Support::Retrier.retry_on_exception do
           QA::Runtime::Browser.visit(:gitlab, QA::Page::Main::Login) do

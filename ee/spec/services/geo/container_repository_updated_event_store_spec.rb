@@ -29,9 +29,10 @@ describe Geo::ContainerRepositoryUpdatedEventStore do
         subject = described_class.new(nil)
 
         expected_message = {
-            class: described_class.name,
-            message: 'Container repository updated event could not be created',
-            error: "Validation failed: Container repository can't be blank"
+          class: described_class.name,
+          host: 'localhost',
+          message: 'Container repository updated event could not be created',
+          error: "Validation failed: Container repository can't be blank"
         }
 
         expect(Gitlab::Geo::Logger).to receive(:error).with(expected_message).and_call_original

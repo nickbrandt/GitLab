@@ -73,6 +73,7 @@ exports[`Design management index page designs renders designs list and header wi
       >
         <gl-button-stub
           class="mr-2 js-select-all"
+          size="md"
           variant="link"
         >
           Select all

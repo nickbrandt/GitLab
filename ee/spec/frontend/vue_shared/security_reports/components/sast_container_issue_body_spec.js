@@ -1,57 +1,42 @@
-import Vue from 'vue';
-import component from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import { shallowMount } from '@vue/test-utils';
+import SastContainerIssueBody from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
 
-describe('sast container issue body', () => {
-  let vm;
+describe('Sast Container Issue Body', () => {
+  let wrapper;
 
-  const Component = Vue.extend(component);
-
-  const sastContainerIssue = {
-    title: 'CVE-2017-11671',
-    namespace: 'debian:8',
-    path: 'debian:8',
-    severity: 'Low',
-    vulnerability: 'CVE-2017-11671',
+  const createComponent = severity => {
+    wrapper = shallowMount(SastContainerIssueBody, {
+      propsData: {
+        issue: {
+          title: 'CVE-2017-11671',
+          namespace: 'debian:8',
+          path: 'debian:8',
+          severity,
+          vulnerability: 'CVE-2017-11671',
+        },
+        status: 'Failed',
+      },
+    });
   };
 
-  const status = 'failed';
-
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('with severity', () => {
-    it('renders severity key', () => {
-      vm = mountComponent(Component, {
-        issue: sastContainerIssue,
-        status,
-      });
+  it('matches snapshot', () => {
+    createComponent('Low');
 
-      expect(vm.$el.textContent.trim()).toContain(sastContainerIssue.severity);
-    });
+    expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('without severity', () => {
-    it('does not render severity key', () => {
-      const issueCopy = Object.assign({}, sastContainerIssue);
-      delete issueCopy.severity;
-
-      vm = mountComponent(Component, {
-        issue: issueCopy,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).not.toContain(sastContainerIssue.severity);
-    });
+  it('renders severity if present on issue', () => {
+    createComponent('Low');
+    expect(wrapper.find('.report-block-list-issue-description-text').text()).toBe('Low:');
   });
 
-  it('renders name', () => {
-    vm = mountComponent(Component, {
-      issue: sastContainerIssue,
-      status,
-    });
-
-    expect(vm.$el.querySelector('button').textContent.trim()).toEqual(sastContainerIssue.title);
+  it('does not render  severity if not present on issue', () => {
+    createComponent();
+    expect(wrapper.find('.report-block-list-issue-description-text').text()).toBe('');
   });
 });

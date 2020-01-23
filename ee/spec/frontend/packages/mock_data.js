@@ -45,6 +45,9 @@ export const npmPackage = {
   updated_at: '2015-12-10',
   version: '',
   _links,
+  build_info: {
+    pipeline_id: 1,
+  },
 };
 
 export const npmFiles = [
@@ -90,3 +93,10 @@ export const mockTags = [
     name: 'foo-4',
   },
 ];
+
+export const mockPipelineInfo = {
+  id: 1,
+  ref: 'branch-name',
+  sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  web_url: 'foo',
+};

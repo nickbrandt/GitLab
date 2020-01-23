@@ -1,9 +1,16 @@
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlLoadingIcon } from '@gitlab/ui';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
+import { npmPackage, mavenPackage as packageWithoutBuildInfo } from '../../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('PackageInformation', () => {
   let wrapper;
+  let store;
 
   const defaultProps = {
     information: [
@@ -22,14 +29,34 @@ describe('PackageInformation', () => {
     ],
   };
 
-  function createComponent(props = {}) {
+  function createComponent(
+    props = {},
+    packageEntity = packageWithoutBuildInfo,
+    hasPipeline = false,
+    isLoading = false,
+    pipelineError = null,
+  ) {
     const propsData = {
       ...defaultProps,
       ...props,
     };
 
+    store = new Vuex.Store({
+      state: {
+        isLoading,
+        packageEntity,
+        pipelineInfo: {},
+        pipelineError,
+      },
+      getters: {
+        packageHasPipeline: () => hasPipeline,
+      },
+    });
+
     wrapper = shallowMount(PackageInformation, {
+      localVue,
       propsData,
+      store,
     });
   }
 
@@ -40,6 +67,10 @@ describe('PackageInformation', () => {
     informationSelector()
       .at(index)
       .text();
+  const packagePipelineInfoListItem = () => wrapper.find('.js-package-pipeline');
+  const pipelineLoader = () => wrapper.find(GlLoadingIcon);
+  const pipelineErrorMessage = () => wrapper.find('.js-pipeline-error');
+  const pipelineInfoContent = () => wrapper.find('.js-pipeline-info');
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
@@ -86,6 +117,38 @@ describe('PackageInformation', () => {
       expect(copyButton().at(0).vm.text).toBe(defaultProps.information[0].value);
       expect(copyButton().at(1).vm.text).toBe(defaultProps.information[1].value);
       expect(copyButton().at(2).vm.text).toBe(defaultProps.information[2].value);
+    });
+  });
+
+  describe('pipeline information', () => {
+    it('does not display pipeline information when no build info is available', () => {
+      createComponent();
+
+      expect(packagePipelineInfoListItem().exists()).toBe(false);
+    });
+
+    it('displays the loading spinner when fetching information', () => {
+      createComponent({}, npmPackage, true, true);
+
+      expect(packagePipelineInfoListItem().exists()).toBe(true);
+      expect(pipelineLoader().exists()).toBe(true);
+    });
+
+    it('displays that the pipeline error information fetching fails', () => {
+      const pipelineError = 'an-error-message';
+      createComponent({}, npmPackage, true, false, pipelineError);
+
+      expect(packagePipelineInfoListItem().exists()).toBe(true);
+      expect(pipelineLoader().exists()).toBe(false);
+      expect(pipelineErrorMessage().exists()).toBe(true);
+      expect(pipelineErrorMessage().text()).toBe(pipelineError);
+    });
+
+    it('displays the pipeline information if found', () => {
+      createComponent({}, npmPackage, true);
+
+      expect(packagePipelineInfoListItem().exists()).toBe(true);
+      expect(pipelineInfoContent().exists()).toBe(true);
     });
   });
 });

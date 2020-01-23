@@ -327,6 +327,16 @@ describe MergeRequest do
     end
   end
 
+  describe '.by_cherry_pick_sha' do
+    it 'returns merge requests that match the given merge commit' do
+      note = create(:track_mr_picking_note, commit_id: '456abc')
+
+      create(:track_mr_picking_note, commit_id: '456def')
+
+      expect(described_class.by_cherry_pick_sha('456abc')).to eq([note.noteable])
+    end
+  end
+
   describe '.in_projects' do
     it 'returns the merge requests for a set of projects' do
       expect(described_class.in_projects(Project.all)).to eq([subject])
@@ -2140,20 +2150,10 @@ describe MergeRequest do
         subject.mark_as_mergeable!
       end
 
-      context 'and merge_requests_conditional_mergeability_check feature flag is enabled' do
-        it 'does not call MergeabilityCheckService' do
-          expect(MergeRequests::MergeabilityCheckService).not_to receive(:new)
+      it 'does not call MergeabilityCheckService' do
+        expect(MergeRequests::MergeabilityCheckService).not_to receive(:new)
 
-          subject.check_mergeability
-        end
-      end
-
-      context 'and merge_requests_conditional_mergeability_check feature flag is disabled' do
-        before do
-          stub_feature_flags(merge_requests_conditional_mergeability_check: false)
-        end
-
-        it_behaves_like 'method that executes MergeabilityCheckService'
+        subject.check_mergeability
       end
     end
   end

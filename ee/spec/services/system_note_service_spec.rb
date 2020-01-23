@@ -104,195 +104,52 @@ describe SystemNoteService do
   end
 
   describe '.change_epic_date_note' do
-    let(:timestamp) { Time.now }
+    let(:date_type) { double }
+    let(:date) { double }
 
-    context 'when start date was changed' do
-      let(:noteable) { create(:epic) }
-
-      subject { described_class.change_epic_date_note(noteable, author, 'start date', timestamp) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_date_changed' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:change_epic_date_note).with(date_type, date)
       end
 
-      it 'sets the note text' do
-        expect(subject.note).to eq "changed start date to #{timestamp.strftime('%b %-d, %Y')}"
-      end
-    end
-
-    context 'when start date was removed' do
-      let(:noteable) { create(:epic, start_date: timestamp) }
-
-      subject { described_class.change_epic_date_note(noteable, author, 'start date', nil) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_date_changed' }
-      end
-
-      it 'sets the note text' do
-        expect(subject.note).to eq 'removed the start date'
-      end
-    end
-
-    context '.issue_promoted' do
-      context 'note on the epic' do
-        subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
-
-        it_behaves_like 'a system note', exclude_project: true do
-          let(:action) { 'moved' }
-          let(:expected_noteable) { epic }
-        end
-
-        it 'sets the note text' do
-          expect(subject.note).to eq("promoted from issue #{issue.to_reference(group)}")
-        end
-      end
-
-      context 'note on the issue' do
-        subject { described_class.issue_promoted(issue, epic, author, direction: :to) }
-
-        it_behaves_like 'a system note' do
-          let(:action) { 'moved' }
-        end
-
-        it 'sets the note text' do
-          expect(subject.note).to eq("promoted to epic #{epic.to_reference(project)}")
-        end
-      end
+      described_class.change_epic_date_note(noteable, author, date_type, date)
     end
   end
 
   describe '.epic_issue' do
-    let(:noteable) { epic }
+    let(:type) { double }
 
-    context 'issue added to an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :added) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_issue_added' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:epic_issue).with(noteable, type)
       end
 
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("added issue #{issue.to_reference(epic.group)}")
-      end
-    end
-
-    context 'issue removed from an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :removed) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_issue_removed' }
-      end
-
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("removed issue #{issue.to_reference(epic.group)}")
-      end
-    end
-
-    context 'invalid type' do
-      it 'raises an error' do
-        expect { described_class.issue_on_epic(issue, epic, author, :invalid) }
-          .not_to change { Note.count }
-      end
+      described_class.epic_issue(epic, noteable, author, type)
     end
   end
 
   describe '.issue_on_epic' do
-    context 'issue added to an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :added) }
+    let(:type) { double }
 
-      it_behaves_like 'a system note' do
-        let(:action) { 'issue_added_to_epic' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:issue_on_epic).with(noteable, type)
       end
 
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("added to epic #{epic.to_reference(issue.project)}")
-      end
-    end
-
-    context 'issue removed from an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :removed) }
-
-      it_behaves_like 'a system note' do
-        let(:action) { 'issue_removed_from_epic' }
-      end
-
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("removed from epic #{epic.to_reference(issue.project)}")
-      end
-    end
-
-    context 'invalid type' do
-      it 'does not create a new note' do
-        expect { described_class.issue_on_epic(issue, epic, author, :invalid) }
-          .not_to change { Note.count }
-      end
+      described_class.issue_on_epic(noteable, epic, author, type)
     end
   end
 
-  describe '.relate_epic' do
-    let(:child_epic) { create(:epic, parent: epic, group: group) }
-    let(:noteable) { child_epic }
+  describe '.change_epics_relation' do
+    let(:child_epic) { double }
+    let(:type) { double }
 
-    subject { described_class.change_epics_relation(epic, child_epic, author, 'relate_epic') }
-
-    it_behaves_like 'a system note', exclude_project: true do
-      let(:action) { 'relate_epic' }
-    end
-
-    context 'when epic is added as child to a parent epic' do
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("added epic &#{child_epic.iid} as child epic")
-        expect(Note.last.note).to eq("added epic &#{epic.iid} as parent epic")
-      end
-    end
-
-    context 'when added epic is from a subgroup' do
-      let(:subgroup) {create(:group, parent: group)}
-
-      before do
-        child_epic.update!({ group: subgroup })
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:change_epics_relation).with(child_epic, type)
       end
 
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("added epic #{group.path}/#{subgroup.path}&#{child_epic.iid} as child epic")
-        expect(Note.last.note).to eq("added epic #{group.path}&#{epic.iid} as parent epic")
-      end
-    end
-  end
-
-  describe '.unrelate_epic' do
-    let(:child_epic) { create(:epic, parent: epic, group: group) }
-    let(:noteable) { child_epic }
-
-    subject { described_class.change_epics_relation(epic, child_epic, author, 'unrelate_epic') }
-
-    it_behaves_like 'a system note', exclude_project: true do
-      let(:action) { 'unrelate_epic' }
-    end
-
-    context 'when child epic is removed from a parent epic' do
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("removed child epic &#{child_epic.iid}")
-        expect(Note.last.note).to eq("removed parent epic &#{epic.iid}")
-      end
-    end
-
-    context 'when removed epic is from a subgroup' do
-      let(:subgroup) {create(:group, parent: group)}
-
-      before do
-        child_epic.update!({ group: subgroup })
-      end
-
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("removed child epic #{group.path}/#{subgroup.path}&#{child_epic.iid}")
-        expect(Note.last.note).to eq("removed parent epic #{group.path}&#{epic.iid}")
-      end
+      described_class.change_epics_relation(epic, child_epic, author, type)
     end
   end
 

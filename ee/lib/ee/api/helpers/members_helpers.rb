@@ -17,6 +17,7 @@ module EE
         override :retrieve_members
         def retrieve_members(source, params:, deep: false)
           members = super
+          members = members.includes(user: :max_access_level_membership)
 
           if can_view_group_identity?(source)
             members = members.includes(user: :group_saml_identities)

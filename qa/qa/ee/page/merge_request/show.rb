@@ -284,12 +284,16 @@ module QA
             wait_for_animated_element :merge_immediately_button
 
             click_element :merge_immediately_button
+
+            finished_loading?
           end
 
           def merge_via_merge_train
             raise ElementNotFound, "Not ready to merge" unless ready_to_merge?
 
             click_element(:merge_button, text: "Start merge train")
+
+            finished_loading?
           end
 
           private

@@ -2,6 +2,15 @@
 
 module API
   module Entities
+    class Membership < Grape::Entity
+      expose :source_id
+      expose :source_name do |member|
+        member.source.name
+      end
+      expose :source_type
+      expose :access_level
+    end
+
     class BlameRangeCommit < Grape::Entity
       expose :id
       expose :parent_ids
@@ -304,6 +313,7 @@ module API
       expose(:wiki_access_level) { |project, options| project.project_feature.string_access_level(:wiki) }
       expose(:builds_access_level) { |project, options| project.project_feature.string_access_level(:builds) }
       expose(:snippets_access_level) { |project, options| project.project_feature.string_access_level(:snippets) }
+      expose(:pages_access_level) { |project, options| project.project_feature.string_access_level(:pages) }
 
       expose :shared_runners_enabled
       expose :lfs_enabled?, as: :lfs_enabled
@@ -1249,20 +1259,20 @@ module API
     end
 
     class Compare < Grape::Entity
-      expose :commit, using: Entities::Commit do |compare, options|
-        ::Commit.decorate(compare.commits, nil).last
+      expose :commit, using: Entities::Commit do |compare, _|
+        compare.commits.last
       end
 
-      expose :commits, using: Entities::Commit do |compare, options|
-        ::Commit.decorate(compare.commits, nil)
+      expose :commits, using: Entities::Commit do |compare, _|
+        compare.commits
       end
 
-      expose :diffs, using: Entities::Diff do |compare, options|
-        compare.diffs(limits: false).to_a
+      expose :diffs, using: Entities::Diff do |compare, _|
+        compare.diffs.diffs.to_a
       end
 
-      expose :compare_timeout do |compare, options|
-        compare.diffs.overflow?
+      expose :compare_timeout do |compare, _|
+        compare.diffs.diffs.overflow?
       end
 
       expose :same, as: :compare_same_ref
@@ -1821,6 +1831,7 @@ module API
       expose :uid, as: :application_id
       expose :name, as: :application_name
       expose :redirect_uri, as: :callback_url
+      expose :confidential
     end
 
     # Use with care, this exposes the secret

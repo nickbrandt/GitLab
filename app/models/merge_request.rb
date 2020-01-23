@@ -228,6 +228,9 @@ class MergeRequest < ApplicationRecord
   scope :by_merge_commit_sha, -> (sha) do
     where(merge_commit_sha: sha)
   end
+  scope :by_cherry_pick_sha, -> (sha) do
+    joins(:notes).where(notes: { commit_id: sha })
+  end
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
   scope :with_api_entity_associations, -> {
@@ -818,7 +821,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def check_mergeability(async: false)
-    return if Feature.enabled?(:merge_requests_conditional_mergeability_check, default_enabled: true) && !recheck_merge_status?
+    return unless recheck_merge_status?
 
     check_service = MergeRequests::MergeabilityCheckService.new(self)
 
@@ -1198,12 +1201,10 @@ class MergeRequest < ApplicationRecord
   end
 
   def in_locked_state
-    begin
-      lock_mr
-      yield
-    ensure
-      unlock_mr
-    end
+    lock_mr
+    yield
+  ensure
+    unlock_mr
   end
 
   def diverged_commits_count
