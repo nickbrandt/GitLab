@@ -8951,7 +8951,7 @@ msgstr ""
 msgid "GitLab project export"
 msgstr ""
 
-msgid "GitLab restart is required to apply changes"
+msgid "GitLab restart is required to apply changes."
 msgstr ""
 
 msgid "GitLab single sign on URL"
@@ -10922,7 +10922,7 @@ msgstr ""
 msgid "Leave Admin Mode"
 msgstr ""
 
-msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked"
+msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked."
 msgstr ""
 
 msgid "Leave edit mode? All unsaved changes will be lost."
