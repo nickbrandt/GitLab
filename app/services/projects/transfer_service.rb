@@ -13,8 +13,6 @@ module Projects
     include Gitlab::ShellAdapter
     TransferError = Class.new(StandardError)
 
-    attr_reader :new_namespace
-
     def execute(new_namespace)
       @new_namespace = new_namespace
 
@@ -38,6 +36,8 @@ module Projects
     end
 
     private
+
+    attr_reader :old_path, :new_path, :new_namespace
 
     # rubocop: disable CodeReuse/ActiveRecord
     def transfer(project)
