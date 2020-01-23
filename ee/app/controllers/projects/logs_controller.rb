@@ -38,7 +38,7 @@ module Projects
     end
 
     def filter_params
-      params.permit(:container_name, :pod_name, :search, :start, :end)
+      params.permit(:container_name, :pod_name, :search, :start_time, :end_time)
     end
 
     def environment

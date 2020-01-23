@@ -26,8 +26,8 @@ describe PodLogsService do
           'pod_name' => pod_name,
           'container_name' => container_name,
           'search' => search,
-          'start' => start_time,
-          'end' => end_time
+          'start_time' => start_time,
+          'end_time' => end_time
         }
       ).permit!
     end

@@ -7,7 +7,7 @@ class PodLogsService < ::BaseService
 
   K8S_NAME_MAX_LENGTH = 253
 
-  PARAMS = %w(pod_name container_name search start end).freeze
+  PARAMS = %w(pod_name container_name search start_time end_time).freeze
 
   SUCCESS_RETURN_KEYS = [:status, :logs, :pod_name, :container_name, :pods, :enable_advanced_querying].freeze
 
@@ -74,8 +74,8 @@ class PodLogsService < ::BaseService
   end
 
   def check_times(result)
-    Time.iso8601(params['start']) if params['start']
-    Time.iso8601(params['end']) if params['end']
+    Time.iso8601(params['start_time']) if params['start_time']
+    Time.iso8601(params['end_time']) if params['end_time']
 
     success(result)
   rescue ArgumentError
@@ -89,8 +89,8 @@ class PodLogsService < ::BaseService
       namespace,
       container: result[:container_name],
       search: params['search'],
-      start_time: params['start'],
-      end_time: params['end']
+      start_time: params['start_time'],
+      end_time: params['end_time']
     )
 
     return { status: :processing } unless response
