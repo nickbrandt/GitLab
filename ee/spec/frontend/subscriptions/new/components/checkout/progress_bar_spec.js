@@ -1,15 +1,12 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Component from 'ee/subscriptions/new/components/checkout/progress_bar.vue';
 
 describe('Progress Bar', () => {
-  const localVue = createLocalVue();
-
   let wrapper;
 
   const createComponent = propsData => {
     wrapper = shallowMount(Component, {
       propsData,
-      localVue,
     });
   };
 

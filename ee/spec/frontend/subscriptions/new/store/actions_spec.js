@@ -4,14 +4,24 @@ import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import * as actions from 'ee/subscriptions/new/store/actions';
 import * as constants from 'ee/subscriptions/new/constants';
+import Api from 'ee/api';
+
+const {
+  countriesPath,
+  countryStatesPath,
+  paymentFormPath,
+  paymentMethodPath,
+  confirmOrderPath,
+} = Api;
 
 jest.mock('~/flash');
-
-constants.STEPS = ['firstStep', 'secondStep'];
-
-let mock;
+jest.mock('ee/subscriptions/new/constants', () => ({
+  STEPS: ['firstStep', 'secondStep'],
+}));
 
 describe('Subscriptions Actions', () => {
+  let mock;
+
   beforeEach(() => {
     mock = new MockAdapter(axios);
   });
@@ -119,7 +129,7 @@ describe('Subscriptions Actions', () => {
 
   describe('fetchCountries', () => {
     it('calls fetchCountriesSuccess with the returned data on success', done => {
-      mock.onGet(constants.COUNTRIES_URL).replyOnce(200, ['Netherlands', 'NL']);
+      mock.onGet(countriesPath).replyOnce(200, ['Netherlands', 'NL']);
 
       testAction(
         actions.fetchCountries,
@@ -132,7 +142,7 @@ describe('Subscriptions Actions', () => {
     });
 
     it('calls fetchCountriesError on error', done => {
-      mock.onGet(constants.COUNTRIES_URL).replyOnce(500);
+      mock.onGet(countriesPath).replyOnce(500);
 
       testAction(actions.fetchCountries, null, {}, [], [{ type: 'fetchCountriesError' }], done);
     });
@@ -174,7 +184,7 @@ describe('Subscriptions Actions', () => {
   describe('fetchStates', () => {
     it('calls resetStates and fetchStatesSuccess with the returned data on success', done => {
       mock
-        .onGet(constants.STATES_URL, { params: { country: 'NL' } })
+        .onGet(countryStatesPath, { params: { country: 'NL' } })
         .replyOnce(200, { utrecht: 'UT' });
 
       testAction(
@@ -188,13 +198,13 @@ describe('Subscriptions Actions', () => {
     });
 
     it('only calls resetStates when no country selected', done => {
-      mock.onGet(constants.STATES_URL).replyOnce(500);
+      mock.onGet(countryStatesPath).replyOnce(500);
 
       testAction(actions.fetchStates, null, { country: null }, [], [{ type: 'resetStates' }], done);
     });
 
     it('calls resetStates and fetchStatesError on error', done => {
-      mock.onGet(constants.STATES_URL).replyOnce(500);
+      mock.onGet(countryStatesPath).replyOnce(500);
 
       testAction(
         actions.fetchStates,
@@ -350,7 +360,7 @@ describe('Subscriptions Actions', () => {
   describe('fetchPaymentFormParams', () => {
     it('fetches paymentFormParams and calls fetchPaymentFormParamsSuccess with the returned data on success', done => {
       mock
-        .onGet(constants.PAYMENT_FORM_URL, { params: { id: constants.PAYMENT_FORM_ID } })
+        .onGet(paymentFormPath, { params: { id: constants.PAYMENT_FORM_ID } })
         .replyOnce(200, { token: 'x' });
 
       testAction(
@@ -364,7 +374,7 @@ describe('Subscriptions Actions', () => {
     });
 
     it('calls fetchPaymentFormParamsError on error', done => {
-      mock.onGet(constants.PAYMENT_FORM_URL).replyOnce(500);
+      mock.onGet(paymentFormPath).replyOnce(500);
 
       testAction(
         actions.fetchPaymentFormParams,
@@ -492,7 +502,7 @@ describe('Subscriptions Actions', () => {
   describe('fetchPaymentMethodDetails', () => {
     it('fetches paymentMethodDetails and calls fetchPaymentMethodDetailsSuccess with the returned data on success and updates isLoadingPaymentMethod to false', done => {
       mock
-        .onGet(constants.PAYMENT_METHOD_URL, { params: { id: 'paymentMethodId' } })
+        .onGet(paymentMethodPath, { params: { id: 'paymentMethodId' } })
         .replyOnce(200, { token: 'x' });
 
       testAction(
@@ -506,7 +516,7 @@ describe('Subscriptions Actions', () => {
     });
 
     it('calls fetchPaymentMethodDetailsError on error and updates isLoadingPaymentMethod to false', done => {
-      mock.onGet(constants.PAYMENT_METHOD_URL).replyOnce(500);
+      mock.onGet(paymentMethodPath).replyOnce(500);
 
       testAction(
         actions.fetchPaymentMethodDetails,
@@ -559,16 +569,8 @@ describe('Subscriptions Actions', () => {
   });
 
   describe('confirmOrder', () => {
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
     it('calls confirmOrderSuccess with a redirect location on success', done => {
-      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { location: 'x' });
+      mock.onPost(confirmOrderPath).replyOnce(200, { location: 'x' });
 
       testAction(
         actions.confirmOrder,
@@ -581,7 +583,7 @@ describe('Subscriptions Actions', () => {
     });
 
     it('calls confirmOrderError with the errors on error', done => {
-      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { errors: 'errors' });
+      mock.onPost(confirmOrderPath).replyOnce(200, { errors: 'errors' });
 
       testAction(
         actions.confirmOrder,
@@ -594,7 +596,7 @@ describe('Subscriptions Actions', () => {
     });
 
     it('calls confirmOrderError on failure', done => {
-      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(500);
+      mock.onPost(confirmOrderPath).replyOnce(500);
 
       testAction(
         actions.confirmOrder,
