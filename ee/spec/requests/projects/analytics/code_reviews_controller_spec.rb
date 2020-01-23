@@ -8,7 +8,6 @@ describe Projects::Analytics::CodeReviewsController, type: :request do
 
   before do
     login_as user
-    stub_feature_flags(code_review_analytics: true)
   end
 
   describe 'GET /*namespace_id/:project_id/analytics/code_reviews' do

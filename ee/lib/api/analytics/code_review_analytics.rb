@@ -28,10 +28,6 @@ module API
         end
       end
 
-      before do
-        not_found! unless Feature.enabled?(:code_review_analytics, default_enabled: true)
-      end
-
       resource :analytics do
         desc 'List code review information about project' do
         end

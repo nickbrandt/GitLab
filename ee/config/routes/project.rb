@@ -79,9 +79,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :audit_events, only: [:index]
 
         namespace :analytics do
-          constraints(::Constraints::FeatureConstrainer.new(:code_review_analytics, default_enabled: true)) do
-            resources :code_reviews, only: [:index]
-          end
+          resources :code_reviews, only: [:index]
         end
 
         draw :merge_requests_ee
