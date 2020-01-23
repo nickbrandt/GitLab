@@ -73,17 +73,33 @@ describe('ServiceDeskService', () => {
     it('makes a request to update template', () => {
       axiosMock.onPut(endpoint).replyOnce(httpStatusCodes.OK, dummyResponse);
 
-      return service.updateTemplate('Bug', true).then(response => {
-        expect(response.data).toEqual(dummyResponse);
-      });
+      return service
+        .updateTemplate(
+          {
+            selectedTemplate: 'Bug',
+            outgoingName: 'GitLab Support Bot',
+          },
+          true,
+        )
+        .then(response => {
+          expect(response.data).toEqual(dummyResponse);
+        });
     });
 
     it('fails on error response', () => {
       axiosMock.onPut(endpoint).networkError();
 
-      return service.updateTemplate('Bug', true).catch(error => {
-        expect(error.message).toBe(errorMessage);
-      });
+      return service
+        .updateTemplate(
+          {
+            selectedTemplate: 'Bug',
+            outgoingName: 'GitLab Support Bot',
+          },
+          true,
+        )
+        .catch(error => {
+          expect(error.message).toBe(errorMessage);
+        });
     });
 
     it('makes a request with the expected body', () => {
@@ -91,10 +107,17 @@ describe('ServiceDeskService', () => {
 
       const spy = jest.spyOn(axios, 'put');
 
-      service.updateTemplate('Bug', true);
+      service.updateTemplate(
+        {
+          selectedTemplate: 'Bug',
+          outgoingName: 'GitLab Support Bot',
+        },
+        true,
+      );
 
       expect(spy).toHaveBeenCalledWith(endpoint, {
         issue_template_key: 'Bug',
+        outgoing_name: 'GitLab Support Bot',
         service_desk_enabled: true,
       });
 
