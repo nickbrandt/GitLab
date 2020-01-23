@@ -179,6 +179,10 @@ module API
           optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node'
           optional :container_repositories_max_capacity, type: Integer, desc: 'Control the maximum concurrency of container repository sync for this node'
           optional :sync_object_storage, type: Boolean, desc: 'Flag indicating if the secondary Geo node will replicate blobs in Object Storage'
+          optional :selective_sync_type, type: String, desc: 'Limit syncing to only specific groups, or shards. Valid values: `"namespaces"`, `"shards"`, or `null`'
+          optional :selective_sync_shards, type: Array, desc: 'The repository storages whose projects should be synced, if `selective_sync_type` == `shards`'
+          optional :selective_sync_namespace_ids, as: :namespace_ids, type: Array, desc: 'The IDs of groups that should be synced, if `selective_sync_type` == `namespaces`'
+          optional :minimum_reverification_interval, type: Integer, desc: 'The interval (in days) in which the repository verification is valid. Once expired, it will be reverified. This has no effect when set on a secondary node.'
         end
         put do
           not_found!('GeoNode') unless geo_node

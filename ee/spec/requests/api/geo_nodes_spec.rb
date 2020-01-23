@@ -13,6 +13,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
   set(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
 
   let(:unexisting_node_id) { GeoNode.maximum(:id).to_i.succ }
+  let(:group_to_sync) { create(:group) }
 
   set(:admin) { create(:admin) }
   set(:user) { create(:user) }
@@ -242,7 +243,11 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
         internal_url: 'https://internal-com.com/',
         files_max_capacity: 33,
         repos_max_capacity: 44,
-        verification_max_capacity: 55
+        verification_max_capacity: 55,
+        selective_sync_type: "shards",
+        selective_sync_shards: %w[shard1 shard2],
+        selective_sync_namespace_ids: [group_to_sync.id],
+        minimum_reverification_interval: 10
       }.stringify_keys
 
       put api("/geo_nodes/#{secondary.id}", admin), params: params
