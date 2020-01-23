@@ -29,7 +29,9 @@ module Gitlab
     #
     # @return [Integer] value
     def value
-      Gitlab::Redis::SharedState.with { |redis| (redis.get(key) || 0).to_i }
+      Gitlab::Redis::SharedState.with do |redis|
+        (redis.get(key) || 0).to_i
+      end
     end
 
     # Increase the counter
@@ -57,15 +59,36 @@ module Gitlab
         end
       end
     end
-    # rubocop:enable Gitlab/RailsLogger
+
+    # Reset the reference counter
+    #
+    # @private Used internally by SRE and debugging purpose
+    # @return [Boolean] whether reset was a success
+    def reset!
+      redis_cmd do |redis|
+        redis.del(key)
+      end
+    end
+
+    # When the reference counter would expire
+    #
+    # @api private Used internally by SRE and debugging purpose
+    # @return [Integer] Number in seconds until expiration or false if never
+    def expires_in
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.ttl(key)
+      end
+    end
 
     private
 
     def redis_cmd
       Gitlab::Redis::SharedState.with { |redis| yield(redis) }
+
       true
     rescue => e
       Rails.logger.warn("GitLab: An unexpected error occurred in writing to Redis: #{e}") # rubocop:disable Gitlab/RailsLogger
+
       false
     end
   end
