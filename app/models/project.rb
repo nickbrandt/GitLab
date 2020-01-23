@@ -2274,7 +2274,7 @@ class Project < ApplicationRecord
   end
 
   def snippets_visible?(user = nil)
-    Ability.allowed?(user, :read_project_snippet, self)
+    Ability.allowed?(user, :read_snippet, self)
   end
 
   def max_attachment_size
