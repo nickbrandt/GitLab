@@ -34,4 +34,28 @@ describe SubscriptionsHelper do
     it { is_expected.to include(plan_data: '[{"id":"bronze_id","code":"bronze","price_per_year":48.0}]') }
     it { is_expected.to include(plan_id: 'bronze_id') }
   end
+
+  describe '#plan_title' do
+    let_it_be(:subscription) { create(:gitlab_subscription) }
+
+    before do
+      allow(helper).to receive(:subscription).and_return(subscription)
+    end
+
+    subject { helper.plan_title }
+
+    it { is_expected.to eq(subscription.hosted_plan.title) }
+  end
+
+  describe '#subscription_seats' do
+    let_it_be(:subscription) { create(:gitlab_subscription) }
+
+    before do
+      allow(helper).to receive(:subscription).and_return(subscription)
+    end
+
+    subject { helper.subscription_seats }
+
+    it { is_expected.to eq(subscription.seats) }
+  end
 end

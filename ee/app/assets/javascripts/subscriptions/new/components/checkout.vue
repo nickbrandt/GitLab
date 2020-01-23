@@ -1,5 +1,6 @@
 <script>
 import { s__ } from '~/locale';
+import { PROGRESS_STEPS } from '../constants';
 import ProgressBar from './checkout/progress_bar.vue';
 import SubscriptionDetails from './checkout/subscription_details.vue';
 import BillingAddress from './checkout/billing_address.vue';
@@ -8,6 +9,11 @@ import ConfirmOrder from './checkout/confirm_order.vue';
 
 export default {
   components: { ProgressBar, SubscriptionDetails, BillingAddress, PaymentMethod, ConfirmOrder },
+  data() {
+    return {
+      step: PROGRESS_STEPS.checkout,
+    };
+  },
   i18n: {
     checkout: s__('Checkout|Checkout'),
   },
@@ -16,7 +22,7 @@ export default {
 <template>
   <div class="checkout d-flex flex-column justify-content-between w-100">
     <div class="full-width">
-      <progress-bar :step="2" />
+      <progress-bar :step="step" />
       <div class="flash-container"></div>
       <h2 class="mt-4 mb-3 mb-lg-5">{{ $options.i18n.checkout }}</h2>
       <subscription-details />
