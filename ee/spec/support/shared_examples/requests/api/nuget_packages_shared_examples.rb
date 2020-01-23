@@ -98,7 +98,7 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
 
     context 'with object storage disabled' do
       context 'without a file from workhorse' do
-        let(:params) { { file: nil } }
+        let(:params) { { package: nil } }
 
         it_behaves_like 'returning response status', :bad_request
       end
@@ -121,7 +121,7 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
           )
         end
         let(:fog_file) { fog_to_uploaded_file(tmp_object) }
-        let(:params) { { file: fog_file, 'file.remote_id' => file_name } }
+        let(:params) { { package: fog_file, 'package.remote_id' => file_name } }
 
         it_behaves_like 'creates nuget package files'
 
@@ -129,8 +129,8 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
           context "with invalid remote_id: #{remote_id}" do
             let(:params) do
               {
-                file: fog_file,
-                'file.remote_id' => remote_id
+                package: fog_file,
+                'package.remote_id' => remote_id
               }
             end
 

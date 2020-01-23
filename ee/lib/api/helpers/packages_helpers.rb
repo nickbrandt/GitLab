@@ -3,6 +3,8 @@
 module API
   module Helpers
     module PackagesHelpers
+      MAX_PACKAGE_FILE_SIZE = 50.megabytes.freeze
+
       def require_packages_enabled!
         not_found! unless ::Gitlab.config.packages.enabled
       end
@@ -29,14 +31,17 @@ module API
         authorize_read_package!(subject)
       end
 
-      def authorize_workhorse!(subject = user_project)
+      def authorize_workhorse!(subject: user_project, has_length: true, maximum_size: MAX_PACKAGE_FILE_SIZE)
         authorize_upload!(subject)
 
         Gitlab::Workhorse.verify_api_request!(headers)
 
         status 200
         content_type Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE
-        ::Packages::PackageFileUploader.workhorse_authorize(has_length: true)
+
+        params = { has_length: has_length }
+        params[:maximum_size] = maximum_size unless has_length
+        ::Packages::PackageFileUploader.workhorse_authorize(params)
       end
 
       def authorize_upload!(subject = user_project)
