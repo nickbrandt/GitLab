@@ -117,11 +117,17 @@ describe Namespace do
       end
 
       context 'with an invalid plan name' do
-        it 'is invalid' do
+        it 'is invalid when `unknown`' do
           group.plan = 'unknown'
 
           expect(group).not_to be_valid
           expect(group.errors[:plan]).to include('is not included in the list')
+        end
+
+        it 'is valid for blank strings' do
+          group.plan = ' '
+
+          expect(group).to be_valid
         end
       end
     end
