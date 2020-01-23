@@ -1,3 +1,5 @@
+import { s__ } from '~/locale';
+
 export default {
   data() {
     return {
@@ -8,7 +10,14 @@ export default {
   },
   computed: {
     canSeeDescriptionVersion() {
-      return Boolean(this.note.description_diff_path && this.note.description_version_id);
+      return Boolean(
+        this.note.description_diff_path &&
+          this.note.description_version_id &&
+          !this.note.description_version_deleted,
+      );
+    },
+    canDeleteDescriptionVersion() {
+      return this.note.can_delete_description_version;
     },
     shouldShowDescriptionVersion() {
       return this.canSeeDescriptionVersion && this.isDescriptionVersionExpanded;
@@ -32,6 +41,14 @@ export default {
       return this.fetchDescriptionVersion({ endpoint, startingVersion }).then(diff => {
         this.isLoadingDescriptionVersion = false;
         this.descriptionVersion = diff;
+      });
+    },
+    deleteDescriptionVersion() {
+      const endpoint = this.note.delete_description_version_path;
+      const startingVersion = this.note.start_description_version_id;
+
+      return this.softDeleteDescriptionVersion({ endpoint, startingVersion }).then(() => {
+        this.descriptionVersion = s__('Deleted');
       });
     },
   },

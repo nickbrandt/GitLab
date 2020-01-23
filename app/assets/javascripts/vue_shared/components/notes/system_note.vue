@@ -18,7 +18,7 @@
  */
 import $ from 'jquery';
 import { mapGetters, mapActions } from 'vuex';
-import { GlSkeletonLoading } from '@gitlab/ui';
+import { GlSkeletonLoading, GlTooltipDirective } from '@gitlab/ui';
 import descriptionVersionHistoryMixin from 'ee_else_ce/notes/mixins/description_version_history';
 import noteHeader from '~/notes/components/note_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -35,6 +35,9 @@ export default {
     noteHeader,
     TimelineEntryItem,
     GlSkeletonLoading,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   mixins: [descriptionVersionHistoryMixin],
   props: {
@@ -80,7 +83,7 @@ export default {
     initMRPopovers(this.$el.querySelectorAll('.gfm-merge_request'));
   },
   methods: {
-    ...mapActions(['fetchDescriptionVersion']),
+    ...mapActions(['fetchDescriptionVersion', 'softDeleteDescriptionVersion']),
   },
 };
 </script>
@@ -122,6 +125,16 @@ export default {
             <gl-skeleton-loading />
           </pre>
           <pre v-else class="wrapper mt-2" v-html="descriptionVersion"></pre>
+          <button
+            v-if="canDeleteDescriptionVersion"
+            v-gl-tooltip
+            type="button"
+            title="Remove description history"
+            class="btn btn-transparent delete-description-history"
+            @click="deleteDescriptionVersion"
+          >
+            <icon name="remove" />
+          </button>
         </div>
       </div>
     </div>

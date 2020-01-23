@@ -8,5 +8,7 @@ export default {
   },
   methods: {
     toggleDescriptionVersion() {},
+    canDeleteDescriptionVersion() {},
+    deleteDescriptionVersion() {},
   },
 };

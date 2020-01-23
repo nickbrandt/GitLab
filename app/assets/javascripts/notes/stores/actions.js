@@ -509,5 +509,24 @@ export const fetchDescriptionVersion = (_, { endpoint, startingVersion }) => {
 export const setCurrentDiscussionId = ({ commit }, discussionId) =>
   commit(types.SET_CURRENT_DISCUSSION_ID, discussionId);
 
+export const softDeleteDescriptionVersion = ({ commit }, { endpoint, startingVersion }) => {
+  let requestUrl = endpoint;
+
+  if (startingVersion) {
+    requestUrl = mergeUrlParams({ start_version_id: startingVersion }, requestUrl);
+  }
+
+  return axios
+    .delete(requestUrl)
+    .then(res => {
+      // Invalidate lastFatechedAt to trigger refetch on next page refresh
+      commit(types.SET_LAST_FETCHED_AT, null);
+      return res.data;
+    })
+    .catch(() => {
+      Flash(__('Something went wrong while deleting description changes. Please try again.'));
+    });
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
