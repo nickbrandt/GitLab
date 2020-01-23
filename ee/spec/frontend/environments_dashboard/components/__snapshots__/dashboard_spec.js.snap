@@ -34,6 +34,8 @@ exports[`dashboard should match the snapshot 1`] = `
     <gl-button-stub
       class="js-add-projects-button btn btn-success"
       role="button"
+      size="md"
+      variant="secondary"
     >
       
       Add projects

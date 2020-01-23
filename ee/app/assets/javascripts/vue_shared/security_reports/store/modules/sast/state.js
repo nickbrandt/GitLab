@@ -12,4 +12,5 @@ export default () => ({
   resolvedIssues: [],
   allIssues: [],
   baseReportOutofDate: false,
+  hasBaseReport: false,
 });

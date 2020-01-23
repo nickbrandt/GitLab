@@ -542,6 +542,20 @@ group = Group.find_by_full_path 'group'
 user.max_member_access_for_group group.id
 ```
 
+### Change user password
+
+```ruby
+password = "your password"
+user = User.find_by_username('your username')
+password_attributes = {
+  password: password,
+  password_confirmation: password,
+  password_automatically_set: false
+}
+
+result = Users::UpdateService.new(user, password_attributes.merge(user: user)).execute
+```
+
 ## Groups
 
 ### Count unique users in a group and sub-groups
@@ -892,6 +906,42 @@ loop do
     puts DateTime.now.to_s + " Active: " + stats.active.to_s + " Queued: " + stats.queued.to_s
   end
   sleep threshold
+end
+```
+
+## Registry
+
+### Registry Disk Space Usage by Project
+
+As a GitLab administrator, you may need to reduce disk space consumption.
+A common culprit is Docker Registry images that are no longer in use. To find
+the storage broken down by each project, run the following in the
+GitLab Rails console:
+
+```ruby
+projects_and_size = []
+# a list of projects you want to look at, can get these however
+projects = Project.last(100)
+
+projects.each do |p|
+   project_total_size = 0
+   container_repositories = p.container_repositories
+
+   container_repositories.each do |c|
+       c.tags.each do |t|
+          project_total_size = project_total_size + t.total_size
+       end
+   end
+
+   if project_total_size > 0
+      projects_and_size << [p.full_path,project_total_size]
+   end
+end
+
+# projects_and_size is filled out now
+# maybe print it as comma separated output?
+projects_and_size.each do |ps|
+   puts "%s,%s" % ps
 end
 ```
 

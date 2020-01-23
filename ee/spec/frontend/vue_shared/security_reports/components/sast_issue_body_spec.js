@@ -1,122 +1,80 @@
-import Vue from 'vue';
-import component from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import { shallowMount } from '@vue/test-utils';
 import { STATUS_FAILED } from '~/reports/constants';
+import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
+import ReportLink from '~/reports/components/report_link.vue';
 
-describe('sast issue body', () => {
-  let vm;
+describe('Sast Issue Body', () => {
+  let wrapper;
 
-  const Component = Vue.extend(component);
+  const findDescriptionText = () => wrapper.find('.report-block-list-issue-description-text');
+  const findReportLink = () => wrapper.find(ReportLink);
 
-  const sastIssue = {
-    cve: 'CVE-2016-9999',
-    file: 'Gemfile.lock',
-    message: 'Test Information Leak Vulnerability in Action View',
-    title: 'Test Information Leak Vulnerability in Action View',
-    path: 'Gemfile.lock',
-    solution:
-      'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
-    tool: 'bundler_audit',
-    url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    urlPath: '/Gemfile.lock',
-    severity: 'medium',
-    confidence: 'low',
+  const createComponent = issue => {
+    wrapper = shallowMount(SastIssueBody, {
+      propsData: {
+        issue,
+        status: STATUS_FAILED,
+      },
+    });
   };
 
-  const status = STATUS_FAILED;
-
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
-  describe('with severity and confidence (new json format)', () => {
-    it('renders severity and confidence', () => {
-      vm = mountComponent(Component, {
-        issue: sastIssue,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).toContain('Medium (Low):');
+  it('matches snapshot', () => {
+    createComponent({
+      severity: 'medium',
+      confidence: 'low',
+      priority: 'high',
     });
+
+    expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('with severity and without confidence (new json format)', () => {
-    it('renders severity only', () => {
-      const issueCopy = Object.assign({}, sastIssue);
-      delete issueCopy.confidence;
-      vm = mountComponent(Component, {
-        issue: issueCopy,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).toContain('Medium:');
+  it('renders priority if no security and confidence are passed', () => {
+    createComponent({
+      priority: 'high',
     });
+
+    expect(findDescriptionText().text()).toBe('high:');
   });
 
-  describe('with confidence and without severity (new json format)', () => {
-    it('renders confidence only', () => {
-      const issueCopy = Object.assign({}, sastIssue);
-      delete issueCopy.severity;
-      vm = mountComponent(Component, {
-        issue: issueCopy,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).toContain('(Low):');
+  it('renders confidence if no severity is passed', () => {
+    createComponent({
+      confidence: 'low',
     });
+
+    expect(findDescriptionText().text()).toBe('(Low):');
   });
 
-  describe('with priority (old json format)', () => {
-    it('renders priority key', () => {
-      const issueCopy = Object.assign({}, sastIssue);
-      delete issueCopy.severity;
-      delete issueCopy.confidence;
-      issueCopy.priority = 'Low';
-      vm = mountComponent(Component, {
-        issue: issueCopy,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).toContain(issueCopy.priority);
+  it('renders severity if no confidence is passed', () => {
+    createComponent({
+      severity: 'medium',
     });
+
+    expect(findDescriptionText().text()).toBe('Medium:');
   });
 
-  describe('without priority', () => {
-    it('does not render priority key', () => {
-      const issueCopy = Object.assign({}, sastIssue);
-      delete issueCopy.severity;
-      delete issueCopy.confidence;
-
-      vm = mountComponent(Component, {
-        issue: issueCopy,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).not.toContain(sastIssue.priority);
+  it('renders severity and confidence if both are passed', () => {
+    createComponent({
+      severity: 'medium',
+      confidence: 'low',
     });
+
+    expect(findDescriptionText().text()).toBe('Medium (Low):');
   });
 
-  describe('title', () => {
-    it('renders title', () => {
-      vm = mountComponent(Component, {
-        issue: sastIssue,
-        status,
-      });
+  it('does not render report link if no path is passed', () => {
+    createComponent({});
 
-      expect(vm.$el.textContent.trim()).toContain(sastIssue.title);
-    });
+    expect(findReportLink().exists()).toBe(false);
   });
 
-  describe('path', () => {
-    it('renders path', () => {
-      vm = mountComponent(Component, {
-        issue: sastIssue,
-        status,
-      });
+  it('renders report link if path is passed', () => {
+    createComponent({ path: 'test-path' });
 
-      expect(vm.$el.querySelector('a').getAttribute('href')).toEqual(sastIssue.urlPath);
-
-      expect(vm.$el.querySelector('a').textContent.trim()).toEqual(sastIssue.path);
-    });
+    expect(findReportLink().exists()).toBe(true);
   });
 });

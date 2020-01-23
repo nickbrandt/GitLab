@@ -155,6 +155,7 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
       >
         <gl-button-stub
           class="bold text-warning-700 text-1 text-decoration-none js-vulnerabilities-toggle"
+          size="md"
           variant="link"
         >
           <icon-stub

@@ -77,7 +77,7 @@ module EE
         end
 
         def random_password
-          Devise.friendly_token.first(::User.password_length.min)
+          ::User.random_password
         end
 
         def valid_username

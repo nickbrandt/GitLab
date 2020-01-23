@@ -2528,6 +2528,9 @@ msgstr ""
 msgid "Average per day: %{average}"
 msgstr ""
 
+msgid "Back to page %{number}"
+msgstr ""
+
 msgid "Background Color"
 msgstr ""
 
@@ -5361,6 +5364,9 @@ msgstr ""
 msgid "Create a personal access token on your account to pull or push via %{protocol}."
 msgstr ""
 
+msgid "Create an account using:"
+msgstr ""
+
 msgid "Create an issue"
 msgstr ""
 
@@ -6798,6 +6804,9 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
+msgid "Email display name"
+msgstr ""
+
 msgid "Email domain is not editable in subgroups. Value inherited from top-level parent group."
 msgstr ""
 
@@ -6841,6 +6850,9 @@ msgid "EmailToken|resetting..."
 msgstr ""
 
 msgid "Emails"
+msgstr ""
+
+msgid "Emails sent from Service Desk will have this name"
 msgstr ""
 
 msgid "Emails separated by comma"
@@ -8915,6 +8927,9 @@ msgstr ""
 msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
 msgstr ""
 
+msgid "GitLab Support Bot"
+msgstr ""
+
 msgid "GitLab User"
 msgstr ""
 
@@ -8939,7 +8954,7 @@ msgstr ""
 msgid "GitLab project export"
 msgstr ""
 
-msgid "GitLab restart is required to apply changes"
+msgid "GitLab restart is required to apply changes."
 msgstr ""
 
 msgid "GitLab single sign on URL"
@@ -10910,7 +10925,7 @@ msgstr ""
 msgid "Leave Admin Mode"
 msgstr ""
 
-msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked"
+msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked."
 msgstr ""
 
 msgid "Leave edit mode? All unsaved changes will be lost."
@@ -11482,6 +11497,9 @@ msgid "Maximum number of comments exceeded"
 msgstr ""
 
 msgid "Maximum number of mirrors that can be synchronizing at the same time."
+msgstr ""
+
+msgid "Maximum page reached"
 msgstr ""
 
 msgid "Maximum push size (MB)"
@@ -13021,6 +13039,12 @@ msgid "PackageRegistry|There are no packages yet"
 msgstr ""
 
 msgid "PackageRegistry|There was a problem fetching the details for this package."
+msgstr ""
+
+msgid "PackageRegistry|There was an error fetching the pipeline information."
+msgstr ""
+
+msgid "PackageRegistry|Unable to fetch pipeline information"
 msgstr ""
 
 msgid "PackageRegistry|Unable to load package"
@@ -17392,6 +17416,9 @@ msgstr ""
 msgid "Sorry, no projects matched your search"
 msgstr ""
 
+msgid "Sorry, you have exceeded the maximum browsable page number. Please use the API to explore further."
+msgstr ""
+
 msgid "Sorry, your filter produced no results"
 msgstr ""
 
@@ -18409,6 +18436,9 @@ msgid "The X509 Certificate to use when mutual TLS is required to communicate wi
 msgstr ""
 
 msgid "The amount of seconds after which a request to get a secondary node status will time out."
+msgstr ""
+
+msgid "The application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are considered non-confidential."
 msgstr ""
 
 msgid "The branch for this project has no active pipeline configuration."
@@ -22719,6 +22749,9 @@ msgid "opened %{timeAgoString} by %{user}"
 msgstr ""
 
 msgid "opened %{timeAgo}"
+msgstr ""
+
+msgid "or"
 msgstr ""
 
 msgid "out of %d total test"

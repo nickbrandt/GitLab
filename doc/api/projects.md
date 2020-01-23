@@ -300,6 +300,15 @@ You can filter by [custom attributes](custom_attributes.md) with:
 GET /projects?custom_attributes[key]=value&custom_attributes[other_key]=other_value
 ```
 
+### Pagination limits
+
+From GitLab 12.10, [offset-based pagination](README.md#offset-based-pagination) will be
+[limited to 10,000 records](https://gitlab.com/gitlab-org/gitlab/issues/34565).
+[Keyset pagination](README.md#keyset-based-pagination) will be required to retrieve projects
+beyond this limit.
+
+Note that keyset pagination only supports `order_by=id`. Other sorting options are not available.
+
 ## List user projects
 
 Get a list of visible projects owned by the given user. When accessed without authentication, only public projects are returned.
@@ -999,6 +1008,7 @@ POST /projects
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `container_expiration_policy_attributes` | hash | no | Update the container expiration policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `enabled` (boolean) |
@@ -1065,6 +1075,7 @@ POST /projects/user/:user_id
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `shared_runners_enabled` | boolean | no | Enable shared runners for this project |
@@ -1130,6 +1141,7 @@ PUT /projects/:id
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `container_expiration_policy_attributes` | hash | no | Update the container expiration policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `enabled` (boolean) |

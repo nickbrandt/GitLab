@@ -31,7 +31,7 @@ describe UpdateAllMirrorsWorker do
       inner_context = nil
       outer_context = nil
 
-      Gitlab::ApplicationContext.with_context(project: build_stubbed(:project)) do
+      Gitlab::ApplicationContext.with_context(project: build(:project)) do
         outer_context = Labkit::Context.current.to_h
 
         expect(worker).to receive(:schedule_mirrors!) do

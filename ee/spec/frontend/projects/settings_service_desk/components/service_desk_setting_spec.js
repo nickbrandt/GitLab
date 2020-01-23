@@ -173,12 +173,16 @@ describe('ServiceDeskSetting', () => {
         propsData: {
           isEnabled: true,
           initialSelectedTemplate: 'Bug',
+          initialOutgoingName: 'GitLab Support Bot',
         },
       });
 
       wrapper.find('button.btn-success').trigger('click');
 
-      expect(eventSpy).toHaveBeenCalledWith('Bug');
+      expect(eventSpy).toHaveBeenCalledWith({
+        selectedTemplate: 'Bug',
+        outgoingName: 'GitLab Support Bot',
+      });
 
       eventHub.$off('serviceDeskTemplateSave', eventSpy);
       eventSpy.mockRestore();

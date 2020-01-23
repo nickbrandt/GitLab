@@ -8,14 +8,14 @@ RSpec.shared_examples 'multiple issue boards show' do
     it 'lets user view board1' do
       show(board1)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(assigns(:board)).to eq(board1)
     end
 
     it 'lets user view board2' do
       show(board2)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(assigns(:board)).to eq(board2)
     end
   end
@@ -28,7 +28,7 @@ RSpec.shared_examples 'multiple issue boards show' do
     it 'let user view the default shown board' do
       show(board2)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(assigns(:board)).to eq(board2)
     end
 
@@ -36,9 +36,9 @@ RSpec.shared_examples 'multiple issue boards show' do
       show(board1)
 
       if parent.is_a?(Project)
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       else
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

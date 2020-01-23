@@ -60,7 +60,7 @@ describe 'Getting designs related to an issue' do
       { 'fullPath' => design.project.full_path },
       query_graphql_field(
         'issue',
-        { iid: design.issue.iid },
+        { iid: design.issue.iid.to_s },
         query_graphql_field(
           'designs', {}, design_node
         )
