@@ -329,7 +329,7 @@ module EE
     private
 
     def validate_plan_name
-      if @plan_name.present? && PLANS.exclude?(@plan_name) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      if defined?(@plan_name) && @plan_name.present? && PLANS.exclude?(@plan_name) # rubocop:disable Gitlab/ModuleWithInstanceVariables
         errors.add(:plan, 'is not included in the list')
       end
     end
