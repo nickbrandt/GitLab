@@ -1,0 +1,18 @@
+%li{ id: dom_id(merge_request), data: { id: merge_request.id } }
+  .issuable-info-container
+    .issuable-main-info
+      .merge-request-title.title
+        %span.merge-request-title-text.js-onboarding-mr-item
+          = link_to merge_request.title, merge_request_path(merge_request)
+
+      .issuable-info
+        %span.issuable-reference
+          = issuable_reference(merge_request)
+
+    .issuable-meta
+      %ul.controls.d-flex.align-items-end
+        - if merge_request.approved_by_users.any?
+          %li.d-flex
+            = render 'approvers', merge_request: merge_request
+      %span
+        = _('merged %{time_ago}').html_safe % { time_ago: time_ago_with_tooltip(merge_request.merged_at, placement: 'bottom', html_class: 'merge_request_updated_ago') }

@@ -1,0 +1,9 @@
+- if @merge_requests.present?
+  .card.card-small.card-without-border
+    %ul.content-list.mr-list.issuable-list
+      = render partial: 'merge_request', collection: @merge_requests
+
+  = paginate @merge_requests
+
+- else
+  = render 'empty_state'

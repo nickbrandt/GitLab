@@ -113,6 +113,7 @@ class License < ApplicationRecord
     dependency_scanning
     epics
     group_ip_restriction
+    group_level_compliance_dashboard
     incident_management
     insights
     license_management
