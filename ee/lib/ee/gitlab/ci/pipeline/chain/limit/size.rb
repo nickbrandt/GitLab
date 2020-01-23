@@ -28,7 +28,7 @@ module EE
                   pipeline.drop!(:size_limit_exceeded)
                 end
 
-                limit.log_error!(project_id: project.id, plan: project.namespace.actual_plan_name)
+                limit.log_error!(project_id: project.id, plan: project.actual_plan_name)
                 error(limit.message)
               end
 
