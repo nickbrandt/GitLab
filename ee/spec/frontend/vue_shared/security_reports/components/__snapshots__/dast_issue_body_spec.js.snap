@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dast Issue Body matches the snaphot 1`] = `
+<div
+  class="report-block-list-issue-description prepend-top-5 append-bottom-5"
+>
+  <div
+    class="report-block-list-issue-description-text"
+  >
+    
+    Low (Medium):
+
+    
+    <modal-open-name-stub
+      class="js-modal-dast"
+      issue="[object Object]"
+      status="failed"
+    />
+  </div>
+</div>
+`;
