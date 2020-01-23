@@ -14,7 +14,7 @@ module Gitlab
 
         @context = context
         @repository = context[:repository] || context[:project].try(:repository)
-        @max_includes = context[:max_includes]
+        @max_includes = context[:max_includes].to_i
         @included = []
 
         # Note: Asciidoctor calls #freeze on extensions, so we can't set new
@@ -35,7 +35,7 @@ module Gitlab
 
         return false if max_include_depth < 1
         return false if target_uri?(target)
-        return false if max_includes.present? && included.size >= max_includes
+        return false if included.size >= max_includes
 
         true
       end
@@ -68,7 +68,7 @@ module Gitlab
 
       private
 
-      attr_accessor :context, :repository, :cache, :max_includes, :included
+      attr_reader :context, :repository, :cache, :max_includes, :included
 
       # Gets a Blob at a path for a specific revision.
       # This method will check that the Blob exists and contains readable text.
