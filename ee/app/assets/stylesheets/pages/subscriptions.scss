@@ -83,15 +83,19 @@ $subscriptions-full-width-lg: 541px;
     flex-grow: 1;
     max-width: 420px;
 
+    legend {
+      border-bottom: 0;
+      font-weight: $gl-font-weight-bold;
+    }
+
     .gl-form-input,
     .gl-form-select {
       height: 32px;
+      line-height: 1rem;
     }
   }
 
   .number {
-    width: 50%;
-
     @media(min-width: map-get($grid-breakpoints, lg)) {
       max-width: 202px;
     }
@@ -99,7 +103,6 @@ $subscriptions-full-width-lg: 541px;
 
   .label {
     padding: 0;
-    width: 50%;
 
     .gl-link {
       font-size: inherit;
@@ -127,6 +130,20 @@ $subscriptions-full-width-lg: 541px;
       @media(min-width: map-get($grid-breakpoints, lg)) {
         width: initial;
       }
+    }
+  }
+
+  #zuora_payment {
+    margin-right: -8px;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      margin-right: 0;
+    }
+
+    iframe {
+      background-color: $white-light;
+      margin: -4px;
+      width: 100% !important;
     }
   }
 

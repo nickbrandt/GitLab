@@ -23,6 +23,11 @@ export default {
   cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
+  countriesPath: '/-/countries',
+  countryStatesPath: '/-/country_states',
+  paymentFormPath: '/-/subscriptions/payment_form',
+  paymentMethodPath: '/-/subscriptions/payment_method',
+  confirmOrderPath: '/-/subscriptions',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -230,5 +235,30 @@ export default {
   initiateGeoDesignSync({ projectId, action }) {
     const url = Api.buildUrl(this.geoDesignsPath);
     return axios.put(`${url}/${projectId}/${action}`, {});
+  },
+
+  fetchCountries() {
+    const url = Api.buildUrl(this.countriesPath);
+    return axios.get(url);
+  },
+
+  fetchStates(country) {
+    const url = Api.buildUrl(this.countryStatesPath);
+    return axios.get(url, { params: { country } });
+  },
+
+  fetchPaymentFormParams(id) {
+    const url = Api.buildUrl(this.paymentFormPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  fetchPaymentMethodDetails(id) {
+    const url = Api.buildUrl(this.paymentMethodPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  confirmOrder(params = {}) {
+    const url = Api.buildUrl(this.confirmOrderPath);
+    return axios.post(url, params);
   },
 };

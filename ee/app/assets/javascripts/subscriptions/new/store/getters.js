@@ -15,6 +15,24 @@ export const selectedPlanPrice = (state, getters) =>
 export const selectedPlanDetails = state =>
   state.availablePlans.find(plan => plan.value === state.selectedPlan);
 
+export const confirmOrderParams = state => ({
+  setup_for_company: state.isSetupForCompany,
+  customer: {
+    country: state.country,
+    address_1: state.streetAddressLine1,
+    address_2: state.streetAddressLine2,
+    city: state.city,
+    state: state.countryState,
+    zip_code: state.zipCode,
+    company: state.organizationName,
+  },
+  subscription: {
+    plan_id: state.selectedPlan,
+    payment_method_id: state.paymentMethodId,
+    quantity: state.numberOfUsers,
+  },
+});
+
 export const endDate = state =>
   new Date(state.startDate).setFullYear(state.startDate.getFullYear() + 1);
 

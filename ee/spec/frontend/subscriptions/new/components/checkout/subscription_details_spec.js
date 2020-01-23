@@ -9,6 +9,7 @@ describe('Subscription Details', () => {
   const localVue = createLocalVue();
   localVue.use(Vuex);
 
+  let store;
   let wrapper;
 
   const planData = [
@@ -23,25 +24,23 @@ describe('Subscription Details', () => {
     fullName: 'Full Name',
   };
 
-  const store = createStore(initialData);
+  const isStepValid = () => wrapper.find(Step).props('isValid');
 
-  const createComponent = (opts = {}) => {
+  const createComponent = () => {
     wrapper = mount(Component, {
       localVue,
       store,
-      ...opts,
     });
   };
 
   beforeEach(() => {
+    store = createStore(initialData);
     createComponent();
   });
 
   afterEach(() => {
     wrapper.destroy();
   });
-
-  const isStepValid = () => wrapper.find(Step).props('isValid');
 
   describe('Setting up for personal use', () => {
     beforeEach(() => {
