@@ -96,7 +96,7 @@ module API
           package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user).execute
 
           file_params = params.merge(
-            file: uploaded_package_file,
+            file: uploaded_package_file(:package),
             file_name: PACKAGE_FILENAME,
             file_type: PACKAGE_FILETYPE
           )
@@ -112,7 +112,7 @@ module API
           forbidden!
         end
         put 'authorize' do
-          authorize_workhorse!(authorized_user_project)
+          authorize_workhorse!(subject: authorized_user_project, has_length: false)
         end
       end
     end

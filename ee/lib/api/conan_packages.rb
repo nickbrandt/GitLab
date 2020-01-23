@@ -250,7 +250,7 @@ module API
           end
           route_setting :authentication, job_token_allowed: true
           put 'authorize' do
-            authorize_workhorse!(project)
+            authorize_workhorse!(subject: project)
           end
         end
 
@@ -273,7 +273,7 @@ module API
           end
           route_setting :authentication, job_token_allowed: true
           put 'authorize' do
-            authorize_workhorse!(project)
+            authorize_workhorse!(subject: project)
           end
 
           desc 'Upload package files' do
