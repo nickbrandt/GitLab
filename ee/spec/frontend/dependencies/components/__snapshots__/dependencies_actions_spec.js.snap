@@ -78,7 +78,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
     variant="secondary"
   >
     <icon-stub
-      name="download"
+      name="export"
       size="16"
     />
   </gl-button-stub>
