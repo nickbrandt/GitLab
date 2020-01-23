@@ -20,6 +20,8 @@
 #   include_descendant_groups: boolean
 
 class EpicsFinder < IssuableFinder
+  include TimeFrameFilter
+
   def self.scalar_params
     @scalar_params ||= %i[
       parent_id
@@ -113,22 +115,6 @@ class EpicsFinder < IssuableFinder
       last_value.to_sym
     end
   end
-
-  # rubocop: disable CodeReuse/ActiveRecord
-  def by_timeframe(items)
-    return items unless params[:start_date] && params[:end_date]
-
-    end_date = params[:end_date].to_date
-    start_date = params[:start_date].to_date
-
-    items
-      .where('epics.start_date is not NULL or epics.end_date is not NULL')
-      .where('epics.start_date is NULL or epics.start_date <= ?', end_date)
-      .where('epics.end_date is NULL or epics.end_date >= ?', start_date)
-  rescue ArgumentError
-    items
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def parent_id?
     params[:parent_id].present?

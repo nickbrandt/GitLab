@@ -284,6 +284,15 @@ describe Epic do
     end
   end
 
+  it_behaves_like 'within_timeframe scope' do
+    let_it_be(:now) { Time.now }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:resource_1) { create(:epic, group: group, start_date: now - 1.day, end_date: now + 1.day) }
+    let_it_be(:resource_2) { create(:epic, group: group, start_date: now + 2.days, end_date: now + 3.days) }
+    let_it_be(:resource_3) { create(:epic, group: group, end_date: now) }
+    let_it_be(:resource_4) { create(:epic, group: group, start_date: now) }
+  end
+
   describe '#start_date_from_milestones' do
     context 'fixed date' do
       it 'returns start date from start date sourcing milestone' do

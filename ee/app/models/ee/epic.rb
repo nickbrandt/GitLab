@@ -67,6 +67,12 @@ module EE
       scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
       scope :has_parent, -> { where.not(parent_id: nil) }
 
+      scope :within_timeframe, -> (start_date, end_date) do
+        where('start_date is not NULL or end_date is not NULL')
+          .where('start_date is NULL or start_date <= ?', end_date)
+          .where('end_date is NULL or end_date >= ?', start_date)
+      end
+
       scope :order_start_or_end_date_asc, -> do
         reorder(Arel.sql("COALESCE(start_date, end_date) ASC NULLS FIRST"))
       end

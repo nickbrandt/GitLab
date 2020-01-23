@@ -197,6 +197,15 @@ describe Milestone do
     end
   end
 
+  it_behaves_like 'within_timeframe scope' do
+    let_it_be(:now) { Time.now }
+    let_it_be(:project) { create(:project, :empty_repo) }
+    let_it_be(:resource_1) { create(:milestone, project: project, start_date: now - 1.day, due_date: now + 1.day) }
+    let_it_be(:resource_2) { create(:milestone, project: project, start_date: now + 2.days, due_date: now + 3.days) }
+    let_it_be(:resource_3) { create(:milestone, project: project, due_date: now) }
+    let_it_be(:resource_4) { create(:milestone, project: project, start_date: now) }
+  end
+
   describe "#percent_complete" do
     it "does not count open issues" do
       milestone.issues << issue
