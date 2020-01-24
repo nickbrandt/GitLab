@@ -7,7 +7,7 @@ describe API::ProjectPackages do
   let(:project) { create(:project, :public) }
   let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
   let(:package_url) { "/projects/#{project.id}/packages/#{package1.id}" }
-  let!(:package2) { create(:npm_package, project: project, version: '2.0.4', name: "@#{project.root_namespace.path}/foo2") }
+  let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
   let!(:another_package) { create(:npm_package) }
   let(:no_package_url) { "/projects/#{project.id}/packages/0" }
   let(:wrong_package_url) { "/projects/#{project.id}/packages/#{another_package.id}" }
@@ -70,10 +70,8 @@ describe API::ProjectPackages do
       end
 
       context 'with sorting' do
-        shared_examples 'package sorting' do |order_by, package_names|
+        shared_examples 'package sorting' do |order_by|
           subject { get api(url), params: { sort: sort, order_by: order_by } }
-
-          let(:packages) { package_names.map { |name| send(name) } }
 
           context "sorting by #{order_by}" do
             context 'ascending order' do
@@ -106,18 +104,20 @@ describe API::ProjectPackages do
           end
         end
 
-        it_behaves_like 'package sorting', 'name', [:package1, :package2, :package3]
-        it_behaves_like 'package sorting', 'created_at', [:package3, :package1, :package2]
-        it_behaves_like 'package sorting', 'version', [:package3, :package2, :package1]
+        it_behaves_like 'package sorting', 'name' do
+          let(:packages) { [package1, package2, package3] }
+        end
 
-        context 'by packages type' do
-          before do
-            # get rid of extra npm package as it messes up
-            # the package type sorting test
-            package2.destroy
-          end
+        it_behaves_like 'package sorting', 'created_at' do
+          let(:packages) { [package3, package1, package2] }
+        end
 
-          it_behaves_like 'package sorting', 'type', [:package3, :package1]
+        it_behaves_like 'package sorting', 'version' do
+          let(:packages) { [package3, package2, package1] }
+        end
+
+        it_behaves_like 'package sorting', 'type' do
+          let(:packages) { [package3, package1, package2] }
         end
       end
     end
