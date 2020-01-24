@@ -44,6 +44,12 @@ module EE
 
         create_note(NoteSummary.new(noteable, project, author, body, action: 'weight'))
       end
+
+      def auto_resolve_prometheus_alert
+        body = 'automatically closed this issue because the alert resolved.'
+
+        create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
+      end
     end
   end
 end

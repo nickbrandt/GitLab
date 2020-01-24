@@ -161,9 +161,7 @@ module EE
     end
 
     def auto_resolve_prometheus_alert(noteable, project, author)
-      body = 'automatically closed this issue because the alert resolved.'
-
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).auto_resolve_prometheus_alert
     end
   end
 end

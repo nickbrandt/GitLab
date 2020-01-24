@@ -74,4 +74,16 @@ describe ::SystemNotes::IssuablesService do
       end
     end
   end
+
+  describe '#auto_resolve_prometheus_alert' do
+    subject { service.auto_resolve_prometheus_alert }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'closed' }
+    end
+
+    it 'creates the expected system note' do
+      expect(subject.note).to eq('automatically closed this issue because the alert resolved.')
+    end
+  end
 end
