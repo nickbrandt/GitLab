@@ -482,7 +482,6 @@ describe Project do
     end
   end
 
-
   context 'merge requests related settings' do
     shared_examples 'setting modified by application setting' do
       context 'final setting' do

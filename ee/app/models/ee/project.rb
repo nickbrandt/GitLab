@@ -734,6 +734,7 @@ module EE
       return self[:merge_requests_author_approval] unless License.feature_available?(:merge_request_approvers_rules)
 
       return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+
       self[:merge_requests_author_approval]
     end
 

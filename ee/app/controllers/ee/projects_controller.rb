@@ -87,7 +87,7 @@ module EE
         attrs << %i[merge_pipelines_enabled]
       end
 
-      attrs = attrs + merge_request_rules_params
+      attrs += merge_request_rules_params
 
       if allow_mirror_params?
         attrs + mirror_params
@@ -115,15 +115,15 @@ module EE
     def merge_request_rules_params
       attrs = []
 
-      if can?(current_user, :modify_merge_request_commiter_setting, @project)
+      if can?(current_user, :modify_merge_request_commiter_setting, project)
         attrs << :merge_requests_disable_committers_approval
       end
 
-      if can?(current_user, :modify_approvers_rules, @project)
+      if can?(current_user, :modify_approvers_rules, project)
         attrs << :disable_overriding_approvers_per_merge_request
       end
 
-      if can?(current_user, :modify_merge_request_author_setting, @project)
+      if can?(current_user, :modify_merge_request_author_setting, project)
         attrs << :merge_requests_author_approval
       end
 

@@ -356,7 +356,7 @@ describe ProjectsController do
       describe ':disable_overriding_approvers_per_merge_request' do
         it_behaves_like 'merge request approvers rules' do
           let(:app_setting) { :disable_overriding_approvers_per_merge_request }
-          let(:setting) { :disable_overriding_approvers_per_merge_request}
+          let(:setting) { :disable_overriding_approvers_per_merge_request }
         end
       end
 

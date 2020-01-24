@@ -48,7 +48,7 @@
 
 .form-group.committers-approval
   .form-check
-    = form.check_box :merge_requests_disable_committers_approval, { disabled: !can?(current_user, :modify_merge_request_commiter_setting, @project),  class: 'form-check-input' }
+    = form.check_box :merge_requests_disable_committers_approval, { disabled: !can?(current_user, :modify_merge_request_commiter_setting, @project), class: 'form-check-input' }
     = form.label :merge_requests_disable_committers_approval, class: 'form-check-label' do
       %span= _('Prevent approval of merge requests by merge request committers')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals',
