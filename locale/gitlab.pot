@@ -5056,6 +5056,9 @@ msgstr ""
 msgid "ContainerRegistry|Copy push command"
 msgstr ""
 
+msgid "ContainerRegistry|Currently, the Container Registry tag expiration feature is not available for projects created before GitLab version 12.8. For updates and more information, visit Issue %{linkStart}#196124%{linkEnd}"
+msgstr ""
+
 msgid "ContainerRegistry|Docker connection error"
 msgstr ""
 
