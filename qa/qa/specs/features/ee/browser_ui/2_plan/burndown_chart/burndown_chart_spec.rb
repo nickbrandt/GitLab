@@ -7,7 +7,6 @@ module QA
 
       let(:milestone) do
         QA::EE::Resource::ProjectMilestone.fabricate_via_api! do |m|
-          m.title = 'v1'
           m.start_date = current_date_yyyy_mm_dd
           m.due_date = next_month_yyyy_mm_dd
         end

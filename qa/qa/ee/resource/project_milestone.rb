@@ -16,6 +16,10 @@ module QA
           end
         end
 
+        def initialize
+          @title = "project-milestone-#{SecureRandom.hex(8)}"
+        end
+
         def resource_web_url(resource)
           super
         rescue ResourceURLMissingError
