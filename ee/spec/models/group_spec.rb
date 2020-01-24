@@ -639,14 +639,6 @@ describe Group do
   describe '#marked_for_deletion?' do
     subject { group.marked_for_deletion? }
 
-    shared_examples_for 'returns false' do
-      it { is_expected.to be_falsey }
-    end
-
-    shared_examples_for 'returns true' do
-      it { is_expected.to be_truthy }
-    end
-
     context 'adjourned deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
@@ -657,11 +649,11 @@ describe Group do
           create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
         end
 
-        it_behaves_like 'returns true'
+        it { is_expected.to be_truthy }
       end
 
       context 'when the group is not marked for adjourned deletion' do
-        it_behaves_like 'returns false'
+        it { is_expected.to be_falsey }
       end
     end
 
@@ -675,10 +667,66 @@ describe Group do
           create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
         end
 
-        it_behaves_like 'returns false'
+        it { is_expected.to be_falsey }
       end
 
       context 'when the group is not marked for adjourned deletion' do
+        it { is_expected.to be_falsey }
+      end
+    end
+  end
+
+  describe '#adjourned_deletion?' do
+    subject { group.adjourned_deletion? }
+
+    shared_examples_for 'returns false' do
+      it { is_expected.to be_falsey }
+    end
+
+    shared_examples_for 'returns true' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'adjourned deletion feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'when adjourned deletion period is set to more than 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 1)
+        end
+
+        it_behaves_like 'returns true'
+      end
+
+      context 'when adjourned deletion period is set to 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 0)
+        end
+
+        it_behaves_like 'returns false'
+      end
+    end
+
+    context 'adjourned deletion feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      end
+
+      context 'when adjourned deletion period is set to more than 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 1)
+        end
+
+        it_behaves_like 'returns false'
+      end
+
+      context 'when adjourned deletion period is set to 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 0)
+        end
+
         it_behaves_like 'returns false'
       end
     end
