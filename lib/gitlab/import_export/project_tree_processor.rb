@@ -19,7 +19,8 @@ module Gitlab
         # some optimizations only yield amortized gains above a certain
         # project size, see https://gitlab.com/gitlab-org/gitlab/issues/27070
         def new_for_file(project_json_path)
-          if Feature.enabled?(:dedup_project_import_metadata) && large_project?(project_json_path)
+          if Feature.enabled?(:dedup_project_import_metadata, Group.find_by_path('gitlab-org')) &&
+              large_project?(project_json_path)
             ProjectTreeProcessor.new
           else
             IdentityProjectTreeProcessor.new
