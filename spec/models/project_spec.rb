@@ -2694,16 +2694,44 @@ describe Project do
     describe '#all_lfs_objects' do
       let(:lfs_object) { create(:lfs_object) }
 
-      before do
-        project.lfs_objects << lfs_object
+      context 'when LFS object is only associated to the source' do
+        before do
+          project.lfs_objects << lfs_object
+        end
+
+        it 'returns the lfs object for a project' do
+          expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
+
+        it 'returns the lfs object for a fork' do
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
 
-      it 'returns the lfs object for a project' do
-        expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+      context 'when LFS object is only associated to the fork' do
+        before do
+          forked_project.lfs_objects << lfs_object
+        end
+
+        it 'returns nothing' do
+          expect(project.all_lfs_objects).to be_empty
+        end
+
+        it 'returns the lfs object for a fork' do
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
 
-      it 'returns the lfs object for a fork' do
-        expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+      context 'when LFS object is associated to both source and fork' do
+        before do
+          project.lfs_objects << lfs_object
+          forked_project.lfs_objects << lfs_object
+        end
+
+        it 'returns the lfs object for the source and fork' do
+          expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
     end
   end

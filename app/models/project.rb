@@ -1382,7 +1382,10 @@ class Project < ApplicationRecord
   #
   # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def all_lfs_objects
-    LfsObject.where(id: LfsObjectsProject.select(:lfs_object_id).where(project: [self, lfs_storage_project]))
+    LfsObject
+      .distinct
+      .joins(:lfs_objects_projects)
+      .where(lfs_objects_projects: { project_id: [self, lfs_storage_project] })
   end
 
   def personal?
