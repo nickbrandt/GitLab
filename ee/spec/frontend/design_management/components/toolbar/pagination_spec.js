@@ -2,6 +2,7 @@
 import 'mousetrap';
 import { shallowMount } from '@vue/test-utils';
 import Pagination from 'ee/design_management/components/toolbar/pagination.vue';
+import { DESIGN_ROUTE_NAME } from 'ee/design_management/router/constants';
 
 const push = jest.fn();
 const $router = {
@@ -60,7 +61,7 @@ describe('Design management pagination component', () => {
     it('routes to previous design on Left button', () => {
       Mousetrap.trigger('left');
       expect(push).toHaveBeenCalledWith({
-        name: 'design',
+        name: DESIGN_ROUTE_NAME,
         params: { id: '1' },
         query: {},
       });
@@ -69,7 +70,7 @@ describe('Design management pagination component', () => {
     it('routes to next design on Right button', () => {
       Mousetrap.trigger('right');
       expect(push).toHaveBeenCalledWith({
-        name: 'design',
+        name: DESIGN_ROUTE_NAME,
         params: { id: '3' },
         query: {},
       });

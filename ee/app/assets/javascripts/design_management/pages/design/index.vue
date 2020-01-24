@@ -26,6 +26,7 @@ import {
   DESIGN_NOT_EXIST_ERROR,
   designDeletionError,
 } from '../../utils/error_messages';
+import { DESIGNS_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
@@ -167,7 +168,7 @@ export default {
       // because we redirect user to /designs (the issue page),
       // we want to create these flashes on the issue page
       createFlash(message);
-      this.$router.push({ name: 'designs' });
+      this.$router.push({ name: this.$options.DESIGNS_ROUTE_NAME });
     },
     onDiffNoteError(e) {
       this.errorMessage = ADD_DISCUSSION_COMMENT_ERROR;
@@ -186,7 +187,7 @@ export default {
     },
     closeDesign() {
       this.$router.push({
-        name: 'designs',
+        name: this.$options.DESIGNS_ROUTE_NAME,
         query: this.$route.query,
       });
     },
@@ -196,6 +197,7 @@ export default {
     next();
   },
   createImageDiffNoteMutation,
+  DESIGNS_ROUTE_NAME,
 };
 </script>
 
@@ -210,7 +212,7 @@ export default {
           :filenames="[design.filename]"
           :project-path="projectPath"
           :iid="issueIid"
-          @done="$router.push({ name: 'designs' })"
+          @done="$router.push({ name: $options.DESIGNS_ROUTE_NAME })"
           @error="onDesignDeleteError"
         >
           <template v-slot="{ mutate, loading, error }">

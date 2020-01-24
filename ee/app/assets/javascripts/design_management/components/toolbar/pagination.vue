@@ -4,6 +4,7 @@ import 'mousetrap';
 import { s__, sprintf } from '~/locale';
 import PaginationButton from './pagination_button.vue';
 import allDesignsMixin from '../../mixins/all_designs';
+import { DESIGN_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
@@ -51,7 +52,7 @@ export default {
     navigateToDesign(design) {
       if (design) {
         this.$router.push({
-          name: 'design',
+          name: DESIGN_ROUTE_NAME,
           params: { id: design.filename },
           query: this.$route.query,
         });
