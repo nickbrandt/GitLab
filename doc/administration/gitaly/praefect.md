@@ -260,9 +260,17 @@ git_data_dirs({
 
 For more information on Gitaly server configuration, see our [Gitaly documentation](index.md#3-gitaly-server-configuration).
 
+When finished editing the configuration file for each Gitaly server, run the
+reconfigure command to put changes into effect:
+
+```shell
+sudo gitlab-ctl reconfigure
+```
+
 When all Gitaly servers are configured, you can run the Praefect connection
 checker to verify Praefect can connect to all Gitaly servers in the Praefect
-config:
+config. This can be done by running the following command on the Praefect
+server:
 
 ```shell
 sudo /opt/gitlab/embedded/bin/praefect -config /var/opt/gitlab/praefect/config.toml dial-nodes
