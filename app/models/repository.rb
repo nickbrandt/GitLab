@@ -1143,7 +1143,11 @@ class Repository
   end
 
   def project
-    container
+    if repo_type.snippet?
+      container.project
+    else
+      container
+    end
   end
 
   private
@@ -1157,7 +1161,7 @@ class Repository
                Gitlab::Git::Commit.find(raw_repository, oid_or_ref)
              end
 
-    ::Commit.new(commit, project) if commit
+    ::Commit.new(commit, container) if commit
   end
 
   def cache

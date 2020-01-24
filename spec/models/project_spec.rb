@@ -113,6 +113,7 @@ describe Project do
       let(:expected_full_path) { "#{container.namespace.full_path}/somewhere" }
       let(:expected_repository_klass) { Repository }
       let(:expected_storage_klass) { Storage::Hashed }
+      let(:expected_web_url_path) { "#{container.namespace.full_path}/somewhere" }
     end
 
     it 'has an inverse relationship with merge requests' do
