@@ -154,9 +154,6 @@ module QA
                 QA::Page::Main::OAuth.perform do |oauth|
                   oauth.authorize! if oauth.needs_authorization?
                 end
-
-                # Log out so that tests are in an initially unauthenticated state
-                QA::Page::Main::Menu.perform(&:sign_out)
               end
             end
 
