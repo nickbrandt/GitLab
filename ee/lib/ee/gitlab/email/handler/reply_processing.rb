@@ -17,7 +17,7 @@ module EE
             command_definitions = ::QuickActions::InterpretService.command_definitions
             extractor = ::Gitlab::QuickActions::Extractor.new(command_definitions)
 
-            extractor.extract_commands(content)[0]
+            extractor.redact_commands(content)
           end
 
           override :process_message
