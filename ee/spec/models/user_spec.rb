@@ -682,6 +682,76 @@ describe User do
     end
   end
 
+  describe '#using_gitlab_com_seat?' do
+    let(:user) { create(:user) }
+
+    context 'when Gitlab.com? is false' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(false)
+      end
+
+      it 'returns false' do
+        expect(user.using_gitlab_com_seat?(nil)).to eq(false)
+      end
+    end
+
+    context 'when Gitlab.com? is true' do
+      let(:namespace) { create(:namespace) }
+
+      before do
+        allow(Gitlab).to receive(:com?).and_return(true)
+        allow(namespace).to receive(:gold_plan?).and_return(false)
+        allow(namespace).to receive(:free_plan?).and_return(false)
+      end
+
+      context 'when namespace is nil' do
+        let(:namespace) { nil }
+
+        it 'returns false' do
+          expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
+        end
+      end
+
+      context 'when namespace is on a free plan' do
+        before do
+          allow(namespace).to receive(:free_plan?).and_return(true)
+        end
+
+        it 'returns false' do
+          expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
+        end
+      end
+
+      context 'when namespace is on a gold plan' do
+        before do
+          allow(namespace).to receive(:gold_plan?).and_return(true)
+        end
+
+        context 'user is not a guest' do
+          let(:user) { create(:project_member, :developer).user }
+
+          it 'returns true' do
+            expect(user.using_gitlab_com_seat?(namespace)).to eq(true)
+          end
+        end
+
+        context 'user is guest' do
+          let(:user) { create(:project_member, :guest).user }
+
+          it 'returns false' do
+            expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
+          end
+        end
+      end
+
+      context 'when namespace is on a plan that is not free or gold' do
+        it 'returns true' do
+          expect(user.using_gitlab_com_seat?(namespace)).to eq(true)
+        end
+      end
+    end
+  end
+
   describe '.username_suggestion' do
     context 'namespace with input name does not exist' do
       let(:name) { 'Arthur Morgan' }
