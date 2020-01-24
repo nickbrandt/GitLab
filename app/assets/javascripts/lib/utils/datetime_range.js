@@ -14,6 +14,113 @@ const dateMinusDuration = (date, duration) => new Date(date.getTime() - duration
 
 const datePlusDuration = (date, duration) => new Date(date.getTime() + durationToMillis(duration));
 
+function handleRangeDirection({ direction = 'before', anchor, before, after }) {
+  let startDate;
+  let endDate;
+
+  if (direction === 'before') {
+    startDate = before;
+    endDate = anchor;
+  } else {
+    startDate = anchor;
+    endDate = after;
+  }
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
+function convertFixedToFixed(range) {
+  return {
+    startTime: new Date(range.startTime).toISOString(),
+    endTime: new Date(range.endTime).toISOString(),
+  };
+}
+
+function convertAnchoredToFixed(range) {
+  const anchor = new Date(range.anchor);
+
+  const { startDate, endDate } = handleRangeDirection({
+    before: dateMinusDuration(anchor, range.duration),
+    after: datePlusDuration(anchor, range.duration),
+    direction: range.direction,
+    anchor,
+  });
+
+  return {
+    startTime: startDate.toISOString(),
+    endTime: endDate.toISOString(),
+  };
+}
+
+function convertRollingToFixed(range) {
+  const now = new Date(Date.now());
+
+  return convertAnchoredToFixed({
+    duration: range.duration,
+    direction: range.direction,
+    anchor: now.toISOString(),
+  });
+}
+
+function convertOpenToFixed(range) {
+  const now = new Date(Date.now());
+  const anchor = new Date(range.anchor);
+
+  const { startDate, endDate } = handleRangeDirection({
+    before: MINIMUM_DATE,
+    after: now,
+    direction: range.direction,
+    anchor,
+  });
+
+  return {
+    startTime: startDate.toISOString(),
+    endTime: endDate.toISOString(),
+  };
+}
+
+function handleInvalidRange(range) {
+  const hasStart = range.startTime;
+  const hasEnd = range.endTime;
+
+  /* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+  const messages = {
+    [true]: 'The input range does not have the right format.',
+    [!hasStart && hasEnd]: 'The input fixed range does not have a start time.',
+    [hasStart && !hasEnd]: 'The input fixed range does not have an end time.',
+  };
+  /* eslint-enable @gitlab/i18n/no-non-i18n-strings */
+
+  throw new Error(messages.true);
+}
+
+const handlers = {
+  invalid: handleInvalidRange,
+  fixed: convertFixedToFixed,
+  anchored: convertAnchoredToFixed,
+  rolling: convertRollingToFixed,
+  open: convertOpenToFixed,
+};
+
+export function getRangeType(range) {
+  const hasStart = range.startTime;
+  const hasEnd = range.endTime;
+  const hasAnchor = range.anchor;
+  const hasDuration = range.duration;
+
+  const types = {
+    fixed: hasStart && hasEnd,
+    anchored: hasAnchor && hasDuration,
+    rolling: hasDuration && !hasAnchor,
+    open: hasAnchor && !hasDuration,
+  };
+
+  return (Object.entries(types).find(([, truthy]) => truthy) || ['invalid'])[0];
+}
+
 /**
  * convertToFixedRange Transforms a `range of time` into a `fixed range of time`.
  *
@@ -82,41 +189,5 @@ const datePlusDuration = (date, duration) => new Date(date.getTime() + durationT
  * @returns An object with a fixed startTime and endTime that
  * corresponds to the input time.
  */
-export const convertToFixedRange = dateTimeRange => {
-  if (dateTimeRange.startTime && !dateTimeRange.endTime) {
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-    throw new Error('The input fixed range does not have an end time.');
-  } else if (!dateTimeRange.startTime && dateTimeRange.endTime) {
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-    throw new Error('The input fixed range does not have an end time.');
-  } else if (dateTimeRange.startTime && dateTimeRange.endTime) {
-    return {
-      startTime: new Date(dateTimeRange.startTime).toISOString(),
-      endTime: new Date(dateTimeRange.endTime).toISOString(),
-    };
-  } else if (dateTimeRange.anchor || dateTimeRange.duration) {
-    const now = new Date(Date.now());
-    const { direction = 'before', duration } = dateTimeRange;
-    const anchorDate = dateTimeRange.anchor ? new Date(dateTimeRange.anchor) : now;
-
-    let startDate;
-    let endDate;
-
-    if (direction === 'before') {
-      startDate = duration ? dateMinusDuration(anchorDate, duration) : MINIMUM_DATE;
-      endDate = anchorDate;
-    } else {
-      startDate = anchorDate;
-      endDate = duration ? datePlusDuration(anchorDate, duration) : now;
-    }
-
-    return {
-      startTime: startDate.toISOString(),
-      endTime: endDate.toISOString(),
-    };
-  }
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-  throw new Error('The input range does not have the right format.');
-};
-
-export default { convertToFixedRange };
+export const convertToFixedRange = dateTimeRange =>
+  handlers[getRangeType(dateTimeRange)](dateTimeRange);

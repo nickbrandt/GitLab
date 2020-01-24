@@ -2,8 +2,25 @@ import _ from 'lodash';
 import * as datetimeRange from '~/lib/utils/datetime_range';
 
 const MOCK_NOW = Date.UTC(2020, 0, 23, 20); // 2020-01-23T20:00:00.000Z
+const rangeTypes = {
+  fixed: [{ startTime: 'exists', endTime: 'exists' }],
+  anchored: [{ anchor: 'exists', duration: 'exists' }],
+  rolling: [{ duration: 'exists' }],
+  open: [{ anchor: 'exists' }],
+  invalid: [{ startTime: 'exists' }, { endTime: 'exists' }, {}, { junk: 'exists' }],
+};
 
 describe('Date time range utils', () => {
+  describe('getRangeType', () => {
+    const { getRangeType } = datetimeRange;
+
+    it('it correctly infers the range type from the input object', () => {
+      Object.entries(rangeTypes).forEach(([type, examples]) => {
+        examples.forEach(example => expect(getRangeType(example)).toEqual(type));
+      });
+    });
+  });
+
   describe('convertToFixedRange', () => {
     const { convertToFixedRange } = datetimeRange;
 
