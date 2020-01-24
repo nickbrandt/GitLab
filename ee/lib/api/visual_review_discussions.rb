@@ -36,7 +36,7 @@ module API
           forbidden!('Anonymous visual review feedback is disabled')
         end
 
-        merge_request = find_merge_request_without_permissions_check(params[:id], params[:merge_request_iid])
+        merge_request = find_merge_request_without_permissions_check(params[:merge_request_iid])
 
         note = create_visual_review_note(merge_request, {
           note: params[:body],
