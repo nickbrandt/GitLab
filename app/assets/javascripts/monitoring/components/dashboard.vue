@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { debounce, pickBy } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import VueDraggable from 'vuedraggable';
 import {
@@ -294,7 +294,7 @@ export default {
 
     generateLink(group, title, yLabel) {
       const dashboard = this.currentDashboard || this.firstDashboard.path;
-      const params = _.pick({ dashboard, group, title, y_label: yLabel }, value => value != null);
+      const params = pickBy({ dashboard, group, title, y_label: yLabel }, value => value != null);
       return mergeUrlParams(params, window.location.href);
     },
     hideAddMetricModal() {
@@ -306,7 +306,7 @@ export default {
     setFormValidity(isValid) {
       this.formIsValid = isValid;
     },
-    debouncedEnvironmentsSearch: _.debounce(function environmentsSearchOnInput(searchTerm) {
+    debouncedEnvironmentsSearch: debounce(function environmentsSearchOnInput(searchTerm) {
       this.setEnvironmentsSearchTerm(searchTerm);
     }, 500),
     submitCustomMetricsForm() {

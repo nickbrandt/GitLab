@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty, findKey } from 'lodash';
 import Vue from 'vue';
 import {
   GlLink,
@@ -118,7 +118,7 @@ export default {
       );
     },
     submitAction() {
-      if (_.isEmpty(this.selectedAlert)) return 'create';
+      if (isEmpty(this.selectedAlert)) return 'create';
       if (this.haveValuesChanged) return 'update';
       return 'delete';
     },
@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     selectQuery(queryId) {
-      const existingAlertPath = _.findKey(this.alertsToManage, alert => alert.metricId === queryId);
+      const existingAlertPath = findKey(this.alertsToManage, alert => alert.metricId === queryId);
       const existingAlert = this.alertsToManage[existingAlertPath];
 
       if (existingAlert) {
