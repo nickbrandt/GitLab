@@ -528,6 +528,9 @@ msgstr ""
 msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
 
+msgid "+%{approvers} more approvers"
+msgstr ""
+
 msgid "+%{extraOptionCount} more"
 msgstr ""
 
@@ -9809,6 +9812,9 @@ msgstr ""
 msgid "Helps reduce request volume for protected paths"
 msgstr ""
 
+msgid "Here you will find recent merge request activity"
+msgstr ""
+
 msgid "Hi %{username}!"
 msgstr ""
 
@@ -12419,6 +12425,9 @@ msgid "No activities found"
 msgstr ""
 
 msgid "No application_settings found"
+msgstr ""
+
+msgid "No approvers"
 msgstr ""
 
 msgid "No authentication methods configured."
