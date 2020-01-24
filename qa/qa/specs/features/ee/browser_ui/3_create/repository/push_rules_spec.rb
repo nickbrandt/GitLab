@@ -1,27 +1,27 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Create', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/34978' do
+  context 'Create' do
     context 'Push Rules' do
       describe 'using non signed commits' do
-        file_name_limitation = 'denied_file'
-        file_size_limitation = 1
-        authors_email_limitation = '(admin@example.com|root@gitlab.com)'
-        branch_name_limitation = 'master'
-        needed_phrase_limitation = 'allowed commit'
-        deny_message_phrase_limitation = 'denied commit'
-
         before :context do
           prepare
 
+          @file_name_limitation = 'denied_file'
+          @file_size_limitation = 1
+          @authors_email_limitation = %{(#{Regexp.escape(@creator.email)}|root@gitlab.com)}
+          @branch_name_limitation = 'master'
+          @needed_phrase_limitation = 'allowed commit'
+          @deny_message_phrase_limitation = 'denied commit'
+
           Page::Project::Settings::Repository.perform do |repository|
             repository.expand_push_rules do |push_rules|
-              push_rules.fill_file_name file_name_limitation
-              push_rules.fill_file_size file_size_limitation
-              push_rules.fill_author_email authors_email_limitation
-              push_rules.fill_branch_name branch_name_limitation
-              push_rules.fill_commit_message_rule needed_phrase_limitation
-              push_rules.fill_deny_commit_message_rule deny_message_phrase_limitation
+              push_rules.fill_file_name @file_name_limitation
+              push_rules.fill_file_size @file_size_limitation
+              push_rules.fill_author_email @authors_email_limitation
+              push_rules.fill_branch_name @branch_name_limitation
+              push_rules.fill_commit_message_rule @needed_phrase_limitation
+              push_rules.fill_deny_commit_message_rule @deny_message_phrase_limitation
               push_rules.check_prevent_secrets
               push_rules.check_restrict_author
               push_rules.check_deny_delete_tag
@@ -36,7 +36,7 @@ module QA
             content: SecureRandom.hex(1000000)
           }]
           wrongly_named_file = [{
-            name: file_name_limitation,
+            name: @file_name_limitation,
             content: SecureRandom.hex(100)
           }]
 
@@ -46,7 +46,8 @@ module QA
         end
 
         it 'restricts users by email format' do
-          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
+          @project.add_member(gitlab_user)
 
           expect_no_error_on_push file: standard_file
           expect_error_on_push file: standard_file, user: gitlab_user
@@ -58,9 +59,9 @@ module QA
         end
 
         it 'restricts commit by message format' do
-          expect_no_error_on_push file: standard_file, commit_message: needed_phrase_limitation
+          expect_no_error_on_push file: standard_file, commit_message: @needed_phrase_limitation
           expect_error_on_push file: standard_file, commit_message: 'forbidden message'
-          expect_error_on_push file: standard_file, commit_message: "#{needed_phrase_limitation} - #{deny_message_phrase_limitation}"
+          expect_error_on_push file: standard_file, commit_message: "#{@needed_phrase_limitation} - #{@deny_message_phrase_limitation}"
         end
 
         it 'restricts committing files with secrets' do
@@ -111,7 +112,7 @@ module QA
         end
 
         it 'restricts commits to current authenticated user' do
-          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
 
           expect_no_error_on_push file: standard_file, gpg: @gpg
           expect_error_on_push file: standard_file, gpg: @gpg, user: gitlab_user
@@ -147,13 +148,13 @@ module QA
         end
       end
 
-      def expect_no_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: Runtime::User, tag: nil, gpg: nil)
+      def expect_no_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: @creator, tag: nil, gpg: nil)
         expect do
           push commit_message: commit_message, branch: branch, file: file, user: user, tag: tag, gpg: gpg
         end.not_to raise_error
       end
 
-      def expect_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: Runtime::User, tag: nil, gpg: nil)
+      def expect_error_on_push(commit_message: 'allowed commit', branch: 'master', file:, user: @creator, tag: nil, gpg: nil)
         expect do
           push commit_message: commit_message, branch: branch, file: file, user: user, tag: tag, gpg: gpg
         end.to raise_error(QA::Git::Repository::RepositoryCommandError)
@@ -161,6 +162,11 @@ module QA
 
       def prepare
         Flow::Login.sign_in
+
+        @creator = Resource::User.fabricate_via_api! do |user|
+          user.username = Runtime::User.username
+          user.password = Runtime::User.password
+        end
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'push_rules'
