@@ -123,7 +123,7 @@ describe API::Vulnerabilities do
           have_attributes(
             author: user,
             title: finding.name,
-            state: 'opened',
+            state: 'detected',
             severity: finding.severity,
             severity_overridden: false,
             confidence: finding.confidence,
@@ -199,7 +199,7 @@ describe API::Vulnerabilities do
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
-            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.current)))
+            have_attributes(state: 'dismissed', closed_by: user, closed_at: be_like_time(Time.current)))
           expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
         end
       end
@@ -237,7 +237,7 @@ describe API::Vulnerabilities do
       end
 
       context 'if a vulnerability is already dismissed' do
-        let(:vulnerability) { create(:vulnerability, :closed, project: project) }
+        let(:vulnerability) { create(:vulnerability, :dismissed, project: project) }
 
         it 'responds with 304 Not Modified' do
           dismiss_vulnerability

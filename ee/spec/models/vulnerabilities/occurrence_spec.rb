@@ -497,7 +497,7 @@ describe Vulnerabilities::Occurrence do
 
   describe '#state' do
     before do
-      create(:vulnerability, :closed, project: finding_with_issue.project, findings: [finding_with_issue])
+      create(:vulnerability, :dismissed, project: finding_with_issue.project, findings: [finding_with_issue])
     end
 
     let(:unresolved_finding) { create(:vulnerabilities_finding) }
@@ -507,7 +507,7 @@ describe Vulnerabilities::Occurrence do
     let(:finding_with_issue) { create(:vulnerabilities_finding, :with_issue_feedback) }
 
     it 'returns the expected state for a unresolved finding' do
-      expect(unresolved_finding.state).to eq 'opened'
+      expect(unresolved_finding.state).to eq 'detected'
     end
 
     it 'returns the expected state for a confirmed finding' do

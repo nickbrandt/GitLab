@@ -10,8 +10,8 @@ FactoryBot.define do
     confidence { :medium }
     report_type { :sast }
 
-    trait :opened do
-      state { :opened }
+    trait :detected do
+      state { :detected }
     end
 
     trait :resolved do
@@ -19,8 +19,8 @@ FactoryBot.define do
       resolved_at { Time.current }
     end
 
-    trait :closed do
-      state { :closed }
+    trait :dismissed do
+      state { :dismissed }
       closed_at { Time.current }
     end
 

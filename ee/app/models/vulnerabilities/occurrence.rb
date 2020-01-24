@@ -136,13 +136,13 @@ module Vulnerabilities
 
     def state
       return 'dismissed' if dismissal_feedback.present?
-      return 'opened' unless Feature.enabled?(:first_class_vulnerabilities, project)
+      return 'detected' unless Feature.enabled?(:first_class_vulnerabilities, project)
 
       if vulnerability.nil?
-        'opened'
+        'detected'
       elsif vulnerability.resolved?
         'resolved'
-      elsif vulnerability.closed? # fail-safe check for cases when dismissal feedback was lost or was not created
+      elsif vulnerability.dismissed? # fail-safe check for cases when dismissal feedback was lost or was not created
         'dismissed'
       else
         'confirmed'

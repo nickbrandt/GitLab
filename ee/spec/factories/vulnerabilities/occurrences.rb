@@ -39,7 +39,7 @@ FactoryBot.define do
 
     trait :confirmed do
       after(:create) do |finding|
-        create(:vulnerability, :opened, project: finding.project, findings: [finding])
+        create(:vulnerability, :detected, project: finding.project, findings: [finding])
       end
     end
 

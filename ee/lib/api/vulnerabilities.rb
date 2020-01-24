@@ -54,7 +54,7 @@ module API
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        break not_modified! if vulnerability.closed?
+        break not_modified! if vulnerability.dismissed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
