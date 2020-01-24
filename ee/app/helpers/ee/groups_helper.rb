@@ -60,6 +60,24 @@ module EE
       { group_id: group }
     end
 
+    override :remove_group_message
+    def remove_group_message(group)
+      return super unless group.feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      date = permanent_deletion_date(Time.now.utc)
+
+      _("The contents of this group, its subgroups and projects will be permanently removed after %{deletion_adjourned_period} days on %{date}. After this point, your data cannot be recovered.") %
+        { date: date, deletion_adjourned_period: deletion_adjourned_period }
+    end
+
+    def permanent_deletion_date(date)
+      (date + deletion_adjourned_period.days).strftime('%F')
+    end
+
+    def deletion_adjourned_period
+      ::Gitlab::CurrentSettings.deletion_adjourned_period
+    end
+
     private
 
     def get_group_sidebar_links

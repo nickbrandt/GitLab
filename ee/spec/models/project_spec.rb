@@ -2257,6 +2257,63 @@ describe Project do
     end
   end
 
+  describe '#ancestor_marked_for_deletion' do
+    context 'adjourned deletion feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      end
+
+      context 'the parent namespace has been marked for deletion' do
+        let(:parent_group) do
+          create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago)
+        end
+
+        let(:project) { create(:project, namespace: parent_group) }
+
+        it 'returns nil' do
+          expect(project.ancestor_marked_for_deletion).to be_nil
+        end
+      end
+    end
+
+    context 'adjourned deletion feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'the parent namespace has been marked for deletion' do
+        let(:parent_group) do
+          create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago)
+        end
+
+        let(:project) { create(:project, namespace: parent_group) }
+
+        it 'returns the parent namespace' do
+          expect(project.ancestor_marked_for_deletion).to eq(parent_group)
+        end
+      end
+
+      context "project or its parent group has not been marked for deletion" do
+        let(:parent_group) { create(:group) }
+        let(:project) { create(:project, namespace: parent_group) }
+
+        it 'returns nil' do
+          expect(project.ancestor_marked_for_deletion).to be_nil
+        end
+      end
+
+      context 'ordering' do
+        let(:group_a) { create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago) }
+        let(:subgroup_a) { create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago, parent: group_a) }
+        let(:project) { create(:project, namespace: subgroup_a) }
+
+        it 'returns the first group that is marked for deletion, up its ancestry chain' do
+          expect(project.ancestor_marked_for_deletion).to eq(subgroup_a)
+        end
+      end
+    end
+  end
+
   describe '#adjourned_deletion?' do
     context 'when marking for deletion feature is available' do
       let(:project) { create(:project) }

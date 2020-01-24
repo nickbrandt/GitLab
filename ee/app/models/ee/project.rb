@@ -702,9 +702,15 @@ module EE
     end
 
     def marked_for_deletion?
-      return false unless feature_available?(:marking_project_for_deletion)
+      marked_for_deletion_at.present? &&
+        feature_available?(:marking_project_for_deletion)
+    end
 
-      marked_for_deletion_at.present?
+    def ancestor_marked_for_deletion
+      return unless feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      ancestors(hierarchy_order: :asc)
+        .joins(:deletion_schedule).first
     end
 
     def has_packages?(package_type)

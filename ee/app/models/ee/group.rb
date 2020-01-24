@@ -274,15 +274,21 @@ module EE
     end
 
     def marked_for_deletion?
-      return false unless feature_available?(:adjourned_deletion_for_projects_and_groups)
-
-      marked_for_deletion_on.present?
+      marked_for_deletion_on.present? &&
+        feature_available?(:adjourned_deletion_for_projects_and_groups)
     end
 
-    def adjourned_deletion?
-      return false unless feature_available?(:adjourned_deletion_for_projects_and_groups)
+    def self_or_ancestor_marked_for_deletion
+      return unless feature_available?(:adjourned_deletion_for_projects_and_groups)
 
-      ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+      self_and_ancestors(hierarchy_order: :asc)
+        .joins(:deletion_schedule).first
+    end
+
+    override :adjourned_deletion?
+    def adjourned_deletion?
+      feature_available?(:adjourned_deletion_for_projects_and_groups) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
     end
 
     private
