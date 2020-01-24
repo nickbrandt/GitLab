@@ -12,7 +12,7 @@ module Resolvers
 
       return Board.none unless parent
 
-      Boards::ListService.new(parent, context[:current_user]).execute
+      Boards::ListService.new(parent, context[:current_user]).execute(create_default_board: false)
     end
   end
 end

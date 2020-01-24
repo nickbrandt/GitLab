@@ -8,8 +8,8 @@ describe Resolvers::BoardsResolver do
   let_it_be(:user) { create(:user) }
 
   shared_examples_for 'group and project boards resolver' do
-    it 'creates the first board' do
-      expect { resolve_boards }.to change { board_parent.boards.count }.from(0).to(1)
+    it 'does not create a default board' do
+      expect(resolve_boards).to eq []
     end
 
     it 'calls Boards::ListService' do
