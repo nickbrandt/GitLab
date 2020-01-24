@@ -3,7 +3,6 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import GeoDesignsApp from 'ee/geo_designs/components/app.vue';
 import store from 'ee/geo_designs/store';
-import GeoDesignsDisabled from 'ee/geo_designs/components/geo_designs_disabled.vue';
 import GeoDesigns from 'ee/geo_designs/components/geo_designs.vue';
 import GeoDesignsEmptyState from 'ee/geo_designs/components/geo_designs_empty_state.vue';
 import GeoDesignsFilterBar from 'ee/geo_designs/components/geo_designs_filter_bar.vue';
@@ -33,10 +32,6 @@ describe('GeoDesignsApp', () => {
     setEndpoint: jest.fn(),
   };
 
-  const glFeatures = {
-    enableGeoDesignSync: true,
-  };
-
   const createComponent = () => {
     wrapper = shallowMount(GeoDesignsApp, {
       localVue,
@@ -44,9 +39,6 @@ describe('GeoDesignsApp', () => {
       propsData,
       methods: {
         ...actionSpies,
-      },
-      provide: {
-        glFeatures,
       },
     });
   };
@@ -56,8 +48,6 @@ describe('GeoDesignsApp', () => {
   });
 
   const findGeoDesignsContainer = () => wrapper.find('.geo-designs-container');
-  const findGeoDesignsEnabledContainer = () => findGeoDesignsContainer().find('section');
-  const findGeoDesignsDisabled = () => findGeoDesignsContainer().find(GeoDesignsDisabled);
   const findGlLoadingIcon = () => findGeoDesignsContainer().find(GlLoadingIcon);
   const findGeoDesigns = () => findGeoDesignsContainer().find(GeoDesigns);
   const findGeoDesignsEmptyState = () => findGeoDesignsContainer().find(GeoDesignsEmptyState);
@@ -72,98 +62,68 @@ describe('GeoDesignsApp', () => {
       expect(findGeoDesignsContainer().exists()).toBe(true);
     });
 
-    describe('when designsEnabled = false', () => {
+    it('renders the filter bar', () => {
+      expect(findGeoDesignsFilterBar().exists()).toBe(true);
+    });
+
+    describe('when isLoading = true', () => {
       beforeEach(() => {
-        glFeatures.enableGeoDesignSync = false;
-        createComponent();
+        wrapper.vm.$store.state.isLoading = true;
       });
 
-      it('shows designs disabled component', () => {
-        expect(findGeoDesignsDisabled().exists()).toBe(true);
+      it('hides designs', () => {
+        expect(findGeoDesigns().exists()).toBe(false);
       });
 
-      it('hides designs enabled container', () => {
-        expect(findGeoDesignsEnabledContainer().exists()).toBe(false);
+      it('hides empty state', () => {
+        expect(findGeoDesignsEmptyState().exists()).toBe(false);
+      });
+
+      it('shows loader', () => {
+        expect(findGlLoadingIcon().exists()).toBe(true);
       });
     });
 
-    describe('when designsEnabled = true', () => {
+    describe('when isLoading = false', () => {
       beforeEach(() => {
-        glFeatures.enableGeoDesignSync = true;
-        createComponent();
+        wrapper.vm.$store.state.isLoading = false;
       });
 
-      it('hides designs disabled component', () => {
-        expect(findGeoDesignsDisabled().exists()).toBe(false);
-      });
-
-      it('shows designs enabled container', () => {
-        expect(findGeoDesignsEnabledContainer().exists()).toBe(true);
-      });
-
-      it('renders the filter bar', () => {
-        expect(findGeoDesignsFilterBar().exists()).toBe(true);
-      });
-
-      describe('when isLoading = true', () => {
+      describe('with designs', () => {
         beforeEach(() => {
-          wrapper.vm.$store.state.isLoading = true;
+          wrapper.vm.$store.state.designs = MOCK_BASIC_FETCH_DATA_MAP.data;
+          wrapper.vm.$store.state.totalDesigns = MOCK_BASIC_FETCH_DATA_MAP.total;
         });
 
-        it('hides designs', () => {
-          expect(findGeoDesigns().exists()).toBe(false);
+        it('shows designs', () => {
+          expect(findGeoDesigns().exists()).toBe(true);
         });
 
         it('hides empty state', () => {
           expect(findGeoDesignsEmptyState().exists()).toBe(false);
         });
 
-        it('shows loader', () => {
-          expect(findGlLoadingIcon().exists()).toBe(true);
+        it('hides loader', () => {
+          expect(findGlLoadingIcon().exists()).toBe(false);
         });
       });
 
-      describe('when isLoading = false', () => {
+      describe('with no designs', () => {
         beforeEach(() => {
-          wrapper.vm.$store.state.isLoading = false;
+          wrapper.vm.$store.state.designs = [];
+          wrapper.vm.$store.state.totalDesigns = 0;
         });
 
-        describe('with designs', () => {
-          beforeEach(() => {
-            wrapper.vm.$store.state.designs = MOCK_BASIC_FETCH_DATA_MAP.data;
-            wrapper.vm.$store.state.totalDesigns = MOCK_BASIC_FETCH_DATA_MAP.total;
-          });
-
-          it('shows designs', () => {
-            expect(findGeoDesigns().exists()).toBe(true);
-          });
-
-          it('hides empty state', () => {
-            expect(findGeoDesignsEmptyState().exists()).toBe(false);
-          });
-
-          it('hides loader', () => {
-            expect(findGlLoadingIcon().exists()).toBe(false);
-          });
+        it('hides designs', () => {
+          expect(findGeoDesigns().exists()).toBe(false);
         });
 
-        describe('with no designs', () => {
-          beforeEach(() => {
-            wrapper.vm.$store.state.designs = [];
-            wrapper.vm.$store.state.totalDesigns = 0;
-          });
+        it('shows empty state', () => {
+          expect(findGeoDesignsEmptyState().exists()).toBe(true);
+        });
 
-          it('hides designs', () => {
-            expect(findGeoDesigns().exists()).toBe(false);
-          });
-
-          it('shows empty state', () => {
-            expect(findGeoDesignsEmptyState().exists()).toBe(true);
-          });
-
-          it('hides loader', () => {
-            expect(findGlLoadingIcon().exists()).toBe(false);
-          });
+        it('hides loader', () => {
+          expect(findGlLoadingIcon().exists()).toBe(false);
         });
       });
     });

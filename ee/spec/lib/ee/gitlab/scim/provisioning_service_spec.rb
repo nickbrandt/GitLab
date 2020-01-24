@@ -53,6 +53,16 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
         expect(user).not_to be_confirmed
       end
 
+      context 'when the current minimum password length is different from the default minimum password length' do
+        before do
+          stub_application_setting minimum_password_length: 21
+        end
+
+        it 'creates the user' do
+          expect { service.execute }.to change { User.count }.by(1)
+        end
+      end
+
       context 'existing user' do
         before do
           create(:user, email: 'work@example.com')
