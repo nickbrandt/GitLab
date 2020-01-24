@@ -14,24 +14,22 @@ class UpdateAllMirrorsWorker
   def perform
     return if Gitlab::Database.read_only?
 
-    Gitlab::ApplicationContext.with_context({ user: nil, project: nil, namespace: nil }) do
-      scheduled = 0
-      with_lease do
-        scheduled = schedule_mirrors!
-      end
-
-      # If we didn't get the lease, or no updates were scheduled, exit early
-      break unless scheduled > 0
-
-      # Wait to give some jobs a chance to complete
-      Kernel.sleep(RESCHEDULE_WAIT)
-
-      # If there's capacity left now (some jobs completed),
-      # reschedule this job to enqueue more work.
-      #
-      # This is in addition to the regular (cron-like) scheduling of this job.
-      UpdateAllMirrorsWorker.perform_async if Gitlab::Mirror.reschedule_immediately?
+    scheduled = 0
+    with_lease do
+      scheduled = schedule_mirrors!
     end
+
+    # If we didn't get the lease, or no updates were scheduled, exit early
+    return unless scheduled > 0
+
+    # Wait to give some jobs a chance to complete
+    Kernel.sleep(RESCHEDULE_WAIT)
+
+    # If there's capacity left now (some jobs completed),
+    # reschedule this job to enqueue more work.
+    #
+    # This is in addition to the regular (cron-like) scheduling of this job.
+    UpdateAllMirrorsWorker.perform_async if Gitlab::Mirror.reschedule_immediately?
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -97,7 +95,7 @@ class UpdateAllMirrorsWorker
       .mirrors_to_sync(freeze_at)
       .reorder('import_state.next_execution_timestamp')
       .limit(batch_size)
-      .includes(:namespace) # Used by `project.mirror?`
+      .with_namespace # Used by `project.mirror?`
 
     relation = relation.where('import_state.next_execution_timestamp > ?', offset_at) if offset_at
 
