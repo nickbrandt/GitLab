@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module Projects
+  module Repositories
     module GitHttpClientController
       extend ActiveSupport::Concern
 

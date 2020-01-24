@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module Projects
+  module Repositories
     module LfsApiController
       extend ::Gitlab::Utils::Override
       include GitlabRoutingHelper

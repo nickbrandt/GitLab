@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module Projects
+  module Repositories
     module GitHttpController
       extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
