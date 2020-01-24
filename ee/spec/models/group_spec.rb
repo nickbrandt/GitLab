@@ -636,6 +636,63 @@ describe Group do
     end
   end
 
+  describe '#self_or_ancestor_marked_for_deletion' do
+    context 'adjourned deletion feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+        create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
+      end
+
+      it 'returns nil' do
+        expect(group.self_or_ancestor_marked_for_deletion).to be_nil
+      end
+    end
+
+    context 'adjourned deletion feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'the group has been marked for deletion' do
+        before do
+          create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
+        end
+
+        it 'returns the group' do
+          expect(group.self_or_ancestor_marked_for_deletion).to eq(group)
+        end
+      end
+
+      context 'the parent group has been marked for deletion' do
+        let(:parent_group) { create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        it 'returns the parent group' do
+          expect(group.self_or_ancestor_marked_for_deletion).to eq(parent_group)
+        end
+      end
+
+      context 'no group has been marked for deletion' do
+        let(:parent_group) { create(:group) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        it 'returns nil' do
+          expect(group.self_or_ancestor_marked_for_deletion).to be_nil
+        end
+      end
+
+      context 'ordering' do
+        let(:group_a) { create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago) }
+        let(:subgroup_a) { create(:group_with_deletion_schedule, marked_for_deletion_on: 1.day.ago, parent: group_a) }
+        let(:group) { create(:group, parent: subgroup_a) }
+
+        it 'returns the first group that is marked for deletion, up its ancestry chain' do
+          expect(group.self_or_ancestor_marked_for_deletion).to eq(subgroup_a)
+        end
+      end
+    end
+  end
+
   describe '#marked_for_deletion?' do
     subject { group.marked_for_deletion? }
 

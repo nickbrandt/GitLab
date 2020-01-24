@@ -140,6 +140,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resource :dependency_proxy, only: [:show, :update]
     resources :packages, only: [:index]
+
+    post '/restore' => '/groups#restore', as: :restore
   end
 end
 
