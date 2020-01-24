@@ -28,7 +28,7 @@ describe 'Group Packages' do
       it 'gives 404' do
         visit_group_packages
 
-        expect(page).to have_gitlab_http_status(404)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -40,7 +40,7 @@ describe 'Group Packages' do
       it 'gives 404' do
         visit_group_packages
 
-        expect(page).to have_gitlab_http_status(404)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
 
