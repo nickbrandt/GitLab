@@ -15,6 +15,7 @@ import {
 import { __, s__ } from '~/locale';
 import Translate from '~/vue_shared/translate';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Icon from '~/vue_shared/components/icon.vue';
 import { alertsValidator, queriesValidator } from '../validators';
 
@@ -54,6 +55,7 @@ export default {
     GlTooltip: GlTooltipDirective,
     TrackEvent: TrackEventDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     disabled: {
       type: Boolean,
@@ -104,7 +106,7 @@ export default {
       return this.disabled || !(this.prometheusMetricId || this.isValidQuery);
     },
     supportsComputedAlerts() {
-      return gon.features && gon.features.prometheusComputedAlerts;
+      return this.glFeatures.prometheusComputedAlerts;
     },
     queryDropdownLabel() {
       return this.currentQuery.label || s__('PrometheusAlerts|Select query');
