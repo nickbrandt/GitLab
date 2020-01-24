@@ -78,6 +78,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :audit_events, only: [:index]
 
+        namespace :security do
+          resources :waf_anomalies, only: [] do
+            get :summary, on: :collection
+          end
+        end
+
         namespace :analytics do
           resources :code_reviews, only: [:index]
         end

@@ -6,7 +6,7 @@
 #js-threat-monitoring-app{ data: { documentation_path: help_page_path('user/clusters/applications', anchor: 'web-application-firewall-modsecurity'),
   chart_empty_state_svg_path: image_path('illustrations/chart-empty-state.svg'),
   empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
-  waf_statistics_endpoint: 'dummy',
+  waf_statistics_endpoint: summary_project_security_waf_anomalies_path(@project, format: :json),
   environments_endpoint: project_environments_path(@project),
   default_environment_id: default_environment_id,
   user_callouts_path: user_callouts_path,
