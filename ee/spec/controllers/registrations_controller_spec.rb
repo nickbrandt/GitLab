@@ -41,4 +41,16 @@ describe RegistrationsController do
       end
     end
   end
+
+  describe '#welcome' do
+    subject { get :welcome }
+
+    before do
+      sign_in(create(:user))
+    end
+
+    it 'renders the checkout layout' do
+      expect(subject).to render_template(:checkout)
+    end
+  end
 end
