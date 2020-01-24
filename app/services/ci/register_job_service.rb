@@ -101,8 +101,8 @@ module Ci
         return false
       end
 
-      if Feature.enabled?(:only_forward_deployments, default_enabled: false)
-        unless build.has_valid_deployment?
+      if Feature.enabled?(:only_forward_deployments, build.project, default_enabled: false)
+        unless build.has_advanced_deployment?
           build.drop!(:invalid_deployment_failure)
           return false
         end

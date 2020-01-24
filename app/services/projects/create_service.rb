@@ -99,6 +99,8 @@ module Projects
       current_user.invalidate_personal_projects_count
 
       create_readme if @initialize_with_readme
+
+      enable_only_forward_deployments
     end
 
     # Refresh the current user's authorizations inline (so they can access the
@@ -122,6 +124,10 @@ module Projects
       }
 
       Files::CreateService.new(@project, current_user, commit_attrs).execute
+    end
+
+    def enable_only_forward_deployments
+      Feature.enable(:only_forward_deployments, @project)
     end
 
     def skip_wiki?

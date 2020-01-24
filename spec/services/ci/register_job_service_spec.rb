@@ -575,7 +575,7 @@ module Ci
         subject { described_class.new(specific_runner).execute }
 
         before do
-          allow_any_instance_of(Ci::Build).to receive(:has_valid_deployment?).and_return(false)
+          allow_any_instance_of(Ci::Build).to receive(:has_advanced_deployment?).and_return(false)
         end
 
         context 'and the only_forward_deployment feature flag is turned on' do
@@ -593,7 +593,7 @@ module Ci
         end
         context 'and the only_forward_deployment feature flag is turned off' do
           before do
-            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, default_enabled: false).and_return(false)
+            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, project, default_enabled: false).and_return(false)
           end
           it 'picks the build' do
             expect(subject.build).to eq(pending_job)

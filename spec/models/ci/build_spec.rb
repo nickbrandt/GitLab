@@ -4271,14 +4271,14 @@ describe Ci::Build do
     end
   end
 
-  describe '#has_valid_deployment?' do
+  describe '#has_advanced_deployment?' do
     let(:environment) { create(:environment, project: project) }
 
-    subject { build.has_valid_deployment? }
+    subject { build.has_advanced_deployment? }
 
-    context 'when there is no related persisted environment' do
+    context 'when there is no last deployment' do
       before do
-        allow(build).to receive(:persisted_environment).and_return(nil)
+        allow(build).to receive(:last_deployment).and_return(nil)
       end
 
       it { is_expected.to be_truthy }
@@ -4325,30 +4325,6 @@ describe Ci::Build do
           it 'is false' do
             build_deployment
             last_deployment
-
-            is_expected.to be_falsy
-          end
-        end
-      end
-
-      context 'and this job has a stop environment' do
-        let(:options) { { environment: { action: 'stop' } } }
-
-        before do
-          last_deployment
-          build_deployment
-        end
-        context 'and the current sha is the same as the one from the latest deployment' do
-          it 'is true' do
-            allow(build.deployment).to receive(:sha).and_return(last_deployment.sha)
-
-            is_expected.to be_truthy
-          end
-        end
-
-        context 'and the current sha is not the same as the one from the latest deployment' do
-          it 'is false' do
-            allow(build.deployment).to receive(:sha).and_return('othersha12345')
 
             is_expected.to be_falsy
           end
