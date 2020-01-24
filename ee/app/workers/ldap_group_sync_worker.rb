@@ -5,6 +5,7 @@ class LdapGroupSyncWorker
 
   feature_category :authentication_and_authorization
   worker_has_external_dependencies!
+  weight 2
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(group_ids, provider = nil)
