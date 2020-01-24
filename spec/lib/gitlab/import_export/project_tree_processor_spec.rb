@@ -6,18 +6,20 @@ describe Gitlab::ImportExport::ProjectTreeProcessor do
   let(:tree) do
     {
       simple: 42,
-      k1: { "v1": 1 },
-      k2: ["v2"],
+      duped_hash_with_id: { "id": 0, "v1": 1 },
+      duped_hash_no_id: { "v1": 1 },
+      duped_array: ["v2"],
       array: [
-        { k1: { "v1": 1 } },
-        { k2: ["v2"] }
+        { duped_hash_with_id: { "id": 0, "v1": 1 } },
+        { duped_array: ["v2"] },
+        { duped_hash_no_id: { "v1": 1 } }
       ],
       nested: {
-        k1: { "v1": 1 },
-        k2: ["v2"],
-        k3: ["don't touch"]
+        duped_hash_with_id: { "id": 0, "v1": 1 },
+        duped_array: ["v2"],
+        array: ["don't touch"]
       }
-    }
+    }.with_indifferent_access
   end
 
   let(:processed_tree) { subject.process(tree) }
@@ -27,15 +29,20 @@ describe Gitlab::ImportExport::ProjectTreeProcessor do
   end
 
   it 'de-duplicates equal values' do
-    expect(processed_tree[:k1]).to be(processed_tree[:array][0][:k1])
-    expect(processed_tree[:k1]).to be(processed_tree[:nested][:k1])
-    expect(processed_tree[:k2]).to be(processed_tree[:array][1][:k2])
-    expect(processed_tree[:k2]).to be(processed_tree[:nested][:k2])
+    expect(processed_tree[:duped_hash_with_id]).to be(processed_tree[:array][0][:duped_hash_with_id])
+    expect(processed_tree[:duped_hash_with_id]).to be(processed_tree[:nested][:duped_hash_with_id])
+    expect(processed_tree[:duped_array]).to be(processed_tree[:array][1][:duped_array])
+    expect(processed_tree[:duped_array]).to be(processed_tree[:nested][:duped_array])
   end
 
-  it 'keeps unique entries intact' do
+  it 'does not de-duplicate hashes without IDs' do
+    expect(processed_tree[:duped_hash_no_id]).to eq(processed_tree[:array][2][:duped_hash_no_id])
+    expect(processed_tree[:duped_hash_no_id]).not_to be(processed_tree[:array][2][:duped_hash_no_id])
+  end
+
+  it 'keeps single entries intact' do
     expect(processed_tree[:simple]).to eq(42)
-    expect(processed_tree[:nested][:k3]).to eq(["don't touch"])
+    expect(processed_tree[:nested][:array]).to eq(["don't touch"])
   end
 
   it 'maintains object equality' do
