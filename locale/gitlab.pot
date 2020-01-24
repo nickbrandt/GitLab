@@ -13188,7 +13188,13 @@ msgstr ""
 msgid "Pagination|Last »"
 msgstr ""
 
+msgid "Pagination|Next"
+msgstr ""
+
 msgid "Pagination|Next ›"
+msgstr ""
+
+msgid "Pagination|Prev"
 msgstr ""
 
 msgid "Pagination|« First"
