@@ -907,6 +907,10 @@ module EE
           expose :count
           expose :items, using: EE::API::Entities::Nuget::PackagesMetadataItem
         end
+
+        class PackagesVersions < Grape::Entity
+          expose :versions
+        end
       end
 
       class NpmPackage < Grape::Entity

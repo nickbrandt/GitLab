@@ -19,6 +19,8 @@ class Packages::PackageFile < ApplicationRecord
   validates :file_name, presence: true
 
   scope :recent, -> { order(id: :desc) }
+  scope :with_file_name, ->(file_name) { where(file_name: file_name) }
+  scope :with_file_name_like, ->(file_name) { where(arel_table[:file_name].matches(file_name)) }
   scope :with_files_stored_locally, -> { where(file_store: ::Packages::PackageFileUploader::Store::LOCAL) }
   scope :with_conan_file_metadata, -> { includes(:conan_file_metadatum) }
 

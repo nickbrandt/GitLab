@@ -165,4 +165,50 @@ RSpec.describe Packages::Package, type: :model do
 
     it { is_expected.to match_array([package3, package2]) }
   end
+
+  context 'with several packages' do
+    let_it_be(:package1) { create(:nuget_package, name: 'FooBarish') }
+    let_it_be(:package2) { create(:npm_package) }
+    let_it_be(:package3) { create(:npm_package) }
+
+    describe '.pluck_names' do
+      subject { described_class.pluck_names.sort }
+
+      it { is_expected.to match_array([package1, package2, package3].map(&:name).sort) }
+    end
+
+    describe '.pluck_versions' do
+      subject { described_class.pluck_versions.sort }
+
+      it { is_expected.to match_array([package1, package2, package3].map(&:version).sort) }
+    end
+
+    describe '.with_name_like' do
+      subject { described_class.with_name_like(package_name) }
+
+      context 'with downcase name' do
+        let(:package_name) { 'foobarish' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with prefix wildcard' do
+        let(:package_name) { '%arish' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with suffix wildcard' do
+        let(:package_name) { 'foo%' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with surrounding wildcards' do
+        let(:package_name) { '%ooba%' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+    end
+  end
 end

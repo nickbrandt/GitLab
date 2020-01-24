@@ -42,7 +42,7 @@ FactoryBot.define do
       package_type { :nuget }
 
       after :create do |package|
-        create :package_file, :nuget, package: package
+        create :package_file, :nuget, package: package, file_name: "#{package.name}.#{package.version}.nupkg"
       end
     end
 
