@@ -7,6 +7,7 @@ import Pagination from './pagination.vue';
 import DeleteButton from '../delete_button.vue';
 import permissionsQuery from '../../graphql/queries/permissions.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
+import { DESIGNS_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
@@ -89,6 +90,7 @@ export default {
       return this.permissions.createDesign;
     },
   },
+  DESIGNS_ROUTE_NAME,
 };
 </script>
 
@@ -96,7 +98,7 @@ export default {
   <header class="d-flex p-2 bg-white align-items-center js-design-header">
     <router-link
       :to="{
-        name: 'designs',
+        name: $options.DESIGNS_ROUTE_NAME,
         query: $route.query,
       }"
       :aria-label="s__('DesignManagement|Go back to designs')"

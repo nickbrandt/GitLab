@@ -14,6 +14,7 @@ import allDesignsMixin from '../mixins/all_designs';
 import { UPLOAD_DESIGN_ERROR, designDeletionError } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
 import { designUploadOptimisticResponse } from '../utils/design_management_utils';
+import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -145,7 +146,7 @@ export default {
     },
     onUploadDesignDone() {
       this.resetFilesToBeSaved();
-      this.$router.push({ name: 'designs' });
+      this.$router.push({ name: DESIGNS_ROUTE_NAME });
     },
     onUploadDesignError() {
       this.resetFilesToBeSaved();
@@ -176,7 +177,7 @@ export default {
     },
     onDesignDelete() {
       this.selectedDesigns = [];
-      if (this.$route.query.version) this.$router.push({ name: 'designs' });
+      if (this.$route.query.version) this.$router.push({ name: DESIGNS_ROUTE_NAME });
     },
     onDesignDeleteError() {
       const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });

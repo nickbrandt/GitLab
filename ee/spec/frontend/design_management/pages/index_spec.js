@@ -8,6 +8,7 @@ import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesi
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
 import UploadButton from 'ee/design_management/components/upload/button.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
+import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
 import createFlash from '~/flash';
 
 const localVue = createLocalVue();
@@ -15,7 +16,7 @@ localVue.use(VueRouter);
 const router = new VueRouter({
   routes: [
     {
-      name: 'designs',
+      name: DESIGNS_ROUTE_NAME,
       path: '/designs',
       component: Index,
     },
@@ -382,7 +383,7 @@ describe('Design management index page', () => {
       createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
 
       router.replace({
-        name: 'designs',
+        name: DESIGNS_ROUTE_NAME,
         query: {
           version: '2',
         },
