@@ -13,72 +13,6 @@ module QA
         @fixed_due_date = (Date.today.to_date + 90).strftime("%Y-%m-%d")
       end
 
-      def create_epic_issue_milestone
-        epic_iid = create_epic
-        milestone_id = create_milestone(@milestone_start_date, @milestone_due_date)
-        issue_id = create_issue(milestone_id)
-        add_issue_to_epic(epic_iid, issue_id)
-        use_epics_milestone_dates(epic_iid)
-        [epic_iid, milestone_id]
-      end
-
-      def create_request(api_endpoint)
-        Runtime::API::Request.new(@api_client, api_endpoint)
-      end
-
-      def create_project
-        project_name = "project_#{SecureRandom.hex(8)}"
-        create_project_request = create_request('/projects')
-        post create_project_request.url, path: project_name, name: project_name, namespace_id: @group_id
-        expect_status(201)
-        json_body[:id]
-      end
-
-      def create_issue(milestone_id)
-        request = create_request("/projects/#{@project_id}/issues")
-        post request.url, title: 'My Test Issue', milestone_id: milestone_id
-        expect_status(201)
-        json_body[:id]
-      end
-
-      def create_milestone(start_date, due_date)
-        request = create_request("/projects/#{@project_id}/milestones")
-        post request.url, title: "Test_Milestone_#{SecureRandom.hex(8)}", due_date: due_date, start_date: start_date
-        expect_status(201)
-        json_body[:id]
-      end
-
-      def create_epic
-        request = create_request("/groups/#{@group_id}/epics")
-        post request.url, title: 'My New Epic', due_date_fixed: @fixed_due_date, start_date_fixed: @fixed_start_date, start_date_is_fixed: true, due_date_is_fixed: true
-        expect_status(201)
-        json_body[:iid]
-      end
-
-      def add_issue_to_epic(epic_iid, issue_id)
-        # Add Issue with milestone to an epic
-        request = create_request("/groups/#{@group_id}/epics/#{epic_iid}/issues/#{issue_id}")
-        post request.url
-
-        expect_status(201)
-        expect_json('epic.title', 'My New Epic*')
-        expect_json('issue.title', 'My Test Issue')
-      end
-
-      def use_epics_milestone_dates(epic_iid)
-        # Update Epic to use Milestone Dates
-        request = create_request("/groups/#{@group_id}/epics/#{epic_iid}")
-        put request.url, start_date_is_fixed: false, due_date_is_fixed: false
-
-        expect_status(200)
-        expect_json('start_date_from_milestones', @milestone_start_date)
-        expect_json('due_date_from_milestones', @milestone_due_date)
-        expect_json('due_date_fixed', @fixed_due_date)
-        expect_json('start_date_fixed', @fixed_start_date)
-        expect_json('start_date', @milestone_start_date)
-        expect_json('due_date', @milestone_due_date)
-      end
-
       it 'Updating milestones changes epic dates' do
         epic_iid, milestone_id = create_epic_issue_milestone
         milestone_start_date = Date.today.to_date.strftime("%Y-%m-%d")
@@ -165,6 +99,74 @@ module QA
         expect_json('due_date_from_milestones', nil)
         expect_json('start_date', nil)
         expect_json('due_date', nil)
+      end
+
+      private
+
+      def create_epic_issue_milestone
+        epic_iid = create_epic
+        milestone_id = create_milestone(@milestone_start_date, @milestone_due_date)
+        issue_id = create_issue(milestone_id)
+        add_issue_to_epic(epic_iid, issue_id)
+        use_epics_milestone_dates(epic_iid)
+        [epic_iid, milestone_id]
+      end
+
+      def create_request(api_endpoint)
+        Runtime::API::Request.new(@api_client, api_endpoint)
+      end
+
+      def create_project
+        project_name = "project_#{SecureRandom.hex(8)}"
+        create_project_request = create_request('/projects')
+        post create_project_request.url, path: project_name, name: project_name, namespace_id: @group_id
+        expect_status(201)
+        json_body[:id]
+      end
+
+      def create_issue(milestone_id)
+        request = create_request("/projects/#{@project_id}/issues")
+        post request.url, title: 'My Test Issue', milestone_id: milestone_id
+        expect_status(201)
+        json_body[:id]
+      end
+
+      def create_milestone(start_date, due_date)
+        request = create_request("/projects/#{@project_id}/milestones")
+        post request.url, title: "Test_Milestone_#{SecureRandom.hex(8)}", due_date: due_date, start_date: start_date
+        expect_status(201)
+        json_body[:id]
+      end
+
+      def create_epic
+        request = create_request("/groups/#{@group_id}/epics")
+        post request.url, title: 'My New Epic', due_date_fixed: @fixed_due_date, start_date_fixed: @fixed_start_date, start_date_is_fixed: true, due_date_is_fixed: true
+        expect_status(201)
+        json_body[:iid]
+      end
+
+      def add_issue_to_epic(epic_iid, issue_id)
+        # Add Issue with milestone to an epic
+        request = create_request("/groups/#{@group_id}/epics/#{epic_iid}/issues/#{issue_id}")
+        post request.url
+
+        expect_status(201)
+        expect_json('epic.title', 'My New Epic*')
+        expect_json('issue.title', 'My Test Issue')
+      end
+
+      def use_epics_milestone_dates(epic_iid)
+        # Update Epic to use Milestone Dates
+        request = create_request("/groups/#{@group_id}/epics/#{epic_iid}")
+        put request.url, start_date_is_fixed: false, due_date_is_fixed: false
+
+        expect_status(200)
+        expect_json('start_date_from_milestones', @milestone_start_date)
+        expect_json('due_date_from_milestones', @milestone_due_date)
+        expect_json('due_date_fixed', @fixed_due_date)
+        expect_json('start_date_fixed', @fixed_start_date)
+        expect_json('start_date', @milestone_start_date)
+        expect_json('due_date', @milestone_due_date)
       end
     end
   end
