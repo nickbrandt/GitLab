@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::GitHttpController, type: :request do
+describe Repositories::GitHttpController, type: :request do
   include GitHttpHelpers
 
   describe 'GET #info_refs' do
