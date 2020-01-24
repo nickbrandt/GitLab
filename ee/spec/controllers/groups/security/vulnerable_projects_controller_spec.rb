@@ -25,7 +25,14 @@ describe Groups::Security::VulnerableProjectsController do
       _ungrouped_project = create(:project)
       _safe_project = create(:project, namespace: group)
       vulnerable_project = create(:project, namespace: group)
-      create_list(:vulnerabilities_occurrence, 2, project: vulnerable_project, severity: :critical)
+      pipeline = create(:ci_pipeline, :success, project: vulnerable_project)
+      create_list(
+        :vulnerabilities_occurrence,
+        2,
+        pipelines: [pipeline],
+        project: vulnerable_project,
+        severity: :critical
+      )
 
       subject
 
@@ -39,8 +46,10 @@ describe Groups::Security::VulnerableProjectsController do
     it 'does not include archived or deleted projects' do
       archived_project = create(:project, :archived, namespace: group)
       deleted_project = create(:project, namespace: group, pending_delete: true)
-      create(:vulnerabilities_occurrence, project: archived_project)
-      create(:vulnerabilities_occurrence, project: deleted_project)
+      archived_pipeline = create(:ci_pipeline, :success, project: archived_project)
+      deleted_pipeline = create(:ci_pipeline, :success, project: deleted_project)
+      create(:vulnerabilities_occurrence, pipelines: [archived_pipeline], project: archived_project)
+      create(:vulnerabilities_occurrence, pipelines: [deleted_pipeline], project: deleted_project)
 
       subject
 
