@@ -15,6 +15,12 @@ module EE
           def allowed_dashboard_templates
             @allowed_dashboard_templates ||= (Set[::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH] + super).freeze
           end
+
+          override :sequences
+          def sequences
+            super.merge(::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH => [::Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+                                                                                          ::Gitlab::Metrics::Dashboard::Stages::Sorter].freeze)
+          end
         end
       end
     end
