@@ -39,7 +39,7 @@ export default {
   <div class="prepend-top-default">
     <gl-skeleton-loading v-if="isInitialLoadInProgress" />
     <gl-table v-else :items="members" :fields="$options.fields">
-      <template #name="{ item }">
+      <template #cell(name)="{ item }">
         <span class="d-flex">
           <gl-avatar v-gl-tooltip :src="item.avatar_url" :size="48" />
           <div class="ml-2">
@@ -57,7 +57,7 @@ export default {
           </div>
         </span>
       </template>
-      <template #identity="{ value }">
+      <template #cell(identity)="{ value }">
         <span class="font-weight-bold">{{ value }}</span>
       </template>
     </gl-table>

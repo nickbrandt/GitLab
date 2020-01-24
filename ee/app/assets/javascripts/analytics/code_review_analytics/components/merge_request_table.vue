@@ -82,7 +82,7 @@ export default {
     stacked="sm"
     thead-class="thead-white border-bottom"
   >
-    <template #mr_details="items">
+    <template #cell(mr_details)="items">
       <div class="d-flex flex-column flex-grow align-items-end align-items-sm-start">
         <div class="mr-title str-truncated my-2">
           <gl-link :href="items.item.web_url" target="_blank" class="font-weight-bold text-plain">{{
@@ -102,7 +102,7 @@ export default {
       </div>
     </template>
 
-    <template #review_time="{ value }">
+    <template #cell(review_time)="{ value }">
       <template v-if="value">
         {{ formatReviewTime(value) }}
       </template>
@@ -111,17 +111,17 @@ export default {
       </template>
     </template>
 
-    <template #author="{ value }">
+    <template #cell(author)="{ value }">
       <gl-avatar-link target="blank" :href="value.web_url">
         <gl-avatar :size="24" :src="value.avatar_url" :entity-name="value.name" />
       </gl-avatar-link>
     </template>
 
-    <template #diff_stats="{ value }">
+    <template #cell(diff_stats)="{ value }">
       <span>{{ value.commits_count }}</span>
     </template>
 
-    <template #line_changes="items">
+    <template #cell(line_changes)="items">
       <span class="font-weight-bold cgreen"> +{{ items.item.diff_stats.additions }} </span>
       <span class="font-weight-bold cred"> -{{ items.item.diff_stats.deletions }} </span>
     </template>

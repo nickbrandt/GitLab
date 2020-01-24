@@ -35,6 +35,7 @@ exports[`dashboard should match the snapshot 1`] = `
       class="js-add-projects-button btn btn-success"
       role="button"
       size="md"
+      tabindex="0"
       variant="secondary"
     >
       

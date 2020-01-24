@@ -190,7 +190,7 @@ export default {
         :no-local-sorting="true"
         stacked="md"
       >
-        <template #name="{value, item}">
+        <template #cell(name)="{value, item}">
           <div ref="col-name" class="flex-truncate-parent">
             <a
               :href="item._links.web_path"
@@ -202,21 +202,21 @@ export default {
           </div>
         </template>
 
-        <template #project="{value}">
+        <template #cell(project)="{value}">
           <div ref="col-project" class="flex-truncate-parent">
             <a :href="value" class="flex-truncate-child"> {{ value }} </a>
           </div>
         </template>
-        <template #version="{value}">
+        <template #cell(version)="{value}">
           {{ value }}
         </template>
-        <template #package_type="{value}">
+        <template #cell(package_type)="{value}">
           {{ value }}
         </template>
-        <template #created_at="{value}">
+        <template #cell(created_at)="{value}">
           <time-ago-tooltip :time="value" />
         </template>
-        <template #actions="{item}">
+        <template #cell(actions)="{item}">
           <gl-button
             ref="action-delete"
             variant="danger"

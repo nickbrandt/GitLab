@@ -261,7 +261,7 @@ export default {
       :items="filesTableRows"
       tbody-tr-class="js-file-row"
     >
-      <template #name="items">
+      <template #cell(name)="items">
         <gl-icon name="doc-code" class="space-right" />
         <gl-link
           :href="items.item.downloadPath"
@@ -272,7 +272,7 @@ export default {
         </gl-link>
       </template>
 
-      <template #created="items">
+      <template #cell(created)="items">
         <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
           timeFormatted(items.item.created)
         }}</span>
