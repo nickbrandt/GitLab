@@ -20,7 +20,7 @@ describe 'Rack Attack global throttles' do
     it 'allows requests over the rate limit' do
       (1 + requests_per_period).times do
         get "/#{project.full_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: { 'Authorization' => "#{::Gitlab::Geo::BaseRequest::GITLAB_GEO_AUTH_TOKEN_TYPE} token" }
-        expect(response).to have_http_status 401
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end

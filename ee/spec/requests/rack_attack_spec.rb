@@ -40,7 +40,7 @@ describe 'Rack Attack EE throttles' do
           # At first, allow requests under the rate limit.
           requests_per_period.times do
             post(*post_args)
-            expect(response).to have_http_status 200
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           # the last straw
@@ -50,7 +50,7 @@ describe 'Rack Attack EE throttles' do
         it 'allows requests after throttling and then waiting for the next period' do
           requests_per_period.times do
             post(*post_args)
-            expect(response).to have_http_status 200
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           expect_rejection { post(*post_args) }
@@ -58,7 +58,7 @@ describe 'Rack Attack EE throttles' do
           Timecop.travel(period.from_now) do
             requests_per_period.times do
               post(*post_args)
-              expect(response).to have_http_status 200
+              expect(response).to have_gitlab_http_status(:ok)
             end
 
             expect_rejection { post(*post_args) }
@@ -73,12 +73,12 @@ describe 'Rack Attack EE throttles' do
           # At first, allow requests under the rate limit.
           requests_per_period.times do
             post(*post_args)
-            expect(response).to have_http_status 200
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           # requests still allowed
           post(*post_args)
-          expect(response).to have_http_status 200
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
