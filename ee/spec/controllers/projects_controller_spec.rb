@@ -42,7 +42,7 @@ describe ProjectsController do
             id: project.path
           }
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -133,7 +133,7 @@ describe ProjectsController do
         it 'does not create the project from project template' do
           expect { post :create, params: { project: templates_params } }.not_to change { Project.count }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.body).to match(/Template name .* is unknown or invalid/)
         end
       end
@@ -154,7 +154,7 @@ describe ProjectsController do
           }
       project.reload
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       params.except(:repository_size_limit).each do |param, value|
         expect(project.public_send(param)).to eq(value)
       end
@@ -177,7 +177,7 @@ describe ProjectsController do
           }
       project.reload
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(project.approver_groups.pluck(:group_id)).to contain_exactly(params[:approver_group_ids])
       expect(project.approvers.pluck(:user_id)).to contain_exactly(params[:approver_ids])
     end
@@ -196,7 +196,7 @@ describe ProjectsController do
           }
       project.reload
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       params.each do |param, value|
         expect(project.public_send(param)).to eq(value)
       end
@@ -218,7 +218,7 @@ describe ProjectsController do
           }
       project.reload
 
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(project.service_desk_enabled).to eq(true)
     end
 
@@ -413,7 +413,7 @@ describe ProjectsController do
         delete :destroy, params: { namespace_id: project.namespace, id: project }
 
         expect(project.reload.marked_for_deletion?).to be_truthy
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(project_path(project))
       end
 
@@ -424,7 +424,7 @@ describe ProjectsController do
 
         delete :destroy, params: { namespace_id: project.namespace, id: project }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:edit)
         expect(flash[:alert]).to include(message)
       end
@@ -436,7 +436,7 @@ describe ProjectsController do
           delete :destroy, params: { namespace_id: project.namespace, id: project }
 
           expect(project.marked_for_deletion?).to be_falsey
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(response).to redirect_to(dashboard_projects_path)
         end
       end
@@ -451,7 +451,7 @@ describe ProjectsController do
         delete :destroy, params: { namespace_id: project.namespace, id: project }
 
         expect(project.marked_for_deletion?).to be_falsey
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(dashboard_projects_path)
       end
     end
@@ -471,7 +471,7 @@ describe ProjectsController do
 
       expect(project.reload.marked_for_deletion_at).to be_nil
       expect(project.reload.archived).to be_falsey
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(response).to redirect_to(edit_project_path(project))
     end
 
@@ -481,7 +481,7 @@ describe ProjectsController do
 
       post :restore, params: { namespace_id: project.namespace, project_id: project }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to render_template(:edit)
       expect(flash[:alert]).to include(message)
     end
