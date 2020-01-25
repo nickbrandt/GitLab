@@ -26,7 +26,8 @@ describe EnvironmentsHelper do
         'validate-query-path' => validate_query_project_prometheus_metrics_path(project),
         'custom-metrics-available' => 'false',
         'alerts-endpoint' => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
-        'prometheus-alerts-available' => 'true'
+        'prometheus-alerts-available' => 'true',
+        'logs-path' => project_logs_path(project)
       )
     end
   end
