@@ -6,9 +6,10 @@ import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import sastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
 import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
 import { mount } from '@vue/test-utils';
-import { waitForMutation } from 'spec/helpers/vue_test_utils_helper';
-import { trimText } from 'spec/helpers/text_helper';
+import { waitForMutation } from 'helpers/vue_test_utils_helper';
+import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
+
 import {
   sastDiffSuccessMock,
   dastDiffSuccessMock,
@@ -82,7 +83,7 @@ describe('Grouped security reports app', () => {
     });
 
     describe('with error', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         mock.onGet(CONTAINER_SCANNING_DIFF_ENDPOINT).reply(500);
         mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(500);
         mock.onGet(DAST_DIFF_ENDPOINT).reply(500);
@@ -90,14 +91,12 @@ describe('Grouped security reports app', () => {
 
         createWrapper(allReportProps);
 
-        Promise.all([
+        return Promise.all([
           waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_ERROR}`),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
-        ])
-          .then(done)
-          .catch(done.fail);
+        ]);
       });
 
       it('renders error state', () => {
@@ -154,7 +153,7 @@ describe('Grouped security reports app', () => {
     });
 
     describe('with successful responses', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         mock.onGet(CONTAINER_SCANNING_DIFF_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
         mock.onGet(DEPENDENCY_SCANNING_DIFF_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
         mock.onGet(DAST_DIFF_ENDPOINT).reply(200, dastDiffSuccessMock);
@@ -162,14 +161,12 @@ describe('Grouped security reports app', () => {
 
         createWrapper(allReportProps);
 
-        Promise.all([
+        return Promise.all([
           waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
-        ])
-          .then(done)
-          .catch(done.fail);
+        ]);
       });
 
       it('renders reports', () => {
@@ -207,33 +204,26 @@ describe('Grouped security reports app', () => {
         );
       });
 
-      it('opens modal with more information', done => {
-        setTimeout(() => {
-          wrapper.vm.$el.querySelector('.break-link').click();
+      it('opens modal with more information', () => {
+        wrapper.vm.$el.querySelector('.break-link').click();
 
-          Vue.nextTick(() => {
-            expect(wrapper.vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
-              mockFindings[0].name,
-            );
-
-            expect(wrapper.vm.$el.querySelector('.modal-body').textContent).toContain(
-              mockFindings[0].solution,
-            );
-
-            done();
-          });
-        }, 0);
-      });
-
-      it('has the success icon for fixed vulnerabilities', done => {
-        setTimeout(() => {
-          const icon = wrapper.vm.$el.querySelector(
-            '.js-sast-container~.js-plain-element .ic-status_success_borderless',
+        return Vue.nextTick().then(() => {
+          expect(wrapper.vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
+            mockFindings[0].name,
           );
 
-          expect(icon).not.toBeNull();
-          done();
-        }, 0);
+          expect(wrapper.vm.$el.querySelector('.modal-body').textContent).toContain(
+            mockFindings[0].solution,
+          );
+        });
+      });
+
+      it('has the success icon for fixed vulnerabilities', () => {
+        const icon = wrapper.vm.$el.querySelector(
+          '.js-sast-container~.js-plain-element .ic-status_success_borderless',
+        );
+
+        expect(icon).not.toBeNull();
       });
     });
   });
@@ -257,7 +247,7 @@ describe('Grouped security reports app', () => {
   });
 
   describe('container scanning reports', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.container_scanning_comparison_path = CONTAINER_SCANNING_DIFF_ENDPOINT;
 
@@ -270,9 +260,7 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS)
-        .then(done)
-        .catch(done.fail);
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS);
     });
 
     it('should set setSastContainerDiffEndpoint', () => {
@@ -287,7 +275,7 @@ describe('Grouped security reports app', () => {
   });
 
   describe('dependency scanning reports', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.dependency_scanning_comparison_path = DEPENDENCY_SCANNING_DIFF_ENDPOINT;
 
@@ -300,9 +288,7 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
-        .then(done)
-        .catch(done.fail);
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS);
     });
 
     it('should set setDependencyScanningDiffEndpoint', () => {
@@ -319,7 +305,7 @@ describe('Grouped security reports app', () => {
   });
 
   describe('dast reports', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.dast_comparison_path = DAST_DIFF_ENDPOINT;
 
@@ -334,9 +320,7 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS)
-        .then(done)
-        .catch(done.fail);
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS);
     });
 
     it('should set setDastDiffEndpoint', () => {
@@ -357,7 +341,7 @@ describe('Grouped security reports app', () => {
   });
 
   describe('sast reports', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       gl.mrWidgetData = gl.mrWidgetData || {};
       gl.mrWidgetData.sast_comparison_path = SAST_DIFF_ENDPOINT;
       gl.mrWidgetData.diverged_commits_count = 100;
@@ -374,9 +358,7 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`)
-        .then(done)
-        .catch(done.fail);
+      return waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`);
     });
 
     it('should set setSastDiffEndpoint', () => {

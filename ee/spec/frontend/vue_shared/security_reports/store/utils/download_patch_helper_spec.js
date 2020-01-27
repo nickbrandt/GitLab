@@ -1,16 +1,10 @@
 import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
 
 describe('downloadPatchHelper', () => {
-  beforeAll(() => {
-    spyOn(document, 'createElement').and.callThrough();
-    spyOn(document.body, 'appendChild').and.callThrough();
-    spyOn(document.body, 'removeChild').and.callThrough();
-  });
-
-  afterEach(() => {
-    document.createElement.calls.reset();
-    document.body.appendChild.calls.reset();
-    document.body.removeChild.calls.reset();
+  beforeEach(() => {
+    jest.spyOn(document, 'createElement');
+    jest.spyOn(document.body, 'appendChild');
+    jest.spyOn(document.body, 'removeChild');
   });
 
   describe('with a base64 encoded string', () => {
@@ -25,7 +19,7 @@ describe('downloadPatchHelper', () => {
 
       downloadPatchHelper(base64String);
 
-      expect(document.createElement).toHaveBeenCalledTimes(1);
+      expect(document.createElement).toHaveBeenCalledWith('a');
       expect(document.body.appendChild).toHaveBeenCalledTimes(1);
       expect(document.body.removeChild).toHaveBeenCalledTimes(1);
     });
@@ -43,7 +37,7 @@ describe('downloadPatchHelper', () => {
 
       downloadPatchHelper(unencodedString, { isEncoded: false });
 
-      expect(document.createElement).toHaveBeenCalledTimes(1);
+      expect(document.createElement).toHaveBeenCalledWith('a');
       expect(document.body.appendChild).toHaveBeenCalledTimes(1);
       expect(document.body.removeChild).toHaveBeenCalledTimes(1);
     });

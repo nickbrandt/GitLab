@@ -1,6 +1,5 @@
-import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import actions, {
+import {
   setHeadBlobPath,
   setBaseBlobPath,
   setVulnerabilityFeedbackPath,
@@ -70,7 +69,7 @@ import actions, {
 } from 'ee/vue_shared/security_reports/store/actions';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 import {
   sastIssues,
@@ -84,6 +83,17 @@ import {
   containerScanningFeedbacks,
   dependencyScanningFeedbacks,
 } from '../mock_data';
+import toasted from '~/vue_shared/plugins/global_toast';
+
+// Mock bootstrap modal implementation
+jest.mock('jquery', () => () => ({
+  modal: jest.fn(),
+}));
+jest.mock('~/lib/utils/url_utility', () => ({
+  visitUrl: jest.fn(),
+}));
+
+jest.mock('~/vue_shared/plugins/global_toast', () => jest.fn());
 
 const createVulnerability = options => ({
   ...options,
@@ -113,6 +123,7 @@ describe('security reports actions', () => {
 
   afterEach(() => {
     mock.restore();
+    toasted.mockClear();
   });
 
   describe('setHeadBlobPath', () => {
@@ -967,7 +978,7 @@ describe('security reports actions', () => {
         mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_vulnerability_path';
       });
 
-      it(`should dispatch ${types.receiveDismissVulnerability}`, done => {
+      it(`should dispatch receiveDismissVulnerability`, done => {
         testAction(
           dismissVulnerability,
           payload,
@@ -990,10 +1001,8 @@ describe('security reports actions', () => {
       });
 
       it('show dismiss vulnerability toast message', done => {
-        spyOn(Vue.toasted, 'show');
-
         const checkToastMessage = () => {
-          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          expect(toasted).toHaveBeenCalledTimes(1);
           done();
         };
 
@@ -1076,10 +1085,8 @@ describe('security reports actions', () => {
       });
 
       it('should show added dismissal comment toast message', done => {
-        spyOn(Vue.toasted, 'show').and.callThrough();
-
         const checkToastMessage = () => {
-          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          expect(toasted).toHaveBeenCalledTimes(1);
           done();
         };
 
@@ -1203,10 +1210,8 @@ describe('security reports actions', () => {
       });
 
       it('should show deleted dismissal comment toast message', done => {
-        spyOn(Vue.toasted, 'show').and.callThrough();
-
         const checkToastMessage = () => {
-          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          expect(toasted).toHaveBeenCalledTimes(1);
           done();
         };
 
@@ -1440,10 +1445,6 @@ describe('security reports actions', () => {
   });
 
   describe('createNewIssue', () => {
-    beforeEach(() => {
-      spyOnDependency(actions, 'visitUrl');
-    });
-
     it('with success should dispatch `requestCreateIssue` and `receiveCreateIssue`', done => {
       mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
       mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
@@ -1490,9 +1491,9 @@ describe('security reports actions', () => {
 
   describe('downloadPatch', () => {
     it('creates a download link and clicks on it to download the file', () => {
-      spyOn(document, 'createElement').and.callThrough();
-      spyOn(document.body, 'appendChild').and.callThrough();
-      spyOn(document.body, 'removeChild').and.callThrough();
+      jest.spyOn(document, 'createElement');
+      jest.spyOn(document.body, 'appendChild');
+      jest.spyOn(document.body, 'removeChild');
 
       downloadPatch({
         state: {
@@ -1569,10 +1570,6 @@ describe('security reports actions', () => {
   });
 
   describe('createMergeRequest', () => {
-    beforeEach(() => {
-      spyOnDependency(actions, 'visitUrl');
-    });
-
     it('with success should dispatch `receiveCreateMergeRequestSuccess`', done => {
       const data = { merge_request_path: 'fakepath.html' };
       mockedState.createVulnerabilityFeedbackMergeRequestPath = 'create_merge_request_path';
