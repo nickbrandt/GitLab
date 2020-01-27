@@ -23,7 +23,7 @@ describe Projects::ThreatMonitoringController do
         it 'renders the show template' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:show)
         end
       end
@@ -37,7 +37,7 @@ describe Projects::ThreatMonitoringController do
         it 'returns 404' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -55,7 +55,7 @@ describe Projects::ThreatMonitoringController do
         it 'returns 404' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -64,7 +64,7 @@ describe Projects::ThreatMonitoringController do
       it 'returns 302' do
         subject
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(new_user_session_path)
       end
     end

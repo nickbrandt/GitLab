@@ -16,7 +16,7 @@ describe Projects::TracingsController do
       it 'renders OK' do
         get :show, params: { namespace_id: project.namespace, project_id: project }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:show)
       end
     end

@@ -38,7 +38,7 @@ describe Projects::FeatureFlagsClientsController do
         it 'returns 404' do
           reset_token
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -51,7 +51,7 @@ describe Projects::FeatureFlagsClientsController do
       it 'returns 404' do
         reset_token
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

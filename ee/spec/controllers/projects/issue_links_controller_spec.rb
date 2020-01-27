@@ -37,7 +37,7 @@ describe Projects::IssueLinksController do
       it 'returns success response' do
         get_link(user, issue1)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         link = json_response.first
         expect(link['id']).to eq(issue2.id)
@@ -53,7 +53,7 @@ describe Projects::IssueLinksController do
       it 'does not return issue_link_type' do
         get_link(user, issue1)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         link = json_response.first
         expect(link['id']).to eq(issue2.id)
@@ -87,7 +87,7 @@ describe Projects::IssueLinksController do
       it 'returns success response' do
         create_link(user, issue1, issue2)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         link = json_response['issuables'].first
         expect(link['id']).to eq(issue2.id)
@@ -103,7 +103,7 @@ describe Projects::IssueLinksController do
       it 'returns 403' do
         create_link(user, issue1, issue2)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
