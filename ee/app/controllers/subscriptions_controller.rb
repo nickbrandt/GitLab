@@ -60,13 +60,11 @@ class SubscriptionsController < ApplicationController
     ).execute
 
     if response[:success]
-      response[:data] = { location: edit_subscriptions_group_path(group.path) }
+      plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
 
-      track_paid_signup_flow_event(
-        'end',
-        label: subscription_params[:plan_id],
-        value: subscription_params[:quantity]
-      )
+      response[:data] = { location: edit_subscriptions_group_path(group.path, plan_id: plan_id, quantity: quantity) }
+
+      track_paid_signup_flow_event('end', label: plan_id, value: quantity)
     end
 
     render json: response[:data]

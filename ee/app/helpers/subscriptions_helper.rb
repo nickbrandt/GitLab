@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module SubscriptionsHelper
+  include ::Gitlab::Utils::StrongMemoize
+
   def subscription_data
     {
       setup_for_company: (current_user.setup_for_company == true).to_s,
@@ -11,11 +13,10 @@ module SubscriptionsHelper
   end
 
   def plan_title
-    @plan_title ||= subscription.hosted_plan.title
-  end
-
-  def subscription_seats
-    @subscription_seats ||= subscription.seats
+    strong_memoize(:plan_title) do
+      plan = plan_data.find { |plan| plan[:id] == params[:plan_id] }
+      plan[:code].titleize if plan
+    end
   end
 
   private
@@ -25,9 +26,5 @@ module SubscriptionsHelper
       .map(&:symbolize_keys)
       .reject { |plan| plan[:free] }
       .map { |plan| plan.slice(:id, :code, :price_per_year) }
-  end
-
-  def subscription
-    @subscription ||= @group.gitlab_subscription
   end
 end

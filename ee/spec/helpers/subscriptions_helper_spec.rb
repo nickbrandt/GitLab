@@ -3,28 +3,32 @@
 require 'spec_helper'
 
 describe SubscriptionsHelper do
+  let_it_be(:raw_plan_data) do
+    [
+      {
+        "name" => "Free Plan",
+        "free" => true
+      },
+      {
+        "id" => "bronze_id",
+        "name" => "Bronze Plan",
+        "free" => false,
+        "code" => "bronze",
+        "price_per_year" => 48.0
+      }
+    ]
+  end
+
+  before do
+    allow(helper).to receive(:params).and_return(plan_id: 'bronze_id')
+    allow_any_instance_of(FetchSubscriptionPlansService).to receive(:execute).and_return(raw_plan_data)
+  end
+
   describe '#subscription_data' do
-    let_it_be(:raw_plan_data) do
-      [
-        {
-          "name" => "Free Plan",
-          "free" => true
-        },
-        {
-          "id" => "bronze_id",
-          "name" => "Bronze Plan",
-          "free" => false,
-          "code" => "bronze",
-          "price_per_year" => 48.0
-        }
-      ]
-    end
     let_it_be(:user) { create(:user, setup_for_company: nil, name: 'First Last') }
 
     before do
       allow(helper).to receive(:current_user).and_return(user)
-      allow(helper).to receive(:params).and_return(plan_id: 'bronze_id')
-      allow_any_instance_of(FetchSubscriptionPlansService).to receive(:execute).and_return(raw_plan_data)
     end
 
     subject { helper.subscription_data }
@@ -36,26 +40,24 @@ describe SubscriptionsHelper do
   end
 
   describe '#plan_title' do
-    let_it_be(:subscription) { create(:gitlab_subscription) }
-
-    before do
-      allow(helper).to receive(:subscription).and_return(subscription)
-    end
-
     subject { helper.plan_title }
 
-    it { is_expected.to eq(subscription.hosted_plan.title) }
-  end
+    it { is_expected.to eq('Bronze') }
 
-  describe '#subscription_seats' do
-    let_it_be(:subscription) { create(:gitlab_subscription) }
+    context 'no plan_id URL parameter present' do
+      before do
+        allow(helper).to receive(:params).and_return({})
+      end
 
-    before do
-      allow(helper).to receive(:subscription).and_return(subscription)
+      it { is_expected.to eq(nil) }
     end
 
-    subject { helper.subscription_seats }
+    context 'a non-existing plan_id URL parameter present' do
+      before do
+        allow(helper).to receive(:params).and_return(plan_id: 'xxx')
+      end
 
-    it { is_expected.to eq(subscription.seats) }
+      it { is_expected.to eq(nil) }
+    end
   end
 end
