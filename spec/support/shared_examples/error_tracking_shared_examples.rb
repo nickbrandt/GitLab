@@ -11,3 +11,26 @@ RSpec.shared_examples 'setting sentry error data' do
     end
   end
 end
+
+RSpec.shared_examples 'setting stack trace error' do
+  it 'sets the stack trace data correctly' do
+    aggregate_failures 'testing the stack trace is correct' do
+      expect(stack_trace_data['dateReceived']).to eql(sentry_stack_trace.date_received)
+      expect(stack_trace_data['issueId']).to eql(sentry_stack_trace.issue_id)
+      expect(stack_trace_data['stackTraceEntries']).to be_an_instance_of(Array)
+      expect(stack_trace_data['stackTraceEntries'].size).to eql(sentry_stack_trace.stack_trace_entries.size)
+    end
+  end
+
+  it 'sets the stack trace entry data correctly' do
+    aggregate_failures 'testing the stack trace entry is correct' do
+      stack_trace_entry = stack_trace_data['stackTraceEntries'].first
+      model_entry = sentry_stack_trace.stack_trace_entries.first
+
+      expect(stack_trace_entry['function']).to eql model_entry['function']
+      expect(stack_trace_entry['col']).to eql model_entry['colNo']
+      expect(stack_trace_entry['line']).to eql model_entry['lineNo'].to_s
+      expect(stack_trace_entry['fileName']).to eql model_entry['filename']
+    end
+  end
+end

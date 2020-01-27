@@ -188,4 +188,69 @@ describe 'sentry errors requests' do
       end
     end
   end
+
+  describe 'getting a stack trace' do
+    let_it_be(:sentry_stack_trace) { build(:error_tracking_error_event) }
+    let(:sentry_gid) { Gitlab::ErrorTracking::DetailedError.new(id: 1).to_global_id.to_s }
+
+    let(:stack_trace_fields) do
+      all_graphql_fields_for('SentryErrorStackTrace'.classify)
+    end
+
+    let(:fields) do
+      query_graphql_field('errorStackTrace', { id: sentry_gid }, stack_trace_fields)
+    end
+
+    let(:stack_trace_data) { graphql_data.dig('project', 'sentryErrors', 'errorStackTrace') }
+
+    it_behaves_like 'a working graphql query' do
+      before do
+        post_graphql(query, current_user: current_user)
+      end
+    end
+
+    context 'when data is loading via reactive cache' do
+      before do
+        post_graphql(query, current_user: current_user)
+      end
+
+      it "is expected to return an empty error" do
+        expect(stack_trace_data).to eq nil
+      end
+    end
+
+    context 'reactive cache returns data' do
+      before do
+        allow_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
+          .to receive(:issue_latest_event)
+          .and_return({ latest_event: sentry_stack_trace })
+
+        post_graphql(query, current_user: current_user)
+      end
+
+      it_behaves_like 'setting stack trace error'
+
+      context 'user does not have permission' do
+        let(:current_user) { create(:user) }
+
+        it "is expected to return an empty error" do
+          expect(stack_trace_data).to eq nil
+        end
+      end
+    end
+
+    context 'sentry api returns an error' do
+      before do
+        expect_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
+          .to receive(:issue_latest_event)
+          .and_return({ error: 'error message' })
+
+        post_graphql(query, current_user: current_user)
+      end
+
+      it 'is expected to handle the error and return nil' do
+        expect(stack_trace_data).to eq nil
+      end
+    end
+  end
 end
