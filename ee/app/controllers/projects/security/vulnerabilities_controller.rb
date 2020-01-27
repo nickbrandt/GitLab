@@ -3,8 +3,6 @@
 module Projects
   module Security
     class VulnerabilitiesController < Projects::ApplicationController
-      include SecurityDashboardsPermissions
-
       def index
         return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
 

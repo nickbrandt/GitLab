@@ -5,39 +5,52 @@
 .issue-details.issuable-details
   %h2.title= _("Vulnerabilities")
 
-  .ci-table.js-security-dashboard-table
-    .gl-responsive-table-row.table-row-header.vulnerabilities-row-header.px-2{ :role => "row" }
-      .table-section.section-5{ :role => "rowheader" }= _("State")
-      .table-section.section-10.ml-md-2{ :role => "rowheader" }= _("Severity")
-      .table-section.flex-grow-1{ :role => "rowheader" }= _("Description")
-
+  %table.table.b-table.b-table-stacked-sm.b-table-fixed.gl-table{ "aria-colcount" => "3", :role => "table" }
     - if @vulnerabilities.blank?
-      .row.empty-state
-        .col-12
-          .svg-250.svg-content
-            = image_tag 'illustrations/security-dashboard-empty-state.svg', alt: _("No vulnerabilities found for this project") 
-        .col-12
-          .text-content
-            %h4.center= _("No vulnerabilities found for this project")
-            %p= _("While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.")
+      %tbody{:role => "rowgroup"}
+        %tr.b-table-empty-row{:role => "row"}
+          %td{:role => "cell"}
+            .empty-state
+              .svg-250.svg-content
+                = image_tag 'illustrations/security-dashboard-empty-state.svg', alt: _("No vulnerabilities found for this project")
+              .text-content
+                %h4.center= _("No vulnerabilities found for this project")
+                %p= _("While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.")
 
     - else
-      - @vulnerabilities.each do |vulnerability|
-        .gl-responsive-table-row.vulnerabilities-row.p-2
-          .table-section.section-5
-            .table-mobile-header{ :role => "rowheader" }= _("State")
-            .table-mobile-content.text-capitalize= vulnerability.state
-          .table-section.section-10.ml-md-2
-            .table-mobile-header{ :role => "rowheader" }= _("Severity")
-            .table-mobile-content
-              .severity-badge{ class: "severity-badge-#{ vulnerability.severity }" }= vulnerability.severity
-          .table-section.flex-grow-1
-            .table-mobile-header{:role => "rowheader"}= _("Description")
-            .table-mobile-content.vulnerability-info.text-truncate
-              = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
-              - if vulnerability.finding
-                %br
-                %span.text-muted.small
-                  = vulnerability.finding.description
+      %thead{:role => "rowgroup"}
+        %tr{:role => "row"}
+          %th.gl-w-128{"aria-colindex" => "1", :role => "columnheader", :scope => "col"}= s_("Vulnerability|State")
+          %th.gl-w-128{"aria-colindex" => "2", :role => "columnheader", :scope => "col"}= s_("Vulnerability|Severity")
+          %th{"aria-colindex" => "3", :role => "columnheader", :scope => "col"}= _("Description")
+      %tbody{:role => "rowgroup"}
+        - @vulnerabilities.each do |vulnerability|
+          %tr{:role => "row"}
+            %td{"aria-colindex" => "1", :role => "cell", "data-label" => s_("Vulnerability|State") }
+              %div.text-capitalize= vulnerability.state
+            %td{"aria-colindex" => "2", :role => "cell", "data-label" => s_("Vulnerability|Severity") }
+              %div
+                -if vulnerability.severity === 'critical'
+                  = sprite_icon("severity-critical", size: 12, css_class: "align-middle text-danger-800")
+                -elsif vulnerability.severity === 'high'
+                  = sprite_icon("severity-high", size: 12, css_class: "align-middle text-danger-600")
+                -elsif vulnerability.severity === 'medium'
+                  = sprite_icon("severity-medium", size: 12, css_class: "align-middle text-warning-400")
+                -elsif vulnerability.severity === 'low'
+                  = sprite_icon("severity-low", size: 12, css_class: "align-middle text-warning-300")
+                -elsif vulnerability.severity === 'info'
+                  = sprite_icon("severity-info", size: 12, css_class: "align-middle text-primary-400")
+                -else
+                  = sprite_icon("severity-unknown", size: 12, css_class: "align-middle text-secondary-400")
+                %span.align-middle.ml-1.text-capitalize= vulnerability.severity
+            %td{"aria-colindex" => "2", :role => "cell", "data-label" => _("Description") }
+              %div
+                = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
+                - if vulnerability.finding
+                  %br
+                  %span.text-muted.small
+                    = vulnerability.finding.location["file"]
+                    = "L:"
+                    = vulnerability.finding.location["start_line"]
 
   = paginate @vulnerabilities, theme: "gitlab"

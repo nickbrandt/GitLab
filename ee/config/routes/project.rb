@@ -175,8 +175,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        # get :vulnerabilities, controller: :dashboard
-
         resources :vulnerabilities, only: [:index], controller: :vulnerabilities
       end
 
