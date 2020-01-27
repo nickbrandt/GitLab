@@ -91,7 +91,7 @@ Below we assume that you have administrative access as the `postgres`
 user. First open a `psql` session as the `postgres` user:
 
 ```shell
-psql -h POSTGRESQL_SERVER -U postgres -d template1
+/opt/gitlab/embedded/bin/psql -h POSTGRESQL_SERVER -U postgres -d template1
 ```
 
 Once you are connected, run the following command. Replace
@@ -100,21 +100,21 @@ generated for the `praefect` SQL user:
 
 ```sql
 CREATE ROLE praefect WITH LOGIN CREATEDB PASSWORD 'PRAEFECT_SQL_PASSWORD';
-\q # exit psql
+\q
 ```
 
 Now connect as the `praefect` user to create the database. This has
 the side effect of verifying that you have access:
 
 ```shell
-psql -h POSTGRESQL_SERVER -U praefect -d template1
+/opt/gitlab/embedded/bin/psql -h POSTGRESQL_SERVER -U praefect -d template1
 ```
 
 Once you have connected as the `praefect` user, run:
 
 ```sql
 CREATE DATABASE praefect_production WITH ENCODING=UTF8;
-\q # quit psql
+\q
 ```
 
 #### Praefect
