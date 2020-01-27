@@ -115,6 +115,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resource :dashboard, only: [:show], controller: :dashboard
       resource :compliance_dashboard, only: [:show]
       resources :vulnerable_projects, only: [:index]
+      resource :discover, only: [:show], controller: :discover
 
       resources :vulnerability_findings, only: [:index] do
         collection do

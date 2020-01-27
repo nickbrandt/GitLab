@@ -257,6 +257,15 @@ module EE
       tabs.any? { |tab| project_nav_tab?(tab) }
     end
 
+    def show_discover_project_security?(project)
+      !!::Feature.enabled?(:discover_security) &&
+        ::Gitlab.com? &&
+        !!current_user &&
+        current_user.created_at > DateTime.new(2020, 1, 20) &&
+        !project.feature_available?(:security_dashboard) &&
+        can?(current_user, :admin_namespace, project.root_ancestor)
+    end
+
     def settings_operations_available?
       return true if super
 
