@@ -15,7 +15,7 @@ describe Emails::ServiceDesk do
   let_it_be(:issue) { create(:issue, project: project) }
   let(:template) { double(content: template_content) }
 
-  class ServiceEmailClass < BaseMailer
+  class ServiceEmailClass < ApplicationMailer
     include GitlabRoutingHelper
     include EmailsHelper
     include Emails::ServiceDesk
