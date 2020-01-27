@@ -36,7 +36,7 @@ describe 'NotesHelpers' do
       stub_licensed_features(epics: true)
     end
 
-    context '#find_noteable' do
+    describe '#find_noteable' do
       it 'returns the expected epic' do
         allow(subject).to receive(:user_group).and_return(group)
 
