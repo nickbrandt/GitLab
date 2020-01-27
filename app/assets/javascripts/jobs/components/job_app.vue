@@ -176,7 +176,9 @@ export default {
   mounted() {
     this.updateSidebar();
   },
-  destroyed() {
+  beforeDestroy() {
+    this.stopPollingTrace();
+    this.stopPolling();
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('scroll', this.updateScroll);
   },
@@ -192,6 +194,8 @@ export default {
       'fetchTrace',
       'scrollBottom',
       'scrollTop',
+      'stopPollingTrace',
+      'stopPolling',
       'toggleScrollButtons',
       'toggleScrollAnimation',
     ]),

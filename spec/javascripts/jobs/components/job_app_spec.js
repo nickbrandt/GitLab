@@ -46,9 +46,10 @@ describe('Job App ', () => {
   });
 
   afterEach(() => {
-    resetStore(store);
     vm.$destroy();
     mock.restore();
+
+    resetStore(store);
   });
 
   describe('while loading', () => {
@@ -384,7 +385,6 @@ describe('Job App ', () => {
           })
           .then(done)
           .catch(done.fail);
-        done();
       });
 
       it('displays remaining time for a delayed job', done => {

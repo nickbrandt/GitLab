@@ -147,7 +147,6 @@ export const toggleScrollisInBottom = ({ commit }, toggle) => {
 
 export const requestTrace = ({ commit }) => commit(types.REQUEST_TRACE);
 
-let traceTimeout;
 export const fetchTrace = ({ dispatch, state }) =>
   axios
     .get(`${state.traceEndpoint}/trace.json`, {
@@ -157,24 +156,32 @@ export const fetchTrace = ({ dispatch, state }) =>
       dispatch('toggleScrollisInBottom', isScrolledToBottom());
       dispatch('receiveTraceSuccess', data);
 
-      if (!data.complete) {
-        traceTimeout = setTimeout(() => {
-          dispatch('fetchTrace');
-        }, 4000);
-      } else {
+      if (data.complete) {
         dispatch('stopPollingTrace');
+      } else if (!state.traceTimeout) {
+        dispatch('startPollingTrace');
       }
     })
     .catch(() => dispatch('receiveTraceError'));
 
-export const stopPollingTrace = ({ commit }) => {
-  commit(types.STOP_POLLING_TRACE);
-  clearTimeout(traceTimeout);
+export const startPollingTrace = ({ dispatch, commit }) => {
+  const traceTimeout = setTimeout(() => {
+    commit(types.SET_TRACE_TIMEOUT, 0);
+    dispatch('fetchTrace');
+  }, 4000);
+
+  commit(types.SET_TRACE_TIMEOUT, traceTimeout);
 };
+
+export const stopPollingTrace = ({ state, commit }) => {
+  clearTimeout(state.traceTimeout);
+  commit(types.SET_TRACE_TIMEOUT, 0);
+  commit(types.STOP_POLLING_TRACE);
+};
+
 export const receiveTraceSuccess = ({ commit }, log) => commit(types.RECEIVE_TRACE_SUCCESS, log);
-export const receiveTraceError = ({ commit }) => {
-  commit(types.RECEIVE_TRACE_ERROR);
-  clearTimeout(traceTimeout);
+export const receiveTraceError = ({ dispatch }) => {
+  dispatch('stopPollingTrace');
   flash(__('An error occurred while fetching the job log.'));
 };
 /**
