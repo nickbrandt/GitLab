@@ -357,6 +357,8 @@ class Project < ApplicationRecord
     project_path: true,
     length: { maximum: 255 }
 
+  validates :project_feature, presence: true
+
   validates :namespace, presence: true
   validates :name, uniqueness: { scope: :namespace_id }
   validates :import_url, public_url: { schemes: ->(project) { project.persisted? ? VALID_MIRROR_PROTOCOLS : VALID_IMPORT_PROTOCOLS },

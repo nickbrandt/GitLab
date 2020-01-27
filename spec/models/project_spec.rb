@@ -279,6 +279,12 @@ describe Project do
       end
     end
 
+    it 'validates presence of project_feature' do
+      project = build(:project, project_feature: nil)
+
+      expect(project).not_to be_valid
+    end
+
     describe 'import_url' do
       it 'does not allow an invalid URI as import_url' do
         project = build(:project, import_url: 'invalid://')
