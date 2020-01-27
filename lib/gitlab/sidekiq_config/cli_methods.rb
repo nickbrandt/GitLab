@@ -25,6 +25,7 @@ module Gitlab
           full_path = File.join(rails_path, path)
           queues = File.exist?(full_path) ? YAML.load_file(full_path) : []
 
+          # https://gitlab.com/gitlab-org/gitlab/issues/199230
           queues.map { |queue| queue.is_a?(Hash) ? queue[:name] : queue }
         end
       end

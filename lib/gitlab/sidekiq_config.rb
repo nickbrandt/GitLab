@@ -13,21 +13,10 @@ module Gitlab
       (EE_QUEUE_CONFIG_PATH if Gitlab.ee?)
     ].compact.freeze
 
-    # For queues that don't have explicit workers - default and mailers
-    DummyWorker = Struct.new(:queue, :weight) do
-      def queue_namespace
-        nil
-      end
-
-      def get_weight
-        weight
-      end
-    end
-
     DEFAULT_WORKERS = [
-      Gitlab::SidekiqConfig::Worker.new(DummyWorker.new('default', 1), ee: false),
-      Gitlab::SidekiqConfig::Worker.new(DummyWorker.new('mailers', 2), ee: false)
-    ].freeze
+      DummyWorker.new('default', weight: 1),
+      DummyWorker.new('mailers', weight: 2)
+    ].map { |worker| Gitlab::SidekiqConfig::Worker.new(worker, ee: false) }.freeze
 
     class << self
       include Gitlab::SidekiqConfig::CliMethods

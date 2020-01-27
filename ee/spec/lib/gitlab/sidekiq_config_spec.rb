@@ -50,12 +50,14 @@ describe Gitlab::SidekiqConfig do
   end
 
   describe '.all_queues_yml_outdated?' do
-    before do
-      workers = [
+    let(:workers) do
+      [
         LdapGroupSyncWorker,
         RepositoryUpdateMirrorWorker
       ].map { |worker| described_class::Worker.new(worker, ee: true) }
+    end
 
+    before do
       allow(described_class).to receive(:workers).and_return(workers)
 
       allow(YAML).to receive(:load_file)
@@ -66,7 +68,7 @@ describe Gitlab::SidekiqConfig do
     it 'returns true if the YAML file does not match the application code' do
       allow(YAML).to receive(:load_file)
                        .with(described_class::EE_QUEUE_CONFIG_PATH)
-                       .and_return(['ldap_group_sync'])
+                       .and_return([workers.first.to_yaml])
 
       expect(described_class.all_queues_yml_outdated?).to be(true)
     end
@@ -74,7 +76,7 @@ describe Gitlab::SidekiqConfig do
     it 'returns false if the YAML file matches the application code' do
       allow(YAML).to receive(:load_file)
                        .with(described_class::EE_QUEUE_CONFIG_PATH)
-                       .and_return(%w[ldap_group_sync repository_update_mirror])
+                       .and_return(workers.map(&:to_yaml))
 
       expect(described_class.all_queues_yml_outdated?).to be(false)
     end

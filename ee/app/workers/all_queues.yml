@@ -3,79 +3,459 @@
 #
 # Do not edit it manually!
 ---
-- cronjob:adjourned_group_deletion
-- cronjob:adjourned_projects_deletion_cron
-- cronjob:clear_shared_runners_minutes
-- cronjob:geo_container_repository_sync_dispatch
-- cronjob:geo_file_download_dispatch
-- cronjob:geo_metrics_update
-- cronjob:geo_migrated_local_files_clean_up
-- cronjob:geo_prune_event_log
-- cronjob:geo_repository_sync
-- cronjob:geo_repository_verification_primary_batch
-- cronjob:geo_repository_verification_secondary_scheduler
-- cronjob:geo_repository_verification_secondary_shard
-- cronjob:geo_scheduler_per_shard_scheduler
-- cronjob:geo_scheduler_primary_per_shard_scheduler
-- cronjob:geo_scheduler_secondary_per_shard_scheduler
-- cronjob:geo_sidekiq_cron_config
-- cronjob:historical_data
-- cronjob:import_software_licenses
-- cronjob:ldap_all_groups_sync
-- cronjob:ldap_sync
-- cronjob:pseudonymizer
-- cronjob:update_all_mirrors
-- cronjob:update_max_seats_used_for_gitlab_com_subscriptions
-- epics:epics_update_epics_dates
-- gcp_cluster:cluster_update_app
-- gcp_cluster:cluster_wait_for_app_update
-- geo:geo_batch_project_registry
-- geo:geo_batch_project_registry_scheduler
-- geo:geo_container_repository_sync
-- geo:geo_design_repository_shard_sync
-- geo:geo_design_repository_sync
-- geo:geo_file_download
-- geo:geo_file_registry_removal
-- geo:geo_file_removal
-- geo:geo_hashed_storage_attachments_migration
-- geo:geo_hashed_storage_migration
-- geo:geo_project_sync
-- geo:geo_rename_repository
-- geo:geo_repositories_clean_up
-- geo:geo_repository_cleanup
-- geo:geo_repository_destroy
-- geo:geo_repository_shard_sync
-- geo:geo_repository_verification_primary_shard
-- geo:geo_repository_verification_primary_single
-- geo:geo_repository_verification_secondary_single
-- geo:geo_scheduler_primary_scheduler
-- geo:geo_scheduler_scheduler
-- geo:geo_scheduler_secondary_scheduler
-- geo:geo_secondary_repository_backfill
-- incident_management:incident_management_process_alert
-- incident_management:incident_management_process_prometheus_alert
-- jira_connect:jira_connect_sync_branch
-- jira_connect:jira_connect_sync_merge_request
-- personal_access_tokens:personal_access_tokens_policy
-- pipeline_default:ci_create_cross_project_pipeline
-- pipeline_default:ci_pipeline_bridge_status
-- pipeline_default:store_security_reports
-- pipeline_default:sync_security_reports_to_report_approval_rules
-- adjourned_project_deletion
-- admin_emails
-- create_github_webhook
-- design_management_new_version
-- elastic_batch_project_indexer
-- elastic_commit_indexer
-- elastic_full_index
-- elastic_indexer
-- elastic_namespace_indexer
-- elastic_namespace_rollout
-- export_csv
-- ldap_group_sync
-- new_epic
-- project_import_schedule
-- project_update_repository_storage
-- refresh_license_compliance_checks
-- repository_push_audit_event
-- repository_update_mirror
+- :name: cronjob:adjourned_group_deletion
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:adjourned_projects_deletion_cron
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:clear_shared_runners_minutes
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_container_repository_sync_dispatch
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_file_download_dispatch
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_metrics_update
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_migrated_local_files_clean_up
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_prune_event_log
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_repository_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_repository_verification_primary_batch
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_repository_verification_secondary_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_repository_verification_secondary_shard
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_scheduler_per_shard_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_scheduler_primary_per_shard_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_scheduler_secondary_per_shard_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:geo_sidekiq_cron_config
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:historical_data
+  :feature_category: :license_compliance
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:import_software_licenses
+  :feature_category: :license_compliance
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:ldap_all_groups_sync
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: true
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:ldap_sync
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: true
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:pseudonymizer
+  :feature_category: :integrations
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:update_all_mirrors
+  :feature_category: :source_code_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: cronjob:update_max_seats_used_for_gitlab_com_subscriptions
+  :feature_category: :license_compliance
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :cpu
+  :weight: 1
+- :name: epics:epics_update_epics_dates
+  :feature_category: :epics
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 2
+- :name: gcp_cluster:cluster_update_app
+  :feature_category: :kubernetes_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: gcp_cluster:cluster_wait_for_app_update
+  :feature_category: :kubernetes_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_batch_project_registry
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_batch_project_registry_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_container_repository_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_design_repository_shard_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_design_repository_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_file_download
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_file_registry_removal
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_file_removal
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_hashed_storage_attachments_migration
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_hashed_storage_migration
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_project_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_rename_repository
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repositories_clean_up
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_cleanup
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_destroy
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_shard_sync
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_verification_primary_shard
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_verification_primary_single
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_repository_verification_secondary_single
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_scheduler_primary_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_scheduler_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_scheduler_secondary_scheduler
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: geo:geo_secondary_repository_backfill
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: incident_management:incident_management_process_alert
+  :feature_category: :incident_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 2
+- :name: incident_management:incident_management_process_prometheus_alert
+  :feature_category: :incident_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :cpu
+  :weight: 2
+- :name: jira_connect:jira_connect_sync_branch
+  :feature_category: :integrations
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: jira_connect:jira_connect_sync_merge_request
+  :feature_category: :integrations
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: personal_access_tokens:personal_access_tokens_policy
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: pipeline_default:ci_create_cross_project_pipeline
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :cpu
+  :weight: 3
+- :name: pipeline_default:ci_pipeline_bridge_status
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :latency_sensitive: true
+  :resource_boundary: :cpu
+  :weight: 3
+- :name: pipeline_default:store_security_reports
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 3
+- :name: pipeline_default:sync_security_reports_to_report_approval_rules
+  :feature_category: :static_application_security_testing
+  :has_external_dependencies: 
+  :latency_sensitive: true
+  :resource_boundary: :cpu
+  :weight: 3
+- :name: adjourned_project_deletion
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: admin_emails
+  :feature_category: :not_owned
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: create_github_webhook
+  :feature_category: :integrations
+  :has_external_dependencies: true
+  :latency_sensitive: 
+  :resource_boundary: :cpu
+  :weight: 2
+- :name: design_management_new_version
+  :feature_category: :design_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_batch_project_indexer
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_commit_indexer
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_full_index
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_indexer
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_namespace_indexer
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: elastic_namespace_rollout
+  :feature_category: :search
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: export_csv
+  :feature_category: :issue_tracking
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :memory
+  :weight: 1
+- :name: ldap_group_sync
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: true
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 2
+- :name: new_epic
+  :feature_category: :epics
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :cpu
+  :weight: 2
+- :name: project_import_schedule
+  :feature_category: :importers
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: project_update_repository_storage
+  :feature_category: :source_code_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: refresh_license_compliance_checks
+  :feature_category: :license_compliance
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 2
+- :name: repository_push_audit_event
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+- :name: repository_update_mirror
+  :feature_category: :source_code_management
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1

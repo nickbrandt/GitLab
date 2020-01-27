@@ -35,11 +35,7 @@ describe Gitlab::SidekiqConfig::CliMethods do
         stub_exists(exists: true)
       end
 
-      context 'when the file contains an array of strings' do
-        before do
-          stub_contents(['queue_a'], ['queue_b'])
-        end
-
+      shared_examples 'valid file contents' do
         it 'memoizes the result' do
           result = described_class.worker_queues(dummy_root)
 
@@ -49,9 +45,20 @@ describe Gitlab::SidekiqConfig::CliMethods do
         end
 
         it 'flattens and joins the contents' do
+          expected_queues = %w[queue_a queue_b]
+          expected_queues = expected_queues.first(1) unless Gitlab.ee?
+
           expect(described_class.worker_queues(dummy_root))
-            .to contain_exactly('queue_a', 'queue_b')
+            .to match_array(expected_queues)
         end
+      end
+
+      context 'when the file contains an array of strings' do
+        before do
+          stub_contents(['queue_a'], ['queue_b'])
+        end
+
+        include_examples 'valid file contents'
       end
 
       context 'when the file contains an array of hashes' do
@@ -59,18 +66,7 @@ describe Gitlab::SidekiqConfig::CliMethods do
           stub_contents([{ name: 'queue_a' }], [{ name: 'queue_b' }])
         end
 
-        it 'memoizes the result' do
-          result = described_class.worker_queues(dummy_root)
-
-          stub_exists(exists: false)
-
-          expect(described_class.worker_queues(dummy_root)).to eq(result)
-        end
-
-        it 'flattens and joins the values of the name field' do
-          expect(described_class.worker_queues(dummy_root))
-            .to contain_exactly('queue_a', 'queue_b')
-        end
+        include_examples 'valid file contents'
       end
     end
 

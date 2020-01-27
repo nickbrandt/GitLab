@@ -32,21 +32,23 @@ describe Gitlab::SidekiqConfig do
   end
 
   describe '.all_queues_yml_outdated?' do
-    before do
-      workers = [
-        PostReceive,
+    let(:workers) do
+      [
         MergeWorker,
+        PostReceive,
         ProcessCommitWorker
       ].map { |worker| described_class::Worker.new(worker, ee: false) }
+    end
 
+    before do
       allow(described_class).to receive(:workers).and_return(workers)
       allow(Gitlab).to receive(:ee?).and_return(false)
     end
 
-    it 'returns true if the YAML file does not match the application code' do
+    it 'returns true if the YAML file does not matcph the application code' do
       allow(YAML).to receive(:load_file)
                        .with(described_class::FOSS_QUEUE_CONFIG_PATH)
-                       .and_return(%w[post_receive merge])
+                       .and_return(workers.first(2).map(&:to_yaml))
 
       expect(described_class.all_queues_yml_outdated?).to be(true)
     end
@@ -54,7 +56,7 @@ describe Gitlab::SidekiqConfig do
     it 'returns false if the YAML file matches the application code' do
       allow(YAML).to receive(:load_file)
                        .with(described_class::FOSS_QUEUE_CONFIG_PATH)
-                       .and_return(%w[merge post_receive process_commit])
+                       .and_return(workers.map(&:to_yaml))
 
       expect(described_class.all_queues_yml_outdated?).to be(false)
     end
