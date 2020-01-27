@@ -175,7 +175,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        get :vulnerabilities, controller: :dashboard
+        # get :vulnerabilities, controller: :dashboard
+
+        resources :vulnerabilities, only: [:index], controller: :vulnerabilities
       end
 
       resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }

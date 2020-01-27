@@ -6,16 +6,16 @@
   %h2.title= _("Vulnerabilities")
 
   .ci-table.js-security-dashboard-table
-    .gl-responsive-table-row.table-row-header.vulnerabilities-row-header.px-2{:role => "row"}
-      .table-section.section-5{:role => "rowheader"}= _("State")
-      .table-section.section-10.ml-md-2{:role => "rowheader"}= _("Severity")
-      .table-section.flex-grow-1{:role => "rowheader"}= _("Description")
+    .gl-responsive-table-row.table-row-header.vulnerabilities-row-header.px-2{ :role => "row" }
+      .table-section.section-5{ :role => "rowheader" }= _("State")
+      .table-section.section-10.ml-md-2{ :role => "rowheader" }= _("Severity")
+      .table-section.flex-grow-1{ :role => "rowheader" }= _("Description")
 
     - if @vulnerabilities.blank?
       .row.empty-state
         .col-12
           .svg-250.svg-content
-            %img{:alt => "No vulnerabilities found for this project", :src => "/assets/illustrations/security-dashboard-empty-state-a39978771073d0bed9552aa458716aec0d47892872212599b4a4a293501932e4.svg"}
+            = image_tag 'illustrations/security-dashboard-empty-state.svg', alt: _("No vulnerabilities found for this project") 
         .col-12
           .text-content
             %h4.center= _("No vulnerabilities found for this project")
@@ -25,12 +25,12 @@
       - @vulnerabilities.each do |vulnerability|
         .gl-responsive-table-row.vulnerabilities-row.p-2
           .table-section.section-5
-            .table-mobile-header{:role => "rowheader"}= _("State")
+            .table-mobile-header{ :role => "rowheader" }= _("State")
             .table-mobile-content.text-capitalize= vulnerability.state
           .table-section.section-10.ml-md-2
-            .table-mobile-header{:role => "rowheader"}= _("Severity")
+            .table-mobile-header{ :role => "rowheader" }= _("Severity")
             .table-mobile-content
-              .severity-badge{class: "severity-badge-#{vulnerability.severity}"}= vulnerability.severity
+              .severity-badge{ class: "severity-badge-#{ vulnerability.severity }" }= vulnerability.severity
           .table-section.flex-grow-1
             .table-mobile-header{:role => "rowheader"}= _("Description")
             .table-mobile-content.vulnerability-info.text-truncate
