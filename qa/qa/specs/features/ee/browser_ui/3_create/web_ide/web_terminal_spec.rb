@@ -6,7 +6,6 @@ module QA
   # It's now skipped because another bug breaks the projects list and
   # causes subsequent tests to fail
   # See https://gitlab.com/gitlab-org/gitlab/issues/197130
-  # BUG_IN_CODE
   context 'Create', :skip do
     describe 'Web IDE web terminal', :docker do
       before do

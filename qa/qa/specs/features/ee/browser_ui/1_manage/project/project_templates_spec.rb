@@ -64,8 +64,7 @@ module QA
         end
       end
 
-      # BUG_IN_CODE
-      context 'instance level', :requires_admin, quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/36815' do
+      context 'instance level', :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/36815', type: :bug } do
         before do
           Flow::Login.sign_in_as_admin
 
