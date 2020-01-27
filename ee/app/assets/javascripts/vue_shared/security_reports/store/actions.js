@@ -50,23 +50,12 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
 /**
  * SAST CONTAINER
  */
-export const setSastContainerHeadPath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_HEAD_PATH, path);
-
-export const setSastContainerBasePath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_BASE_PATH, path);
 
 export const setSastContainerDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
 
 export const requestSastContainerReports = ({ commit }) =>
   commit(types.REQUEST_SAST_CONTAINER_REPORTS);
-
-export const receiveSastContainerReports = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_CONTAINER_REPORTS, response);
-
-export const receiveSastContainerError = ({ commit }, error) =>
-  commit(types.RECEIVE_SAST_CONTAINER_ERROR, error);
 
 export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
@@ -96,76 +85,15 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
     });
 };
 
-export const fetchSastContainerReports = ({ state, dispatch }) => {
-  const { base, head } = state.sastContainer.paths;
-
-  dispatch('requestSastContainerReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'container_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveSastContainerReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveSastContainerError');
-    });
-};
-
 export const updateContainerScanningIssue = ({ commit }, issue) =>
   commit(types.UPDATE_CONTAINER_SCANNING_ISSUE, issue);
 
 /**
  * DAST
  */
-export const setDastHeadPath = ({ commit }, path) => commit(types.SET_DAST_HEAD_PATH, path);
-
-export const setDastBasePath = ({ commit }, path) => commit(types.SET_DAST_BASE_PATH, path);
-
 export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
 
 export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
-
-export const receiveDastReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DAST_REPORTS, response);
-
-export const receiveDastError = ({ commit }, error) => commit(types.RECEIVE_DAST_ERROR, error);
-
-export const fetchDastReports = ({ state, dispatch }) => {
-  const { base, head } = state.dast.paths;
-
-  dispatch('requestDastReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dast',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDastReports', {
-        head: values && values[0] ? values[0].data : null,
-        base: values && values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDastError');
-    });
-};
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
@@ -199,23 +127,12 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 /**
  * DEPENDENCY SCANNING
  */
-export const setDependencyScanningHeadPath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_HEAD_PATH, path);
-
-export const setDependencyScanningBasePath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
 
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 
 export const requestDependencyScanningReports = ({ commit }) =>
   commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
-
-export const receiveDependencyScanningReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_REPORTS, response);
-
-export const receiveDependencyScanningError = ({ commit }, error) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_ERROR, error);
 
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
@@ -242,32 +159,6 @@ export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('receiveDependencyScanningDiffError');
-    });
-};
-
-export const fetchDependencyScanningReports = ({ state, dispatch }) => {
-  const { base, head } = state.dependencyScanning.paths;
-
-  dispatch('requestDependencyScanningReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dependency_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDependencyScanningReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDependencyScanningError');
     });
 };
 

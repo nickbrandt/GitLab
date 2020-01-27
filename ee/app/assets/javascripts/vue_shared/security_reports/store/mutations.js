@@ -1,15 +1,7 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
-import {
-  parseDependencyScanningIssues,
-  parseDastIssues,
-  getUnapprovedVulnerabilities,
-  findIssueIndex,
-  parseDiff,
-} from './utils';
-import filterByKey from './utils/filter_by_key';
+import { findIssueIndex, parseDiff } from './utils';
 import getFileLocation from './utils/get_file_location';
-import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 
 export default {
@@ -58,52 +50,12 @@ export default {
   },
 
   // SAST CONTAINER
-  [types.SET_SAST_CONTAINER_HEAD_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'head', path);
-  },
-
-  [types.SET_SAST_CONTAINER_BASE_PATH](state, path) {
-    Vue.set(state.sastContainer.paths, 'base', path);
-  },
-
   [types.SET_SAST_CONTAINER_DIFF_ENDPOINT](state, path) {
     Vue.set(state.sastContainer.paths, 'diffEndpoint', path);
   },
 
   [types.REQUEST_SAST_CONTAINER_REPORTS](state) {
     Vue.set(state.sastContainer, 'isLoading', true);
-  },
-
-  /**
-   * For sast container we only render unapproved vulnerabilities.
-   */
-  [types.RECEIVE_SAST_CONTAINER_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const headIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-      const baseIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.base.vulnerabilities, reports.enrichData, reports.base.image),
-        reports.base.unapproved,
-      );
-      const filterKey = 'vulnerability';
-
-      const newIssues = filterByKey(headIssues, baseIssues, filterKey);
-      const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    } else if (reports.head && !reports.base) {
-      const newIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
-        reports.head.unapproved,
-      );
-
-      Vue.set(state.sastContainer, 'newIssues', newIssues);
-      Vue.set(state.sastContainer, 'isLoading', false);
-    }
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
@@ -124,20 +76,7 @@ export default {
     Vue.set(state.sastContainer, 'hasError', true);
   },
 
-  [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
-    Vue.set(state.sastContainer, 'isLoading', false);
-    Vue.set(state.sastContainer, 'hasError', true);
-  },
-
   // DAST
-
-  [types.SET_DAST_HEAD_PATH](state, path) {
-    Vue.set(state.dast.paths, 'head', path);
-  },
-
-  [types.SET_DAST_BASE_PATH](state, path) {
-    Vue.set(state.dast.paths, 'base', path);
-  },
 
   [types.SET_DAST_DIFF_ENDPOINT](state, path) {
     Vue.set(state.dast.paths, 'diffEndpoint', path);
@@ -145,25 +84,6 @@ export default {
 
   [types.REQUEST_DAST_REPORTS](state) {
     Vue.set(state.dast, 'isLoading', true);
-  },
-
-  [types.RECEIVE_DAST_REPORTS](state, reports) {
-    if (reports.head && reports.base) {
-      const headIssues = parseDastIssues(reports.head.site, reports.enrichData);
-      const baseIssues = parseDastIssues(reports.base.site, reports.enrichData);
-      const filterKey = 'pluginid';
-      const newIssues = filterByKey(headIssues, baseIssues, filterKey);
-      const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
-
-      Vue.set(state.dast, 'newIssues', newIssues);
-      Vue.set(state.dast, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.dast, 'isLoading', false);
-    } else if (reports.head && reports.head.site && !reports.base) {
-      const newIssues = parseDastIssues(reports.head.site, reports.enrichData);
-
-      Vue.set(state.dast, 'newIssues', newIssues);
-      Vue.set(state.dast, 'isLoading', false);
-    }
   },
 
   [types.RECEIVE_DAST_DIFF_SUCCESS](state, { diff, enrichData }) {
@@ -184,20 +104,7 @@ export default {
     Vue.set(state.dast, 'hasError', true);
   },
 
-  [types.RECEIVE_DAST_ERROR](state) {
-    Vue.set(state.dast, 'isLoading', false);
-    Vue.set(state.dast, 'hasError', true);
-  },
-
   // DEPENDECY SCANNING
-
-  [types.SET_DEPENDENCY_SCANNING_HEAD_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'head', path);
-  },
-
-  [types.SET_DEPENDENCY_SCANNING_BASE_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'base', path);
-  },
 
   [types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT](state, path) {
     Vue.set(state.dependencyScanning.paths, 'diffEndpoint', path);
@@ -205,56 +112,6 @@ export default {
 
   [types.REQUEST_DEPENDENCY_SCANNING_REPORTS](state) {
     Vue.set(state.dependencyScanning, 'isLoading', true);
-  },
-
-  /**
-   * Compares dependency scanning results and returns the formatted report
-   *
-   * Dependency report has 3 types of issues, newIssues, resolvedIssues and allIssues.
-   *
-   * When we have both base and head:
-   * - newIssues = head - base
-   * - resolvedIssues = base - head
-   * - allIssues = head - newIssues - resolvedIssues
-   *
-   * When we only have head
-   * - newIssues = head
-   * - resolvedIssues = 0
-   * - allIssues = 0
-   */
-  [types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const filterKey = 'cve';
-      const parsedHead = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      const parsedBase = parseDependencyScanningIssues(
-        reports.base,
-        reports.enrichData,
-        state.blobPath.base,
-      );
-
-      const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
-      const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
-      const allIssues = filterByKey(parsedHead, newIssues.concat(resolvedIssues), filterKey);
-
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.dependencyScanning, 'allIssues', allIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
-
-    if (reports.head && !reports.base) {
-      const newIssues = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
   },
 
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS](state, { diff, enrichData }) {
@@ -271,11 +128,6 @@ export default {
   },
 
   [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR](state) {
-    Vue.set(state.dependencyScanning, 'isLoading', false);
-    Vue.set(state.dependencyScanning, 'hasError', true);
-  },
-
-  [types.RECEIVE_DEPENDENCY_SCANNING_ERROR](state) {
     Vue.set(state.dependencyScanning, 'isLoading', false);
     Vue.set(state.dependencyScanning, 'hasError', true);
   },
