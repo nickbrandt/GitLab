@@ -1150,7 +1150,6 @@ ActiveRecord::Schema.define(version: 2020_01_27_090233) do
     t.bigint "cluster_id", null: false
     t.integer "status", null: false
     t.string "version", limit: 255, null: false
-    t.string "kibana_hostname", limit: 255
     t.text "status_reason"
     t.index ["cluster_id"], name: "index_clusters_applications_elastic_stacks_on_cluster_id", unique: true
   end
