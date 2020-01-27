@@ -1,9 +1,9 @@
 {
-  "summary": { "total": 11, "resolved": 0, "failed": 2 },
+  "summary": { "total": 11, "resolved": 0, "errored": 0, "failed": 2 },
   "suites": [
     {
       "name": "rspec:pg",
-      "summary": { "total": 8, "resolved": 0, "failed": 2 },
+      "summary": { "total": 8, "resolved": 0, "errored": 0, "failed": 2 },
       "new_failures": [
         {
           "result": "failure",
@@ -19,14 +19,20 @@
         }
       ],
       "resolved_failures": [],
-      "existing_failures": []
+      "existing_failures": [],
+      "new_errors": [],
+      "resolved_errors": [],
+      "existing_errors": []
     },
     {
       "name": "java ant",
-      "summary": { "total": 3, "resolved": 0, "failed": 0 },
+      "summary": { "total": 3, "resolved": 0, "errored": 0, "failed": 0 },
       "new_failures": [],
       "resolved_failures": [],
-      "existing_failures": []
+      "existing_failures": [],
+      "new_errors": [],
+      "resolved_errors": [],
+      "existing_errors": []
     }
   ]
 }
