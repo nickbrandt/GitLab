@@ -32,20 +32,29 @@ function handleRangeDirection({ direction = 'before', anchor, before, after }) {
   };
 }
 
-function convertFixedToFixed(range) {
+/**
+ * Converts a fixed range to a fixed range
+ * @param {Object} fixedRange - A range with fixed start and end (e.g. From January 1st 2020 to January 31st 2020)
+ */
+function convertFixedToFixed(fixedRange) {
+  //
   return {
-    startTime: new Date(range.startTime).toISOString(),
-    endTime: new Date(range.endTime).toISOString(),
+    startTime: new Date(fixedRange.startTime).toISOString(),
+    endTime: new Date(fixedRange.endTime).toISOString(),
   };
 }
 
-function convertAnchoredToFixed(range) {
-  const anchor = new Date(range.anchor);
+/**
+ * Converts an anchored range to a fixed range
+ * @param {Object} anchoredRange - A duration of time relative to an fixed point in time (2 minutes before January 1st, 1 day after)
+ */
+function convertAnchoredToFixed(anchoredRange) {
+  const anchor = new Date(anchoredRange.anchor);
 
   const { startDate, endDate } = handleRangeDirection({
-    before: dateMinusDuration(anchor, range.duration),
-    after: datePlusDuration(anchor, range.duration),
-    direction: range.direction,
+    before: dateMinusDuration(anchor, anchoredRange.duration),
+    after: datePlusDuration(anchor, anchoredRange.duration),
+    direction: anchoredRange.direction,
     anchor,
   });
 
@@ -55,24 +64,32 @@ function convertAnchoredToFixed(range) {
   };
 }
 
-function convertRollingToFixed(range) {
+/**
+ * Converts a rolling change to a fixed range
+ * @param {Object} rollingRange - a time range relative to now (Last 2 minutes, Next 2 days)
+ */
+function convertRollingToFixed(rollingRange) {
   const now = new Date(Date.now());
 
   return convertAnchoredToFixed({
-    duration: range.duration,
-    direction: range.direction,
+    duration: rollingRange.duration,
+    direction: rollingRange.direction,
     anchor: now.toISOString(),
   });
 }
 
-function convertOpenToFixed(range) {
+/**
+ * Converts an open range to a fixed range
+ * @param {Object} openRange - a time range relative to an anchor (Before 1st of January, After 1st of January)
+ */
+function convertOpenToFixed(openRange) {
   const now = new Date(Date.now());
-  const anchor = new Date(range.anchor);
+  const anchor = new Date(openRange.anchor);
 
   const { startDate, endDate } = handleRangeDirection({
     before: MINIMUM_DATE,
     after: now,
-    direction: range.direction,
+    direction: openRange.direction,
     anchor,
   });
 
@@ -126,24 +143,17 @@ export function getRangeType(range) {
  *
  * A a range of time can be understood as an arbitrary period
  * of time that can represent points in time relative to the
- * present moment. Some examples can be:
- *
- * -
- * - From January 1st onwards
- * -
- * - Last 2 days
- * - The next 2 days
- * - Today so far
+ * present moment:
  *
  * The range of time can take different shapes according to
  * the point of time and type of time range it represents.
  *
  * The following types of ranges can be represented:
  *
- * - Fixed Range: fixed start and ends (e.g. From January 1st 2020 to January 31st 2020)
- * - Anchored Range: a fixed points in time (2 minutes before January 1st, 1 day after )
- * - Rolling Range: a time range relative to now (Last 2 minutes, Next 2 days)
- * - Open Range: a time range relative to now (Before 1st of January, After 1st of January)
+ * Fixed Range: A range with fixed start and end (e.g. From January 1st 2020 to January 31st 2020)
+ * Anchored Range: A duration of time relative to an fixed point in time (2 minutes before January 1st, 1 day after)
+ * Rolling Range: A time range relative to now (Last 2 minutes, Next 2 days)
+ * Open Range: A time range relative to an anchor (Before 1st of January, After 1st of January)
  *
  * @param {Object} dateTimeRange - A Time Range representation
  * It contains the data needed to create a fixed time range plus
