@@ -24,27 +24,6 @@ describe Gitlab::SidekiqConfig do
     end
   end
 
-  describe '.expand_queues' do
-    it 'expands queue namespaces to concrete queue names' do
-      queues = described_class.expand_queues(%w[cronjob])
-
-      expect(queues).to include('cronjob:stuck_import_jobs')
-      expect(queues).to include('cronjob:stuck_merge_jobs')
-    end
-
-    it 'lets concrete queue names pass through' do
-      queues = described_class.expand_queues(%w[post_receive])
-
-      expect(queues).to include('post_receive')
-    end
-
-    it 'lets unknown queues pass through' do
-      queues = described_class.expand_queues(%w[unknown])
-
-      expect(queues).to include('unknown')
-    end
-  end
-
   describe '.workers_for_all_queues_yml' do
     it 'returns a tuple with FOSS workers first' do
       expect(described_class.workers_for_all_queues_yml.first)

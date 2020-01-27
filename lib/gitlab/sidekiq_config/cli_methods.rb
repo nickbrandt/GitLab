@@ -37,6 +37,12 @@ module Gitlab
           [queue, *queues_set.grep(/\A#{queue}:/)]
         end
       end
+
+      def clear_memoization!
+        if instance_variable_defined?('@worker_queues')
+          remove_instance_variable('@worker_queues')
+        end
+      end
       # rubocop:enable Gitlab/ModuleWithInstanceVariables
     end
   end
