@@ -8,7 +8,6 @@ import { polyfillSticky } from '~/lib/utils/sticky';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import createStore from '../store';
 import EmptyState from './empty_state.vue';
 import EnvironmentsBlock from './environments_block.vue';
 import ErasedBlock from './erased_block.vue';
@@ -22,7 +21,6 @@ import { isNewJobLogActive } from '../store/utils';
 
 export default {
   name: 'JobPageApp',
-  store: createStore(),
   components: {
     CiHeader,
     Callout,
@@ -60,24 +58,12 @@ export default {
       required: false,
       default: null,
     },
-    endpoint: {
-      type: String,
-      required: true,
-    },
     terminalPath: {
       type: String,
       required: false,
       default: null,
     },
-    pagePath: {
-      type: String,
-      required: true,
-    },
     projectPath: {
-      type: String,
-      required: true,
-    },
-    logState: {
       type: String,
       required: true,
     },
@@ -161,15 +147,6 @@ export default {
   created() {
     this.throttled = _.throttle(this.toggleScrollButtons, 100);
 
-    this.setJobEndpoint(this.endpoint);
-    this.setTraceOptions({
-      logState: this.logState,
-      pagePath: this.pagePath,
-    });
-
-    this.fetchJob();
-    this.fetchTrace();
-
     window.addEventListener('resize', this.onResize);
     window.addEventListener('scroll', this.updateScroll);
   },
@@ -184,14 +161,10 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setJobEndpoint',
-      'setTraceOptions',
-      'fetchJob',
       'fetchJobsForStage',
       'hideSidebar',
       'showSidebar',
       'toggleSidebar',
-      'fetchTrace',
       'scrollBottom',
       'scrollTop',
       'stopPollingTrace',
@@ -227,7 +200,7 @@ export default {
   <div>
     <gl-loading-icon
       v-if="isLoading"
-      :size="2"
+      size="lg"
       class="js-job-loading qa-loading-animation prepend-top-20"
     />
 

@@ -14,6 +14,16 @@ import {
   scrollUp,
 } from '~/lib/utils/scroll_utils';
 
+export const init = ({ dispatch }, { endpoint, logState, pagePath }) => {
+  dispatch('setJobEndpoint', endpoint);
+  dispatch('setTraceOptions', {
+    logState,
+    pagePath,
+  });
+
+  return Promise.all([dispatch('fetchJob'), dispatch('fetchTrace')]);
+};
+
 export const setJobEndpoint = ({ commit }, endpoint) => commit(types.SET_JOB_ENDPOINT, endpoint);
 export const setTraceOptions = ({ commit }, options) => commit(types.SET_TRACE_OPTIONS, options);
 

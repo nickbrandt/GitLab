@@ -4,7 +4,7 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 import { waitForMutation } from 'spec/helpers/vue_test_utils_helper';
 import axios from '~/lib/utils/axios_utils';
 import jobApp from '~/jobs/components/job_app.vue';
-import createStore, { initStore } from '~/jobs/store';
+import createStore from '~/jobs/store';
 import * as types from '~/jobs/store/mutation_types';
 import job from '../mock_data';
 
@@ -15,7 +15,7 @@ describe('Job App ', () => {
   let vm;
   let mock;
 
-  const settings = {
+  const initSettings = {
     endpoint: `${gl.TEST_HOST}jobs/123.json`,
     pagePath: `${gl.TEST_HOST}jobs/123`,
     logState:
@@ -34,10 +34,10 @@ describe('Job App ', () => {
 
   const waitForJobReceived = () => waitForMutation(store, types.RECEIVE_JOB_SUCCESS);
   const setupAndMount = ({ jobData = {}, traceData = {} } = {}) => {
-    mock.onGet(settings.endpoint).replyOnce(200, { ...job, ...jobData });
-    mock.onGet(`${settings.pagePath}/trace.json`).reply(200, traceData);
+    mock.onGet(initSettings.endpoint).replyOnce(200, { ...job, ...jobData });
+    mock.onGet(`${initSettings.pagePath}/trace.json`).reply(200, traceData);
 
-    initStore(store, settings);
+    store.dispatch('init', initSettings);
 
     vm = mountComponentWithStore(Component, { props, store });
 
