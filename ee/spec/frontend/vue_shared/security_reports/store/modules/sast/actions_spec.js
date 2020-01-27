@@ -44,9 +44,9 @@ describe('sast report actions', () => {
     });
   });
 
-  describe('requestReports', () => {
-    it(`should commit ${types.REQUEST_REPORTS}`, done => {
-      testAction(actions.requestReports, {}, state, [{ type: types.REQUEST_REPORTS }], [], done);
+  describe('requestDiff', () => {
+    it(`should commit ${types.REQUEST_DIFF}`, done => {
+      testAction(actions.requestDiff, {}, state, [{ type: types.REQUEST_DIFF }], [], done);
     });
   });
 
@@ -115,7 +115,7 @@ describe('sast report actions', () => {
           { ...rootState, ...state },
           [],
           [
-            { type: 'requestReports' },
+            { type: 'requestDiff' },
             {
               type: 'receiveDiffSuccess',
               payload: {
@@ -144,7 +144,7 @@ describe('sast report actions', () => {
           {},
           { ...rootState, ...state },
           [],
-          [{ type: 'requestReports' }, { type: 'receiveDiffError' }],
+          [{ type: 'requestDiff' }, { type: 'receiveDiffError' }],
           done,
         );
       });
@@ -165,7 +165,7 @@ describe('sast report actions', () => {
           {},
           { ...rootState, ...state },
           [],
-          [{ type: 'requestReports' }, { type: 'receiveDiffError' }],
+          [{ type: 'requestDiff' }, { type: 'receiveDiffError' }],
           done,
         );
       });

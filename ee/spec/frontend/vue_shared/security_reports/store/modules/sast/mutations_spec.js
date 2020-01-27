@@ -20,9 +20,9 @@ describe('sast module mutations', () => {
     });
   });
 
-  describe(types.REQUEST_REPORTS, () => {
+  describe(types.REQUEST_DIFF, () => {
     it('should set the `isLoading` status to `true`', () => {
-      mutations[types.REQUEST_REPORTS](state);
+      mutations[types.REQUEST_DIFF](state);
 
       expect(state.isLoading).toBe(true);
     });

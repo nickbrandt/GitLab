@@ -7,7 +7,7 @@ export default {
     Vue.set(state.paths, 'diffEndpoint', path);
   },
 
-  [types.REQUEST_REPORTS](state) {
+  [types.REQUEST_DIFF](state) {
     state.isLoading = true;
   },
 

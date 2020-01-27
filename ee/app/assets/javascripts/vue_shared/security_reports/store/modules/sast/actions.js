@@ -4,7 +4,7 @@ import * as types from './mutation_types';
 
 export const setDiffEndpoint = ({ commit }, path) => commit(types.SET_DIFF_ENDPOINT, path);
 
-export const requestReports = ({ commit }) => commit(types.REQUEST_REPORTS);
+export const requestDiff = ({ commit }) => commit(types.REQUEST_DIFF);
 
 export const updateVulnerability = ({ commit }, vulnerability) =>
   commit(types.UPDATE_VULNERABILITY, vulnerability);
@@ -16,7 +16,7 @@ export const receiveDiffError = ({ commit }, response) =>
   commit(types.RECEIVE_DIFF_ERROR, response);
 
 export const fetchDiff = ({ state, rootState, dispatch }) => {
-  dispatch('requestReports');
+  dispatch('requestDiff');
 
   return Promise.all([
     pollUntilComplete(state.paths.diffEndpoint),
