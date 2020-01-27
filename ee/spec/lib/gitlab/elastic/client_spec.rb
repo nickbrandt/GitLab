@@ -28,8 +28,6 @@ describe Gitlab::Elastic::Client do
       .to_return(status: 200, body: "RoleName", headers: {})
     stub_request(:get, "http://169.254.169.254/latest/meta-data/iam/security-credentials/RoleName")
       .to_return(status: 200, body: creds_response, headers: {})
-    stub_request(:put, "http://169.254.169.254/latest/api/token")
-      .to_return(status: 200, body: "", headers: {})
   end
 
   describe '.build' do
@@ -64,13 +62,8 @@ describe Gitlab::Elastic::Client do
           stub_request(:get, 'http://example-elastic:9200/foo/_all/1')
             .with(
               headers: {
-                'Accept'               => '*/*',
-                'Accept-Encoding'      => 'gzip,deflate',
-                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date, Signature=e52132ac542972698e99d9a8337b7493e4ca6210f61fc8da5cbb8008d8b2fb87',
+                'Authorization'        => 'AWS4-HMAC-SHA256 Credential=0/20170303/us-east-1/es/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=4ba2aae19a476152dacf5a2191da67b0cf81b9d7152dab5c42b1bba701da19f1',
                 'Content-Type'         => 'application/json',
-                'Date'                 => 'Fri, 03 Mar 2017 13:39:52 GMT',
-                'Host'                 => 'example-elastic:9200',
-                'User-Agent'           => 'Faraday v0.15.4',
                 'X-Amz-Content-Sha256' => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
                 'X-Amz-Date'           => '20170303T133952Z'
               })
