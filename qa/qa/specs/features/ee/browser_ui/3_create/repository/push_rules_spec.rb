@@ -9,7 +9,7 @@ module QA
 
           @file_name_limitation = 'denied_file'
           @file_size_limitation = 1
-          @authors_email_limitation = %{(#{Regexp.escape(@creator.email)}|root@gitlab.com)}
+          @authors_email_limitation = %{(#{Regexp.escape(@creator.email)}|#{@root.email})}
           @branch_name_limitation = 'master'
           @needed_phrase_limitation = 'allowed commit'
           @deny_message_phrase_limitation = 'denied commit'
@@ -76,7 +76,7 @@ module QA
 
         it 'restricts commits by user' do
           expect_no_error_on_push file: standard_file
-          expect_error_on_push file: standard_file, user: root_user
+          expect_error_on_push file: standard_file, user: @root
         end
 
         it 'restricts removal of tag' do
@@ -112,7 +112,8 @@ module QA
         end
 
         it 'restricts commits to current authenticated user' do
-          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
+          gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+          @project.add_member(gitlab_user)
 
           expect_no_error_on_push file: standard_file, gpg: @gpg
           expect_error_on_push file: standard_file, gpg: @gpg, user: gitlab_user
@@ -126,22 +127,13 @@ module QA
          }]
       end
 
-      def root_user
-        Resource::User.new.tap do |user|
-          user.username = 'root'
-          user.name = 'GitLab QA'
-          user.email = 'root@gitlab.com'
-          user.password = nil
-        end
-      end
-
       def push(commit_message:, branch:, file:, user:, tag:, gpg:)
         Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = @project
           push.commit_message = commit_message
           push.new_branch = branch != 'master'
           push.branch_name = branch
-          push.user = user
+          push.user = user if user != @root
           push.files = file if tag.nil?
           push.tag_name = tag unless tag.nil?
           push.gpg_key_id = gpg.key_id unless gpg.nil?
@@ -166,6 +158,13 @@ module QA
         @creator = Resource::User.fabricate_via_api! do |user|
           user.username = Runtime::User.username
           user.password = Runtime::User.password
+        end
+
+        @root = Resource::User.new.tap do |user|
+          user.username = 'root'
+          user.name = 'GitLab QA'
+          user.email = 'root@gitlab.com'
+          user.password = nil
         end
 
         @project = Resource::Project.fabricate_via_api! do |project|
