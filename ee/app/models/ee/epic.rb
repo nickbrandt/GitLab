@@ -202,12 +202,15 @@ module EE
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
 
-      def related_issues(ids:, preload: nil)
-        ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
+      def related_issues(ids: nil, preload: nil)
+        items = ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
           .joins(:epic_issue)
           .preload(preload)
-          .where("epic_issues.epic_id": ids)
           .order('epic_issues.relative_position, epic_issues.id')
+
+        return items unless ids
+
+        items.where("epic_issues.epic_id": ids)
       end
     end
 

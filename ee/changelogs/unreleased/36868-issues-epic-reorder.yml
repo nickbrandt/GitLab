@@ -1,0 +1,5 @@
+---
+title: Order epic related issues by relative_position
+merge_request: 23776
+author:
+type: fixed
