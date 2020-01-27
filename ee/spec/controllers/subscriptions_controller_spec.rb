@@ -197,7 +197,7 @@ describe SubscriptionsController do
         it 'returns the group edit location in JSON format' do
           subject
 
-          expect(response.body).to eq({ location: "/-/subscriptions/groups/#{group.path}/edit" }.to_json)
+          expect(response.body).to eq({ location: "/-/subscriptions/groups/#{group.path}/edit?plan_id=x&quantity=2" }.to_json)
         end
       end
 
