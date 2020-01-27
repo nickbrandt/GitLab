@@ -66,12 +66,13 @@ module Gitlab
         workers.partition(&:ee?).reverse.map(&:sort)
       end
 
+      # YAML.load_file is OK here as we control the file contents
       def all_queues_yml_outdated?
         foss_workers, ee_workers = workers_for_all_queues_yml
 
-        return true if foss_workers != YAML.safe_load(File.read(FOSS_QUEUE_CONFIG_PATH))
+        return true if foss_workers != YAML.load_file(FOSS_QUEUE_CONFIG_PATH)
 
-        Gitlab.ee? && ee_workers != YAML.safe_load(File.read(EE_QUEUE_CONFIG_PATH))
+        Gitlab.ee? && ee_workers != YAML.load_file(EE_QUEUE_CONFIG_PATH)
       end
 
       def queues_for_sidekiq_queues_yml
@@ -89,9 +90,9 @@ module Gitlab
          remaining_queues.map(&:queue_and_weight)).sort
       end
 
+      # YAML.load_file is OK here as we control the file contents
       def sidekiq_queues_yml_outdated?
-        # YAML.load is OK here as we control the file contents
-        config_queues = YAML.load(File.read(SIDEKIQ_QUEUES_PATH))[:queues] # rubocop:disable Security/YAMLLoad
+        config_queues = YAML.load_file(SIDEKIQ_QUEUES_PATH)[:queues]
 
         queues_for_sidekiq_queues_yml != config_queues
       end

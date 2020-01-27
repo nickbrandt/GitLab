@@ -44,17 +44,17 @@ describe Gitlab::SidekiqConfig do
     end
 
     it 'returns true if the YAML file does not match the application code' do
-      allow(File).to receive(:read)
+      allow(YAML).to receive(:load_file)
                        .with(described_class::FOSS_QUEUE_CONFIG_PATH)
-                       .and_return(YAML.dump(%w[post_receive merge]))
+                       .and_return(%w[post_receive merge])
 
       expect(described_class.all_queues_yml_outdated?).to be(true)
     end
 
     it 'returns false if the YAML file matches the application code' do
-      allow(File).to receive(:read)
+      allow(YAML).to receive(:load_file)
                        .with(described_class::FOSS_QUEUE_CONFIG_PATH)
-                       .and_return(YAML.dump(%w[merge post_receive process_commit]))
+                       .and_return(%w[merge post_receive process_commit])
 
       expect(described_class.all_queues_yml_outdated?).to be(false)
     end
@@ -104,17 +104,17 @@ describe Gitlab::SidekiqConfig do
     end
 
     it 'returns true if the YAML file does not match the application code' do
-      allow(File).to receive(:read)
+      allow(YAML).to receive(:load_file)
                        .with(described_class::SIDEKIQ_QUEUES_PATH)
-                       .and_return(YAML.dump(queues: expected_queues.reverse))
+                       .and_return(queues: expected_queues.reverse)
 
       expect(described_class.sidekiq_queues_yml_outdated?).to be(true)
     end
 
     it 'returns false if the YAML file matches the application code' do
-      allow(File).to receive(:read)
+      allow(YAML).to receive(:load_file)
                        .with(described_class::SIDEKIQ_QUEUES_PATH)
-                       .and_return(YAML.dump(queues: expected_queues))
+                       .and_return(queues: expected_queues)
 
       expect(described_class.sidekiq_queues_yml_outdated?).to be(false)
     end

@@ -33,20 +33,44 @@ describe Gitlab::SidekiqConfig::CliMethods do
     context 'when the file exists' do
       before do
         stub_exists(exists: true)
-        stub_contents(['queue_a'], ['queue_b'])
       end
 
-      it 'memoizes the result' do
-        result = described_class.worker_queues(dummy_root)
+      context 'when the file contains an array of strings' do
+        before do
+          stub_contents(['queue_a'], ['queue_b'])
+        end
 
-        stub_exists(exists: false)
+        it 'memoizes the result' do
+          result = described_class.worker_queues(dummy_root)
 
-        expect(described_class.worker_queues(dummy_root)).to eq(result)
+          stub_exists(exists: false)
+
+          expect(described_class.worker_queues(dummy_root)).to eq(result)
+        end
+
+        it 'flattens and joins the contents' do
+          expect(described_class.worker_queues(dummy_root))
+            .to contain_exactly('queue_a', 'queue_b')
+        end
       end
 
-      it 'flattens and joins the contents' do
-        expect(described_class.worker_queues(dummy_root))
-          .to contain_exactly('queue_a', 'queue_b')
+      context 'when the file contains an array of hashes' do
+        before do
+          stub_contents([{ name: 'queue_a' }], [{ name: 'queue_b' }])
+        end
+
+        it 'memoizes the result' do
+          result = described_class.worker_queues(dummy_root)
+
+          stub_exists(exists: false)
+
+          expect(described_class.worker_queues(dummy_root)).to eq(result)
+        end
+
+        it 'flattens and joins the values of the name field' do
+          expect(described_class.worker_queues(dummy_root))
+            .to contain_exactly('queue_a', 'queue_b')
+        end
       end
     end
 
