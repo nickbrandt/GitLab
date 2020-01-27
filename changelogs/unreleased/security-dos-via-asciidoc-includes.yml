@@ -1,5 +1,5 @@
 ---
-title: Denial of service via AsciiDoc includes
-merge_request: 133
+title: Limit number of AsciiDoc includes per document
+merge_request:
 author:
 type: security
