@@ -612,7 +612,7 @@ Here are some common pitfalls and how to overcome them:
   }'
   ```
   
- - **I'm getting a `health check timeout: no Elasticsearch node available` error in Sidekiq during the indexing process**
+- **I'm getting a `health check timeout: no Elasticsearch node available` error in Sidekiq during the indexing process**
 
    ```
    Gitlab::Elastic::Indexer::Error: time="2020-01-23T09:13:00Z" level=fatal msg="health check timeout: no Elasticsearch node available"
