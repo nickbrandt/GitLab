@@ -7,7 +7,7 @@ describe DesignManagement::SaveDesignsService do
   let(:developer) { create(:user) }
   let(:user) { developer }
   let(:files) { [rails_sample] }
-  let(:design_repository) { EE::Gitlab::GlRepository::DESIGN.repository_accessor.call(project) }
+  let(:design_repository) { EE::Gitlab::GlRepository::DESIGN.repository_resolver.call(project) }
   let(:rails_sample_name) { 'rails_sample.jpg' }
   let(:rails_sample) { sample_image(rails_sample_name) }
   let(:dk_png) { sample_image('dk.png') }
