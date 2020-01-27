@@ -1,0 +1,5 @@
+---
+title: Escape special chars in Sentry error header
+merge_request: 197922
+author:
+type: security

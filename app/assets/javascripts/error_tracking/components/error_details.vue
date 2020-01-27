@@ -1,6 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import dateFormat from 'dateformat';
+import { escape } from 'lodash';
 import createFlash from '~/flash';
 import { GlButton, GlFormInput, GlLink, GlLoadingIcon, GlBadge } from '@gitlab/ui';
 import { __, sprintf, n__ } from '~/locale';
@@ -104,7 +105,7 @@ export default {
       return sprintf(
         __('Reported %{timeAgo} by %{reportedBy}'),
         {
-          reportedBy: `<strong>${this.GQLerror.culprit}</strong>`,
+          reportedBy: `<strong>${escape(this.GQLerror.culprit)}</strong>`,
           timeAgo: this.timeFormatted(this.stacktraceData.date_received),
         },
         false,
@@ -182,7 +183,12 @@ export default {
     </div>
     <div v-else-if="showDetails" class="error-details">
       <div class="top-area align-items-center justify-content-between py-3">
-        <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
+        <span
+          v-if="!loadingStacktrace && stacktrace"
+          v-html="reported"
+          data-qa-selector="reported_text"
+        >
+        </span>
         <div class="d-inline-flex">
           <loading-button
             :label="__('Ignore')"
