@@ -28,7 +28,7 @@ describe JwtController do
       it 'allows access' do
         get '/jwt/auth', params: parameters, headers: headers
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(token_response['access']).to be_present
         expect(token_access['actions']).to eq ['pull']
         expect(token_access['type']).to eq 'repository'

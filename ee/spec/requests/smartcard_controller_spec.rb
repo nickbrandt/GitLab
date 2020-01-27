@@ -72,7 +72,7 @@ describe SmartcardController, type: :request do
       it 'renders 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -140,7 +140,7 @@ describe SmartcardController, type: :request do
       it 'renders 401' do
         subject
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
         expect(request.env['warden']).not_to be_authenticated
       end
     end
