@@ -52,6 +52,13 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
 
         expect([service_params_for(project.id, active: true)]).to eq rows
       end
+
+      context 'project has been deleted before migrations was executed' do
+        it 'does not create services entries' do
+          project.delete
+          expect { subject.perform(project.id) }.not_to change { services.order(:id).map { |row| row.attributes } }
+        end
+      end
     end
 
     context 'prometheus integration services exist' do

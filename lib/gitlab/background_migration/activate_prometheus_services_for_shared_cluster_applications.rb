@@ -7,6 +7,10 @@ module Gitlab
     class ActivatePrometheusServicesForSharedClusterApplications
       module Migratable
         # Migration model namespace isolated from application code.
+        class Project < ActiveRecord::Base
+        end
+
+        # Migration model namespace isolated from application code.
         class PrometheusService < ActiveRecord::Base
           self.inheritance_column = :_type_disabled
           self.table_name = 'services'
@@ -45,7 +49,7 @@ module Gitlab
 
       def perform(project_id)
         service = Migratable::PrometheusService.find_by(project_id: project_id) || Migratable::PrometheusService.for_project(project_id)
-        service.update!(active: true) if service.managed?
+        service.update!(active: true) if service.managed? && Project.find_by(id: project_id)
       end
     end
   end

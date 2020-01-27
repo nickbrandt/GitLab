@@ -1,0 +1,6 @@
+---
+title: 'Fix PG::ForeignKeyViolation: ERROR in ActivatePrometheusServicesForSharedClusterApplications
+  background migration job'
+merge_request: 23770
+author:
+type: fixed
