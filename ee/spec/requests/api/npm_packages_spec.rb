@@ -40,7 +40,6 @@ describe API::NpmPackages do
     let!(:package_dependency_link2) { create(:packages_dependency_link, package: package, dependency_type: :devDependencies) }
     let!(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
     let!(:package_dependency_link4) { create(:packages_dependency_link, package: package, dependency_type: :peerDependencies) }
-    let!(:package_dependency_link5) { create(:packages_dependency_link, package: package, dependency_type: :deprecated) }
 
     context 'a public project' do
       it 'returns the package info without oauth token' do
@@ -301,7 +300,7 @@ describe API::NpmPackages do
             .to change { project.packages.count }.by(1)
             .and change { Packages::PackageFile.count }.by(1)
             .and change { Packages::Dependency.count}.by(4)
-            .and change { Packages::DependencyLink.count}.by(7)
+            .and change { Packages::DependencyLink.count}.by(6)
 
           expect(response).to have_gitlab_http_status(200)
         end
@@ -317,7 +316,7 @@ describe API::NpmPackages do
               .to change { project.packages.count }.by(1)
               .and change { Packages::PackageFile.count }.by(1)
               .and not_change { Packages::Dependency.count}
-              .and change { Packages::DependencyLink.count}.by(7)
+              .and change { Packages::DependencyLink.count}.by(6)
           end
         end
       end

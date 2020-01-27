@@ -7,7 +7,7 @@ module Packages
 
       attr_reader :name, :packages
 
-      NPM_VALID_DEPENDENCY_TYPES = %i[dependencies devDependencies bundleDependencies peerDependencies deprecated].freeze
+      NPM_VALID_DEPENDENCY_TYPES = %i[dependencies devDependencies bundleDependencies peerDependencies].freeze
 
       def initialize(name, packages)
         @name = name

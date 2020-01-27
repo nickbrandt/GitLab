@@ -42,14 +42,14 @@ describe Packages::CreateDependencyService do
         it 'creates dependencies and links' do
           expect(Packages::Dependency)
             .to receive(:ids_for_package_names_and_version_patterns)
-            .exactly(5).times
+            .exactly(4).times
             .and_call_original
 
           expect { subject }
             .to change { Packages::Dependency.count }.by(4)
-            .and change { Packages::DependencyLink.count }.by(7)
-          expect(dependency_names).to match_array(%w(d3 d3 d3 dagre-d3 dagre-d3 express express))
-          expect(dependency_link_types).to match_array(%w(bundleDependencies dependencies dependencies deprecated devDependencies devDependencies peerDependencies))
+            .and change { Packages::DependencyLink.count }.by(6)
+          expect(dependency_names).to match_array(%w(d3 d3 d3 dagre-d3 dagre-d3 express))
+          expect(dependency_link_types).to match_array(%w(bundleDependencies dependencies dependencies devDependencies devDependencies peerDependencies))
         end
       end
 
