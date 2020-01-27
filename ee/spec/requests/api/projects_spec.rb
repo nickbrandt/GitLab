@@ -182,7 +182,7 @@ describe API::Projects do
 
     describe 'marked_for_deletion attribute' do
       it 'exposed when the feature is available' do
-        stub_licensed_features(marking_project_for_deletion: true)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
 
         get api("/projects/#{project.id}", user)
 
@@ -190,7 +190,7 @@ describe API::Projects do
       end
 
       it 'not exposed when the feature is not available' do
-        stub_licensed_features(marking_project_for_deletion: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
 
         get api("/projects/#{project.id}", user)
 
@@ -675,7 +675,7 @@ describe API::Projects do
   describe 'POST /projects/:id/restore' do
     context 'feature is available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: true)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
       it 'restores project' do
@@ -701,7 +701,7 @@ describe API::Projects do
 
     context 'feature is not available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
       it 'returns error' do
@@ -715,7 +715,7 @@ describe API::Projects do
   describe 'DELETE /projects/:id' do
     context 'when feature is available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: true)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
       it 'marks project for deletion' do
@@ -748,7 +748,7 @@ describe API::Projects do
 
     context 'when feature is not available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
       it 'deletes project' do

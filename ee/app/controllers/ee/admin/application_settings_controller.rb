@@ -38,7 +38,7 @@ module EE
           attrs << :default_project_deletion_protection
         end
 
-        if License.feature_available?(:marking_project_for_deletion)
+        if License.feature_available?(:adjourned_deletion_for_projects_and_groups)
           attrs << :deletion_adjourned_period
         end
 
