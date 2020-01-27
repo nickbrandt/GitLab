@@ -638,6 +638,22 @@ describe User do
     end
 
     context 'when user is active' do
+      context 'when user is a support bot' do
+        let(:user) { create(:user, bot_type: 'support_bot') }
+
+        it 'returns false' do
+          expect(user.using_license_seat?).to eq false
+        end
+      end
+
+      context 'when user is a ghost' do
+        let(:user) { create(:user, ghost: true) }
+
+        it 'returns false' do
+          expect(user.using_license_seat?).to eq false
+        end
+      end
+
       context 'when license is nil (core/free/default)' do
         before do
           allow(License).to receive(:current).and_return(nil)
