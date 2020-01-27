@@ -32,7 +32,7 @@ describe MergeRequestWidgetEntity do
   end
 
   def create_all_artifacts
-    artifacts = %i(codequality sast dependency_scanning container_scanning dast license_management performance)
+    artifacts = %i(codequality license_management performance)
 
     artifacts.each do |artifact_type|
       create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
@@ -95,10 +95,6 @@ describe MergeRequestWidgetEntity do
 
     where(:json_entry, :artifact_type) do
       :codeclimate         | :codequality
-      :sast                | :sast
-      :dependency_scanning | :dependency_scanning
-      :sast_container      | :container_scanning
-      :dast                | :dast
       :license_management  | :license_management
       :performance         | :performance
     end

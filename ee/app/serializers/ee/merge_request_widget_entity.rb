@@ -40,26 +40,6 @@ module EE
         merge_request.enabled_reports
       end
 
-      expose :sast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:sast) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:sast)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:sast)
-        end
-      end
-
-      expose :dependency_scanning, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dependency_scanning) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:dependency_scanning)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:dependency_scanning)
-        end
-      end
-
       expose :license_management, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:license_management) } do
         expose :head_path do |merge_request|
           head_pipeline_downloadable_path_for_report_type(:license_management)
@@ -88,26 +68,6 @@ module EE
 
       expose :metrics_reports_path, if: -> (mr, _) { mr.has_metrics_reports? } do |merge_request|
         metrics_reports_project_merge_request_path(merge_request.project, merge_request, format: :json)
-      end
-
-      expose :sast_container, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:container_scanning) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:container_scanning)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:container_scanning)
-        end
-      end
-
-      expose :dast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dast) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:dast)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:dast)
-        end
       end
 
       expose :pipeline_id, if: -> (mr, _) { mr.head_pipeline } do |merge_request|
