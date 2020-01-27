@@ -17135,6 +17135,9 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
+msgid "Severity"
+msgstr ""
+
 msgid "Severity: %{severity}"
 msgstr ""
 
@@ -17924,6 +17927,9 @@ msgid "Starts %{startsIn}"
 msgstr ""
 
 msgid "Starts at (UTC)"
+msgstr ""
+
+msgid "State"
 msgstr ""
 
 msgid "State your message to activate"
@@ -21045,6 +21051,9 @@ msgid "Vulnerabilities"
 msgstr ""
 
 msgid "Vulnerabilities over time"
+msgstr ""
+
+msgid "Vulnerability List"
 msgstr ""
 
 msgid "Vulnerability-Check"

@@ -26,7 +26,7 @@ module Projects
 
       def vulnerabilities
         return render_404 unless Feature.enabled?(:first_class_vulnerabilities, project)
-       
+
         @vulnerabilities = Kaminari.paginate_array(project.vulnerabilities).page(params[:page])
       end
     end

@@ -174,7 +174,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :summary
           end
         end
-        
+
         get :vulnerabilities, controller: :dashboard
       end
 
