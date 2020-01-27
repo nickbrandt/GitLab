@@ -8,7 +8,7 @@ import {
   setCanCreateIssuePermission,
   setCanCreateFeedbackPermission,
   requestSastContainerReports,
-  requestDastReports,
+  requestDastDiff,
   requestDependencyScanningReports,
   openModal,
   setModalData,
@@ -247,15 +247,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('requestDastReports', () => {
+  describe('requestDastDiff', () => {
     it('should commit request mutation', done => {
       testAction(
-        requestDastReports,
+        requestDastDiff,
         null,
         mockedState,
         [
           {
-            type: types.REQUEST_DAST_REPORTS,
+            type: types.REQUEST_DAST_DIFF,
           },
         ],
         [],
@@ -1484,7 +1484,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDastReports',
+              type: 'requestDastDiff',
             },
             {
               type: 'receiveDastDiffSuccess',
@@ -1517,7 +1517,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDastReports',
+              type: 'requestDastDiff',
             },
             {
               type: 'receiveDastDiffError',
@@ -1546,7 +1546,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDastReports',
+              type: 'requestDastDiff',
             },
             {
               type: 'receiveDastDiffError',

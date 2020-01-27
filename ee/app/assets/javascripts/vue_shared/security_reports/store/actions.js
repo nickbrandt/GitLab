@@ -93,7 +93,7 @@ export const updateContainerScanningIssue = ({ commit }, issue) =>
  */
 export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
 
-export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
+export const requestDastDiff = ({ commit }) => commit(types.REQUEST_DAST_DIFF);
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
@@ -103,7 +103,7 @@ export const receiveDastDiffSuccess = ({ commit }, response) =>
 export const receiveDastDiffError = ({ commit }) => commit(types.RECEIVE_DAST_DIFF_ERROR);
 
 export const fetchDastDiff = ({ state, dispatch }) => {
-  dispatch('requestDastReports');
+  dispatch('requestDastDiff');
 
   return Promise.all([
     pollUntilComplete(state.dast.paths.diffEndpoint),

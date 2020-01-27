@@ -79,9 +79,9 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('REQUEST_DAST_REPORTS', () => {
+  describe('REQUEST_DAST_DIFF', () => {
     it('should set dast loading flag to true', () => {
-      mutations[types.REQUEST_DAST_REPORTS](stateCopy);
+      mutations[types.REQUEST_DAST_DIFF](stateCopy);
 
       expect(stateCopy.dast.isLoading).toEqual(true);
     });
