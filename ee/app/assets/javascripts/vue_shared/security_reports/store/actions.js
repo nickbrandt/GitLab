@@ -131,8 +131,8 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 
-export const requestDependencyScanningReports = ({ commit }) =>
-  commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
+export const requestDependencyScanningDiff = ({ commit }) =>
+  commit(types.REQUEST_DEPENDENCY_SCANNING_DIFF);
 
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
@@ -141,7 +141,7 @@ export const receiveDependencyScanningDiffError = ({ commit }) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR);
 
 export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
-  dispatch('requestDependencyScanningReports');
+  dispatch('requestDependencyScanningDiff');
 
   return Promise.all([
     pollUntilComplete(state.dependencyScanning.paths.diffEndpoint),

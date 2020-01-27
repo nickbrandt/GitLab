@@ -87,9 +87,9 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('REQUEST_DEPENDENCY_SCANNING_REPORTS', () => {
+  describe('REQUEST_DEPENDENCY_SCANNING_DIFF', () => {
     it('should set dependency scanning loading flag to true', () => {
-      mutations[types.REQUEST_DEPENDENCY_SCANNING_REPORTS](stateCopy);
+      mutations[types.REQUEST_DEPENDENCY_SCANNING_DIFF](stateCopy);
 
       expect(stateCopy.dependencyScanning.isLoading).toEqual(true);
     });

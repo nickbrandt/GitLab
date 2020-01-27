@@ -9,7 +9,7 @@ import {
   setCanCreateFeedbackPermission,
   requestSastContainerReports,
   requestDastDiff,
-  requestDependencyScanningReports,
+  requestDependencyScanningDiff,
   openModal,
   setModalData,
   requestDismissVulnerability,
@@ -264,15 +264,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('requestDependencyScanningReports', () => {
+  describe('requestDependencyScanningDiff', () => {
     it('should commit request mutation', done => {
       testAction(
-        requestDependencyScanningReports,
+        requestDependencyScanningDiff,
         null,
         mockedState,
         [
           {
-            type: types.REQUEST_DEPENDENCY_SCANNING_REPORTS,
+            type: types.REQUEST_DEPENDENCY_SCANNING_DIFF,
           },
         ],
         [],
@@ -1327,7 +1327,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDependencyScanningReports',
+              type: 'requestDependencyScanningDiff',
             },
             {
               type: 'receiveDependencyScanningDiffSuccess',
@@ -1360,7 +1360,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDependencyScanningReports',
+              type: 'requestDependencyScanningDiff',
             },
             {
               type: 'receiveDependencyScanningDiffError',
@@ -1389,7 +1389,7 @@ describe('security reports actions', () => {
           [],
           [
             {
-              type: 'requestDependencyScanningReports',
+              type: 'requestDependencyScanningDiff',
             },
             {
               type: 'receiveDependencyScanningDiffError',
