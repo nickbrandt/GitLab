@@ -49,9 +49,13 @@ module EE
       params[:weight].to_s.downcase == ::IssuesFinder::FILTER_ANY
     end
 
+    def assignee_ids?
+      params[:assignee_ids].present?
+    end
+
     override :by_assignee
     def by_assignee(items)
-      if assignees.any?
+      if assignees.any? && !not_query?
         assignees.each do |assignee|
           items = items.assigned_to(assignee)
         end
@@ -62,15 +66,14 @@ module EE
       super
     end
 
+    override :assignees
     # rubocop: disable CodeReuse/ActiveRecord
     def assignees
       strong_memoize(:assignees) do
-        if params[:assignee_ids]
+        if assignee_ids?
           ::User.where(id: params[:assignee_ids])
-        elsif params[:assignee_username]
-          ::User.where(username: params[:assignee_username])
         else
-          []
+          super
         end
       end
     end

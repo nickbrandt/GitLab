@@ -54,6 +54,27 @@ describe IssuesFinder do
         end
       end
 
+      context 'filter by username' do
+        let_it_be(:user3) { create(:user) }
+        let(:issuables) { issues }
+
+        before do
+          project2.add_developer(user3)
+          issue2.assignees = [user, user2]
+          issue3.assignees = [user2, user3]
+        end
+
+        it_behaves_like 'assignee username filter' do
+          let(:params) { { assignee_username: [user2.username, user3.username] } }
+          let(:expected_issuables) { [issue3] }
+        end
+
+        it_behaves_like 'assignee NOT username filter' do
+          let(:params) { { not: { assignee_username: [user.username, user2.username] } } }
+          let(:expected_issuables) { [issue4] }
+        end
+      end
+
       context 'filter by epic' do
         let_it_be(:group) { create(:group) }
 
