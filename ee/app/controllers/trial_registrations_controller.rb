@@ -17,10 +17,12 @@ class TrialRegistrationsController < RegistrationsController
   private
 
   def set_redirect_url
+    target_url = new_trial_url(params: request.query_parameters)
+
     if user_signed_in?
-      redirect_to new_trial_url
+      redirect_to target_url
     else
-      store_location_for(:user, new_trial_url)
+      store_location_for(:user, target_url)
     end
   end
 

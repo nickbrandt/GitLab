@@ -20,6 +20,14 @@ describe TrialRegistrationsController do
 
         expect(response).to redirect_to(new_trial_url)
       end
+
+      it 'redirect keeps the query string parameters' do
+        get_params = { glm_source: 'some_source', glm_content: 'some_content' }
+
+        get :new, params: get_params
+
+        expect(response).to redirect_to(new_trial_url(get_params))
+      end
     end
 
     context 'when customer is not authenticated' do
