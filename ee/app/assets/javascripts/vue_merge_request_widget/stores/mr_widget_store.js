@@ -11,7 +11,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.headBlobPath = blobPath.head_path || '';
     this.baseBlobPath = blobPath.base_path || '';
     this.sastHelp = data.sast_help_path;
-    this.sastContainerHelp = data.sast_container_help_path;
+    this.containerScanningHelp = data.container_scanning_help_path;
     this.dastHelp = data.dast_help_path;
     this.dependencyScanningHelp = data.dependency_scanning_help_path;
     this.vulnerabilityFeedbackPath = data.vulnerability_feedback_path;

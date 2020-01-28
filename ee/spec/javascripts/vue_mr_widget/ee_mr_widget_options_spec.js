@@ -29,7 +29,7 @@ import {
 const SAST_SELECTOR = '.js-sast-widget';
 const DAST_SELECTOR = '.js-dast-widget';
 const DEPENDENCY_SCANNING_SELECTOR = '.js-dependency-scanning-widget';
-const CONTAINER_SCANNING_SELECTOR = '.js-sast-container';
+const CONTAINER_SCANNING_SELECTOR = '.js-container-scanning';
 
 describe('ee merge request widget options', () => {
   let vm;

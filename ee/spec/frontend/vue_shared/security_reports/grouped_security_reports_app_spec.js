@@ -31,7 +31,7 @@ describe('Grouped security reports app', () => {
     headBlobPath: 'path',
     baseBlobPath: 'path',
     sastHelpPath: 'path',
-    sastContainerHelpPath: 'path',
+    containerScanningHelpPath: 'path',
     dastHelpPath: 'path',
     dependencyScanningHelpPath: 'path',
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
@@ -93,7 +93,7 @@ describe('Grouped security reports app', () => {
 
         return Promise.all([
           waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_ERROR}`),
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_ERROR),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
         ]);
@@ -164,7 +164,7 @@ describe('Grouped security reports app', () => {
         return Promise.all([
           waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS),
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
         ]);
       });
@@ -220,7 +220,7 @@ describe('Grouped security reports app', () => {
 
       it('has the success icon for fixed vulnerabilities', () => {
         const icon = wrapper.vm.$el.querySelector(
-          '.js-sast-container~.js-plain-element .ic-status_success_borderless',
+          '.js-container-scanning~.js-plain-element .ic-status_success_borderless',
         );
 
         expect(icon).not.toBeNull();
@@ -260,11 +260,13 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      return waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS);
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS);
     });
 
-    it('should set setSastContainerDiffEndpoint', () => {
-      expect(wrapper.vm.sastContainer.paths.diffEndpoint).toEqual(CONTAINER_SCANNING_DIFF_ENDPOINT);
+    it('should set setContainerScanningDiffEndpoint', () => {
+      expect(wrapper.vm.containerScanning.paths.diffEndpoint).toEqual(
+        CONTAINER_SCANNING_DIFF_ENDPOINT,
+      );
     });
 
     it('should display the correct numbers of vulnerabilities', () => {

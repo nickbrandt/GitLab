@@ -71,11 +71,11 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('REQUEST_SAST_CONTAINER_REPORTS', () => {
-    it('should set sast container loading flag to true', () => {
-      mutations[types.REQUEST_SAST_CONTAINER_REPORTS](stateCopy);
+  describe('REQUEST_CONTAINER_SCANNING_DIFF', () => {
+    it('should set container scanning loading flag to true', () => {
+      mutations[types.REQUEST_CONTAINER_SCANNING_DIFF](stateCopy);
 
-      expect(stateCopy.sastContainer.isLoading).toEqual(true);
+      expect(stateCopy.containerScanning.isLoading).toEqual(true);
     });
   });
 
@@ -516,8 +516,8 @@ describe('security reports mutations', () => {
 
   describe('UPDATE_CONTAINER_SCANNING_ISSUE', () => {
     it('updates issue in the new issues list', () => {
-      stateCopy.sastContainer.newIssues = mockFindings;
-      stateCopy.sastContainer.resolvedIssues = [];
+      stateCopy.containerScanning.newIssues = mockFindings;
+      stateCopy.containerScanning.resolvedIssues = [];
       const updatedIssue = {
         ...mockFindings[0],
         foo: 'bar',
@@ -525,12 +525,12 @@ describe('security reports mutations', () => {
 
       mutations[types.UPDATE_CONTAINER_SCANNING_ISSUE](stateCopy, updatedIssue);
 
-      expect(stateCopy.sastContainer.newIssues[0]).toEqual(updatedIssue);
+      expect(stateCopy.containerScanning.newIssues[0]).toEqual(updatedIssue);
     });
 
     it('updates issue in the resolved issues list', () => {
-      stateCopy.sastContainer.newIssues = [];
-      stateCopy.sastContainer.resolvedIssues = mockFindings;
+      stateCopy.containerScanning.newIssues = [];
+      stateCopy.containerScanning.resolvedIssues = mockFindings;
       const updatedIssue = {
         ...mockFindings[0],
         foo: 'bar',
@@ -538,7 +538,7 @@ describe('security reports mutations', () => {
 
       mutations[types.UPDATE_CONTAINER_SCANNING_ISSUE](stateCopy, updatedIssue);
 
-      expect(stateCopy.sastContainer.resolvedIssues[0]).toEqual(updatedIssue);
+      expect(stateCopy.containerScanning.resolvedIssues[0]).toEqual(updatedIssue);
     });
   });
 
@@ -570,19 +570,19 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('SET_SAST_CONTAINER_DIFF_ENDPOINT', () => {
-    const endpoint = 'sast_container_diff_endpoint.json';
+  describe('SET_CONTAINER_SCANNING_DIFF_ENDPOINT', () => {
+    const endpoint = 'container_scanning_diff_endpoint.json';
 
     beforeEach(() => {
-      mutations[types.SET_SAST_CONTAINER_DIFF_ENDPOINT](stateCopy, endpoint);
+      mutations[types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT](stateCopy, endpoint);
     });
 
     it('should set the correct endpoint', () => {
-      expect(stateCopy.sastContainer.paths.diffEndpoint).toEqual(endpoint);
+      expect(stateCopy.containerScanning.paths.diffEndpoint).toEqual(endpoint);
     });
   });
 
-  describe('RECEIVE_SAST_CONTAINER_DIFF_SUCCESS', () => {
+  describe('RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS', () => {
     const reports = {
       diff: {
         added: [
@@ -595,20 +595,20 @@ describe('security reports mutations', () => {
     };
 
     beforeEach(() => {
-      mutations[types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](stateCopy, reports);
+      mutations[types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS](stateCopy, reports);
     });
 
     it('should set isLoading to false', () => {
-      expect(stateCopy.sastContainer.isLoading).toBe(false);
+      expect(stateCopy.containerScanning.isLoading).toBe(false);
     });
 
     it('should set baseReportOutofDate to true', () => {
-      expect(stateCopy.sastContainer.baseReportOutofDate).toBe(true);
+      expect(stateCopy.containerScanning.baseReportOutofDate).toBe(true);
     });
 
     it('should parse and set the added vulnerabilities', () => {
       reports.diff.added.forEach((vuln, i) => {
-        expect(stateCopy.sastContainer.newIssues[i]).toEqual(
+        expect(stateCopy.containerScanning.newIssues[i]).toEqual(
           expect.objectContaining({
             name: vuln.name,
             title: vuln.name,
@@ -620,7 +620,7 @@ describe('security reports mutations', () => {
 
     it('should parse and set the fixed vulnerabilities', () => {
       reports.diff.fixed.forEach((vuln, i) => {
-        expect(stateCopy.sastContainer.resolvedIssues[i]).toEqual(
+        expect(stateCopy.containerScanning.resolvedIssues[i]).toEqual(
           expect.objectContaining({
             name: vuln.name,
             title: vuln.name,
@@ -631,12 +631,12 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('RECEIVE_SAST_CONTAINER_DIFF_ERROR', () => {
-    it('should set sast container loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](stateCopy);
+  describe('RECEIVE_CONTAINER_SCANNING_DIFF_ERROR', () => {
+    it('should set container scanning loading flag to false and error flag to true', () => {
+      mutations[types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR](stateCopy);
 
-      expect(stateCopy.sastContainer.isLoading).toEqual(false);
-      expect(stateCopy.sastContainer.hasError).toEqual(true);
+      expect(stateCopy.containerScanning.isLoading).toEqual(false);
+      expect(stateCopy.containerScanning.hasError).toEqual(true);
     });
   });
 

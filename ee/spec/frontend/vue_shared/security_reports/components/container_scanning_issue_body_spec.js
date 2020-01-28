@@ -1,11 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
-import SastContainerIssueBody from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
+import ContainerScanningIssueBody from 'ee/vue_shared/security_reports/components/container_scanning_issue_body.vue';
 
-describe('Sast Container Issue Body', () => {
+describe('Container Scanning Issue Body', () => {
   let wrapper;
 
   const createComponent = severity => {
-    wrapper = shallowMount(SastContainerIssueBody, {
+    wrapper = shallowMount(ContainerScanningIssueBody, {
       propsData: {
         issue: {
           title: 'CVE-2017-11671',

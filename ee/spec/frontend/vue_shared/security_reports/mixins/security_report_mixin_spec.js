@@ -5,7 +5,7 @@ describe('securityReportMixin', () => {
   it.each`
     key                     | link
     ${'sast'}               | ${'http://fake.url/sast/help/path'}
-    ${'sastContainer'}      | ${'http://fake.url/sast/container/help/path'}
+    ${'containerScanning'}  | ${'http://fake.url/container/scanning/help/path'}
     ${'dast'}               | ${'http://fake.url/dast/help/path'}
     ${'dependencyScanning'} | ${'http://fake.url/dependency/scanning/help/path'}
   `('generates correct external link with icon', ({ key, link }) => {

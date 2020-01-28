@@ -7,7 +7,7 @@ import {
   setPipelineId,
   setCanCreateIssuePermission,
   setCanCreateFeedbackPermission,
-  requestSastContainerReports,
+  requestContainerScanningDiff,
   requestDastDiff,
   requestDependencyScanningDiff,
   openModal,
@@ -39,10 +39,10 @@ import {
   requestDeleteDismissalComment,
   showDismissalDeleteButtons,
   hideDismissalDeleteButtons,
-  setSastContainerDiffEndpoint,
-  receiveSastContainerDiffSuccess,
-  receiveSastContainerDiffError,
-  fetchSastContainerDiff,
+  setContainerScanningDiffEndpoint,
+  receiveContainerScanningDiffSuccess,
+  receiveContainerScanningDiffError,
+  fetchContainerScanningDiff,
   setDependencyScanningDiffEndpoint,
   receiveDependencyScanningDiffSuccess,
   receiveDependencyScanningDiffError,
@@ -230,15 +230,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('requestSastContainerReports', () => {
+  describe('requestContainerScanningDiff', () => {
     it('should commit request mutation', done => {
       testAction(
-        requestSastContainerReports,
+        requestContainerScanningDiff,
         null,
         mockedState,
         [
           {
-            type: types.REQUEST_SAST_CONTAINER_REPORTS,
+            type: types.REQUEST_CONTAINER_SCANNING_DIFF,
           },
         ],
         [],
@@ -1087,17 +1087,17 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('setSastContainerDiffEndpoint', () => {
+  describe('setContainerScanningDiffEndpoint', () => {
     it('should pass down the endpoint to the mutation', done => {
-      const payload = '/sast_container_endpoint.json';
+      const payload = '/container_scanning_endpoint.json';
 
       testAction(
-        setSastContainerDiffEndpoint,
+        setContainerScanningDiffEndpoint,
         payload,
         mockedState,
         [
           {
-            type: types.SET_SAST_CONTAINER_DIFF_ENDPOINT,
+            type: types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT,
             payload,
           },
         ],
@@ -1107,17 +1107,17 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('receiveSastContainerDiffSuccess', () => {
+  describe('receiveContainerScanningDiffSuccess', () => {
     it('should pass down the response to the mutation', done => {
       const payload = { data: 'Effort yields its own rewards.' };
 
       testAction(
-        receiveSastContainerDiffSuccess,
+        receiveContainerScanningDiffSuccess,
         payload,
         mockedState,
         [
           {
-            type: types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS,
+            type: types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS,
             payload,
           },
         ],
@@ -1127,15 +1127,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('receiveSastContainerDiffError', () => {
+  describe('receiveContainerScanningDiffError', () => {
     it('should commit container diff error mutation', done => {
       testAction(
-        receiveSastContainerDiffError,
+        receiveContainerScanningDiffError,
         undefined,
         mockedState,
         [
           {
-            type: types.RECEIVE_SAST_CONTAINER_DIFF_ERROR,
+            type: types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR,
           },
         ],
         [],
@@ -1144,17 +1144,18 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('fetchSastContainerDiff', () => {
+  describe('fetchContainerScanningDiff', () => {
     const diff = { vulnerabilities: [] };
+    const endpoint = 'container_scanning_diff.json';
 
     beforeEach(() => {
       mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_feedback';
-      mockedState.sastContainer.paths.diffEndpoint = 'sast_container_diff.json';
+      mockedState.containerScanning.paths.diffEndpoint = endpoint;
     });
 
     describe('on success', () => {
-      it('should dispatch `receiveSastContainerDiffSuccess`', done => {
-        mock.onGet('sast_container_diff.json').reply(200, diff);
+      it('should dispatch `receiveContainerScanningDiffSuccess`', done => {
+        mock.onGet(endpoint).reply(200, diff);
         mock
           .onGet('vulnerabilities_feedback', {
             params: {
@@ -1164,16 +1165,16 @@ describe('security reports actions', () => {
           .reply(200, containerScanningFeedbacks);
 
         testAction(
-          fetchSastContainerDiff,
+          fetchContainerScanningDiff,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestSastContainerReports',
+              type: 'requestContainerScanningDiff',
             },
             {
-              type: 'receiveSastContainerDiffSuccess',
+              type: 'receiveContainerScanningDiffSuccess',
               payload: {
                 diff,
                 enrichData: containerScanningFeedbacks,
@@ -1186,8 +1187,8 @@ describe('security reports actions', () => {
     });
 
     describe('when vulnerabilities path errors', () => {
-      it('should dispatch `receiveSastContainerError`', done => {
-        mock.onGet('sast_container_diff.json').reply(500);
+      it('should dispatch `receiveContainerScanningError`', done => {
+        mock.onGet(endpoint).reply(500);
         mock
           .onGet('vulnerabilities_feedback', {
             params: {
@@ -1197,16 +1198,16 @@ describe('security reports actions', () => {
           .reply(200, containerScanningFeedbacks);
 
         testAction(
-          fetchSastContainerDiff,
+          fetchContainerScanningDiff,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestSastContainerReports',
+              type: 'requestContainerScanningDiff',
             },
             {
-              type: 'receiveSastContainerDiffError',
+              type: 'receiveContainerScanningDiffError',
             },
           ],
           done,
@@ -1215,8 +1216,8 @@ describe('security reports actions', () => {
     });
 
     describe('when feedback path errors', () => {
-      it('should dispatch `receiveSastContainerError`', done => {
-        mock.onGet('sast_container_diff.json').reply(200, diff);
+      it('should dispatch `receiveContainerScanningError`', done => {
+        mock.onGet(endpoint).reply(200, diff);
         mock
           .onGet('vulnerabilities_feedback', {
             params: {
@@ -1226,16 +1227,16 @@ describe('security reports actions', () => {
           .reply(500);
 
         testAction(
-          fetchSastContainerDiff,
+          fetchContainerScanningDiff,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestSastContainerReports',
+              type: 'requestContainerScanningDiff',
             },
             {
-              type: 'receiveSastContainerDiffError',
+              type: 'receiveContainerScanningDiffError',
             },
           ],
           done,

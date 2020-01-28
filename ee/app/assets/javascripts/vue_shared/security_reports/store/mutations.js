@@ -49,31 +49,31 @@ export default {
     state.canCreateFeedbackPermission = permission;
   },
 
-  // SAST CONTAINER
-  [types.SET_SAST_CONTAINER_DIFF_ENDPOINT](state, path) {
-    Vue.set(state.sastContainer.paths, 'diffEndpoint', path);
+  // CONTAINER SCANNING
+  [types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT](state, path) {
+    Vue.set(state.containerScanning.paths, 'diffEndpoint', path);
   },
 
-  [types.REQUEST_SAST_CONTAINER_REPORTS](state) {
-    Vue.set(state.sastContainer, 'isLoading', true);
+  [types.REQUEST_CONTAINER_SCANNING_DIFF](state) {
+    Vue.set(state.containerScanning, 'isLoading', true);
   },
 
-  [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
+  [types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS](state, { diff, enrichData }) {
     const { added, fixed, existing } = parseDiff(diff, enrichData);
     const baseReportOutofDate = diff.base_report_out_of_date || false;
     const hasBaseReport = Boolean(diff.base_report_created_at);
 
-    Vue.set(state.sastContainer, 'isLoading', false);
-    Vue.set(state.sastContainer, 'newIssues', added);
-    Vue.set(state.sastContainer, 'resolvedIssues', fixed);
-    Vue.set(state.sastContainer, 'allIssues', existing);
-    Vue.set(state.sastContainer, 'baseReportOutofDate', baseReportOutofDate);
-    Vue.set(state.sastContainer, 'hasBaseReport', hasBaseReport);
+    Vue.set(state.containerScanning, 'isLoading', false);
+    Vue.set(state.containerScanning, 'newIssues', added);
+    Vue.set(state.containerScanning, 'resolvedIssues', fixed);
+    Vue.set(state.containerScanning, 'allIssues', existing);
+    Vue.set(state.containerScanning, 'baseReportOutofDate', baseReportOutofDate);
+    Vue.set(state.containerScanning, 'hasBaseReport', hasBaseReport);
   },
 
-  [types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](state) {
-    Vue.set(state.sastContainer, 'isLoading', false);
-    Vue.set(state.sastContainer, 'hasError', true);
+  [types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR](state) {
+    Vue.set(state.containerScanning, 'isLoading', false);
+    Vue.set(state.containerScanning, 'hasError', true);
   },
 
   // DAST
@@ -251,15 +251,15 @@ export default {
   [types.UPDATE_CONTAINER_SCANNING_ISSUE](state, issue) {
     // Find issue in the correct list and update it
 
-    const newIssuesIndex = findIssueIndex(state.sastContainer.newIssues, issue);
+    const newIssuesIndex = findIssueIndex(state.containerScanning.newIssues, issue);
     if (newIssuesIndex !== -1) {
-      state.sastContainer.newIssues.splice(newIssuesIndex, 1, issue);
+      state.containerScanning.newIssues.splice(newIssuesIndex, 1, issue);
       return;
     }
 
-    const resolvedIssuesIndex = findIssueIndex(state.sastContainer.resolvedIssues, issue);
+    const resolvedIssuesIndex = findIssueIndex(state.containerScanning.resolvedIssues, issue);
     if (resolvedIssuesIndex !== -1) {
-      state.sastContainer.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
+      state.containerScanning.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
     }
   },
 

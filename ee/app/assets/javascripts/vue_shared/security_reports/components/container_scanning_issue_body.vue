@@ -1,13 +1,13 @@
 <script>
 /**
- * Renders SAST CONTAINER body text
+ * Renders CONTAINER SCANNING body text
  * [priority]: [name] in [link]:[line]
  */
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
 import { humanize } from '~/lib/utils/text_utility';
 
 export default {
-  name: 'SastContainerIssueBody',
+  name: 'ContainerScanningIssueBody',
   components: {
     ModalOpenName,
   },
