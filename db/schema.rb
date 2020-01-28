@@ -2881,6 +2881,8 @@ ActiveRecord::Schema.define(version: 2020_01_27_090233) do
     t.datetime_with_timezone "updated_at", null: false
     t.string "name", null: false
     t.text "description"
+    t.integer "iid", null: false
+    t.index ["project_id", "iid"], name: "index_operations_feature_flags_on_project_id_and_iid", unique: true
     t.index ["project_id", "name"], name: "index_operations_feature_flags_on_project_id_and_name", unique: true
   end
 

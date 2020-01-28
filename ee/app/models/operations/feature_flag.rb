@@ -2,9 +2,13 @@
 
 module Operations
   class FeatureFlag < ApplicationRecord
+    include AtomicInternalId
+
     self.table_name = 'operations_feature_flags'
 
     belongs_to :project
+
+    has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.operations_feature_flags&.maximum(:iid) }, backfill: true, presence: false
 
     default_value_for :active, true
 
