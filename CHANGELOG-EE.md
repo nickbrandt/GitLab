@@ -215,6 +215,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Update the alerts used in the Dependency List to follow GitLab design guidelines. !21760
 
 
+## 12.5.8
+
+- No changes.
+
 ## 12.5.5
 
 - No changes.
