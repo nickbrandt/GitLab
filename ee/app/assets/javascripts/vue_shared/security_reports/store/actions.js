@@ -93,7 +93,7 @@ export const updateContainerScanningIssue = ({ commit }, issue) =>
  */
 export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
 
-export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
+export const requestDastDiff = ({ commit }) => commit(types.REQUEST_DAST_DIFF);
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
@@ -103,7 +103,7 @@ export const receiveDastDiffSuccess = ({ commit }, response) =>
 export const receiveDastDiffError = ({ commit }) => commit(types.RECEIVE_DAST_DIFF_ERROR);
 
 export const fetchDastDiff = ({ state, dispatch }) => {
-  dispatch('requestDastReports');
+  dispatch('requestDastDiff');
 
   return Promise.all([
     pollUntilComplete(state.dast.paths.diffEndpoint),
@@ -131,8 +131,8 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 
-export const requestDependencyScanningReports = ({ commit }) =>
-  commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
+export const requestDependencyScanningDiff = ({ commit }) =>
+  commit(types.REQUEST_DEPENDENCY_SCANNING_DIFF);
 
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
@@ -141,7 +141,7 @@ export const receiveDependencyScanningDiffError = ({ commit }) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR);
 
 export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
-  dispatch('requestDependencyScanningReports');
+  dispatch('requestDependencyScanningDiff');
 
   return Promise.all([
     pollUntilComplete(state.dependencyScanning.paths.diffEndpoint),

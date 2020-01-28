@@ -82,7 +82,7 @@ export default {
     Vue.set(state.dast.paths, 'diffEndpoint', path);
   },
 
-  [types.REQUEST_DAST_REPORTS](state) {
+  [types.REQUEST_DAST_DIFF](state) {
     Vue.set(state.dast, 'isLoading', true);
   },
 
@@ -110,7 +110,7 @@ export default {
     Vue.set(state.dependencyScanning.paths, 'diffEndpoint', path);
   },
 
-  [types.REQUEST_DEPENDENCY_SCANNING_REPORTS](state) {
+  [types.REQUEST_DEPENDENCY_SCANNING_DIFF](state) {
     Vue.set(state.dependencyScanning, 'isLoading', true);
   },
 

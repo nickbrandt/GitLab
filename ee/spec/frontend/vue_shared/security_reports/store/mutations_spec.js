@@ -79,17 +79,17 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('REQUEST_DAST_REPORTS', () => {
+  describe('REQUEST_DAST_DIFF', () => {
     it('should set dast loading flag to true', () => {
-      mutations[types.REQUEST_DAST_REPORTS](stateCopy);
+      mutations[types.REQUEST_DAST_DIFF](stateCopy);
 
       expect(stateCopy.dast.isLoading).toEqual(true);
     });
   });
 
-  describe('REQUEST_DEPENDENCY_SCANNING_REPORTS', () => {
+  describe('REQUEST_DEPENDENCY_SCANNING_DIFF', () => {
     it('should set dependency scanning loading flag to true', () => {
-      mutations[types.REQUEST_DEPENDENCY_SCANNING_REPORTS](stateCopy);
+      mutations[types.REQUEST_DEPENDENCY_SCANNING_DIFF](stateCopy);
 
       expect(stateCopy.dependencyScanning.isLoading).toEqual(true);
     });
