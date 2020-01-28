@@ -211,7 +211,10 @@ module Gitlab
 
       def merge_requests
         strong_memoize(:merge_requests) do
-          options = base_options.merge(project_ids: non_guest_project_ids)
+          options = base_options.merge(
+            project_ids: filter_project_ids_by_feature(:merge_requests, limit_project_ids)
+          )
+
           MergeRequest.elastic_search(query, options: options)
         end
       end
@@ -226,17 +229,14 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:blobs) do
-          project_ids = visible_project_ids
-
-          opt = base_options.merge(
-            additional_filter: repository_filter(project_ids),
-            project_ids: project_ids
+          options = base_options.merge(
+            additional_filter: repository_filter(limit_project_ids)
           )
 
           Repository.elastic_search(
             query,
             type: :blob,
-            options: opt.merge({ highlight: true })
+            options: options.merge({ highlight: true })
           )[:blobs][:results].response
         end
       end
@@ -245,17 +245,14 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:wiki_blobs) do
-          project_ids = visible_project_ids(visible_for_guests: true)
-
-          opt = base_options.merge(
-            additional_filter: wiki_filter(project_ids),
-            project_ids: project_ids
+          options = base_options.merge(
+            additional_filter: wiki_filter(limit_project_ids)
           )
 
           ProjectWiki.elastic_search(
             query,
             type: :wiki_blob,
-            options: opt.merge({ highlight: true })
+            options: options.merge({ highlight: true })
           )[:wiki_blobs][:results].response
         end
       end
@@ -270,11 +267,8 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:commits) do
-          project_ids = visible_project_ids
-
           options = base_options.merge(
-            additional_filter: repository_filter(project_ids),
-            project_ids: project_ids
+            additional_filter: repository_filter(limit_project_ids)
           )
 
           Repository.find_commits_by_message_with_elastic(
@@ -294,22 +288,24 @@ module Gitlab
         blob_filter(:repository, project_ids)
       end
 
-      def visible_project_ids(visible_for_guests: false)
-        visible_for_guests ? limit_project_ids : non_guest_project_ids
+      def filter_project_ids_by_feature(feature, project_ids)
+        return project_ids if project_ids == :any
+
+        Project
+          .id_in(project_ids)
+          .filter_by_feature_visibility(feature, current_user)
+          .pluck_primary_key
       end
 
       def blob_filter(feature, project_ids)
         key_name = "#{feature}_access_level"
 
+        project_ids = filter_project_ids_by_feature(feature, project_ids)
+
         conditions =
           if project_ids == :any
             [{ exists: { field: "id" } }]
           else
-            project_ids = Project
-              .id_in(project_ids)
-              .filter_by_feature_visibility(feature, current_user)
-              .pluck_primary_key
-
             [{ terms: { id: project_ids } }]
           end
 
