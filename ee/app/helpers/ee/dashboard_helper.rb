@@ -55,10 +55,18 @@ module EE
           links << :operations
         end
 
-        if ::Feature.enabled?(:security_dashboard, default_enabled: true) && can?(current_user, :read_security_dashboard)
+        if security_dashboard_available?
           links << :security
         end
       end
+    end
+
+    def security_dashboard_available?
+      app_instance = ApplicationInstance.new
+
+      ::Feature.enabled?(:security_dashboard, default_enabled: true) &&
+        app_instance.feature_available?(:security_dashboard) &&
+        can?(current_user, :read_application_instance_security_dashboard, app_instance)
     end
   end
 end

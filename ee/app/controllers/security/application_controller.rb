@@ -2,16 +2,21 @@
 
 module Security
   class ApplicationController < ::ApplicationController
-    before_action :authorize_read_security_dashboard!
+    include SecurityDashboardsPermissions
+
+    before_action :check_feature_enabled!
     before_action do
       push_frontend_feature_flag(:security_dashboard, default_enabled: true)
     end
 
-    private
+    protected
 
-    def authorize_read_security_dashboard!
-      render_404 unless Feature.enabled?(:security_dashboard, default_enabled: true) &&
-        can?(current_user, :read_security_dashboard)
+    def check_feature_enabled!
+      render_404 unless Feature.enabled?(:security_dashboard, default_enabled: true)
+    end
+
+    def vulnerable
+      @vulnerable ||= ApplicationInstance.new
     end
   end
 end
