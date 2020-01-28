@@ -2,14 +2,13 @@
 
 require 'spec_helper'
 
-describe Analytics::ProductivityAnalyticsController do
-  let(:current_user) { create(:user) }
-  let(:group) { create :group }
+describe Groups::Analytics::ProductivityAnalyticsController do
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:group) { create :group }
 
   before do
-    sign_in(current_user) if current_user
+    sign_in(current_user)
 
-    stub_feature_flags(group_level_productivity_analytics: false)
     stub_licensed_features(productivity_analytics: true)
   end
 
@@ -21,7 +20,7 @@ describe Analytics::ProductivityAnalyticsController do
     it 'increments usage counter' do
       expect(Gitlab::UsageDataCounters::ProductivityAnalyticsCounter).to receive(:count).with(:views)
 
-      get :show, format: :html
+      get :show, format: :html, params: { group_id: group }
 
       expect(response).to be_successful
     end
@@ -36,40 +35,50 @@ describe Analytics::ProductivityAnalyticsController do
   end
 
   describe 'GET show' do
-    subject { get :show }
+    subject { get :show, params: { group_id: group } }
 
-    it 'authorizes for ability to view analytics' do
-      expect(Ability).to receive(:allowed?).with(current_user, :view_productivity_analytics, :global).and_return(false)
+    context 'when user is not authorized to view productivity analytics' do
+      before do
+        expect(Ability).to receive(:allowed?).with(current_user, :read_group, group).and_return(true)
+        expect(Ability).to receive(:allowed?).with(current_user, :view_productivity_analytics, group).and_return(false)
+      end
 
-      subject
+      it 'renders 403, forbidden error' do
+        subject
 
-      expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
 
-    it 'renders show template regardless of license' do
-      stub_licensed_features(productivity_analytics: false)
+    context 'when productivity_analytics feature flag is disabled' do
+      before do
+        stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => false)
+      end
 
-      subject
+      it 'renders 404, not found error' do
+        subject
 
-      expect(response).to be_successful
-      expect(response).to render_template :show
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
 
-    it 'renders `404` when feature flag is disabled' do
-      stub_licensed_features(productivity_analytics: true)
-      stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => false)
+    context 'when feature is not licensed' do
+      before do
+        stub_licensed_features(productivity_analytics: false)
+      end
 
-      get :show
+      it 'renders forbidden error' do
+        subject
 
-      expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
   end
 
   describe 'GET show.json' do
     subject { get :show, format: :json, params: params }
 
-    let(:params) { {} }
-
+    let(:params) { { group_id: group } }
     let(:analytics_mock) { instance_double('ProductivityAnalytics') }
 
     before do
@@ -81,12 +90,16 @@ describe Analytics::ProductivityAnalyticsController do
               .and_return(analytics_mock)
     end
 
-    it 'checks for premium license' do
-      stub_licensed_features(productivity_analytics: false)
+    context 'when feature is not licensed' do
+      before do
+        stub_licensed_features(productivity_analytics: false)
+      end
 
-      subject
+      it 'renders forbidden error' do
+        subject
 
-      expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
 
     context 'when invalid params are given' do
@@ -105,30 +118,30 @@ describe Analytics::ProductivityAnalyticsController do
     end
 
     context 'without group_id specified' do
-      it 'returns 403' do
+      it 'renders 403, forbidden' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
     context 'with non-existing group_id' do
       let(:params) { { group_id: 'SOMETHING_THAT_DOES_NOT_EXIST' } }
 
-      it 'renders 404' do
+      it 'renders 404, not_found' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
     context 'with non-existing project_id' do
       let(:params) { { group_id: group, project_id: 'SOMETHING_THAT_DOES_NOT_EXIST' } }
 
-      it 'renders 404' do
+      it 'renders 404, not_found' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 

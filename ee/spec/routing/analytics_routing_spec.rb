@@ -13,6 +13,8 @@ describe 'Analytics' do
     let(:user) { create(:user) }
 
     before do
+      stub_feature_flags(group_level_productivity_analytics: false)
+
       login_as(user)
     end
 
