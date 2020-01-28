@@ -9,7 +9,7 @@ module API
 
     helpers do
       def filter_params(params)
-        unless can?(current_user, :modify_merge_request_commiter_setting, user_project)
+        unless can?(current_user, :modify_merge_request_committer_setting, user_project)
           params.delete(:merge_requests_disable_committers_approval)
         end
 
@@ -21,7 +21,6 @@ module API
           params.delete(:merge_requests_author_approval)
         end
 
-        # binding.pry
         params
       end
     end

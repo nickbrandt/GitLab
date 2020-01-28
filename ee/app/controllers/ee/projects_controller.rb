@@ -115,7 +115,7 @@ module EE
     def merge_request_rules_params
       attrs = []
 
-      if can?(current_user, :modify_merge_request_commiter_setting, project)
+      if can?(current_user, :modify_merge_request_committer_setting, project)
         attrs << :merge_requests_disable_committers_approval
       end
 

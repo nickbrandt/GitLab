@@ -14107,9 +14107,6 @@ msgstr ""
 msgid "Prevent approval of merge requests by merge request author"
 msgstr ""
 
-msgid "Prevent approval of merge requests by merge request commiters"
-msgstr ""
-
 msgid "Prevent approval of merge requests by merge request committers"
 msgstr ""
 
@@ -14117,6 +14114,9 @@ msgid "Prevent environment from auto-stopping"
 msgstr ""
 
 msgid "Prevent users from changing their profile name"
+msgstr ""
+
+msgid "Prevent users from modifing merge request approvers list"
 msgstr ""
 
 msgid "Preview"
@@ -16340,7 +16340,7 @@ msgstr ""
 msgid "Rook"
 msgstr ""
 
-msgid "Rules that define what git pushes are accepted for a project. All newly created projects will use this settings."
+msgid "Rules that define what git pushes are accepted for a project. All newly created projects will use these settings."
 msgstr ""
 
 msgid "Run CI/CD pipelines for external repositories"
@@ -17379,7 +17379,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Settings to prevent self-approval across all projects in the instance. Only an administrator can modify those settings."
+msgid "Settings to prevent self-approval across all projects in the instance. Only an administrator can modify these settings."
 msgstr ""
 
 msgid "Severity: %{severity}"
@@ -21119,9 +21119,6 @@ msgid "Username or email"
 msgstr ""
 
 msgid "Users"
-msgstr ""
-
-msgid "Users cannot modify merge request approvers list"
 msgstr ""
 
 msgid "Users in License:"

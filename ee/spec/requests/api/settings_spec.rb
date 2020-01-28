@@ -172,7 +172,7 @@ describe API::Settings, 'EE Settings' do
         prevent_merge_requests_committers_approval: true
       }
     end
-    let(:feature) { :merge_request_approvers_rules }
+    let(:feature) { :admin_merge_request_approvers_rules }
 
     it_behaves_like 'settings for licensed features'
   end

@@ -107,14 +107,14 @@ describe API::ProjectApprovals do
         false | false | true  | true
         false | true  | true  | true
         true  | false | false | false
-        true  | true  | false | nil
+        true  | true  | false | false
         true  | false | true  | true
-        true  | true  | true  | nil
+        true  | true  | true  | true
       end
 
       with_them do
         before do
-          stub_licensed_features(merge_request_approvers_rules: license_value)
+          stub_licensed_features(admin_merge_request_approvers_rules: license_value)
           stub_application_setting(app_setting => setting_value)
         end
 
@@ -145,42 +145,6 @@ describe API::ProjectApprovals do
       end
 
       context 'updates merge requests settings' do
-        # context 'updates merge requests author approval setting when possible' do
-        #   using RSpec::Parameterized::TableSyntax
-
-        #   where(:license_value, :setting_value, :param_value, :final_value) do
-        #     false | false | false | false
-        #     false | true  | false | false
-        #     false | false | true  | true
-        #     false | true  | true  | true
-        #     true  | false | false | false
-        #     true  | true  | false | false
-        #     true  | false | true  | true
-        #     true  | true  | true  | false
-        #   end
-
-        #   with_them do
-        #     let(:current_user) { admin }
-        #     let(:app_setting) { :prevent_merge_requests_committers_approval }
-        #     let(:setting) { :merge_requests_disable_committers_approval }
-
-        #     before do
-        #       stub_licensed_features(merge_request_approvers_rules: license_value)
-        #       stub_application_setting(app_setting => setting_value)
-        #     end
-
-        #     it 'changes settings properly' do
-        #       settings = {
-        #         setting => param_value
-        #       }
-
-        #       post api(url, current_user), params: settings
-
-        #       expect(json_response.symbolize_keys).to include({ setting => final_value})
-        #     end
-        #   end
-        # end
-
         it_behaves_like 'updates merge requests settings when possible' do
           let(:current_user) { admin }
           let(:app_setting) { :disable_overriding_approvers_per_merge_request }

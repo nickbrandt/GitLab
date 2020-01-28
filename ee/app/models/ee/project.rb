@@ -724,25 +724,25 @@ module EE
     end
 
     def disable_overriding_approvers_per_merge_request
-      return self[:disable_overriding_approvers_per_merge_request] unless License.feature_available?(:merge_request_approvers_rules)
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
 
       ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
-        self[:disable_overriding_approvers_per_merge_request]
+        super
     end
 
     def merge_requests_author_approval
-      return self[:merge_requests_author_approval] unless License.feature_available?(:merge_request_approvers_rules)
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
 
       return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
 
-      self[:merge_requests_author_approval]
+      super
     end
 
     def merge_requests_disable_committers_approval
-      return self[:merge_requests_disable_committers_approval] unless License.feature_available?(:merge_request_approvers_rules)
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
 
       ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
-        self[:merge_requests_disable_committers_approval]
+        super
     end
 
     def license_compliance

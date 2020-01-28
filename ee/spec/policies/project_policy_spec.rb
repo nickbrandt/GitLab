@@ -1228,14 +1228,14 @@ describe ProjectPolicy do
         :owner | false | true
         :owner | true | false
         :admin | false | true
-        :admin | true | false
+        :admin | true | true
       end
 
       with_them do
         let(:current_user) { public_send(role) }
 
         before do
-          stub_licensed_features(merge_request_approvers_rules: true)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
           stub_application_setting(setting_name => setting)
         end
 
@@ -1262,7 +1262,7 @@ describe ProjectPolicy do
         let(:current_user) { public_send(role) }
 
         before do
-          stub_licensed_features(merge_request_approvers_rules: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: false)
           stub_application_setting(setting_name => setting)
         end
 
@@ -1287,10 +1287,10 @@ describe ProjectPolicy do
     end
   end
 
-  describe ':modify_merge_request_commiter_setting' do
+  describe ':modify_merge_request_committer_setting' do
     it_behaves_like 'merge request rules' do
       let(:setting_name) { :prevent_merge_requests_committers_approval }
-      let(:policy) { :modify_merge_request_commiter_setting }
+      let(:policy) { :modify_merge_request_committer_setting }
     end
   end
 
@@ -1317,7 +1317,7 @@ describe ProjectPolicy do
         let(:current_user) { public_send(role) }
 
         before do
-          stub_licensed_features(merge_request_approvers_rules: true)
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
           stub_application_setting(setting_name => setting)
         end
 
@@ -1344,7 +1344,7 @@ describe ProjectPolicy do
         let(:current_user) { public_send(role) }
 
         before do
-          stub_licensed_features(merge_request_approvers_rules: false)
+          stub_licensed_features(admin_merge_request_approvers_rules: false)
           stub_application_setting(setting_name => setting)
         end
 

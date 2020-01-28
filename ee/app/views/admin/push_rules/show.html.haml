@@ -2,14 +2,14 @@
 - page_title _("Push Rules")
 - @content_class = "limit-container-width" unless fluid_layout
 
-%section.settings.no-animate#js-visibility-settings{ class: ('expanded' if expanded_by_default?) }
+%section.settings.no-animate{ class: ('expanded' if expanded_by_default?) }
   .settings-header
     %h4
       = _('Push Rules')
     %button.btn.js-settings-toggle{ type: 'button' }
       = expanded_by_default? ? _('Collapse') : _('Expand')
     %p
-      = _('Rules that define what git pushes are accepted for a project. All newly created projects will use this settings.')
+      = _('Rules that define what git pushes are accepted for a project. All newly created projects will use these settings.')
   .settings-content
     = render 'push_rules'
 

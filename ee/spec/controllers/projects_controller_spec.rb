@@ -335,7 +335,7 @@ describe ProjectsController do
 
         with_them do
           before do
-            stub_licensed_features(merge_request_approvers_rules: license_value)
+            stub_licensed_features(admin_merge_request_approvers_rules: license_value)
             stub_application_setting(app_setting => setting_value)
           end
 
