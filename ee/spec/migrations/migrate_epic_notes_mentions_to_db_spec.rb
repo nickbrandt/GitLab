@@ -16,9 +16,9 @@ describe MigrateEpicNotesMentionsToDb, :migration, :sidekiq do
     namespaces.create!(id: 1, name: 'group1', path: 'group1', owner_id: 1)
     epics.create!(id: 1, iid: 1, title: "title", title_html: 'title', description: 'epic description', group_id: 1, author_id: 1)
 
-    notes.create!(note: 'note1 for @root to check', noteable_id: 1, noteable_type: 'Epic')
-    notes.create!(note: 'note2 for @root to check', noteable_id: 1, noteable_type: 'Epic', system: true)
-    notes.create!(note: 'note3 for @root to check', noteable_id: 1, noteable_type: 'Epic')
+    notes.create!(note: 'note1 for @root to check', id: 1, noteable_id: 1, noteable_type: 'Epic')
+    notes.create!(note: 'note2 for @root to check', id: 2, noteable_id: 1, noteable_type: 'Epic', system: true)
+    notes.create!(note: 'note3 for @root to check', id: 3, noteable_id: 1, noteable_type: 'Epic')
   end
 
   it 'schedules epic mentions migrations' do
