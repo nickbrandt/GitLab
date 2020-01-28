@@ -964,17 +964,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    describe 'unassign command with non-existent assignee reference' do
-      let(:content) { "/unassign @#{user.username} @#{user3.username}" }
-      let(:issue) { create(:issue, project: project, assignees: [user, user2]) }
-
-      it 'ignores non-existent assignee references' do
-        _, explanations = service.explain(content, issue)
-
-        expect(explanations).to eq(["Removes assignee @#{user.username}."])
-      end
-    end
-
     describe 'weight command' do
       let(:content) { '/weight 4' }
 
