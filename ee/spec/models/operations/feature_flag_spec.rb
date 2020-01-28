@@ -16,6 +16,14 @@ describe Operations::FeatureFlag do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
+
+    it_behaves_like 'AtomicInternalId', validate_presence: false do
+      let(:internal_id_attribute) { :iid }
+      let(:instance) { build(:operations_feature_flag) }
+      let(:scope) { :project }
+      let(:scope_attrs) { { project: instance.project } }
+      let(:usage) { :operations_feature_flags }
+    end
   end
 
   describe 'Scope creation' do
