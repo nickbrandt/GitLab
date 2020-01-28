@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::CredentialsHelper do
+describe CredentialsInventoryHelper do
   let(:filter) { nil }
 
   before do

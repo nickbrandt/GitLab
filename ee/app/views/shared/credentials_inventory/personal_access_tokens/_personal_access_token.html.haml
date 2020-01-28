@@ -1,9 +1,9 @@
 .gl-responsive-table-row{ role: 'row', data: { qa_selector: 'credentials_personal_access_token_row_content' } }
-  .table-section.section-25
+  .table-section.section-40
     .table-mobile-header{ role: 'rowheader' }
       = _('Owner')
     .table-mobile-content
-      = render 'admin/users/user_detail', user: personal_access_token.user
+      = render 'shared/credentials_inventory/users/user_detail', user: personal_access_token.user
   .table-section.section-30
     .table-mobile-header{ role: 'rowheader' }
       = _('Scope')
