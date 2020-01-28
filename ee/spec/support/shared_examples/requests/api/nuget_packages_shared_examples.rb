@@ -72,7 +72,7 @@ RSpec.shared_examples 'process nuget workhorse authorization' do |user_type, sta
         project.add_maintainer(user)
       end
 
-      it_behaves_like 'returning response status', :error
+      it_behaves_like 'returning response status', :forbidden
     end
   end
 end
@@ -104,6 +104,7 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
       end
 
       context 'with correct params' do
+        it_behaves_like 'package workhorse uploads'
         it_behaves_like 'creates nuget package files'
         it_behaves_like 'a gitlab tracking event', described_class.name, 'push_package'
       end
