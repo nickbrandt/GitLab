@@ -15,8 +15,8 @@ module Geo
           .where(Geo::EventLog.arel_table[:id].lteq(geo_event_log_id))
       end
 
-      def delete_with_limit(limit)
-        ::Gitlab::Database::Subquery.self_join(limit(limit)).delete_all
+      def delete_with_limit(maximum)
+        limit(maximum).delete_all
       end
     end
 
