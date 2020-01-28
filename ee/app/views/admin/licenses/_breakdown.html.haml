@@ -13,44 +13,50 @@
 - else
   - users_over_license = 0
 
+- true_up_url = 'https://about.gitlab.com/license-faq/'
+- true_up_link_start = '<a href="%{url}">'.html_safe % { url: true_up_url }
+- link_end = '</a>'.html_safe
+
 .license-panel.prepend-top-default
-  .row
-    .col-sm-4
+  .d-flex.pb-2
+    .col-sm-6.d-flex.pl-0
       .info-well.dark-well
         .well-segment.well-centered
           %h3.center
-            Users in License:
+            = _('Users in License:')
             = licensed_users
           %hr
           - if @license.will_expire?
-            Your license is valid from
-            %strong
-              #{@license.starts_at} to
+            = _('Your license is valid from')
             %strong<>
-              #{@license.expires_at}
+              = _(' %{start} to %{end}') % { start: @license.starts_at, end: @license.expires_at }
             \.
-          The
-          %a{ href: 'https://about.gitlab.com/license-faq/' } true-up model
-          allows having more users, and additional users will incur a retroactive charge on renewal.
+          = _('The %{link_start}true-up model%{link_end} allows having more users, and additional users will incur a retroactive charge on renewal.').html_safe % { link_start: true_up_link_start, link_end: link_end }
           = seats_calculation_message
-    .col-sm-4
+    .col-sm-6.d-flex.pr-0
       .info-well.dark-well
         .well-segment.well-centered
           %h3.center
-            Maximum Users:
+            = _('Active Users:')
+            = current_active_user_count
+          %hr
+            %p
+            = _('This is the number of currently active users on your installation, and this is the minimum number you need to purchase when you renew your license.')
+  .d-flex.pb-3
+    .col-sm-6.d-flex.pl-0
+      .info-well.dark-well.flex-fill
+        .well-segment.well-centered
+          %h3.center
+            = _('Maximum Users:')
             = number_with_delimiter max_user_count
           %hr
-            This is the highest peak of users on your installation since the license started, and
-            this is the minimum number you need to purchase when you renew your license.
-    .col-sm-4
+            = _('This is the highest peak of users on your installation since the license started.')
+    .col-sm-6.d-flex.pr-0
       .info-well.dark-well
         .well-segment.well-centered
           %h3.center
-            Users over License:
+            = _('Users over License:')
             = number_with_delimiter users_over_license
           %hr
-            The
-            %a{ href: 'https://about.gitlab.com/licensing-faq/' } true-up model
-            has a retroactive charge for these users at the next renewal. If you want to update your
-            license sooner to prevent this, please contact
-            %a{ href: 'https://support.gitlab.com' } Support.
+            - support_link_start = '<a href="%{url}">'.html_safe % { url: ::EE::CUSTOMER_SUPPORT_URL }
+            = _('The %{true_up_link_start}true-up model%{link_end} has a retroactive charge for these users at the next renewal. If you want to update your license sooner to prevent this, %{support_link_start}please contact our Support team%{link_end}.').html_safe % { support_link_start: support_link_start, true_up_link_start: true_up_link_start, link_end: link_end }
