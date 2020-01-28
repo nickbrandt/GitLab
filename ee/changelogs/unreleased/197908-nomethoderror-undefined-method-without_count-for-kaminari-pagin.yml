@@ -1,0 +1,5 @@
+---
+title: Fix 500 error in global search for blob, wiki_blob and commit search
+merge_request: 23326
+author:
+type: fixed
