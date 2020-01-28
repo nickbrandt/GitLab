@@ -1,4 +1,4 @@
-import { defaultTimeWindow, timeWindows } from '../constants';
+import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
 
 export default () => ({
   /**
@@ -9,9 +9,9 @@ export default () => ({
   /**
    * Time range (Show last)
    */
-  timeWindow: {
-    options: { ...timeWindows },
-    current: defaultTimeWindow,
+  timeRange: {
+    options: timeRanges,
+    current: defaultTimeRange,
   },
 
   /**

@@ -4,10 +4,12 @@ import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { s__ } from '~/locale';
+import { convertToFixedRange } from '~/lib/utils/datetime_range';
+
 import * as types from './mutation_types';
 
-import { getTimeRange } from '../utils';
-import { timeWindows } from '../constants';
+// import { getTimeRange } from '../utils';
+// import { timeWindows } from '../constants';
 
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
@@ -39,8 +41,8 @@ export const setSearch = ({ dispatch, commit }, searchQuery) => {
   dispatch('fetchLogs');
 };
 
-export const setTimeWindow = ({ dispatch, commit }, timeWindowKey) => {
-  commit(types.SET_TIME_WINDOW, timeWindowKey);
+export const setTimeRange = ({ dispatch, commit }, timeRange) => {
+  commit(types.SET_TIME_RANGE, timeRange);
   dispatch('fetchLogs');
 };
 
@@ -72,12 +74,11 @@ export const fetchLogs = ({ commit, state }) => {
     search: state.search,
   };
 
-  if (state.timeWindow.current) {
-    const { current } = state.timeWindow;
-    const { start, end } = getTimeRange(timeWindows[current].seconds);
+  if (state.timeRange.current) {
+    const { startTime, endTime } = convertToFixedRange(state.timeRange.current);
 
-    params.start = start;
-    params.end = end;
+    params.start = startTime;
+    params.end = endTime;
   }
 
   commit(types.REQUEST_PODS_DATA);
