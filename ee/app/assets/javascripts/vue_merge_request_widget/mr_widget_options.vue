@@ -304,7 +304,7 @@ export default {
         :enabled-reports="mr.enabledSecurityReports"
         :sast-help-path="mr.sastHelp"
         :dast-help-path="mr.dastHelp"
-        :sast-container-help-path="mr.sastContainerHelp"
+        :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"

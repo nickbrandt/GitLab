@@ -51,7 +51,7 @@ export default {
       required: false,
       default: '',
     },
-    sastContainerHelpPath: {
+    containerScanningHelpPath: {
       type: String,
       required: false,
       default: '',
@@ -118,7 +118,7 @@ export default {
   computed: {
     ...mapState([
       'sast',
-      'sastContainer',
+      'containerScanning',
       'dast',
       'dependencyScanning',
       'summaryCounts',
@@ -129,10 +129,10 @@ export default {
     ...mapGetters([
       'groupedSummaryText',
       'summaryStatus',
-      'groupedSastContainerText',
+      'groupedContainerScanningText',
       'groupedDastText',
       'groupedDependencyText',
-      'sastContainerStatusIcon',
+      'containerScanningStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
       'isBaseSecurityReportOutOfDate',
@@ -203,8 +203,8 @@ export default {
     const containerScanningDiffEndpoint = gl?.mrWidgetData?.container_scanning_comparison_path;
 
     if (containerScanningDiffEndpoint && this.hasContainerScanningReports) {
-      this.setSastContainerDiffEndpoint(containerScanningDiffEndpoint);
-      this.fetchSastContainerDiff();
+      this.setContainerScanningDiffEndpoint(containerScanningDiffEndpoint);
+      this.fetchContainerScanningDiff();
     }
 
     // eslint-disable-next-line camelcase
@@ -248,8 +248,8 @@ export default {
       'deleteDismissalComment',
       'showDismissalDeleteButtons',
       'hideDismissalDeleteButtons',
-      'fetchSastContainerDiff',
-      'setSastContainerDiffEndpoint',
+      'fetchContainerScanningDiff',
+      'setContainerScanningDiffEndpoint',
       'fetchDependencyScanningDiff',
       'setDependencyScanningDiffEndpoint',
       'fetchDastDiff',
@@ -327,18 +327,18 @@ export default {
 
       <template v-if="hasContainerScanningReports">
         <summary-row
-          :summary="groupedSastContainerText"
-          :status-icon="sastContainerStatusIcon"
-          :popover-options="sastContainerPopover"
-          class="js-sast-container"
+          :summary="groupedContainerScanningText"
+          :status-icon="containerScanningStatusIcon"
+          :popover-options="containerScanningPopover"
+          class="js-container-scanning"
           data-qa-selector="container_scan_report"
         />
 
         <issues-list
-          v-if="sastContainer.newIssues.length || sastContainer.resolvedIssues.length"
-          :unresolved-issues="sastContainer.newIssues"
-          :resolved-issues="sastContainer.resolvedIssues"
-          :component="$options.componentNames.SastContainerIssueBody"
+          v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
+          :unresolved-issues="containerScanning.newIssues"
+          :resolved-issues="containerScanning.resolvedIssues"
+          :component="$options.componentNames.ContainerScanningIssueBody"
           class="report-block-group-list"
         />
       </template>

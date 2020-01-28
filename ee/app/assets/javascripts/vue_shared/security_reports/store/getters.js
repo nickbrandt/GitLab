@@ -3,9 +3,9 @@ import { countIssues, groupedTextBuilder, statusIcon, groupedReportText } from '
 import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
 
-export const groupedSastContainerText = ({ sastContainer }) =>
+export const groupedContainerScanningText = ({ containerScanning }) =>
   groupedReportText(
-    sastContainer,
+    containerScanning,
     messages.CONTAINER_SCANNING,
     messages.CONTAINER_SCANNING_HAS_ERROR,
     messages.CONTAINER_SCANNING_IS_LOADING,
@@ -23,7 +23,7 @@ export const groupedDependencyText = ({ dependencyScanning }) =>
   );
 
 export const summaryCounts = state =>
-  [state.sast, state.sastContainer, state.dast, state.dependencyScanning].reduce(
+  [state.sast, state.containerScanning, state.dast, state.dependencyScanning].reduce(
     (acc, report) => {
       const curr = countIssues(report);
       acc.added += curr.added;
@@ -81,8 +81,12 @@ export const summaryStatus = (state, getters) => {
   return SUCCESS;
 };
 
-export const sastContainerStatusIcon = ({ sastContainer }) =>
-  statusIcon(sastContainer.isLoading, sastContainer.hasError, sastContainer.newIssues.length);
+export const containerScanningStatusIcon = ({ containerScanning }) =>
+  statusIcon(
+    containerScanning.isLoading,
+    containerScanning.hasError,
+    containerScanning.newIssues.length,
+  );
 
 export const dastStatusIcon = ({ dast }) =>
   statusIcon(dast.isLoading, dast.hasError, dast.newIssues.length);
@@ -97,43 +101,43 @@ export const dependencyScanningStatusIcon = ({ dependencyScanning }) =>
 export const areReportsLoading = state =>
   state.sast.isLoading ||
   state.dast.isLoading ||
-  state.sastContainer.isLoading ||
+  state.containerScanning.isLoading ||
   state.dependencyScanning.isLoading;
 
 export const areAllReportsLoading = state =>
   state.sast.isLoading &&
   state.dast.isLoading &&
-  state.sastContainer.isLoading &&
+  state.containerScanning.isLoading &&
   state.dependencyScanning.isLoading;
 
 export const allReportsHaveError = state =>
   state.sast.hasError &&
   state.dast.hasError &&
-  state.sastContainer.hasError &&
+  state.containerScanning.hasError &&
   state.dependencyScanning.hasError;
 
 export const anyReportHasError = state =>
   state.sast.hasError ||
   state.dast.hasError ||
-  state.sastContainer.hasError ||
+  state.containerScanning.hasError ||
   state.dependencyScanning.hasError;
 
 export const noBaseInAllReports = state =>
   !state.sast.hasBaseReport &&
   !state.dast.hasBaseReport &&
-  !state.sastContainer.hasBaseReport &&
+  !state.containerScanning.hasBaseReport &&
   !state.dependencyScanning.hasBaseReport;
 
 export const anyReportHasIssues = state =>
   state.sast.newIssues.length > 0 ||
   state.dast.newIssues.length > 0 ||
-  state.sastContainer.newIssues.length > 0 ||
+  state.containerScanning.newIssues.length > 0 ||
   state.dependencyScanning.newIssues.length > 0;
 
 export const isBaseSecurityReportOutOfDate = state =>
   state.sast.baseReportOutofDate ||
   state.dast.baseReportOutofDate ||
-  state.sastContainer.baseReportOutofDate ||
+  state.containerScanning.baseReportOutofDate ||
   state.dependencyScanning.baseReportOutofDate;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

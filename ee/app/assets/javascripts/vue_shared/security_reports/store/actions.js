@@ -48,26 +48,26 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
 
 /**
- * SAST CONTAINER
+ * CONTAINER SCANNING
  */
 
-export const setSastContainerDiffEndpoint = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
+export const setContainerScanningDiffEndpoint = ({ commit }, path) =>
+  commit(types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT, path);
 
-export const requestSastContainerReports = ({ commit }) =>
-  commit(types.REQUEST_SAST_CONTAINER_REPORTS);
+export const requestContainerScanningDiff = ({ commit }) =>
+  commit(types.REQUEST_CONTAINER_SCANNING_DIFF);
 
-export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
+export const receiveContainerScanningDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS, response);
 
-export const receiveSastContainerDiffError = ({ commit }) =>
-  commit(types.RECEIVE_SAST_CONTAINER_DIFF_ERROR);
+export const receiveContainerScanningDiffError = ({ commit }) =>
+  commit(types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR);
 
-export const fetchSastContainerDiff = ({ state, dispatch }) => {
-  dispatch('requestSastContainerReports');
+export const fetchContainerScanningDiff = ({ state, dispatch }) => {
+  dispatch('requestContainerScanningDiff');
 
   return Promise.all([
-    pollUntilComplete(state.sastContainer.paths.diffEndpoint),
+    pollUntilComplete(state.containerScanning.paths.diffEndpoint),
     axios.get(state.vulnerabilityFeedbackPath, {
       params: {
         category: 'container_scanning',
@@ -75,13 +75,13 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
     }),
   ])
     .then(values => {
-      dispatch('receiveSastContainerDiffSuccess', {
+      dispatch('receiveContainerScanningDiffSuccess', {
         diff: values[0].data,
         enrichData: values[1].data,
       });
     })
     .catch(() => {
-      dispatch('receiveSastContainerDiffError');
+      dispatch('receiveContainerScanningDiffError');
     });
 };
 

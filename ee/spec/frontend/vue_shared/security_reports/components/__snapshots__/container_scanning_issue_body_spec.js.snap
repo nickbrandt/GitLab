@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Sast Container Issue Body matches snapshot 1`] = `
+exports[`Container Scanning Issue Body matches snapshot 1`] = `
 <div
   class="report-block-list-issue-description prepend-top-5 append-bottom-5"
 >

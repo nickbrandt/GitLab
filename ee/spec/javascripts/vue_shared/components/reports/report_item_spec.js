@@ -90,7 +90,7 @@ describe('Report issue', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssue, {
         issue: dockerReportParsed.unapproved[0],
-        component: componentNames.SastContainerIssueBody,
+        component: componentNames.ContainerScanningIssueBody,
         status: STATUS_FAILED,
       });
     });

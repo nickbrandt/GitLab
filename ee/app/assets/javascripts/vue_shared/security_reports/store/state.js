@@ -16,7 +16,7 @@ export default () => ({
   canCreateIssuePermission: false,
   canCreateFeedbackPermission: false,
 
-  sastContainer: {
+  containerScanning: {
     paths: {
       head: null,
       base: null,
