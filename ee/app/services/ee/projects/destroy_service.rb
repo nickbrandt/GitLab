@@ -34,8 +34,8 @@ module EE
       def log_geo_event(project)
         ::Geo::RepositoryDeletedEventStore.new(
           project,
-          repo_path: repo_path,
-          wiki_path: wiki_path
+          repo_path: project.disk_path,
+          wiki_path: project.wiki.disk_path
         ).create!
       end
 
