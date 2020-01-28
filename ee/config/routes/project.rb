@@ -167,6 +167,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       namespace :security do
         resources :dashboard, only: [:show, :index], controller: :dashboard
         resource :configuration, only: [:show], controller: :configuration
+        resource :discover, only: [:show], controller: :discover
 
         resources :vulnerability_findings, only: [:index] do
           collection do

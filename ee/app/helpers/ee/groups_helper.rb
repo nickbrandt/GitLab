@@ -78,6 +78,15 @@ module EE
       ::Gitlab::CurrentSettings.deletion_adjourned_period
     end
 
+    def show_discover_group_security?(group)
+      !!::Feature.enabled?(:discover_security) &&
+        ::Gitlab.com? &&
+        !!current_user &&
+        current_user.created_at > DateTime.new(2020, 1, 20) &&
+        !@group.feature_available?(:security_dashboard) &&
+        can?(current_user, :admin_group, @group)
+    end
+
     private
 
     def get_group_sidebar_links
