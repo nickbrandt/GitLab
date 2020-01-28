@@ -215,6 +215,7 @@ module Gitlab
 
         return unless token && login
         return if login != token.username
+        return unless token.valid_for?(project)
 
         scopes = abilities_for_scopes(token.scopes)
 

@@ -373,4 +373,56 @@ describe DeployToken do
       end
     end
   end
+
+  describe '#valid_for?' do
+    let(:target_project) { create(:project) }
+    let(:deploy_token) { create(:deploy_token, :project) }
+
+    subject { deploy_token.valid_for?(target_project) }
+
+    context 'when no project is passed in' do
+      let(:target_project) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when a project is passed in' do
+      context 'and when the token is of group type' do
+        let(:group) { create(:group) }
+        let(:deploy_token) { create(:deploy_token, :group) }
+
+        before do
+          deploy_token.groups << group
+        end
+
+        context 'and the passed-in project belongs to the token group' do
+          let(:target_project) { create(:project, group: group) }
+
+          it { is_expected.to be_truthy }
+        end
+
+        context 'and the passed-in project does not belong to the token group' do
+          let(:target_project) { create(:project, group: create(:group)) }
+
+          it { is_expected.to be_falsy }
+        end
+      end
+
+      context 'and the token is of project type' do
+        before do
+          deploy_token.projects << target_project
+        end
+
+        context 'and the passed-in project is the same as the token project' do
+          it { is_expected.to be_truthy }
+        end
+
+        context 'and the passed-in project is not the same as the token project' do
+          subject { deploy_token.valid_for?(create(:project)) }
+
+          it { is_expected.to be_falsey }
+        end
+      end
+    end
+  end
 end
