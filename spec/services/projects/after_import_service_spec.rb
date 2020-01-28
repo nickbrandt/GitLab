@@ -76,13 +76,13 @@ describe Projects::AfterImportService do
       let(:exception) { GRPC::DeadlineExceeded.new }
 
       before do
-        repository.write_ref('refs/pull/1/head', sha)
-        expect(repository)
-          .to receive(:delete_all_refs_except)
-          .and_raise(exception)
-        expect(repository)
-          .to receive(:delete_all_refs_except)
-        .and_call_original
+        call_count = 0
+        original_method = repository.method(:delete_all_refs_except)
+
+        allow(repository).to receive(:delete_all_refs_except) do |*args|
+          call_count += 1
+          call_count > 1 ? original_method.call(*args) : raise(exception)
+        end
 
         subject.execute
       end
