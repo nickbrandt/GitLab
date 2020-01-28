@@ -525,6 +525,35 @@ For other punctuation rules, please refer to the
 - Use sentence case in headings. Do not capitalize the words of the title, unless
   it refers to a product feature. For example, capitalizing "issues" is acceptable in
   `## What you can do with GitLab Issues`, but not in `## Closing multiple issues`.
+- Our docs site search engine prioritizes headings, therefore, make sure to write
+  headings that contextualize the subject and help to take the user to the right
+  document. For example, `## Examples` is a bad heading; `## GitLab Pages examples`
+  is a better one. It's not an exact science, but please consider this carefully.
+
+### Anchor links
+
+Headings generate anchor links automatically when rendered. `## This is an example`
+generates the anchor `#this-is-an-example`.
+
+Keep in mind that the GitLab UI links to a large number of docs and respective
+anchor links to take the user to the right spot. Therefore, when you change a
+heading, search `doc/*`, `app/views/*`, and `ee/app/views/*` for the old anchor
+to make sure you're not breaking an anchor linked from other docs nor from the
+GitLab UI. If you find the old anchor, make sure to replace it with the new one.
+
+Important:
+
+- Avoid crosslinking docs to headings unless you need to link to a specific section
+  of the document. This will avoid breaking anchors in the future in case the heading
+  is changed.
+- If possible, avoid changing headings since they're not only linked internally.
+  There are various links to GitLab documentation on the internet, such as tutorials,
+  presentations, StackOverflow posts, and other sources.
+- Do not link to `h1` headings.
+
+Note that, with Kramdown, it is possible to add a custom ID to an HTML element
+with Markdown markup, but they **do not** work in GitLab's `/help`. Therefore,
+do not use this option until further notice.
 
 ## Links
 
