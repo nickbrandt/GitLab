@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe RemoteMirror, :mailer do
+describe RemoteMirror do
   include GitHelpers
 
   describe 'URL validation' do
@@ -189,10 +189,10 @@ describe RemoteMirror, :mailer do
         remote_mirror.project.add_maintainer(user)
       end
 
-      it 'notifies the project maintainers', :sidekiq_might_not_need_inline do
-        perform_enqueued_jobs { subject }
+      it 'schedule a notification for the remote mirror', :sidekiq_might_not_need_inline do
+        expect(RemoteMirrorNotificationWorker).to receive(:perform_async).with(remote_mirror.id)
 
-        should_email(user)
+        subject
       end
     end
   end
