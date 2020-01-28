@@ -29,4 +29,5 @@
     = render 'shared/billings/trial_status', namespace: namespace
 
   - if namespace.eligible_for_trial?
-    %p= link_to 'Start your free trial', new_trial_registration_path, class: 'btn btn-primary'
+    - glm_content = namespace_for_user?(namespace) ? 'user-billing' : 'group-billing'
+    %p= link_to 'Start your free trial', new_trial_registration_path(glm_source: 'gitlab.com', glm_content: glm_content), class: 'btn btn-primary'

@@ -7,7 +7,7 @@ module EE
     end
 
     def trials_link_url
-      new_trial_registration_path
+      new_trial_registration_path(glm_source: 'gitlab.com', glm_content: 'top-right-dropdown')
     end
 
     def user_badges_in_admin_section(user)

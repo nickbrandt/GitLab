@@ -11,7 +11,7 @@ describe 'Trial Sign In' do
     end
 
     it 'logs the user in' do
-      visit(new_trial_registration_path)
+      visit(new_trial_registration_path(glm_source: 'any-source', glm_content: 'any-content'))
 
       within('div#login-pane') do
         fill_in 'user_login', with: user.email
