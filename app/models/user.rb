@@ -59,6 +59,12 @@ class User < ApplicationRecord
 
   MINIMUM_INACTIVE_DAYS = 180
 
+  enum bot_type: {
+    support_bot: 1,
+    alert_bot: 2,
+    visual_review_bot: 3
+  }
+
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
   # rubocop: disable CodeReuse/ServiceClass
@@ -322,6 +328,8 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
+  scope :bots, -> { where.not(bot_type: nil) }
+  scope :humans, -> { where(bot_type: nil) }
 
   scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
     where('EXISTS (?)',
@@ -598,6 +606,33 @@ class User < ApplicationRecord
       end
     end
 
+    def alert_bot
+      email_pattern = "alert%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+        u.bio = 'The GitLab alert bot'
+        u.name = 'GitLab Alert Bot'
+      end
+    end
+
+    def support_bot
+      email_pattern = "support%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
+        u.bio = 'The GitLab support bot used for Service Desk'
+        u.name = 'GitLab Support Bot'
+      end
+    end
+
+    def visual_review_bot
+      email_pattern = "visual_review%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
+        u.bio = 'The Gitlab Visual Review feedback bot'
+        u.name = 'Gitlab Visual Review Bot'
+      end
+    end
+
     # Return true if there is only single non-internal user in the deployment,
     # ghost user is ignored.
     def single_user?
@@ -613,16 +648,23 @@ class User < ApplicationRecord
     username
   end
 
+  def bot?
+    return bot_type.present? if has_attribute?(:bot_type)
+
+    # Some older *migration* specs utilize this removed column
+    read_attribute(:support_bot)
+  end
+
   def internal?
-    ghost?
+    ghost? || bot?
   end
 
   def self.internal
-    where(ghost: true)
+    where(ghost: true).or(bots)
   end
 
   def self.non_internal
-    without_ghosts
+    without_ghosts.humans
   end
 
   #

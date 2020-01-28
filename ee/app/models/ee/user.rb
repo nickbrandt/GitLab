@@ -70,9 +70,6 @@ module EE
         joins(:identities).where(identities: { provider: provider })
       end
 
-      scope :bots, -> { where.not(bot_type: nil) }
-      scope :humans, -> { where(bot_type: nil) }
-
       scope :with_invalid_expires_at_tokens, ->(expiration_date) do
         where(id: ::PersonalAccessToken.with_invalid_expires_at(expiration_date).select(:user_id))
       end
@@ -85,53 +82,10 @@ module EE
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
-
-      enum bot_type: {
-        support_bot: 1,
-        alert_bot: 2,
-        visual_review_bot: 3
-      }
     end
 
     class_methods do
       extend ::Gitlab::Utils::Override
-
-      def support_bot
-        email_pattern = "support%s@#{Settings.gitlab.host}"
-
-        unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
-          u.bio = 'The GitLab support bot used for Service Desk'
-          u.name = 'GitLab Support Bot'
-        end
-      end
-
-      def alert_bot
-        email_pattern = "alert%s@#{Settings.gitlab.host}"
-
-        unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
-          u.bio = 'The GitLab alert bot'
-          u.name = 'GitLab Alert Bot'
-        end
-      end
-
-      def visual_review_bot
-        email_pattern = "visual_review%s@#{Settings.gitlab.host}"
-
-        unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
-          u.bio = 'The Gitlab Visual Review feedback bot'
-          u.name = 'Gitlab Visual Review Bot'
-        end
-      end
-
-      override :internal
-      def internal
-        super.or(bots)
-      end
-
-      override :non_internal
-      def non_internal
-        super.humans
-      end
 
       def non_ldap
         joins('LEFT JOIN identities ON identities.user_id = users.id')
@@ -332,18 +286,6 @@ module EE
       return false if group_managed_account?
 
       super
-    end
-
-    override :internal?
-    def internal?
-      super || bot?
-    end
-
-    def bot?
-      return bot_type.present? if has_attribute?(:bot_type)
-
-      # Some older *migration* specs utilize this removed column
-      read_attribute(:support_bot)
     end
 
     protected

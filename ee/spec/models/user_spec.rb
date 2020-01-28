@@ -74,16 +74,6 @@ describe User do
       end
     end
 
-    describe 'bots & humans' do
-      it 'returns corresponding users' do
-        human = create(:user)
-        bot = create(:user, :bot)
-
-        expect(described_class.humans).to match_array([human])
-        expect(described_class.bots).to match_array([bot])
-      end
-    end
-
     describe 'with_invalid_expires_at_tokens' do
       it 'only includes users with invalid tokens' do
         valid_pat = create(:personal_access_token, expires_at: 7.days.from_now)
@@ -589,37 +579,6 @@ describe User do
 
       it 'is false' do
         expect(user.allow_password_authentication_for_git?).to eq false
-      end
-    end
-  end
-
-  describe 'internal methods' do
-    let!(:user) { create(:user) }
-    let!(:ghost) { described_class.ghost }
-    let!(:support_bot) { described_class.support_bot }
-    let!(:alert_bot) { described_class.alert_bot }
-    let!(:visual_review_bot) { described_class.visual_review_bot }
-    let!(:non_internal) { [user] }
-    let!(:internal) { [ghost, support_bot, alert_bot, visual_review_bot] }
-
-    it 'returns non internal users' do
-      expect(described_class.internal).to eq(internal)
-      expect(internal.all?(&:internal?)).to eq(true)
-    end
-
-    it 'returns internal users' do
-      expect(described_class.non_internal).to eq(non_internal)
-      expect(non_internal.all?(&:internal?)).to eq(false)
-    end
-
-    describe '#bot?' do
-      it 'marks bot users' do
-        expect(user.bot?).to eq(false)
-        expect(ghost.bot?).to eq(false)
-
-        expect(support_bot.bot?).to eq(true)
-        expect(alert_bot.bot?).to eq(true)
-        expect(visual_review_bot.bot?).to eq(true)
       end
     end
   end
