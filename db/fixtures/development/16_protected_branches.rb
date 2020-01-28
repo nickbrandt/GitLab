@@ -1,9 +1,9 @@
 require './spec/support/sidekiq_middleware'
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   admin_user = User.find(1)
 
-  Project.not_mass_generated.each do |project|
+  seeder.not_mass_generated_projects.each do |project|
     params = {
       name: 'master'
     }

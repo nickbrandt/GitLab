@@ -82,13 +82,13 @@ class Gitlab::Seeder::Burndown
   end
 end
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   if project_id = ENV['PROJECT_ID']
     project = Project.find(project_id)
     seeder = Gitlab::Seeder::Burndown.new(project)
     seeder.seed!
   else
-    Project.not_mass_generated.each do |project|
+    seeder.not_mass_generated_projects.each do |project|
       seeder = Gitlab::Seeder::Burndown.new(project)
       seeder.seed!
     end

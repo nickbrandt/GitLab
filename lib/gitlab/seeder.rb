@@ -2,13 +2,17 @@
 
 # :nocov:
 module DeliverNever
-  def deliver_later
-    self
+  refine ActionMailer::MessageDelivery do
+    def deliver_later
+      self
+    end
   end
 end
 
 module MuteNotifications
-  def new_note(note)
+  refine NotificationService do
+    def new_note(note)
+    end
   end
 end
 
@@ -21,24 +25,12 @@ module Gitlab
     ESTIMATED_INSERT_PER_MINUTE = 2_000_000
     MASS_INSERT_ENV = 'MASS_INSERT'
 
-    module ProjectSeed
-      extend ActiveSupport::Concern
-
-      included do
-        scope :not_mass_generated, -> do
-          where.not("path LIKE '#{MASS_INSERT_PROJECT_START}%'")
-        end
-      end
+    def self.not_mass_generated_users
+      User.where.not("username LIKE '#{MASS_INSERT_USER_START}%'") # rubocop:disable CodeReuse/ActiveRecord
     end
 
-    module UserSeed
-      extend ActiveSupport::Concern
-
-      included do
-        scope :not_mass_generated, -> do
-          where.not("username LIKE '#{MASS_INSERT_USER_START}%'")
-        end
-      end
+    def self.not_mass_generated_projects
+      Project.where.not("path LIKE '#{MASS_INSERT_PROJECT_START}%'") # rubocop:disable CodeReuse/ActiveRecord
     end
 
     def self.with_mass_insert(size, model)
@@ -72,46 +64,21 @@ module Gitlab
       end
     end
 
+    using MuteNotifications
+    using DeliverNever
+
     def self.quiet
       # Disable database insertion logs so speed isn't limited by ability to print to console
       old_logger = ActiveRecord::Base.logger
       ActiveRecord::Base.logger = nil
 
-      # Additional seed logic for models.
-      Project.include(ProjectSeed)
-      User.include(UserSeed)
-
-      mute_notifications
-      mute_mailer
-
       SeedFu.quiet = true
 
-      yield
+      yield self
 
       SeedFu.quiet = false
       ActiveRecord::Base.logger = old_logger
       puts "\nOK".color(:green)
-    end
-
-    def self.without_gitaly_timeout
-      # Remove Gitaly timeout
-      old_timeout = Gitlab::CurrentSettings.current_application_settings.gitaly_timeout_default
-      Gitlab::CurrentSettings.current_application_settings.update_columns(gitaly_timeout_default: 0)
-      # Otherwise we still see the default value when running seed_fu
-      ApplicationSetting.expire
-
-      yield
-    ensure
-      Gitlab::CurrentSettings.current_application_settings.update_columns(gitaly_timeout_default: old_timeout)
-      ApplicationSetting.expire
-    end
-
-    def self.mute_notifications
-      NotificationService.prepend(MuteNotifications)
-    end
-
-    def self.mute_mailer
-      ActionMailer::MessageDelivery.prepend(DeliverNever)
     end
   end
 end

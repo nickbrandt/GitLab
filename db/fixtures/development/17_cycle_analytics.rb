@@ -213,11 +213,11 @@ class Gitlab::Seeder::CycleAnalytics
   end
 end
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   flag = 'SEED_CYCLE_ANALYTICS'
 
   if ENV[flag]
-    Project.not_mass_generated.find_each do |project|
+    seeder.not_mass_generated_projects.find_each do |project|
       # This seed naively assumes that every project has a repository, and every
       # repository has a `master` branch, which may be the case for a pristine
       # GDK seed, but is almost never true for a GDK that's actually had

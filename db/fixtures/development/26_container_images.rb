@@ -43,14 +43,14 @@ class Gitlab::Seeder::ContainerImages
   end
 end
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   flag = 'SEED_CONTAINER_IMAGES'
 
   if ENV[flag]
     admin_user = User.admins.first
     images_count = Integer(ENV[flag])
 
-    Project.not_mass_generated.visible_to_user(admin_user).sample(1).each do |project|
+    seeder.not_mass_generated_projects.visible_to_user(admin_user).sample(1).each do |project|
       puts "\nSeeding #{images_count} container images to the '#{project.full_path}' project."
 
       seeder = Gitlab::Seeder::ContainerImages.new(project, images_count)

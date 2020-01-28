@@ -5,10 +5,10 @@ module Db
     module Development
       class SpamLog
         def self.seed
-          Gitlab::Seeder.quiet do
+          Gitlab::Seeder.quiet do |seeder|
             (::SpamLog.default_per_page + 3).times do |i|
               ::SpamLog.create(
-                user: self.random_user,
+                user: self.random_user(seeder),
                 user_agent: FFaker::Lorem.sentence,
                 source_ip: FFaker::Internet.ip_v4_address,
                 title: FFaker::Lorem.sentence,
@@ -21,8 +21,8 @@ module Db
           end
         end
 
-        def self.random_user
-          User.find(User.not_mass_generated.pluck(:id).sample)
+        def self.random_user(seeder)
+          User.find(seeder.not_mass_generated_users.pluck(:id).sample)
         end
       end
     end

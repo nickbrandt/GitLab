@@ -141,14 +141,14 @@ class Gitlab::Seeder::Packages
   end
 end
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   flag = 'SEED_ALL_PACKAGE_TYPES'
 
   puts "Use the `#{flag}` environment variable to seed packages of all types." unless ENV[flag]
 
   package_types = ENV[flag] ? %i[npm maven conan nuget] : [:npm]
 
-  Project.not_mass_generated.sample(5).each do |project|
+  seeder.not_mass_generated_projects.sample(5).each do |project|
     puts "\nSeeding packages for the '#{project.full_path}' project"
     seeder = Gitlab::Seeder::Packages.new(project)
 

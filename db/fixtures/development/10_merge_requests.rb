@@ -1,13 +1,12 @@
 require './spec/support/sidekiq_middleware'
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   # Limit the number of merge requests per project to avoid long seeds
   MAX_NUM_MERGE_REQUESTS = 10
 
-  projects = Project
+  projects = seeder.not_mass_generated_projects
     .non_archived
     .with_merge_requests_enabled
-    .not_mass_generated
     .reject(&:empty_repo?)
 
   projects.each do |project|

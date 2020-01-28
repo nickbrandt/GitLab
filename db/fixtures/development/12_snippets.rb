@@ -1,6 +1,6 @@
 require './spec/support/sidekiq_middleware'
 
-Gitlab::Seeder.quiet do
+Gitlab::Seeder.quiet do |seeder|
   content =<<eos
 class Member < ActiveRecord::Base
   include Notifiable
@@ -25,7 +25,7 @@ end
 eos
 
   50.times do |i|
-    user = User.not_mass_generated.sample
+    user = seeder.not_mass_generated_users.sample
 
     PersonalSnippet.seed(:id, [{
       id: i,
@@ -39,4 +39,3 @@ eos
     print('.')
   end
 end
-
