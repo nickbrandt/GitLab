@@ -1,8 +1,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
+
+import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
 
 export default {
   components: {
@@ -11,6 +14,7 @@ export default {
     GlDropdownItem,
     GlFormGroup,
     GlSearchBoxByClick,
+    DateTimePicker,
     LogControlButtons,
   },
   props: {
@@ -37,12 +41,24 @@ export default {
   data() {
     return {
       searchQuery: '',
+      selectedTimeRange: defaultTimeRange,
+      timeRanges,
       isElasticStackCalloutDismissed: false,
     };
   },
   computed: {
-    ...mapState('environmentLogs', ['environments', 'timeWindow', 'logs', 'pods']),
+    ...mapState('environmentLogs', ['environments', 'timeRange', 'logs', 'pods']),
     ...mapGetters('environmentLogs', ['trace']),
+
+    timeRangeModel: {
+      get() {
+        return this.timeRange.current;
+      },
+      set(val) {
+        this.setTimeRange(val);
+      },
+    },
+
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
     },
@@ -85,7 +101,7 @@ export default {
     ...mapActions('environmentLogs', [
       'setInitData',
       'setSearch',
-      'setTimeWindow',
+      'setTimeRange',
       'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
@@ -166,22 +182,13 @@ export default {
           label-for="time-window-dropdown"
           class="col-3 px-1"
         >
-          <gl-dropdown
-            id="time-window-dropdown"
-            ref="time-window-dropdown"
+          <date-time-picker
+            ref="dateTimePicker"
+            v-model="timeRangeModel"
+            class="w-100 gl-h-32"
             :disabled="disableAdvancedControls"
-            :text="timeWindow.options[timeWindow.current].label"
-            class="d-flex gl-h-32"
-            toggle-class="dropdown-menu-toggle"
-          >
-            <gl-dropdown-item
-              v-for="(option, key) in timeWindow.options"
-              :key="key"
-              @click="setTimeWindow(key)"
-            >
-              {{ option.label }}
-            </gl-dropdown-item>
-          </gl-dropdown>
+            :options="timeRanges"
+          />
         </gl-form-group>
         <gl-form-group
           id="search-fg"

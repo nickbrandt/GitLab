@@ -119,12 +119,19 @@ describe('Logs Store Mutations', () => {
     });
   });
 
-  describe('SET_TIME_WINDOW', () => {
-    it('sets a time window Key', () => {
-      const mockKey = 'fourHours';
-      mutations[types.SET_TIME_WINDOW](state, mockKey);
+  describe('SET_TIME_RANGE', () => {
+    it('sets a default range', () => {
+      expect(state.timeRange.current).toEqual(expect.any(Object));
+    });
 
-      expect(state.timeWindow.current).toEqual(mockKey);
+    it('sets a time range', () => {
+      const mockRange = {
+        start: '2020-01-10T18:00:00.000Z',
+        end: '2020-01-10T10:00:00.000Z',
+      };
+      mutations[types.SET_TIME_RANGE](state, mockRange);
+
+      expect(state.timeRange.current).toEqual(mockRange);
     });
   });
 
