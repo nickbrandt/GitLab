@@ -39,6 +39,8 @@ module EE
         issuable_description_versions.where('id BETWEEN ? AND ?', start_id, self.id)
 
       description_versions.update_all(deleted_at: Time.now)
+
+      issuable&.expire_note_etag_cache
     end
 
     def deleted?
