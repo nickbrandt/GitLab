@@ -20,7 +20,7 @@ describe 'epic mentions migration', migration: false do
 
   # non-migrateable resources
   # this epic is already migrated, as it has a record in the epic_user_mentions table
-  let!(:resource4) { epics.create!(iid: 4, title: "title3", title_html: 'title3', description: 'epic description with @root mention', group_id: group.id, author_id: user.id) }
+  let!(:resource4) { epics.create!(iid: 4, title: "title4", title_html: 'title4', description: 'epic description with @root mention', group_id: group.id, author_id: user.id) }
   let!(:user_mention) { epic_user_mentions.create!(epic_id: resource4.id, mentioned_users_ids: [1]) }
   # this epic has no mentions so should be filtered out
   let!(:resource5) { epics.create!(iid: 5, title: "title5", title_html: 'title5', description: 'epic description with no mention', group_id: group.id, author_id: user.id) }

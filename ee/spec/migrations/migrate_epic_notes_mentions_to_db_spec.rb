@@ -24,7 +24,7 @@ describe 'epic notes mentions migration', migration: false do
   # this note is already migrated, as it has a record in the epic_user_mentions table
   let!(:resource4) { notes.create!(note: 'note3 for @root to check', noteable_id: epic.id, noteable_type: 'Epic') }
   let!(:user_mention) { epic_user_mentions.create!(epic_id: epic.id, note_id: resource4.id, mentioned_users_ids: [1]) }
-  # this note points to an innexistent noteable record
+  # this note points to an inexistent noteable record
   let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic') }
 
   describe MigrateEpicNotesMentionsToDb, :migration do
