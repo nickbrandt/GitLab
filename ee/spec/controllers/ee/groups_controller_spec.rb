@@ -15,9 +15,9 @@ describe GroupsController do
     render_views
 
     let_it_be(:event1) { create(:event, project: project) }
-    let_it_be(:event2) { create(:event, project: nil, group: group) }
-    let_it_be(:event3) { create(:event, project: nil, group: subgroup) }
-    let_it_be(:event4) { create(:event, project: nil, group: subgroup2) }
+    let_it_be(:event2) { create(:event, :epic_create_event, group: group) }
+    let_it_be(:event3) { create(:event, :epic_create_event, group: subgroup) }
+    let_it_be(:event4) { create(:event, :epic_create_event, group: subgroup2) }
 
     context 'when authorized' do
       before do
