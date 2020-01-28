@@ -7,4 +7,8 @@ class ApplicationInstance
   def all_pipelines
     ::Ci::Pipeline.all
   end
+
+  def feature_available?(feature)
+    License.feature_available?(feature)
+  end
 end
