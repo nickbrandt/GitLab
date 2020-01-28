@@ -225,6 +225,30 @@ describe 'issue boards', :js do
           end
         end
 
+        context 'when the user is editing a wip limit and clicks close' do
+          it 'updates the max issue count wip limit' do
+            max_issue_count = 3
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            # Danger: coupling to gitlab-ui class name for close.
+            # Change when https://gitlab.com/gitlab-org/gitlab-ui/issues/578 is resolved
+            find('.gl-drawer-close-button').click
+
+            wait_for_requests
+
+            page.within(find(".board:nth-child(2)")) do
+              click_button('List Settings')
+            end
+
+            expect(page.find('.js-wip-limit')).to have_text(max_issue_count)
+          end
+        end
+
         context "when user off clicks" do
           it 'updates the max issue count wip limit' do
             max_issue_count = 2

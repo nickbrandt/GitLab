@@ -111,13 +111,12 @@ export default {
     offFocus() {
       if (this.currentWipLimit !== this.activeList.maxIssueCount) {
         this.updating = true;
+        // NOTE: Need a ref to activeListId in case the user closes the drawer.
+        const id = this.activeListId;
 
-        this.updateListWipLimit({ maxIssueCount: this.currentWipLimit, id: this.activeListId })
+        this.updateListWipLimit({ maxIssueCount: this.currentWipLimit, id })
           .then(({ config }) => {
-            boardsStoreEE.setMaxIssueCountOnList(
-              this.activeListId,
-              JSON.parse(config.data).list.max_issue_count,
-            );
+            boardsStoreEE.setMaxIssueCountOnList(id, JSON.parse(config.data).list.max_issue_count);
             this.resetStateAfterUpdate();
           })
           .catch(() => {
