@@ -30,7 +30,7 @@ describe Projects::AuditEventsController do
 
           request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index)
         end
 
@@ -55,7 +55,7 @@ describe Projects::AuditEventsController do
         it 'renders 404' do
           request
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -69,7 +69,7 @@ describe Projects::AuditEventsController do
       it 'renders 404' do
         request
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

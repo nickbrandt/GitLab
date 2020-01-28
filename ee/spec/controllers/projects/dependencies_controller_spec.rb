@@ -33,7 +33,7 @@ describe Projects::DependenciesController do
             get :index, params: params, format: :html
           end
 
-          it { expect(response).to have_http_status(:ok) }
+          it { expect(response).to have_gitlab_http_status(:ok) }
 
           it 'renders the side navigation with the correct submenu set as active' do
             expect(response.body).to have_active_sub_navigation('Dependency List')
@@ -76,7 +76,7 @@ describe Projects::DependenciesController do
             end
 
             it 'returns success code' do
-              expect(response).to have_gitlab_http_status(200)
+              expect(response).to have_gitlab_http_status(:ok)
             end
           end
 
@@ -231,13 +231,13 @@ describe Projects::DependenciesController do
         it 'returns 403 for a JSON request' do
           get :index, params: params, format: :json
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'returns a 404 for an HTML request' do
           get :index, params: params, format: :html
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -254,13 +254,13 @@ describe Projects::DependenciesController do
       it 'returns 403 for a JSON request' do
         get :index, params: params, format: :json
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'returns a 404 for an HTML request' do
         get :index, params: params, format: :html
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

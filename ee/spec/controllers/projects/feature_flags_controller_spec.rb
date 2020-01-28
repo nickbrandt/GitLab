@@ -55,7 +55,7 @@ describe Projects::FeatureFlagsController do
       end
 
       it 'shows not found' do
-        expect(subject).to have_gitlab_http_status(404)
+        expect(subject).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -268,7 +268,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -278,7 +278,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -340,7 +340,7 @@ describe Projects::FeatureFlagsController do
     it 'returns 200' do
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'creates a new feature flag' do
@@ -372,7 +372,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 400' do
         subject
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
 
       it 'returns an error message' do
@@ -409,7 +409,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -428,7 +428,7 @@ describe Projects::FeatureFlagsController do
       it 'creates feature flag scopes successfully' do
         expect { subject }.to change { Operations::FeatureFlagScope.count }.by(2)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'creates feature flag scopes in a correct order' do
@@ -453,7 +453,7 @@ describe Projects::FeatureFlagsController do
         it 'returns 400' do
           subject
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message'])
             .to include('Default scope has to be the first element')
         end
@@ -543,7 +543,7 @@ describe Projects::FeatureFlagsController do
     it 'returns 200' do
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'deletes one feature flag' do
@@ -566,7 +566,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -603,7 +603,7 @@ describe Projects::FeatureFlagsController do
     it 'returns 200' do
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'updates the name of the feature flag name' do
@@ -666,7 +666,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -705,7 +705,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 400' do
         subject
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
 
@@ -755,7 +755,7 @@ describe Projects::FeatureFlagsController do
       it 'returns 400' do
         subject
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
 

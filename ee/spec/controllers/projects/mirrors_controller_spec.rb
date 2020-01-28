@@ -144,14 +144,14 @@ describe Projects::MirrorsController do
       it 'processes a successful update' do
         do_put(project, { import_url: 'https://updated.example.com' }, format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['import_url']).to eq('https://updated.example.com')
       end
 
       it 'processes an unsuccessful update' do
         do_put(project, { import_url: 'ftp://invalid.invalid' }, format: :json)
 
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
         expect(json_response['import_url'].first).to match /is blocked/
       end
 
@@ -160,14 +160,14 @@ describe Projects::MirrorsController do
 
         do_put(project, { import_data_attributes: { password: 'update' } }, format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(project.reload_import_data.id).to eq(import_data_id)
       end
 
       it 'sets ssh_known_hosts_verified_at and verified_by when the update sets known hosts' do
         do_put(project, { import_data_attributes: { ssh_known_hosts: 'update' } }, format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_within(1.minute).of(Time.now)
@@ -179,7 +179,7 @@ describe Projects::MirrorsController do
 
         do_put(project, { import_data_attributes: { ssh_known_hosts: '' } }, format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_nil
@@ -192,7 +192,7 @@ describe Projects::MirrorsController do
 
         do_put(project, { mirror_user_id: other_user.id }, format: :json)
 
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
         expect(json_response['mirror_user_id'].first).to eq("is invalid")
       end
     end
