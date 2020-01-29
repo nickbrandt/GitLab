@@ -113,7 +113,7 @@ describe Admin::ApplicationSettingsController do
 
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
-      let(:feature) { :marking_project_for_deletion }
+      let(:feature) { :adjourned_deletion_for_projects_and_groups }
 
       it_behaves_like 'settings for licensed features'
     end

@@ -14,7 +14,7 @@ describe Projects::MarkForDeletionService do
 
   context 'with soft-delete feature turned on' do
     before do
-      stub_licensed_features(marking_project_for_deletion: true)
+      stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
     end
 
     context 'marking project for deletion' do

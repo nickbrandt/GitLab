@@ -12,7 +12,7 @@ module EE
           end
           post ':id/restore' do
             authorize!(:remove_project, user_project)
-            break not_found! unless user_project.feature_available?(:marking_project_for_deletion)
+            break not_found! unless user_project.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
             result = ::Projects::RestoreService.new(user_project, current_user).execute
             if result[:status] == :success

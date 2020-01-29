@@ -126,7 +126,7 @@ module EE
 
     override :remove_project_message
     def remove_project_message(project)
-      return super unless project.feature_available?(:marking_project_for_deletion)
+      return super unless project.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
       date = permanent_deletion_date(Time.now.utc)
       _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?") %

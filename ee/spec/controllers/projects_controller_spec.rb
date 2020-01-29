@@ -406,7 +406,7 @@ describe ProjectsController do
 
     context 'feature is available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: true)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
       it 'marks project for deletion' do
@@ -444,7 +444,7 @@ describe ProjectsController do
 
     context 'feature is not available' do
       before do
-        stub_licensed_features(marking_project_for_deletion: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
       it 'deletes project right away' do

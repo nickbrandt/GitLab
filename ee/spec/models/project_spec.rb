@@ -2319,7 +2319,7 @@ describe Project do
       let(:project) { create(:project) }
 
       before do
-        stub_licensed_features(marking_project_for_deletion: true)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
       context 'when number of days is set to more than 0' do
@@ -2343,7 +2343,7 @@ describe Project do
       let(:project) { create(:project) }
 
       before do
-        stub_licensed_features(marking_project_for_deletion: false)
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
       context 'when number of days is set to more than 0' do
