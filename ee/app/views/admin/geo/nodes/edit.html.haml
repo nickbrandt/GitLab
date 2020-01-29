@@ -1,7 +1,7 @@
 - page_title _('Edit Geo Node')
 
 - if Feature.enabled?(:enable_geo_node_form_js)
-  #js-geo-node-form
+  #js-geo-node-form{ data: { "node-data" => @serialized_node } }
 - else
   %h3.page-title
     Edit Geo Node
