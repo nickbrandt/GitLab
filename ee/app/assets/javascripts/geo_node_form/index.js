@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import GeoNodeFormApp from './components/app.vue';
 
 Vue.use(Translate);
@@ -12,9 +13,22 @@ export default () => {
     components: {
       GeoNodeFormApp,
     },
-
     render(createElement) {
-      return createElement('geo-node-form-app');
+      const {
+        dataset: { nodeData },
+      } = this.$options.el;
+
+      let node;
+      if (nodeData) {
+        node = JSON.parse(nodeData);
+        node = convertObjectPropsToCamelCase(node, { deep: true });
+      }
+
+      return createElement('geo-node-form-app', {
+        props: {
+          node,
+        },
+      });
     },
   });
 };
