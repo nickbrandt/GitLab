@@ -239,9 +239,6 @@ export default {
         this.externalDashboardUrl.length
       );
     },
-    shouldRenderSearchableEnvironmentsDropdown() {
-      return this.glFeatures.searchableEnvironmentsDropdown;
-    },
     shouldShowEnvironmentsDropdownNoMatchedMsg() {
       return !this.environmentsLoading && this.filteredEnvironments.length === 0;
     },
@@ -407,7 +404,6 @@ export default {
               }}</gl-dropdown-header>
               <gl-dropdown-divider />
               <gl-search-box-by-type
-                v-if="shouldRenderSearchableEnvironmentsDropdown"
                 ref="monitorEnvironmentsDropdownSearch"
                 class="m-2"
                 @input="debouncedEnvironmentsSearch"
@@ -428,7 +424,6 @@ export default {
                 >
               </div>
               <div
-                v-if="shouldRenderSearchableEnvironmentsDropdown"
                 v-show="shouldShowEnvironmentsDropdownNoMatchedMsg"
                 ref="monitorEnvironmentsDropdownMsg"
                 class="text-secondary no-matches-message"
