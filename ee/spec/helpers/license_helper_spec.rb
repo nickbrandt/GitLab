@@ -9,6 +9,32 @@ describe LicenseHelper do
   end
 
   describe '#license_message' do
+    context 'license installed' do
+      subject { license_message(signed_in: true, is_admin: false) }
+
+      let(:license) { double('License') }
+      let(:faq_link_regex) { /For renewal instructions <a href.*>view our Licensing FAQ\.<\/a>/ }
+
+      before do
+        allow(License).to receive(:current).and_return(license)
+        allow(license).to receive(:notify_users?).and_return(true)
+        allow(license).to receive(:expired?).and_return(false)
+        allow(license).to receive(:remaining_days).and_return(4)
+      end
+
+      it 'does NOT have a license faq link if license is a trial' do
+        allow(license).to receive(:trial?).and_return(true)
+
+        expect(subject).not_to match(faq_link_regex)
+      end
+
+      it 'has license faq link if license is not a trial' do
+        allow(license).to receive(:trial?).and_return(false)
+
+        expect(subject).to match(faq_link_regex)
+      end
+    end
+
     context 'no license installed' do
       before do
         allow(License).to receive(:current).and_return(nil)
