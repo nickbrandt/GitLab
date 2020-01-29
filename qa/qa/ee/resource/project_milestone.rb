@@ -6,15 +6,6 @@ module QA
       class ProjectMilestone < QA::Resource::ProjectMilestone
         attr_writer :start_date, :due_date
 
-        attribute :id
-        attribute :iid
-
-        attribute :project do
-          QA::Resource::Project.fabricate_via_api! do |resource|
-            resource.name = 'project-with-milestone'
-          end
-        end
-
         def api_post_body
           {
             title: title
