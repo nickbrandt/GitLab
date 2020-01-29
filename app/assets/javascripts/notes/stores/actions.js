@@ -509,7 +509,6 @@ export const fetchDescriptionVersion = (_, { endpoint, startingVersion }) => {
 export const setCurrentDiscussionId = ({ commit }, discussionId) =>
   commit(types.SET_CURRENT_DISCUSSION_ID, discussionId);
 
-
 export const softDeleteDescriptionVersion = (_, { endpoint, startingVersion }) => {
   let requestUrl = endpoint;
 
@@ -520,8 +519,9 @@ export const softDeleteDescriptionVersion = (_, { endpoint, startingVersion }) =
   return axios
     .delete(requestUrl)
     .then(res => res.data)
-    .catch(() => {
+    .catch(e => {
       Flash(__('Something went wrong while deleting description changes. Please try again.'));
+      return Promise.reject(e);
     });
 };
 
