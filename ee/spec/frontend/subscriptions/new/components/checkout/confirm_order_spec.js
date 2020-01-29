@@ -1,8 +1,9 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Api from 'ee/api';
 import createStore from 'ee/subscriptions/new/store';
 import * as types from 'ee/subscriptions/new/store/mutation_types';
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Component from 'ee/subscriptions/new/components/checkout/confirm_order.vue';
 
 describe('Confirm Order', () => {
@@ -10,6 +11,8 @@ describe('Confirm Order', () => {
   localVue.use(Vuex);
 
   let wrapper;
+
+  jest.mock('ee/api.js');
 
   const store = createStore();
 
@@ -20,6 +23,9 @@ describe('Confirm Order', () => {
       ...opts,
     });
   };
+
+  const findConfirmButton = () => wrapper.find(GlButton);
+  const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
 
   beforeEach(() => {
     createComponent();
@@ -35,7 +41,35 @@ describe('Confirm Order', () => {
     });
 
     it('button should be visible', () => {
-      expect(wrapper.find(GlButton).exists()).toBe(true);
+      expect(findConfirmButton().exists()).toBe(true);
+    });
+
+    it('shows the text "Confirm purchase"', () => {
+      expect(findConfirmButton().text()).toBe('Confirm purchase');
+    });
+
+    it('the loading indicator should not be visible', () => {
+      expect(findLoadingIcon().exists()).toBe(false);
+    });
+
+    describe('Clicking the button', () => {
+      beforeEach(() => {
+        Api.confirmOrder = jest.fn().mockReturnValue(new Promise(jest.fn()));
+
+        findConfirmButton().vm.$emit('click');
+      });
+
+      it('calls the confirmOrder API method', () => {
+        expect(Api.confirmOrder).toHaveBeenCalled();
+      });
+
+      it('shows the text "Confirming..."', () => {
+        expect(findConfirmButton().text()).toBe('Confirming...');
+      });
+
+      it('the loading indicator should be visible', () => {
+        expect(findLoadingIcon().exists()).toBe(true);
+      });
     });
   });
 
@@ -45,7 +79,7 @@ describe('Confirm Order', () => {
     });
 
     it('button should not be visible', () => {
-      expect(wrapper.find(GlButton).exists()).toBe(false);
+      expect(findConfirmButton().exists()).toBe(false);
     });
   });
 });
