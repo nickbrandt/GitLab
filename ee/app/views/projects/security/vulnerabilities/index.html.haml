@@ -48,7 +48,6 @@
                 = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
                 - if vulnerability.finding
                   %br
-                  %span.text-muted.small
-                    = "#{vulnerability.finding.location["file"]}:#{vulnerability.finding.location["start_line"]}"
+                  %span.text-muted.small #{vulnerability.finding.location["file"]}:#{vulnerability.finding.location["start_line"]}
 
   = paginate @vulnerabilities, theme: "gitlab"
