@@ -53,10 +53,6 @@ class SoftwareLicensePolicy < ApplicationRecord
     LEGACY_CLASSIFICATION_STATUS.key(classification) || classification
   end
 
-  def self.workaround_cache_key
-    pluck(:id, :classification).flatten
-  end
-
   def self.to_classification(approval_status)
     LEGACY_CLASSIFICATION_STATUS.fetch(approval_status, approval_status)
   end
