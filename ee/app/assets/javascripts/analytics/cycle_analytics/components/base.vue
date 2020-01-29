@@ -216,28 +216,35 @@ export default {
     </div>
     <div class="mw-100">
       <div
-        class="mt-3 py-2 px-3 d-flex bg-gray-light border-top border-bottom flex-column flex-md-row justify-content-between"
+        class="row-content-block second-block d-flex flex-column flex-lg-row mt-3 py-2 px-3 justify-content-between"
       >
-        <groups-dropdown-filter
-          v-if="!hideGroupDropDown"
-          class="js-groups-dropdown-filter dropdown-select"
-          :query-params="$options.groupsQueryParams"
-          :default-group="selectedGroup"
-          @selected="onGroupSelect"
-        />
-        <projects-dropdown-filter
-          v-if="shouldDisplayFilters"
-          :key="selectedGroup.id"
-          class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
-          :group-id="selectedGroup.id"
-          :query-params="$options.projectsQueryParams"
-          :multi-select="$options.multiProjectSelect"
-          :default-projects="selectedProjects"
-          @selected="onProjectsSelect"
-        />
+        <div
+          :class="[
+            { 'flex-grow-1': selectedGroup },
+            'dropdown-container d-flex flex-column flex-lg-row mr-2',
+          ]"
+        >
+          <groups-dropdown-filter
+          v-if="!hideGroupDropDown"          
+            class="js-groups-dropdown-filter w-100"
+            :query-params="$options.groupsQueryParams"
+            :default-group="selectedGroup"            
+            @selected="onGroupSelect"
+          />
+          <projects-dropdown-filter
+            v-if="shouldDisplayFilters"
+            :key="selectedGroup.id"
+            class="js-projects-dropdown-filter ml-lg-1 mt-1 mt-lg-0 w-100"
+            :group-id="selectedGroup.id"
+            :query-params="$options.projectsQueryParams"
+            :multi-select="$options.multiProjectSelect"
+            :default-projects="selectedProjects"
+            @selected="onProjectsSelect"
+          />
+        </div>
         <div
           v-if="shouldDisplayFilters"
-          class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
+          class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end"
         >
           <date-range
             :start-date="startDate"
