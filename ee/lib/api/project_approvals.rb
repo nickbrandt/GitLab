@@ -30,7 +30,8 @@ module API
           optional :disable_overriding_approvers_per_merge_request, type: Boolean, desc: 'Should MRs be able to override approvers and approval count'
           optional :merge_requests_author_approval, type: Boolean, desc: 'Should merge request authors be able to self approve merge requests; `true` means authors cannot self approve'
           optional :merge_requests_disable_committers_approval, type: Boolean, desc: 'Should committers be able to self approve merge requests'
-          at_least_one_of :approvals_before_merge, :reset_approvals_on_push, :disable_overriding_approvers_per_merge_request, :merge_requests_author_approval, :merge_requests_disable_committers_approval
+          optional :require_password_to_approve, type: Boolean, desc: 'Should approvers authenticate via password before adding approval'
+          at_least_one_of :approvals_before_merge, :reset_approvals_on_push, :disable_overriding_approvers_per_merge_request, :merge_requests_author_approval, :merge_requests_disable_committers_approval, :require_password_to_approve
         end
         post '/' do
           project_params = declared(params, include_missing: false, include_parent_namespaces: false)

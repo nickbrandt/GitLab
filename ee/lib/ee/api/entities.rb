@@ -506,6 +506,7 @@ module EE
         expose :disable_overriding_approvers_per_merge_request
         expose :merge_requests_author_approval
         expose :merge_requests_disable_committers_approval
+        expose :require_password_to_approve
       end
 
       class Approvals < Grape::Entity
