@@ -92,7 +92,7 @@ module EE
         end
 
         def elastic_stack_available?
-          ::Feature.enabled?(:enable_cluster_application_elastic_stack) && !!cluster.application_elastic_stack
+          !!cluster.application_elastic_stack
         end
 
         private

@@ -4,9 +4,6 @@ module Projects
   class LogsController < Projects::ApplicationController
     before_action :authorize_read_pod_logs!
     before_action :environment
-    before_action do
-      push_frontend_feature_flag(:enable_cluster_application_elastic_stack)
-    end
 
     def index
       if environment.nil?
