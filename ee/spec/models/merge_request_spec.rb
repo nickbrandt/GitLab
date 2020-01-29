@@ -523,7 +523,7 @@ describe MergeRequest do
             expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
-            expect(subject[:key]).to include(*[license_1.id, license_1.classification, license_2.id, license_2.classification])
+            expect(subject[:key].last).to include("software_license_policies/query-")
           end
         end
 
