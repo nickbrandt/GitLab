@@ -187,8 +187,8 @@ func (u *upstream) configureRoutes() {
 		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, signingProxy), withMatcher(isContentType("application/octet-stream"))),
 
 		// CI Artifacts
-		route("POST", apiPattern+`v4/jobs/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
-		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
+		route("POST", apiPattern+`v4/jobs/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy))),
+		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy))),
 
 		// Terminal websocket
 		wsRoute(projectPattern+`-/environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
@@ -202,13 +202,13 @@ func (u *upstream) configureRoutes() {
 		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
 
 		// Maven Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, filestore.BodyUploader(api, proxy, nil)),
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, filestore.BodyUploader(api, signingProxy, nil)),
 
 		// Conan Artifact Repository
-		route("PUT", apiPattern+`v4/packages/conan/`, filestore.BodyUploader(api, proxy, nil)),
+		route("PUT", apiPattern+`v4/packages/conan/`, filestore.BodyUploader(api, signingProxy, nil)),
 
 		// NuGet Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, proxy)),
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, signingProxy)),
 
 		// We are porting API to disk acceleration
 		// we need to declare each routes until we have fixed all the routes on the rails codebase.
@@ -232,9 +232,9 @@ func (u *upstream) configureRoutes() {
 		),
 
 		// Uploads
-		route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, proxy)),
-		route("POST", snippetUploadPattern, upload.Accelerate(api, proxy)),
-		route("POST", userUploadPattern, upload.Accelerate(api, proxy)),
+		route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, signingProxy)),
+		route("POST", snippetUploadPattern, upload.Accelerate(api, signingProxy)),
+		route("POST", userUploadPattern, upload.Accelerate(api, signingProxy)),
 
 		// For legacy reasons, user uploads are stored under the document root.
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file
