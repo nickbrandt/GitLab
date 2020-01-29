@@ -209,6 +209,20 @@ describe('AddIssuableForm', () => {
           done();
         });
       });
+
+      it('shows error message when error is present', done => {
+        const itemAddFailureMessage = 'Something went wrong while submitting.';
+        wrapper.setProps({
+          hasError: true,
+          itemAddFailureMessage,
+        });
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.find('.gl-field-error').exists()).toBe(true);
+          expect(wrapper.find('.gl-field-error').text()).toContain(itemAddFailureMessage);
+          done();
+        });
+      });
     });
   });
 });

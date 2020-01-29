@@ -59,6 +59,11 @@ export default {
       required: false,
       default: itemAddFailureTypesMap.NOT_FOUND,
     },
+    itemAddFailureMessage: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -86,7 +91,9 @@ export default {
       );
     },
     addRelatedErrorMessage() {
-      if (this.itemAddFailureType === itemAddFailureTypesMap.NOT_FOUND) {
+      if (this.itemAddFailureMessage) {
+        return this.itemAddFailureMessage;
+      } else if (this.itemAddFailureType === itemAddFailureTypesMap.NOT_FOUND) {
         return addRelatedIssueErrorMap[this.issuableType];
       }
       // Only other failure is MAX_NUMBER_OF_CHILD_EPICS at the moment
