@@ -1,0 +1,6 @@
+---
+title: Adjust skip trial copy in trial sign up flow for SaaS users who are logged
+  in
+merge_request: 22923
+author:
+type: changed
