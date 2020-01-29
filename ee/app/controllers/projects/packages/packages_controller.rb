@@ -11,6 +11,7 @@ module Projects
       def index
         @packages = project.packages
                       .has_version
+                      .processed
                       .sort_by_attribute(@sort = params[:sort] || 'created_desc')
                       .page(params[:page])
       end

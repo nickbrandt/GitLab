@@ -139,4 +139,20 @@ RSpec.describe Packages::Package, type: :model do
       is_expected.to eq([package])
     end
   end
+
+  describe '.processed' do
+    let!(:package1) { create(:nuget_package) }
+    let!(:package2) { create(:npm_package) }
+    let!(:package3) { create(:nuget_package) }
+
+    subject { described_class.processed }
+
+    it { is_expected.to eq([package1, package2, package3]) }
+
+    context 'with temporary packages' do
+      let!(:package1) { create(:nuget_package, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+      it { is_expected.to eq([package2, package3]) }
+    end
+  end
 end

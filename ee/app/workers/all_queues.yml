@@ -321,6 +321,12 @@
   :latency_sensitive: 
   :resource_boundary: :unknown
   :weight: 1
+- :name: package_repositories:packages_nuget_extraction
+  :feature_category: :package_registry
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
 - :name: personal_access_tokens:personal_access_tokens_policy
   :feature_category: :authentication_and_authorization
   :has_external_dependencies: 
