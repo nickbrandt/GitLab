@@ -273,6 +273,17 @@ describe Group do
       expect(vulnerable_projects.first).to eq(vulnerable_project)
     end
 
+    it 'includes projects in subgroups' do
+      subgroup = create(:group, parent: group)
+      project = create(:project, namespace: subgroup)
+      create(:vulnerabilities_occurrence, project: project)
+
+      vulnerable_projects = group.vulnerable_projects
+
+      expect(vulnerable_projects.count).to be(1)
+      expect(vulnerable_projects.first).to eq(project)
+    end
+
     it 'does not include projects that only have dismissed vulnerabilities' do
       project = create(:project, namespace: group)
       vulnerability = create(:vulnerabilities_occurrence, report_type: :dast, project: project)

@@ -151,7 +151,12 @@ module EE
     end
 
     def vulnerable_projects
-      projects.where("EXISTS(?)", ::Vulnerabilities::Occurrence.select(1).undismissed.where('vulnerability_occurrences.project_id = projects.id'))
+      vulnerabilities = ::Vulnerabilities::Occurrence
+        .select(1)
+        .undismissed
+        .where('vulnerability_occurrences.project_id = projects.id')
+
+      ::Project.for_group_and_its_subgroups(self).where("EXISTS(?)", vulnerabilities)
     end
 
     def human_ldap_access
