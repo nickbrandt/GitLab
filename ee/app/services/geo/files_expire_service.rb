@@ -53,7 +53,7 @@ module Geo
         end
       end
 
-      Geo::FileRemovalWorker.bulk_perform_async(paths_to_remove)
+      Geo::FileRemovalWorker.bulk_perform_async(paths_to_remove) # rubocop:disable Scalability/BulkPerformWithContext
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

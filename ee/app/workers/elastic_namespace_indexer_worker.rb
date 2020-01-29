@@ -27,14 +27,14 @@ class ElasticNamespaceIndexerWorker
     # https://www.rubydoc.info/github/mperham/sidekiq/Sidekiq%2FClient:push_bulk
     namespace.all_projects.find_in_batches do |batch|
       args = batch.map { |project| [:index, project.class.to_s, project.id, project.es_id] }
-      ElasticIndexerWorker.bulk_perform_async(args)
+      ElasticIndexerWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
     end
   end
 
   def delete_from_index(namespace)
     namespace.all_projects.find_in_batches do |batch|
       args = batch.map { |project| [:delete, project.class.to_s, project.id, project.es_id] }
-      ElasticIndexerWorker.bulk_perform_async(args)
+      ElasticIndexerWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
     end
   end
 end

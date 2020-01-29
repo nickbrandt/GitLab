@@ -22,7 +22,7 @@ namespace :gitlab do
           [:index, 'Project', id, nil] # es_id is unused for :index
         end
 
-        ElasticIndexerWorker.bulk_perform_async(args)
+        ElasticIndexerWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
         print "."
       end
 
