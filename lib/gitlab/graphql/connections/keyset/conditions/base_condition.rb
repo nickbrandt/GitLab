@@ -6,8 +6,8 @@ module Gitlab
       module Keyset
         module Conditions
           class BaseCondition
-            def initialize(arel_table, names, values, operator, before_or_after)
-              @arel_table, @names, @values, @operator, @before_or_after = arel_table, names, values, operator, before_or_after
+            def initialize(arel_table, order_list, values, operators, before_or_after)
+              @arel_table, @order_list, @values, @operators, @before_or_after = arel_table, order_list, values, operators, before_or_after
             end
 
             def build
@@ -16,7 +16,7 @@ module Gitlab
 
             private
 
-            attr_reader :arel_table, :names, :values, :operator, :before_or_after
+            attr_reader :arel_table, :order_list, :values, :operators, :before_or_after
 
             def table_condition(attribute, value, operator)
               case operator
