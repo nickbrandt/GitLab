@@ -90,10 +90,17 @@ module EE
             dast: :dast_jobs,
             dependency_scanning: :dependency_scanning_jobs,
             license_management: :license_management_jobs,
+            license_scanning: :license_scanning_jobs,
             sast: :sast_jobs
           }
 
           results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1))
+
+          license_scan_count = results.delete("license_scanning")
+          if license_scan_count && results["license_management"]
+            results["license_management"] += license_scan_count
+          end
+
           results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
         end
         # rubocop: enable CodeReuse/ActiveRecord
