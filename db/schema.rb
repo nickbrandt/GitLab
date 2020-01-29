@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_03_025821) do
+ActiveRecord::Schema.define(version: 2020_02_04_131054) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -564,7 +564,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_025821) do
     t.integer "cached_markdown_version"
     t.string "target_path", limit: 255
     t.integer "broadcast_type", limit: 2, default: 1, null: false
-    t.index ["starts_at", "ends_at", "id"], name: "index_broadcast_messages_on_starts_at_and_ends_at_and_id"
+    t.index ["ends_at", "broadcast_type", "id"], name: "index_broadcast_message_on_ends_at_and_broadcast_type_and_id"
   end
 
   create_table "chat_names", id: :serial, force: :cascade do |t|
