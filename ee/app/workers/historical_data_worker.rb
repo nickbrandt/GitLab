@@ -2,7 +2,7 @@
 
 class HistoricalDataWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :license_compliance
 

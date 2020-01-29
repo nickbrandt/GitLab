@@ -3,7 +3,7 @@
 module Geo
   class PruneEventLogWorker
     include ApplicationWorker
-    include CronjobQueue
+    include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
     include ::Gitlab::Utils::StrongMemoize
     include ::Gitlab::Geo::LogHelpers
 

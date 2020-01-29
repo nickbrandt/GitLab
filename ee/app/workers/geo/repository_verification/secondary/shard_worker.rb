@@ -4,7 +4,7 @@ module Geo
   module RepositoryVerification
     module Secondary
       class ShardWorker < Geo::Scheduler::Secondary::SchedulerWorker
-        include CronjobQueue
+        include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
         attr_accessor :shard_name
 
         def perform(shard_name)

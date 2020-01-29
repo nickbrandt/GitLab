@@ -4,7 +4,7 @@ module Geo
   class MetricsUpdateWorker
     include ApplicationWorker
     include ExclusiveLeaseGuard
-    include CronjobQueue
+    include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
     feature_category :geo_replication
 
