@@ -3,7 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import createStore from 'ee/subscriptions/new/store';
 import * as types from 'ee/subscriptions/new/store/mutation_types';
 import { GlLoadingIcon } from '@gitlab/ui';
-import Component from 'ee/subscriptions/new/components/checkout/components/zuora.vue';
+import Component from 'ee/subscriptions/new/components/checkout/zuora.vue';
 
 describe('Zuora', () => {
   const localVue = createLocalVue();

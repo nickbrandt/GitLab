@@ -4,7 +4,7 @@ import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlFormGroup, GlFormSelect, GlFormInput, GlSprintf, GlLink } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
-import Step from './components/step.vue';
+import Step from './step.vue';
 
 export default {
   components: {
