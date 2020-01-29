@@ -2,40 +2,15 @@
 
 module Gitlab
   module ImportExport
-    # this is mostly useful for testing and comparing results between
-    # processed and unprocessed project trees without changing the
-    # structure of the caller
-    class IdentityProjectTreeProcessor
-      def process(tree_hash)
-        tree_hash
-      end
-    end
+    class ProjectTreeLoader
+      def load(path, dedup_entries: false)
+        tree_hash = ActiveSupport::JSON.decode(IO.read(path))
 
-    # optimizes the project tree for memory efficiency by deduplicating entries
-    class ProjectTreeProcessor
-      LARGE_PROJECT_FILE_SIZE_BYTES = 500.megabyte
-
-      class << self
-        # some optimizations only yield amortized gains above a certain
-        # project size, see https://gitlab.com/gitlab-org/gitlab/issues/27070
-        def new_for_file(project_json_path)
-          if Feature.enabled?(:dedup_project_import_metadata, Group.find_by_path('gitlab-org')) &&
-              large_project?(project_json_path)
-            ProjectTreeProcessor.new
-          else
-            IdentityProjectTreeProcessor.new
-          end
+        if dedup_entries
+          dedup_tree(tree_hash)
+        else
+          tree_hash
         end
-
-        private
-
-        def large_project?(project_json_path)
-          File.size(project_json_path) >= LARGE_PROJECT_FILE_SIZE_BYTES
-        end
-      end
-
-      def process(tree_hash)
-        dedup_tree(tree_hash)
       end
 
       private

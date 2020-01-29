@@ -29,8 +29,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect_any_instance_of(Gitlab::Git::Repository).to receive(:create_branch).with('feature', 'DCBA')
         allow_any_instance_of(Gitlab::Git::Repository).to receive(:create_branch)
 
-        project_tree_restorer = described_class.new(user: @user, shared: @shared,
-          project: @project, project_tree_processor: Gitlab::ImportExport::ProjectTreeProcessor.new)
+        project_tree_restorer = described_class.new(user: @user, shared: @shared, project: @project)
 
         @restored_project_json = project_tree_restorer.restore
       end
@@ -452,8 +451,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     let(:user) { create(:user) }
     let!(:project) { create(:project, :builds_disabled, :issues_disabled, name: 'project', path: 'project') }
     let(:project_tree_restorer) do
-      described_class.new(user: user, shared: shared, project: project,
-      project_tree_processor: Gitlab::ImportExport::ProjectTreeProcessor.new)
+      described_class.new(user: user, shared: shared, project: project)
     end
     let(:restored_project_json) { project_tree_restorer.restore }
 
@@ -678,8 +676,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     let(:user) { create(:user) }
     let(:tree_hash) { { 'visibility_level' => visibility } }
     let(:restorer) do
-      described_class.new(user: user, shared: shared, project: project,
-      project_tree_processor: Gitlab::ImportExport::ProjectTreeProcessor.new)
+      described_class.new(user: user, shared: shared, project: project)
     end
 
     before do
