@@ -29,6 +29,12 @@ if Gitlab::Runtime.multi_threaded?
   log_pool_size('DB', previous_db_pool_size, current_db_pool_size)
 
   Gitlab.ee do
+    if File.exist?(Rails.root.join('config/database_geo.yml'))
+      Rails.application.configure do
+        config.geo_database = config_for(:database_geo)
+      end
+    end
+
     if Gitlab::Runtime.sidekiq? && Gitlab::Geo.geo_database_configured?
       previous_geo_db_pool_size = Rails.configuration.geo_database['pool']
       Rails.configuration.geo_database['pool'] = max_threads
