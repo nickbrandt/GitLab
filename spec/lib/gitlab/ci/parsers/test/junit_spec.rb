@@ -205,6 +205,14 @@ describe Gitlab::Ci::Parsers::Test::Junit do
       end
     end
 
+    context 'when JUnit file contains large input' do
+      let(:junit) { File.read(('spec/fixtures/junit/junit_with_large_input.xml')) }
+
+      it 'parses XML without throwing an error' do
+        expect { subject }.not_to raise_error
+      end
+    end
+
     private
 
     def flattened_test_cases(test_suite)

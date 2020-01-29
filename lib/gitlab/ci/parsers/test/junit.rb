@@ -8,7 +8,7 @@ module Gitlab
           JunitParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
           def parse!(xml_data, test_suite)
-            root = Hash.from_xml(xml_data)
+            root = Nokogiri::XML(xml_data).to_hash
 
             all_cases(root) do |test_case|
               test_case = create_test_case(test_case)
