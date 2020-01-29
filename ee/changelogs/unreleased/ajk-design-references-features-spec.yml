@@ -1,0 +1,5 @@
+---
+title: Fix rendering of design management references
+merge_request: 24001
+author:
+type: fixed
