@@ -42,7 +42,7 @@ func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) 
 	reqBody, contentType, err := multipartBodyWithFile()
 	require.NoError(t, err)
 
-	ts := uploadTestServer(t, nil)
+	ts := signedUploadTestServer(t, nil)
 	defer ts.Close()
 
 	ws := startWorkhorseServer(ts.URL)
@@ -60,15 +60,25 @@ func TestArtifactsUpload(t *testing.T) {
 	testArtifactsUpload(t, uploadArtifactsV4)
 }
 
+func expectSignedRequest(t *testing.T, r *http.Request) {
+	t.Helper()
+
+	_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
+	require.NoError(t, err)
+}
+
 func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.Server {
 	return testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/authorize") {
+			expectSignedRequest(t, r)
+
 			w.Header().Set("Content-Type", api.ResponseContentType)
 			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
 				t.Fatal(err)
 			}
 			return
 		}
+
 		err := r.ParseMultipartForm(100000)
 		if err != nil {
 			t.Fatal(err)
@@ -84,6 +94,18 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 			extraTests(r)
 		}
 		w.WriteHeader(200)
+	})
+}
+
+func signedUploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.Server {
+	t.Helper()
+
+	return uploadTestServer(t, func(r *http.Request) {
+		expectSignedRequest(t, r)
+
+		if extraTests != nil {
+			extraTests(r)
+		}
 	})
 }
 
@@ -103,45 +125,53 @@ func parseJWT(token *jwt.Token) (interface{}, error) {
 }
 
 func TestAcceleratedUpload(t *testing.T) {
-	ts := uploadTestServer(t, func(r *http.Request) {
-		jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), parseJWT)
-		require.NoError(t, err)
-
-		rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
-		if len(rewrittenFields) != 1 || len(rewrittenFields["file"].(string)) == 0 {
-			t.Fatalf("Unexpected rewritten_fields value: %v", rewrittenFields)
-		}
-	})
-
-	defer ts.Close()
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
-
 	tests := []struct {
-		method   string
-		resource string
+		method             string
+		resource           string
+		signedFinalization bool
 	}{
-		{"POST", `/example`},
-		{"POST", `/uploads/personal_snippet`},
-		{"POST", `/uploads/user`},
-		{"POST", `/api/v4/projects/1/wikis/attachments`},
-		{"POST", `/api/graphql`},
-		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files"},
+		{"POST", `/example`, false},
+		{"POST", `/uploads/personal_snippet`, true},
+		{"POST", `/uploads/user`, true},
+		{"POST", `/api/v4/projects/1/wikis/attachments`, false},
+		{"POST", `/api/graphql`, false},
+		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files", true},
 	}
 
 	for _, tt := range tests {
-		reqBody, contentType, err := multipartBodyWithFile()
-		require.NoError(t, err)
+		t.Run(tt.resource, func(t *testing.T) {
+			ts := uploadTestServer(t,
+				func(r *http.Request) {
+					if tt.signedFinalization {
+						expectSignedRequest(t, r)
+					}
 
-		req, err := http.NewRequest(tt.method, ws.URL+tt.resource, reqBody)
-		require.NoError(t, err)
+					jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), parseJWT)
+					require.NoError(t, err)
 
-		req.Header.Set("Content-Type", contentType)
-		resp, err := http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		require.Equal(t, 200, resp.StatusCode)
+					rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
+					if len(rewrittenFields) != 1 || len(rewrittenFields["file"].(string)) == 0 {
+						t.Fatalf("Unexpected rewritten_fields value: %v", rewrittenFields)
+					}
+				})
 
-		resp.Body.Close()
+			defer ts.Close()
+			ws := startWorkhorseServer(ts.URL)
+			defer ws.Close()
+
+			reqBody, contentType, err := multipartBodyWithFile()
+			require.NoError(t, err)
+
+			req, err := http.NewRequest(tt.method, ws.URL+tt.resource, reqBody)
+			require.NoError(t, err)
+
+			req.Header.Set("Content-Type", contentType)
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			require.Equal(t, 200, resp.StatusCode)
+
+			resp.Body.Close()
+		})
 	}
 }
 
@@ -223,19 +253,15 @@ func TestLfsUpload(t *testing.T) {
 		require.Equal(t, r.Method, "PUT")
 		switch r.RequestURI {
 		case resource + "/authorize":
-			// Expect the authorization call to be signed
-			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
-			require.NoError(t, err)
+			expectSignedRequest(t, r)
 
 			// Instruct workhorse to accept the upload
 			w.Header().Set("Content-Type", api.ResponseContentType)
-			_, err = fmt.Fprint(w, lfsApiResponse)
+			_, err := fmt.Fprint(w, lfsApiResponse)
 			require.NoError(t, err)
 
 		case resource:
-			// Expect the finalization call to be signed
-			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
-			require.NoError(t, err)
+			expectSignedRequest(t, r)
 
 			// Expect the request to point to a file on disk containing the data
 			require.NoError(t, r.ParseForm())
@@ -282,16 +308,16 @@ func packageUploadTestServer(t *testing.T, resource string, reqBody string, rspB
 		)
 		switch r.RequestURI {
 		case resource + "/authorize":
-			// Expect the authorization call to be signed
-			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
-			require.NoError(t, err)
+			expectSignedRequest(t, r)
 
 			// Instruct workhorse to accept the upload
 			w.Header().Set("Content-Type", api.ResponseContentType)
-			_, err = fmt.Fprint(w, apiResponse)
+			_, err := fmt.Fprint(w, apiResponse)
 			require.NoError(t, err)
 
 		case resource:
+			expectSignedRequest(t, r)
+
 			// Expect the request to point to a file on disk containing the data
 			require.NoError(t, r.ParseForm())
 
