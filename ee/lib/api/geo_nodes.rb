@@ -193,7 +193,9 @@ module API
 
           update_params = declared_params(include_missing: false)
 
-          if geo_node.update(update_params)
+          updated_geo_node = ::Geo::NodeUpdateService.new(geo_node, update_params).execute
+
+          if updated_geo_node
             present geo_node, with: EE::API::Entities::GeoNode
           else
             render_validation_error!(geo_node)
