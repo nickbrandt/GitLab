@@ -41,14 +41,14 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file.file_name + '.sha1')
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('text/plain')
+        expect(response.media_type).to eq('text/plain')
         expect(response.body).to eq(package_file.file_sha1)
       end
     end
@@ -67,7 +67,7 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when no private token' do
@@ -80,7 +80,7 @@ describe API::MavenPackages do
         download_file(package_file.file_name, job_token: job.token)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -97,7 +97,7 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when not enough permissions' do
@@ -118,7 +118,7 @@ describe API::MavenPackages do
         download_file(package_file.file_name, job_token: job.token)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -164,14 +164,14 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file.file_name + '.sha1')
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('text/plain')
+        expect(response.media_type).to eq('text/plain')
         expect(response.body).to eq(package_file.file_sha1)
       end
     end
@@ -190,7 +190,7 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when no private token' do
@@ -203,7 +203,7 @@ describe API::MavenPackages do
         download_file(package_file.file_name, job_token: job.token)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -220,7 +220,7 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when not enough permissions' do
@@ -241,7 +241,7 @@ describe API::MavenPackages do
         download_file(package_file.file_name, job_token: job.token)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -272,14 +272,14 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file.file_name + '.sha1')
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('text/plain')
+        expect(response.media_type).to eq('text/plain')
         expect(response.body).to eq(package_file.file_sha1)
       end
     end
@@ -297,7 +297,7 @@ describe API::MavenPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when not enough permissions' do
@@ -318,7 +318,7 @@ describe API::MavenPackages do
         download_file(package_file.file_name, job_token: job.token)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -351,7 +351,7 @@ describe API::MavenPackages do
       authorize_upload_with_token
 
       expect(response).to have_gitlab_http_status(200)
-      expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+      expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
       expect(json_response['TempPath']).not_to be_nil
     end
 

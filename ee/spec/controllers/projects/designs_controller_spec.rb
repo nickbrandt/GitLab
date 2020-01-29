@@ -37,7 +37,7 @@ describe Projects::DesignsController do
 
         subject
 
-        expect(response.header['Content-Disposition']).to eq(%Q(attachment; filename*=UTF-8''#{filename}; filename=\"#{filename}\"))
+        expect(response.header['Content-Disposition']).to eq(%Q(attachment; filename=\"#{filename}\"; filename*=UTF-8''#{filename}))
       end
 
       context 'when the design is not an LFS file' do

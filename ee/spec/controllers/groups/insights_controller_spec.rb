@@ -79,7 +79,7 @@ describe Groups::InsightsController do
         it 'does return the default config' do
           subject
 
-          expect(response.parsed_body).to eq(parent_group.default_insights_config.to_json)
+          expect(response.parsed_body).to eq(parent_group.default_insights_config.as_json)
         end
       end
 

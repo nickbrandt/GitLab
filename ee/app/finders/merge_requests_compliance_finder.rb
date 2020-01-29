@@ -19,7 +19,7 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
       .limit(1)
       .to_sql
 
-    sql = find_group_projects.as('projects').to_sql
+    sql = find_group_projects.arel.as('projects').to_sql
     records = Project
       .select('projects.id, events.target_id as merge_request_id')
       .from([Arel.sql("#{sql} JOIN LATERAL (#{lateral}) #{Event.table_name} ON true")])

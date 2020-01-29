@@ -58,17 +58,11 @@ module EE
 
     def ce_lookup_context
       @ce_lookup_context ||= begin
-        context = lookup_context.dup
-
-        # This could duplicate the paths we're going to modify
-        context.view_paths = lookup_context.view_paths.paths
-
-        # Discard lookup path ee/ for the new paths
-        context.view_paths.paths.delete_if do |resolver|
+        ce_view_paths = lookup_context.view_paths.paths.reject do |resolver|
           resolver.to_path.start_with?("#{Rails.root}/ee")
         end
 
-        context
+        ActionView::LookupContext.new(ce_view_paths)
       end
     end
 
