@@ -141,7 +141,7 @@ describe API::IssueLinks do
 
         it 'returns 201 when sending full path of target project' do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: project.to_reference(full: true), target_issue_iid: target_issue.iid }
+               params: { target_project_id: project.full_path, target_issue_iid: target_issue.iid }
 
           expect_link_response
         end
