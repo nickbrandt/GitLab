@@ -221,7 +221,7 @@ export default {
         <div
           :class="[
             { 'flex-grow-1': selectedGroup },
-            'dropdown-container d-flex flex-column flex-lg-row mr-2',
+            'dropdown-container d-flex flex-column flex-lg-row mr-2 mt-2 mt-md-0',
           ]"
         >
           <groups-dropdown-filter
