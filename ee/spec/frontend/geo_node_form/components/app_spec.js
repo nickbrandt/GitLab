@@ -1,12 +1,14 @@
 import { shallowMount } from '@vue/test-utils';
 import GeoNodeFormApp from 'ee/geo_node_form/components/app.vue';
 import GeoNodeForm from 'ee/geo_node_form/components/geo_node_form.vue';
-import { MOCK_NODE } from '../mock_data';
+import { MOCK_SELECTIVE_SYNC_TYPES, MOCK_SYNC_SHARDS, MOCK_NODE } from '../mock_data';
 
 describe('GeoNodeFormApp', () => {
   let wrapper;
 
   const propsData = {
+    selectiveSyncTypes: MOCK_SELECTIVE_SYNC_TYPES,
+    syncShardsOptions: MOCK_SYNC_SHARDS,
     node: undefined,
   };
 

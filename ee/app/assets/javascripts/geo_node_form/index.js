@@ -15,7 +15,7 @@ export default () => {
     },
     render(createElement) {
       const {
-        dataset: { nodeData },
+        dataset: { selectiveSyncTypes, syncShardsOptions, nodeData },
       } = this.$options.el;
 
       let node;
@@ -26,6 +26,8 @@ export default () => {
 
       return createElement('geo-node-form-app', {
         props: {
+          selectiveSyncTypes: JSON.parse(selectiveSyncTypes),
+          syncShardsOptions: JSON.parse(syncShardsOptions),
           node,
         },
       });
