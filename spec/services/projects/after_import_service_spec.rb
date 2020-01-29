@@ -77,9 +77,8 @@ describe Projects::AfterImportService do
 
       before do
         call_count = 0
-        original_method = repository.method(:delete_all_refs_except)
 
-        allow(repository).to receive(:delete_all_refs_except) do |*args|
+        allow(repository).to receive(:delete_all_refs_except).and_wrap_original do |original_method, *args|
           call_count += 1
           call_count > 1 ? original_method.call(*args) : raise(exception)
         end
