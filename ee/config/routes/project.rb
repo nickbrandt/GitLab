@@ -84,8 +84,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         namespace :analytics do
           resources :code_reviews, only: [:index]
         end
-
-        draw :merge_requests_ee
       end
       # End of the /-/ scope.
 
