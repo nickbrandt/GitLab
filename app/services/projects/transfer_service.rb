@@ -132,6 +132,8 @@ module Projects
     end
 
     def rollback_folder_move
+      return if project.hashed_storage?(:repository)
+
       move_repo_folder(@new_path, @old_path)
       move_repo_folder("#{@new_path}.wiki", "#{@old_path}.wiki")
     end
