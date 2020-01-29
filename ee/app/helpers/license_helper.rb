@@ -48,6 +48,13 @@ module LicenseHelper
       message << 'service.'
     end
 
+    unless is_trial
+      renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
+      renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
+      link_end = '</a>'.html_safe
+      message << _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
+    end
+
     message.join(' ').html_safe
   end
 
