@@ -165,11 +165,16 @@ describe('Api', () => {
   });
 
   describe('getPodLogs', () => {
-    const projectPath = 'root/test-project';
+    const projectPath = '/root/test-project';
     const environmentName = 'production';
     const podName = 'pod';
     const containerName = 'container';
     const search = 'foo +bar';
+    const environment = {
+      name: environmentName,
+      enable_advanced_logs_querying: false,
+      project_path: projectPath,
+    };
 
     const getRequest = () => mock.history.get[0];
 
@@ -182,9 +187,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
+      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentName, podName, containerName })
+      Api.getPodLogs({ environment, podName, containerName })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
@@ -198,9 +203,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
+      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentName })
+      Api.getPodLogs({ environment })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
@@ -212,9 +217,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
+      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentName, podName })
+      Api.getPodLogs({ environment, podName })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
@@ -227,9 +232,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and search', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
+      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentName, podName, search })
+      Api.getPodLogs({ environment, podName, search })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({

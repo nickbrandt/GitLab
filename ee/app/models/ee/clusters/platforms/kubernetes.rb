@@ -72,9 +72,14 @@ module EE
             environment = ::Environment.find_by(id: opts['environment_id'])
             return unless environment
 
+            method = elastic_stack_available? ? :elasticsearch_project_logs_path : :k8s_project_logs_path
+
             ::Gitlab::EtagCaching::Store.new.tap do |store|
               store.touch(
-                ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
+                # not using send with untrusted input, this is better for readability
+                # rubocop:disable GitlabSecurity/PublicSend
+                ::Gitlab::Routing.url_helpers.send(
+                  method,
                   environment.project,
                   environment_name: environment.name,
                   pod_name: opts['pod_name'],
@@ -86,11 +91,14 @@ module EE
           end
         end
 
+        def elastic_stack_available?
+          ::Feature.enabled?(:enable_cluster_application_elastic_stack) && !!cluster.application_elastic_stack
+        end
+
         private
 
         def pod_logs(pod_name, namespace, container: nil, search: nil, start_time: nil, end_time: nil)
-          enable_advanced_querying = ::Feature.enabled?(:enable_cluster_application_elastic_stack) && !!elastic_stack_client
-          logs = if enable_advanced_querying
+          logs = if elastic_stack_available?
                    elastic_stack_pod_logs(namespace, pod_name, container, search, start_time, end_time)
                  else
                    platform_pod_logs(namespace, pod_name, container)
@@ -100,8 +108,7 @@ module EE
             logs: logs,
             status: :success,
             pod_name: pod_name,
-            container_name: container,
-            enable_advanced_querying: enable_advanced_querying
+            container_name: container
           }
         end
 

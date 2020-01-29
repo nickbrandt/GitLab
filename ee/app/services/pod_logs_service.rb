@@ -9,7 +9,7 @@ class PodLogsService < ::BaseService
 
   PARAMS = %w(pod_name container_name search start end).freeze
 
-  SUCCESS_RETURN_KEYS = [:status, :logs, :pod_name, :container_name, :pods, :enable_advanced_querying].freeze
+  SUCCESS_RETURN_KEYS = [:status, :logs, :pod_name, :container_name, :pods].freeze
 
   steps :check_param_lengths,
     :check_deployment_platform,
@@ -95,7 +95,7 @@ class PodLogsService < ::BaseService
 
     return { status: :processing } unless response
 
-    result.merge!(response.slice(:pod_name, :container_name, :logs, :enable_advanced_querying))
+    result.merge!(response.slice(:pod_name, :container_name, :logs))
 
     if response[:status] == :error
       error(response[:error]).reverse_merge(result)

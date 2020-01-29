@@ -3,14 +3,12 @@ import * as types from 'ee/logs/stores/mutation_types';
 
 import logsPageState from 'ee/logs/stores/state';
 import {
-  mockProjectPath,
   mockEnvName,
   mockEnvironments,
   mockPods,
   mockPodName,
   mockLogsResult,
   mockSearch,
-  mockEnableAdvancedQuerying,
 } from '../mock_data';
 
 describe('Logs Store Mutations', () => {
@@ -27,11 +25,6 @@ describe('Logs Store Mutations', () => {
   });
 
   describe('SET_PROJECT_ENVIRONMENT', () => {
-    it('sets the project path', () => {
-      mutations[types.SET_PROJECT_PATH](state, mockProjectPath);
-      expect(state.projectPath).toEqual(mockProjectPath);
-    });
-
     it('sets the environment', () => {
       mutations[types.SET_PROJECT_ENVIRONMENT](state, mockEnvName);
       expect(state.environments.current).toEqual(mockEnvName);
@@ -123,16 +116,6 @@ describe('Logs Store Mutations', () => {
       mutations[types.SET_CURRENT_POD_NAME](state, mockPodName);
 
       expect(state.pods.current).toEqual(mockPodName);
-    });
-  });
-
-  describe('ENABLE_ADVANCED_QUERYING', () => {
-    it('set advanced querying toggle', () => {
-      state.enableAdvancedQuerying = !mockEnableAdvancedQuerying;
-
-      mutations[types.ENABLE_ADVANCED_QUERYING](state, mockEnableAdvancedQuerying);
-
-      expect(state.enableAdvancedQuerying).toEqual(mockEnableAdvancedQuerying);
     });
   });
 

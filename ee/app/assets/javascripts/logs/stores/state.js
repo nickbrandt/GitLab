@@ -2,19 +2,9 @@ import { defaultTimeWindow, timeWindows } from '../constants';
 
 export default () => ({
   /**
-   * Current project path
-   */
-  projectPath: '',
-
-  /**
    * Full text search
    */
   search: '',
-
-  /**
-   * True if log source is elasticsearch
-   */
-  enableAdvancedQuerying: false,
 
   /**
    * Time range (Show last)

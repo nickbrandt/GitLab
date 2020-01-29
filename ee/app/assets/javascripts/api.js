@@ -11,7 +11,8 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  podLogsPath: '/:project_full_path/-/logs/k8s.json',
+  k8sPodLogsPath: ':project_path/-/logs/k8s.json',
+  elasticsearchPodLogsPath: ':project_path/-/logs/elasticsearch.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
@@ -93,19 +94,24 @@ export default {
    * Returns pods logs for an environment with an optional pod and container
    *
    * @param {Object} params
-   * @param {string} params.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
-   * @param {number} params.environmentId - Id of the environment
+   * @param {Object} param.environment - Environment object
    * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
    * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
    * @param {string=} params.start - Starting date to query the logs in ISO format
    * @param {string=} params.end - Ending date to query the logs in ISO format
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
-  getPodLogs({ projectPath, environmentName, podName, containerName, search, start, end }) {
-    const url = this.buildUrl(this.podLogsPath).replace(':project_full_path', projectPath);
+  getPodLogs({ environment, podName, containerName, search, start, end }) {
+    let baseUrl;
+    if (environment.enable_advanced_logs_querying) {
+      baseUrl = this.elasticsearchPodLogsPath;
+    } else {
+      baseUrl = this.k8sPodLogsPath;
+    }
+    const url = this.buildUrl(baseUrl.replace(':project_path', environment.project_path));
 
     const params = {
-      environment_name: environmentName,
+      environment_name: environment.name,
     };
 
     if (podName) {

@@ -17,6 +17,16 @@ module Projects
     end
 
     def k8s
+      render_logs
+    end
+
+    def elasticsearch
+      render_logs
+    end
+
+    private
+
+    def render_logs
       ::Gitlab::UsageCounters::PodLogs.increment(project.id)
       ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
@@ -30,8 +40,6 @@ module Projects
         render status: :bad_request, json: result
       end
     end
-
-    private
 
     def index_params
       params.permit(:environment_name)

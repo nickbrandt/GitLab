@@ -14,10 +14,6 @@ export default {
     LogControlButtons,
   },
   props: {
-    projectFullPath: {
-      type: String,
-      required: true,
-    },
     environmentName: {
       type: String,
       required: false,
@@ -45,13 +41,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('environmentLogs', [
-      'environments',
-      'timeWindow',
-      'logs',
-      'pods',
-      'enableAdvancedQuerying',
-    ]),
+    ...mapState('environmentLogs', ['environments', 'timeWindow', 'logs', 'pods']),
     ...mapGetters('environmentLogs', ['trace']),
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
@@ -60,7 +50,10 @@ export default {
       return gon.features && gon.features.enableClusterApplicationElasticStack;
     },
     advancedFeaturesEnabled() {
-      return this.featureElasticEnabled && this.enableAdvancedQuerying;
+      const environment = this.environments.options.find(
+        ({ name }) => name === this.environments.current,
+      );
+      return this.featureElasticEnabled && environment && environment.enable_advanced_logs_querying;
     },
     shouldShowElasticStackCallout() {
       return (
@@ -83,7 +76,6 @@ export default {
   },
   mounted() {
     this.setInitData({
-      projectPath: this.projectFullPath,
       environmentName: this.environmentName,
       podName: this.currentPodName,
     });
@@ -157,7 +149,7 @@ export default {
           <gl-dropdown
             id="pods-dropdown"
             :text="pods.current || s__('Environments|No pods to display')"
-            :disabled="logs.isLoading"
+            :disabled="environments.isLoading"
             class="d-flex gl-h-32 js-pods-dropdown"
             toggle-class="dropdown-menu-toggle"
           >

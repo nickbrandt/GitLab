@@ -2,20 +2,21 @@ export const mockProjectPath = 'root/autodevops-deploy';
 export const mockEnvName = 'production';
 export const mockEnvironmentsEndpoint = `${mockProjectPath}/environments.json`;
 export const mockEnvId = '99';
-export const mockEnableAdvancedQuerying = true;
 export const mockDocumentationPath = '/documentation.md';
 
-const makeMockEnvironment = (id, name) => ({
+const makeMockEnvironment = (id, name, advancedQuerying) => ({
   id,
   logs_path: `${mockProjectPath}/environments/${id}/logs`,
+  project_path: mockProjectPath,
   name,
+  enable_advanced_logs_querying: advancedQuerying,
 });
 
-export const mockEnvironment = makeMockEnvironment(mockEnvId, mockEnvName);
+export const mockEnvironment = makeMockEnvironment(mockEnvId, mockEnvName, true);
 export const mockEnvironments = [
   mockEnvironment,
-  makeMockEnvironment(101, 'staging'),
-  makeMockEnvironment(102, 'review/a-feature'),
+  makeMockEnvironment(101, 'staging', false),
+  makeMockEnvironment(102, 'review/a-feature', false),
 ];
 
 export const mockPodName = 'production-764c58d697-aaaaa';
