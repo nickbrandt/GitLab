@@ -18,6 +18,7 @@ describe Gitlab::UsageData do
       create(:ci_build, name: 'dast', pipeline: pipeline)
       create(:ci_build, name: 'dependency_scanning', pipeline: pipeline)
       create(:ci_build, name: 'license_management', pipeline: pipeline)
+      create(:ee_ci_build, name: 'license_scanning', pipeline: pipeline)
       create(:ci_build, name: 'sast', pipeline: pipeline)
 
       create(:prometheus_alert, project: projects[0])
@@ -118,7 +119,7 @@ describe Gitlab::UsageData do
       expect(count_data[:container_scanning_jobs]).to eq(1)
       expect(count_data[:dast_jobs]).to eq(1)
       expect(count_data[:dependency_scanning_jobs]).to eq(1)
-      expect(count_data[:license_management_jobs]).to eq(1)
+      expect(count_data[:license_management_jobs]).to eq(2)
       expect(count_data[:sast_jobs]).to eq(1)
     end
 
