@@ -490,34 +490,6 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
               .to eq(auth_success)
           end
 
-          context 'when using a group token' do
-            let(:group) { create(:group, projects: [project]) }
-            let(:deploy_token) { create(:deploy_token, :group, read_repository: false, groups: [group])}
-
-            it 'succeeds when login and a group token are valid' do
-              auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:read_container_image])
-
-              expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip')).to eq(auth_success)
-            end
-          end
-
-          context 'when the project token is not valid for the given project' do
-            let(:deploy_token) { create(:deploy_token, read_repository: false, projects: [create(:project)]) }
-
-            it 'fails' do
-              expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip')).to eq(auth_failure)
-            end
-          end
-
-          context 'when the project token is not valid for the given project' do
-            let(:deploy_token) { create(:deploy_token, :group, read_repository: false, groups: [group]) }
-            let(:group) { create(:group, projects: [create(:project)]) }
-
-            it 'fails when the group token is not valid for the given project' do
-              expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip')).to eq(auth_failure)
-            end
-          end
-
           it 'fails when login is not valid' do
             expect(gl_auth.find_for_git_client('random_login', deploy_token.token, project: project, ip: 'ip'))
               .to eq(auth_failure)

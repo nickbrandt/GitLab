@@ -96,16 +96,6 @@ class DeployToken < ApplicationRecord
     write_attribute(:expires_at, value.presence || Forever.date)
   end
 
-  def valid_for?(target_project)
-    return false unless target_project
-
-    if group_type?
-      target_project.group == group
-    elsif project_type?
-      target_project == project
-    end
-  end
-
   private
 
   def expired?
