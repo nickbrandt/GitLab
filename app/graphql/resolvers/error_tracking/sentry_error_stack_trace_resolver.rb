@@ -8,7 +8,6 @@ module Resolvers
                 description: 'ID of the Sentry issue'
 
       def resolve(**args)
-        current_user = context[:current_user]
         issue_id = GlobalID.parse(args[:id]).model_id
 
         # Get data from Sentry

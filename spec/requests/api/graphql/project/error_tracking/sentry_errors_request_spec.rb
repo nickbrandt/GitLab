@@ -40,8 +40,8 @@ describe 'sentry errors requests' do
         post_graphql(query, current_user: current_user)
       end
 
-      it "is expected to return an empty error" do
-        expect(error_data).to eq nil
+      it 'is expected to return an empty error' do
+        expect(error_data).to be_nil
       end
     end
 
@@ -49,7 +49,7 @@ describe 'sentry errors requests' do
       before do
         allow_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:issue_details)
-          .and_return({ issue: sentry_detailed_error })
+          .and_return(issue: sentry_detailed_error)
 
         post_graphql(query, current_user: current_user)
       end
@@ -72,8 +72,8 @@ describe 'sentry errors requests' do
       context 'user does not have permission' do
         let(:current_user) { create(:user) }
 
-        it "is expected to return an empty error" do
-          expect(error_data).to eq nil
+        it 'is expected to return an empty error' do
+          expect(error_data).to be_nil
         end
       end
     end
@@ -82,13 +82,13 @@ describe 'sentry errors requests' do
       before do
         expect_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:issue_details)
-          .and_return({ error: 'error message' })
+          .and_return(error: 'error message')
 
         post_graphql(query, current_user: current_user)
       end
 
       it 'is expected to handle the error and return nil' do
-        expect(error_data).to eq nil
+        expect(error_data).to be_nil
       end
     end
   end
@@ -132,8 +132,8 @@ describe 'sentry errors requests' do
         post_graphql(query, current_user: current_user)
       end
 
-      it "is expected to return nil" do
-        expect(error_data).to eq nil
+      it 'is expected to return nil' do
+        expect(error_data).to be_nil
       end
     end
 
@@ -141,7 +141,7 @@ describe 'sentry errors requests' do
       before do
         expect_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:list_sentry_issues)
-          .and_return({ issues: [sentry_error], pagination: pagination })
+          .and_return(issues: [sentry_error], pagination: pagination)
 
         post_graphql(query, current_user: current_user)
       end
@@ -174,17 +174,17 @@ describe 'sentry errors requests' do
       end
     end
 
-    context "sentry api itself errors out" do
+    context 'sentry api itself errors out' do
       before do
         expect_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:list_sentry_issues)
-          .and_return({ error: 'error message' })
+          .and_return(error: 'error message')
 
         post_graphql(query, current_user: current_user)
       end
 
       it 'is expected to handle the error and return nil' do
-        expect(error_data).to eq nil
+        expect(error_data).to be_nil
       end
     end
   end
@@ -214,8 +214,8 @@ describe 'sentry errors requests' do
         post_graphql(query, current_user: current_user)
       end
 
-      it "is expected to return an empty error" do
-        expect(stack_trace_data).to eq nil
+      it 'is expected to return an empty error' do
+        expect(stack_trace_data).to be_nil
       end
     end
 
@@ -223,7 +223,7 @@ describe 'sentry errors requests' do
       before do
         allow_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:issue_latest_event)
-          .and_return({ latest_event: sentry_stack_trace })
+          .and_return(latest_event: sentry_stack_trace)
 
         post_graphql(query, current_user: current_user)
       end
@@ -233,8 +233,8 @@ describe 'sentry errors requests' do
       context 'user does not have permission' do
         let(:current_user) { create(:user) }
 
-        it "is expected to return an empty error" do
-          expect(stack_trace_data).to eq nil
+        it 'is expected to return an empty error' do
+          expect(stack_trace_data).to be_nil
         end
       end
     end
@@ -243,13 +243,13 @@ describe 'sentry errors requests' do
       before do
         expect_any_instance_of(ErrorTracking::ProjectErrorTrackingSetting)
           .to receive(:issue_latest_event)
-          .and_return({ error: 'error message' })
+          .and_return(error: 'error message')
 
         post_graphql(query, current_user: current_user)
       end
 
       it 'is expected to handle the error and return nil' do
-        expect(stack_trace_data).to eq nil
+        expect(stack_trace_data).to be_nil
       end
     end
   end

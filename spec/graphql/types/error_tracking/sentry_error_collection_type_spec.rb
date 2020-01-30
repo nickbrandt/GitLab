@@ -12,7 +12,7 @@ describe GitlabSchema.types['SentryErrorCollection'] do
       errors
       detailed_error
       external_url
-      errorStackTrace
+      error_stack_trace
     ]
 
     is_expected.to have_graphql_fields(*expected_fields)

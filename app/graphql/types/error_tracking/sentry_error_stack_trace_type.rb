@@ -2,10 +2,11 @@
 
 module Types
   module ErrorTracking
-    # rubocop: disable Graphql/AuthorizeTypes
     class SentryErrorStackTraceType < ::Types::BaseObject
       graphql_name 'SentryErrorStackTrace'
       description 'An object containing a stack trace entry for a Sentry error.'
+
+      authorize :read_sentry_issue
 
       field :issue_id, GraphQL::STRING_TYPE,
             null: false,
@@ -17,6 +18,5 @@ module Types
             null: false,
             description: 'Stack trace entries for the Sentry error'
     end
-    # rubocop: enable Graphql/AuthorizeTypes
   end
 end
