@@ -11,6 +11,23 @@ describe API::Namespaces do
 
   describe "GET /namespaces" do
     context "when authenticated as admin" do
+
+      it 'avoids N+1 queries', :request_store do
+        create(:gitlab_subscription, hosted_plan: gold_plan, namespace: create(:group))
+
+        get api("/namespaces", admin)
+
+        control_count = ActiveRecord::QueryRecorder.new do
+          get api("/namespaces", admin)
+        end.count
+
+        7.times { create(:gitlab_subscription, hosted_plan: gold_plan, namespace: create(:group)) }
+
+        get api("/namespaces", admin)
+
+        expect { get api("/namespaces", admin) }.not_to exceed_query_limit(control_count)
+      end
+
       it "returns correct attributes" do
         get api("/namespaces", admin)
 

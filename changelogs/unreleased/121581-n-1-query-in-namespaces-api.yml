@@ -1,0 +1,5 @@
+---
+title: Improve namespace API query performance
+merge_request: 22206
+author:
+type: performance
