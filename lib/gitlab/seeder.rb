@@ -64,6 +64,9 @@ module Gitlab
       end
     end
 
+    puts "Seeder required here!"
+    caller.each { |l| puts l }
+
     using MuteNotifications
     using DeliverNever
 
@@ -74,7 +77,17 @@ module Gitlab
 
       SeedFu.quiet = true
 
+      p "In Seeder.quiet before yield"
+      p NotificationService.method(:new_note)
+      p NotificationService.method(:new_note).source_location
+      p NotificationService.method(:new_note).source
+
       yield self
+
+      p "In Seeder.quiet after yield"
+      p NotificationService.method(:new_note)
+      p NotificationService.method(:new_note).source_location
+      p NotificationService.method(:new_note).source
 
       SeedFu.quiet = false
       ActiveRecord::Base.logger = old_logger

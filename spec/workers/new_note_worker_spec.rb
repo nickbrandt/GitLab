@@ -8,6 +8,10 @@ describe NewNoteWorker do
 
     it "calls NotificationService#new_note" do
       expect_next_instance_of(NotificationService) do |service|
+        p "In expect_next_instance_of(NotificationService)"
+        p service.method(:new_note)
+        p service.method(:new_note).source_location
+        p service.method(:new_note).source
         expect(service).to receive(:new_note).with(note)
       end
 
