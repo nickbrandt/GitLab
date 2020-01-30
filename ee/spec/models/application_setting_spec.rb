@@ -267,14 +267,14 @@ describe ApplicationSetting do
     where(indexing: [true, false], searching: [true, false], limiting: [true, false])
 
     with_them do
-      set(:included_project_container) { create(:elasticsearch_indexed_project) }
-      set(:included_namespace_container) { create(:elasticsearch_indexed_namespace) }
+      let_it_be(:included_project_container) { create(:elasticsearch_indexed_project) }
+      let_it_be(:included_namespace_container) { create(:elasticsearch_indexed_namespace) }
 
-      set(:included_project) { included_project_container.project }
-      set(:included_namespace) { included_namespace_container.namespace }
+      let_it_be(:included_project) { included_project_container.project }
+      let_it_be(:included_namespace) { included_namespace_container.namespace }
 
-      set(:excluded_project) { create(:project) }
-      set(:excluded_namespace) { create(:namespace) }
+      let_it_be(:excluded_project) { create(:project) }
+      let_it_be(:excluded_namespace) { create(:namespace) }
 
       let(:only_when_enabled_globally) { indexing && searching && !limiting }
 

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::RegisterJobService do
-  set(:shared_runner) { create(:ci_runner, :instance) }
+  let_it_be(:shared_runner) { create(:ci_runner, :instance) }
   let!(:project) { create :project, shared_runners_enabled: true }
   let!(:pipeline) { create :ci_empty_pipeline, project: project }
   let!(:pending_build) { create :ci_build, pipeline: pipeline }

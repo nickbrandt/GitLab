@@ -391,7 +391,7 @@ describe DesignManagement::Design do
   end
 
   describe '#user_notes_count', :use_clean_rails_memory_store_caching do
-    set(:design) { create(:design, :with_file) }
+    let_it_be(:design) { create(:design, :with_file) }
 
     subject { design.user_notes_count }
 

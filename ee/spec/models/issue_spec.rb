@@ -9,7 +9,7 @@ describe Issue do
 
   context 'callbacks' do
     describe '.after_create' do
-      set(:project) { create(:project) }
+      let_it_be(:project) { create(:project) }
       let(:author) { User.alert_bot }
 
       context 'when issue title is "New: Incident"' do

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe AlertsService do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:service_params) { { project: project, active: active } }
   let(:active) { true }
   let(:service) { described_class.new(service_params) }

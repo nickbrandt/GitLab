@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe DesignManagement::DesignUserNotesCountService, :use_clean_rails_memory_store_caching do
-  set(:design) { create(:design, :with_file) }
+  let_it_be(:design) { create(:design, :with_file) }
 
   subject { described_class.new(design) }
 

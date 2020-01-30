@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe IncidentManagement::ProjectIncidentManagementSetting do
-  set(:project) { create(:project, :repository, create_templates: :issue) }
+  let_it_be(:project) { create(:project, :repository, create_templates: :issue) }
 
   describe 'Associations' do
     it { is_expected.to belong_to(:project) }

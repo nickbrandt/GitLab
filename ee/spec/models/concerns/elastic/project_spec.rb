@@ -8,7 +8,7 @@ describe Project, :elastic do
   end
 
   context 'when limited indexing is on' do
-    set(:project) { create :project, name: 'test1' }
+    let_it_be(:project) { create :project, name: 'test1' }
 
     before do
       stub_ee_application_setting(elasticsearch_limit_indexing: true)
@@ -62,7 +62,7 @@ describe Project, :elastic do
     end
 
     context 'when a group is enabled' do
-      set(:group) { create(:group) }
+      let_it_be(:group) { create(:group) }
 
       before do
         create :elasticsearch_indexed_namespace, namespace: group

@@ -6,7 +6,7 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :clean_gitlab_r
   include ::EE::GeoHelpers
 
   let(:logger) { Gitlab::Geo::LogCursor::Logger.new(described_class, Logger::INFO) }
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:secondary) { create(:geo_node) }
   let(:project) { create(:project) }
   let(:repository_updated_event) { create(:geo_repository_updated_event, project: project) }
   let(:event_log) { create(:geo_event_log, repository_updated_event: repository_updated_event) }

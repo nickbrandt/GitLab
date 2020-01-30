@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Ci::CreatePipelineService, '#execute' do
-  set(:namespace) { create(:namespace) }
-  set(:gold_plan) { create(:gold_plan) }
-  set(:plan_limits) { create(:plan_limits, plan: gold_plan) }
-  set(:project) { create(:project, :repository, namespace: namespace) }
-  set(:user) { create(:user) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:gold_plan) { create(:gold_plan) }
+  let_it_be(:plan_limits) { create(:plan_limits, plan: gold_plan) }
+  let_it_be(:project, reload: true) { create(:project, :repository, namespace: namespace) }
+  let_it_be(:user) { create(:user) }
   let(:ref_name) { 'master' }
 
   let(:service) do

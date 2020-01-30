@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Geo::RepositoryDeletedEventStore do
   include EE::GeoHelpers
 
-  set(:project) { create(:project, path: 'bar') }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:project) { create(:project, path: 'bar') }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:project_id) { project.id }
   let(:project_name) { project.name }

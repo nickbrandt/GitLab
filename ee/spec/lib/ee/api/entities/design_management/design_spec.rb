@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe EE::API::Entities::DesignManagement::Design do
-  set(:design) { create(:design) }
+  let_it_be(:design) { create(:design) }
   let(:entity) { described_class.new(design, request: double) }
 
   subject { entity.as_json }

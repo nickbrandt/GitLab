@@ -6,9 +6,8 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-
+  let_it_be(:primary, reload: true) { create(:geo_node, :primary) }
+  let_it_be(:secondary, reload: true) { create(:geo_node) }
   let(:options) { {} }
 
   subject(:daemon) { described_class.new(options) }
@@ -268,7 +267,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
   end
 
   describe '#handle_single_event' do
-    set(:event_log) { create(:geo_event_log, :updated_event) }
+    let_it_be(:event_log) { create(:geo_event_log, :updated_event) }
 
     it 'skips execution when no event data is found' do
       event_log = build(:geo_event_log)

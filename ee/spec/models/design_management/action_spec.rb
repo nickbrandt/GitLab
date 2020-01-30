@@ -9,9 +9,9 @@ describe DesignManagement::Action do
 
   describe 'scopes' do
     describe '.most_recent' do
-      set(:design_a) { create(:design) }
-      set(:design_b) { create(:design) }
-      set(:design_c) { create(:design) }
+      let_it_be(:design_a) { create(:design) }
+      let_it_be(:design_b) { create(:design) }
+      let_it_be(:design_c) { create(:design) }
 
       let(:designs) { [design_a, design_b, design_c] }
 
@@ -35,15 +35,15 @@ describe DesignManagement::Action do
     end
 
     describe '.up_to_version' do
-      set(:issue) { create(:issue) }
-      set(:design_a) { create(:design, issue: issue) }
-      set(:design_b) { create(:design, issue: issue) }
+      let_it_be(:issue) { create(:issue) }
+      let_it_be(:design_a) { create(:design, issue: issue) }
+      let_it_be(:design_b) { create(:design, issue: issue) }
 
       # let bindings are not available in before(:all) contexts,
       # so we need to redefine the array on each construction.
-      set(:oldest) { create(:design_version, designs: [design_a, design_b]) }
-      set(:middle) { create(:design_version, designs: [design_a, design_b]) }
-      set(:newest) { create(:design_version, designs: [design_a, design_b]) }
+      let_it_be(:oldest) { create(:design_version, designs: [design_a, design_b]) }
+      let_it_be(:middle) { create(:design_version, designs: [design_a, design_b]) }
+      let_it_be(:newest) { create(:design_version, designs: [design_a, design_b]) }
 
       subject { described_class.where(design: issue.designs).up_to_version(version) }
 

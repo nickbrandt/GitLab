@@ -9,8 +9,8 @@ describe Repository do
 
   TestBlob = Struct.new(:path)
 
-  set(:primary_node)   { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node)   { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:project) { create(:project, :repository) }
   let(:repository) { project.repository }

@@ -4,8 +4,8 @@ require 'spec_helper'
 describe Gitlab::GitAccessDesign do
   include DesignManagementTestHelpers
 
-  set(:project) { create(:project) }
-  set(:user) { project.owner }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { project.owner }
   let(:protocol) { 'web' }
   let(:actor) { user }
 
@@ -25,7 +25,7 @@ describe Gitlab::GitAccessDesign do
     end
 
     context "when the user is not allowed to manage designs" do
-      set(:user) { create(:user) }
+      let_it_be(:user) { create(:user) }
 
       it "raises an error " do
         expect { subject }.to raise_error(::Gitlab::GitAccess::UnauthorizedError)

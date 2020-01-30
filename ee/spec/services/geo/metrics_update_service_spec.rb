@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Geo::MetricsUpdateService, :geo, :prometheus do
   include ::EE::GeoHelpers
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:another_secondary) { create(:geo_node) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:another_secondary) { create(:geo_node) }
 
   subject { described_class.new }
 

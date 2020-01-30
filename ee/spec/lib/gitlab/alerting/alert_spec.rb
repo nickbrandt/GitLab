@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Alerting::Alert do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   let(:alert) { build(:alerting_alert, project: project, payload: payload) }
   let(:payload) { {} }

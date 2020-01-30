@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Quota::Size do
-  set(:namespace) { create(:namespace) }
-  set(:gold_plan) { create(:gold_plan) }
-  set(:project) { create(:project, :repository, namespace: namespace) }
-  set(:plan_limits) { create(:plan_limits, plan: gold_plan) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:gold_plan, reload: true) { create(:gold_plan) }
+  let_it_be(:project, reload: true) { create(:project, :repository, namespace: namespace) }
+  let_it_be(:plan_limits) { create(:plan_limits, plan: gold_plan) }
   let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
   let(:pipeline) { build_stubbed(:ci_pipeline, project: project) }

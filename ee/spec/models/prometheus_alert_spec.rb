@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe PrometheusAlert do
-  set(:project) { build(:project) }
+  let_it_be(:project) { build(:project) }
   let(:metric) { build(:prometheus_metric) }
 
   describe '.distinct_projects' do

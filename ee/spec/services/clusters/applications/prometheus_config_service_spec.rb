@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Clusters::Applications::PrometheusConfigService do
   include Gitlab::Routing.url_helpers
 
-  set(:project) { create(:project) }
-  set(:production) { create(:environment, project: project) }
-  set(:cluster) { create(:cluster, :provided_by_user, projects: [project]) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:production) { create(:environment, project: project) }
+  let_it_be(:cluster) { create(:cluster, :provided_by_user, projects: [project]) }
 
   let(:application) do
     create(:clusters_applications_prometheus, :installed, cluster: cluster)

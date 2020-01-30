@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::CacheInvalidationEventStore do
   include EE::GeoHelpers
 
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:secondary_node) { create(:geo_node) }
 
   let(:cache_key) { 'cache-key' }
 

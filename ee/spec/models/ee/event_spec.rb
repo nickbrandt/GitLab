@@ -4,11 +4,11 @@ require 'spec_helper'
 
 describe Event do
   describe '#visible_to_user?' do
-    set(:non_member) { create(:user) }
-    set(:member) { create(:user) }
-    set(:guest) { create(:user) }
-    set(:author) { create(:author) }
-    set(:admin) { create(:admin) }
+    let_it_be(:non_member) { create(:user) }
+    let_it_be(:member) { create(:user) }
+    let_it_be(:guest) { create(:user) }
+    let_it_be(:author) { create(:author) }
+    let_it_be(:admin) { create(:admin) }
     let(:epic) { create(:epic, group: group, author: author) }
     let(:note_on_epic) { create(:note, :on_epic, noteable: epic) }
     let(:event) { described_class.new(group: group, target: target, author: author) }
