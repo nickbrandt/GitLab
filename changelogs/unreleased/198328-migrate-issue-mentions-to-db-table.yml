@@ -1,0 +1,5 @@
+---
+title: Migrate mentions for issues to issue_user_mentions DB table
+merge_request: 24149
+author:
+type: changed
