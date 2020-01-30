@@ -4,6 +4,7 @@ class Projects::AuditEventsController < Projects::ApplicationController
   include LicenseHelper
   include AuditEvents::EnforcesValidDateParams
   include AuditEvents::AuditLogsParams
+  include AuditEvents::Sortable
 
   before_action :authorize_admin_project!
   before_action :check_audit_events_available!

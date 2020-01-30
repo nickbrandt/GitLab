@@ -8,8 +8,10 @@ describe Projects::AuditEventsController do
   let(:project) { create(:project, :private) }
 
   describe 'GET #index' do
+    let(:sort) { nil }
+
     let(:request) do
-      get :index, params: { project_id: project.to_param, namespace_id: project.namespace.to_param }
+      get :index, params: { project_id: project.to_param, namespace_id: project.namespace.to_param, sort: sort }
     end
 
     context 'authorized' do
@@ -19,7 +21,7 @@ describe Projects::AuditEventsController do
       end
 
       context 'when audit_events feature is available' do
-        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Project.name, entity_id: project.id).permit! }
+        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Project.name, entity_id: project.id, sort: '').permit! }
 
         before do
           stub_licensed_features(audit_events: true)
@@ -35,14 +37,42 @@ describe Projects::AuditEventsController do
         end
 
         context 'ordering' do
+          shared_examples 'orders by id descending' do
+            it 'orders by id descending' do
+              request
+
+              expect(assigns(:events)).to eq(project.audit_events.order(id: :desc))
+            end
+          end
+
           before do
             create_list(:project_audit_event, 5, entity_id: project.id)
           end
 
-          it 'orders by id descending' do
-            request
+          context 'when no sort order is specified' do
+            it_behaves_like 'orders by id descending'
+          end
 
-            expect(assigns(:events)).to eq(project.audit_events.order(id: :desc))
+          context 'when sorting by latest events first' do
+            let(:sort) { 'created_desc' }
+
+            it_behaves_like 'orders by id descending'
+          end
+
+          context 'when sorting by oldest events first' do
+            let(:sort) { 'created_asc' }
+
+            it 'orders by id ascending' do
+              request
+
+              expect(assigns(:events)).to eq(project.audit_events.order(id: :asc))
+            end
+          end
+
+          context 'when sorting by an unsupported sort order' do
+            let(:sort) { 'FOO' }
+
+            it_behaves_like 'orders by id descending'
           end
         end
       end

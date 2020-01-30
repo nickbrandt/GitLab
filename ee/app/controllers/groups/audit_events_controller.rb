@@ -3,6 +3,7 @@
 class Groups::AuditEventsController < Groups::ApplicationController
   include AuditEvents::EnforcesValidDateParams
   include AuditEvents::AuditLogsParams
+  include AuditEvents::Sortable
 
   before_action :authorize_admin_group!
   before_action :check_audit_events_available!

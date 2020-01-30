@@ -1,14 +1,15 @@
 - page_title 'Audit Log'
-- entity_type = params[:entity_type]
 
 .todos-filters
   .row-content-block.second-block
     = form_tag admin_audit_logs_path, method: :get, class: 'filter-form' do
       .filter-item.inline
-        - if entity_type.present?
-          = hidden_field_tag(:entity_type, entity_type)
+        - if params[:sort]
+          = hidden_field_tag(:sort, params[:sort])
+        - if params[:entity_type].present?
+          = hidden_field_tag(:entity_type, params[:entity_type])
 
-        = dropdown_tag(audit_entity_type_label(entity_type),
+        = dropdown_tag(audit_entity_type_label(params[:entity_type]),
           options: { toggle_class: 'js-type-search js-filter-submit js-type-filter',
           dropdown_class: 'dropdown-menu-type dropdown-menu-selectable dropdown-menu-action js-filter-submit',
           placeholder: 'Search types',
@@ -54,6 +55,8 @@
             class: 'form-control', placeholder: 'YYYY-MM-DD'
 
         = submit_tag _('Search'), class: 'btn'
+
+= render 'shared/audit_events/event_sort'
 
 - if @events.present?
   %table#events-table.table
