@@ -24,15 +24,21 @@ module RuboCop
         MSG
 
         def_node_matcher :schedules_in_batch_without_context?, <<~PATTERN
-          (send (...) {:bulk_perform_async :bulk_perform_in} (...))
+          (send (...) {:bulk_perform_async :bulk_perform_in} _*)
         PATTERN
 
         def on_send(node)
-          return if in_migration?(node)
+          return if in_migration?(node) || in_spec?(node)
           return unless schedules_in_batch_without_context?(node)
           return if name_of_receiver(node) == "BackgroundMigrationWorker"
 
           add_offense(node, location: :expression)
+        end
+
+        private
+
+        def in_spec?(node)
+          file_path_for_node(node).end_with?("_spec.rb")
         end
       end
     end

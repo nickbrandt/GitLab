@@ -21,7 +21,10 @@ describe RuboCop::Cop::Scalability::BulkPerformWithContext do
 
   it "adds an offense when calling bulk_perform_in" do
     inspect_source(<<~CODE.strip_indent)
-      Worker.bulk_perform_in(args)
+      diffs.each_batch(of: BATCH_SIZE) do |relation, index|
+        ids = relation.pluck_primary_key.map { |id| [id] }
+        DeleteDiffFilesWorker.bulk_perform_in(index * 5.minutes, ids)
+      end
     CODE
 
     expect(cop.offenses.size).to eq(1)
@@ -29,6 +32,16 @@ describe RuboCop::Cop::Scalability::BulkPerformWithContext do
 
   it "does not add an offense for migrations" do
     allow(cop).to receive(:in_migration?).and_return(true)
+
+    inspect_source(<<~CODE.strip_indent)
+      Worker.bulk_perform_in(args)
+    CODE
+
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "does not add an offence for specs" do
+    allow(cop).to receive(:in_spec?).and_return(true)
 
     inspect_source(<<~CODE.strip_indent)
       Worker.bulk_perform_in(args)
