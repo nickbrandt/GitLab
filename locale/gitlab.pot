@@ -21095,7 +21095,7 @@ msgstr ""
 msgid "Vulnerability|Severity"
 msgstr ""
 
-msgid "Vulnerability|State"
+msgid "Vulnerability|Status"
 msgstr ""
 
 msgid "WIP"
