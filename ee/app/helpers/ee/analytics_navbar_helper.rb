@@ -12,7 +12,51 @@ module EE
       ].compact
     end
 
+    override :group_analytics_navbar_links
+    def group_analytics_navbar_links(group, current_user)
+      super + [
+        contribution_analytics_navbar_link(group, current_user),
+        group_insights_navbar_link(group, current_user),
+        issues_analytics_navbar_link(group, current_user)
+      ].compact
+    end
+
     private
+
+    def contribution_analytics_navbar_link(group, current_user)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless group_sidebar_link?(:contribution_analytics)
+
+      navbar_sub_item(
+        title: _('Contribution Analytics'),
+        path: 'groups/contribution_analytics#show',
+        link: group_contribution_analytics_path(group),
+        link_to_options: { data: { placement: 'right', qa_selector: 'contribution_analytics_link' } }
+      )
+    end
+
+    def group_insights_navbar_link(group, current_user)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless group_sidebar_link?(:group_insights)
+
+      navbar_sub_item(
+        title: _('Insights'),
+        path: 'groups/insights#show',
+        link:  group_insights_path(group),
+        link_to_options: { class: 'shortcuts-group-insights', data: { qa_selector: 'group_insights_link' } }
+      )
+    end
+
+    def issues_analytics_navbar_link(group, current_user)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless group_sidebar_link?(:analytics)
+
+      navbar_sub_item(
+        title: _('Issues Analytics'),
+        path: 'issues_analytics#show',
+        link: group_issues_analytics_path(group)
+      )
+    end
 
     def insights_navbar_link(project, current_user)
       return unless ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, project)

@@ -8,6 +8,8 @@ describe 'Groups > Contribution Analytics', :js do
   let(:empty_project) { create(:project, namespace: group) }
 
   before do
+    stub_feature_flags(analytics_pages_under_group_analytics_sidebar: { enabled: false, thing: group })
+
     group.add_owner(user)
     sign_in(user)
   end
