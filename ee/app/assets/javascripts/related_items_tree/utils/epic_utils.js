@@ -1,9 +1,14 @@
 import { PathIdSeparator } from 'ee/related_issues/constants';
-import createGqClient from '~/lib/graphql';
+import createGqClient, { fetchPolicies } from '~/lib/graphql';
 
 import { ChildType } from '../constants';
 
-export const gqClient = createGqClient();
+export const gqClient = createGqClient(
+  {},
+  {
+    fetchPolicy: fetchPolicies.NO_CACHE,
+  },
+);
 
 /**
  * Returns a numeric representation of item
