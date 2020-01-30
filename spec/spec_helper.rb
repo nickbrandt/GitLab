@@ -76,6 +76,8 @@ RSpec.configure do |config|
     metadata[:level] = quality_level.level_for(location)
     metadata[:api] = true if location =~ %r{/spec/requests/api/}
 
+    metadata[:aggregate_failures] = true unless metadata.key?(:aggregate_failures)
+
     # do not overwrite type if it's already set
     next if metadata.key?(:type)
 

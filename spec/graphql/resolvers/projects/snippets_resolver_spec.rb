@@ -34,11 +34,9 @@ describe Resolvers::Projects::SnippetsResolver do
 
     context 'when using filters' do
       it 'returns the snippets by visibility' do
-        aggregate_failures do
-          expect(resolve_snippets(args: { visibility: 'are_private' })).to be_empty
-          expect(resolve_snippets(args: { visibility: 'are_internal' })).to contain_exactly(project_snippet)
-          expect(resolve_snippets(args: { visibility: 'are_public' })).to contain_exactly(other_project_snippet)
-        end
+        expect(resolve_snippets(args: { visibility: 'foo' })).to be_empty
+        expect(resolve_snippets(args: { visibility: 'bar' })).to contain_exactly(project_snippet)
+        expect(resolve_snippets(args: { visibility: 'baz' })).to contain_exactly(other_project_snippet)
       end
 
       it 'returns the snippets by gid' do
