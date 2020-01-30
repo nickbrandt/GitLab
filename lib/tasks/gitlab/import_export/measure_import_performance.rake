@@ -6,7 +6,8 @@ require 'down/http'
 # It uses gitlab:import_export:import task for the actual import
 #
 # @example
-#   bundle exec rake "gitlab:import_export:measure_import_performance"
+#   bundle exec rake "gitlab:import_export:measure_import_performance[root, root, testingprojectimport, https://gitlab.com/gitlab-org/quality/performance-data/raw/master/gitlabhq_export.tar.gz]"
+#   bundle exec rake "gitlab:import_export:measure_import_performance[root, root, testingprojectimport, /path/to/archive]"
 #
 namespace :gitlab do
   namespace :import_export do
