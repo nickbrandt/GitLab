@@ -18,6 +18,7 @@ export default () => ({
   vulnerabilitiesHistoryEndpoint: null,
   vulnerabilitiesEndpoint: null,
   activeVulnerability: null,
+  sourceBranch: null,
   modal: {
     data: {
       description: { text: s__('Vulnerability|Description') },

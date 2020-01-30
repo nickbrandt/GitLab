@@ -13,6 +13,8 @@ import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
 import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 
+const sourceBranch = 'feature-branch-1';
+
 describe('vulnerabilities count actions', () => {
   const data = mockDataVulnerabilitiesCount;
   const params = { filters: { type: ['sast'] } };
@@ -35,6 +37,24 @@ describe('vulnerabilities count actions', () => {
           {
             type: types.SET_PIPELINE_ID,
             payload: pipelineId,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setSourceBranch', () => {
+    it('should commit the correct mutation', done => {
+      testAction(
+        actions.setSourceBranch,
+        sourceBranch,
+        state,
+        [
+          {
+            type: types.SET_SOURCE_BRANCH,
+            payload: sourceBranch,
           },
         ],
         [],

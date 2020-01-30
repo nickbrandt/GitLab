@@ -1,0 +1,5 @@
+---
+title: Fixes a bug that prevented auto-remediation on the pipeline security dashboard
+merge_request: 23677
+author:
+type: fixed
