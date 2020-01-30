@@ -259,6 +259,37 @@ describe 'SAML provider settings' do
         end
       end
 
+      context 'when user has access locked' do
+        before do
+          user.lock_access!
+          identity = create(:group_saml_identity, saml_provider: saml_provider, user: user)
+          mock_group_saml(uid: identity.extern_uid)
+        end
+
+        it 'warns user that their account is locked' do
+          visit sso_group_saml_providers_path(group)
+
+          click_link 'Sign in with Single Sign-On'
+
+          expect(page).to have_content('Your account is locked.')
+        end
+
+        context 'with 2FA' do
+          before do
+            user.update!(otp_required_for_login: true)
+          end
+
+          it 'warns user their account is locked' do
+            visit sso_group_saml_providers_path(group)
+
+            click_link 'Sign in with Single Sign-On'
+
+            expect(page).to have_content('Your account is locked.')
+            expect(current_path).to eq sso_group_saml_providers_path(group)
+          end
+        end
+      end
+
       context 'for a private group' do
         let(:group) { create(:group, :private) }
 
