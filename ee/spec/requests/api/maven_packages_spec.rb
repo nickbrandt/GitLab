@@ -6,8 +6,8 @@ describe API::MavenPackages do
   let(:user)    { create(:user) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:personal_access_token) { create(:personal_access_token, user: user) }
-  let(:jwt_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
-  let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => jwt_token } }
+  let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
+  let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
   let(:job) { create(:ci_build, user: user) }
   let(:version) { '1.0-SNAPSHOT' }
@@ -342,7 +342,7 @@ describe API::MavenPackages do
 
       authorize_upload_with_token
 
-      expect(response).to have_gitlab_http_status(500)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'authorizes upload with job token' do
@@ -402,6 +402,12 @@ describe API::MavenPackages do
         put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2f.ssh%2fauthorized_keys"), params: params, headers: headers_with_token
 
         expect(response).to have_gitlab_http_status(400)
+      end
+
+      context 'without workhorse header' do
+        subject { upload_file_with_token(params) }
+
+        it_behaves_like 'package workhorse uploads'
       end
 
       it 'creates package and stores package file' do
