@@ -1,5 +1,12 @@
 import _ from 'lodash';
-import { getRangeType, convertToFixedRange } from '~/lib/utils/datetime_range';
+import {
+  getRangeType,
+  convertToFixedRange,
+  isEqualTimeRanges,
+  findTimeRange,
+  timeRangeToParams,
+  timeRangeFromParams,
+} from '~/lib/utils/datetime_range';
 
 const MOCK_NOW = Date.UTC(2020, 0, 23, 20);
 
@@ -225,6 +232,228 @@ describe('Date time range utils', () => {
         };
 
         expect(() => convertToFixedRange(wrongAnchor)).toThrow();
+      });
+    });
+  });
+
+  describe('isEqualTimeRanges', () => {
+    it('equal only compares relevant properies', () => {
+      expect(
+        isEqualTimeRanges(
+          {
+            label: 'A label',
+            default: true,
+            start: '1970-01-01T00:00:00.000Z',
+            end: '2020-01-01T00:00:00.000Z',
+          },
+          {
+            start: '1970-01-01T00:00:00.000Z',
+            end: '2020-01-01T00:00:00.000Z',
+          },
+        ),
+      ).toBe(true);
+
+      expect(
+        isEqualTimeRanges(
+          {
+            label: 'A label',
+            default: true,
+            anotherKey: 'anotherValue',
+            anchor: '1970-01-01T00:00:00.000Z',
+            duration: { seconds: 60 },
+          },
+          {
+            anchor: '1970-01-01T00:00:00.000Z',
+            duration: { seconds: 60 },
+          },
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('findTimeRange', () => {
+    const timeRanges = [
+      {
+        label: 'Before 2020',
+        anchor: '2020-01-01T00:00:00.000Z',
+      },
+      {
+        label: 'Last 30 minutes',
+        duration: { seconds: 60 * 30 },
+      },
+      {
+        label: 'In 2019',
+        start: '2019-01-01T00:00:00.000Z',
+        end: '2019-12-31T12:59:59.999Z',
+      },
+      {
+        label: 'Next 2 minutes',
+        direction: 'after',
+        duration: {
+          seconds: 60 * 2,
+        },
+      },
+    ];
+
+    it('finds a time range', () => {
+      const tr0 = {
+        anchor: '2020-01-01T00:00:00.000Z',
+      };
+      expect(findTimeRange(tr0, timeRanges)).toBe(timeRanges[0]);
+
+      const tr1 = {
+        duration: { seconds: 60 * 30 },
+      };
+      expect(findTimeRange(tr1, timeRanges)).toBe(timeRanges[1]);
+
+      const tr1Direction = {
+        direction: 'before',
+        duration: {
+          seconds: 60 * 30,
+        },
+      };
+      expect(findTimeRange(tr1Direction, timeRanges)).toBe(timeRanges[1]);
+
+      const tr2 = {
+        someOtherLabel: 'Added arbitrarily',
+        start: '2019-01-01T00:00:00.000Z',
+        end: '2019-12-31T12:59:59.999Z',
+      };
+      expect(findTimeRange(tr2, timeRanges)).toBe(timeRanges[2]);
+
+      const tr3 = {
+        direction: 'after',
+        duration: {
+          seconds: 60 * 2,
+        },
+      };
+      expect(findTimeRange(tr3, timeRanges)).toBe(timeRanges[3]);
+    });
+
+    it('doesnot finds a missing time range', () => {
+      const nonExistant = {
+        direction: 'before',
+        duration: {
+          seconds: 200,
+        },
+      };
+      expect(findTimeRange(nonExistant, timeRanges)).toBeUndefined();
+    });
+  });
+
+  describe('conversion to/from params', () => {
+    describe('timeRangeToParams', () => {
+      it('converts fixed ranges to params', () => {
+        const range = {
+          label: 'Added arbitrarily',
+          start: '2019-01-01T00:00:00.000Z',
+          end: '2019-12-31T12:59:59.999Z',
+        };
+
+        expect(timeRangeToParams(range)).toEqual({
+          start: '2019-01-01T00:00:00.000Z',
+          end: '2019-12-31T12:59:59.999Z',
+        });
+      });
+
+      it('converts anchored ranges to params', () => {
+        const range = {
+          label: 'Added arbitrarily',
+          anchor: '2019-01-01T00:00:00.000Z',
+          direction: 'before', // default direction
+          duration: {
+            seconds: 60 * 10,
+          },
+        };
+
+        expect(timeRangeToParams(range)).toEqual({
+          anchor: '2019-01-01T00:00:00.000Z',
+          duration_seconds: '600',
+        });
+      });
+
+      it('converts rolling ranges to params', () => {
+        const range = {
+          direction: 'after',
+          duration: {
+            seconds: 60 * 2,
+          },
+        };
+
+        expect(timeRangeToParams(range)).toEqual({
+          direction: 'after',
+          duration_seconds: '120',
+        });
+      });
+    });
+
+    describe('timeRangeFromParams', () => {
+      it('converts fixed ranges from params', () => {
+        const params = {
+          other_param: 'other_value',
+          start: '2019-01-01T00:00:00.000Z',
+          end: '2019-12-31T12:59:59.999Z',
+        };
+
+        expect(timeRangeFromParams(params)).toEqual({
+          start: '2019-01-01T00:00:00.000Z',
+          end: '2019-12-31T12:59:59.999Z',
+        });
+      });
+
+      it('converts anchored ranges to params', () => {
+        const range = {
+          other_param: 'other_value',
+          anchor: '2019-01-01T00:00:00.000Z',
+          direction: 'after',
+          duration_seconds: '120',
+        };
+
+        expect(timeRangeFromParams(range)).toEqual({
+          anchor: '2019-01-01T00:00:00.000Z',
+          direction: 'after',
+          duration: {
+            seconds: 60 * 2,
+          },
+        });
+      });
+
+      it('converts rolling ranges from params', () => {
+        const params = {
+          other_param: 'other_value',
+          direction: 'after',
+          duration_seconds: '120',
+        };
+
+        expect(timeRangeFromParams(params)).toEqual({
+          direction: 'after',
+          duration: {
+            seconds: 60 * 2,
+          },
+        });
+      });
+
+      it('converts rolling ranges from params with a default direction', () => {
+        const params = {
+          other_param: 'other_value',
+          direction: 'before',
+          duration_seconds: '120',
+        };
+
+        expect(timeRangeFromParams(params)).toEqual({
+          duration: {
+            seconds: 60 * 2,
+          },
+        });
+      });
+
+      it('converts to null when for no relevant params', () => {
+        const range = {
+          useless_param_1: 'value1',
+          useless_param_2: 'value2',
+        };
+
+        expect(timeRangeFromParams(range)).toBe(null);
       });
     });
   });
