@@ -110,7 +110,7 @@ If you have 2FA enabled, you need to use a [personal access token](../../profile
 To authenticate with a [personal access token](../../profile/personal_access_tokens.md),
 set your NPM configuration:
 
-```bash
+```shell
 # Set URL for your scoped packages.
 # For example package with name `@foo/bar` will use this URL for download
 npm config set @foo:registry https://gitlab.com/api/v4/packages/npm/
@@ -140,7 +140,7 @@ If you encounter an error message with [Yarn](https://yarnpkg.com/en/), see the
 
 To avoid hard-coding the `authToken` value, you may use a variables in its place:
 
-```bash
+```shell
 npm config set '//gitlab.com/api/v4/projects/<your_project_id>/packages/npm/:_authToken' "${NPM_TOKEN}"
 npm config set '//gitlab.com/api/v4/packages/npm/:_authToken' "${NPM_TOKEN}"
 ```
@@ -351,7 +351,7 @@ And the `.npmrc` file should look like:
 
 You do not need a token to run `npm install` unless your project is private (the token is only required to publish). If the `.npmrc` file was checked in with a reference to `$NPM_TOKEN`, you can remove it. If you prefer to leave the reference in, you'll need to set a value prior to running `npm install` or set the value using [GitLab environment variables](./../../../ci/variables/README.md):
 
-```bash
+```shell
 NPM_TOKEN=<your_token> npm install
 ```
 

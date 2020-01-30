@@ -345,7 +345,7 @@ Read about [configuring Server hooks](../../../administration/server_hooks.md) o
 
 A sample `pre-receive` hook is provided below.
 
-```bash
+```shell
 #!/usr/bin/env bash
 
 # --- Assume only one push mirror target

@@ -1017,7 +1017,7 @@ unable to assign the correct ownership to the registry files during the restore
 
 To get your registry working again:
 
-```bash
+```shell
 sudo chown -R registry:registry /var/opt/gitlab/gitlab-rails/shared/registry/docker
 ```
 

@@ -583,7 +583,7 @@ ldapsearch -H ldaps://$host:$port -D "$bind_dn" -y bind_dn_password.txt  -b "$ba
 - Run the following check command to make sure that the LDAP settings are
   correct and GitLab can see your users:
 
-  ```bash
+  ```shell
   # For Omnibus installations
   sudo gitlab-rake gitlab:ldap:check
 

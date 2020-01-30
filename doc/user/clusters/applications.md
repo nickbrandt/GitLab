@@ -196,25 +196,25 @@ rules that allow external access to your deployed applications.
 
 If you installed Ingress via the **Applications**, run the following command:
 
-```bash
+```shell
 kubectl get service --namespace=gitlab-managed-apps ingress-nginx-ingress-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
 
 Some Kubernetes clusters return a hostname instead, like [Amazon EKS](https://aws.amazon.com/eks/). For these platforms, run:
 
-```bash
+```shell
 kubectl get service --namespace=gitlab-managed-apps ingress-nginx-ingress-controller -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 ```
 
 For Istio/Knative, the command will be different:
 
-```bash
+```shell
 kubectl get svc --namespace=istio-system knative-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip} '
 ```
 
 Otherwise, you can list the IP addresses of all load balancers:
 
-```bash
+```shell
 kubectl get svc --all-namespaces -o jsonpath='{range.items[?(@.status.loadBalancer.ingress)]}{.status.loadBalancer.ingress[*].ip} '
 ```
 
@@ -698,7 +698,7 @@ information.
 By default, the drop log for traffic is logged out by the
 `cilium-monitor` sidecar container. You can check these logs via:
 
-```bash
+```shell
 kubectl -n gitlab-managed-apps logs cilium-XXXX cilium-monitor
 ```
 

@@ -64,7 +64,7 @@ partial clone, all files – large or small – may be treated the same.
 With the `uploadpack.allowFilter` and `uploadpack.allowAnySHA1InWant` options
 enabled on the Git server:
 
-```bash
+```shell
 # clone the repo, excluding blobs larger than 1 megabyte
 git clone --filter=blob:limit=1m <url>
 
@@ -109,7 +109,7 @@ enabled on the Git server:
    [issue tracking support for `--filter=sparse:oid`](https://gitlab.com/gitlab-org/git/issues/4)
    for updates.
 
-   ```bash
+   ```shell
    # Create a new directory for the Git repository
    mkdir jumbo-repo && cd jumbo-repo
 
@@ -140,7 +140,7 @@ enabled on the Git server:
    other paths being downloaded automatically when checking out branches. Follow
    [issue proposing automating sparse checkouts](https://gitlab.com/gitlab-org/git/issues/5) for updates.
 
-   ```bash
+   ```shell
    # Enable sparse checkout
    git config --local core.sparsecheckout true
 

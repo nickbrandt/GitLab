@@ -186,7 +186,7 @@ single NFS mount point as you normally would in `/etc/fstab`. Let's assume your
 NFS mount point is `/gitlab-nfs`. Then, add the following bind mounts in
 `/etc/fstab`:
 
-```bash
+```shell
 /gitlab-nfs/gitlab-data/git-data /var/opt/gitlab/git-data none bind 0 0
 /gitlab-nfs/gitlab-data/.ssh /var/opt/gitlab/.ssh none bind 0 0
 /gitlab-nfs/gitlab-data/uploads /var/opt/gitlab/gitlab-rails/uploads none bind 0 0

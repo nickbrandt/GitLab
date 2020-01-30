@@ -28,7 +28,7 @@ to use the `docker` executor.
 
 A one-line example can be seen below:
 
-```bash
+```shell
 sudo gitlab-runner register \
   --url "https://gitlab.example.com/" \
   --registration-token "PROJECT_REGISTRATION_TOKEN" \
@@ -559,7 +559,7 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
 
 - **First way -** Do a `docker login` on your local machine:
 
-  ```bash
+  ```shell
   docker login registry.example.com:5000 --username my_username --password my_password
   ```
 
@@ -568,7 +568,7 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
   If you don't need access to the registry from your computer, you
   can do a `docker logout`:
 
-  ```bash
+  ```shell
   docker logout registry.example.com:5000
   ```
 
@@ -579,7 +579,7 @@ There are two ways to determine the value of `DOCKER_AUTH_CONFIG`:
   `${username}:${password}` and create the Docker configuration JSON manually.
   Open a terminal and execute the following command:
 
-  ```bash
+  ```shell
   echo -n "my_username:my_password" | base64
 
   # Example output to copy
@@ -790,7 +790,7 @@ able to run Docker with your regular user account.
 
 First start with creating a file named `build_script`:
 
-```bash
+```shell
 cat <<EOF > build_script
 git clone https://gitlab.com/gitlab-org/gitlab-runner.git /builds/gitlab-org/gitlab-runner
 cd /builds/gitlab-org/gitlab-runner

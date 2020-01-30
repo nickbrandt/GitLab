@@ -172,6 +172,6 @@ sudo gitlab-rake "gitlab:packages:migrate"
 
 For installations from source:
 
-```bash
+```shell
 RAILS_ENV=production sudo -u git -H bundle exec rake gitlab:packages:migrate
 ```

@@ -159,7 +159,7 @@ You must do the following:
 
      Then run the following command:
 
-     ```bash
+     ```shell
      kubectl apply -f knative-serving-only-role.yaml
      ```
 
@@ -362,7 +362,7 @@ Kubernetes cluster. Click on each function to obtain detailed scale and invocati
 
 The function details can be retrieved directly from Knative on the cluster:
 
-```bash
+```shell
 kubectl -n "$KUBE_NAMESPACE" get services.serving.knative.dev
 ```
 
@@ -370,7 +370,7 @@ The sample function can now be triggered from any HTTP client using a simple `PO
 
   1. Using curl (replace the URL on the last line with the URL of your application):
 
-     ```bash
+     ```shell
      curl \
      --header "Content-Type: application/json" \
      --request POST \
@@ -388,7 +388,7 @@ To access your Kubernetes secrets from within your function, the secrets should 
 
 #### CLI example
 
-```bash
+```shell
 kubectl create secret generic my-secrets -n "$KUBE_NAMESPACE" --from-literal MY_SECRET=imverysecure
 ```
 
@@ -491,7 +491,7 @@ Go to the **CI/CD > Pipelines** and click on the pipeline that deployed your app
 
 The output will look like this:
 
-```bash
+```shell
 Running with gitlab-runner 12.1.0-rc1 (6da35412)
   on prm-com-gitlab-org ae3bfce3
 Using Docker executor with image registry.gitlab.com/gitlab-org/gitlabktl:latest ...

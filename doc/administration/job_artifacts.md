@@ -156,7 +156,7 @@ _The artifacts are stored by default in
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
-   ```bash
+   ```shell
    gitlab-rake gitlab:artifacts:migrate
    ```
 
@@ -184,7 +184,7 @@ _The artifacts are stored by default in
 1. Save the file and [restart GitLab][] for the changes to take effect.
 1. Migrate any existing local artifacts to the object storage:
 
-   ```bash
+   ```shell
    sudo -u git -H bundle exec rake gitlab:artifacts:migrate RAILS_ENV=production
    ```
 

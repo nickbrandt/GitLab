@@ -548,7 +548,7 @@ GET /users/:user_id/starred_projects
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature. |
 | `min_access_level` | integer | no | Limit by current user minimal [access level](members.md). |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/users/5/starred_projects"
 ```
 
@@ -1229,7 +1229,7 @@ GET /projects/:id/forks
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `min_access_level` | integer | no | Limit by current user minimal [access level](members.md) |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/forks"
 ```
 
@@ -1312,7 +1312,7 @@ POST /projects/:id/star
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/star"
 ```
 
@@ -1401,7 +1401,7 @@ POST /projects/:id/unstar
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/unstar"
 ```
 
@@ -1490,7 +1490,7 @@ GET /projects/:id/starrers
 | --------- | ---- | -------- | ----------- |
 | `search` | string | no | Search for specific users. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/starrers"
 ```
 
@@ -1531,7 +1531,7 @@ Get languages used in a project with percentage value.
 GET /projects/:id/languages
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/languages"
 ```
 
@@ -1559,7 +1559,7 @@ POST /projects/:id/archive
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/archive"
 ```
 
@@ -1667,7 +1667,7 @@ POST /projects/:id/unarchive
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/unarchive"
 ```
 
@@ -1811,7 +1811,7 @@ cURL to post data using the header `Content-Type: multipart/form-data`.
 The `file=` parameter must point to a file on your filesystem and be preceded
 by `@`. For example:
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" https://gitlab.example.com/api/v4/projects/5/uploads
 ```
 
@@ -1857,7 +1857,7 @@ DELETE /projects/:id/share/:group_id
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `group_id` | integer | yes | The ID of the group |
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/share/17
 ```
 
@@ -2025,7 +2025,7 @@ GET /projects
 | `order_by` | string | no | Return requests ordered by `id`, `name`, `created_at` or `last_activity_at` fields |
 | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects?search=test
 ```
 
@@ -2184,7 +2184,7 @@ POST /projects/:id/mirror/pull
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/mirror/pull
 ```
 

@@ -1009,7 +1009,7 @@ If you are having trouble connecting to a Gitaly node with command line (CLI) to
 
 Verify that you can reach Gitaly via TCP:
 
-```bash
+```shell
 sudo gitlab-rake gitlab:tcp_check[GITALY_SERVER_IP,GITALY_LISTEN_PORT]
 ```
 
@@ -1019,7 +1019,7 @@ If you use proxy servers in your command line environment, such as Bash, these c
 
 If you use Bash or a compatible command line environment, run the following commands to determine whether you have proxy servers configured:
 
-```bash
+```shell
 echo $http_proxy
 echo $https_proxy
 ```
@@ -1028,7 +1028,7 @@ If either of these variables have a value, your Gitaly CLI connections may be ge
 
 To remove the proxy setting, run the following commands (depending on which variables had values):
 
-```bash
+```shell
 unset http_proxy
 unset https_proxy
 ```

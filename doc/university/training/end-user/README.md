@@ -59,7 +59,7 @@ Workshop Time!
 
 - One-time configuration of the Git client:
 
-```bash
+```shell
 git config --global user.name "Your Name"
 git config --global user.email you@example.com
 ```
@@ -68,7 +68,7 @@ git config --global user.email you@example.com
   each project
 - Check settings with:
 
-```bash
+```shell
 git config --global --list
 ```
 
@@ -81,7 +81,7 @@ git config --global --list
 - Create a workspace or development directory
 - This is where we'll be working and adding content
 
-```bash
+```shell
 mkdir ~/development
 cd ~/development
 

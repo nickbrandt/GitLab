@@ -274,7 +274,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    can temporarily disable auto-refreshing and replicating. In our experience, you can expect a 20%
    decrease in indexing time. We'll enable them when indexing is done. This step is optional!
 
-   ```bash
+   ```shell
    curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' --data '{
        "index" : {
            "refresh_interval" : "-1",
@@ -356,7 +356,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 
 1. Enable replication and refreshing again after indexing (only if you previously disabled it):
 
-   ```bash
+   ```shell
    curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' ---data '{
        "index" : {
            "number_of_replicas" : 1,
@@ -368,7 +368,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 
    For Elasticsearch 6.x, the index should be in read-only mode before proceeding with the force merge:
 
-   ```bash
+   ```shell
    curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
      "settings": {
        "index.blocks.write": true
@@ -377,13 +377,13 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 
    Then, initiate the force merge:
 
-   ```bash
+   ```shell
    curl --request POST 'localhost:9200/gitlab-production/_forcemerge?max_num_segments=5'
    ```
 
    After this, if your index is in read-only mode, switch back to read-write:
 
-   ```bash
+   ```shell
    curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
      "settings": {
        "index.blocks.write": false
@@ -471,7 +471,7 @@ However, some larger installations may wish to tune the merge policy settings:
 
 - Consider reducing the `index.merge.policy.max_merged_segment` size from the default 5 GB to maybe 2 GB or 3 GB.  Merging only happens when a segment has at least 50% deletions.  Smaller segment sizes will allow merging to happen more frequently.
 
-  ```bash
+  ```shell
   curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
     "index" : {
       "merge.policy.max_merged_segment": "2gb"
@@ -481,7 +481,7 @@ However, some larger installations may wish to tune the merge policy settings:
 
 - You can also adjust `index.merge.policy.reclaim_deletes_weight`, which controls how aggressively deletions are targeted.  But this can lead to costly merge decisions, so we recommend not changing this unless you understand the tradeoffs.
 
-  ```bash
+  ```shell
   curl --request PUT localhost:9200/gitlab-production/_settings ---header 'Content-Type: application/json' --data '{
     "index" : {
       "merge.policy.reclaim_deletes_weight": "3.0"
@@ -604,7 +604,7 @@ Here are some common pitfalls and how to overcome them:
 
   If you have a **hard requirement to have a green status for your single node Elasticsearch cluster**, please make sure you understand the risks outlined in the previous paragraph and then simply run the following query to set the number of replicas to `0`(the cluster will no longer try to create any shard replicas):
 
-  ```bash
+  ```shell
   curl --request PUT localhost:9200/gitlab-production/_settings --header 'Content-Type: application/json' --data '{
   "index" : {
      "number_of_replicas" : 0

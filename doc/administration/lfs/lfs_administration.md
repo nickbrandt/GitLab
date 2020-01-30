@@ -178,7 +178,7 @@ On Omnibus installations, the settings are prefixed by `lfs_object_store_`:
 1. Save the file and [reconfigure GitLab]s for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:
 
-   ```bash
+   ```shell
    gitlab-rake gitlab:lfs:migrate
    ```
 
@@ -214,7 +214,7 @@ For source installations the settings are nested under `lfs:` and then
 1. Save the file and [restart GitLab][] for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:
 
-   ```bash
+   ```shell
    sudo -u git -H bundle exec rake gitlab:lfs:migrate RAILS_ENV=production
    ```
 

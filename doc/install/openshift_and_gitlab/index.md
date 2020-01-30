@@ -222,7 +222,7 @@ Now that you got a taste of what OpenShift looks like, let's deploy GitLab!
 First, we will create a new project to host our application. You can do this
 either by running the CLI client:
 
-```bash
+```shell
 oc new-project gitlab
 ```
 
@@ -255,13 +255,13 @@ parameters for those objects.
 The template for GitLab resides in the Omnibus GitLab repository under the
 docker directory. Let's download it locally with `wget`:
 
-```bash
+```shell
 wget https://gitlab.com/gitlab-org/omnibus-gitlab/raw/master/docker/openshift-template.json
 ```
 
 And then let's import it in OpenShift:
 
-```bash
+```shell
 oc create -f openshift-template.json -n openshift
 ```
 

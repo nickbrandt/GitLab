@@ -8,13 +8,13 @@ comments: false
 
 - Create a new repository by instantiating it through:
 
-  ```bash
+  ```shell
   git init
   ```
 
 - Copy an existing project by cloning the repository through:
 
-  ```bash
+  ```shell
   git clone <url>
   ```
 
@@ -24,7 +24,7 @@ comments: false
 - Bare repositories don't allow file editing or committing changes.
 - Create a bare repo with:
 
-  ```bash
+  ```shell
   git init --bare project-name.git
   ```
 

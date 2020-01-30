@@ -135,7 +135,7 @@ do this manually.
 1. SSH in to the database node in the **secondary** and trigger PostgreSQL to
    promote to read-write:
 
-   ```bash
+   ```shell
    sudo gitlab-pg-ctl promote
    ```
 
@@ -157,7 +157,7 @@ do this manually.
 1. Promote the **secondary** to **primary**. SSH into a single application
    server and execute:
 
-   ```bash
+   ```shell
    sudo gitlab-rake geo:set_secondary_as_primary
    ```
 

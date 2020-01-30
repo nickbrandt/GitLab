@@ -134,7 +134,7 @@ on, and use that key for all projects that are run on this machine.
 
 Once done, try to login to the remote server in order to accept the fingerprint:
 
-```bash
+```shell
 ssh example.com
 ```
 

@@ -357,7 +357,7 @@ is prepended with the relevant node for better clarity:
    1. **(secondary)** Save the snippet below in a file, let's say `/tmp/replica.sh`. Modify the
       embedded paths if necessary:
 
-      ```bash
+      ```shell
       #!/bin/bash
 
       PORT="5432"

@@ -6,13 +6,13 @@ comments: false
 
 - To remove files from stage use reset HEAD where HEAD is the last commit of the current branch. This will unstage the file but maintain the modifications.
 
-  ```bash
+  ```shell
   git reset HEAD <file>
   ```
 
 - To revert the file back to the state it was in before the changes we can use:
 
-  ```bash
+  ```shell
   git checkout -- <file>
   ```
 

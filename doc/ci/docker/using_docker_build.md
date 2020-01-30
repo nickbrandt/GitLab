@@ -16,7 +16,7 @@ One of the new trends in Continuous Integration/Deployment is to:
 It's also useful when your application already has the `Dockerfile` that can be
 used to create and test an image:
 
-```bash
+```shell
 docker build -t my-image dockerfiles/
 docker run my-image /script/to/run/tests
 docker tag my-image my-registry:5000/my-image
@@ -48,7 +48,7 @@ GitLab Runner then executes job scripts as the `gitlab-runner` user.
 
 1. During GitLab Runner installation select `shell` as method of executing job scripts or use command:
 
-   ```bash
+   ```shell
    sudo gitlab-runner register -n \
      --url https://gitlab.com/ \
      --registration-token REGISTRATION_TOKEN \
@@ -63,13 +63,13 @@ GitLab Runner then executes job scripts as the `gitlab-runner` user.
 
 1. Add `gitlab-runner` user to `docker` group:
 
-   ```bash
+   ```shell
    sudo usermod -aG docker gitlab-runner
    ```
 
 1. Verify that `gitlab-runner` has access to Docker:
 
-   ```bash
+   ```shell
    sudo -u gitlab-runner -H docker info
    ```
 
@@ -160,7 +160,7 @@ support this.
 1. Register GitLab Runner from the command line to use `docker` and `privileged`
    mode:
 
-   ```bash
+   ```shell
    sudo gitlab-runner register -n \
      --url https://gitlab.com/ \
      --registration-token REGISTRATION_TOKEN \
@@ -320,7 +320,7 @@ In order to do that, follow the steps:
 
 1. Register GitLab Runner from the command line to use `docker` and share `/var/run/docker.sock`:
 
-   ```bash
+   ```shell
    sudo gitlab-runner register -n \
      --url https://gitlab.com/ \
      --registration-token REGISTRATION_TOKEN \
