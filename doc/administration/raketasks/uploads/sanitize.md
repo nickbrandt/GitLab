@@ -7,7 +7,7 @@ You need `exiftool` installed on your system. If you installed GitLab:
 - Using the Omnibus package, you're all set.
 - From source, make sure `exiftool` is installed:
 
-  ```sh
+  ```shell
   # Debian/Ubuntu
   sudo apt-get install libimage-exiftool-perl
 

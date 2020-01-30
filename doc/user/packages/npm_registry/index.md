@@ -43,7 +43,7 @@ NPM to your local development environment.
 Once installation is complete, verify you can use NPM in your terminal by
 running:
 
-```sh
+```shell
 npm --version
 ```
 
@@ -61,7 +61,7 @@ your development environment.
 
 Once installed, you can verify that Yarn is available with the following command:
 
-```sh
+```shell
 yarn --version
 ```
 
@@ -77,13 +77,13 @@ Understanding how to create a full JavaScript project is outside the scope of
 this guide but you can initialize a new empty package by creating and navigating
 to an empty directory and using the following command:
 
-```sh
+```shell
 npm init
 ```
 
 Or if you're using Yarn:
 
-```sh
+```shell
 yarn init
 ```
 
@@ -149,7 +149,7 @@ Then, you could run `npm publish` either locally or via GitLab CI/CD:
 
 - **Locally:** Export `NPM_TOKEN` before publishing:
 
-  ```sh
+  ```shell
   NPM_TOKEN=<your_token> npm publish
   ```
 
@@ -191,7 +191,7 @@ domain name.
 Once you have enabled it and set up [authentication](#authenticating-to-the-gitlab-npm-registry),
 you can upload an NPM package to your project:
 
-```sh
+```shell
 npm publish
 ```
 
@@ -248,7 +248,7 @@ NPM packages are commonly installed using the the `npm` or `yarn` commands
 inside a JavaScript project. If you haven't already, you will need to set the
 URL for scoped packages. You can do this with the following command:
 
-```sh
+```shell
 npm config set @foo:registry https://gitlab.com/api/v4/packages/npm/
 ```
 
@@ -259,13 +259,13 @@ is setup so you can successfully install the package. Once this has been
 completed, you can run the following command inside your project to install a
 package:
 
-```sh
+```shell
 npm install @my-project-scope/my-package
 ```
 
 Or if you're using Yarn:
 
-```sh
+```shell
 yarn add @my-project-scope/my-package
 ```
 
@@ -302,7 +302,7 @@ deploy:
 If you are using [yarn](https://yarnpkg.com/en/) with the NPM registry, you may get
 an error message like:
 
-```sh
+```shell
 yarn install v1.15.2
 warning package.json: No license field
 info No lockfile found.
@@ -384,7 +384,7 @@ a package without specifying the tag or version.
 
 Examples of the supported `dist-tag` commands and using tags in general:
 
-```sh
+```shell
 npm publish @scope/package --tag               # Publish new package with new tag
 npm dist-tag add @scope/package@version my-tag # Add a tag to an existing package
 npm dist-tag ls @scope/package                 # List all tags under the package

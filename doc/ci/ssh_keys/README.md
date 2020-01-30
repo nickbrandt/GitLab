@@ -150,7 +150,7 @@ connection would fail if the public keys would not match).
 To find out the host keys of your server, run the `ssh-keyscan` command from a
 trusted network (ideally, from the private server itself):
 
-```sh
+```shell
 ## Use the domain name
 ssh-keyscan example.com
 

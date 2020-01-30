@@ -393,7 +393,7 @@ To add a Kubernetes cluster to your project, group, or instance:
 
      Get the API URL by running this command:
 
-     ```sh
+     ```shell
      kubectl cluster-info | grep 'Kubernetes master' | awk '/http/ {print $NF}'
      ```
 
@@ -402,7 +402,7 @@ To add a Kubernetes cluster to your project, group, or instance:
       `default-token-xxxxx`. Copy that token name for use below.
      - Get the certificate by running this command:
 
-       ```sh
+       ```shell
 
        kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
 
@@ -530,7 +530,7 @@ To add an existing EKS cluster to your project, group, or instance:
          `default-token-xxxxx`. Copy that token name for use below.
       1. Get the certificate with:
 
-         ```sh
+         ```shell
          kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
          ```
 

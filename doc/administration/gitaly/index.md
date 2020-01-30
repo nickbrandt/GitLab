@@ -309,7 +309,7 @@ can read and write to `/mnt/gitlab/storage2`.
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Tail the logs to see the requests:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl tail gitaly
    ```
 
@@ -343,7 +343,7 @@ can read and write to `/mnt/gitlab/storage2`.
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 1. Tail the logs to see the requests:
 
-   ```sh
+   ```shell
    tail -f /home/git/gitlab/log/gitaly.log
    ```
 
@@ -435,7 +435,7 @@ To configure Gitaly with TLS:
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
 1. On the Gitaly server, create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
-   ```sh
+   ```shell
    sudo mkdir -p /etc/gitlab/ssl
    sudo chmod 755 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
@@ -491,7 +491,7 @@ To configure Gitaly with TLS:
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on client node(s).
 1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
-   ```sh
+   ```shell
    sudo mkdir -p /etc/gitlab/ssl
    sudo chmod 700 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
@@ -856,7 +856,7 @@ your GitLab / Gitaly server already at `/opt/gitlab/embedded/bin/gitaly-debug`.
 If you're investigating an older GitLab version you can compile this
 tool offline and copy the executable to your server:
 
-```sh
+```shell
 git clone https://gitlab.com/gitlab-org/gitaly.git
 cd cmd/gitaly-debug
 GOOS=linux GOARCH=amd64 go build -o gitaly-debug
@@ -864,7 +864,7 @@ GOOS=linux GOARCH=amd64 go build -o gitaly-debug
 
 To see the help page of `gitaly-debug` for a list of supported sub-commands, run:
 
-```sh
+```shell
 gitaly-debug -h
 ```
 
@@ -887,7 +887,7 @@ default level is `WARN`.
 
 You can run a GRPC trace with:
 
-```sh
+```shell
 GRPC_TRACE=all GRPC_VERBOSITY=DEBUG sudo gitlab-rake gitlab:gitaly:check
 ```
 
@@ -925,7 +925,7 @@ Confirm the following are all true:
 - When any user performs a `git push` to any repository on this Gitaly node, it
   fails with the following error (note the `401 Unauthorized`):
 
-  ```sh
+  ```shell
   remote: GitLab: 401 Unauthorized
   To <REMOTE_URL>
   ! [remote rejected] branch-name -> branch-name (pre-receive hook declined)
@@ -939,7 +939,7 @@ Confirm the following are all true:
 - When [tailing the logs](https://docs.gitlab.com/omnibus/settings/logs.html#tail-logs-in-a-console-on-the-server) on an app node and reproducing the error, you get `401` errors
   when reaching the `/api/v4/internal/allowed` endpoint:
 
-  ```sh
+  ```shell
   # api_json.log
   {
     "time": "2019-07-18T00:30:14.967Z",

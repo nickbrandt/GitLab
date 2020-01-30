@@ -267,7 +267,7 @@ that's why it needs to uniquely map to a single user.
 If you want to use different keys depending on the repository you are working
 on, you can issue the following command while inside your repository:
 
-```sh
+```shell
 git config core.sshCommand "ssh -o IdentitiesOnly=yes -i ~/.ssh/private-key-filename-for-this-repository -F /dev/null"
 ```
 
@@ -314,13 +314,13 @@ despite giving very little context as to where they point, would also work.
 
 Cloning the `gitlab` repository normally looks like this:
 
-```sh
+```shell
 git clone git@gitlab.com:gitlab-org/gitlab.git
 ```
 
 To clone it for `user_1`, replace `gitlab.com` with the SSH alias `user_1.gitlab.com`:
 
-```sh
+```shell
 git clone git@<user_1.gitlab.com>:gitlab-org/gitlab.git
 ```
 
@@ -328,7 +328,7 @@ Fix a previously cloned repository using the `git remote` command.
 
 The example below assumes the remote repository is aliased as `origin`.
 
-```sh
+```shell
 git remote set-url origin git@<user_1.gitlab.com>:gitlab-org/gitlab.git
 ```
 

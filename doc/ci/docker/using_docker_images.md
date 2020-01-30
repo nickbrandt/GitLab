@@ -805,7 +805,7 @@ is specific to your project.
 
 Then create some service containers:
 
-```sh
+```shell
 docker run -d --name service-mysql mysql:latest
 docker run -d --name service-postgres postgres:latest
 ```
@@ -817,7 +817,7 @@ respectively. They will both run in the background (`-d`).
 Finally, create a build container by executing the `build_script` file we
 created earlier:
 
-```sh
+```shell
 docker run --name build -i --link=service-mysql:mysql --link=service-postgres:postgres ruby:2.6 /bin/bash < build_script
 ```
 
@@ -829,7 +829,7 @@ piped using STDIN to the bash interpreter which in turn executes the
 When you finish testing and no longer need the containers, you can remove them
 with:
 
-```sh
+```shell
 docker rm -f -v build service-mysql service-postgres
 ```
 

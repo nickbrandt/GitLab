@@ -214,7 +214,7 @@ Other providers will vary. If you're running self-managed GitLab, or otherwise
 have access to the server for the other repository, you can securely gather the
 key fingerprints:
 
-```sh
+```shell
 $ cat /etc/ssh/ssh_host*pub | ssh-keygen -E md5 -l -f -
 256 MD5:f4:28:9f:23:99:15:21:1b:bf:ed:1f:8e:a0:76:b2:9d root@example.com (ECDSA)
 256 MD5:e6:eb:45:8a:3c:59:35:5f:e9:5b:80:12:be:7e:22:73 root@example.com (ED25519)

@@ -239,7 +239,7 @@ you can flip the feature flag from a Rails console.
 
 1. Enter the Rails console:
 
-   ```sh
+   ```shell
    sudo gitlab-rails console
    ```
 
@@ -253,7 +253,7 @@ you can flip the feature flag from a Rails console.
 
 1. Enter the Rails console:
 
-   ```sh
+   ```shell
    cd /home/git/gitlab
    RAILS_ENV=production sudo -u git -H bundle exec rails console
    ```

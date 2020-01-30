@@ -264,7 +264,7 @@ This feature:
 - Is viewable by checking your Ingress controller's `modsec` log for rule violations.
   For example:
 
-  ```sh
+  ```shell
   kubectl logs -n gitlab-managed-apps $(kubectl get pod -n gitlab-managed-apps -l app=nginx-ingress,component=controller --no-headers=true -o custom-columns=:metadata.name) modsecurity-log -f
   ```
 
@@ -784,7 +784,7 @@ To avoid installation errors:
 
   You can confirm that the certificates match via `kubectl`:
 
-  ```sh
+  ```shell
   kubectl get configmaps/values-content-configuration-ingress -n gitlab-managed-apps -o \
   "jsonpath={.data['cert\.pem']}" | base64 -d > a.pem
   kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem

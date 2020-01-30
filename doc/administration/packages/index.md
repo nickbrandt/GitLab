@@ -166,7 +166,7 @@ The processing will be done in a background worker and requires **no downtime**.
 
 For Omnibus GitLab:
 
-```sh
+```shell
 sudo gitlab-rake "gitlab:packages:migrate"
 ```
 

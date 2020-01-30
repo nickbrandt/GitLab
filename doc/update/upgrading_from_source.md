@@ -247,7 +247,7 @@ sudo -u git -H make
 There might be configuration options available for [`gitlab.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example)).
 View them with the command below and apply them manually to your current `gitlab.yml`:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 git diff origin/PREVIOUS_BRANCH:config/gitlab.yml.example origin/BRANCH:config/gitlab.yml.example
@@ -257,7 +257,7 @@ git diff origin/PREVIOUS_BRANCH:config/gitlab.yml.example origin/BRANCH:config/g
 
 Ensure you're still up-to-date with the latest NGINX configuration changes:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 # For HTTPS configurations
@@ -293,7 +293,7 @@ There might be new configuration options available for
 [`gitlab.default.example`](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/support/init.d/gitlab.default.example).
 View them with the command below and apply them manually to your current `/etc/default/gitlab`:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 git diff origin/PREVIOUS_BRANCH:lib/support/init.d/gitlab.default.example origin/BRANCH:lib/support/init.d/gitlab.default.example

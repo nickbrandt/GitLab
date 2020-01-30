@@ -55,7 +55,7 @@ NOTE: **Note:** From GitLab 12.1, it will automatically be detected if Rugged ca
 
 If you previously enabled Rugged using the feature flag, you will need to unset the feature flag by using:
 
-```sh
+```shell
 sudo gitlab-rake gitlab:features:unset_rugged
 ```
 
@@ -82,7 +82,7 @@ on an Linux NFS server, do the following:
 
 1. On the NFS server, run:
 
-   ```sh
+   ```shell
    echo 0 > /proc/sys/fs/leases-enable
    sysctl -w fs.leases-enable=0
    ```

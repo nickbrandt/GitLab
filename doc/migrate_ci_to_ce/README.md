@@ -326,13 +326,13 @@ You should also make sure that you can:
 
 ### 2. Check NGINX configuration
 
-```sh
+```shell
 sudo nginx -t
 ```
 
 ### 3. Restart NGINX
 
-```sh
+```shell
 sudo /etc/init.d/nginx restart
 ```
 

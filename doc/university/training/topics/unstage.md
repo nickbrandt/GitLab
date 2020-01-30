@@ -18,13 +18,13 @@ comments: false
 
 - To remove a file from disk and repo use `git rm` and to remove a directory use the `-r` flag:
 
-  ```sh
+  ```shell
   git rm '*.txt'
   git rm -r <dirname>
   ```
 
 - If we want to remove a file from the repository but keep it on disk, say we forgot to add it to our `.gitignore` file then use `--cache`:
 
-  ```sh
+  ```shell
   git rm <filename> --cache
   ```

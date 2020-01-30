@@ -60,7 +60,7 @@ using your GitLab credentials.
 For example if the Registry's URL is `registry.example.com`, then you should be
 able to login with:
 
-```sh
+```shell
 docker login registry.example.com
 ```
 
@@ -68,7 +68,7 @@ Building and publishing images should be a straightforward process. Just make
 sure that you are using the Registry URL with the namespace and project name
 that is hosted on GitLab:
 
-```sh
+```shell
 docker build -t registry.example.com/group/project/image .
 docker push registry.example.com/group/project/image
 ```
@@ -94,7 +94,7 @@ registry.example.com/group/project/my/image:rc1
 To download and run a container from images hosted in GitLab Container Registry,
 use `docker run`:
 
-```sh
+```shell
 docker run [options] registry.example.com/group/project/image [arguments]
 ```
 
@@ -134,7 +134,7 @@ The minimal scope needed for both of them is `read_registry`.
 
 Example of using a token:
 
-```sh
+```shell
 docker login registry.example.com -u <username> -p <token>
 ```
 

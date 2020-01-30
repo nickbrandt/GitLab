@@ -68,7 +68,7 @@ installed before running `make`.
 
 To install on Debian or Ubuntu, run:
 
-```sh
+```shell
 sudo apt install libicu-dev
 ```
 
@@ -76,7 +76,7 @@ sudo apt install libicu-dev
 
 To install on CentOS or RHEL, run:
 
-```sh
+```shell
 sudo yum install libicu-devel
 ```
 
@@ -84,7 +84,7 @@ sudo yum install libicu-devel
 
 To install on macOS, run:
 
-```sh
+```shell
 brew install icu4c
 export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH"
 ```
@@ -93,7 +93,7 @@ export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 To build and install the indexer, run:
 
-```sh
+```shell
 indexer_path=/home/git/gitlab-elasticsearch-indexer
 
 # Run the installation task for gitlab-elasticsearch-indexer:
@@ -108,7 +108,7 @@ Please remember to pass the `-E` flag to `sudo` if you do so.
 
 Example:
 
-```sh
+```shell
 PREFIX=/usr sudo -E make install
 ```
 
@@ -184,7 +184,7 @@ To disable the Elasticsearch integration:
 1. Click **Save changes** for the changes to take effect.
 1. (Optional) Delete the existing index by running one of these commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:delete_index
 
@@ -206,7 +206,7 @@ To index via the Admin Area:
 1. [Configure your Elasticsearch host and port](#enabling-elasticsearch).
 1. Create empty indexes using one of the following commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:create_empty_index
 
@@ -219,7 +219,7 @@ To index via the Admin Area:
 1. Click **Check progress** in the confirmation message to see the status of the background jobs.
 1. Personal snippets need to be indexed manually by running one of these commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_snippets
 
@@ -241,7 +241,7 @@ If the database size is less than 500 MiB, and the size of all hosted repos is l
 1. [Enable **Elasticsearch indexing** and configure your host and port](#enabling-elasticsearch).
 1. Index your data using one of the following commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index
 
@@ -261,7 +261,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 1. [Configure your Elasticsearch host and port](#enabling-elasticsearch).
 1. Create empty indexes using one of the following commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:create_empty_index
 
@@ -284,7 +284,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 
 1. Index projects and their associated data:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_projects
 
@@ -296,7 +296,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    You can view the jobs in **Admin Area > Monitoring > Background Jobs > Queues Tab**
    and click `elastic_indexer`, or you can query indexing status using a rake task:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_projects_status
 
@@ -309,7 +309,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    If you want to limit the index to a range of projects you can provide the
    `ID_FROM` and `ID_TO` parameters:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_projects ID_FROM=1001 ID_TO=2000
 
@@ -331,7 +331,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
    it will check every project repository again to make sure that every commit in
    a repository is indexed, which can be useful in case if your index is outdated:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_projects UPDATE_INDEX=true ID_TO=1000
 
@@ -346,7 +346,7 @@ or creating [extra Sidekiq processes](../administration/operations/extra_sidekiq
 1. Personal snippets are not associated with a project and need to be indexed separately
    by running one of these commands:
 
-   ```sh
+   ```shell
    # Omnibus installations
    sudo gitlab-rake gitlab:elastic:index_snippets
 
@@ -437,7 +437,7 @@ In addition to the rake tasks, there are some environment variables that can be 
 
 Because the `ID_TO` and `ID_FROM` environment variables use the `or equal to` comparison, you can index only one project by using both these variables with the same project ID number:
 
-```sh
+```shell
 root@git:~# sudo gitlab-rake gitlab:elastic:index_projects ID_TO=5 ID_FROM=5
 Indexing project repositories...I, [2019-03-04T21:27:03.083410 #3384]  INFO -- : Indexing GitLab User / test (ID=33)...
 I, [2019-03-04T21:27:05.215266 #3384]  INFO -- : Indexing GitLab User / test (ID=33) is done!

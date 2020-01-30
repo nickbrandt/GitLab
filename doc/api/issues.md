@@ -1427,7 +1427,7 @@ GET /projects/:id/issues/:issue_id/related_merge_requests
 | `id`        | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user  |
 | `issue_iid` | integer | yes      | The internal ID of a project's issue |
 
-```sh
+```shell
 curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/issues/11/related_merge_requests
 ```
 

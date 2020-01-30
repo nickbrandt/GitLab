@@ -55,7 +55,7 @@ To start extra Sidekiq processes, you must enable `sidekiq-cluster`:
 
 1. Save the file and reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 
@@ -78,7 +78,7 @@ you list:
 
 1. Save the file and reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 
@@ -113,7 +113,7 @@ use all of its resources to perform those operations. To set up a separate
 
 1. Save the file and reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 
@@ -145,7 +145,7 @@ details.
 
 1. Save the file and reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 
@@ -162,7 +162,7 @@ This will set the concurrency (number of threads) for the Sidekiq process.
 
 1. Save the file and reconfigure GitLab for the changes to take effect:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl reconfigure
    ```
 

@@ -44,7 +44,7 @@ Follow [Git for enormous repositories](https://gitlab.com/groups/gitlab-org/-/ep
 To enable partial clone, use the [feature flags API](../../api/features.md).
 For example:
 
-```sh
+```shell
 curl --data "value=true" --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/features/gitaly_upload_pack_filter
 ```
 

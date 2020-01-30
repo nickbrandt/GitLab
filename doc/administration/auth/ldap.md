@@ -564,7 +564,7 @@ This example uses `ldapsearch` and assumes you are using ActiveDirectory. The
 following query returns the login names of the users that will be allowed to
 log in to GitLab if you configure your own user_filter.
 
-```sh
+```shell
 ldapsearch -H ldaps://$host:$port -D "$bind_dn" -y bind_dn_password.txt  -b "$base" "$user_filter" sAMAccountName
 ```
 

@@ -138,13 +138,13 @@ There are two ways to manually do the same thing as automatic uploading (describ
 
 **Option 1: rake task**
 
-```sh
+```shell
 rake gitlab:lfs:migrate
 ```
 
 **Option 2: rails console**
 
-```sh
+```shell
 $ sudo gitlab-rails console            # Login to rails console
 
 > # Upload LFS files manually

@@ -329,7 +329,7 @@ where a reader must replace text with their own value.
 
 For example:
 
-```sh
+```shell
 cp <your_source_directory> <your_destination_directory>
 ```
 
@@ -1273,7 +1273,7 @@ METHOD /endpoint
 
 Example request:
 
-```sh
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/endpoint?parameters'
 ```
 
