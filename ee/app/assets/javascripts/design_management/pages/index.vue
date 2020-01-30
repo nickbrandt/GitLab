@@ -11,7 +11,11 @@ import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.gra
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import { UPLOAD_DESIGN_ERROR, designDeletionError } from '../utils/error_messages';
+import {
+  UPLOAD_DESIGN_ERROR,
+  designUploadSkippedWarning,
+  designDeletionError,
+} from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
 import { designUploadOptimisticResponse } from '../utils/design_management_utils';
 import { DESIGNS_ROUTE_NAME } from '../router/constants';
@@ -133,7 +137,7 @@ export default {
 
       return this.$apollo
         .mutate(mutationPayload)
-        .then(() => this.onUploadDesignDone())
+        .then(res => this.onUploadDesignDone(res))
         .catch(() => this.onUploadDesignError());
     },
     afterUploadDesign(
@@ -144,9 +148,18 @@ export default {
     ) {
       updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
     },
-    onUploadDesignDone() {
+    onUploadDesignDone(res) {
+      const skippedFiles = res?.data?.designManagementUpload?.skippedDesigns || [];
+      const skippedWarningMessage = designUploadSkippedWarning(this.filesToBeSaved, skippedFiles);
+      if (skippedWarningMessage) {
+        createFlash(skippedWarningMessage, 'warning');
+      }
+
+      // if this upload resulted in a new version being created, redirect user to the latest version
+      if (!this.isLatestVersion) {
+        this.$router.push({ name: DESIGNS_ROUTE_NAME });
+      }
       this.resetFilesToBeSaved();
-      this.$router.push({ name: DESIGNS_ROUTE_NAME });
     },
     onUploadDesignError() {
       this.resetFilesToBeSaved();
