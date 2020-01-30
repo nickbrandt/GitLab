@@ -179,10 +179,7 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/maven/*path/:file_name/authorize', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
-        authorize_create_package!(user_project)
-
-        require_gitlab_workhorse!
-        Gitlab::Workhorse.verify_api_request!(headers)
+        authorize_upload!
 
         status 200
         content_type Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE
@@ -205,8 +202,7 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
-        authorize_create_package!(user_project)
-        require_gitlab_workhorse!
+        authorize_upload!
 
         file_name, format = extract_format(params[:file_name])
 

@@ -172,8 +172,8 @@ describe API::NugetPackages do
   end
 
   describe 'PUT /api/v4/projects/:id/packages/nuget' do
-    let_it_be(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
-    let_it_be(:workhorse_header) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
+    let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
+    let(:workhorse_header) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
     let_it_be(:file_name) { 'package.nupkg' }
     let(:url) { "/projects/#{project.id}/packages/nuget" }
     let(:headers) { {} }
