@@ -3,7 +3,7 @@
 module AuditEvents
   module AuditLogsParams
     def audit_logs_params
-      params.permit(:entity_type, :entity_id, :created_before, :created_after)
+      params.permit(:entity_type, :entity_id, :created_before, :created_after, :sort)
     end
   end
 end

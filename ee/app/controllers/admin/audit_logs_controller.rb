@@ -3,6 +3,7 @@
 class Admin::AuditLogsController < Admin::ApplicationController
   include AuditEvents::EnforcesValidDateParams
   include AuditEvents::AuditLogsParams
+  include AuditEvents::Sortable
 
   before_action :check_license_admin_audit_log_available!
 

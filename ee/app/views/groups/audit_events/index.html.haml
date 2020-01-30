@@ -4,4 +4,5 @@
 %p.light Events in #{@group.name}
 
 = render 'shared/audit_events/event_filter', path: group_audit_events_path(@group)
+= render 'shared/audit_events/event_sort'
 = render 'shared/audit_events/event_table', events: @events
