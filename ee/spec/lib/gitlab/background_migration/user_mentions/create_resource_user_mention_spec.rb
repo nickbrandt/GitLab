@@ -47,6 +47,10 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
                     title_html: "epic title  @#{author.username}", description: description_mentions)
     end
 
+    it 'has correct no_quote_columns' do
+      expect(Gitlab::BackgroundMigration::UserMentions::Models::Epic.no_quote_columns).to match([:note_id, :epic_id])
+    end
+
     it 'migrates mentions' do
       join = MigrateEpicMentionsToDb::JOIN
       conditions = MigrateEpicMentionsToDb::QUERY_CONDITIONS
