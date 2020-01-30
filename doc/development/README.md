@@ -191,6 +191,10 @@ Complementary reads:
 
 - [Shell scripting standards and style guidelines](shell_scripting_guide/index.md)
 
+## Domain-specific guides
+
+- [CI/CD development documentation](cicd/index.md)
+
 ## Other Development guides
 
 - [Defining relations between files using projections](projections.md)
