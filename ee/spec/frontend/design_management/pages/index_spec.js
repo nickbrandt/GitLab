@@ -71,8 +71,9 @@ describe('Design management index page', () => {
     allVersions = [],
     createDesign = true,
     stubs = {},
+    mockMutate = jest.fn().mockResolvedValue(),
   } = {}) {
-    mutate = jest.fn(() => Promise.resolve());
+    mutate = mockMutate;
     const $apollo = {
       queries: {
         designs: {
@@ -253,7 +254,7 @@ describe('Design management index page', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.filesToBeSaved).toEqual([]);
         expect(wrapper.vm.isSaving).toBeFalsy();
-        expect(wrapper.vm.$router.currentRoute.path).toEqual('/designs');
+        expect(wrapper.vm.isLatestVersion).toBe(true);
       });
     });
 
@@ -300,6 +301,29 @@ describe('Design management index page', () => {
         wrapper.vm.onUploadDesign(new Array(MAXIMUM_FILE_UPLOAD_LIMIT + 1).fill(mockDesigns[0]));
 
         expect(createFlash).toHaveBeenCalled();
+      });
+    });
+
+    it('flashes warning if designs are skipped', () => {
+      createComponent({
+        mockMutate: () =>
+          Promise.resolve({
+            data: { designManagementUpload: { skippedDesigns: [{ filename: 'test.jpg' }] } },
+          }),
+      });
+
+      const uploadDesign = wrapper.vm.onUploadDesign([
+        {
+          name: 'test',
+        },
+      ]);
+
+      return uploadDesign.then(() => {
+        expect(createFlash).toHaveBeenCalledTimes(1);
+        expect(createFlash).toHaveBeenCalledWith(
+          'Upload skipped. test.jpg did not change.',
+          'warning',
+        );
       });
     });
   });
