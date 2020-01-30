@@ -2,9 +2,9 @@
 
 exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is 0 renders "None" in the block 1`] = `"None"`;
 
-exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is greater than 0 it renders 1 1`] = `"1"`;
+exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is greater than 0 it renders 1 1`] = `"1 issue"`;
 
-exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is greater than 0 it renders 11 1`] = `"11"`;
+exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is greater than 0 it renders 11 1`] = `"11 issues"`;
 
 exports[`BoardSettingsSideBar when activeList is present when activeListWipLimit is greater than 0 when list type is "assignee" renders the correct list type text 1`] = `"Assignee"`;
 
