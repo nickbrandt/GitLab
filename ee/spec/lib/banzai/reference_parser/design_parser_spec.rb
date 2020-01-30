@@ -65,7 +65,7 @@ describe Banzai::ReferenceParser::DesignParser do
     it 'returns the correct designs' do
       frag = document([design, create(:design, :with_versions)])
 
-      expect(subject.process([frag])).to contain_exactly(design)
+      expect(subject.process([frag])[:visible]).to contain_exactly(design)
     end
   end
 
