@@ -11,7 +11,7 @@ module EE
 
           override :object_link_text_extras
           def object_link_text_extras(issue, matches)
-            super + design_link_extras(issue, matches.names.include?('path') && matches[:path])
+            super + design_link_extras(issue, matches.named_captures['path'])
           end
 
           private
