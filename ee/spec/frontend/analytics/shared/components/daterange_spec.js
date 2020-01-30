@@ -29,6 +29,8 @@ describe('Daterange component', () => {
 
   const findDaterangePicker = () => wrapper.find(GlDaterangePicker);
 
+  const findDateRangeIndicator = () => wrapper.find('.daterange-indicator');
+
   describe('template', () => {
     describe('when show is false', () => {
       it('does not render the daterange picker', () => {
@@ -65,6 +67,24 @@ describe('Daterange component', () => {
             },
           ]);
         });
+      });
+    });
+
+    describe('with a maxDateRange being set', () => {
+      beforeEach(() => {
+        factory({ maxDateRange: 30 });
+      });
+
+      it('displays the max date range indicator', () => {
+        expect(findDateRangeIndicator().exists()).toBe(true);
+      });
+
+      it('displays the correct number of selected days in the indicator', () => {
+        expect(
+          findDateRangeIndicator()
+            .find('span')
+            .text(),
+        ).toBe('10 days');
       });
     });
   });
