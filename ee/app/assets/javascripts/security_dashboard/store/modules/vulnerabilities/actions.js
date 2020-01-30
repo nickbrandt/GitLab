@@ -20,6 +20,8 @@ const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
 
 export const setPipelineId = ({ commit }, id) => commit(types.SET_PIPELINE_ID, id);
 
+export const setSourceBranch = ({ commit }, ref) => commit(types.SET_SOURCE_BRANCH, ref);
+
 export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_ENDPOINT, endpoint);
 };
@@ -375,12 +377,16 @@ export const downloadPatch = ({ state }) => {
   $('#modal-mrwidget-security-issue').modal('hide');
 };
 
-export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) => {
+export const createMergeRequest = ({ state, dispatch }, { vulnerability, flashError }) => {
   const {
     report_type,
     project_fingerprint,
     create_vulnerability_feedback_merge_request_path,
   } = vulnerability;
+
+  // The target branch for the MR is the source branch of the pipeline.
+  // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/23677#note_278221556
+  const targetBranch = state.sourceBranch;
 
   dispatch('requestCreateMergeRequest');
 
@@ -392,6 +398,7 @@ export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) 
         project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
+          target_branch: targetBranch,
           category: report_type,
         },
       },

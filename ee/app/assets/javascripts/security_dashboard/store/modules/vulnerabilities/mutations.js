@@ -10,6 +10,9 @@ export default {
   [types.SET_PIPELINE_ID](state, payload) {
     state.pipelineId = payload;
   },
+  [types.SET_SOURCE_BRANCH](state, payload) {
+    state.sourceBranch = payload;
+  },
   [types.SET_VULNERABILITIES_ENDPOINT](state, payload) {
     state.vulnerabilitiesEndpoint = payload;
   },

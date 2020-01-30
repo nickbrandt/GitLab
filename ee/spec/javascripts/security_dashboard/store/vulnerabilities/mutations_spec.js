@@ -21,6 +21,16 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('SET_SOURCE_BRANCH', () => {
+    const sourceBranch = 'feature-branch-1';
+
+    it(`should set the sourceBranch to ${sourceBranch}`, () => {
+      mutations[types.SET_SOURCE_BRANCH](state, sourceBranch);
+
+      expect(state.sourceBranch).toBe(sourceBranch);
+    });
+  });
+
   describe('SET_VULNERABILITIES_ENDPOINT', () => {
     it('should set `vulnerabilitiesEndpoint` to `fakepath.json`', () => {
       const endpoint = 'fakepath.json';
