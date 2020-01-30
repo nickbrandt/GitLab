@@ -4,18 +4,12 @@ class ServiceDeskEmailReceiverWorker < EmailReceiverWorker # rubocop:disable Sca
   include ApplicationWorker
 
   def perform(raw)
-    return unless service_desk_enabled?
+    return unless ::Gitlab::ServiceDeskEmail.enabled?
 
-    raise NotImplementedError
-  end
-
-  private
-
-  def service_desk_enabled?
-    !!config&.enabled && Feature.enabled?(:service_desk_email)
-  end
-
-  def config
-    @config ||= Gitlab.config.service_desk_email
+    begin
+      Gitlab::Email::ServiceDeskReceiver.new(raw).execute
+    rescue => e
+      handle_failure(raw, e)
+    end
   end
 end

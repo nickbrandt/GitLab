@@ -153,6 +153,44 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
           end
         end
       end
+
+      context 'when using service desk key' do
+        let_it_be(:service_desk_settings) { create(:service_desk_setting, project: project, project_key: 'mykey') }
+        let(:email_raw) { service_desk_fixture('emails/service_desk_custom_address.eml') }
+        let(:receiver) { Gitlab::Email::ServiceDeskReceiver.new(email_raw) }
+
+        before do
+          stub_service_desk_email_setting(enabled: true, address: 'support+%{key}@example.com')
+        end
+
+        it_behaves_like 'a new issue request'
+
+        context 'when there is no project with the key' do
+          let(:email_raw) { service_desk_fixture('emails/service_desk_custom_address.eml', key: 'some_key') }
+
+          it 'bounces the email' do
+            expect { receiver.execute }.to raise_error(Gitlab::Email::ProjectNotFound)
+          end
+        end
+
+        context 'when the project slug does not match' do
+          let(:email_raw) { service_desk_fixture('emails/service_desk_custom_address.eml', slug: 'some-slug') }
+
+          it 'bounces the email' do
+            expect { receiver.execute }.to raise_error(Gitlab::Email::ProjectNotFound)
+          end
+        end
+
+        context 'when service_desk_email feature is disabled' do
+          before do
+            stub_feature_flags(service_desk_email: false)
+          end
+
+          it 'bounces the email' do
+            expect { receiver.execute }.to raise_error(Gitlab::Email::ProjectNotFound)
+          end
+        end
+      end
     end
 
     describe '#can_handle?' do
@@ -265,5 +303,10 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
 
   def email_fixture(path, dir:)
     fixture_file(path, dir: dir).gsub('project_id', project.project_id.to_s)
+  end
+
+  def service_desk_fixture(path, slug: nil, key: 'mykey')
+    slug ||= project.full_path_slug.to_s
+    fixture_file(path, dir: 'ee').gsub('project_slug', slug).gsub('project_key', key)
   end
 end
