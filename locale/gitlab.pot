@@ -3188,6 +3188,12 @@ msgstr ""
 msgid "Certificate (PEM)"
 msgstr ""
 
+msgid "Certificate Issuer"
+msgstr ""
+
+msgid "Certificate Subject"
+msgstr ""
+
 msgid "Change assignee"
 msgstr ""
 
@@ -11124,6 +11130,9 @@ msgstr ""
 msgid "Learn more about the dependency list"
 msgstr ""
 
+msgid "Learn more about x509 signed commits"
+msgstr ""
+
 msgid "Learn more in the"
 msgstr ""
 
@@ -18165,6 +18174,9 @@ msgid "Subgroups"
 msgstr ""
 
 msgid "Subgroups and projects"
+msgstr ""
+
+msgid "Subject Key Identifier:"
 msgstr ""
 
 msgid "Subkeys"
