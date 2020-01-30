@@ -1,0 +1,5 @@
+---
+title: Fix DB connection pool size for Geo database
+merge_request: 24021
+author:
+type: fixed
