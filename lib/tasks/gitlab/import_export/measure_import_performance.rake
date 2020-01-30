@@ -14,14 +14,20 @@ namespace :gitlab do
       # Load it here to avoid polluting Rake tasks with Sidekiq test warnings
       require 'sidekiq/testing'
 
-      # TODO: do I need this?
-      # warn_user_is_not_gitlab
+      # make project name unique in case of any clean-up failures
+      project_name = "#{args.project_path}_#{Time.current.to_i}"
+      time = Benchmark.measure do
+        Rake::Task["gitlab:import_export:import"].invoke(args.username, args.namespace_path, project_name, args.archive_path)
+      end
 
-      # TODO: the flow;
-      # run
-      # measure
-      # cleanup
-      Rake::Task["gitlab:import_export:import"].invoke(args.username, args.namespace_path, args.project_path, args.archive_path)
+      puts "Import time: #{time}"
+
+      puts "Removing the project"
+      project = Project.find_by_full_path("#{args.namespace_path}/#{project_name}")
+      user = User.find_by_username(args.username)
+
+      ::Projects::DestroyService.new(project, user).execute
+      puts "Cleanup finished"
     end
   end
 end
