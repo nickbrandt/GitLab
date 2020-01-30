@@ -7,6 +7,8 @@ module Banzai
 
       Identifier = Struct.new(:issue_iid, :filename, keyword_init: true)
 
+      self.reference_type = :design
+
       # This filter must be enabled by setting the following flags:
       #  - design_management
       #  - design_management_reference_filter_gfm_pipeline

@@ -55,6 +55,7 @@ describe Banzai::Filter::DesignReferenceFilter do
       expect(link.attr('data-project')).to eq(project.id.to_s)
       expect(link.attr('data-issue')).to eq(issue.id.to_s)
       expect(link.attr('data-original')).to eq(reference)
+      expect(link.attr('data-reference-type')).to eq('design')
       expect(link.text).to eq(design.to_reference)
     end
   end
@@ -62,6 +63,18 @@ describe Banzai::Filter::DesignReferenceFilter do
   describe '.call' do
     it 'requires project context' do
       expect { described_class.call('') }.to raise_error(ArgumentError, /:project/)
+    end
+  end
+
+  describe 'support for redaction' do
+    before do
+      enable_design_management
+    end
+
+    it 'supports the reference redactor' do
+      res = reference_pipeline(redact: true).to_document(input_text)
+
+      expect(res.css('a').first).to be_present
     end
   end
 
