@@ -14,6 +14,8 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     let_it_be(:board) { create(:board, group: group, assignee: user, labels: [label]) }
     let_it_be(:note) { create(:note, noteable: epic) }
     let_it_be(:note_event) { create(:event, :created, target: note, author: user) }
+    let_it_be(:epic_emoji) { create(:award_emoji, awardable: epic) }
+    let_it_be(:epic_note_emoji) { create(:award_emoji, awardable: note) }
 
     let(:shared) { Gitlab::ImportExport::Shared.new(group) }
     let(:export_path) { "#{Dir.tmpdir}/group_tree_saver_spec_ee" }
@@ -81,6 +83,20 @@ describe Gitlab::ImportExport::GroupTreeSaver do
 
         notes = epic_json['notes']
         expect(notes.first['events'].first['action']).to eq(note_event.action)
+      end
+
+      it "saves epic's award emojis" do
+        expect_successful_save(group_tree_saver)
+
+        award_emoji = epic_json['award_emoji'].first
+        expect(award_emoji['name']).to eq(epic_emoji.name)
+      end
+
+      it "saves epic's note award emojis" do
+        expect_successful_save(group_tree_saver)
+
+        award_emoji = epic_json['notes'].first['award_emoji'].first
+        expect(award_emoji['name']).to eq(epic_note_emoji.name)
       end
     end
 
