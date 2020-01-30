@@ -6,7 +6,7 @@ import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
-import PackageTags from 'ee/packages/details/components/package_tags.vue';
+import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';

@@ -21,6 +21,7 @@ import {
 } from '../constants';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
+import PackageTags from '../../shared/components/package_tags.vue';
 
 export default {
   components: {
@@ -32,6 +33,7 @@ export default {
     TimeAgoTooltip,
     GlModal,
     Icon,
+    PackageTags,
   },
   mixins: [Tracking.mixin()],
   data() {
@@ -191,14 +193,19 @@ export default {
         stacked="md"
       >
         <template #cell(name)="{value, item}">
-          <div ref="col-name" class="flex-truncate-parent">
-            <a
-              :href="item._links.web_path"
-              class="flex-truncate-child"
-              data-qa-selector="package_link"
-            >
+          <div
+            class="flex-truncate-parent d-flex align-items-center justify-content-end justify-content-md-start"
+          >
+            <a :href="item._links.web_path" data-qa-selector="package_link">
               {{ value }}
             </a>
+            <package-tags
+              v-if="item.tags && item.tags.length"
+              class="prepend-left-8"
+              :tags="item.tags"
+              hide-label
+              :tag-display-limit="1"
+            />
           </div>
         </template>
 

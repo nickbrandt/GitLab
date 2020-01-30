@@ -15,7 +15,7 @@ import PackageInformation from './information.vue';
 import NpmInstallation from './npm_installation.vue';
 import MavenInstallation from './maven_installation.vue';
 import ConanInstallation from './conan_installation.vue';
-import PackageTags from './package_tags.vue';
+import PackageTags from '../../shared/components/package_tags.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
