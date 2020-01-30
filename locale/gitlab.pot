@@ -12604,6 +12604,9 @@ msgstr ""
 msgid "No public groups"
 msgstr ""
 
+msgid "No related merge requests found."
+msgstr ""
+
 msgid "No repository"
 msgstr ""
 
