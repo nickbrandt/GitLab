@@ -20,6 +20,10 @@ describe('system note component', () => {
     mock.onDelete('/path/to/diff/1').replyOnce(200);
   }
 
+  const findBlankBtn = () => wrapper.find('.note-headline-light .btn-blank');
+
+  const findDescriptionVersion = () => wrapper.find('.description-version');
+
   beforeEach(() => {
     props = {
       note: {
@@ -63,24 +67,24 @@ describe('system note component', () => {
   });
 
   it('should display button to toggle description diff, description version does not display', () => {
-    const button = wrapper.find('.note-headline-light .btn-blank');
+    const button = findBlankBtn();
     expect(button.exists()).toBe(true);
     expect(button.text()).toContain('Compare with previous version');
-    expect(wrapper.find('.description-version').exists()).toBe(false);
+    expect(findDescriptionVersion().exists()).toBe(false);
   });
 
   it('click on button to toggle description diff displays description diff with delete icon button', done => {
     mockFetchDiff();
-    expect(wrapper.find('.description-version').exists()).toBe(false);
+    expect(findDescriptionVersion().exists()).toBe(false);
 
-    const button = wrapper.find('.note-headline-light .btn-blank');
+    const button = findBlankBtn();
     button.trigger('click');
     return wrapper.vm
       .$nextTick()
       .then(() => waitForPromises())
       .then(() => {
-        expect(wrapper.find('.description-version').exists()).toBe(true);
-        expect(wrapper.find('.description-version').html()).toContain(diffData);
+        expect(findDescriptionVersion().exists()).toBe(true);
+        expect(findDescriptionVersion().html()).toContain(diffData);
         expect(
           wrapper
             .find('.description-version button.delete-description-history svg.ic-remove')
@@ -93,17 +97,18 @@ describe('system note component', () => {
   it('click on delete icon button deletes description diff', done => {
     mockFetchDiff();
     mockDeleteDiff();
-    wrapper.find('.note-headline-light .btn-blank').trigger('click');
+    const button = findBlankBtn();
+    button.trigger('click');
     return wrapper.vm
       .$nextTick()
       .then(() => waitForPromises())
       .then(() => {
-        const button = wrapper.find('.description-version button.delete-description-history');
-        button.trigger('click');
+        const deleteButton = wrapper.find({ ref: 'deleteDescriptionVersionButton' });
+        deleteButton.trigger('click');
       })
       .then(() => waitForPromises())
       .then(() => {
-        expect(wrapper.find('.description-version').text()).toContain('Deleted');
+        expect(findDescriptionVersion().text()).toContain('Deleted');
         done();
       });
   });

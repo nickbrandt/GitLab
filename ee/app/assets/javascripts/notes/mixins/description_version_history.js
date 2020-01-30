@@ -1,11 +1,7 @@
-import { s__ } from '~/locale';
-
 export default {
   data() {
     return {
-      isLoadingDescriptionVersion: false,
       isDescriptionVersionExpanded: false,
-      descriptionVersion: '',
     };
   },
   computed: {
@@ -34,22 +30,16 @@ export default {
         return false;
       }
 
-      this.isLoadingDescriptionVersion = true;
       const endpoint = this.note.description_diff_path;
       const startingVersion = this.note.start_description_version_id;
 
-      return this.fetchDescriptionVersion({ endpoint, startingVersion }).then(diff => {
-        this.isLoadingDescriptionVersion = false;
-        this.descriptionVersion = diff;
-      });
+      return this.fetchDescriptionVersion({ endpoint, startingVersion });
     },
     deleteDescriptionVersion() {
       const endpoint = this.note.delete_description_version_path;
       const startingVersion = this.note.start_description_version_id;
 
-      return this.softDeleteDescriptionVersion({ endpoint, startingVersion }).then(() => {
-        this.descriptionVersion = s__('Deleted');
-      });
+      return this.softDeleteDescriptionVersion({ endpoint, startingVersion });
     },
   },
 };

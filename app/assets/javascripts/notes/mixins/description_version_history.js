@@ -3,12 +3,12 @@
 export default {
   computed: {
     canSeeDescriptionVersion() {},
+    canDeleteDescriptionVersion() {},
     shouldShowDescriptionVersion() {},
     descriptionVersionToggleIcon() {},
   },
   methods: {
     toggleDescriptionVersion() {},
-    canDeleteDescriptionVersion() {},
     deleteDescriptionVersion() {},
   },
 };

@@ -322,10 +322,7 @@ $note-form-margin-left: 72px;
         pre {
           max-height: $dropdown-max-height-lg;
           white-space: pre-wrap;
-
-          &.loading-state {
-            height: 94px;
-          }
+          padding-right: 30px;
         }
       }
 
