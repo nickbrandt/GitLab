@@ -771,6 +771,9 @@ nicely on different mobile devices.
   To make things easier for the user, always add a full code block for things that can be
   useful to copy and paste, as they can easily do it with the button on code blocks.
 - Add a blank line above and below code blocks.
+- When providing a shell command and its output, prefix the shell command with `$` and
+  leave a blank line between the command and the output.
+- When providing a command without output, don't prefix the shell command with `$`.
 - For regular code blocks, always use a highlighting class corresponding to the
   language for better readability. Examples:
 
