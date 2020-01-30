@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlFormSelect, GlToggle } from '@gitlab/ui';
+import { GlButton, GlFormSelect, GlToggle, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
@@ -15,6 +15,7 @@ export default {
     GlButton,
     GlFormSelect,
     GlToggle,
+    GlLoadingIcon,
   },
   props: {
     isEnabled: {
@@ -112,7 +113,7 @@ export default {
           </div>
         </template>
         <template v-else>
-          <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+          <gl-loading-icon :inline="true" />
           <span class="sr-only">{{ __('Fetching incoming email') }}</span>
         </template>
 
