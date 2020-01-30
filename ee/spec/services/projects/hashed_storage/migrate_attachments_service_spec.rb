@@ -7,7 +7,7 @@ describe Projects::HashedStorage::MigrateAttachmentsService do
 
   let(:project) { create(:project, storage_version: 1) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
-  let(:hashed_storage) { Storage::HashedProject.new(project) }
+  let(:hashed_storage) { Storage::Hashed.new(project) }
   let(:old_attachments_path) { legacy_storage.disk_path }
   let(:new_attachments_path) { hashed_storage.disk_path }
 

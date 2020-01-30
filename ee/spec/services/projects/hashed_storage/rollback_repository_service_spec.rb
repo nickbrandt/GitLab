@@ -8,7 +8,7 @@ describe Projects::HashedStorage::RollbackRepositoryService, :clean_gitlab_redis
   let(:gitlab_shell) { Gitlab::Shell.new }
   let(:project) { create(:project, :repository, :wiki_repo, :design_repo, storage_version: ::Project::HASHED_STORAGE_FEATURES[:repository]) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
-  let(:hashed_storage) { Storage::HashedProject.new(project) }
+  let(:hashed_storage) { Storage::Hashed.new(project) }
   let(:old_disk_path) { hashed_storage.disk_path }
   let(:new_disk_path) { legacy_storage.disk_path }
 

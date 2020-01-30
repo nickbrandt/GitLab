@@ -119,7 +119,7 @@ FactoryBot.define do
     project { create(:project, :repository) }
 
     old_attachments_path { Storage::LegacyProject.new(project).disk_path }
-    new_attachments_path { Storage::HashedProject.new(project).disk_path }
+    new_attachments_path { Storage::Hashed.new(project).disk_path }
   end
 
   factory :geo_lfs_object_deleted_event, class: 'Geo::LfsObjectDeletedEvent' do
