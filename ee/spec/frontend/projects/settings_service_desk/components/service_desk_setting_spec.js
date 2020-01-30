@@ -1,4 +1,5 @@
 import { shallowMount, mount } from '@vue/test-utils';
+import { GlLoadingIcon } from '@gitlab/ui';
 import eventHub from 'ee/projects/settings_service_desk/event_hub';
 import ServiceDeskSetting from 'ee/projects/settings_service_desk/components/service_desk_setting.vue';
 
@@ -33,7 +34,7 @@ describe('ServiceDeskSetting', () => {
         });
 
         it('should see loading spinner and not the incoming email', () => {
-          expect(wrapper.contains('.fa-spinner')).toBe(true);
+          expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
           expect(wrapper.contains('.incoming-email')).toBe(false);
         });
       });
@@ -73,7 +74,7 @@ describe('ServiceDeskSetting', () => {
 
       it('should see email and not the loading spinner', () => {
         expect(wrapper.find('.incoming-email').element.value).toEqual(incomingEmail);
-        expect(wrapper.contains('.fa-spinner')).toBe(false);
+        expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
       });
 
       it('renders a copy to clipboard button', () => {
