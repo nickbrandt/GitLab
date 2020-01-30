@@ -10470,6 +10470,9 @@ msgstr ""
 msgid "Is blocked by"
 msgstr ""
 
+msgid "Is this GitLab trial for your company?"
+msgstr ""
+
 msgid "Is using license seat:"
 msgstr ""
 
