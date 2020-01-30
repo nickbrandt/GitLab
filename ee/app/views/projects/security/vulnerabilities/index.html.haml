@@ -29,7 +29,7 @@
             %td{ "aria-colindex" => "1", :role => "cell", "data-label" => s_("Vulnerability|Status") }
               .text-capitalize= vulnerability.state
             %td{ "aria-colindex" => "2", :role => "cell", "data-label" => s_("Vulnerability|Severity") }
-              %div.text-nowrap
+              .text-nowrap
                 - if vulnerability.severity === 'critical'
                   = sprite_icon("severity-critical", size: 12, css_class: "align-middle text-danger-800")
                 - elsif vulnerability.severity === 'high'
