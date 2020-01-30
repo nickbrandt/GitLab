@@ -89,3 +89,15 @@ shared_examples 'returns paginated packages' do
     end
   end
 end
+
+shared_examples 'package workhorse uploads' do
+  context 'without a workhorse header' do
+    let(:workhorse_token) { JWT.encode({ 'iss' => 'invalid header' }, Gitlab::Workhorse.secret, 'HS256') }
+
+    it 'rejects the request' do
+      subject
+
+      expect(response).to have_gitlab_http_status(403)
+    end
+  end
+end

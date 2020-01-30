@@ -93,6 +93,7 @@ describe Gitlab::UsageData do
         design_management_designs_delete
         user_preferences_group_overview_details
         user_preferences_group_overview_security_dashboard
+        template_repositories
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
