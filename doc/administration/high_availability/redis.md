@@ -978,7 +978,7 @@ To make sure your configuration is correct:
 
 1. To simulate a failover on master Redis, SSH into the Redis server and run:
 
-   ```bash
+   ```shell
    # port must match your master redis port, and the sleep time must be a few seconds bigger than defined one
     redis-cli -h localhost -p 6379 DEBUG sleep 20
    ```
