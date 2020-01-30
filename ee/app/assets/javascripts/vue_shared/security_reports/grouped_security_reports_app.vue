@@ -10,6 +10,7 @@ import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
 import { s__, sprintf } from '~/locale';
+import { mrStates } from '~/mr_popover/constants';
 
 export default {
   store: createStore(),
@@ -118,6 +119,11 @@ export default {
       required: false,
       default: 0,
     },
+    mrState: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   componentNames,
   computed: {
@@ -173,6 +179,9 @@ export default {
       return sprintf(
         s__('Security report is out of date. Retry the pipeline for the target branch.'),
       );
+    },
+    isMRActive() {
+      return this.mrState !== mrStates.merged && this.mrState !== mrStates.closed;
     },
   },
 
@@ -285,7 +294,11 @@ export default {
       </a>
     </div>
 
-    <div v-if="isBaseSecurityReportOutOfDate" slot="subHeading" class="text-secondary-700 text-1">
+    <div
+      v-if="isMRActive && isBaseSecurityReportOutOfDate"
+      slot="subHeading"
+      class="text-secondary-700 text-1"
+    >
       <span>{{ subHeadingText }}</span>
     </div>
 
