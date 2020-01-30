@@ -3,6 +3,7 @@ import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
 import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
+import { fetchPolicies } from '~/lib/graphql';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignDiscussion from '../../components/design_notes/design_discussion.vue';
@@ -70,7 +71,7 @@ export default {
     },
     design: {
       query: getDesignQuery,
-      fetchPolicy: 'network-only',
+      fetchPolicy: fetchPolicies.NETWORK_ONLY,
       variables() {
         return this.designVariables;
       },
@@ -215,7 +216,7 @@ export default {
           @done="$router.push({ name: $options.DESIGNS_ROUTE_NAME })"
           @error="onDesignDeleteError"
         >
-          <template v-slot="{ mutate, loading, error }">
+          <template v-slot="{ mutate, loading }">
             <toolbar
               :id="id"
               :is-deleting="loading"

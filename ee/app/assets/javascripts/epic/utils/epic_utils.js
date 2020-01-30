@@ -3,13 +3,18 @@ import Cookies from 'js-cookie';
 
 import { __, s__, sprintf } from '~/locale';
 
-import createGqClient from '~/lib/graphql';
+import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { dateInWords, parsePikadayDate } from '~/lib/utils/datetime_utility';
 
 import { dateTypes } from '../constants';
 
-const gqClient = createGqClient();
+const gqClient = createGqClient(
+  {},
+  {
+    fetchPolicy: fetchPolicies.NO_CACHE,
+  },
+);
 
 const triggerDocumentEvent = (eventName, eventParam) => {
   $(document).trigger(eventName, eventParam);

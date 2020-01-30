@@ -75,10 +75,7 @@ export const receiveItemsFailure = ({ commit }, data) => {
   flash(s__('Epics|Something went wrong while fetching child epics.'));
   commit(types.RECEIVE_ITEMS_FAILURE, data);
 };
-export const fetchItems = (
-  { dispatch },
-  { parentItem, isSubItem = false, fetchPolicy = 'cache-first' },
-) => {
+export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
   const { iid, fullPath } = parentItem;
 
   dispatch('requestItems', {
@@ -90,7 +87,6 @@ export const fetchItems = (
     .query({
       query: epicChildren,
       variables: { iid, fullPath },
-      fetchPolicy,
     })
     .then(({ data }) => {
       const children = processQueryResponse(data.group);
@@ -458,7 +454,6 @@ export const createNewIssue = ({ state, dispatch }, { issuesEndpoint, title }) =
     .then(() =>
       dispatch('fetchItems', {
         parentItem,
-        fetchPolicy: 'network-only',
       }),
     )
     .catch(e => {
