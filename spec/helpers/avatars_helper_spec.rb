@@ -22,6 +22,21 @@ describe AvatarsHelper do
       end
     end
 
+    shared_examples 'Gitaly exception handling' do
+      before do
+        allow(resource).to receive(:avatar_url).and_raise(error_class)
+      end
+
+      it 'handles Gitaly exception gracefully' do
+        expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
+          an_instance_of(error_class), source_type: 'Project', source_id: resource.id
+        )
+        expect { project_icon(resource) }.not_to raise_error
+      end
+
+      it_behaves_like 'resource with a default avatar', 'project'
+    end
+
     context 'when providing a project' do
       let(:helper_args) { [resource] }
       let(:resource) { create(:project, name: 'foo') }
@@ -33,33 +48,15 @@ describe AvatarsHelper do
       end
 
       context 'when Gitaly is unavailable' do
-        before do
-          allow(resource).to receive(:avatar_url).and_raise(GRPC::Unavailable)
-        end
+        let(:error_class) { GRPC::Unavailable }
 
-        it 'handles Gitaly unavailable exceptions gracefully' do
-          expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
-            an_instance_of(GRPC::Unavailable), source_type: 'Project', source_id: resource.id
-          )
-          expect { project_icon(resource) }.not_to raise_error
-        end
-
-        it_behaves_like 'resource with a default avatar', 'project'
+        include_examples 'Gitaly exception handling'
       end
 
       context 'when Gitaly request is taking too long' do
-        before do
-          allow(resource).to receive(:avatar_url).and_raise(GRPC::DeadlineExceeded)
-        end
+        let(:error_class) { GRPC::DeadlineExceeded }
 
-        it 'handles Gitaly timeout exceptions gracefully' do
-          expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
-            an_instance_of(GRPC::DeadlineExceeded), source_type: 'Project', source_id: resource.id
-          )
-          expect { project_icon(resource) }.not_to raise_error
-        end
-
-        it_behaves_like 'resource with a default avatar', 'project'
+        include_examples 'Gitaly exception handling'
       end
     end
 
