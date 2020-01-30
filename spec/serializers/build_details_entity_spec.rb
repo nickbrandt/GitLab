@@ -186,13 +186,8 @@ describe BuildDetailsEntity do
     end
 
     context 'when the build has archive type artifacts' do
+      let!(:build) { create(:ci_build, :artifacts, artifacts_expire_at: 7.days.from_now) }
       let!(:report) { create(:ci_job_artifact, :codequality, job: build) }
-      let!(:archive) { create(:ci_job_artifact, :archive, job: build) }
-      let!(:metadata) { create(:ci_job_artifact, :metadata, job: build) }
-
-      before do
-        build.update(artifacts_expire_at: 7.days.from_now)
-      end
 
       it 'exposes artifact details' do
         expect(subject[:artifact].keys).to include(:download_path, :browse_path, :keep_path, :expire_at, :expired)
