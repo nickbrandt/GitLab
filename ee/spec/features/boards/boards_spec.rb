@@ -204,14 +204,14 @@ describe 'issue boards', :js do
       end
 
       it 'shows the list settings button' do
-        expect(page).to have_selector(:button, "List Settings")
+        expect(page).to have_selector(:button, "List settings")
         expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
 
       context 'when settings button is clicked' do
         it 'shows the board list settings sidebar' do
           page.within(find(".board:nth-child(2)")) do
-            click_button('List Settings')
+            click_button('List settings')
           end
 
           expect(page.find('.js-board-settings-sidebar').find('.gl-label-text')).to have_text("Brount")
@@ -221,7 +221,31 @@ describe 'issue boards', :js do
       context 'when boards setting sidebar is open' do
         before do
           page.within(find(".board:nth-child(2)")) do
-            click_button('List Settings')
+            click_button('List settings')
+          end
+        end
+
+        context "when user clicks Remove Limit" do
+          before do
+            max_issue_count = 2
+            page.within(find('.js-board-settings-sidebar')) do
+              click_button("Edit")
+
+              find('input').set(max_issue_count)
+            end
+
+            # Off click
+            find('body').click
+
+            wait_for_requests
+          end
+
+          it "sets max issue count to zero" do
+            page.find('.js-remove-limit').click
+
+            wait_for_requests
+
+            expect(page.find('.js-wip-limit')).to have_text("None")
           end
         end
 
@@ -242,7 +266,7 @@ describe 'issue boards', :js do
             wait_for_requests
 
             page.within(find(".board:nth-child(2)")) do
-              click_button('List Settings')
+              click_button('List settings')
             end
 
             expect(page.find('.js-wip-limit')).to have_text(max_issue_count)
@@ -308,7 +332,7 @@ describe 'issue boards', :js do
       end
 
       it 'does not show the list settings button' do
-        expect(page).to have_no_selector(:button, "List Settings")
+        expect(page).to have_no_selector(:button, "List settings")
         expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
     end

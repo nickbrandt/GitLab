@@ -3,14 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import {
-  GlDrawer,
-  GlLabel,
-  GlButton,
-  GlFormInput,
-  GlAvatarLink,
-  GlAvatarLabeled,
-} from '@gitlab/ui';
+import { GlDrawer, GlLabel, GlFormInput, GlAvatarLink, GlAvatarLabeled } from '@gitlab/ui';
 import BoardSettingsSidebar from 'ee/boards/components/board_settings_sidebar.vue';
 import boardsStore from 'ee_else_ce/boards/stores/boards_store_ee';
 import getters from 'ee_else_ce/boards/stores/getters';
@@ -32,8 +25,9 @@ describe('BoardSettingsSideBar', () => {
   const labelTitle = 'test';
   const labelColor = '#FFFF';
   const listId = 1;
+  const currentWipLimit = 1; // Needs to be other than null to trigger requests.
 
-  const createComponent = (state = {}, actions = {}, localState = {}) => {
+  const createComponent = (state = { activeListId: 0 }, actions = {}, localState = {}) => {
     storeActions = actions;
 
     const store = new Vuex.Store({
@@ -88,23 +82,19 @@ describe('BoardSettingsSideBar', () => {
     });
 
     describe('on close', () => {
-      it('calls closeSidebar', done => {
+      it('calls closeSidebar', () => {
         const spy = jest.fn();
-        createComponent({}, { setActiveListId: spy });
+        createComponent({ activeListId: 0 }, { setActiveListId: spy });
 
         wrapper.find(GlDrawer).vm.$emit('close');
 
-        return wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(storeActions.setActiveListId).toHaveBeenCalledWith(
-              expect.anything(),
-              0,
-              undefined,
-            );
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(storeActions.setActiveListId).toHaveBeenCalledWith(
+            expect.anything(),
+            0,
+            undefined,
+          );
+        });
       });
     });
 
@@ -307,45 +297,80 @@ describe('BoardSettingsSideBar', () => {
         list_type: 'label',
       });
 
-      createComponent({ activeListId: listId });
+      createComponent({ activeListId: listId }, { updateListWipLimit: () => {} });
     });
 
-    it('renders an input', done => {
-      wrapper.find(GlButton).vm.$emit('click');
+    it('renders an input', () => {
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.find(GlFormInput).exists()).toBe(true);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlFormInput).exists()).toBe(true);
+      });
     });
 
-    it('does not render current wipLimit text', done => {
-      wrapper.find(GlButton).vm.$emit('click');
+    it('does not render current wipLimit text', () => {
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.find('.js-wip-limit').exists()).toBe(false);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find('.js-wip-limit').exists()).toBe(false);
+      });
     });
 
-    it('sets wipLimit to be the value of list.maxIssueCount', done => {
-      expect(wrapper.vm.currentWipLimit).toEqual(0);
+    it('sets wipLimit to be the value of list.maxIssueCount', () => {
+      expect(wrapper.vm.currentWipLimit).toEqual(null);
 
-      wrapper.find(GlButton).vm.$emit('click');
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.vm.currentWipLimit).toBe(4);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.vm.currentWipLimit).toBe(4);
+      });
+    });
+  });
+
+  describe('remove limit', () => {
+    describe('when wipLimit is set', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          max_issue_count: 4,
+          list_type: 'label',
+        });
+        const spy = jest.fn().mockResolvedValue({
+          config: { data: JSON.stringify({ list: { max_issue_count: 0 } }) },
+        });
+
+        createComponent({ activeListId: listId }, { updateListWipLimit: spy });
+      });
+
+      it('resets wipLimit to 0', () => {
+        expect(wrapper.vm.activeList.maxIssueCount).toEqual(4);
+
+        wrapper.find('.js-remove-limit').vm.$emit('click');
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.vm.activeList.maxIssueCount).toEqual(0);
+        });
+      });
+    });
+
+    describe('when wipLimit is not set', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          max_issue_count: 0,
+          list_type: 'label',
+        });
+
+        createComponent({ activeListId: listId }, { updateListWipLimit: () => {} });
+      });
+
+      it('does not render the remove limit button', () => {
+        expect(wrapper.find('.js-remove-limit').exists()).toBe(false);
+      });
     });
   });
 
@@ -374,9 +399,13 @@ describe('BoardSettingsSideBar', () => {
       describe(`when blur is triggered by ${blurMethod}`, () => {
         it('calls updateListWipLimit', () => {
           const spy = jest.fn().mockResolvedValue({
-            config: { data: JSON.stringify({ list: { max_issue_count: 'hello' } }) },
+            config: { data: JSON.stringify({ list: { max_issue_count: '4' } }) },
           });
-          createComponent({ activeListId: 1 }, { updateListWipLimit: spy }, { edit: true });
+          createComponent(
+            { activeListId: 1 },
+            { updateListWipLimit: spy },
+            { edit: true, currentWipLimit },
+          );
 
           triggerBlur(blurMethod);
 
@@ -387,11 +416,7 @@ describe('BoardSettingsSideBar', () => {
 
         describe('when component wipLimit and List.maxIssueCount are equal', () => {
           it('doesnt call updateListWipLimit', () => {
-            const spy = jest.fn(() =>
-              Promise.resolve({
-                config: { data: JSON.stringify({ list: { max_issue_count: 0 } }) },
-              }),
-            );
+            const spy = jest.fn().mockResolvedValue({});
             createComponent(
               { activeListId: 1 },
               { updateListWipLimit: spy },
@@ -406,16 +431,33 @@ describe('BoardSettingsSideBar', () => {
           });
         });
 
+        describe('when currentWipLimit is null', () => {
+          it('doesnt call updateListWipLimit', () => {
+            const spy = jest.fn().mockResolvedValue({});
+            createComponent(
+              { activeListId: 1 },
+              { updateListWipLimit: spy },
+              { edit: true, currentWipLimit: null },
+            );
+
+            triggerBlur(blurMethod);
+
+            return wrapper.vm.$nextTick().then(() => {
+              expect(spy).toHaveBeenCalledTimes(0);
+            });
+          });
+        });
+
         describe('when response is successful', () => {
           const maxIssueCount = 11;
 
           beforeEach(() => {
-            const spy = jest.fn(() =>
-              Promise.resolve({
-                config: { data: JSON.stringify({ list: { max_issue_count: maxIssueCount } }) },
-              }),
+            const spy = jest.fn().mockResolvedValue({});
+            createComponent(
+              { activeListId: 1 },
+              { updateListWipLimit: spy },
+              { edit: true, currentWipLimit: maxIssueCount },
             );
-            createComponent({ activeListId: 1 }, { updateListWipLimit: spy }, { edit: true });
 
             triggerBlur(blurMethod);
 
@@ -445,7 +487,7 @@ describe('BoardSettingsSideBar', () => {
             createComponent(
               { activeListId: 1 },
               { updateListWipLimit: spy, setActiveListId: () => {} },
-              { edit: true },
+              { edit: true, currentWipLimit },
             );
 
             triggerBlur(blurMethod);
