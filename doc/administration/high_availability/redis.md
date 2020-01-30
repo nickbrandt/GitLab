@@ -8,8 +8,10 @@ type: reference
 
 The following are the requirements for providing your own Redis instance:
 
-- Redis version 2.8 or higher. Version 3.2 or higher is recommend as this is
-  what ships with the GitLab Omnibus package.
+- GitLab 12.0 and later requires Redis version 3.2 or higher. Version 3.2 or higher is recommend as this is
+  what ships with the GitLab Omnibus package. Older Redis versions do not
+  support an optional count argument to SPOP which is now required for
+  [Merge Trains](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md).
 - Standalone Redis or Redis high availability with Sentinel are supported. Redis
   Cluster is not supported.
 - Managed Redis from cloud providers such as AWS Elasticache will work. If these
