@@ -69,7 +69,7 @@ describe API::ProjectApprovals do
           project.disable_overriding_approvers_per_merge_request = true
           project.merge_requests_author_approval = false
           project.merge_requests_disable_committers_approval = true
-          project.require_password_to_approve = true
+          project.require_password_to_approve = false
           project.save
 
           settings = {
