@@ -6,8 +6,8 @@ describe API::MavenPackages do
   let(:user)    { create(:user) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:personal_access_token) { create(:personal_access_token, user: user) }
-  let(:jwt_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
-  let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => jwt_token } }
+  let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
+  let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
   let(:job) { create(:ci_build, user: user) }
   let(:version) { '1.0-SNAPSHOT' }
@@ -26,14 +26,14 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file_xml.file_name + '.sha1')
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('text/plain')
         expect(response.body).to eq(package_file_xml.file_sha1)
       end
@@ -48,20 +48,20 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
       it 'denies download when no private token' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'allows download with job token' do
         download_file(package_file_xml.file_name, job_token: job.token)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
     end
@@ -74,7 +74,7 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
@@ -83,19 +83,19 @@ describe API::MavenPackages do
 
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'denies download when no private token' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'allows download with job token' do
         download_file(package_file_xml.file_name, job_token: job.token)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
     end
@@ -105,7 +105,7 @@ describe API::MavenPackages do
 
       download_file(package_file_xml.file_name)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'project name is different from a package name' do
@@ -114,7 +114,7 @@ describe API::MavenPackages do
       it 'rejects request' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -141,14 +141,14 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file_xml.file_name + '.sha1')
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('text/plain')
         expect(response.body).to eq(package_file_xml.file_sha1)
       end
@@ -163,20 +163,20 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
       it 'denies download when no private token' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'allows download with job token' do
         download_file(package_file_xml.file_name, job_token: job.token)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
     end
@@ -189,7 +189,7 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
@@ -198,19 +198,19 @@ describe API::MavenPackages do
 
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'denies download when no private token' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'allows download with job token' do
         download_file(package_file_xml.file_name, job_token: job.token)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
     end
@@ -220,7 +220,7 @@ describe API::MavenPackages do
 
       download_file(package_file_xml.file_name)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     def download_file(file_name, params = {}, request_headers = headers)
@@ -241,14 +241,14 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
       it 'returns sha1 of the file' do
         download_file(package_file_xml.file_name + '.sha1')
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('text/plain')
         expect(response.body).to eq(package_file_xml.file_sha1)
       end
@@ -262,7 +262,7 @@ describe API::MavenPackages do
       it 'returns the file' do
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
 
@@ -271,19 +271,19 @@ describe API::MavenPackages do
 
         download_file_with_token(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'denies download when no private token' do
         download_file(package_file_xml.file_name)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'allows download with job token' do
         download_file(package_file_xml.file_name, job_token: job.token)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.content_type.to_s).to eq('application/octet-stream')
       end
     end
@@ -293,7 +293,7 @@ describe API::MavenPackages do
 
       download_file(package_file_xml.file_name)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     def download_file(file_name, params = {}, request_headers = headers)
@@ -310,13 +310,13 @@ describe API::MavenPackages do
     it 'rejects a malicious request' do
       put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2F.ssh%2Fauthorized_keys/authorize"), params: {}, headers: headers_with_token
 
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
 
     it 'authorizes posting package with a valid token' do
       authorize_upload_with_token
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
       expect(json_response['TempPath']).not_to be_nil
     end
@@ -326,7 +326,7 @@ describe API::MavenPackages do
 
       authorize_upload_with_token
 
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
 
     it 'rejects request without a valid permission' do
@@ -334,7 +334,7 @@ describe API::MavenPackages do
 
       authorize_upload_with_token
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'rejects requests that did not go through gitlab-workhorse' do
@@ -342,13 +342,13 @@ describe API::MavenPackages do
 
       authorize_upload_with_token
 
-      expect(response).to have_gitlab_http_status(500)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'authorizes upload with job token' do
       authorize_upload(job_token: job.token)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     def authorize_upload(params = {}, request_headers = headers)
@@ -371,13 +371,13 @@ describe API::MavenPackages do
     it 'rejects requests without a file from workhorse' do
       upload_file_with_token
 
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
 
     it 'rejects request without a token' do
       upload_file
 
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
 
     it 'rejects request if feature is not in the license' do
@@ -385,7 +385,7 @@ describe API::MavenPackages do
 
       upload_file_with_token
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'when params from workhorse are correct' do
@@ -401,7 +401,13 @@ describe API::MavenPackages do
       it 'rejects a malicious request' do
         put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2f.ssh%2fauthorized_keys"), params: params, headers: headers_with_token
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
+      end
+
+      context 'without workhorse header' do
+        subject { upload_file_with_token(params) }
+
+        it_behaves_like 'package workhorse uploads'
       end
 
       it 'creates package and stores package file' do
@@ -409,14 +415,14 @@ describe API::MavenPackages do
           .and change { Packages::MavenMetadatum.count }.by(1)
           .and change { Packages::PackageFile.count }.by(1)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(package_file.file_name).to eq(file_upload.original_filename)
       end
 
       it 'allows upload with job token' do
         upload_file(params.merge(job_token: job.token))
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(package.build_info.pipeline).to eq job.pipeline
       end
 
@@ -426,7 +432,7 @@ describe API::MavenPackages do
         it 'rejects request' do
           expect { upload_file_with_token(params) }.not_to change { project.packages.count }
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message']).to include('Validation failed')
         end
       end

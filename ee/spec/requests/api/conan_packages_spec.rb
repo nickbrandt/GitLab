@@ -586,6 +586,8 @@ describe API::ConanPackages do
         context 'without a file from workhorse' do
           let(:params) { { file: nil } }
 
+          it_behaves_like 'package workhorse uploads'
+
           it 'rejects the request' do
             subject
 
@@ -710,7 +712,7 @@ describe API::ConanPackages do
 
         subject
 
-        expect(response).to have_gitlab_http_status(:error)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       context 'when using remote storage' do
