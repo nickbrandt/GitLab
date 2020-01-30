@@ -248,6 +248,8 @@ GEM
     doorkeeper-openid_connect (1.5.0)
       doorkeeper (~> 4.3)
       json-jwt (~> 1.6)
+    down (5.1.0)
+      addressable (~> 2.5)
     ed25519 (1.2.4)
     elasticsearch (6.8.0)
       elasticsearch-api (= 6.8.0)
@@ -1199,6 +1201,7 @@ DEPENDENCIES
   discordrb-webhooks-blackst0ne (~> 3.3)
   doorkeeper (~> 4.4.3)
   doorkeeper-openid_connect (~> 1.5)
+  down
   ed25519 (~> 1.2)
   elasticsearch-api (~> 6.8)
   elasticsearch-model (~> 6.1)

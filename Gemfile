@@ -321,6 +321,9 @@ gem 'snowplow-tracker', '~> 0.6.1'
 # Memory benchmarks
 gem 'derailed_benchmarks', require: false
 
+# File downloads
+gem 'down', require: false
+
 # Metrics
 group :metrics do
   gem 'method_source', '~> 0.8', require: false

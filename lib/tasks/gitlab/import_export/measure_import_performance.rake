@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'down/http'
 # Import a test project (`gitlabhq`) and measure the time it takes to complete
 #
 # It uses gitlab:import_export:import task for the actual import
@@ -14,10 +15,20 @@ namespace :gitlab do
       # Load it here to avoid polluting Rake tasks with Sidekiq test warnings
       require 'sidekiq/testing'
 
+      # Check that the tarball file is valid
+      if args.archive_path.match?(URI.regexp(%w[http https ftp]))
+        puts "Tarball is remote, downloading..."
+        proj_file = Down::Http.download(args.archive_path)
+      else
+        proj_file = args.archive_path
+      end
+      raise Errno::ENOENT unless File.exist?(proj_file)
+
       # make project name unique in case of any clean-up failures
       project_name = "#{args.project_path}_#{Time.current.to_i}"
+
       time = Benchmark.measure do
-        Rake::Task["gitlab:import_export:import"].invoke(args.username, args.namespace_path, project_name, args.archive_path)
+        Rake::Task["gitlab:import_export:import"].invoke(args.username, args.namespace_path, project_name, proj_file)
       end
 
       puts "Import time: #{time}"
