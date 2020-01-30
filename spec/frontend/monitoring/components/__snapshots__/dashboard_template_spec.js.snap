@@ -3,6 +3,7 @@
 exports[`Dashboard template matches the default snapshot 1`] = `
 <div
   class="prometheus-graphs"
+  data-qa-selector="prometheus_graphs"
 >
   <div
     class="prometheus-graphs-header gl-p-3 pb-0 border-bottom bg-gray-light"
