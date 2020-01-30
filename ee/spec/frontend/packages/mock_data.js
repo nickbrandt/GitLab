@@ -77,8 +77,6 @@ export const conanPackage = {
   _links,
 };
 
-export const packageList = [mavenPackage, npmPackage, conanPackage];
-
 export const mockTags = [
   {
     name: 'foo-1',
@@ -93,6 +91,8 @@ export const mockTags = [
     name: 'foo-4',
   },
 ];
+
+export const packageList = [mavenPackage, { ...npmPackage, tags: mockTags }, conanPackage];
 
 export const mockPipelineInfo = {
   id: 1,

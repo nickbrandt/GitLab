@@ -916,6 +916,7 @@ module EE
         expose :project_id, if: ->(_, opts) { opts[:group] }
         expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
         expose :build_info, using: BuildInfo
+        expose :tags
 
         private
 

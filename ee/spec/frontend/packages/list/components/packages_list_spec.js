@@ -3,6 +3,7 @@ import _ from 'underscore';
 import Tracking from '~/tracking';
 import { mount } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
+import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import stubChildren from 'helpers/stub_children';
@@ -18,6 +19,7 @@ describe('packages_list', () => {
   const findPackageListDeleteModal = () => wrapper.find({ ref: 'packageListDeleteModal' });
   const findSortingItems = () => wrapper.findAll({ name: 'sorting-item-stub' });
   const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
+  const findPackageTags = () => wrapper.findAll(PackageTags);
 
   const mountOptions = {
     stubs: {
@@ -83,9 +85,14 @@ describe('packages_list', () => {
     const sorting = findPackageListPagination();
     expect(sorting.exists()).toBe(true);
   });
+
   it('contains a modal component', () => {
     const sorting = findPackageListDeleteModal();
     expect(sorting.exists()).toBe(true);
+  });
+
+  it('renders package tags when a package has tags', () => {
+    expect(findPackageTags()).toHaveLength(1);
   });
 
   describe('when the user can destroy the package', () => {
