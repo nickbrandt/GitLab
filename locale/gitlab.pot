@@ -6011,6 +6011,9 @@ msgstr ""
 msgid "Default project deletion protection"
 msgstr ""
 
+msgid "Default projects limit"
+msgstr ""
+
 msgid "Default: Directly import the Google Code email address or username"
 msgstr ""
 
@@ -11565,6 +11568,9 @@ msgstr ""
 msgid "Maximum delay (Minutes)"
 msgstr ""
 
+msgid "Maximum duration of a session."
+msgstr ""
+
 msgid "Maximum job timeout"
 msgstr ""
 
@@ -11583,10 +11589,22 @@ msgstr ""
 msgid "Maximum number of mirrors that can be synchronizing at the same time."
 msgstr ""
 
+msgid "Maximum number of projects."
+msgstr ""
+
 msgid "Maximum page reached"
 msgstr ""
 
 msgid "Maximum push size (MB)"
+msgstr ""
+
+msgid "Maximum size limit for a single commit."
+msgstr ""
+
+msgid "Maximum size limit for each repository."
+msgstr ""
+
+msgid "Maximum size of individual attachments in comments."
 msgstr ""
 
 msgid "Maximum time between updates that a mirror can have when scheduled to synchronize."
@@ -16949,9 +16967,6 @@ msgstr ""
 msgid "Session duration (minutes)"
 msgstr ""
 
-msgid "Session expiration, projects limit and attachment size."
-msgstr ""
-
 msgid "Set %{epic_ref} as the parent epic."
 msgstr ""
 
@@ -16989,6 +17004,9 @@ msgid "Set notification email for abuse reports."
 msgstr ""
 
 msgid "Set parent epic to an epic"
+msgstr ""
+
+msgid "Set projects and maximum size limits, session duration, user options, and check feature availability for namespace plan."
 msgstr ""
 
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
