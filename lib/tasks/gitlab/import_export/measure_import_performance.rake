@@ -24,6 +24,7 @@ namespace :gitlab do
         else
           proj_file = args.archive_path
         end
+
         raise Errno::ENOENT unless File.exist?(proj_file)
 
         # make project name unique in case of any clean-up failures
@@ -35,13 +36,12 @@ namespace :gitlab do
 
         puts "Import time: #{time}"
 
-
         puts "Removing the project"
         project = Project.find_by_full_path("#{args.namespace_path}/#{project_name}")
         user = User.find_by_username(args.username)
 
         ::Projects::DestroyService.new(project, user).execute
-      ensure 
+      ensure
         if proj_file.is_a?(Tempfile)
           proj_file.close
           proj_file.unlink
