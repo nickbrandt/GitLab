@@ -7,11 +7,18 @@ module EE
         module ServiceSelector
           extend ActiveSupport::Concern
 
-          class_methods do
-            def call(params)
-              return ::Metrics::Dashboard::ClusterDashboardService if params[:cluster]
+          EE_SERVICES = [
+            ::Metrics::Dashboard::ClusterDashboardService
+          ].freeze
 
-              super
+          class_methods do
+            extend ::Gitlab::Utils::Override
+
+            private
+
+            override :services
+            def services
+              EE_SERVICES + super
             end
           end
         end
