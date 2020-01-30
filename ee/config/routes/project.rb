@@ -165,7 +165,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       namespace :security do
-        resources :dashboard, only: [:show, :index], controller: :dashboard
+        resources :dashboard, only: [:index], controller: :dashboard
         resource :configuration, only: [:show], controller: :configuration
         resource :discover, only: [:show], controller: :discover
 
@@ -175,7 +175,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :vulnerabilities, only: [:index], controller: :vulnerabilities
+        resources :vulnerabilities, only: [:show, :index], controller: :vulnerabilities
       end
 
       resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
