@@ -1,0 +1,5 @@
+---
+title: Add health_status column to issues and epics tables
+merge_request: 24202
+author:
+type: added

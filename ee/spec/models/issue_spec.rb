@@ -572,4 +572,6 @@ describe Issue do
       it { is_expected.to eq(expected) }
     end
   end
+
+  it_behaves_like 'having health status'
 end
