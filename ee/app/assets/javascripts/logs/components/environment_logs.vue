@@ -52,11 +52,9 @@ export default {
 
     timeRangeModel: {
       get() {
-        console.log('Getting range model:', this.timeRange.current);
         return this.timeRange.current;
       },
       set(val) {
-        console.log('Setting range model:', val);
         this.setTimeRange(val);
       },
     },

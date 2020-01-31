@@ -8,8 +8,13 @@ import { convertToFixedRange } from '~/lib/utils/datetime_range';
 
 import * as types from './mutation_types';
 
-// import { getTimeRange } from '../utils';
-// import { timeWindows } from '../constants';
+const flashTimeRangeWarning = () => {
+  flash(s__('Metrics|Invalid time range, please verify.'), 'warning');
+};
+
+const flashLogsError = () => {
+  flash(s__('Metrics|There was an error fetching the logs, please try again'));
+};
 
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
@@ -75,10 +80,13 @@ export const fetchLogs = ({ commit, state }) => {
   };
 
   if (state.timeRange.current) {
-    const { startTime, endTime } = convertToFixedRange(state.timeRange.current);
-
-    params.start = startTime;
-    params.end = endTime;
+    try {
+      const { start, end } = convertToFixedRange(state.timeRange.current);
+      params.start = start;
+      params.end = end;
+    } catch {
+      flashTimeRangeWarning();
+    }
   }
 
   commit(types.REQUEST_PODS_DATA);
@@ -95,7 +103,7 @@ export const fetchLogs = ({ commit, state }) => {
     .catch(() => {
       commit(types.RECEIVE_PODS_DATA_ERROR);
       commit(types.RECEIVE_LOGS_DATA_ERROR);
-      flash(s__('Metrics|There was an error fetching the logs, please try again'));
+      flashLogsError();
     });
 };
 
