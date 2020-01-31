@@ -16,5 +16,6 @@ mutation uploadDesign($files: [Upload!]!, $projectPath: ID!, $iid: ID!) {
     skippedDesigns {
       filename
     }
+    errors
   }
 }
