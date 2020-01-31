@@ -10,7 +10,15 @@ import MavenInstallation from 'ee/packages/details/components/maven_installation
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
-import { conanPackage, mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
+import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
+import {
+  conanPackage,
+  mavenPackage,
+  mavenFiles,
+  npmPackage,
+  npmFiles,
+  nugetPackage,
+} from '../../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -29,6 +37,8 @@ describe('PackagesApp', () => {
     mavenHelpPath: 'foo',
     conanPath: 'foo',
     conanHelpPath: 'foo',
+    nugetPath: 'foo',
+    nugetHelpPath: 'foo',
   };
 
   function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
@@ -64,6 +74,7 @@ describe('PackagesApp', () => {
   const npmInstallation = () => wrapper.find(NpmInstallation);
   const mavenInstallation = () => wrapper.find(MavenInstallation);
   const conanInstallation = () => wrapper.find(ConanInstallation);
+  const nugetInstallation = () => wrapper.find(NugetInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -198,5 +209,13 @@ describe('PackagesApp', () => {
     });
 
     expect(conanInstallation()).toExist();
+  });
+
+  it('renders package installation instructions for nuget packages', () => {
+    createComponent({
+      packageEntity: nugetPackage,
+    });
+
+    expect(nugetInstallation()).toExist();
   });
 });

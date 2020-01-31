@@ -35,11 +35,9 @@ export default {
   },
   computed: {
     nugetCommand() {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       return `nuget install ${this.packageEntity.name} -Source "GitLab"`;
     },
     setupCommand() {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       return `nuget source Add -Name "GitLab" -Source "${this.registryUrl}" -UserName <your_username> -Password <your_token>`;
     },
     helpText() {
