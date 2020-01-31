@@ -3,7 +3,7 @@
 class FixProjectsWithoutProjectFeature < ActiveRecord::Migration[5.2]
   include Gitlab::Database::MigrationHelpers
 
-  BATCH_SIZE = 100_000
+  BATCH_SIZE = 50_000
 
   disable_ddl_transaction!
 

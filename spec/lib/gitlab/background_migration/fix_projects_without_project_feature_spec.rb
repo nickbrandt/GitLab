@@ -25,8 +25,28 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
     ActiveRecord::Base.connection.select_one('SELECT MIN(id), MAX(id) FROM projects').values
   end
 
-  it 'creates a default ProjectFeature for projects without it' do
+  it 'creates a ProjectFeature for projects without it' do
     expect { subject }.to change { project_feature_records }.from([project.id]).to([project.id, *projects_without_feature.map(&:id)])
+  end
+
+  it 'creates ProjectFeature records with default values' do
+    subject
+
+    project_id = projects_without_feature.first.id
+    record = ActiveRecord::Base.connection.select_one('SELECT * FROM project_features WHERE id=$1', nil, [[nil, project_id]])
+
+    expect(record.except('id', 'project_id', 'created_at', 'updated_at')).to eq(
+      {
+        "merge_requests_access_level" => 20,
+        "issues_access_level" => 20,
+        "wiki_access_level" => 20,
+        "snippets_access_level" => 20,
+        "builds_access_level" => 20,
+        "repository_access_level" => 20,
+        "pages_access_level" => 20,
+        "forking_access_level" => 20
+      }
+    )
   end
 
   it 'sets created_at/updated_at timestamps' do
