@@ -107,6 +107,17 @@ class Gitlab::Seeder::Packages
       # when using ::Packages::Nuget::CreatePackageService, packages have a fixed name and a fixed version.
       pkg.update!(name: name, version: version)
 
+      filename = 'package.nupkg'
+      with_cloned_fixture_file('nuget', filename) do |filepath|
+        file_params = {
+          file: UploadedFile.new(filepath, filename: filename),
+          file_name: filename,
+          file_sha1: '1234567890',
+          size: 100.kilobytes
+        }
+        ::Packages::CreatePackageFileService.new(pkg, file_params).execute
+      end
+
       print '.'
     end
   end
