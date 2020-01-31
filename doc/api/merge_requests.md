@@ -61,6 +61,7 @@ Parameters:
 | `search`                        | string         | no       | Search merge requests against their `title` and `description`                                                          |
 | `in`                            | string         | no       | Modify the scope of the `search` attribute. `title`, `description`, or a string joining them with comma. Default is `title,description` |
 | `wip`                           | string         | no       | Filter merge requests against their `wip` status. `yes` to return *only* WIP merge requests, `no` to return *non* WIP merge requests |
+| `not`                           | Hash           | no       | Return issues that do not match the parameters supplied. Accepts: `labels`, `milestone`, `author_id`, `author_username`, `assignee_id`, `assignee_ids`, `assignee_username`, `my_reaction_emoji`, `search`, `in` |
 
 NOTE: **Note:**
 [Starting in GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/29984),
@@ -239,6 +240,7 @@ Parameters:
 | `target_branch`                 | string         | no       | Return merge requests with the given target branch                                                                             |
 | `search`                        | string         | no       | Search merge requests against their `title` and `description`                                                                  |
 | `wip`                           | string         | no       | Filter merge requests against their `wip` status. `yes` to return *only* WIP merge requests, `no` to return *non* WIP merge requests |
+| `not`                           | Hash           | no       | Return issues that do not match the parameters supplied. Accepts: `labels`, `milestone`, `author_id`, `author_username`, `assignee_id`, `assignee_username`, `my_reaction_emoji`, `search`, `in` |
 
 ```json
 [
@@ -401,6 +403,7 @@ Parameters:
 | `target_branch`                 | string         | no       | Return merge requests with the given target branch                                                                             |
 | `search`                        | string         | no       | Search merge requests against their `title` and `description` |
 | `non_archived`                  | boolean        | no       | Return merge requests from non archived projects only. Default is true. _(Introduced in [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/23809))_  |
+| `not`                           | Hash           | no       | Return issues that do not match the parameters supplied. Accepts: `labels`, `milestone`, `author_id`, `author_username`, `assignee_id`, `assignee_username`, `my_reaction_emoji`, `search`, `in` |
 
 ```json
 [

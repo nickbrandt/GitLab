@@ -73,7 +73,7 @@ class IssuableFinder
 
     # This should not be used in controller strong params!
     def negatable_array_params
-      @negatable_array_params ||= array_params.keys.append(:iids)
+      @negatable_array_params ||= array_params.keys.append(:iids, :assignee_ids)
     end
 
     # This should not be used in controller strong params!

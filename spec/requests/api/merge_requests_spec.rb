@@ -425,6 +425,107 @@ describe API::MergeRequests do
           )
         end
       end
+
+      context 'NOT params' do
+        let(:merge_request2) { create(:merge_request, :simple, milestone: milestone, author: user, assignees: [user], merge_request_context_commits: [merge_request_context_commit], source_project: project, target_project: project, source_branch: 'what', title: "What", created_at: base_time) }
+
+        before do
+          create(:label_link, label: label, target: merge_request)
+          create(:label_link, label: label2, target: merge_request2)
+        end
+
+        it 'returns merge requests without any of the labels given' do
+          get api(endpoint_path, user), params: { not: { labels: ["#{label.title}, #{label2.title}"] } }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.length).to eq(3)
+          json_response.each do |mr|
+            expect(mr['labels']).not_to include(label2.title, label.title)
+          end
+        end
+
+        it 'returns merge requests without any of the milestones given' do
+          get api(endpoint_path, user), params: { not: { milestone: milestone.title } }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.length).to eq(4)
+          json_response.each do |mr|
+            expect(mr['milestone']).not_to eq(milestone.title)
+          end
+        end
+
+        it 'returns merge requests without the author given' do
+          get api(endpoint_path, user), params: { not: { author_id: user2.id } }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.length).to eq(5)
+          json_response.each do |mr|
+            expect(mr['author']['id']).not_to eq(user2.id)
+          end
+        end
+
+        it 'returns merge requests without the assignee given' do
+          get api(endpoint_path, user), params: { not: { assignee_id: user2.id } }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.length).to eq(5)
+          json_response.each do |mr|
+            expect(mr['assignee']['id']).not_to eq(user2.id)
+          end
+        end
+
+        it 'returns merge requests without any of the assignees given' do
+          get api(endpoint_path, user), params: { not: { assignee_ids: [user.id, user2.id] } }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.length).to eq(0)
+        end
+
+        context 'search and in params' do
+          let(:search_string) { 'test' }
+
+          it 'returns merge requests without search string in either title or description' do
+            get api(endpoint_path, user), params: { not: { search: search_string, in: 'title, description' } }
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Array)
+            expect(json_response.length).to eq(1)
+            json_response.each do |mr|
+              expect(mr['title']).not_to eq(search_string)
+              expect(mr['description']).not_to eq(search_string)
+            end
+          end
+
+          it 'returns merge requests without search string in title' do
+            get api(endpoint_path, user), params: { not: { search: search_string, in: 'title' } }
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Array)
+            expect(json_response.length).to eq(1)
+            json_response.each do |mr|
+              expect(mr['title']).not_to eq(search_string)
+            end
+          end
+
+          it 'returns merge requests without search string in description' do
+            merge_request2.update(description: 'test')
+
+            get api(endpoint_path, user), params: { not: { search: search_string, in: 'description' } }
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Array)
+            expect(json_response.length).to eq(4)
+            json_response.each do |mr|
+              expect(mr['description']).not_to eq(search_string)
+            end
+          end
+        end
+      end
     end
   end
 

@@ -45,11 +45,17 @@ RSpec.shared_context 'MergeRequestsFinder multiple projects with merge requests 
     allow_gitaly_n_plus_1 { create(:project, group: subgroup) }
   end
 
+  set(:label) { create(:label, project: project1) }
+  set(:label2) { create(:label, project: project1) }
+
   let!(:merge_request1) { create(:merge_request, assignees: [user], author: user, source_project: project2, target_project: project1, target_branch: 'merged-target') }
   let!(:merge_request2) { create(:merge_request, :conflict, assignees: [user], author: user, source_project: project2, target_project: project1, state: 'closed') }
   let!(:merge_request3) { create(:merge_request, :simple, author: user, assignees: [user2], source_project: project2, target_project: project2, state: 'locked', title: 'thing WIP thing') }
   let!(:merge_request4) { create(:merge_request, :simple, author: user, source_project: project3, target_project: project3, title: 'WIP thing') }
   let!(:merge_request5) { create(:merge_request, :simple, author: user, source_project: project4, target_project: project4, title: '[WIP]') }
+
+  let!(:label_link) { create(:label_link, label: label, target: merge_request2) }
+  let!(:label_link2) { create(:label_link, label: label2, target: merge_request3) }
 
   before do
     project1.add_maintainer(user)
