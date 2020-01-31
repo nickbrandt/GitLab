@@ -329,6 +329,33 @@ Note the following properties:
 
 ![anomaly panel type](img/prometheus_dashboard_anomaly_panel_type.png)
 
+#### Column
+
+To add a column panel type to a dashboard, look at the following sample dashboard file:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group title'
+    panels:
+      - title: "Column"
+        type: "column"
+        metrics:
+        - id: 1024_memory
+          query: 'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-([^c].*|c([^a]|a([^n]|n([^a]|a([^r]|r[^y])))).*|)-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job) / count(avg(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-([^c].*|c([^a]|a([^n]|n([^a]|a([^r]|r[^y])))).*|)-(.*)",namespace="%{kube_namespace}"}) without (job)) /1024/1024'
+          unit: MB
+          label: "Memory Usage"
+```
+
+Note the following properties:
+
+| Property | Type | Required | Description |
+| ------ | ------ | ------ | ------ |
+| type | string | yes | Type of panel to be rendered. For column panel types, set to `column` |
+| query_range | yes | yes | For column panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
+
+![anomaly panel type](img/prometheus_dashboard_column_panel_type.png)
+
 ##### Single Stat
 
 To add a single stat panel type to a dashboard, look at the following sample dashboard file:
