@@ -111,7 +111,7 @@ describe HelpController do
         it 'renders the raw file' do
           get :show,
               params: {
-                path: 'integration/img/gitlab_app'
+                path: 'fixtures/gitlab_tanuki'
               },
               format: :png
           expect(response).to be_successful
