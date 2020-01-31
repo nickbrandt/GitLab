@@ -87,6 +87,12 @@ class DeployToken < ApplicationRecord
     end
   end
 
+  def holder
+    strong_memoize(:holder) do
+      project_deploy_tokens.first || group_deploy_tokens.first
+    end
+  end
+
   def expires_at
     expires_at = read_attribute(:expires_at)
     expires_at != Forever.date ? expires_at : nil
