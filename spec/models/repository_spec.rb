@@ -537,12 +537,16 @@ describe Repository do
       it { is_expected.to eq(already_merged) }
 
       describe "cache values" do
-        after do
+        it "writes the values to redis" do
+          expect(cache).to receive(:write).with(cache_key, merge_state_hash.to_json, expires_in: 10.minutes)
+
           subject
         end
 
-        it "writes the values to redis" do
-          expect(cache).to receive(:write).with(cache_key, merge_state_hash.to_json, expires_in: 10.minutes)
+        it "matches the supplied hash" do
+          subject
+
+          expect(JSON.parse(cache.read(cache_key))).to eq(merge_state_hash)
         end
       end
     end

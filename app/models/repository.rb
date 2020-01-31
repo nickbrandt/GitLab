@@ -915,38 +915,37 @@ class Repository
   end
 
   def merged_branch_names(branch_names = [])
-    if branch_names.empty? || Feature.disabled?(:merged_branch_names_redis_caching)
-      # Currently we should skip caching if requesting all branch names
-      # This is only used in a few places, notably app/services/branches/delete_merged_service.rb,
-      # and it could potentially result in a very large cache/performance issues with the current
-      # implementation.
-      raw_repository.merged_branch_names(branch_names)
-    else
-      cached_branch_names = cache.read(:merged_branch_names)
-      merged_branch_names_hash = cached_branch_names.present? ? JSON.parse(cached_branch_names) : {}
-      missing_branch_names = branch_names.select { |bn| !merged_branch_names_hash.key?(bn) }
+    # Currently we should skip caching if requesting all branch names
+    # This is only used in a few places, notably app/services/branches/delete_merged_service.rb,
+    # and it could potentially result in a very large cache/performance issues with the current
+    # implementation.
+    skip_cache = branch_names.empty? || Feature.disabled?(:merged_branch_names_redis_caching)
+    return raw_repository.merged_branch_names(branch_names) if skip_cache
 
-      # Track some metrics here whilst feature flag is enabled
-      if cached_branch_names.present?
-        counter = Gitlab::Metrics.counter(
-          :gitlab_repository_merged_branch_names_cache_hit,
-          "Count of cache hits for Repository#merged_branch_names"
-        )
-        counter.increment(full_hit: missing_branch_names.empty?)
-      end
+    cached_branch_names = cache.read(:merged_branch_names)
+    merged_branch_names_hash = cached_branch_names.present? ? JSON.parse(cached_branch_names) : {}
+    missing_branch_names = branch_names.select { |bn| !merged_branch_names_hash.key?(bn) }
 
-      unless missing_branch_names.empty?
-        merged = raw_repository.merged_branch_names(missing_branch_names)
-
-        missing_branch_names.each do |bn|
-          merged_branch_names_hash[bn] = merged.include?(bn).to_s
-        end
-
-        cache.write(:merged_branch_names, merged_branch_names_hash.to_json, expires_in: 10.minutes)
-      end
-
-      Set.new(merged_branch_names_hash.select { |k, v| v.to_s == "true" }.keys)
+    # Track some metrics here whilst feature flag is enabled
+    if cached_branch_names.present?
+      counter = Gitlab::Metrics.counter(
+        :gitlab_repository_merged_branch_names_cache_hit,
+        "Count of cache hits for Repository#merged_branch_names"
+      )
+      counter.increment(full_hit: missing_branch_names.empty?)
     end
+
+    unless missing_branch_names.empty?
+      merged = raw_repository.merged_branch_names(missing_branch_names)
+
+      missing_branch_names.each do |bn|
+        merged_branch_names_hash[bn] = merged.include?(bn).to_s
+      end
+
+      cache.write(:merged_branch_names, merged_branch_names_hash.to_json, expires_in: 10.minutes)
+    end
+
+    Set.new(merged_branch_names_hash.select { |k, v| v.to_s == "true" }.keys)
   end
 
   def merge_base(*commits_or_ids)
