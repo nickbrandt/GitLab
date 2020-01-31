@@ -6,6 +6,7 @@
   ],
   "properties" : {
     "id": { "type": "integer" },
+    "iid": { "type": ["integer", "null"] },
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
     "name": { "type": "string" },
