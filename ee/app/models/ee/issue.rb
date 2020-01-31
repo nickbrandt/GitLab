@@ -145,7 +145,20 @@ module EE
     end
 
     class_methods do
-      # override
+      extend ::Gitlab::Utils::Override
+
+      override :simple_sorts
+      def simple_sorts
+        super.merge(
+          {
+            'weight' => -> { order_weight_asc.with_order_id_desc },
+            'weight_asc' => -> { order_weight_asc.with_order_id_desc },
+            'weight_desc' => -> { order_weight_desc.with_order_id_desc }
+          }
+        )
+      end
+
+      override :sort_by_attribute
       def sort_by_attribute(method, excluded_labels: [])
         case method.to_s
         when 'weight', 'weight_asc' then order_weight_asc.with_order_id_desc
