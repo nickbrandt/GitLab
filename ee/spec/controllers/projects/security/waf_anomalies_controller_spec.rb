@@ -41,7 +41,7 @@ describe Projects::Security::WafAnomaliesController do
         it 'returns anomaly summary' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['total_traffic']).to eq(0)
           expect(json_response['anomalous_traffic']).to eq(0)
           expect(response).to match_response_schema('vulnerabilities/summary', dir: 'ee')
@@ -52,7 +52,7 @@ describe Projects::Security::WafAnomaliesController do
         it 'returns not found' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -67,7 +67,7 @@ describe Projects::Security::WafAnomaliesController do
       it 'returns unauthorized' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

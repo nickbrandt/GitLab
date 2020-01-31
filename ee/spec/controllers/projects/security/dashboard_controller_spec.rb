@@ -38,7 +38,7 @@ describe Projects::Security::DashboardController do
       it 'returns the latest pipeline with security reports for project' do
         show_security_dashboard
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
         expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
       end
@@ -52,7 +52,7 @@ describe Projects::Security::DashboardController do
       it 'returns the latest pipeline with security reports for project' do
         show_security_dashboard
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
         expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
       end
@@ -62,7 +62,7 @@ describe Projects::Security::DashboardController do
       it 'renders empty state' do
         show_security_dashboard
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
         expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=false]")
       end
@@ -86,7 +86,7 @@ describe Projects::Security::DashboardController do
       it 'renders the vulnerability page' do
         show_vulnerability
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:show)
         expect(response.body).to have_text(vulnerability.title)
       end
@@ -116,7 +116,7 @@ describe Projects::Security::DashboardController do
       it 'renders the 404 page' do
         show_vulnerability
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
