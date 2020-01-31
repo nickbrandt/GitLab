@@ -332,7 +332,6 @@ group :metrics do
 end
 
 group :development do
-  gem 'listen', '~> 3.0'
   gem 'brakeman', '~> 4.2', require: false
   gem 'danger', '~> 6.0', require: false
 
