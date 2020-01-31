@@ -13,7 +13,7 @@
 = render "projects/settings/repository/protected_branches"
 
 = render @deploy_keys
-= render "projects/deploy_tokens/index"
+= render "shared/deploy_tokens/index", entity: @project
 = render "projects/cleanup/show"
 
 = render_if_exists 'shared/promotions/promote_repository_features'
