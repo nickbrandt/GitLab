@@ -16,5 +16,6 @@ mutation createImageDiffNote($input: CreateImageDiffNoteInput!) {
         }
       }
     }
+    errors
   }
 }
