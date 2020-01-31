@@ -26,7 +26,7 @@ describe Vulnerabilities::CreateService do
         have_attributes(
           author: user,
           title: finding.name,
-          state: 'opened',
+          state: 'detected',
           severity: finding.severity,
           severity_overridden: false,
           confidence: finding.confidence,
