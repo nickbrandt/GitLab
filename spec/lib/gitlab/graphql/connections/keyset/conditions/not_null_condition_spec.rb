@@ -28,7 +28,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
       let(:order_list) { %w(relative_position id) }
       let(:values)     { [1500, 500] }
 
-      context 'when :after' do
+      shared_examples ':after condition' do
         it 'generates :after sql' do
           expected_sql = <<~SQL
             ("issues"."relative_position" > 1500)
@@ -42,6 +42,10 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
 
           expect(condition.build.squish).to eq expected_sql.squish
         end
+      end
+
+      context 'when :after' do
+        it_behaves_like ':after condition'
       end
 
       context 'when :before' do
@@ -59,6 +63,12 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
 
           expect(condition.build.squish).to eq expected_sql.squish
         end
+      end
+
+      context 'when :foo' do
+        let(:before_or_after) { :foo }
+
+        it_behaves_like ':after condition'
       end
     end
   end

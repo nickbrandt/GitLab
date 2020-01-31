@@ -8,6 +8,8 @@ module Gitlab
           class BaseCondition
             def initialize(arel_table, order_list, values, operators, before_or_after)
               @arel_table, @order_list, @values, @operators, @before_or_after = arel_table, order_list, values, operators, before_or_after
+
+              @before_or_after = :after unless [:after, :before].include?(@before_or_after)
             end
 
             def build

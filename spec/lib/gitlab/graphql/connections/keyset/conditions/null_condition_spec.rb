@@ -13,18 +13,22 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NullCondition do
       let(:arel_table) { Issue.arel_table }
       let(:order_list) { %w(relative_position id) }
 
-      context 'when :after' do
+      shared_examples ':after condition' do
         it 'generates sql' do
           expected_sql = <<~SQL
-          (
-            "issues"."relative_position" IS NULL
-            AND
-            "issues"."id" > 500
-          )
+            (
+              "issues"."relative_position" IS NULL
+              AND
+              "issues"."id" > 500
+            )
           SQL
 
           expect(condition.build.squish).to eq expected_sql.squish
         end
+      end
+
+      context 'when :after' do
+        it_behaves_like ':after condition'
       end
 
       context 'when :before' do
@@ -42,6 +46,12 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NullCondition do
 
           expect(condition.build.squish).to eq expected_sql.squish
         end
+      end
+
+      context 'when :foo' do
+        let(:before_or_after) { :foo }
+
+        it_behaves_like ':after condition'
       end
     end
   end
