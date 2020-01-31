@@ -58,26 +58,11 @@ export default {
     });
   },
 
-  [types.RECEIVE_LOAD_LICENSE_REPORT](state, reports) {
-    const { headReport, baseReport } = reports;
-
-    Object.assign(state, {
-      headReport,
-      baseReport,
-      isLoadingLicenseReport: false,
-      loadLicenseReportError: false,
-    });
-  },
   [types.RECEIVE_LOAD_LICENSE_REPORT_ERROR](state, error) {
     Object.assign(state, {
       managedLicenses: [],
       isLoadingLicenseReport: false,
       loadLicenseReportError: error,
-    });
-  },
-  [types.REQUEST_LOAD_LICENSE_REPORT](state) {
-    Object.assign(state, {
-      isLoadingLicenseReport: true,
     });
   },
 

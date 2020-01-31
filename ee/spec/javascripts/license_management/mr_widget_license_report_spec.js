@@ -54,7 +54,6 @@ describe('License Report MR Widget', () => {
   const defaultActions = {
     setAPISettings: () => {},
     loadManagedLicenses: () => {},
-    loadLicenseReport: () => {},
     loadParsedLicenseReport: () => {},
   };
 
@@ -80,257 +79,191 @@ describe('License Report MR Widget', () => {
     vm.$destroy();
   });
 
-  describe('with the `parsedLicenseReport` feature flag turned off', () => {
-    beforeAll(() => {
-      gon.features = gon.features || {};
-      gon.features.parsedLicenseReport = false;
-    });
-
-    describe('computed', () => {
-      describe('hasLicenseReportIssues', () => {
-        it('should be false, if the report is empty', () => {
-          const getters = {
-            ...defaultGetters,
-            licenseReport() {
-              return [];
-            },
-          };
-          vm = mountComponent({ getters });
-
-          expect(vm.hasLicenseReportIssues).toBe(false);
-        });
-
-        it('should be true, if the report is not empty', () => {
-          expect(vm.hasLicenseReportIssues).toBe(true);
-        });
-      });
-
-      describe('licenseReportStatus', () => {
-        it('should be `LOADING`, if the report is loading', () => {
-          const getters = {
-            ...defaultGetters,
-            isLoading() {
-              return true;
-            },
-          };
-          vm = mountComponent({ getters });
-
-          expect(vm.licenseReportStatus).toBe(LOADING);
-        });
-
-        it('should be `ERROR`, if the report is has an error', () => {
-          const state = { ...defaultState, loadLicenseReportError: new Error('test') };
-          vm = mountComponent({ state });
-
-          expect(vm.licenseReportStatus).toBe(ERROR);
-        });
-
-        it('should be `SUCCESS`, if the report is successful', () => {
-          expect(vm.licenseReportStatus).toBe(SUCCESS);
-        });
-      });
-
-      describe('showActionButtons', () => {
-        const { fullReportPath, licenseManagementSettingsPath, ...otherProps } = defaultProps;
-
-        it('should be true if fullReportPath AND licenseManagementSettingsPath prop are provided', () => {
-          const props = { ...otherProps, fullReportPath, licenseManagementSettingsPath };
-          vm = mountComponent({ props });
-
-          expect(vm.showActionButtons).toBe(true);
-        });
-
-        it('should be true if only licenseManagementSettingsPath is provided', () => {
-          const props = { ...otherProps, fullReportPath: null, licenseManagementSettingsPath };
-          vm = mountComponent({ props });
-
-          expect(vm.showActionButtons).toBe(true);
-        });
-
-        it('should be true if only fullReportPath is provided', () => {
-          const props = {
-            ...otherProps,
-            fullReportPath,
-            licenseManagementSettingsPath: null,
-          };
-          vm = mountComponent({ props });
-
-          expect(vm.showActionButtons).toBe(true);
-        });
-
-        it('should be false if fullReportPath and licenseManagementSettingsPath prop are not provided', () => {
-          const props = {
-            ...otherProps,
-            fullReportPath: null,
-            licenseManagementSettingsPath: null,
-          };
-          vm = mountComponent({ props });
-
-          expect(vm.showActionButtons).toBe(false);
-        });
-      });
-    });
-
-    it('should render report section wrapper', () => {
-      expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
-    });
-
-    it('should render report widget section', () => {
-      expect(vm.$el.querySelector('.report-block-container')).not.toBeNull();
-    });
-
-    describe('`View full report` button', () => {
-      const selector = '.js-full-report';
-
-      it('should be rendered when fullReportPath prop is provided', () => {
-        const linkEl = vm.$el.querySelector(selector);
-
-        expect(linkEl).not.toBeNull();
-        expect(linkEl.getAttribute('href')).toEqual(defaultProps.fullReportPath);
-        expect(linkEl.textContent.trim()).toEqual('View full report');
-      });
-
-      it('should not be rendered when fullReportPath prop is not provided', () => {
-        const props = { ...defaultProps, fullReportPath: null };
-        vm = mountComponent({ props });
-
-        const linkEl = vm.$el.querySelector(selector);
-
-        expect(linkEl).toBeNull();
-      });
-    });
-
-    describe('`Manage licenses` button', () => {
-      const selector = '.js-manage-licenses';
-
-      it('should be rendered when licenseManagementSettingsPath prop is provided', () => {
-        const linkEl = vm.$el.querySelector(selector);
-
-        expect(linkEl).not.toBeNull();
-        expect(linkEl.getAttribute('href')).toEqual(defaultProps.licenseManagementSettingsPath);
-        expect(linkEl.textContent.trim()).toEqual('Manage licenses');
-      });
-
-      it('should not be rendered when licenseManagementSettingsPath prop is not provided', () => {
-        const props = { ...defaultProps, licenseManagementSettingsPath: null };
-        vm = mountComponent({ props });
-
-        const linkEl = vm.$el.querySelector(selector);
-
-        expect(linkEl).toBeNull();
-      });
-    });
-
-    it('should render set approval modal', () => {
-      expect(vm.$el.querySelector('#modal-set-license-approval')).not.toBeNull();
-    });
-
-    it('should init store after mount', () => {
-      const actions = {
-        setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
-        loadManagedLicenses: jasmine.createSpy('loadManagedLicenses').and.callFake(() => {}),
-        loadLicenseReport: jasmine.createSpy('loadLicenseReport').and.callFake(() => {}),
-        loadParsedLicenseReport: jasmine
-          .createSpy('loadParsedLicenseReport')
-          .and.callFake(() => {}),
-      };
-      vm = mountComponent({ actions });
-
-      expect(actions.setAPISettings).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        {
-          apiUrlManageLicenses: apiUrl,
-          headPath: defaultProps.headPath,
-          basePath: defaultProps.basePath,
-          licensesApiPath: defaultProps.licensesApiPath,
-          canManageLicenses: true,
-        },
-        undefined,
-      );
-
-      expect(actions.loadManagedLicenses).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        undefined,
-        undefined,
-      );
-
-      expect(actions.loadLicenseReport).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        undefined,
-        undefined,
-      );
-
-      expect(actions.loadParsedLicenseReport).not.toHaveBeenCalled();
-    });
-
-    describe('approval status', () => {
-      const findSecurityApprovalHelpLink = () =>
-        vm.$el.querySelector('.js-security-approval-help-link');
-
-      it('does not show a link to security approval help page if report does not contain blacklisted licenses', () => {
-        expect(findSecurityApprovalHelpLink()).toBeNull();
-      });
-
-      it('shows a link to security approval help page if report contains blacklisted licenses', () => {
+  describe('computed', () => {
+    describe('hasLicenseReportIssues', () => {
+      it('should be false, if the report is empty', () => {
         const getters = {
           ...defaultGetters,
-          reportContainsBlacklistedLicense() {
+          licenseReport() {
+            return [];
+          },
+        };
+        vm = mountComponent({ getters });
+
+        expect(vm.hasLicenseReportIssues).toBe(false);
+      });
+
+      it('should be true, if the report is not empty', () => {
+        expect(vm.hasLicenseReportIssues).toBe(true);
+      });
+    });
+
+    describe('licenseReportStatus', () => {
+      it('should be `LOADING`, if the report is loading', () => {
+        const getters = {
+          ...defaultGetters,
+          isLoading() {
             return true;
           },
         };
         vm = mountComponent({ getters });
-        const securityApprovalHelpLink = findSecurityApprovalHelpLink();
 
-        expect(findSecurityApprovalHelpLink()).not.toBeNull();
-        expect(securityApprovalHelpLink.getAttribute('href')).toEqual(
-          securityApprovalsHelpPagePath,
-        );
+        expect(vm.licenseReportStatus).toBe(LOADING);
+      });
+
+      it('should be `ERROR`, if the report is has an error', () => {
+        const state = { ...defaultState, loadLicenseReportError: new Error('test') };
+        vm = mountComponent({ state });
+
+        expect(vm.licenseReportStatus).toBe(ERROR);
+      });
+
+      it('should be `SUCCESS`, if the report is successful', () => {
+        expect(vm.licenseReportStatus).toBe(SUCCESS);
+      });
+    });
+
+    describe('showActionButtons', () => {
+      const { fullReportPath, licenseManagementSettingsPath, ...otherProps } = defaultProps;
+
+      it('should be true if fullReportPath AND licenseManagementSettingsPath prop are provided', () => {
+        const props = { ...otherProps, fullReportPath, licenseManagementSettingsPath };
+        vm = mountComponent({ props });
+
+        expect(vm.showActionButtons).toBe(true);
+      });
+
+      it('should be true if only licenseManagementSettingsPath is provided', () => {
+        const props = { ...otherProps, fullReportPath: null, licenseManagementSettingsPath };
+        vm = mountComponent({ props });
+
+        expect(vm.showActionButtons).toBe(true);
+      });
+
+      it('should be true if only fullReportPath is provided', () => {
+        const props = {
+          ...otherProps,
+          fullReportPath,
+          licenseManagementSettingsPath: null,
+        };
+        vm = mountComponent({ props });
+
+        expect(vm.showActionButtons).toBe(true);
+      });
+
+      it('should be false if fullReportPath and licenseManagementSettingsPath prop are not provided', () => {
+        const props = {
+          ...otherProps,
+          fullReportPath: null,
+          licenseManagementSettingsPath: null,
+        };
+        vm = mountComponent({ props });
+
+        expect(vm.showActionButtons).toBe(false);
       });
     });
   });
 
-  describe('with the `parsedLicenseReport` feature flag turned on', () => {
-    beforeAll(() => {
-      gon.features = gon.features || {};
-      gon.features.parsedLicenseReport = true;
+  it('should render report section wrapper', () => {
+    expect(vm.$el.querySelector('.license-report-widget')).not.toBeNull();
+  });
+
+  it('should render report widget section', () => {
+    expect(vm.$el.querySelector('.report-block-container')).not.toBeNull();
+  });
+
+  describe('`View full report` button', () => {
+    const selector = '.js-full-report';
+
+    it('should be rendered when fullReportPath prop is provided', () => {
+      const linkEl = vm.$el.querySelector(selector);
+
+      expect(linkEl).not.toBeNull();
+      expect(linkEl.getAttribute('href')).toEqual(defaultProps.fullReportPath);
+      expect(linkEl.textContent.trim()).toEqual('View full report');
     });
 
-    afterAll(() => {
-      gon.features.parsedLicenseReport = false;
+    it('should not be rendered when fullReportPath prop is not provided', () => {
+      const props = { ...defaultProps, fullReportPath: null };
+      vm = mountComponent({ props });
+
+      const linkEl = vm.$el.querySelector(selector);
+
+      expect(linkEl).toBeNull();
+    });
+  });
+
+  describe('`Manage licenses` button', () => {
+    const selector = '.js-manage-licenses';
+
+    it('should be rendered when licenseManagementSettingsPath prop is provided', () => {
+      const linkEl = vm.$el.querySelector(selector);
+
+      expect(linkEl).not.toBeNull();
+      expect(linkEl.getAttribute('href')).toEqual(defaultProps.licenseManagementSettingsPath);
+      expect(linkEl.textContent.trim()).toEqual('Manage licenses');
     });
 
-    it('should load the reports from the backend API', () => {
-      const actions = {
-        setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
-        loadManagedLicenses: jasmine.createSpy('loadManagedLicenses').and.callFake(() => {}),
-        loadLicenseReport: jasmine.createSpy('loadLicenseReport').and.callFake(() => {}),
-        loadParsedLicenseReport: jasmine
-          .createSpy('loadParsedLicenseReport')
-          .and.callFake(() => {}),
-      };
-      vm = mountComponent({ actions });
+    it('should not be rendered when licenseManagementSettingsPath prop is not provided', () => {
+      const props = { ...defaultProps, licenseManagementSettingsPath: null };
+      vm = mountComponent({ props });
 
-      expect(actions.setAPISettings).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        {
-          apiUrlManageLicenses: apiUrl,
-          headPath: defaultProps.headPath,
-          basePath: defaultProps.basePath,
-          licensesApiPath: defaultProps.licensesApiPath,
-          canManageLicenses: true,
+      const linkEl = vm.$el.querySelector(selector);
+
+      expect(linkEl).toBeNull();
+    });
+  });
+
+  it('should render set approval modal', () => {
+    expect(vm.$el.querySelector('#modal-set-license-approval')).not.toBeNull();
+  });
+
+  it('should init store after mount', () => {
+    const actions = {
+      setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
+      loadParsedLicenseReport: jasmine.createSpy('loadParsedLicenseReport').and.callFake(() => {}),
+    };
+    vm = mountComponent({ actions });
+
+    expect(actions.setAPISettings).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      {
+        apiUrlManageLicenses: apiUrl,
+        headPath: defaultProps.headPath,
+        basePath: defaultProps.basePath,
+        licensesApiPath: defaultProps.licensesApiPath,
+        canManageLicenses: true,
+      },
+      undefined,
+    );
+
+    expect(actions.loadParsedLicenseReport).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      undefined,
+      undefined,
+    );
+  });
+
+  describe('approval status', () => {
+    const findSecurityApprovalHelpLink = () =>
+      vm.$el.querySelector('.js-security-approval-help-link');
+
+    it('does not show a link to security approval help page if report does not contain blacklisted licenses', () => {
+      expect(findSecurityApprovalHelpLink()).toBeNull();
+    });
+
+    it('shows a link to security approval help page if report contains blacklisted licenses', () => {
+      const getters = {
+        ...defaultGetters,
+        reportContainsBlacklistedLicense() {
+          return true;
         },
-        undefined,
-      );
+      };
+      vm = mountComponent({ getters });
+      const securityApprovalHelpLink = findSecurityApprovalHelpLink();
 
-      expect(actions.loadParsedLicenseReport).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        undefined,
-        undefined,
-      );
-
-      expect(actions.loadLicenseReport).not.toHaveBeenCalled();
-
-      expect(actions.loadManagedLicenses).not.toHaveBeenCalled();
+      expect(findSecurityApprovalHelpLink()).not.toBeNull();
+      expect(securityApprovalHelpLink.getAttribute('href')).toEqual(securityApprovalsHelpPagePath);
     });
   });
 });

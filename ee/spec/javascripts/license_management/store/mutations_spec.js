@@ -3,11 +3,7 @@ import * as types from 'ee/vue_shared/license_management/store/mutation_types';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 import { TEST_HOST } from 'spec/test_constants';
-import {
-  approvedLicense,
-  licenseBaseIssues,
-  licenseHeadIssues,
-} from 'ee_spec/license_management/mock_data';
+import { approvedLicense } from 'ee_spec/license_management/mock_data';
 
 describe('License store mutations', () => {
   let store;
@@ -180,27 +176,6 @@ describe('License store mutations', () => {
     });
   });
 
-  describe('RECEIVE_LOAD_LICENSE_REPORT', () => {
-    it('sets isLoadingLicenseReport and loadLicenseReportError to false and saves report', () => {
-      store.replaceState({
-        ...store.state,
-        headReport: false,
-        baseReport: false,
-        isLoadingLicenseReport: true,
-        loadLicenseReportError: true,
-      });
-
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-
-      store.commit(types.RECEIVE_LOAD_LICENSE_REPORT, payload);
-
-      expect(store.state.headReport).toEqual(licenseHeadIssues);
-      expect(store.state.baseReport).toEqual(licenseBaseIssues);
-      expect(store.state.isLoadingLicenseReport).toBe(false);
-      expect(store.state.loadLicenseReportError).toBe(false);
-    });
-  });
-
   describe('RECEIVE_LOAD_LICENSE_REPORT_ERROR', () => {
     it('sets isLoadingLicenseReport to true and saves the error', () => {
       const error = new Error('test');
@@ -214,19 +189,6 @@ describe('License store mutations', () => {
 
       expect(store.state.isLoadingLicenseReport).toBe(false);
       expect(store.state.loadLicenseReportError).toBe(error);
-    });
-  });
-
-  describe('REQUEST_LOAD_LICENSE_REPORT', () => {
-    it('sets isLoadingLicenseReport to true', () => {
-      store.replaceState({
-        ...store.state,
-        isLoadingLicenseReport: true,
-      });
-
-      store.commit(types.REQUEST_LOAD_LICENSE_REPORT);
-
-      expect(store.state.isLoadingLicenseReport).toBe(true);
     });
   });
 
