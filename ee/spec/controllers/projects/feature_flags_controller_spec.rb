@@ -121,6 +121,14 @@ describe Projects::FeatureFlagsController do
       expect(feature_flag_json['active']).to eq(false)
     end
 
+    it 'returns the feature flag iid' do
+      subject
+
+      feature_flag_json = json_response['feature_flags'].first
+
+      expect(feature_flag_json['iid']).to eq(feature_flag_active.iid)
+    end
+
     context 'when scope is specified' do
       let(:view_params) do
         { namespace_id: project.namespace, project_id: project, scope: scope }
