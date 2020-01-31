@@ -116,7 +116,6 @@ export default {
   <monitor-heatmap-chart
     v-else-if="isPanelType('heatmap') && graphDataHasMetrics"
     :graph-data="graphData"
-    :container-width="dashboardWidth"
   />
   <monitor-column-chart
     v-else-if="isPanelType('column') && graphDataHasMetrics"
