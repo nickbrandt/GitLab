@@ -1,0 +1,5 @@
+---
+title: added an overflow:hidden to prevent h2 and h1 lines from overlapping images
+merge_request:
+author: Gwen_
+type: fixed
