@@ -96,9 +96,8 @@ to integrate with.
 
 1. Navigate to the [Integrations page](project_services.md#accessing-the-project-services)
 1. Click the **Prometheus** service
-1. Provide the base URL of the your server, for example `http://prometheus.example.com/`.
-   The **Test Settings** button can be used to confirm connectivity from GitLab
-   to the Prometheus server.
+1. Provide the base URL of your server, for example `http://prometheus.example.com/`
+1. Click **Save changes**
 
 ![Configure Prometheus Service](img/prometheus_service_configuration.png)
 
