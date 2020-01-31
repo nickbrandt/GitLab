@@ -14,9 +14,9 @@ module EE
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }
 
         field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
-              description: "Deprecated. Use `design_collection`",
+              description: "Deprecated. Use `designCollection`",
               method: :design_collection,
-              deprecation_reason: 'use design_collection'
+              deprecation_reason: 'Use designCollection'
 
         field :design_collection, ::Types::DesignManagement::DesignCollectionType, null: true,
               description: 'Collection of design images associated with this issue'
