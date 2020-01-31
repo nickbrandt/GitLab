@@ -3,8 +3,9 @@
 require 'spec_helper'
 require './db/post_migrate/20200211155539_migrate_merge_request_mentions_to_db'
 require './db/post_migrate/20200229161025_migrate_issue_mentions_to_db'
+require './db/post_migrate/20200301125025_migrate_issue_notes_mentions_to_db'
 
-describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200229161025 do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200301125025 do
   include MigrationsHelpers
 
   context 'when migrating data' do
@@ -87,6 +88,18 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
       let(:resource) { issue1 }
 
       it_behaves_like 'resource mentions migration', MigrateIssueMentionsToDb, Issue
+
+      context 'mentions in note' do
+        let!(:note1) { notes.create!(noteable_id: issue1.id, noteable_type: 'Issue', project_id: project.id, author_id: author.id, note: description_mentions) }
+        let!(:note2) { notes.create!(noteable_id: issue1.id, noteable_type: 'Issue', project_id: project.id, author_id: author.id, note: 'sample note') }
+        let!(:note3) { notes.create!(noteable_id: issue1.id, noteable_type: 'Issue', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
+        # this not does not have actual mentions
+        let!(:note4) { notes.create!(noteable_id: issue1.id, noteable_type: 'Issue', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref', system: true) }
+        # this note points to an innexistent noteable record in issues table
+        let!(:note5) { notes.create!(noteable_id: issues.maximum(:id) + 10, noteable_type: 'Issue', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
+
+        it_behaves_like 'resource notes mentions migration', MigrateIssueNotesMentionsToDb, Issue
+      end
     end
   end
 

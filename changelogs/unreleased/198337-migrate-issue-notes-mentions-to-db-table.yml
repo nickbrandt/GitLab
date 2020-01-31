@@ -1,0 +1,5 @@
+---
+title: Migrate mentions for issue notes to DB table
+merge_request: 24266
+author:
+type: changed
