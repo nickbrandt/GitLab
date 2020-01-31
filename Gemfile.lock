@@ -1279,7 +1279,6 @@ DEPENDENCIES
   license_finder (~> 5.4)
   licensee (~> 8.9)
   liquid (~> 4.0)
-  listen (~> 3.0)
   lograge (~> 0.5)
   loofah (~> 2.2)
   lru_redux
