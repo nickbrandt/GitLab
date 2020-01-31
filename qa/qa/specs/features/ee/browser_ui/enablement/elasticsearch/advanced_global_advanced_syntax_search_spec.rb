@@ -2,7 +2,7 @@
 
 module QA
   context 'Create' do
-    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin, quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/197207' do
+    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
       let(:project_name_suffix) { SecureRandom.hex(8) }
       let(:project_file_name) { 'elasticsearch.rb' }
       let(:project_file_content) { "elasticsearch: #{SecureRandom.hex(8)}" }

@@ -486,3 +486,5 @@ gem 'liquid', '~> 4.0'
 
 # LRU cache
 gem 'lru_redux'
+
+gem 'erubi', '~> 1.9.0'
