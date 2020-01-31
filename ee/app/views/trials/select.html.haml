@@ -9,7 +9,7 @@
 = render 'errors'
 
 = form_tag apply_trials_path, method: :post do
-  .form-group
+  .form-group.gl-select2-html5-required-fix
     = label_tag :namespace_id, _('This subscription is for'), for: :namespace_id, class: 'col-form-label'
     = select_tag :namespace_id, namespace_options_for_select, class: 'select2', required: true
   #group_name.form-group.hidden
