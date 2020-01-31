@@ -4271,62 +4271,50 @@ describe Ci::Build do
     end
   end
 
-  describe '#has_advanced_deployment?' do
+  describe '#forward_deployment?' do
     let(:environment) { create(:environment, project: project) }
+    let(:options) { { environment: { action: 'start' } } }
+    let(:build) do
+      create(:ci_build,
+             pipeline: pipeline,
+             environment: environment,
+             project: project,
+             options: options)
+    end
 
-    subject { build.has_advanced_deployment? }
+    subject { build.forward_deployment? }
 
-    context 'when there is no last deployment' do
-      before do
-        allow(build).to receive(:last_deployment).and_return(nil)
-      end
+    context 'when it is not linked to a start environment' do
+      let(:options) { { environment: { action: 'stop' } } }
 
       it { is_expected.to be_truthy }
-
-      it 'does not run any additional SQL query' do
-        env_query_count = ActiveRecord::QueryRecorder.new { build.persisted_environment }.count
-        method_query_count = ActiveRecord::QueryRecorder.new { subject }.count
-
-        expect(method_query_count).to eq(env_query_count)
-      end
     end
 
-    context 'when there is no existing deployment' do
-      it 'is true' do
-        expect(environment.last_deployment).to be_nil
-        is_expected.to be_truthy
+    context 'when it is linked to a start environment' do
+      context 'and the forward_deployment_enabled switch is turned off for this project' do
+        it 'is true' do
+          project.update!(forward_deployment_enabled: false)
+
+          is_expected.to be_truthy
+        end
       end
-    end
 
-    context 'when there is a persisted environment and a last deployment' do
-      let(:last_deployment) { create(:deployment, :success, environment: environment, project: project) }
-      let(:build) do
-        create(:ci_build,
-               pipeline: pipeline,
-               environment: environment,
-               project: project,
-               options: options)
-      end
-      let(:build_deployment) { create(:deployment, :success, environment: environment, deployable: build) }
+      context 'and the forward_deployment_enabled switch is turned on for this project' do
+        let!(:deployment) { create(:deployment, deployable: build) }
 
-      context 'and this job has a start environment' do
-        let(:options) { { environment: { action: 'start' } } }
-
-        context 'and the current deployment is later than the last successful deployment' do
+        context 'and the deployment is a forward deployment' do
           it 'is true' do
-            last_deployment
-            build_deployment
+            allow(build.deployment).to receive(:forward?).and_return(true)
 
             is_expected.to be_truthy
           end
         end
 
-        context 'and the current deployment is not later than the last successful deployment' do
+        context 'and the deployment is not a forward deployment' do
           it 'is false' do
-            build_deployment
-            last_deployment
+            allow(build.deployment).to receive(:forward?).and_return(false)
 
-            is_expected.to be_falsy
+            is_expected.to be_falsey
           end
         end
       end

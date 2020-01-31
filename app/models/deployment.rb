@@ -258,6 +258,10 @@ class Deployment < ApplicationRecord
     errors.add(:ref, _('The branch or tag does not exist'))
   end
 
+  def forward?
+    self.id > environment.last_deployment.id
+  end
+
   private
 
   def ref_path

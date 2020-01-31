@@ -38,18 +38,10 @@ describe Projects::CreateService, '#execute' do
   end
 
   describe 'after create actions' do
-    subject { create_project(user, opts) }
-
     it 'invalidate personal_projects_count caches' do
       expect(user).to receive(:invalidate_personal_projects_count)
 
-      subject
-    end
-
-    it 'turns on the only_forward_deployments feature flag for this project' do
-      expect(Feature).to receive(:enable).with(:only_forward_deployments, an_instance_of(Project))
-
-      subject
+      create_project(user, opts)
     end
   end
 

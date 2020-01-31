@@ -569,18 +569,32 @@ module Ci
         end
       end
 
+      context 'when the forward_deployment_enabled project setting is turned off' do
+        subject { described_class.new(specific_runner).execute }
+
+        before do
+          allow(pending_job.project).to receive(:forward_deployment_enabled).and_return(false)
+        end
+
+        it 'does not trigger the forward_deployment? check' do
+          expect(pending_job).not_to receive(:forward_deployment?)
+
+          subject
+        end
+      end
+
       context 'when a deployment is invalid' do
         let!(:pending_job) { create(:ci_build, :pending, pipeline: pipeline) }
 
         subject { described_class.new(specific_runner).execute }
 
         before do
-          allow_any_instance_of(Ci::Build).to receive(:has_advanced_deployment?).and_return(false)
+          allow_any_instance_of(Ci::Build).to receive(:forward_deployment?).and_return(false)
         end
 
-        context 'and the only_forward_deployment feature flag is turned on' do
+        context 'and the forward_deployment_enabled project setting is turned on' do
           before do
-            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, default_enabled: false).and_return(true)
+            allow(pending_job.project).to receive(:forward_deployment_enabled).and_return(true)
           end
           it 'returns no build and marks it as failed' do
             expect(subject.build).to be_nil
@@ -589,18 +603,6 @@ module Ci
 
             expect(pending_job).to be_failed
             expect(pending_job).to be_invalid_deployment_failure
-          end
-        end
-        context 'and the only_forward_deployment feature flag is turned off' do
-          before do
-            allow(Feature).to receive(:enabled?).with(:only_forward_deployments, project, default_enabled: false).and_return(false)
-          end
-          it 'picks the build' do
-            expect(subject.build).to eq(pending_job)
-
-            pending_job.reload
-
-            expect(pending_job).to be_running
           end
         end
       end

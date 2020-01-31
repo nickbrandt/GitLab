@@ -924,22 +924,17 @@ module Ci
         failure_reason: :data_integrity_failure)
     end
 
-    def has_advanced_deployment?
-      return true unless last_deployment
+    def forward_deployment?
+      return true unless starts_environment?
+      return true unless project.forward_deployment_enabled?
 
       # if our deployment is later than last successful deployment
       # it should fullfil the rule of being a forward deployment
       # if this is incremental deployment it will always be later in the pipeline
-      starts_environment? ? deployment.id >= last_deployment.id : true
+      deployment&.forward?
     end
 
     private
-
-    def last_deployment
-      return unless has_environment?
-
-      @last_deployment ||= deployment&.environment&.last_deployment
-    end
 
     def build_data
       @build_data ||= Gitlab::DataBuilder::Build.build(self)

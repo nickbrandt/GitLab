@@ -551,4 +551,35 @@ describe Deployment do
       expect(deploy.errors[:ref]).not_to be_empty
     end
   end
+
+  describe '#forward?' do
+    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:environment) { create(:environment, project: project) }
+    let(:last_deployment) { create(:deployment, environment: environment ) }
+    let(:deployment) { create(:deployment, environment: environment) }
+
+    subject { deployment.forward? }
+
+    context 'when this deployment is later than the environment last deployment' do
+      it 'is true' do
+        last_deployment
+        deployment
+
+        allow(environment).to receive(:last_deployment).and_return(last_deployment)
+
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when this deployment is later than the environment last deployment' do
+      it 'is false' do
+        deployment
+        last_deployment
+
+        allow(environment).to receive(:last_deployment).and_return(last_deployment)
+
+        is_expected.to be_falsey
+      end
+    end
+  end
 end
