@@ -17,7 +17,7 @@ describe Groups::EpicsController do
       it 'returns 404 status' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -56,7 +56,7 @@ describe Groups::EpicsController do
       it "returns index" do
         get :index, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       context 'when there is no logged in user' do
@@ -67,7 +67,7 @@ describe Groups::EpicsController do
           get :index, params: { group_id: group, sort: 'start_date_asc' }
 
           expect(cookies['epic_sort']).to eq('start_date_asc')
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -77,7 +77,7 @@ describe Groups::EpicsController do
             get :index, params: { group_id: group, sort: 'start_date_asc' }
 
             expect(user.user_preference.epics_sort).to eq('start_date_asc')
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
 
@@ -88,7 +88,7 @@ describe Groups::EpicsController do
             get :index, params: { group_id: group, sort: 'start_date_asc' }
 
             expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
       end
@@ -110,7 +110,7 @@ describe Groups::EpicsController do
           get :index, params: { group_id: group, page: last_page.to_param }
 
           expect(assigns(:epics).current_page).to eq(last_page)
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it_behaves_like 'disabled when using an external authorization service' do
@@ -216,7 +216,7 @@ describe Groups::EpicsController do
           it 'the link to the issue is included' do
             get :discussions, params: { group_id: group, id: epic.to_param }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.size).to eq(1)
             discussion = json_response[0]
             notes = discussion["notes"]
@@ -266,7 +266,7 @@ describe Groups::EpicsController do
           it 'returns a not found 404 response' do
             show_epic
 
-            expect(response).to have_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(response.content_type).to eq 'text/html'
           end
         end
@@ -285,7 +285,7 @@ describe Groups::EpicsController do
           group.add_developer(user)
           show_epic(:json)
 
-          expect(response).to have_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/epic', dir: 'ee')
         end
 
@@ -293,7 +293,7 @@ describe Groups::EpicsController do
           it 'returns a not found 404 response' do
             show_epic(:json)
 
-            expect(response).to have_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(response.content_type).to eq 'application/json'
           end
         end
@@ -384,7 +384,7 @@ describe Groups::EpicsController do
         it 'returns a not found 404 response' do
           subject
 
-          expect(response).to have_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -409,7 +409,7 @@ describe Groups::EpicsController do
           it 'returns 200 response' do
             subject
 
-            expect(response).to have_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           it 'creates a new epic' do
@@ -435,7 +435,7 @@ describe Groups::EpicsController do
           end
 
           it 'returns 422 response' do
-            expect(response).to have_gitlab_http_status(422)
+            expect(response).to have_gitlab_http_status(:unprocessable_entity)
           end
 
           it 'does not create a new epic' do
@@ -449,7 +449,7 @@ describe Groups::EpicsController do
           group.add_guest(user)
           subject
 
-          expect(response).to have_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -463,14 +463,14 @@ describe Groups::EpicsController do
         group.add_developer(user)
         delete :destroy, params: { group_id: group, id: epic.to_param, destroy_confirm: true }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it "deletes the epic" do
         group.add_owner(user)
         delete :destroy, params: { group_id: group, id: epic.to_param, destroy_confirm: true }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(controller).to set_flash[:notice].to(/The epic was successfully deleted\./)
       end
     end

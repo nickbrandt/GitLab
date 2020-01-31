@@ -88,7 +88,7 @@ describe GroupsController do
       it 'prevents access to group resources' do
         get :show, params: { id: group }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response.location).to match(/groups\/#{group.to_param}\/-\/saml\/sso\?redirect=.+&token=/)
       end
     end
@@ -103,7 +103,7 @@ describe GroupsController do
       it 'allows access to group resources' do
         get :show, params: { id: group }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end

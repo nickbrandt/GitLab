@@ -72,7 +72,7 @@ describe Groups::GroupMembersController do
              },
              format: :js
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end

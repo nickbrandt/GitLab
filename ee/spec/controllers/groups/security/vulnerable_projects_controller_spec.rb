@@ -36,7 +36,7 @@ describe Groups::Security::VulnerableProjectsController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response.count).to be(1)
       expect(json_response.first['id']).to eq(vulnerable_project.id)
       expect(json_response.first['full_path']).to eq(project_path(vulnerable_project))
@@ -53,7 +53,7 @@ describe Groups::Security::VulnerableProjectsController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to be_empty
     end
   end
