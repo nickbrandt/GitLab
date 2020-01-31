@@ -9,6 +9,7 @@
 This documentation is self-generated based on GitLab current GraphQL schema.
 
 The API can be explored interactively using the [GraphiQL IDE](../index.md#graphiql).
+
 Each table below documents a GraphQL type. Types match loosely to models, but not all
 fields and methods on a model are available via GraphQL.
 
