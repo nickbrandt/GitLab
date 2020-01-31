@@ -465,3 +465,9 @@
   :latency_sensitive: 
   :resource_boundary: :unknown
   :weight: 1
+- :name: service_desk_email_receiver
+  :feature_category: :issue_tracking
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
