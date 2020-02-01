@@ -39,12 +39,18 @@ module API
 
         not_found!('Error Tracking Setting') unless setting
 
-        update_params = {
-          error_tracking_setting_attributes: { enabled: params[:active] }
-        }
-        result = ::Projects::Operations::UpdateService.new(user_project, current_user, update_params).execute
+        # update_params = {
+        #   error_tracking_setting_attributes: { enabled: params[:active] }
+        # }
 
-        present result, with: Entities::ErrorTracking::ProjectSetting
+        # result = ::Projects::Operations::UpdateService.new(user_project, current_user, update_params).execute
+        setting.enabled = params[:active]
+        setting.save!
+        # if result[:status] == :success
+        present setting, with: Entities::ErrorTracking::ProjectSetting
+        # else
+        # result
+        # end
       end
     end
   end

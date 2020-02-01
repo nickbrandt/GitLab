@@ -12,6 +12,10 @@ describe API::ErrorTracking do
       get api("/projects/#{project.id}/error_tracking/settings", user)
     end
 
+    def make_patch_request(active)
+      patch api("/projects/#{project.id}/error_tracking/settings", user), params: { active: active }
+    end
+
     context 'when authenticated as maintainer' do
       before do
         project.add_maintainer(user)
@@ -27,6 +31,14 @@ describe API::ErrorTracking do
           'sentry_external_url' => setting.sentry_external_url,
           'api_url' => setting.api_url
         )
+      end
+
+      it 'returns active is invalid if non boolean' do
+        make_patch_request("randomstring")
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response['error'])
+          .to eq('active is invalid')
       end
     end
 
@@ -44,6 +56,14 @@ describe API::ErrorTracking do
         expect(json_response['message'])
           .to eq('404 Error Tracking Setting Not Found')
       end
+
+      it 'returns 404 for update request' do
+        make_patch_request(true)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message'])
+          .to eq('404 Error Tracking Setting Not Found')
+      end
     end
 
     context 'when authenticated as reporter' do
@@ -56,11 +76,23 @@ describe API::ErrorTracking do
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
+
+      it 'returns 403 for update request' do
+        make_patch_request(true)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
 
     context 'when authenticated as non-member' do
       it 'returns 404' do
         make_request
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      it 'returns 404 for update request' do
+        make_patch_request(false)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -71,6 +103,12 @@ describe API::ErrorTracking do
 
       it 'returns 401' do
         make_request
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+
+      it 'returns 401 for update request' do
+        make_patch_request(true)
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
