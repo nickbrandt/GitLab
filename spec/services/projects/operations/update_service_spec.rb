@@ -146,13 +146,13 @@ describe Projects::Operations::UpdateService do
       end
 
       context 'partial_update' do
-        let(:params) {
+        let(:params) do
           {
             error_tracking_setting_attributes: {
               enabled: true
             }
           }
-        }
+        end
 
         context 'with setting' do
           before do

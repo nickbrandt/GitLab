@@ -17,7 +17,6 @@ describe API::ErrorTracking do
     end
 
     context 'when authenticated as maintainer' do
-
       shared_examples 'returns project settings' do
         it 'returns correct project settings' do
           subject
@@ -45,12 +44,6 @@ describe API::ErrorTracking do
       end
 
       context 'patch settings' do
-        subject do
-          make_patch_request(true)
-        end
-
-        it_behaves_like 'returns project settings'
-
         subject do
           make_patch_request(false)
         end
