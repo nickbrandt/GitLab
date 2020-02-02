@@ -233,6 +233,7 @@ module EE
         # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
         def usage_activity_by_stage_manage
           {
+            events: ::Event.distinct_count_by(:author_id),
             groups: ::GroupMember.distinct_count_by(:user_id),
             ldap_keys: ::LDAPKey.distinct_count_by(:user_id),
             ldap_users: ::GroupMember.of_ldap_type.distinct_count_by(:user_id)
