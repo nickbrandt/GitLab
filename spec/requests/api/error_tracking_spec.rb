@@ -17,52 +17,87 @@ describe API::ErrorTracking do
     end
 
     context 'when authenticated as maintainer' do
+
+      shared_examples 'returns project settings' do
+        it 'returns correct project settings' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response).to eq(
+            'active' => setting.reload.enabled,
+            'project_name' => setting.project_name,
+            'sentry_external_url' => setting.sentry_external_url,
+            'api_url' => setting.api_url
+          )
+        end
+      end
+
       before do
         project.add_maintainer(user)
       end
 
-      it 'returns project settings' do
-        make_request
+      context 'get settings' do
+        subject do
+          make_request
+        end
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response).to eq(
-          'active' => setting.enabled,
-          'project_name' => setting.project_name,
-          'sentry_external_url' => setting.sentry_external_url,
-          'api_url' => setting.api_url
-        )
+        it_behaves_like 'returns project settings'
       end
 
-      it 'returns active is invalid if non boolean' do
-        make_patch_request("randomstring")
+      context 'patch settings' do
+        subject do
+          make_patch_request(true)
+        end
 
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['error'])
-          .to eq('active is invalid')
+        it_behaves_like 'returns project settings'
+
+        subject do
+          make_patch_request(false)
+        end
+
+        it_behaves_like 'returns project settings'
+
+        it 'returns active is invalid if non boolean' do
+          make_patch_request("randomstring")
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error'])
+            .to eq('active is invalid')
+        end
       end
     end
 
     context 'without a project setting' do
       let(:project) { create(:project) }
 
+      shared_examples 'returns 404' do
+        it 'returns correct project settings' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
+          expect(json_response['message'])
+            .to eq('404 Error Tracking Setting Not Found')
+        end
+      end
+
       before do
         project.add_maintainer(user)
       end
 
-      it 'returns 404' do
-        make_request
+      context 'get settings' do
+        subject do
+          make_request
+        end
 
-        expect(response).to have_gitlab_http_status(:not_found)
-        expect(json_response['message'])
-          .to eq('404 Error Tracking Setting Not Found')
+        it_behaves_like 'returns 404'
       end
 
-      it 'returns 404 for update request' do
-        make_patch_request(true)
+      context 'patch settings' do
+        subject do
+          make_patch_request(true)
+        end
 
-        expect(response).to have_gitlab_http_status(:not_found)
-        expect(json_response['message'])
-          .to eq('404 Error Tracking Setting Not Found')
+        it_behaves_like 'returns 404'
       end
     end
 

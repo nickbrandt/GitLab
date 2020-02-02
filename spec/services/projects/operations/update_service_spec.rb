@@ -145,6 +145,41 @@ describe Projects::Operations::UpdateService do
         end
       end
 
+      context 'partial_update' do
+        let(:params) {
+          {
+            error_tracking_setting_attributes: {
+              enabled: true
+            }
+          }
+        }
+
+        context 'with setting' do
+          before do
+            create(:project_error_tracking_setting, :disabled, project: project)
+          end
+
+          it 'service succeeds' do
+            expect(result[:status]).to eq(:success)
+          end
+
+          it 'updates attributes' do
+            expect { result }
+              .to change { project.reload.error_tracking_setting.enabled }
+              .from(false)
+              .to(true)
+          end
+        end
+
+        context 'without setting' do
+          it 'does not create a setting' do
+            expect(result[:status]).to eq(:error)
+
+            expect(project.reload.error_tracking_setting).to be_nil
+          end
+        end
+      end
+
       context 'with masked param token' do
         let(:params) do
           {
