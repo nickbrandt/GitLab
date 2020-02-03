@@ -7,6 +7,7 @@ import Filters from 'ee/security_dashboard/components/filters.vue';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
+import UnscannedProjects from 'ee/security_dashboard/components/unscanned_projects.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_chart.vue';
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list_vuex.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
@@ -17,6 +18,7 @@ import { getParameterValues } from '~/lib/utils/url_utility';
 import axios from '~/lib/utils/axios_utils';
 
 const pipelineId = 123;
+const unscannedProjectsEndpoint = `${TEST_HOST}/unscanned_projects`;
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
 const vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilities_history`;
@@ -46,6 +48,7 @@ describe('Security Dashboard component', () => {
       },
       propsData: {
         dashboardDocumentation: '',
+        unscannedProjectsEndpoint,
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
@@ -82,6 +85,10 @@ describe('Security Dashboard component', () => {
 
     it('renders the security dashboard table ', () => {
       expect(wrapper.find(SecurityDashboardTable).exists()).toBe(true);
+    });
+
+    it('renders the unscanned-projects widget', () => {
+      expect(wrapper.find(UnscannedProjects).exists()).toBe(true);
     });
 
     it('renders the vulnerability chart', () => {
@@ -206,6 +213,7 @@ describe('Security Dashboard component', () => {
 
   describe.each`
     endpointProp                        | Component
+    ${'unscannedProjectsEndpoint'}      | ${UnscannedProjects}
     ${'vulnerabilitiesCountEndpoint'}   | ${VulnerabilityCountList}
     ${'vulnerabilitiesHistoryEndpoint'} | ${VulnerabilityChart}
     ${'vulnerableProjectsEndpoint'}     | ${VulnerabilitySeverity}
