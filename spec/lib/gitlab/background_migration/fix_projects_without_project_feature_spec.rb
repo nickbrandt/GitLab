@@ -8,29 +8,24 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
   let(:project_features) { table(:project_features) }
 
   let(:namespace) { namespaces.create(name: 'foo', path: 'foo') }
-  let!(:project) { projects.create!(namespace_id: namespace.id) }
-  let!(:projects_without_feature) do
-    [
-      projects.create!(namespace_id: namespace.id, visibility_level: 0),
-      projects.create!(namespace_id: namespace.id, visibility_level: 20)
-    ]
-  end
 
-  let(:public_project_without_feature) { projects_without_feature.last }
-  let(:private_project_without_feature) { projects_without_feature.first }
+  let!(:project) { projects.create!(namespace_id: namespace.id) }
+  let(:private_project_without_feature) { projects.create!(namespace_id: namespace.id, visibility_level: 0) }
+  let(:public_project_without_feature) { projects.create!(namespace_id: namespace.id, visibility_level: 20) }
+  let!(:projects_without_feature) { [private_project_without_feature, public_project_without_feature] }
 
   before do
     project_features.create({ project_id: project.id, pages_access_level: 20 })
   end
 
-  subject { described_class.new.perform(*project_range) }
+  subject { described_class.new.perform(Project.minimum(:id), Project.maximum(:id)) }
 
   def project_feature_records
-    ActiveRecord::Base.connection.select_all('SELECT project_id FROM project_features ORDER BY project_id').map { |e| e['project_id'] }
+    project_features.order(:project_id).pluck(:project_id)
   end
 
-  def project_range
-    ActiveRecord::Base.connection.select_one('SELECT MIN(id), MAX(id) FROM projects').values
+  def features(project)
+    project_features.find_by(project_id: project.id)&.attributes
   end
 
   it 'creates a ProjectFeature for projects without it' do
@@ -40,10 +35,7 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
   it 'creates ProjectFeature records with default values for a public project' do
     subject
 
-    project_id = public_project_without_feature.id
-    record = ActiveRecord::Base.connection.select_one("SELECT * FROM project_features WHERE id=#{project_id}")
-
-    expect(record.except('id', 'project_id', 'created_at', 'updated_at')).to eq(
+    expect(features(public_project_without_feature)).to include(
       {
         "merge_requests_access_level" => 20,
         "issues_access_level" => 20,
@@ -60,21 +52,7 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
   it 'creates ProjectFeature records with default values for a private project' do
     subject
 
-    project_id = private_project_without_feature.id
-    record = ActiveRecord::Base.connection.select_one("SELECT * FROM project_features WHERE id=#{project_id}")
-
-    expect(record.except('id', 'project_id', 'created_at', 'updated_at')).to eq(
-      {
-        "merge_requests_access_level" => 20,
-        "issues_access_level" => 20,
-        "wiki_access_level" => 20,
-        "snippets_access_level" => 20,
-        "builds_access_level" => 20,
-        "repository_access_level" => 20,
-        "pages_access_level" => 10,
-        "forking_access_level" => 20
-      }
-    )
+    expect(features(private_project_without_feature)).to include("pages_access_level" => 10)
   end
 
   context 'when access control to pages is forced' do
@@ -85,29 +63,13 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
     it 'creates ProjectFeature records with default values for a public project' do
       subject
 
-      project_id = public_project_without_feature.id
-      record = ActiveRecord::Base.connection.select_one("SELECT * FROM project_features WHERE id=#{project_id}")
-
-      expect(record.except('id', 'project_id', 'created_at', 'updated_at')).to eq(
-        {
-          "merge_requests_access_level" => 20,
-          "issues_access_level" => 20,
-          "wiki_access_level" => 20,
-          "snippets_access_level" => 20,
-          "builds_access_level" => 20,
-          "repository_access_level" => 20,
-          "pages_access_level" => 10,
-          "forking_access_level" => 20
-        }
-      )
+      expect(features(public_project_without_feature)).to include("pages_access_level" => 10)
     end
   end
 
   it 'sets created_at/updated_at timestamps' do
     subject
 
-    offenders = ActiveRecord::Base.connection.select_all('SELECT 1 FROM project_features WHERE created_at IS NULL or updated_at IS NULL')
-
-    expect(offenders).to be_empty
+    expect(project_features.where('created_at IS NULL OR updated_at IS NULL')).to be_empty
   end
 end
