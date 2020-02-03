@@ -89,7 +89,7 @@ export default {
       variant="light"
       :title="moreTagsTooltip"
       class="d-none d-md-block prepend-left-4"
-      ><gl-sprintf message="+%{tags} more">
+      ><gl-sprintf :message="__('+%{tags} more')">
         <template #tags>
           {{ moreTagsDisplay }}
         </template>

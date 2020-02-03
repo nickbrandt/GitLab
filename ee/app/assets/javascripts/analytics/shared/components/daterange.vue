@@ -82,7 +82,7 @@ export default {
       class="daterange-indicator d-flex flex-row flex-lg-row align-items-flex-start align-items-lg-center"
     >
       <span class="number-of-days pl-2 pr-1">
-        <gl-sprintf message="%{numberOfDays} days">
+        <gl-sprintf :message="__('%{numberOfDays} days')">
           <template #numberOfDays>{{ numberOfDays }}</template>
         </gl-sprintf>
       </span>
