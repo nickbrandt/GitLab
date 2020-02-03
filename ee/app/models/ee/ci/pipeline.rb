@@ -46,6 +46,7 @@ module EE
           dast: %i[dast],
           performance: %i[merge_request_performance_metrics],
           license_management: %i[license_management],
+          license_scanning: %i[license_management],
           metrics: %i[metrics_reports]
         }.freeze
 
@@ -107,21 +108,23 @@ module EE
       def batch_lookup_report_artifact_for_file_type(file_type)
         return unless available_licensed_report_type?(file_type)
 
-        latest_report_artifacts[file_type.to_s]&.last
+        latest_report_artifacts
+          .values_at(*::Ci::JobArtifact.associated_file_types_for(file_type.to_s))
+          .flatten
+          .compact
+          .last
       end
 
       def any_report_artifact_for_type(file_type)
-        report_artifact_for_file_type(file_type)
-      end
-
-      def report_artifact_for_file_type(file_type)
         return unless available_licensed_report_type?(file_type)
 
         job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
       end
 
       def expose_license_scanning_data?
-        any_report_artifact_for_type(:license_management)
+        return unless available_licensed_report_type?(:license_management)
+
+        batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
 
       def security_reports

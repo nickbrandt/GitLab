@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Ci::Pipeline do
+  using RSpec::Parameterized::TableSyntax
+
   let(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
 
@@ -117,7 +119,60 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#report_artifact_for_file_type' do
+  describe '#batch_lookup_report_artifact_for_file_type' do
+    subject(:artifact) { pipeline.batch_lookup_report_artifact_for_file_type(file_type) }
+
+    let!(:build) { create(:ee_ci_build, artifact_type, :success, pipeline: pipeline) }
+
+    context 'with security report artifact' do
+      let!(:build) { create(:ee_ci_build, :dependency_scanning, :success, pipeline: pipeline) }
+      let(:file_type) { :dependency_scanning }
+
+      before do
+        stub_licensed_features(dependency_scanning: true)
+      end
+
+      it 'returns right kind of artifacts' do
+        expect(artifact.file_type).to eq file_type.to_s
+      end
+
+      context 'when looking for other type of artifact' do
+        let(:file_type) { :codequality }
+
+        it 'returns nothing' do
+          is_expected.to be_nil
+        end
+      end
+    end
+
+    context 'with license compliance artifact' do
+      before do
+        stub_licensed_features(license_management: true)
+      end
+
+      [:license_management, :license_scanning].each do |artifact_type|
+        let!(:build) { create(:ee_ci_build, artifact_type, :success, pipeline: pipeline) }
+
+        context 'when looking for license_scanning' do
+          let(:file_type) { :license_scanning }
+
+          it 'returns artifact' do
+            is_expected.to be_kind_of Ci::JobArtifact
+          end
+        end
+
+        context 'when looking for license_management' do
+          let(:file_type) { :license_management }
+
+          it 'returns artifact' do
+            is_expected.to be_kind_of Ci::JobArtifact
+          end
+        end
+      end
+    end
+  end
+
+  describe '#any_report_artifact_for_type' do
     let!(:build) { create(:ci_build, pipeline: pipeline) }
 
     let!(:artifact) do
@@ -127,7 +182,7 @@ describe Ci::Pipeline do
         file_format: ::Ci::JobArtifact::TYPE_AND_FORMAT_PAIRS[file_type])
     end
 
-    subject { pipeline.report_artifact_for_file_type(file_type) }
+    subject { pipeline.any_report_artifact_for_type(file_type) }
 
     described_class::REPORT_LICENSED_FEATURES.each do |file_type, licensed_features|
       context "for file_type: #{file_type}" do
@@ -142,6 +197,20 @@ describe Ci::Pipeline do
           it_behaves_like 'multi-licensed report type', licensed_features
         end
       end
+    end
+  end
+
+  describe '#expose_license_scanning_data?' do
+    subject { pipeline.expose_license_scanning_data? }
+
+    before do
+      stub_licensed_features(license_management: true)
+    end
+
+    [:license_scanning, :license_management].each do |artifact_type|
+      let!(:build) { create(:ee_ci_build, artifact_type, pipeline: pipeline) }
+
+      it { is_expected.to be_truthy }
     end
   end
 
