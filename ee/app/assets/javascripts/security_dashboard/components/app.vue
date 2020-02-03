@@ -3,6 +3,7 @@ import { isUndefined } from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
+import UnscannedProjects from './unscanned_projects.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
@@ -13,12 +14,18 @@ export default {
   components: {
     Filters,
     IssueModal,
+    UnscannedProjects,
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
     VulnerabilitySeverity,
   },
   props: {
+    unscannedProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -76,16 +83,23 @@ export default {
       return this.lockToProject !== null;
     },
     shouldShowAside() {
-      return this.shouldShowChart || this.shouldShowVulnerabilitySeverities;
+      return (
+        this.shouldShowChart ||
+        this.shouldShowVulnerabilitySeverities ||
+        this.shouldShowUnscannedProjects
+      );
     },
     shouldShowChart() {
       return Boolean(this.vulnerabilitiesHistoryEndpoint);
     },
-    shouldShowVulnerabilitySeverities() {
-      return Boolean(this.vulnerableProjectsEndpoint);
-    },
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
+    },
+    shouldShowUnscannedProjects() {
+      return Boolean(this.unscannedProjectsEndpoint);
+    },
+    shouldShowVulnerabilitySeverities() {
+      return Boolean(this.vulnerableProjectsEndpoint);
     },
   },
   watch: {
@@ -158,6 +172,11 @@ export default {
         <vulnerability-severity
           v-if="shouldShowVulnerabilitySeverities"
           :endpoint="vulnerableProjectsEndpoint"
+          class="mb-3"
+        />
+        <unscanned-projects
+          v-if="shouldShowUnscannedProjects"
+          :endpoint="unscannedProjectsEndpoint"
         />
       </aside>
     </div>

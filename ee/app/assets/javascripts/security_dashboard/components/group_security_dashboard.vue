@@ -22,6 +22,11 @@ export default {
       type: String,
       required: true,
     },
+    unscannedProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -55,6 +60,7 @@ export default {
 
 <template>
   <security-dashboard
+    :unscanned-projects-endpoint="unscannedProjectsEndpoint"
     :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
     :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
     :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"

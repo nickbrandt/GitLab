@@ -29,6 +29,10 @@ export default function(dashboardType) {
     dashboardType,
     plugins: [projectsPlugin, syncWithRouter(router)],
   });
+
+  const unscannedProjectsEndpoint =
+    gon.features && gon.features.unscannedProjects ? el.dataset.unscannedProjectsEndpoint : '';
+
   return new Vue({
     el,
     store,
@@ -37,6 +41,7 @@ export default function(dashboardType) {
     render(createElement) {
       return createElement('group-security-dashboard-app', {
         props: {
+          unscannedProjectsEndpoint,
           dashboardDocumentation: el.dataset.dashboardDocumentation,
           emptyStateSvgPath: el.dataset.emptyStateSvgPath,
           projectsEndpoint: el.dataset.projectsEndpoint,

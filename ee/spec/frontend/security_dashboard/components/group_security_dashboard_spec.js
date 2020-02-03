@@ -10,6 +10,7 @@ localVue.use(Vuex);
 const dashboardDocumentation = '/help/docs';
 const emptyStateSvgPath = '/svgs/empty/svg';
 const projectsEndpoint = '/projects';
+const unscannedProjectsEndpoint = '/unscanned_projects';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
 const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
@@ -41,6 +42,7 @@ describe('Group Security Dashboard component', () => {
         dashboardDocumentation,
         emptyStateSvgPath,
         projectsEndpoint,
+        unscannedProjectsEndpoint,
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
@@ -72,6 +74,7 @@ describe('Group Security Dashboard component', () => {
       expect(dashboard.exists()).toBe(true);
       expect(dashboard.props()).toEqual(
         expect.objectContaining({
+          unscannedProjectsEndpoint,
           vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint,
           vulnerabilitiesHistoryEndpoint,
