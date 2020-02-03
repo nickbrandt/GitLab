@@ -112,6 +112,24 @@ describe API::ErrorTracking do
       end
     end
 
+    context 'when authenticated as developer' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'returns 403' do
+        make_request
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+
+      it 'returns 403 for update request' do
+        make_patch_request(true)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+
     context 'when authenticated as non-member' do
       it 'returns 404' do
         make_request

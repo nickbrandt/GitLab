@@ -169,6 +169,13 @@ describe Projects::Operations::UpdateService do
               .from(false)
               .to(true)
           end
+
+          it 'only updates enabled attribute' do
+            result
+
+            expect(project.error_tracking_setting.previous_changes.keys)
+              .to contain_exactly('enabled')
+          end
         end
 
         context 'without setting' do
