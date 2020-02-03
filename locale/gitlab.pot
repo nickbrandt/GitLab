@@ -13654,10 +13654,10 @@ msgstr ""
 msgid "Pipelines emails"
 msgstr ""
 
-msgid "Pipelines for last month"
+msgid "Pipelines for last month (%{oneMonthAgo} - %{today})"
 msgstr ""
 
-msgid "Pipelines for last week"
+msgid "Pipelines for last week (%{oneWeekAgo} - %{today})"
 msgstr ""
 
 msgid "Pipelines for last year"
@@ -13798,16 +13798,10 @@ msgstr ""
 msgid "Pipeline|You’re about to stop pipeline %{pipelineId}."
 msgstr ""
 
-msgid "Pipeline|all"
-msgstr ""
-
 msgid "Pipeline|for"
 msgstr ""
 
 msgid "Pipeline|on"
-msgstr ""
-
-msgid "Pipeline|success"
 msgstr ""
 
 msgid "Pipeline|with stage"
