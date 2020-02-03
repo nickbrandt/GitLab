@@ -204,7 +204,7 @@ export default {
             class="js-logs-search"
             type="search"
             autofocus
-            @submit="disableAdvancedControls && setSearch(searchQuery)"
+            @submit="!disableAdvancedControls && setSearch(searchQuery)"
           />
         </gl-form-group>
       </div>
