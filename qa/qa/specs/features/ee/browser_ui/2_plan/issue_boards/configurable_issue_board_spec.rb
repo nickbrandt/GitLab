@@ -18,7 +18,6 @@ module QA
 
         EE::Page::Component::IssueBoard::Show.perform do |show|
           show.click_boards_config_button
-
           show.set_name(new_board_name)
 
           expect(show.boards_dropdown).to have_content(new_board_name)
