@@ -81,8 +81,8 @@ export const loadParsedLicenseReport = ({ dispatch, state }) => {
       const existingLicenses = (data.existing_licenses || []).map(convertToOldReportFormat);
       dispatch('receiveLoadParsedLicenseReport', { newLicenses, existingLicenses });
     })
-    .catch(() => {
-      dispatch('receiveLoadLicenseReportError');
+    .catch(error => {
+      dispatch('receiveLoadLicenseReportError', error);
     });
 };
 

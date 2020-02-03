@@ -596,7 +596,10 @@ describe('License store actions', () => {
           null,
           state,
           [],
-          [{ type: 'requestLoadParsedLicenseReport' }, { type: 'receiveLoadLicenseReportError' }],
+          [
+            { type: 'requestLoadParsedLicenseReport' },
+            { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
+          ],
         )
           .then(done)
           .catch(done.fail);
