@@ -50,6 +50,13 @@ module EE
       scope :metrics_reports, -> do
         with_file_types(METRICS_REPORT_FILE_TYPES)
       end
+
+      def self.associated_file_types_for(file_type)
+        return unless file_types.include?(file_type)
+        return LICENSE_SCANNING_REPORT_FILE_TYPES if LICENSE_SCANNING_REPORT_FILE_TYPES.include?(file_type)
+
+        [file_type]
+      end
     end
 
     def log_geo_deleted_event

@@ -121,19 +121,20 @@ describe MergeRequest do
   describe '#enabled_reports' do
     let(:project) { create(:project, :repository) }
 
-    where(:report_type, :with_reports) do
-      :sast | :with_sast_reports
-      :container_scanning | :with_container_scanning_reports
-      :dast | :with_dast_reports
-      :dependency_scanning | :with_dependency_scanning_reports
-      :license_management | :with_license_management_reports
+    where(:report_type, :with_reports, :feature) do
+      :sast                | :with_sast_reports                | :sast
+      :container_scanning  | :with_container_scanning_reports  | :container_scanning
+      :dast                | :with_dast_reports                | :dast
+      :dependency_scanning | :with_dependency_scanning_reports | :dependency_scanning
+      :license_management  | :with_license_management_reports  | :license_management
+      :license_management  | :with_license_scanning_reports    | :license_management
     end
 
     with_them do
       subject { merge_request.enabled_reports[report_type] }
 
       before do
-        stub_licensed_features({ report_type => true })
+        stub_licensed_features({ feature => true })
       end
 
       context "when head pipeline has reports" do

@@ -7,7 +7,7 @@ FactoryBot.define do
       config_source { :webide_source }
     end
 
-    %i[license_management dependency_list dependency_scanning sast dast container_scanning].each do |report_type|
+    %i[container_scanning dast dependency_list dependency_scanning license_management license_scanning sast].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status { :success }
 
