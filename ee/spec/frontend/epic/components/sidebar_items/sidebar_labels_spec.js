@@ -3,14 +3,14 @@ import Vue from 'vue';
 import SidebarLabels from 'ee/epic/components/sidebar_items/sidebar_labels.vue';
 import createStore from 'ee/epic/store';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData, mockLabels } from '../../mock_data';
 
 describe('SidebarLabelsComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     const Component = Vue.extend(SidebarLabels);
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
@@ -20,8 +20,6 @@ describe('SidebarLabelsComponent', () => {
       store,
       props: { canUpdate: false, sidebarCollapsed: false },
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {
@@ -45,7 +43,7 @@ describe('SidebarLabelsComponent', () => {
   describe('methods', () => {
     describe('toggleSidebarRevealLabelsDropdown', () => {
       it('calls `toggleSidebar` action with param `sidebarCollapse`', () => {
-        spyOn(vm, 'toggleSidebar');
+        jest.spyOn(vm, 'toggleSidebar');
 
         vm.toggleSidebarRevealLabelsDropdown();
 
@@ -59,7 +57,7 @@ describe('SidebarLabelsComponent', () => {
 
     describe('handleDropdownClose', () => {
       it('calls `toggleSidebar` action only when `sidebarExpandedOnClick` prop is true', () => {
-        spyOn(vm, 'toggleSidebar');
+        jest.spyOn(vm, 'toggleSidebar');
 
         vm.sidebarExpandedOnClick = true;
 

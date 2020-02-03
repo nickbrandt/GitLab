@@ -3,14 +3,14 @@ import Vue from 'vue';
 import SidebarHeader from 'ee/epic/components/sidebar_items/sidebar_header.vue';
 import createStore from 'ee/epic/store';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../../mock_data';
 
 describe('SidebarHeaderComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     const Component = Vue.extend(SidebarHeader);
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
@@ -20,8 +20,6 @@ describe('SidebarHeaderComponent', () => {
       store,
       props: { sidebarCollapsed: false },
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {

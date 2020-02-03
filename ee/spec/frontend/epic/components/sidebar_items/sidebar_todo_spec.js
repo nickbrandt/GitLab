@@ -3,7 +3,7 @@ import Vue from 'vue';
 import SidebarTodo from 'ee/epic/components/sidebar_items/sidebar_todo.vue';
 import createStore from 'ee/epic/store';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../../mock_data';
 
 describe('SidebarTodoComponent', () => {
@@ -11,7 +11,7 @@ describe('SidebarTodoComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     gon.current_user_id = 1;
 
     const Component = Vue.extend(SidebarTodo);
@@ -23,8 +23,6 @@ describe('SidebarTodoComponent', () => {
       store,
       props: { sidebarCollapsed: false },
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {
