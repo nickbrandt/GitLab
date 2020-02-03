@@ -12,7 +12,8 @@ class Gitlab::Seeder::Vulnerabilities
 
     10.times do |rank|
       primary_identifier = create_identifier(rank)
-      occurrence = create_occurrence(rank, primary_identifier)
+      vulnerability = create_vulnerability
+      occurrence = create_occurrence(vulnerability, rank, primary_identifier)
       # Create occurrence_pipeline join model
       occurrence.pipelines << pipeline
       # Create occurrence_identifier join models
@@ -24,7 +25,7 @@ class Gitlab::Seeder::Vulnerabilities
         when 0
           create_feedback(occurrence, 'dismissal')
         when 1
-          create_feedback(occurrence, 'issue')
+          create_feedback(occurrence, 'issue', vulnerability: vulnerability)
         else
           # no feedback
         end
@@ -34,8 +35,20 @@ class Gitlab::Seeder::Vulnerabilities
 
   private
 
-  def create_occurrence(rank, primary_identifier)
+  def create_vulnerability
+    project.vulnerabilities.create!(
+      state: random_state,
+      author: author,
+      title: 'Cypher with no integrity',
+      severity: random_severity_level,
+      confidence: random_confidence_level,
+      report_type: random_report_type
+    )
+  end
+
+  def create_occurrence(vulnerability, rank, primary_identifier)
     project.vulnerability_findings.create!(
+      vulnerability: vulnerability,
       uuid: random_uuid,
       name: 'Cipher with no integrity',
       report_type: :sast,
@@ -59,8 +72,12 @@ class Gitlab::Seeder::Vulnerabilities
     )
   end
 
-  def create_feedback(occurrence, type)
-    issue = create_issue("Dismiss #{occurrence.name}") if type == 'issue'
+  def create_feedback(occurrence, type, vulnerability: nil)
+    if type == 'issue'
+      issue = create_issue("Dismiss #{occurrence.name}")
+      create_vulnerability_issue_link(vulnerability, issue)
+    end
+
     project.vulnerability_feedback.create!(
       feedback_type: type,
       category: 'sast',
@@ -69,6 +86,14 @@ class Gitlab::Seeder::Vulnerabilities
       pipeline: pipeline,
       project_fingerprint: occurrence.project_fingerprint,
       vulnerability_data: { category: 'sast' })
+  end
+
+  def create_vulnerability_issue_link(vulnerability, issue)
+    ::Vulnerabilities::IssueLink.create!(
+      vulnerability: vulnerability,
+      issue: issue,
+      link_type: :created
+    )
   end
 
   def scanner
@@ -88,6 +113,14 @@ class Gitlab::Seeder::Vulnerabilities
 
   def random_severity_level
     ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.sample
+  end
+
+  def random_report_type
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.sample
+  end
+
+  def random_state
+    ::Vulnerability.states.keys.sample
   end
 
   def metadata(line)
