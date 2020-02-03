@@ -62,14 +62,6 @@ module EE
 
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
 
-      state_machine :state_id do
-        after_transition any => :merged do |merge_request|
-          merge_request.merge_train&.merged!
-
-          true
-        end
-      end
-
       scope :order_review_time_desc, -> do
         joins(:metrics).reorder(::Gitlab::Database.nulls_last_order('merge_request_metrics.first_comment_at'))
       end

@@ -9,7 +9,7 @@ module MergeTrains
       # that means there was an unexpected commit came from out of merge train cycle.
       unless MergeTrain.sha_exists_in_history?(target_project.id, target_branch, newrev)
         merge_request = MergeTrain.first_in_train(target_project.id, target_branch)
-        merge_request.merge_train.stale! if merge_request
+        merge_request.merge_train.outdate_pipeline if merge_request
       end
     end
   end

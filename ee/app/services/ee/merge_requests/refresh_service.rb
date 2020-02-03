@@ -48,6 +48,8 @@ module EE
 
       # rubocop:disable Gitlab/ModuleWithInstanceVariables
       def check_merge_train_status
+        return unless @push.branch_updated?
+
         MergeTrains::CheckStatusService.new(project, current_user)
           .execute(project, @push.branch_name, @push.newrev)
       end

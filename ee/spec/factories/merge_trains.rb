@@ -8,20 +8,24 @@ FactoryBot.define do
     user
     pipeline factory: :ci_pipeline
 
-    trait :created do
-      status { :created }
+    trait :idle do
+      status { MergeTrain.state_machines[:status].states[:idle].value }
     end
 
     trait :merged do
-      status { :merged }
+      status { MergeTrain.state_machines[:status].states[:merged].value }
+    end
+
+    trait :merging do
+      status { MergeTrain.state_machines[:status].states[:merging].value }
     end
 
     trait :stale do
-      status { :stale }
+      status { MergeTrain.state_machines[:status].states[:stale].value }
     end
 
     trait :fresh do
-      status { :fresh }
+      status { MergeTrain.state_machines[:status].states[:fresh].value }
     end
   end
 end

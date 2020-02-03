@@ -50,6 +50,16 @@ describe MergeRequests::RefreshService do
       subject
     end
 
+    context 'when branch is deleted' do
+      let(:newrev) { Gitlab::Git::BLANK_SHA }
+
+      it 'does not check merge train status' do
+        expect(MergeTrains::CheckStatusService).not_to receive(:new)
+
+        subject
+      end
+    end
+
     context '#update_approvers' do
       let(:owner) { create(:user) }
       let(:current_user) { merge_request.author }
