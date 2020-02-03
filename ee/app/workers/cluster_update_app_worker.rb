@@ -28,13 +28,17 @@ class ClusterUpdateAppWorker
     return unless project
 
     find_application(app_name, app_id) do |app|
-      break if app.updated_since?(scheduled_time)
-      break if app.update_in_progress?
-
-      Clusters::Applications::PrometheusUpdateService.new(app, project).execute
+      update_prometheus(app, scheduled_time, project)
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def update_prometheus(app, scheduled_time, project)
+    return if app.updated_since?(scheduled_time)
+    return if app.update_in_progress?
+
+    Clusters::Applications::PrometheusUpdateService.new(app, project).execute
+  end
 
   def lease_key
     @lease_key ||= "#{self.class.name.underscore}-#{@app_id}"
