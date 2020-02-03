@@ -155,4 +155,14 @@ RSpec.describe Packages::Package, type: :model do
       it { is_expected.to eq([package2, package3]) }
     end
   end
+
+  describe '.limit_recent' do
+    let!(:package1) { create(:nuget_package) }
+    let!(:package2) { create(:nuget_package) }
+    let!(:package3) { create(:nuget_package) }
+
+    subject { described_class.limit_recent(2) }
+
+    it { is_expected.to match_array([package3, package2]) }
+  end
 end

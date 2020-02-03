@@ -38,7 +38,7 @@ FactoryBot.define do
 
     factory :nuget_package do
       sequence(:name) { |n| "NugetPackage#{n}"}
-      version { '1.0.0' }
+      sequence(:version) { |n| "1.0.#{n}" }
       package_type { :nuget }
 
       after :create do |package|

@@ -84,7 +84,7 @@ module API
         end
 
         # https://docs.microsoft.com/en-us/nuget/api/package-publish-resource
-        desc 'The NuGet Package Content endpoint' do
+        desc 'The NuGet Package Publish endpoint' do
           detail 'This feature was introduced in GitLab 12.6'
         end
         params do
@@ -117,6 +117,64 @@ module API
         end
         put 'authorize' do
           authorize_workhorse!(subject: authorized_user_project, has_length: false)
+        end
+
+        params do
+          requires :package_name, type: String, desc: 'The NuGet package name', regexp: API::NO_SLASH_URL_PART_REGEX
+        end
+        namespace '/metadata/*package_name' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          # https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource
+          desc 'The NuGet Metadata Service - Package name level' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get 'index', format: :json do
+            packages = ::Packages::Nuget::PackageFinder.new(authorized_user_project, package_name: params[:package_name])
+                                                       .execute
+
+            not_found!('Packages') unless packages.exists?
+
+            present ::Packages::Nuget::PackagesMetadataPresenter.new(packages),
+                    with: EE::API::Entities::Nuget::PackagesMetadata
+          end
+
+          desc 'The NuGet Metadata Service - Package name and version level' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          params do
+            requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
+          end
+          get '*package_version', format: :json do
+            package = ::Packages::Nuget::PackageFinder
+              .new(authorized_user_project, package_name: params[:package_name], package_version: params[:package_version])
+              .execute
+              .first
+
+            not_found!('Package') unless package
+
+            present ::Packages::Nuget::PackageMetadataPresenter.new(package),
+                    with: EE::API::Entities::Nuget::PackageMetadata
+          end
+        end
+
+        # https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
+        desc 'The NuGet Content Service' do
+          detail 'This feature was introduced in GitLab 12.8'
+        end
+        params do
+          requires :package_name, type: String, desc: 'The NuGet package name', regexp: API::NO_SLASH_URL_PART_REGEX
+          requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
+        end
+        namespace '/download/*package_name/*package_version' do
+          params do
+            requires :package_filename, type: String, desc: 'The NuGet package filename', regexp: API::NO_SLASH_URL_PART_REGEX
+          end
+          get '*package_filename' do
+            not_found!('package not found') # TODO NUGET API: not implemented yet.
+          end
         end
       end
     end
