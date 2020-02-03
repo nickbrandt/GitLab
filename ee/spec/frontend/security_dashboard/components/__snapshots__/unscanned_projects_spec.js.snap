@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UnscannedProjects component header matches the snapshot 1`] = `
+<header
+  class="px-3 pt-3 mb-0"
+>
+  <h4
+    class="my-0"
+  >
+    Project scanning
+  </h4>
+   
+  <p
+    class="text-secondary mb-0"
+  >
+    
+      Default branch scanning by project
+    
+  </p>
+</header>
+`;
+
+exports[`UnscannedProjects component tab content shows a list of outdated projects 1`] = `
+<div
+  class="mx-3 my-2"
+  style="max-height: 245px; overflow-y: auto; line-height: normal;"
+>
+  <div>
+    <h5>
+      Foo
+    </h5>
+     
+    <ul
+      class="list-unstyled"
+    >
+      <li>
+        <a
+          class="gl-link"
+          href="/foo/security/dashboard"
+          rel="noopener"
+          target="_blank"
+        >
+          Foo
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+`;
+
+exports[`UnscannedProjects component tab content shows a list of untested projects 1`] = `
+<div
+  class="mx-3 my-2"
+  style="max-height: 245px; overflow-y: auto; line-height: normal;"
+>
+  <ul
+    class="list-unstyled"
+  >
+    <li>
+      <a
+        class="gl-link"
+        href="/foo/security/dashboard"
+        rel="noopener"
+        target="_blank"
+      >
+        Foo
+      </a>
+    </li>
+  </ul>
+</div>
+`;
