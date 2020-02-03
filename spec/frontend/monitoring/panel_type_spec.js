@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { setTestTimeout } from 'helpers/timeout';
+import invalidUrl from '~/lib/utils/invalid_url';
 import axios from '~/lib/utils/axios_utils';
 import PanelType from '~/monitoring/components/panel_type.vue';
 import EmptyChart from '~/monitoring/components/charts/empty_chart.vue';
@@ -16,20 +17,25 @@ global.URL.createObjectURL = jest.fn();
 describe('Panel Type component', () => {
   let axiosMock;
   let store;
-  let panelType;
-  const dashboardWidth = 100;
+  let state;
+  let wrapper;
   const exampleText = 'example_text';
 
-  const createWrapper = props =>
-    shallowMount(PanelType, {
+  const createWrapper = props => {
+    wrapper = shallowMount(PanelType, {
       propsData: {
         ...props,
       },
       store,
     });
+  };
 
   beforeEach(() => {
     setTestTimeout(1000);
+
+    store = createStore();
+    state = store.state.monitoringDashboard;
+
     axiosMock = new AxiosMockAdapter(axios);
   });
 
@@ -44,19 +50,18 @@ describe('Panel Type component', () => {
     graphDataNoResult.metrics[0].result = [];
 
     beforeEach(() => {
-      panelType = createWrapper({
-        dashboardWidth,
+      createWrapper({
         graphData: graphDataNoResult,
       });
     });
 
     afterEach(() => {
-      panelType.destroy();
+      wrapper.destroy();
     });
 
     describe('Empty Chart component', () => {
       beforeEach(() => {
-        glEmptyChart = panelType.find(EmptyChart);
+        glEmptyChart = wrapper.find(EmptyChart);
       });
 
       it('is a Vue instance', () => {
@@ -66,51 +71,105 @@ describe('Panel Type component', () => {
       it('it receives a graph title', () => {
         const props = glEmptyChart.props();
 
-        expect(props.graphTitle).toBe(panelType.vm.graphData.title);
+        expect(props.graphTitle).toBe(wrapper.vm.graphData.title);
       });
     });
   });
 
   describe('when graph data is available', () => {
     beforeEach(() => {
-      store = createStore();
-      panelType = createWrapper({
-        dashboardWidth,
+      createWrapper({
         graphData: graphDataPrometheusQueryRange,
       });
     });
 
     afterEach(() => {
-      panelType.destroy();
+      wrapper.destroy();
     });
 
     it('sets no clipboard copy link on dropdown by default', () => {
-      const link = () => panelType.find('.js-chart-link');
+      const link = () => wrapper.find('.js-chart-link');
       expect(link().exists()).toBe(false);
     });
 
     describe('Time Series Chart panel type', () => {
       it('is rendered', () => {
-        expect(panelType.find(TimeSeriesChart).isVueInstance()).toBe(true);
-        expect(panelType.find(TimeSeriesChart).exists()).toBe(true);
+        expect(wrapper.find(TimeSeriesChart).isVueInstance()).toBe(true);
+        expect(wrapper.find(TimeSeriesChart).exists()).toBe(true);
       });
 
       it('includes a default group id', () => {
-        expect(panelType.vm.groupId).toBe('panel-type-chart');
+        expect(wrapper.vm.groupId).toBe('panel-type-chart');
       });
     });
 
     describe('Anomaly Chart panel type', () => {
-      beforeEach(done => {
-        panelType.setProps({
+      beforeEach(() => {
+        wrapper.setProps({
           graphData: anomalyMockGraphData,
         });
-        panelType.vm.$nextTick(done);
+        return wrapper.vm.$nextTick();
       });
 
       it('is rendered with an anomaly chart', () => {
-        expect(panelType.find(AnomalyChart).isVueInstance()).toBe(true);
-        expect(panelType.find(AnomalyChart).exists()).toBe(true);
+        expect(wrapper.find(AnomalyChart).isVueInstance()).toBe(true);
+        expect(wrapper.find(AnomalyChart).exists()).toBe(true);
+      });
+    });
+  });
+
+  describe('View Logs dropdown item', () => {
+    const mockLogsPath = '/path/to/logs';
+    const mockTimeRange = { duration: { seconds: 120 } };
+
+    const findViewLogsLink = () => wrapper.find({ ref: 'viewLogsLink' });
+
+    beforeEach(() => {
+      createWrapper({
+        graphData: graphDataPrometheusQueryRange,
+      });
+      return wrapper.vm.$nextTick();
+    });
+
+    it('is not present by default', () =>
+      wrapper.vm.$nextTick(() => {
+        expect(findViewLogsLink().exists()).toBe(false);
+      }));
+
+    it('is not present if a time range is not set', () => {
+      state.logsPath = mockLogsPath;
+      state.timeRange = null;
+
+      return wrapper.vm.$nextTick(() => {
+        expect(findViewLogsLink().exists()).toBe(false);
+      });
+    });
+
+    it('is not present if the logs path is default', () => {
+      state.logsPath = invalidUrl;
+      state.timeRange = mockTimeRange;
+
+      return wrapper.vm.$nextTick(() => {
+        expect(findViewLogsLink().exists()).toBe(false);
+      });
+    });
+
+    it('is not present if the logs path is not set', () => {
+      state.logsPath = null;
+      state.timeRange = mockTimeRange;
+
+      return wrapper.vm.$nextTick(() => {
+        expect(findViewLogsLink().exists()).toBe(false);
+      });
+    });
+
+    it('is present when logs path and time a range is present', () => {
+      state.logsPath = mockLogsPath;
+      state.timeRange = mockTimeRange;
+
+      return wrapper.vm.$nextTick(() => {
+        expect(findViewLogsLink().exists()).toBe(true);
+        expect(findViewLogsLink().attributes('href')).toEqual('/path/to/logs?duration_seconds=120');
       });
     });
   });
@@ -119,20 +178,18 @@ describe('Panel Type component', () => {
     const clipboardText = 'A value to copy.';
 
     beforeEach(() => {
-      store = createStore();
-      panelType = createWrapper({
+      createWrapper({
         clipboardText,
-        dashboardWidth,
         graphData: graphDataPrometheusQueryRange,
       });
     });
 
     afterEach(() => {
-      panelType.destroy();
+      wrapper.destroy();
     });
 
     it('sets clipboard text on the dropdown', () => {
-      const link = () => panelType.find('.js-chart-link');
+      const link = () => wrapper.find('.js-chart-link');
 
       expect(link().exists()).toBe(true);
       expect(link().element.dataset.clipboardText).toBe(clipboardText);
@@ -140,22 +197,20 @@ describe('Panel Type component', () => {
   });
 
   describe('when downloading metrics data as CSV', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       graphDataPrometheusQueryRange.y_label = 'metric';
-      store = createStore();
-      panelType = shallowMount(PanelType, {
+      wrapper = shallowMount(PanelType, {
         propsData: {
           clipboardText: exampleText,
-          dashboardWidth,
           graphData: graphDataPrometheusQueryRange,
         },
         store,
       });
-      panelType.vm.$nextTick(done);
+      return wrapper.vm.$nextTick();
     });
 
     afterEach(() => {
-      panelType.destroy();
+      wrapper.destroy();
     });
 
     describe('csvText', () => {
@@ -165,7 +220,7 @@ describe('Panel Type component', () => {
         const firstRow = `${data[0][0]},${data[0][1]}`;
         const secondRow = `${data[1][0]},${data[1][1]}`;
 
-        expect(panelType.vm.csvText).toBe(`${header}\r\n${firstRow}\r\n${secondRow}\r\n`);
+        expect(wrapper.vm.csvText).toBe(`${header}\r\n${firstRow}\r\n${secondRow}\r\n`);
       });
     });
 
@@ -174,7 +229,7 @@ describe('Panel Type component', () => {
         expect(global.URL.createObjectURL).toHaveBeenLastCalledWith(expect.any(Blob));
         expect(global.URL.createObjectURL).toHaveBeenLastCalledWith(
           expect.objectContaining({
-            size: panelType.vm.csvText.length,
+            size: wrapper.vm.csvText.length,
             type: 'text/plain',
           }),
         );

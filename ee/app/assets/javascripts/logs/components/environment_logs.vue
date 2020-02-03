@@ -6,6 +6,7 @@ import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
 import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
+import { timeRangeFromUrl } from '~/monitoring/utils';
 
 export default {
   components: {
@@ -41,7 +42,6 @@ export default {
   data() {
     return {
       searchQuery: '',
-      selectedTimeRange: defaultTimeRange,
       timeRanges,
       isElasticStackCalloutDismissed: false,
     };
@@ -91,6 +91,7 @@ export default {
   },
   mounted() {
     this.setInitData({
+      timeRange: timeRangeFromUrl() || defaultTimeRange,
       environmentName: this.environmentName,
       podName: this.currentPodName,
     });
