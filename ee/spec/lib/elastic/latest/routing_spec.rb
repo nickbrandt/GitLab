@@ -63,6 +63,12 @@ describe Elastic::Latest::Routing do
 
         expect(subject.routing_options(options)).to eq({ routing: project_routing })
       end
+
+      it 'returns empty hash when there are too many project_ids' do
+        max_count = included_class::ES_ROUTING_MAX_COUNT
+
+        expect(subject.routing_options({ project_ids: 1.upto(max_count + 1).to_a })).to eq({})
+      end
     end
 
     context 'when feature flag is disabled' do
