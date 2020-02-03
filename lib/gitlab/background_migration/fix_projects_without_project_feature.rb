@@ -31,12 +31,15 @@ module Gitlab
               snippets_access_level,
               builds_access_level,
               repository_access_level,
-              pages_access_level,
               forking_access_level,
+              pages_access_level,
               created_at,
               updated_at
             )
-              SELECT projects.id, 20, 20, 20, 20, 20, 20, 20, 20, NOW(), NOW()
+              SELECT projects.id,
+                20, 20, 20, 20, 20, 20, 20,
+                #{pages_access_level},
+                NOW(), NOW()
               FROM projects
               WHERE projects.id BETWEEN #{Integer(from_id)} AND #{Integer(to_id)}
               AND NOT EXISTS (
@@ -49,6 +52,14 @@ module Gitlab
           SELECT COUNT(*) as number_of_created_records
           FROM created_records
         SQL
+      end
+
+      def pages_access_level
+        if ::Gitlab::Pages.access_control_is_forced?
+          "10"
+        else
+          "GREATEST(projects.visibility_level, 10)"
+        end
       end
 
       def log(count, from_id, to_id)
