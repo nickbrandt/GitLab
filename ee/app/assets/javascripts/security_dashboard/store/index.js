@@ -7,6 +7,7 @@ import mediator from './plugins/mediator';
 import filters from './modules/filters/index';
 import vulnerabilities from './modules/vulnerabilities/index';
 import vulnerableProjects from './modules/vulnerable_projects/index';
+import unscannedProjects from './modules/unscanned_projects/index';
 
 Vue.use(Vuex);
 
@@ -19,6 +20,7 @@ export default ({ dashboardType = DASHBOARD_TYPES.PROJECT, plugins = [] } = {}) 
       vulnerableProjects,
       filters,
       vulnerabilities,
+      unscannedProjects,
     },
     plugins: [mediator, ...plugins],
   });
