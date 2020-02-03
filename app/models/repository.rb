@@ -1130,6 +1130,13 @@ class Repository
     true
   end
 
+  def create_from_bundle(bundle_path)
+    raw.create_from_bundle(bundle_path)
+    after_create
+
+    true
+  end
+
   def blobs_metadata(paths, ref = 'HEAD')
     references = Array.wrap(paths).map { |path| [ref, path] }
 
