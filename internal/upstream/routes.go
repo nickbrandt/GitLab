@@ -215,6 +215,7 @@ func (u *upstream) configureRoutes() {
 		// Overall status can be seen at https://gitlab.com/groups/gitlab-org/-/epics/1802#current-status
 		route("POST", apiPattern+`v4/projects/[0-9]+/wikis/attachments\z`, uploadAccelerateProxy),
 		route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
+		route("POST", apiPattern+`v4/groups/import`, upload.Accelerate(api, signingProxy)),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
