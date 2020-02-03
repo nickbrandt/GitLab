@@ -122,7 +122,7 @@ describe Ci::Pipeline do
   describe '#batch_lookup_report_artifact_for_file_type' do
     subject(:artifact) { pipeline.batch_lookup_report_artifact_for_file_type(file_type) }
 
-    let!(:build) { create(:ee_ci_build, artifact_type, :success, pipeline: pipeline) }
+    let(:build_artifact) { build.job_artifacts.sample }
 
     context 'with security report artifact' do
       let!(:build) { create(:ee_ci_build, :dependency_scanning, :success, pipeline: pipeline) }
@@ -133,7 +133,7 @@ describe Ci::Pipeline do
       end
 
       it 'returns right kind of artifacts' do
-        expect(artifact.file_type).to eq file_type.to_s
+        is_expected.to eq(build_artifact)
       end
 
       context 'when looking for other type of artifact' do
@@ -157,7 +157,7 @@ describe Ci::Pipeline do
           let(:file_type) { :license_scanning }
 
           it 'returns artifact' do
-            is_expected.to be_kind_of Ci::JobArtifact
+            is_expected.to eq(build_artifact)
           end
         end
 
@@ -165,7 +165,7 @@ describe Ci::Pipeline do
           let(:file_type) { :license_management }
 
           it 'returns artifact' do
-            is_expected.to be_kind_of Ci::JobArtifact
+            is_expected.to eq(build_artifact)
           end
         end
       end
