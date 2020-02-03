@@ -24,7 +24,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
                :issues_disabled,
                name: 'project',
                path: 'project',
-               group: create(:group, visibility_level: Gitlab::VisibilityLevel::PRIVATE))
+               group: create(:group, :private))
       end
 
       context 'with pre-existing epic' do
