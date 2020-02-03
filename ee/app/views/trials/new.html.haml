@@ -1,4 +1,5 @@
 - page_title _('Start your Free Gold Trial')
+- glm_params = { glm_source: params[:glm_source], glm_content: params[:glm_content] }
 
 %h3.center.pt-6
   = _('Start your Free Gold Trial')
@@ -8,7 +9,7 @@
 
 = render 'errors'
 
-= form_tag create_lead_trials_path, method: :post do |f|
+= form_tag create_lead_trials_path(glm_params), method: :post do |f|
   .form-group
     = label_tag :first_name, _('First name'), for: :first_name, class: 'col-form-label'
     = text_field_tag :first_name, params[:first_name] || current_user.first_name, class: 'form-control', required: true
