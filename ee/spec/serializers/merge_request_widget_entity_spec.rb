@@ -208,7 +208,7 @@ describe MergeRequestWidgetEntity do
 
   it 'has vulnerability feedback paths' do
     expect(subject.as_json[:vulnerability_feedback_path]).to eq(
-      "/#{merge_request.project.full_path}/vulnerability_feedback"
+      "/#{merge_request.project.full_path}/-/vulnerability_feedback"
     )
     expect(subject.as_json).to include(:create_vulnerability_feedback_issue_path)
     expect(subject.as_json).to include(:create_vulnerability_feedback_merge_request_path)
