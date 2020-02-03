@@ -466,9 +466,6 @@ msgstr ""
 msgid "%{total} open issues"
 msgstr ""
 
-msgid "%{unstaged} unstaged and %{staged} staged changes"
-msgstr ""
-
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
@@ -725,9 +722,6 @@ msgid "<no name set>"
 msgstr ""
 
 msgid "<no scopes selected>"
-msgstr ""
-
-msgid "<strong>%{changedFilesLength} unstaged</strong> and <strong>%{stagedFilesLength} staged</strong> changes"
 msgstr ""
 
 msgid "<strong>%{group_name}</strong> group members"
