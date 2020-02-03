@@ -31,7 +31,7 @@ Example response:
 }
 ```
 
-### Enable/Disable Error Tracking project settings
+### Enable or disable the Error Tracking project settings
 
 The API allows you to enable or disable the Error Tracking settings for a project. Only for project maintainers.
 
@@ -41,7 +41,7 @@ PATCH /projects/:id/error_tracking/settings
 
 | Attribute | Type    | Required | Description           |
 | --------- | ------- | -------- | --------------------- |
-| `id`      | integer | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `id`      | integer | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `active`  | boolean | yes      | Pass `true` to enable the already configured error tracking settings or `false` to disable it. |
 
 ```shell
