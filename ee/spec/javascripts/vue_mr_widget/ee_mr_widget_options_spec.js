@@ -61,6 +61,8 @@ describe('ee merge request widget options', () => {
     gon.features = {};
   });
 
+  const findSecurityWidget = () => vm.$el.querySelector('.js-security-widget');
+
   const VULNERABILITY_FEEDBACK_ENDPOINT = 'vulnerability_feedback_path';
 
   describe('SAST', () => {
@@ -84,7 +86,11 @@ describe('ee merge request widget options', () => {
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(vm.$el.querySelector(SAST_SELECTOR).textContent.trim()).toContain('SAST is loading');
+        expect(
+          findSecurityWidget()
+            .querySelector(SAST_SELECTOR)
+            .textContent.trim(),
+        ).toContain('SAST is loading');
       });
     });
 
@@ -99,8 +105,9 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(`${SAST_SELECTOR} .report-block-list-issue-description`)
-                .textContent,
+              findSecurityWidget().querySelector(
+                `${SAST_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
             ),
           ).toEqual('SAST detected 1 new, and 2 fixed vulnerabilities');
           done();
@@ -120,8 +127,9 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(`${SAST_SELECTOR} .report-block-list-issue-description`)
-                .textContent,
+              findSecurityWidget().querySelector(
+                `${SAST_SELECTOR} .report-block-list-issue-description`,
+              ).textContent,
             ).trim(),
           ).toEqual('SAST detected no vulnerabilities');
           done();
@@ -139,9 +147,9 @@ describe('ee merge request widget options', () => {
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(removeBreakLine(vm.$el.querySelector(SAST_SELECTOR).textContent)).toContain(
-            'SAST: Loading resulted in an error',
-          );
+          expect(
+            removeBreakLine(findSecurityWidget().querySelector(SAST_SELECTOR).textContent),
+          ).toContain('SAST: Loading resulted in an error');
           done();
         }, 0);
       });
@@ -170,7 +178,9 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(vm.$el.querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
+          removeBreakLine(
+            findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
+          ),
         ).toContain('Dependency scanning is loading');
       });
     });
@@ -187,7 +197,7 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
+              findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
@@ -213,7 +223,7 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
+              findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
@@ -235,7 +245,7 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
+              findSecurityWidget().querySelector(
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
@@ -257,7 +267,9 @@ describe('ee merge request widget options', () => {
       it('should render error indicator', done => {
         setTimeout(() => {
           expect(
-            removeBreakLine(vm.$el.querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent),
+            removeBreakLine(
+              findSecurityWidget().querySelector(DEPENDENCY_SCANNING_SELECTOR).textContent,
+            ),
           ).toContain('Dependency scanning: Loading resulted in an error');
           done();
         }, 0);
@@ -650,7 +662,9 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
         expect(
-          removeBreakLine(vm.$el.querySelector(CONTAINER_SCANNING_SELECTOR).textContent),
+          removeBreakLine(
+            findSecurityWidget().querySelector(CONTAINER_SCANNING_SELECTOR).textContent,
+          ),
         ).toContain('Container scanning is loading');
       });
     });
@@ -667,7 +681,7 @@ describe('ee merge request widget options', () => {
         setTimeout(() => {
           expect(
             removeBreakLine(
-              vm.$el.querySelector(
+              findSecurityWidget().querySelector(
                 `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
@@ -687,9 +701,11 @@ describe('ee merge request widget options', () => {
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(vm.$el.querySelector(CONTAINER_SCANNING_SELECTOR).textContent.trim()).toContain(
-            'Container scanning: Loading resulted in an error',
-          );
+          expect(
+            findSecurityWidget()
+              .querySelector(CONTAINER_SCANNING_SELECTOR)
+              .textContent.trim(),
+          ).toContain('Container scanning: Loading resulted in an error');
           done();
         }, 0);
       });
@@ -717,7 +733,11 @@ describe('ee merge request widget options', () => {
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
-        expect(vm.$el.querySelector(DAST_SELECTOR).textContent.trim()).toContain('DAST is loading');
+        expect(
+          findSecurityWidget()
+            .querySelector(DAST_SELECTOR)
+            .textContent.trim(),
+        ).toContain('DAST is loading');
       });
     });
 
@@ -732,7 +752,7 @@ describe('ee merge request widget options', () => {
       it('should render provided data', done => {
         setTimeout(() => {
           expect(
-            vm.$el
+            findSecurityWidget()
               .querySelector(`${DAST_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
           ).toEqual('DAST detected 1 new, and 2 fixed vulnerabilities');
@@ -751,9 +771,11 @@ describe('ee merge request widget options', () => {
 
       it('should render error indicator', done => {
         setTimeout(() => {
-          expect(vm.$el.querySelector(DAST_SELECTOR).textContent.trim()).toContain(
-            'DAST: Loading resulted in an error',
-          );
+          expect(
+            findSecurityWidget()
+              .querySelector(DAST_SELECTOR)
+              .textContent.trim(),
+          ).toContain('DAST: Loading resulted in an error');
           done();
         }, 0);
       });
@@ -1076,6 +1098,8 @@ describe('ee merge request widget options', () => {
     const noSecurityReportsEnabledCases = [
       undefined,
       {},
+      { foo: true },
+      { license_management: true },
       {
         dast: false,
         sast: false,
@@ -1085,26 +1109,15 @@ describe('ee merge request widget options', () => {
     ];
 
     noSecurityReportsEnabledCases.forEach(noSecurityReportsEnabled => {
-      beforeEach(() => {
+      it('does not render the security reports widget', () => {
         gl.mrWidgetData = {
           ...mockData,
           enabled_reports: noSecurityReportsEnabled,
         };
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-      });
 
-      it('does not render the security reports', () => {
-        const selectors = [
-          SAST_SELECTOR,
-          DAST_SELECTOR,
-          DEPENDENCY_SCANNING_SELECTOR,
-          CONTAINER_SCANNING_SELECTOR,
-        ];
-
-        const securityWidgets = selectors.map(selector => vm.$el.querySelector(selector));
-
-        expect(securityWidgets).toEqual([null, null, null, null]);
+        expect(findSecurityWidget()).toBe(null);
       });
     });
   });
