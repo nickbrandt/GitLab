@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::GeoReplication, :geo, :geo_fdw, api: true do
+describe API::GeoReplication, :request_store, :geo, :geo_fdw, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
