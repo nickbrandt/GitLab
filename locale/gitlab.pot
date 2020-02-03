@@ -5903,6 +5903,9 @@ msgstr ""
 msgid "CycleAnalytics|Tasks by type"
 msgstr ""
 
+msgid "CycleAnalytics|The given date range is larger than 180 days"
+msgstr ""
+
 msgid "CycleAnalytics|Total days to completion"
 msgstr ""
 
