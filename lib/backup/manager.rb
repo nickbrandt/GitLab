@@ -126,6 +126,7 @@ module Backup
     end
 
     def unpack
+      cleanup_required = true
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
@@ -155,13 +156,14 @@ module Backup
           tar_file = backup_file_list.first
         end
 
-        progress.print 'Unpacking backup ... '
+          progress.print 'Unpacking backup ... '
 
-        if Kernel.system(*%W(tar -xf #{tar_file}))
-          progress.puts 'done'.color(:green)
-        else
-          progress.puts 'unpacking backup failed'.color(:red)
-          exit 1
+          if Kernel.system(*%W(tar -xf #{tar_file}))
+            progress.puts 'done'.color(:green)
+          else
+            progress.puts 'unpacking backup failed'.color(:red)
+            exit 1
+          end
         end
       end
       true

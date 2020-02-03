@@ -683,7 +683,7 @@ lose access to your GitLab server.
 
 You may also want to restore any TLS keys, certificates, or [SSH host keys](https://superuser.com/questions/532040/copy-ssh-keys-from-one-server-to-another-server/532079#532079).
 
-Starting with GitLab12.9 if an untarred backup (like the ones made with
+Starting with GitLab 12.9 if an untarred backup (like the ones made with
 `SKIP=tar`) is found, and no backup is chosen with `BACKUP=<timestamp>`, the
 untarred backup is used.
 
