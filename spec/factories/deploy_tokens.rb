@@ -30,9 +30,5 @@ FactoryBot.define do
     trait :project do
       deploy_token_type { DeployToken.deploy_token_types[:project_type] }
     end
-
-    trait :project do
-      deploy_token_type { 2 }
-    end
   end
 end
