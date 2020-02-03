@@ -36,7 +36,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.licenseManagement = data.license_management;
     this.metricsReportsPath = data.metrics_reports_path;
 
-    this.enabledSecurityReports = convertObjectPropsToCamelCase(data.enabled_reports);
+    this.enabledReports = convertObjectPropsToCamelCase(data.enabled_reports);
 
     this.blockingMergeRequests = data.blocking_merge_requests;
 
