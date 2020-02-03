@@ -14,13 +14,13 @@ module Gitlab
       private
 
       def create_missing!(from_id, to_id)
-        result = ActiveRecord::Base.connection.select_one(sql, nil, [[nil, from_id], [nil, to_id]])
+        result = ActiveRecord::Base.connection.select_one(sql(from_id, to_id))
         return 0 unless result
 
         result['number_of_created_records']
       end
 
-      def sql
+      def sql(from_id, to_id)
         <<~SQL
           WITH created_records AS (
             INSERT INTO project_features (
@@ -38,7 +38,7 @@ module Gitlab
             )
               SELECT projects.id, 20, 20, 20, 20, 20, 20, 20, 20, NOW(), NOW()
               FROM projects
-              WHERE projects.id BETWEEN $1 AND $2
+              WHERE projects.id BETWEEN #{Integer(from_id)} AND #{Integer(to_id)}
               AND NOT EXISTS (
                 SELECT 1 FROM project_features
                 WHERE project_features.project_id = projects.id

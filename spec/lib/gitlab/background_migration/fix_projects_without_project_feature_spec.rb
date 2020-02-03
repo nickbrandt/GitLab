@@ -33,7 +33,7 @@ describe Gitlab::BackgroundMigration::FixProjectsWithoutProjectFeature, :migrati
     subject
 
     project_id = projects_without_feature.first.id
-    record = ActiveRecord::Base.connection.select_one('SELECT * FROM project_features WHERE id=$1', nil, [[nil, project_id]])
+    record = ActiveRecord::Base.connection.select_one("SELECT * FROM project_features WHERE id=#{project_id}")
 
     expect(record.except('id', 'project_id', 'created_at', 'updated_at')).to eq(
       {
