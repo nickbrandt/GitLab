@@ -21,6 +21,6 @@ FactoryBot.define do
   factory :note_on_epic, parent: :note, traits: [:on_epic]
 
   factory :diff_note_on_design, parent: :note, traits: [:on_design], class: 'DiffNote' do
-    position { build(:image_diff_position, file: noteable.full_path) }
+    position { build(:image_diff_position, file: noteable.full_path, diff_refs: noteable.diff_refs) }
   end
 end
