@@ -62,7 +62,6 @@ export default {
         ...this.diffFileCommentForm,
       });
 
-      // eslint-disable-next-line camelcase
       const diffFileHeadSha = this.commit && this?.diffFile?.diff_refs?.head_sha;
 
       postData.data.note.commit_id = diffFileHeadSha || null;

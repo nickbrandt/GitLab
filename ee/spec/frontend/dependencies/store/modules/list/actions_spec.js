@@ -13,7 +13,7 @@ import {
 } from 'ee/dependencies/store/modules/list/constants';
 import createFlash from '~/flash';
 
-import mockDependenciesResponse from './data/mock_dependencies';
+import mockDependenciesResponse from './data/mock_dependencies.json';
 
 jest.mock('~/flash', () => jest.fn());
 
