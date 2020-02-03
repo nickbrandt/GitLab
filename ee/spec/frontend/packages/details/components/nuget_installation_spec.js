@@ -78,6 +78,7 @@ describe('NugetInstallation', () => {
         .$nextTick()
         .then(() => {
           installationTab().trigger('click');
+          return wrapper.vm.$nextTick();
         })
         .then(() => {
           expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.INSTALLATION, {
