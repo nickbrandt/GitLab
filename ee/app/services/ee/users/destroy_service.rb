@@ -10,6 +10,8 @@ module EE
         super(user, options) do |delete_user|
           mirror_cleanup(delete_user)
         end
+
+        log_audit_event(user) if options[:hard_delete]
       end
 
       def mirror_cleanup(user)
@@ -30,6 +32,14 @@ module EE
         mirror_owners -= [user]
 
         mirror_owners.first
+      end
+
+      def log_audit_event(user)
+        ::AuditEventService.new(
+          current_user,
+          user,
+          action: :destroy
+        ).for_user.security_event
       end
     end
   end
