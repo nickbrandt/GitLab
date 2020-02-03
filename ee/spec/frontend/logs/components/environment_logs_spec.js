@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { GlDropdown, GlDropdownItem, GlSearchBoxByClick } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 
 import { createStore } from 'ee/logs/stores';
@@ -42,7 +43,7 @@ describe('EnvironmentLogs', () => {
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
   const findSearchBar = () => wrapper.find('.js-logs-search');
-  const findTimeWindowDropdown = () => wrapper.find({ ref: 'time-window-dropdown' });
+  const findTimeRangePicker = () => wrapper.find({ ref: 'dateTimePicker' });
 
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
@@ -116,8 +117,8 @@ describe('EnvironmentLogs', () => {
 
     expect(findSearchBar().exists()).toBe(true);
     expect(findSearchBar().is(GlSearchBoxByClick)).toBe(true);
-    expect(findTimeWindowDropdown().exists()).toBe(true);
-    expect(findTimeWindowDropdown().is(GlDropdown)).toBe(true);
+    expect(findTimeRangePicker().exists()).toBe(true);
+    expect(findTimeRangePicker().is(DateTimePicker)).toBe(true);
 
     // log trace
     expect(findLogTrace().isEmpty()).toBe(false);
@@ -169,7 +170,7 @@ describe('EnvironmentLogs', () => {
     });
 
     it('displays a disabled time window dropdown', () => {
-      expect(findTimeWindowDropdown().attributes('disabled')).toBe('true');
+      expect(findTimeRangePicker().attributes('disabled')).toBe('true');
     });
 
     it('does not update buttons state', () => {
@@ -207,7 +208,7 @@ describe('EnvironmentLogs', () => {
     it('displays a disabled search bar and time window dropdown', () => {
       expect(findSearchBar().exists()).toBe(true);
       expect(findSearchBar().attributes('disabled')).toBe('true');
-      expect(findTimeWindowDropdown().attributes('disabled')).toBe('true');
+      expect(findTimeRangePicker().attributes('disabled')).toBe('true');
     });
   });
 
@@ -234,7 +235,7 @@ describe('EnvironmentLogs', () => {
     });
 
     it('displays an enabled time window dropdown', () => {
-      expect(findTimeWindowDropdown().attributes('disabled')).toBeFalsy();
+      expect(findTimeRangePicker().attributes('disabled')).toBeFalsy();
     });
 
     it('populates environments dropdown', () => {

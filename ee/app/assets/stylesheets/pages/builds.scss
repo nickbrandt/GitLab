@@ -18,10 +18,6 @@
       }
     }
 
-    .dropdown-menu {
-      width: 300px;
-    }
-
     .controllers {
       @include build-controllers(16px, flex-end, true, 2);
     }
