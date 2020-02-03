@@ -7,11 +7,11 @@ module EE
 
       override :execute
       def execute(user, options = {})
-        super(user, options) do |delete_user|
+        result = super(user, options) do |delete_user|
           mirror_cleanup(delete_user)
         end
 
-        log_audit_event(user) if options[:hard_delete]
+        log_audit_event(user) if result.destroyed?
       end
 
       def mirror_cleanup(user)
