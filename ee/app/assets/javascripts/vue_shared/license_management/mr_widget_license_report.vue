@@ -106,20 +106,10 @@ export default {
       licensesApiPath,
     });
 
-    if (gon.features && gon.features.parsedLicenseReport) {
-      this.loadParsedLicenseReport();
-    } else {
-      this.loadLicenseReport();
-      this.loadManagedLicenses();
-    }
+    this.loadParsedLicenseReport();
   },
   methods: {
-    ...mapActions([
-      'setAPISettings',
-      'loadManagedLicenses',
-      'loadLicenseReport',
-      'loadParsedLicenseReport',
-    ]),
+    ...mapActions(['setAPISettings', 'loadParsedLicenseReport']),
   },
 };
 </script>

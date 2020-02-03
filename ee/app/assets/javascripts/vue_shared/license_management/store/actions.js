@@ -86,44 +86,8 @@ export const loadParsedLicenseReport = ({ dispatch, state }) => {
     });
 };
 
-export const requestLoadLicenseReport = ({ commit }) => {
-  commit(types.REQUEST_LOAD_LICENSE_REPORT);
-};
-export const receiveLoadLicenseReport = ({ commit }, reports) => {
-  commit(types.RECEIVE_LOAD_LICENSE_REPORT, reports);
-};
 export const receiveLoadLicenseReportError = ({ commit }, error) => {
   commit(types.RECEIVE_LOAD_LICENSE_REPORT_ERROR, error);
-};
-export const loadLicenseReport = ({ dispatch, state }) => {
-  dispatch('requestLoadLicenseReport');
-
-  const { headPath, basePath } = state;
-
-  const promises = [axios.get(headPath).then(({ data }) => data)];
-
-  if (basePath) {
-    promises.push(
-      axios
-        .get(basePath)
-        .then(({ data }) => data)
-        .catch(e => {
-          if (e.response.status === 404) {
-            return {};
-          }
-
-          throw e;
-        }),
-    );
-  }
-
-  return Promise.all(promises)
-    .then(([headReport, baseReport = {}]) => {
-      dispatch('receiveLoadLicenseReport', { headReport, baseReport });
-    })
-    .catch(error => {
-      dispatch('receiveLoadLicenseReportError', error);
-    });
 };
 
 export const requestSetLicenseApproval = ({ commit }) => {
@@ -131,11 +95,7 @@ export const requestSetLicenseApproval = ({ commit }) => {
 };
 export const receiveSetLicenseApproval = ({ commit, dispatch }) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL);
-  if (gon.features && gon.features.parsedLicenseReport) {
-    dispatch('loadParsedLicenseReport');
-  } else {
-    dispatch('loadManagedLicenses');
-  }
+  dispatch('loadParsedLicenseReport');
 };
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);

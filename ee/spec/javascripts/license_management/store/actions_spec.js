@@ -5,18 +5,11 @@ import createState from 'ee/vue_shared/license_management/store/state';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { TEST_HOST } from 'spec/test_constants';
 import testAction from 'spec/helpers/vuex_action_helper';
-import {
-  approvedLicense,
-  blacklistedLicense,
-  licenseHeadIssues,
-  licenseBaseIssues,
-} from 'ee_spec/license_management/mock_data';
+import { approvedLicense, blacklistedLicense } from 'ee_spec/license_management/mock_data';
 import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
-  const headPath = `${TEST_HOST}/licenses/head`;
-  const basePath = `${TEST_HOST}/licenses/base`;
 
   let axiosMock;
   let licenseId;
@@ -27,8 +20,6 @@ describe('License store actions', () => {
     state = {
       ...createState(),
       apiUrlManageLicenses,
-      headPath,
-      basePath,
       currentLicenseInModal: approvedLicense,
     };
     licenseId = approvedLicense.id;
@@ -40,7 +31,7 @@ describe('License store actions', () => {
 
   describe('setAPISettings', () => {
     it('commits SET_API_SETTINGS', done => {
-      const payload = { headPath, apiUrlManageLicenses };
+      const payload = { apiUrlManageLicenses };
       testAction(
         actions.setAPISettings,
         payload,
@@ -186,47 +177,16 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    gon.features = gon.features || {};
-    const { parsedLicenseReport } = gon.features;
-
-    afterEach(() => {
-      gon.features.parsedLicenseReport = parsedLicenseReport;
-    });
-
-    describe('with the parsedLicenseReport feature flag enabled', () => {
-      beforeEach(() => {
-        gon.features.parsedLicenseReport = true;
-      });
-
-      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
-        testAction(
-          actions.receiveSetLicenseApproval,
-          null,
-          state,
-          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-          [{ type: 'loadParsedLicenseReport' }],
-        )
-          .then(done)
-          .catch(done.fail);
-      });
-    });
-
-    describe('with the parsedLicenseReport feature flag disabled', () => {
-      beforeEach(() => {
-        gon.features.parsedLicenseReport = false;
-      });
-
-      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
-        testAction(
-          actions.receiveSetLicenseApproval,
-          null,
-          state,
-          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-          [{ type: 'loadManagedLicenses' }],
-        )
-          .then(done)
-          .catch(done.fail);
-      });
+    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+      testAction(
+        actions.receiveSetLicenseApproval,
+        null,
+        state,
+        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+        [{ type: 'loadParsedLicenseReport' }],
+      )
+        .then(done)
+        .catch(done.fail);
     });
   });
 
@@ -511,35 +471,6 @@ describe('License store actions', () => {
     });
   });
 
-  describe('requestLoadLicenseReport', () => {
-    it('commits REQUEST_LOAD_LICENSE_REPORT', done => {
-      testAction(
-        actions.requestLoadLicenseReport,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadLicenseReport', () => {
-    it('commits RECEIVE_LOAD_LICENSE_REPORT', done => {
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-      testAction(
-        actions.receiveLoadLicenseReport,
-        payload,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT, payload }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('receiveLoadLicenseReportError', () => {
     it('commits RECEIVE_LOAD_LICENSE_REPORT_ERROR', done => {
       const error = new Error('Test');
@@ -549,84 +480,6 @@ describe('License store actions', () => {
         state,
         [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT_ERROR, payload: error }],
         [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('loadLicenseReport', () => {
-    let headMock;
-    let baseMock;
-
-    beforeEach(() => {
-      headMock = axiosMock.onGet(headPath);
-      baseMock = axiosMock.onGet(basePath);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReport for successful response', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [200, licenseBaseIssues]);
-
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReport for 404 on basePath', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [404, null]);
-
-      const payload = { headReport: licenseHeadIssues, baseReport: {} };
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReportError for error response on head Path', done => {
-      headMock.replyOnce(() => [500, '']);
-      baseMock.replyOnce(() => [200, licenseBaseIssues]);
-
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
-        ],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReportError for error response on base Path', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [500, '']);
-
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
-        ],
       )
         .then(done)
         .catch(done.fail);

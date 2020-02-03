@@ -1,12 +1,8 @@
 export default () => ({
   apiUrlManageLicenses: null,
   licensesApiPath: null,
-  basePath: null,
-  baseReport: null,
   canManageLicenses: false,
   currentLicenseInModal: null,
-  headPath: null,
-  headReport: null,
   isDeleting: false,
   isLoadingLicenseReport: false,
   isLoadingManagedLicenses: false,
