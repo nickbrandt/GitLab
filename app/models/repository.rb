@@ -65,6 +65,8 @@ class Repository
     xcode_config: :xcode_project?
   }.freeze
 
+  MERGED_BRANCH_NAMES_CACHE_DURATION = 10.minutes
+
   def initialize(full_path, project, disk_path: nil, repo_type: Gitlab::GlRepository::PROJECT)
     @full_path = full_path
     @disk_path = disk_path || full_path
@@ -923,7 +925,7 @@ class Repository
     return raw_repository.merged_branch_names(branch_names) if skip_cache
 
     cached_branch_names = cache.read(:merged_branch_names)
-    merged_branch_names_hash = cached_branch_names.present? ? JSON.parse(cached_branch_names) : {}
+    merged_branch_names_hash = cached_branch_names || {}
     missing_branch_names = branch_names.select { |bn| !merged_branch_names_hash.key?(bn) }
 
     # Track some metrics here whilst feature flag is enabled
@@ -935,17 +937,17 @@ class Repository
       counter.increment(full_hit: missing_branch_names.empty?)
     end
 
-    unless missing_branch_names.empty?
+    if missing_branch_names.any?
       merged = raw_repository.merged_branch_names(missing_branch_names)
 
       missing_branch_names.each do |bn|
-        merged_branch_names_hash[bn] = merged.include?(bn).to_s
+        merged_branch_names_hash[bn] = merged.include?(bn)
       end
 
-      cache.write(:merged_branch_names, merged_branch_names_hash.to_json, expires_in: 10.minutes)
+      cache.write(:merged_branch_names, merged_branch_names_hash, expires_in: MERGED_BRANCH_NAMES_CACHE_DURATION)
     end
 
-    Set.new(merged_branch_names_hash.select { |k, v| v.to_s == "true" }.keys)
+    Set.new(merged_branch_names_hash.select { |_, v| v }.keys)
   end
 
   def merge_base(*commits_or_ids)

@@ -502,10 +502,10 @@ describe Repository do
 
     let(:merge_state_hash) do
       {
-        "test" => "false",
-        "beep" => "false",
-        "boop" => "false",
-        "definitely_merged" => "true"
+        "test" => false,
+        "beep" => false,
+        "boop" => false,
+        "definitely_merged" => true
       }
     end
 
@@ -538,7 +538,7 @@ describe Repository do
 
       describe "cache values" do
         it "writes the values to redis" do
-          expect(cache).to receive(:write).with(cache_key, merge_state_hash.to_json, expires_in: 10.minutes)
+          expect(cache).to receive(:write).with(cache_key, merge_state_hash, expires_in: Repository::MERGED_BRANCH_NAMES_CACHE_DURATION)
 
           subject
         end
@@ -546,20 +546,21 @@ describe Repository do
         it "matches the supplied hash" do
           subject
 
-          expect(JSON.parse(cache.read(cache_key))).to eq(merge_state_hash)
+          expect(cache.read(cache_key)).to eq(merge_state_hash)
         end
       end
     end
 
     context "cache is not empty" do
       before do
-        cache.write(cache_key, merge_state_hash.to_json)
+        cache.write(cache_key, merge_state_hash)
       end
 
       it { is_expected.to eq(already_merged) }
 
       it "doesn't fetch from the disk" do
         expect(repository.raw_repository).not_to receive(:merged_branch_names)
+
         subject
       end
     end
@@ -568,13 +569,14 @@ describe Repository do
       before do
         allow(repository.raw_repository).to receive(:merged_branch_names).with(["boop"]).and_return([])
         hash = merge_state_hash.except("boop")
-        cache.write(cache_key, hash.to_json)
+        cache.write(cache_key, hash)
       end
 
       it { is_expected.to eq(already_merged) }
 
       it "does fetch from the disk" do
         expect(repository.raw_repository).to receive(:merged_branch_names).with(["boop"])
+
         subject
       end
     end
