@@ -60,6 +60,7 @@ describe('MergeRequestTable component', () => {
         'Merge Request',
         'Review time',
         'Author',
+        'Approvers',
         'Comments',
         'Commits',
         'Line changes',

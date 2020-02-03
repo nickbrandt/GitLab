@@ -3,7 +3,8 @@ import { escape } from 'underscore';
 import { mapState } from 'vuex';
 import { __, sprintf, n__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
-import { GlTable, GlLink, GlIcon, GlAvatarLink, GlAvatar } from '@gitlab/ui';
+import { GlTable, GlLink, GlIcon, GlAvatarLink, GlAvatar, GlTooltipDirective } from '@gitlab/ui';
+import ApproversColumn from './approvers_column.vue';
 
 export default {
   name: 'MergeRequestTable',
@@ -13,6 +14,10 @@ export default {
     GlIcon,
     GlAvatarLink,
     GlAvatar,
+    ApproversColumn,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   computed: {
     ...mapState(['mergeRequests']),
@@ -50,6 +55,11 @@ export default {
     {
       key: 'author',
       label: __('Author'),
+      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+    },
+    {
+      key: 'approved_by',
+      label: __('Approvers'),
       tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
     },
     {
@@ -112,9 +122,13 @@ export default {
     </template>
 
     <template #cell(author)="{ value }">
-      <gl-avatar-link target="blank" :href="value.web_url">
+      <gl-avatar-link v-gl-tooltip target="blank" :href="value.web_url" :title="value.name">
         <gl-avatar :size="24" :src="value.avatar_url" :entity-name="value.name" />
       </gl-avatar-link>
+    </template>
+
+    <template #cell(approved_by)="{ value }">
+      <approvers-column :approvers="value && value.length ? value : []" />
     </template>
 
     <template #cell(diff_stats)="{ value }">
