@@ -122,8 +122,6 @@ module EE
       end
 
       def expose_license_scanning_data?
-        return unless available_licensed_report_type?(:license_management)
-
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
 
