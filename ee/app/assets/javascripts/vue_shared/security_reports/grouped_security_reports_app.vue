@@ -202,7 +202,6 @@ export default {
     this.setCanCreateIssuePermission(this.canCreateIssue);
     this.setCanCreateFeedbackPermission(this.canCreateFeedback);
 
-    // eslint-disable-next-line camelcase
     const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
 
     if (sastDiffEndpoint && this.hasSastReports) {
@@ -210,7 +209,6 @@ export default {
       this.fetchSastDiff();
     }
 
-    // eslint-disable-next-line camelcase
     const containerScanningDiffEndpoint = gl?.mrWidgetData?.container_scanning_comparison_path;
 
     if (containerScanningDiffEndpoint && this.hasContainerScanningReports) {
@@ -218,7 +216,6 @@ export default {
       this.fetchContainerScanningDiff();
     }
 
-    // eslint-disable-next-line camelcase
     const dastDiffEndpoint = gl?.mrWidgetData?.dast_comparison_path;
 
     if (dastDiffEndpoint && this.hasDastReports) {
@@ -226,7 +223,6 @@ export default {
       this.fetchDastDiff();
     }
 
-    // eslint-disable-next-line camelcase
     const dependencyScanningDiffEndpoint = gl?.mrWidgetData?.dependency_scanning_comparison_path;
 
     if (dependencyScanningDiffEndpoint && this.hasDependencyScanningReports) {

@@ -36,6 +36,6 @@ export const start = ({ rootState, commit }) => {
     })
     .catch(err => {
       commit(types.SET_ERROR, err);
-      return Promise.reject(err);
+      throw err;
     });
 };

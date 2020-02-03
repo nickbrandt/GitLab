@@ -6,7 +6,7 @@ import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import ConfigureFeatureFlagsModal from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 import { TEST_HOST } from 'spec/test_constants';
-import NavigationTabs from '~/vue_shared/components/navigation_tabs';
+import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
 import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import axios from '~/lib/utils/axios_utils';
 import { getRequestData } from '../mock_data';
