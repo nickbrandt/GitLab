@@ -12,7 +12,7 @@ module Backup
       @progress = progress
     end
 
-    def pack
+    def write_info
       # Make sure there is a connection
       ActiveRecord::Base.connection.reconnect!
 
@@ -20,7 +20,14 @@ module Backup
         File.open("#{backup_path}/backup_information.yml", "w+") do |file|
           file << backup_information.to_yaml.gsub(/^---\n/, '')
         end
+      end
+    end
 
+    def pack
+      # Make sure there is a connection
+      ActiveRecord::Base.connection.reconnect!
+
+      Dir.chdir(backup_path) do
         # create archive
         progress.print "Creating backup archive: #{tar_file} ... "
         # Set file permissions on open to prevent chmod races.
@@ -31,8 +38,6 @@ module Backup
           puts "creating archive #{tar_file} failed".color(:red)
           raise Backup::Error, 'Backup failed'
         end
-
-        upload
       end
     end
 
@@ -107,39 +112,45 @@ module Backup
 
     # rubocop: disable Metrics/AbcSize
     def unpack
+      cleanup_required = true
       Dir.chdir(backup_path) do
         # check for existing backups in the backup dir
-        if backup_file_list.empty?
-          progress.puts "No backups found in #{backup_path}"
-          progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
-          exit 1
-        elsif backup_file_list.many? && ENV["BACKUP"].nil?
-          progress.puts 'Found more than one backup:'
-          # print list of available backups
-          progress.puts " " + available_timestamps.join("\n ")
-          progress.puts 'Please specify which one you want to restore:'
-          progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
-          exit 1
-        end
-
-        tar_file = if ENV['BACKUP'].present?
-                     File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
-                   else
-                     backup_file_list.first
-                   end
-
-        unless File.exist?(tar_file)
-          progress.puts "The backup file #{tar_file} does not exist!"
-          exit 1
-        end
-
-        progress.print 'Unpacking backup ... '
-
-        if Kernel.system(*%W(tar -xf #{tar_file}))
-          progress.puts 'done'.color(:green)
+        if File.exist?(File.join(backup_path, 'backup_information.yml')) && !ENV['BACKUP'].present?
+          progress.puts "Non tarred backup found in #{backup_path}, using that"
+          cleanup_required = false
         else
-          progress.puts 'unpacking backup failed'.color(:red)
-          exit 1
+          if backup_file_list.empty?
+            progress.puts "No backups found in #{backup_path}"
+            progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
+            exit 1
+          elsif backup_file_list.many? && ENV["BACKUP"].nil?
+            progress.puts 'Found more than one backup:'
+            # print list of available backups
+            progress.puts " " + available_timestamps.join("\n ")
+            progress.puts 'Please specify which one you want to restore:'
+            progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
+            exit 1
+          end
+
+          tar_file = if ENV['BACKUP'].present?
+                       File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
+                     else
+                       backup_file_list.first
+                     end
+
+          unless File.exist?(tar_file)
+            progress.puts "The backup file #{tar_file} does not exist!"
+            exit 1
+          end
+
+          progress.print 'Unpacking backup ... '
+
+          if Kernel.system(*%W(tar -xf #{tar_file}))
+            progress.puts 'done'.color(:green)
+          else
+            progress.puts 'unpacking backup failed'.color(:red)
+            exit 1
+          end
         end
 
         ENV["VERSION"] = "#{settings[:db_version]}" if settings[:db_version].to_i > 0
@@ -157,6 +168,7 @@ module Backup
           exit 1
         end
       end
+      cleanup_required
     end
 
     def tar_version

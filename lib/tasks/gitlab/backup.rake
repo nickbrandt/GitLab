@@ -17,9 +17,16 @@ namespace :gitlab do
       Rake::Task['gitlab:backup:registry:create'].invoke
 
       backup = Backup::Manager.new(progress)
-      backup.pack
-      backup.cleanup
-      backup.remove_old
+      backup.write_info
+
+      if !(ENV['SKIP'] && ENV['SKIP'].include?('tar'))
+        backup.pack
+        backup.upload
+        backup.cleanup
+        backup.remove_old
+      else
+        backup.upload
+      end
 
       progress.puts "Warning: Your gitlab.rb and gitlab-secrets.json files contain sensitive data \n" \
            "and are not included in this backup. You will need these files to restore a backup.\n" \
@@ -33,7 +40,7 @@ namespace :gitlab do
       warn_user_is_not_gitlab
 
       backup = Backup::Manager.new(progress)
-      backup.unpack
+      cleanup_required = backup.unpack
 
       unless backup.skipped?('db')
         begin
@@ -72,7 +79,10 @@ namespace :gitlab do
       Rake::Task['gitlab:shell:setup'].invoke
       Rake::Task['cache:clear'].invoke
 
-      backup.cleanup
+      if cleanup_required
+        backup.cleanup
+      end
+
       puts "Warning: Your gitlab.rb and gitlab-secrets.json files contain sensitive data \n" \
            "and are not included in this backup. You will need to restore these files manually.".color(:red)
       puts "Restore task is done."
