@@ -290,14 +290,14 @@ describe API::V3::Github do
       let(:project) { create(:project, group: group) }
       let!(:project2) { create(:project, :public, group: group) }
 
-      it 'returns an array of projects excluding the public ones belonging to group with github format' do
+      it 'returns an array of projects belonging to group excluding the ones user is not directly a member of, even when public' do
         expect_project_under_namespace([project], group, user)
       end
 
       context 'when instance admin' do
         let(:user) { create(:user, :admin) }
 
-        it 'returns an array of projects belonging to group with github format' do
+        it 'returns an array of projects belonging to group' do
           expect_project_under_namespace([project, project2], group, user)
         end
       end
