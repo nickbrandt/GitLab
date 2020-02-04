@@ -5,6 +5,8 @@ module Elastic
     module Routing
       extend ActiveSupport::Concern
 
+      ES_ROUTING_MAX_COUNT = 128
+
       def routing_options(options)
         return {} if Feature.disabled?(:elasticsearch_use_routing)
         return {} if options[:public_and_internal_projects]
@@ -31,6 +33,8 @@ module Elastic
       private
 
       def build_routing(ids)
+        return [] if ids.count > ES_ROUTING_MAX_COUNT
+
         ids.map { |id| "project_#{id}" }.join(',')
       end
     end
