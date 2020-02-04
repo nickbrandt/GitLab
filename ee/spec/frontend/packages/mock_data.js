@@ -77,6 +77,18 @@ export const conanPackage = {
   _links,
 };
 
+export const nugetPackage = {
+  created_at: '2015-12-10',
+  id: 4,
+  name: 'NugetPackage1',
+  package_files: [],
+  package_type: 'nuget',
+  project_id: 1,
+  tags: [],
+  updated_at: '2015-12-10',
+  version: '1.0.0',
+};
+
 export const mockTags = [
   {
     name: 'foo-1',

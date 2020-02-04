@@ -60,6 +60,7 @@ export default {
         'd-block': this.tagCount === 1,
         'd-md-block': this.tagCount > 1,
         'append-right-4': index !== this.tagsToRender.length - 1,
+        'prepend-left-8': !this.hideLabel && index === 0,
       };
     },
   },
@@ -70,7 +71,7 @@ export default {
   <div class="d-flex align-items-center">
     <div v-if="!hideLabel" ref="tagLabel" class="d-flex align-items-center">
       <gl-icon name="labels" class="append-right-8" />
-      <strong class="append-right-8 js-tags-count">{{ tagsDisplay }}</strong>
+      <strong class="js-tags-count">{{ tagsDisplay }}</strong>
     </div>
 
     <gl-badge
