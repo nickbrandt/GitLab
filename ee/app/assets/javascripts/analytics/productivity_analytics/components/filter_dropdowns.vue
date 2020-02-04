@@ -68,6 +68,7 @@ export default {
     per_page: projectsPerPage,
     with_shared: false, // exclude forks
     order_by: LAST_ACTIVITY_AT,
+    include_subgroups: true,
   },
 };
 </script>
