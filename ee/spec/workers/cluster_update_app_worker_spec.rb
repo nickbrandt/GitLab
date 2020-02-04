@@ -3,7 +3,10 @@
 require 'spec_helper'
 
 describe ClusterUpdateAppWorker do
-  let(:project) { create(:project) }
+  include ExclusiveLeaseHelpers
+
+  let_it_be(:project) { create(:project) }
+
   let(:prometheus_update_service) { spy }
 
   subject { described_class.new }
@@ -41,6 +44,55 @@ describe ClusterUpdateAppWorker do
       expect(prometheus_update_service).to receive(:execute)
 
       subject.perform(application.name, application.id, project.id, Time.now)
+    end
+
+    context 'with exclusive lease' do
+      let(:application) { create(:clusters_applications_prometheus, :installed) }
+      let(:lease_key) { "#{described_class.name.underscore}-#{application.id}" }
+
+      before do
+        allow(Gitlab::ExclusiveLease).to receive(:new)
+        stub_exclusive_lease_taken(lease_key)
+      end
+
+      it 'does not allow same app to be updated concurrently by same project' do
+        expect(Clusters::Applications::PrometheusUpdateService).not_to receive(:new)
+
+        subject.perform(application.name, application.id, project.id, Time.now)
+      end
+
+      it 'does not allow same app to be updated concurrently by different project' do
+        project1 = create(:project)
+
+        expect(Clusters::Applications::PrometheusUpdateService).not_to receive(:new)
+
+        subject.perform(application.name, application.id, project1.id, Time.now)
+      end
+
+      it 'allows different app to be updated concurrently by same project' do
+        application2 = create(:clusters_applications_prometheus, :installed)
+        lease_key2 = "#{described_class.name.underscore}-#{application2.id}"
+
+        stub_exclusive_lease(lease_key2)
+
+        expect(Clusters::Applications::PrometheusUpdateService).to receive(:new)
+          .with(application2, project)
+
+        subject.perform(application2.name, application2.id, project.id, Time.now)
+      end
+
+      it 'allows different app to be updated by different project' do
+        application2 = create(:clusters_applications_prometheus, :installed)
+        lease_key2 = "#{described_class.name.underscore}-#{application2.id}"
+        project2 = create(:project)
+
+        stub_exclusive_lease(lease_key2)
+
+        expect(Clusters::Applications::PrometheusUpdateService).to receive(:new)
+          .with(application2, project2)
+
+        subject.perform(application2.name, application2.id, project2.id, Time.now)
+      end
     end
   end
 end
