@@ -3,11 +3,6 @@
 class ConfirmationsController < Devise::ConfirmationsController
   include AcceptsPendingInvitations
 
-  def almost_there
-    flash[:notice] = nil
-    render layout: "devise_empty"
-  end
-
   protected
 
   def after_resending_confirmation_instructions_path_for(resource)

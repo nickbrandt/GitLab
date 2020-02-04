@@ -82,7 +82,6 @@ linters:
       - 'app/views/dashboard/snippets/index.html.haml'
       - 'app/views/dashboard/todos/_todo.html.haml'
       - 'app/views/dashboard/todos/index.html.haml'
-      - 'app/views/devise/confirmations/almost_there.haml'
       - 'app/views/devise/mailer/_confirmation_instructions_account.html.haml'
       - 'app/views/devise/mailer/_confirmation_instructions_secondary.html.haml'
       - 'app/views/devise/mailer/email_changed.html.haml'
