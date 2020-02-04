@@ -2,7 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/project_selector/st
 import mutations from 'ee/security_dashboard/store/modules/vulnerable_projects/mutations';
 import * as types from 'ee/security_dashboard/store/modules/vulnerable_projects/mutation_types';
 
-describe('projectsSelector mutations', () => {
+describe('Vulnerable projects mutations', () => {
   let state;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('projectsSelector mutations', () => {
   });
 
   describe('SET_HAS_ERROR', () => {
-    it('sets state.projects to be "true"', () => {
+    it('sets state.hasError to be "true"', () => {
       expect(state.hasError).toBe(false);
 
       mutations[types.SET_HAS_ERROR](state, true);
