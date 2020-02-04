@@ -103,6 +103,22 @@ describe('IDE commit sidebar actions', () => {
         .catch(done.fail);
     });
 
+    it('is not called on mount if commitAction state is already set', done => {
+      store.state.commit = { commitAction: consts.COMMIT_TO_CURRENT_BRANCH };
+
+      createComponent();
+
+      vm.$nextTick()
+        .then(() => {
+          expect(vm.$store.dispatch).not.toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            jasmine.anything(),
+          );
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
     describe('default branch', () => {
       it('dispatches correct action for default branch', () => {
         createComponent({
