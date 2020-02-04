@@ -41,14 +41,6 @@ module EE
       end
 
       expose :license_management, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:license_management) } do
-        expose :head_path do |merge_request|
-          head_pipeline_downloadable_path_for_report_type(:license_management)
-        end
-
-        expose :base_path do |merge_request|
-          base_pipeline_downloadable_path_for_report_type(:license_management)
-        end
-
         expose :managed_licenses_path do |merge_request|
           expose_path(api_v4_projects_managed_licenses_path(id: merge_request.target_project.id))
         end

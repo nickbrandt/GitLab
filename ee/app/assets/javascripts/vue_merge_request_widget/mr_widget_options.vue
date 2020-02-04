@@ -47,8 +47,7 @@ export default {
       return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
-      const { licenseManagement } = this.mr;
-      return licenseManagement && licenseManagement.head_path;
+      return this.mr.enabledReports?.licenseManagement;
     },
     hasCodequalityIssues() {
       return (
@@ -332,8 +331,6 @@ export default {
         :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
         :full-report-path="mr.licenseManagement.license_management_full_report_path"
         :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
-        :base-path="mr.licenseManagement.base_path"
-        :head-path="mr.licenseManagement.head_path"
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />

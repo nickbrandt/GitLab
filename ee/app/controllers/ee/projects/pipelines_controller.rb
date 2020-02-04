@@ -6,16 +6,6 @@ module EE
       extend ActiveSupport::Concern
       extend ::Gitlab::Utils::Override
 
-      prepended do
-        # Since feature flags are pushed only once on page load, we need to
-        # ensure they're pushed for all tabs in the pipelines view. This is
-        # because the user can freely navigate between them *without*
-        # triggering a page load.
-        before_action only: [:show, :builds, :failures, :security, :licenses] do
-          push_frontend_feature_flag(:parsed_license_report, default_enabled: true)
-        end
-      end
-
       def security
         if pipeline.expose_security_dashboard?
           render_show

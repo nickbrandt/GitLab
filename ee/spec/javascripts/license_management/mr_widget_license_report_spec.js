@@ -41,8 +41,6 @@ describe('License Report MR Widget', () => {
   const defaultProps = {
     loadingText: 'LOADING',
     errorText: 'ERROR',
-    headPath: `${TEST_HOST}/head.json`,
-    basePath: `${TEST_HOST}/head.json`,
     licensesApiPath: `${TEST_HOST}/parsed_license_report.json`,
     canManageLicenses: true,
     licenseManagementSettingsPath: `${TEST_HOST}/lm_settings`,
@@ -229,8 +227,6 @@ describe('License Report MR Widget', () => {
       jasmine.any(Object),
       {
         apiUrlManageLicenses: apiUrl,
-        headPath: defaultProps.headPath,
-        basePath: defaultProps.basePath,
         licensesApiPath: defaultProps.licensesApiPath,
         canManageLicenses: true,
       },

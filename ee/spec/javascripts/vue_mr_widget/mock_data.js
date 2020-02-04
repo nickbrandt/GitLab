@@ -15,7 +15,7 @@ export default Object.assign({}, mockData, {
     container_scanning: false,
     dast: false,
     dependency_scanning: false,
-    license_management: true,
+    license_management: false,
   },
 });
 

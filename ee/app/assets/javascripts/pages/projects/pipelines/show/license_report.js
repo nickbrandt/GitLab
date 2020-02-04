@@ -11,7 +11,6 @@ export default () => {
 
   if (licensesTab) {
     const {
-      licenseHeadPath,
       canManageLicenses,
       apiUrl,
       licenseManagementSettingsPath,
@@ -30,7 +29,6 @@ export default () => {
             apiUrl,
             licensesApiPath,
             licenseManagementSettingsPath,
-            headPath: licenseHeadPath,
             canManageLicenses: parseBoolean(canManageLicenses),
             alwaysOpen: true,
             reportSectionClass: 'split-report-section',
