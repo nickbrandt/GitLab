@@ -212,7 +212,6 @@ describe Geo::RepositoryVerificationPrimaryService do
   def stub_project_repository(project, repository)
     allow(Repository).to receive(:new).with(
       project.full_path,
-      project,
       shard: project.repository_storage,
       disk_path: project.disk_path
     ).and_return(repository)
@@ -221,7 +220,6 @@ describe Geo::RepositoryVerificationPrimaryService do
   def stub_wiki_repository(wiki, repository)
     allow(Repository).to receive(:new).with(
       project.wiki.full_path,
-      project,
       shard: project.repository_storage,
       disk_path: project.wiki.disk_path,
       repo_type: Gitlab::GlRepository::WIKI

@@ -24,7 +24,7 @@ FactoryBot.define do
     skip_create # Commits cannot be persisted
 
     initialize_with do
-      new(git_commit, project)
+      new(git_commit, repository: project.repository)
     end
 
     after(:build) do |commit, evaluator|

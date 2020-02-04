@@ -65,10 +65,7 @@ class Blob < SimpleDelegator
     BlobViewer::YarnLock
   ].freeze
 
-  attr_reader :container
-
-  delegate :repository, to: :container, allow_nil: true
-  delegate :project, to: :repository, allow_nil: true
+  attr_reader :repository
 
   # Wrap a Gitlab::Git::Blob object, or return nil when given nil
   #
@@ -80,22 +77,22 @@ class Blob < SimpleDelegator
   #
   #     blob = Blob.decorate(nil)
   #     puts "truthy" if blob # No output
-  def self.decorate(blob, container = nil)
+  def self.decorate(blob, repository:)
     return if blob.nil?
 
-    new(blob, container)
+    new(blob, repository: repository)
   end
 
-  def self.lazy(container, commit_id, path, blob_size_limit: Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
-    BatchLoader.for([commit_id, path]).batch(key: container.repository) do |items, loader, args|
+  def self.lazy(commit_id, path, repository:, blob_size_limit: Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
+    BatchLoader.for([commit_id, path]).batch(key: repository) do |items, loader, args|
       args[:key].blobs_at(items, blob_size_limit: blob_size_limit).each do |blob|
         loader.call([blob.commit_id, blob.path], blob) if blob
       end
     end
   end
 
-  def initialize(blob, container = nil)
-    @container = container
+  def initialize(blob, repository:)
+    @repository = repository
 
     super(blob)
   end
@@ -119,7 +116,7 @@ class Blob < SimpleDelegator
   def load_all_data!
     # Endpoint needed: https://gitlab.com/gitlab-org/gitaly/issues/756
     Gitlab::GitalyClient.allow_n_plus_1_calls do
-      super(repository) if container
+      super(repository) if repository
     end
   end
 

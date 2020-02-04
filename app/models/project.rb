@@ -791,7 +791,7 @@ class Project < ApplicationRecord
   end
 
   def repository
-    @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path)
+    @repository ||= Repository.new(full_path, shard: repository_storage, disk_path: disk_path)
   end
 
   def cleanup
@@ -1415,8 +1415,8 @@ class Project < ApplicationRecord
 
   # Expires various caches before a project is renamed.
   def expire_caches_before_rename(old_path)
-    repo = Repository.new(old_path, self, shard: repository_storage)
-    wiki = Repository.new("#{old_path}.wiki", self, shard: repository_storage, repo_type: Gitlab::GlRepository::WIKI)
+    repo = Repository.new(old_path, shard: repository_storage)
+    wiki = Repository.new("#{old_path}.wiki", shard: repository_storage, repo_type: Gitlab::GlRepository::WIKI)
 
     if repo.exists?
       repo.before_delete

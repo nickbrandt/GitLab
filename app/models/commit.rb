@@ -25,10 +25,8 @@ class Commit
   attr_accessor :redacted_description_html
   attr_accessor :redacted_title_html
   attr_accessor :redacted_full_title_html
-  attr_reader :container
 
-  delegate :repository, to: :container
-  delegate :project, to: :repository, allow_nil: true
+  attr_reader :gpg_commit, :repository
 
   DIFF_SAFE_LINES = Gitlab::Git::DiffCollection::DEFAULT_LIMITS[:max_lines]
 
@@ -47,12 +45,12 @@ class Commit
   cache_markdown_field :description, pipeline: :commit_description
 
   class << self
-    def decorate(commits, container)
+    def decorate(commits, repository:)
       commits.map do |commit|
         if commit.is_a?(Commit)
           commit
         else
-          self.new(commit, container)
+          self.new(commit, repository: repository)
         end
       end
     end
@@ -88,24 +86,24 @@ class Commit
       }
     end
 
-    def from_hash(hash, container)
-      raw_commit = Gitlab::Git::Commit.new(container.repository.raw, hash)
-      new(raw_commit, container)
+    def from_hash(hash, repository:)
+      raw_commit = Gitlab::Git::Commit.new(repository.raw, hash)
+      new(raw_commit, repository: repository)
     end
 
     def valid_hash?(key)
       !!(EXACT_COMMIT_SHA_PATTERN =~ key)
     end
 
-    def lazy(container, oid)
-      BatchLoader.for({ container: container, oid: oid }).batch(replace_methods: false) do |items, loader|
-        items_by_container = items.group_by { |i| i[:container] }
+    def lazy(oid, repository:)
+      BatchLoader.for({ repository: repository, oid: oid }).batch(replace_methods: false) do |items, loader|
+        items_by_repo = items.group_by { |i| i[:repository] }
 
-        items_by_container.each do |container, commit_ids|
+        items_by_repo.each do |repository, commit_ids|
           oids = commit_ids.map { |i| i[:oid] }
 
-          container.repository.commits_by(oids: oids).each do |commit|
-            loader.call({ container: commit.container, oid: commit.id }, commit) if commit
+          repository.commits_by(oids: oids).each do |commit|
+            loader.call({ repository: commit.repository, oid: commit.id }, commit) if commit
           end
         end
       end
@@ -118,11 +116,13 @@ class Commit
 
   attr_accessor :raw
 
-  def initialize(raw_commit, container)
+  def initialize(raw_commit, repository:)
     raise "Nil as raw commit passed" unless raw_commit
 
     @raw = raw_commit
-    @container = container
+    @repository = repository
+    # FIXME: why does this need `if container`? 
+    # @gpg_commit = Gitlab::Gpg::Commit.new(self) if container
   end
 
   delegate \
@@ -266,17 +266,18 @@ class Commit
   end
 
   def parents
-    @parents ||= parent_ids.map { |oid| Commit.lazy(container, oid) }
+    @parents ||= parent_ids.map { |oid| Commit.lazy(oid, repository: repository) }
   end
 
   def parent
     strong_memoize(:parent) do
-      container.commit_by(oid: self.parent_id) if self.parent_id
+      repository.commit_by(oid: self.parent_id) if self.parent_id
     end
   end
 
+  # FIXME: we need a different way to get notes for commits? 
   def notes
-    container.notes.for_commit_id(self.id)
+    # container.notes.for_commit_id(self.id)
   end
 
   def user_mentions
@@ -432,7 +433,7 @@ class Commit
     return unless entry
 
     if entry[:type] == :blob
-      blob = ::Blob.decorate(Gitlab::Git::Blob.new(name: entry[:name]), container)
+      blob = ::Blob.decorate(Gitlab::Git::Blob.new(name: entry[:name]), repository: repository)
       blob.image? || blob.video? || blob.audio? ? :raw : :blob
     else
       entry[:type]

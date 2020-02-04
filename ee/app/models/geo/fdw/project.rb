@@ -30,7 +30,7 @@ module Geo
       end
 
       def repository
-        @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path)
+        @repository ||= Repository.new(full_path, shard: repository_storage, disk_path: disk_path)
       end
 
       def storage
