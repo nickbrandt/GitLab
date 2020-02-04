@@ -10,6 +10,7 @@ exports[`dashboard should match the snapshot 1`] = `
     ok-disabled="true"
     ok-title="Add projects"
     ok-variant="success"
+    size="md"
     title="Add projects"
     titletag="h4"
   >
