@@ -94,6 +94,18 @@ To fix this problem:
 - Add the self-signed certificate from the remote GitLab instance to the `/etc/gitlab/trusted-certs` directory on the local GitLab instance and run `sudo gitlab-ctl reconfigure` as per the instructions for [installing custom public certificates](https://docs.gitlab.com/omnibus/settings/ssl.html#install-custom-public-certificates).
 - If your local GitLab instance was installed using the Helm Charts, you can [add your self-signed certificate to your GitLab instance](https://docs.gitlab.com/runner/install/kubernetes.html#providing-a-custom-certificate-for-accessing-gitlab).
 
+You may also get another error when trying to mirror a repository from a remote GitLab instance that uses a self-signed certificate:
+
+```shell
+2:Fetching remote upstream failed: fatal: unable to access &amp;#39;https://gitlab.domain.tld/root/test-repo/&amp;#39;:
+SSL: unable to obtain common name from peer certificate
+```
+
+In this case, the problem can be related to the certificate itself:
+
+- Double check that your self-signed certificate is not missing a common name. If it is then regenerate a valid certificate
+- add it to `/etc/gitlab/trusted-certs` and run `sudo gitlab-ctl reconfigure`
+
 ## Unable to perform Git operations due to an internal or self-signed certificate
 
 If your GitLab instance is using a self-signed certificate, or the certificate is signed by an internal certificate authority (CA), you might run into the following errors when attempting to perform Git operations:
