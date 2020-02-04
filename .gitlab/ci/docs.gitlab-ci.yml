@@ -44,13 +44,28 @@ review-docs-cleanup:
     - ./scripts/trigger-build-docs cleanup
   when: manual
 
+graphql-docs-generate:
+  extends:
+    - .only-ee
+    - .default-tags
+    - .default-retry
+    - .default-cache
+    - .default-only
+    - .default-before_script
+    - .only:changes-code-backstage-qa
+    - .use-pg9
+  stage: prepare
+  script:
+    - bundle exec rake gitlab:graphql:compile_docs
+    - bundle exec rake gitlab:graphql:schema:dump
+
 docs lint:
   extends:
     - .default-tags
     - .default-retry
     - .default-only
     - .only:changes-docs
-  image: "registry.gitlab.com/gitlab-org/gitlab-docs:docs-lint"
+  image: 'registry.gitlab.com/gitlab-org/gitlab-docs:docs-lint'
   stage: test
   dependencies: []
   script:
@@ -66,19 +81,3 @@ docs lint:
     - bundle exec nanoc check internal_links
     # Check the internal anchor links
     - bundle exec nanoc check internal_anchors
-
-graphql-reference-verify:
-  extends:
-    - .only-ee
-    - .default-tags
-    - .default-retry
-    - .default-cache
-    - .default-only
-    - .default-before_script
-    - .only:changes-code-backstage-qa
-    - .use-pg9
-  stage: test
-  needs: ["setup-test-env"]
-  script:
-    - bundle exec rake gitlab:graphql:check_docs
-    - bundle exec rake gitlab:graphql:check_schema

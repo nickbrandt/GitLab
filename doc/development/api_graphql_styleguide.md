@@ -738,6 +738,6 @@ More about complexity:
 Our schema is located at `app/graphql/gitlab_schema.rb`.
 See the [schema reference](../api/graphql/reference/index.md) for details.
 
-This generated GraphQL documentation needs to be updated when the schema changes.
+This generated GraphQL documentation is automatically updated when the schema changes via the CI/CD pipeline on push.
 For information on generating GraphQL documentation and schema files, see
 [updating the schema documentation](rake_tasks.md#update-graphql-documentation-and-schema-definitions).
