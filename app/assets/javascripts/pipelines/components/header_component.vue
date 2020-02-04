@@ -1,5 +1,5 @@
 <script>
-import { GlAlert, GlButton, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlAlert, GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
 import ciHeader from '~/vue_shared/components/header_ci_component.vue';
 import { setUrlFragment, redirectTo } from '~/lib/utils/url_utility';
@@ -21,7 +21,6 @@ export default {
     ciHeader,
     GlAlert,
     GlButton,
-    GlLoadingIcon,
     GlModal,
   },
   directives: {
@@ -204,14 +203,7 @@ export default {
 <template>
   <div class="pipeline-header-container">
     <gl-alert v-if="hasError" :variant="failure.variant">{{ failure.text }}</gl-alert>
-    <ci-header
-      v-if="shouldRenderContent"
-      :status="pipeline.detailedStatus"
-      :time="pipeline.createdAt"
-      :user="pipeline.user"
-      :item-id="Number(pipelineId)"
-      item-name="Pipeline"
-    >
+    <ci-header :status="status" :user="pipeline.user" item-name="Pipeline">
       <gl-button
         v-if="pipeline.retryable"
         :loading="isRetrying"
@@ -250,7 +242,6 @@ export default {
         {{ __('Delete') }}
       </gl-button>
     </ci-header>
-    <gl-loading-icon v-if="isLoadingInitialQuery" size="lg" class="gl-mt-3 gl-mb-3" />
 
     <gl-modal
       :modal-id="$options.DELETE_MODAL_ID"

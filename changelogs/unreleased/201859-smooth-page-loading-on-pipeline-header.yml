@@ -1,0 +1,5 @@
+---
+title: Clean up rendering pipeline page on load for smoothness
+merge_request: 24359
+author: Takuya Noguchi
+type: fixed

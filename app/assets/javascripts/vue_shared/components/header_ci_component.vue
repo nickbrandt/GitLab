@@ -36,14 +36,6 @@ export default {
       type: String,
       required: true,
     },
-    itemId: {
-      type: Number,
-      required: true,
-    },
-    time: {
-      type: String,
-      required: true,
-    },
     user: {
       type: Object,
       required: false,
@@ -86,6 +78,14 @@ export default {
     message() {
       return this.user?.status?.message;
     },
+    itemId() {
+      const el = document.querySelector('.js-pipeline-details-vue');
+      return el ? el.dataset.pipelineId : null;
+    },
+    time() {
+      const el = document.querySelector('.js-pipeline-details-vue');
+      return el ? el.dataset.createdAt : null;
+    },
   },
 
   methods: {
@@ -103,14 +103,14 @@ export default {
     data-testid="ci-header-content"
   >
     <section class="header-main-content">
-      <ci-icon-badge :status="status" />
+      <ci-icon-badge v-if="status" :status="status" />
 
       <strong> {{ itemName }} #{{ itemId }} </strong>
 
       <template v-if="shouldRenderTriggeredLabel">{{ __('triggered') }}</template>
       <template v-else>{{ __('created') }}</template>
 
-      <timeago-tooltip :time="time" />
+      <timeago-tooltip v-if="time" :time="time" />
 
       {{ __('by') }}
 
