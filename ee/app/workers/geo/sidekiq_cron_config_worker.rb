@@ -3,7 +3,7 @@
 module Geo
   class SidekiqCronConfigWorker
     include ApplicationWorker
-    include CronjobQueue
+    include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
     feature_category :geo_replication
 

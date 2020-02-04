@@ -2,7 +2,7 @@
 
 class PseudonymizerWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :integrations
 

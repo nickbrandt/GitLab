@@ -2,7 +2,7 @@
 
 class AdjournedProjectsDeletionCronWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   INTERVAL = 5.minutes.to_i
 

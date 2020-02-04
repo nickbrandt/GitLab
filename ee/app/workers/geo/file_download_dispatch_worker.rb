@@ -2,7 +2,7 @@
 
 module Geo
   class FileDownloadDispatchWorker < Geo::Scheduler::Secondary::SchedulerWorker
-    include CronjobQueue
+    include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
     private
 

@@ -4,7 +4,7 @@ class ClearSharedRunnersMinutesWorker
   LEASE_TIMEOUT = 3600
 
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :continuous_integration
 
