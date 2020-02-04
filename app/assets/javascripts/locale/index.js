@@ -1,5 +1,5 @@
 import Jed from 'jed';
-import ensureSingleLine from './es6/ensure_single_line';
+import ensureSingleLine from './ensure_single_line';
 import sprintf from './sprintf';
 
 const languageCode = () => document.querySelector('html').getAttribute('lang') || 'en';

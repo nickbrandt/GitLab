@@ -1,4 +1,4 @@
-import ensureSingleLine from '~/locale/es6/ensure_single_line';
+import ensureSingleLine from '~/locale/ensure_single_line';
 
 describe('locale', () => {
   describe('ensureSingleLine', () => {
