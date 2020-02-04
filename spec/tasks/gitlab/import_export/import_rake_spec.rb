@@ -10,6 +10,9 @@ describe 'gitlab:import_export:import rake task' do
   let(:project) { Project.find_by_full_path("#{namespace_path}/#{project_name}") }
 
   before do
+    stub_env('GITALY_DISABLE_REQUEST_LIMITS', true)
+    stub_feature_flags(gitaly_enforce_requests_limits: false)
+
     Rake.application.rake_require('tasks/gitlab/import_export/import')
     allow(Settings.uploads.object_store).to receive(:[]=).and_call_original
     allow_any_instance_of(GitlabProjectImport).to receive(:exit)
