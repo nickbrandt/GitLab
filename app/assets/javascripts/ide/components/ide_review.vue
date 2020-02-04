@@ -42,32 +42,34 @@ export default {
 </script>
 
 <template>
-  <div class="multi-file-commit-panel-inner-content">
-    <ide-tree-list :viewer-type="viewer" header-class="ide-review-header">
-      <template #header>
-        <div class="ide-review-button-holder">
-          {{ __('Review') }}
-          <editor-mode-dropdown
+  <ide-tree-list
+    :viewer-type="viewer"
+    header-class="ide-review-header"
+    class="multi-file-commit-panel-inner-content"
+  >
+    <template #header>
+      <div class="ide-review-button-holder">
+        {{ __('Review') }}
+        <editor-mode-dropdown
+          v-if="currentMergeRequest"
+          :viewer="viewer"
+          :merge-request-id="currentMergeRequest.iid"
+          @click="updateViewer"
+        />
+      </div>
+      <div class="prepend-top-5 ide-review-sub-header">
+        <template v-if="showLatestChangesText">
+          {{ __('Latest changes') }}
+        </template>
+        <template v-else-if="showMergeRequestText">
+          {{ __('Merge request') }} (<a
             v-if="currentMergeRequest"
-            :viewer="viewer"
-            :merge-request-id="currentMergeRequest.iid"
-            @click="updateViewer"
-          />
-        </div>
-        <div class="prepend-top-5 ide-review-sub-header">
-          <template v-if="showLatestChangesText">
-            {{ __('Latest changes') }}
-          </template>
-          <template v-else-if="showMergeRequestText">
-            {{ __('Merge request') }} (<a
-              v-if="currentMergeRequest"
-              :href="currentMergeRequest.web_url"
-              v-text="mergeRequestId"
-            ></a
-            >)
-          </template>
-        </div>
-      </template>
-    </ide-tree-list>
-  </div>
+            :href="currentMergeRequest.web_url"
+            v-text="mergeRequestId"
+          ></a
+          >)
+        </template>
+      </div>
+    </template>
+  </ide-tree-list>
 </template>
