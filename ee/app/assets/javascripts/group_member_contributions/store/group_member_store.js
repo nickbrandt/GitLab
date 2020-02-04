@@ -43,7 +43,7 @@ export default class GroupMemberStore {
   sortMembers(sortByColumn) {
     if (sortByColumn) {
       this.state.currentSortedColumn = sortByColumn;
-      this.state.sortOrders[sortByColumn] = this.state.sortOrders[sortByColumn] * -1;
+      this.state.sortOrders[sortByColumn] *= -1;
 
       const currentColumnOrder = this.state.sortOrders[sortByColumn] || 1;
       const members = this.state.members.slice().sort((a, b) => {
