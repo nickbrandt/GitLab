@@ -2,10 +2,10 @@
 
 module DeployTokens
   class CreateService < BaseService
+    include DeployTokenMethods
+
     def execute
-      @project.deploy_tokens.create(params) do |deploy_token|
-        deploy_token.username = params[:username].presence
-      end
+      create_deploy_token_for(@project, params)
     end
   end
 end

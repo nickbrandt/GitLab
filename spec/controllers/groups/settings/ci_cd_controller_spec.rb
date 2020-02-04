@@ -210,4 +210,26 @@ describe Groups::Settings::CiCdController do
       end
     end
   end
+
+  describe 'POST create_deploy_token' do
+    let(:deploy_token_params) do
+      {
+        name: 'deployer_token',
+        expires_at: 1.month.from_now.to_date.to_s,
+        username: 'deployer',
+        read_repository: '1',
+        deploy_token_type: '1'
+      }
+    end
+
+    subject(:create_deploy_token) { post :create_deploy_token, params: { group_id: group, deploy_token: deploy_token_params } }
+
+    before do
+      group.add_owner(user)
+    end
+
+    it_behaves_like 'a created deploy token' do
+      let(:deploy_token) { create_deploy_token }
+    end
+  end
 end

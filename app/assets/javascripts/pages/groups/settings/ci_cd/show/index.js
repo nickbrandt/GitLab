@@ -1,9 +1,13 @@
 import initSettingsPanels from '~/settings_panels';
 import AjaxVariableList from '~/ci_variable_list/ajax_variable_list';
+import DueDateSelectors from '~/due_date_select';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize expandable settings panels
   initSettingsPanels();
+
+  // eslint-disable-next-line no-new
+  new DueDateSelectors({});
 
   const variableListEl = document.querySelector('.js-ci-variable-list-section');
   // eslint-disable-next-line no-new

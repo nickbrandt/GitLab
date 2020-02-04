@@ -22,10 +22,10 @@
                 %span{ class: ('text-warning' if token.expires_soon?) }
                   In #{distance_of_time_in_words_to_now(token.expires_at)}
               - else
-                %span.token-never-expires-label Never
+                %span.token-never-expires-label= _('Never')
             %td= token.scopes.present? ? token.scopes.join(", ") : "<no scopes selected>"
             %td= link_to s_('DeployTokens|Revoke'), "#", class: "btn btn-danger float-right", data: { toggle: "modal", target: "#revoke-modal-#{token.id}"}
             = render 'shared/deploy_tokens/revoke_modal', token: token, entity: entity
 - else
   .settings-message.text-center
-    = s_('DeployTokens|This project has no active Deploy Tokens.')
+    = s_('DeployTokens|This %{entity_type} has no active Deploy Tokens.') % { entity_type: entity.class.name.downcase }

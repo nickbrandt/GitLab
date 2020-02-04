@@ -6441,10 +6441,10 @@ msgstr ""
 msgid "DeployTokens|Scopes"
 msgstr ""
 
-msgid "DeployTokens|This action cannot be undone."
+msgid "DeployTokens|This %{entity_type} has no active Deploy Tokens."
 msgstr ""
 
-msgid "DeployTokens|This project has no active Deploy Tokens."
+msgid "DeployTokens|This action cannot be undone."
 msgstr ""
 
 msgid "DeployTokens|Use this token as a password. Make sure you save it - you won't be able to access it again."
@@ -6460,6 +6460,9 @@ msgid "DeployTokens|You are about to revoke"
 msgstr ""
 
 msgid "DeployTokens|Your New Deploy Token"
+msgstr ""
+
+msgid "DeployTokens|Your new group deploy token has been created."
 msgstr ""
 
 msgid "DeployTokens|Your new project deploy token has been created."

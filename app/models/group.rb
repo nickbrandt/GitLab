@@ -15,6 +15,7 @@ class Group < Namespace
   include WithUploads
   include Gitlab::Utils::StrongMemoize
   include GroupAPICompatibility
+  include DeployTokenAccessible
 
   ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT = 10
 
@@ -58,6 +59,9 @@ class Group < Namespace
   has_one :import_export_upload
 
   has_many :import_failures, inverse_of: :group
+
+  has_many :group_deploy_tokens
+  has_many :deploy_tokens, through: :group_deploy_tokens
 
   accepts_nested_attributes_for :variables, allow_destroy: true
 
@@ -469,6 +473,14 @@ class Group < Namespace
 
   def adjourned_deletion?
     false
+  end
+
+  def deploy_token_create_url(opts = {})
+    Gitlab::Routing.url_helpers.create_deploy_token_group_settings_ci_cd_path(self, opts)
+  end
+
+  def deploy_token_revoke_url_for(token)
+    Gitlab::Routing.url_helpers.revoke_group_deploy_token_path(self, token)
   end
 
   private

@@ -73,13 +73,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
             post :reset_cache
             put :reset_registration_token
+            post :create_deploy_token, path: 'deploy_token/create'
           end
 
           resource :operations, only: [:show, :update]
           resource :integrations, only: [:show]
 
           resource :repository, only: [:show], controller: :repository do
-            post :create_deploy_token, path: 'deploy_token/create'
             post :cleanup
           end
         end
