@@ -32,7 +32,7 @@ describe MergeRequestWidgetEntity do
   end
 
   def create_all_artifacts
-    artifacts = %i(codequality license_management performance)
+    artifacts = %i(codequality performance)
 
     artifacts.each do |artifact_type|
       create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
@@ -95,7 +95,6 @@ describe MergeRequestWidgetEntity do
 
     where(:json_entry, :artifact_type) do
       :codeclimate         | :codequality
-      :license_management  | :license_management
       :performance         | :performance
     end
 
@@ -149,12 +148,9 @@ describe MergeRequestWidgetEntity do
 
       it 'is included' do
         expect(subject.as_json).to include(:license_management)
-        expect(subject.as_json[:license_management]).to include(:head_path)
-        expect(subject.as_json[:license_management]).to include(:base_path)
         expect(subject.as_json[:license_management]).to include(:managed_licenses_path)
         expect(subject.as_json[:license_management]).to include(:can_manage_licenses)
         expect(subject.as_json[:license_management]).to include(:license_management_full_report_path)
-        expect(subject.as_json[:license_management][:head_path]).to include('proxy=true')
       end
 
       context 'when feature is not licensed' do

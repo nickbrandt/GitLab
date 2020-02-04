@@ -257,9 +257,7 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(500, []);
-        mock.onGet('head_path.json').reply(500, []);
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onAny().reply(500);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -783,16 +781,15 @@ describe('ee merge request widget options', () => {
   });
 
   describe('license management report', () => {
-    const headPath = `${TEST_HOST}/head.json`;
-    const basePath = `${TEST_HOST}/base.json`;
     const licenseManagementApiUrl = `${TEST_HOST}/manage_license_api`;
 
     it('should be rendered if license management data is set', () => {
       gl.mrWidgetData = {
         ...mockData,
+        enabled_reports: {
+          license_management: true,
+        },
         license_management: {
-          head_path: headPath,
-          base_path: basePath,
           managed_licenses_path: licenseManagementApiUrl,
           can_manage_licenses: false,
         },
@@ -1114,6 +1111,14 @@ describe('ee merge request widget options', () => {
           ...mockData,
           enabled_reports: noSecurityReportsEnabled,
         };
+
+        if (noSecurityReportsEnabled?.license_management) {
+          // Provide license report config if it's going to be rendered
+          gl.mrWidgetData.license_management = {
+            managed_licenses_path: `${TEST_HOST}/manage_license_api`,
+            can_manage_licenses: false,
+          };
+        }
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 

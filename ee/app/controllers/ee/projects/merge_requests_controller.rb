@@ -11,7 +11,6 @@ module EE
         include DescriptionDiffActions
 
         before_action only: [:show] do
-          push_frontend_feature_flag(:parsed_license_report, default_enabled: true)
           push_frontend_feature_flag(:anonymous_visual_review_feedback)
         end
 
