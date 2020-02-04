@@ -46,6 +46,21 @@ After configuring a GitLab instance with an internal CA certificate, you might n
 
 If you have the problems listed above, add your certificate to `/etc/gitlab/trusted-certs` and run `sudo gitlab-ctl reconfigure`.
 
+## Using GitLab Runner with a GitLab instance configured with internal CA certificate or self-signed certificate
+
+Besides getting the errors mentioned in
+[Using an internal CA certificate with GitLab](ssl.md#using-an-internal-ca-certificate-with-gitlab),
+your CI pipelines may stuck stuck in `Pending` status. In the runner logs you may see the below error:
+
+```shell
+Dec  6 02:43:17 runner-host01 gitlab-runner[15131]: #033[0;33mWARNING: Checking for jobs... failed
+#033[0;m  #033[0;33mrunner#033[0;m=Bfkz1fyb #033[0;33mstatus#033[0;m=couldn't execute POST against
+https://gitlab.domain.tld/api/v4/jobs/request: Post https://gitlab.domain.tld/api/v4/jobs/request:
+x509: certificate signed by unknown authority
+```
+
+If you face similar problem, add your certificate to `/etc/gitlab-runner/certs` and restart the runner via `gitlab-runner restart`.
+
 ## Mirroring a remote GitLab repository that uses a self-signed SSL certificate
 
 **Scenario:** When configuring a local GitLab instance to [mirror a repository](../../user/project/repository/repository_mirroring.md) from a remote GitLab instance that uses a self-signed certificate, you may see the `SSL certificate problem: self signed certificate` error in the UI.
