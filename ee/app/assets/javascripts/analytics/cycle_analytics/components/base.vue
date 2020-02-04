@@ -193,6 +193,7 @@ export default {
     per_page: PROJECTS_PER_PAGE,
     with_shared: false,
     order_by: LAST_ACTIVITY_AT,
+    include_subgroups: true,
   },
   durationChartTooltipDateFormat: dateFormats.defaultDate,
   maxDateRange: DATE_RANGE_LIMIT,
