@@ -13,6 +13,11 @@ describe 'Admin updates EE-only settings' do
 
   context 'Geo settings' do
     context 'when the license has Geo feature' do
+      it 'hides JS alert' do
+        visit admin_geo_settings_path
+        expect(page).not_to have_content("Geo is only available for users who have at least a Premium license.")
+      end
+
       it 'allows users to change Geo settings' do
         visit admin_geo_settings_path
         page.within('section') do
@@ -28,12 +33,12 @@ describe 'Admin updates EE-only settings' do
     end
 
     context 'when the license does not have Geo feature' do
-      it 'shows empty page' do
+      it 'shows JS alert' do
         allow(License).to receive(:feature_available?).and_return(false)
 
         visit admin_geo_settings_path
 
-        expect(page).to have_content 'You need a different license to use Geo replication'
+        expect(page).to have_content("Geo is only available for users who have at least a Premium license.")
       end
     end
   end

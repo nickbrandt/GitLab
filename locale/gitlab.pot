@@ -11529,6 +11529,9 @@ msgstr ""
 msgid "Manage two-factor authentication"
 msgstr ""
 
+msgid "Manage your license"
+msgstr ""
+
 msgid "Manifest"
 msgstr ""
 
@@ -19205,6 +19208,9 @@ msgstr ""
 msgid "This GitLab instance does not provide any shared Runners yet. Instance administrators can register shared Runners in the admin area."
 msgstr ""
 
+msgid "This GitLab instance is licensed at the %{insufficient_license} tier. Geo is only available for users who have at least a Premium license."
+msgstr ""
+
 msgid "This action can lead to data loss. To prevent accidental actions we ask you to confirm your intention."
 msgstr ""
 
@@ -21866,9 +21872,6 @@ msgid "You must set up incoming email before it becomes active."
 msgstr ""
 
 msgid "You need a different license to enable FileLocks feature"
-msgstr ""
-
-msgid "You need a different license to use Geo replication."
 msgstr ""
 
 msgid "You need git-lfs version %{min_git_lfs_version} (or greater) to continue. Please visit https://git-lfs.github.com"

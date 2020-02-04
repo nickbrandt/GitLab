@@ -14,9 +14,8 @@ describe Admin::Geo::SettingsController, :geo do
 
   shared_examples 'license required' do
     context 'without a valid license' do
-      it 'redirects to license page with a flash message' do
-        expect(subject).to redirect_to(admin_license_path)
-        expect(flash[:alert]).to include('You need a different license to use Geo replication')
+      it 'redirects to 403 page' do
+        expect(subject).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -26,20 +25,37 @@ describe Admin::Geo::SettingsController, :geo do
       sign_in(admin)
     end
 
-    subject { get :show }
+    context 'without a valid license' do
+      subject { get :show }
 
-    it_behaves_like 'license required'
+      render_views
+
+      before do
+        stub_licensed_features(geo: false)
+      end
+
+      it 'does not redirects to the 403 page' do
+        expect(subject).not_to redirect_to(:forbidden)
+      end
+
+      it 'does show license alert' do
+        expect(subject).to render_template(partial: '_license_alert')
+        expect(subject.body).to include('Geo is only available for users who have at least a Premium license.')
+      end
+    end
 
     context 'with a valid license' do
+      subject { get :show }
+
       render_views
 
       before do
         stub_licensed_features(geo: true)
       end
 
-      it 'renders the show template' do
-        expect(subject).to have_gitlab_http_status(200)
-        expect(subject).to render_template(:show)
+      it 'does not show license alert' do
+        expect(subject).to render_template(partial: '_license_alert')
+        expect(subject.body).not_to include('Geo is only available for users who have at least a Premium license.')
       end
     end
   end
