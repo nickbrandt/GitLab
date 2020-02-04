@@ -3680,6 +3680,23 @@ ActiveRecord::Schema.define(version: 2020_02_03_025821) do
     t.index ["user_id"], name: "index_resource_label_events_on_user_id"
   end
 
+  create_table "resource_milestone_events", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "issue_id"
+    t.bigint "merge_request_id"
+    t.bigint "milestone_id"
+    t.integer "action", limit: 2, null: false
+    t.integer "state", limit: 2, null: false
+    t.integer "cached_markdown_version"
+    t.text "reference"
+    t.text "reference_html"
+    t.datetime_with_timezone "created_at", null: false
+    t.index ["issue_id"], name: "index_resource_milestone_events_on_issue_id"
+    t.index ["merge_request_id"], name: "index_resource_milestone_events_on_merge_request_id"
+    t.index ["milestone_id"], name: "index_resource_milestone_events_on_milestone_id"
+    t.index ["user_id"], name: "index_resource_milestone_events_on_user_id"
+  end
+
   create_table "resource_weight_events", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "issue_id", null: false
@@ -4842,6 +4859,10 @@ ActiveRecord::Schema.define(version: 2020_02_03_025821) do
   add_foreign_key "resource_label_events", "labels", on_delete: :nullify
   add_foreign_key "resource_label_events", "merge_requests", on_delete: :cascade
   add_foreign_key "resource_label_events", "users", on_delete: :nullify
+  add_foreign_key "resource_milestone_events", "issues", on_delete: :cascade
+  add_foreign_key "resource_milestone_events", "merge_requests", on_delete: :cascade
+  add_foreign_key "resource_milestone_events", "milestones", on_delete: :cascade
+  add_foreign_key "resource_milestone_events", "users", on_delete: :nullify
   add_foreign_key "resource_weight_events", "issues", on_delete: :cascade
   add_foreign_key "resource_weight_events", "users", on_delete: :nullify
   add_foreign_key "reviews", "merge_requests", on_delete: :cascade
