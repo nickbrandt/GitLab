@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 describe API::ProjectApprovalRules do
-  set(:group) { create(:group_with_members) }
-  set(:user) { create(:user) }
-  set(:user2) { create(:user) }
-  set(:admin) { create(:user, :admin) }
-  set(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
-  set(:approver) { create(:user) }
+  let_it_be(:group) { create(:group_with_members) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:user2) { create(:user) }
+  let_it_be(:admin) { create(:user, :admin) }
+  let_it_be(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
+  let_it_be(:approver) { create(:user) }
 
   describe 'GET /projects/:id/approval_rules' do
     let(:url) { "/projects/#{project.id}/approval_rules" }
@@ -43,7 +43,7 @@ describe API::ProjectApprovalRules do
       end
 
       context 'private group filtering' do
-        set(:private_group) { create :group, :private }
+        let_it_be(:private_group) { create :group, :private }
 
         before do
           rule.groups << private_group

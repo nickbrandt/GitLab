@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'clusters/clusters/show' do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   shared_examples 'cluster health section' do
     let(:cluster_presenter) { cluster.present(current_user: user) }

@@ -7,10 +7,10 @@ describe API::Geo do
   include ApiHelpers
   include ::EE::GeoHelpers
 
-  set(:admin) { create(:admin) }
-  set(:user) { create(:user) }
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:admin) { create(:admin) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
   let(:geo_token_header) do
     { 'X-Gitlab-Token' => secondary_node.system_hook.token }
   end

@@ -3,11 +3,10 @@
 require 'spec_helper'
 
 describe API::Todos do
-  set(:group) { create(:group) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }
-
-  set(:project) { create(:project, group: group) }
 
   describe 'GET /todos' do
     let(:author_1) { create(:user) }

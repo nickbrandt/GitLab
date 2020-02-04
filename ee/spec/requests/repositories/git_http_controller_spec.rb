@@ -6,8 +6,8 @@ describe Repositories::GitHttpController, type: :request do
   include GitHttpHelpers
 
   describe 'GET #info_refs' do
-    set(:user) { create(:user) }
-    set(:project) { create(:project, :repository, :private) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:project) { create(:project, :repository, :private) }
     let(:path) { "#{project.full_path}.git" }
     let(:env) { { user: user.username, password: user.password } }
 

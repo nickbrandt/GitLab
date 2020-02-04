@@ -10,7 +10,7 @@ describe API::Templates do
     'LICENSE/custom.txt'           => 'Custom licenses'
   }
 
-  set(:project) { create(:project, :custom_repo, files: files) }
+  let_it_be(:project) { create(:project, :custom_repo, files: files) }
 
   before do
     stub_ee_application_setting(file_template_project: project)

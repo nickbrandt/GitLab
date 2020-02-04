@@ -6,7 +6,7 @@ describe DependencyEntity do
   describe '#as_json' do
     subject { described_class.represent(dependency, request: request).as_json }
 
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
     let(:project) { create(:project, :repository, :private) }
     let(:request) { double('request') }
     let(:dependency) { build(:dependency, :with_vulnerabilities, :with_licenses) }

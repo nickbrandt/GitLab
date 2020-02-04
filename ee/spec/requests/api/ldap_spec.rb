@@ -6,8 +6,8 @@ describe API::Ldap do
   include ApiHelpers
   include LdapHelpers
 
-  set(:user) { create(:user) }
-  set(:admin) { create(:admin) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:admin) { create(:admin) }
   let(:adapter) { ldap_adapter }
 
   before do

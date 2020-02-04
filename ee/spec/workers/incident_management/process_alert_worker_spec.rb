@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe IncidentManagement::ProcessAlertWorker do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   describe '#perform' do
     let(:alert) { :alert }

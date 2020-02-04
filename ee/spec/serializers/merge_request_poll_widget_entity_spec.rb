@@ -5,9 +5,9 @@ require 'spec_helper'
 describe MergeRequestPollWidgetEntity do
   include ProjectForksHelper
 
-  set(:user) { create(:user) }
-  set(:project) { create :project, :repository }
-  set(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create :project, :repository }
+  let_it_be(:merge_request, reload: true) { create(:merge_request, source_project: project, target_project: project) }
   let(:request) { double('request', current_user: user) }
 
   before do

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'admin/application_settings/_elasticsearch_form' do
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do

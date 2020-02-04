@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe API::ManagedLicenses do
-  set(:project) { create(:project, :public) }
-  set(:maintainer_user) { create(:user) }
-  set(:dev_user) { create(:user) }
-  set(:reporter_user) { create(:user) }
-  set(:software_license_policy) { create(:software_license_policy, project: project) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:maintainer_user) { create(:user) }
+  let_it_be(:dev_user) { create(:user) }
+  let_it_be(:reporter_user) { create(:user) }
+  let_it_be(:software_license_policy) { create(:software_license_policy, project: project) }
 
   before do
     stub_licensed_features(license_management: true)

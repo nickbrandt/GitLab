@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 describe API::Issues, :mailer do
-  set(:user) { create(:user) }
-  set(:project) do
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) do
     create(:project, :public, creator_id: user.id, namespace: user.namespace)
   end
-  set(:group) { create(:group) }
-  set(:epic) { create(:epic, group: group) }
-  set(:group_project) { create(:project, :public, creator_id: user.id, namespace: group) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:epic) { create(:epic, group: group) }
+  let_it_be(:group_project) { create(:project, :public, creator_id: user.id, namespace: group) }
 
-  let(:user2)       { create(:user) }
-  set(:author)      { create(:author) }
-  set(:assignee)    { create(:assignee) }
+  let(:user2)             { create(:user) }
+  let_it_be(:author)      { create(:author) }
+  let_it_be(:assignee)    { create(:assignee) }
   let(:issue_title)       { 'foo' }
   let(:issue_description) { 'closed' }
   let!(:issue) do
@@ -28,7 +28,7 @@ describe API::Issues, :mailer do
            description: issue_description
   end
 
-  set(:milestone) { create(:milestone, title: '1.0.0', project: project) }
+  let_it_be(:milestone) { create(:milestone, title: '1.0.0', project: project) }
 
   before(:all) do
     project.add_reporter(user)
