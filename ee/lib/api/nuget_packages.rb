@@ -13,6 +13,7 @@ module API
     AUTHENTICATE_REALM_HEADER = 'Www-Authenticate: Basic realm'
     AUTHENTICATE_REALM_NAME = 'GitLab Nuget Package Registry'
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
+    NON_NEGATIVE_INTEGER_REGEX = %r{\A0|[1-9]\d*\z}.freeze
 
     PACKAGE_FILENAME = 'package.nupkg'
 
@@ -203,6 +204,36 @@ module API
 
             # nuget and dotnet don't support 302 Moved status codes, supports_direct_download has to be set to false
             present_carrierwave_file!(package_file.file, supports_direct_download: false)
+          end
+        end
+
+        params do
+          requires :q, type: String, desc: 'The search term'
+          optional :skip, type: Integer, desc: 'The number of results to skip', default: 0, regexp: NON_NEGATIVE_INTEGER_REGEX
+          optional :take, type: Integer, desc: 'The number of results to return', default: Kaminari.config.default_per_page, regexp: POSITIVE_INTEGER_REGEX
+          optional :prerelease, type: Boolean, desc: 'Include prerelease versions', default: true
+        end
+        namespace '/query' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          # https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
+          desc 'The NuGet Search Service' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get format: :json do
+            search_options = {
+              include_prerelease_versions: params[:prerelease],
+              per_page: params[:take],
+              padding: params[:skip]
+            }
+            search = Packages::Nuget::SearchService
+              .new(authorized_user_project, params[:q], search_options)
+              .execute
+
+            present ::Packages::Nuget::SearchResultsPresenter.new(search),
+              with: EE::API::Entities::Nuget::SearchResults
           end
         end
       end

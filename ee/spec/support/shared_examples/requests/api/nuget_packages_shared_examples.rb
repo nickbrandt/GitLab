@@ -293,6 +293,60 @@ RSpec.shared_examples 'process nuget download content request' do |user_type, st
   end
 end
 
+RSpec.shared_examples 'process nuget search request' do |user_type, status, add_member = true|
+  RSpec.shared_examples 'returns a valid json search response' do |status, total_hits, versions|
+    it_behaves_like 'returning response status', status
+
+    it 'returns a valid json response' do
+      subject
+
+      expect(response.media_type).to eq('application/json')
+      expect(json_response).to be_a(Hash)
+      expect(json_response).to match_schema('public_api/v4/packages/nuget/search', dir: 'ee')
+      expect(json_response['totalHits']).to eq total_hits
+      expect(json_response['data'].map { |e| e['versions'].size }).to match_array(versions)
+    end
+  end
+
+  context "for user type #{user_type}" do
+    before do
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it_behaves_like 'returns a valid json search response', status, 4, [1, 5, 5, 1]
+
+    context 'with skip set to 2' do
+      let(:skip) { 2 }
+
+      it_behaves_like 'returns a valid json search response', status, 4, [5, 1]
+    end
+
+    context 'with take set to 2' do
+      let(:take) { 2 }
+
+      it_behaves_like 'returns a valid json search response', status, 4, [1, 5]
+    end
+
+    context 'without prereleases' do
+      let(:include_prereleases) { false }
+
+      it_behaves_like 'returns a valid json search response', status, 3, [1, 5, 5]
+    end
+
+    context 'with empty search term' do
+      let(:search_term) { '' }
+
+      it_behaves_like 'returns a valid json search response', status, 5, [1, 5, 5, 1, 1]
+    end
+
+    context 'with nil search term' do
+      let(:search_term) { nil }
+
+      it_behaves_like 'returns a valid json search response', status, 5, [1, 5, 5, 1, 1]
+    end
+  end
+end
+
 RSpec.shared_examples 'rejects nuget access with invalid project id' do
   context 'with a project id with invalid integers' do
     using RSpec::Parameterized::TableSyntax

@@ -284,6 +284,10 @@ describe API::NugetPackages do
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
+
+          it_behaves_like 'rejects nuget access with unknown project id'
+
+          it_behaves_like 'rejects nuget access with invalid project id'
         end
       end
 
@@ -475,6 +479,84 @@ describe API::NugetPackages do
             'PRIVATE' | :developer  | false | false | 'rejects nuget packages access'            | :unauthorized
             'PRIVATE' | :guest      | false | false | 'rejects nuget packages access'            | :unauthorized
             'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access'            | :unauthorized
+          end
+
+          with_them do
+            let(:token) { user_token ? personal_access_token.token : 'wrong' }
+            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
+
+            subject { get api(url), headers: headers }
+
+            before do
+              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            end
+
+            after do
+              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            end
+
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+          end
+        end
+
+        it_behaves_like 'rejects nuget access with unknown project id'
+
+        it_behaves_like 'rejects nuget access with invalid project id'
+      end
+
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
+    end
+
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
+  end
+
+  describe 'GET /api/v4/projects/:id/packages/nuget/query' do
+    let_it_be(:package_a) { create(:nuget_package, name: 'Dummy.PackageA', project: project) }
+    let_it_be(:packages_b) { create_list(:nuget_package, 5, name: 'Dummy.PackageB', project: project) }
+    let_it_be(:packages_c) { create_list(:nuget_package, 5, name: 'Dummy.PackageC', project: project) }
+    let_it_be(:package_d) { create(:nuget_package, name: 'Dummy.PackageD', version: '5.0.5-alpha', project: project) }
+    let_it_be(:package_e) { create(:nuget_package, name: 'Foo.BarE', project: project) }
+    let(:search_term) { 'uMmy' }
+    let(:take) { 26 }
+    let(:skip) { 0 }
+    let(:include_prereleases) { true }
+    let(:query_parameters) { { q: search_term, take: take, skip: skip, prerelease: include_prereleases } }
+    let(:url) { "/projects/#{project.id}/packages/nuget/query?#{query_parameters.to_query}" }
+
+    subject { get api(url) }
+
+    context 'with packages features enabled' do
+      before do
+        stub_licensed_features(packages: true)
+      end
+
+      context 'with feature flag enabled' do
+        before do
+          stub_feature_flags(nuget_package_registry: { enabled: true, thing: project })
+        end
+
+        context 'with valid project' do
+          using RSpec::Parameterized::TableSyntax
+
+          where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
+            'PUBLIC'  | :developer  | true  | true  | 'process nuget search request'  | :success
+            'PUBLIC'  | :guest      | true  | true  | 'process nuget search request'  | :success
+            'PUBLIC'  | :developer  | true  | false | 'process nuget search request'  | :success
+            'PUBLIC'  | :guest      | true  | false | 'process nuget search request'  | :success
+            'PUBLIC'  | :developer  | false | true  | 'process nuget search request'  | :success
+            'PUBLIC'  | :guest      | false | true  | 'process nuget search request'  | :success
+            'PUBLIC'  | :developer  | false | false | 'process nuget search request'  | :success
+            'PUBLIC'  | :guest      | false | false | 'process nuget search request'  | :success
+            'PUBLIC'  | :anonymous  | false | true  | 'process nuget search request'  | :success
+            'PRIVATE' | :developer  | true  | true  | 'process nuget search request'  | :success
+            'PRIVATE' | :guest      | true  | true  | 'rejects nuget packages access' | :forbidden
+            'PRIVATE' | :developer  | true  | false | 'rejects nuget packages access' | :unauthorized
+            'PRIVATE' | :guest      | true  | false | 'rejects nuget packages access' | :unauthorized
+            'PRIVATE' | :developer  | false | true  | 'rejects nuget packages access' | :not_found
+            'PRIVATE' | :guest      | false | true  | 'rejects nuget packages access' | :not_found
+            'PRIVATE' | :developer  | false | false | 'rejects nuget packages access' | :unauthorized
+            'PRIVATE' | :guest      | false | false | 'rejects nuget packages access' | :unauthorized
+            'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access' | :unauthorized
           end
 
           with_them do
