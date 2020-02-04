@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('IssueCardWeight component', () => {
   let vm;
@@ -19,7 +19,7 @@ describe('IssueCardWeight component', () => {
       weight: 5,
     });
 
-    expect(vm.$el.querySelector('.board-card-info-text')).toContainText('5');
+    expect(vm.$el.querySelector('.board-card-info-text').innerText).toContain('5');
   });
 
   it('renders a link when no tag is specified', () => {
@@ -53,7 +53,7 @@ describe('IssueCardWeight component', () => {
 
     it('renders weight', () => {
       expect(vm.$el.querySelector('.board-card-info-text')).toBeDefined();
-      expect(vm.$el.querySelector('.board-card-info-text')).toContainText(0);
+      expect(vm.$el.querySelector('.board-card-info-text').innerText).toContain(0);
     });
   });
 });

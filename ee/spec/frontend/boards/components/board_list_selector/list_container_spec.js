@@ -1,9 +1,9 @@
 import Vue from 'vue';
 
 import ListContainer from 'ee/boards/components/boards_list_selector/list_container.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
-import { mockAssigneesList } from 'spec/boards/mock_data';
+import { mockAssigneesList } from 'jest/boards/mock_data';
 
 const createComponent = () => {
   const Component = Vue.extend(ListContainer);
@@ -66,7 +66,7 @@ describe('ListContainer', () => {
 
     describe('handleItemClick', () => {
       it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick(assignee);
@@ -81,14 +81,11 @@ describe('ListContainer', () => {
       expect(vm.$el.classList.contains('dropdown-assignees-list')).toBe(true);
     });
 
-    it('renders loading animation when prop `loading` is true', done => {
+    it('renders loading animation when prop `loading` is true', () => {
       vm.loading = true;
-      Vue.nextTick()
-        .then(() => {
-          expect(vm.$el.querySelector('.dropdown-loading')).not.toBeNull();
-        })
-        .then(done)
-        .catch(done.fail);
+      return Vue.nextTick().then(() => {
+        expect(vm.$el.querySelector('.dropdown-loading')).not.toBeNull();
+      });
     });
 
     it('renders dropdown body elements', () => {
