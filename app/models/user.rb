@@ -627,10 +627,7 @@ class User < ApplicationRecord
   end
 
   def bot?
-    return bot_type.present? if has_attribute?(:bot_type)
-
-    # Some older *migration* specs utilize this removed column
-    read_attribute(:support_bot)
+    bot_type.present?
   end
 
   def internal?
