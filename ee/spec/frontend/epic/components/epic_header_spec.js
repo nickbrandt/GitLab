@@ -4,14 +4,14 @@ import EpicHeader from 'ee/epic/components/epic_header.vue';
 import createStore from 'ee/epic/store';
 import { statusType } from 'ee/epic/constants';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
 describe('EpicHeaderComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     const Component = Vue.extend(EpicHeader);
 
     store = createStore();
@@ -21,8 +21,6 @@ describe('EpicHeaderComponent', () => {
     vm = mountComponentWithStore(Component, {
       store,
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {

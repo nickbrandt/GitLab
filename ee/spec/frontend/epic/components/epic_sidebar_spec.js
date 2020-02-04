@@ -6,7 +6,7 @@ import createStore from 'ee/epic/store';
 import epicUtils from 'ee/epic/utils/epic_utils';
 import { dateTypes } from 'ee/epic/constants';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData, mockAncestors } from '../mock_data';
 
 describe('EpicSidebarComponent', () => {
@@ -14,7 +14,7 @@ describe('EpicSidebarComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     const Component = Vue.extend(EpicSidebar);
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
@@ -24,8 +24,6 @@ describe('EpicSidebarComponent', () => {
     vm = mountComponentWithStore(Component, {
       store,
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {
@@ -35,7 +33,7 @@ describe('EpicSidebarComponent', () => {
   describe('methods', () => {
     describe('getDateFromMilestonesTooltip', () => {
       it('calls `epicUtils.getDateFromMilestonesTooltip` with `dateType` param', () => {
-        spyOn(epicUtils, 'getDateFromMilestonesTooltip');
+        jest.spyOn(epicUtils, 'getDateFromMilestonesTooltip');
 
         vm.getDateFromMilestonesTooltip(dateTypes.start);
 
@@ -49,7 +47,7 @@ describe('EpicSidebarComponent', () => {
 
     describe('changeStartDateType', () => {
       it('calls `toggleStartDateType` on component with `dateTypeIsFixed` param', () => {
-        spyOn(vm, 'toggleStartDateType');
+        jest.spyOn(vm, 'toggleStartDateType');
 
         vm.changeStartDateType(true, true);
 
@@ -61,7 +59,7 @@ describe('EpicSidebarComponent', () => {
       });
 
       it('calls `saveDate` on component when `typeChangeOnEdit` param false', () => {
-        spyOn(vm, 'saveDate');
+        jest.spyOn(vm, 'saveDate');
 
         vm.changeStartDateType(true, false);
 
@@ -77,7 +75,7 @@ describe('EpicSidebarComponent', () => {
 
     describe('saveStartDate', () => {
       it('calls `saveDate` on component with `date` param set to `newDate`', () => {
-        spyOn(vm, 'saveDate');
+        jest.spyOn(vm, 'saveDate');
 
         vm.saveStartDate('2018-1-1');
 
@@ -93,7 +91,7 @@ describe('EpicSidebarComponent', () => {
 
     describe('changeDueDateType', () => {
       it('calls `toggleDueDateType` on component with `dateTypeIsFixed` param', () => {
-        spyOn(vm, 'toggleDueDateType');
+        jest.spyOn(vm, 'toggleDueDateType');
 
         vm.changeDueDateType(true, true);
 
@@ -105,7 +103,7 @@ describe('EpicSidebarComponent', () => {
       });
 
       it('calls `saveDate` on component when `typeChangeOnEdit` param false', () => {
-        spyOn(vm, 'saveDate');
+        jest.spyOn(vm, 'saveDate');
 
         vm.changeDueDateType(true, false);
 
@@ -121,7 +119,7 @@ describe('EpicSidebarComponent', () => {
 
     describe('saveDueDate', () => {
       it('calls `saveDate` on component with `date` param set to `newDate`', () => {
-        spyOn(vm, 'saveDate');
+        jest.spyOn(vm, 'saveDate');
 
         vm.saveDueDate('2018-1-1');
 

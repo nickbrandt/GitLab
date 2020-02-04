@@ -5,7 +5,7 @@ import * as actions from 'ee/epic/store/actions';
 import epicUtils from 'ee/epic/utils/epic_utils';
 import { statusType, dateTypes } from 'ee/epic/constants';
 
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 
 import { mockEpicMeta, mockEpicData } from '../mock_data';
@@ -96,7 +96,7 @@ describe('Epic Store Actions', () => {
 
   describe('triggerIssuableEvent', () => {
     it('Calls `triggerDocumentEvent` with events `issuable_vue_app:change`, `issuable:change` and passes `isEpicOpen` as param', () => {
-      spyOn(epicUtils, 'triggerDocumentEvent').and.returnValue(false);
+      jest.spyOn(epicUtils, 'triggerDocumentEvent').mockReturnValue(false);
 
       const data = { isEpicOpen: true };
       actions.triggerIssuableEvent({}, data);
@@ -199,8 +199,8 @@ describe('Epic Store Actions', () => {
     const sidebarCollapsed = true;
 
     beforeEach(() => {
-      spyOn(epicUtils, 'toggleContainerClass').and.stub();
-      spyOn(epicUtils, 'setCollapsedGutter').and.stub();
+      jest.spyOn(epicUtils, 'toggleContainerClass');
+      jest.spyOn(epicUtils, 'setCollapsedGutter');
     });
 
     it('should call `epicUtils.toggleContainerClass` with classes `right-sidebar-expanded` & `right-sidebar-collapsed`', () => {
@@ -315,7 +315,7 @@ describe('Epic Store Actions', () => {
 
   describe('triggerTodoToggleEvent', () => {
     it('Calls `triggerDocumentEvent` with event `todo:toggle` and passes `count` as param', () => {
-      spyOn(epicUtils, 'triggerDocumentEvent').and.returnValue(false);
+      jest.spyOn(epicUtils, 'triggerDocumentEvent').mockReturnValue(false);
 
       const data = { count: 5 };
       actions.triggerTodoToggleEvent({}, data);
@@ -629,7 +629,7 @@ describe('Epic Store Actions', () => {
 
     it('dispatches requestEpicDateSave and requestEpicDateSaveSuccess when request is successful', done => {
       mock.onPut(/(.*)/).replyOnce(200, {});
-      spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+      jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
         Promise.resolve({
           data: mockUpdateEpicMutationRes,
         }),
@@ -656,7 +656,7 @@ describe('Epic Store Actions', () => {
 
     it('dispatches requestEpicDateSave and requestEpicDateSaveFailure when request fails', done => {
       mock.onPut(/(.*)/).replyOnce(500, {});
-      spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+      jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
         Promise.resolve({
           data: {
             updateEpic: {
@@ -795,7 +795,7 @@ describe('Epic Store Actions', () => {
     describe('success', () => {
       it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleSuccess with param `subscribed` when request is complete', done => {
         mock.onPost(/(.*)/).replyOnce(200, {});
-        spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+        jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
           Promise.resolve({
             data: mockEpicSetSubscriptionRes,
           }),
@@ -837,7 +837,7 @@ describe('Epic Store Actions', () => {
     describe('failure', () => {
       it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleFailure when request fails', done => {
         mock.onPost(/(.*)/).replyOnce(500, {});
-        spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+        jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
           Promise.resolve({
             data: {
               epicSetSubscription: {

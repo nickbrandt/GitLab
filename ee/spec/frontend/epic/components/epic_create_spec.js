@@ -3,14 +3,14 @@ import Vue from 'vue';
 import EpicCreate from 'ee/epic/components/epic_create.vue';
 import createStore from 'ee/epic/store';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta } from '../mock_data';
 
 describe('EpicCreateComponent', () => {
   let vm;
   let store;
 
-  beforeEach(done => {
+  beforeEach(() => {
     const Component = Vue.extend(EpicCreate);
 
     store = createStore();
@@ -19,8 +19,6 @@ describe('EpicCreateComponent', () => {
     vm = mountComponentWithStore(Component, {
       store,
     });
-
-    setTimeout(done);
   });
 
   afterEach(() => {
@@ -59,7 +57,7 @@ describe('EpicCreateComponent', () => {
     describe('epicTitle', () => {
       describe('set', () => {
         it('calls `setEpicCreateTitle` with param `value`', () => {
-          spyOn(vm, 'setEpicCreateTitle');
+          jest.spyOn(vm, 'setEpicCreateTitle');
 
           const newEpicTitle = 'foobar';
 
