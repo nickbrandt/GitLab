@@ -4543,7 +4543,7 @@
         {
           "kind": "OBJECT",
           "name": "Board",
-          "description": null,
+          "description": "Represents a project or group board",
           "fields": [
             {
               "name": "id",
