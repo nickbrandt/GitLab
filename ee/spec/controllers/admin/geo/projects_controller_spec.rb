@@ -102,7 +102,7 @@ describe Admin::Geo::ProjectsController, :geo do
           synced_registry.update_column(:project_id, -1)
 
           expect(subject).to redirect_to(admin_geo_projects_path)
-          expect(flash[:notice]).to include('was successfully removed')
+          expect(flash[:toast]).to include('was successfully removed')
           expect { Geo::ProjectRegistry.find(synced_registry.id) }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
@@ -129,7 +129,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       it 'flags registry for reverify' do
         expect(subject).to redirect_to(admin_geo_projects_path)
-        expect(flash[:notice]).to include('is scheduled for re-verify')
+        expect(flash[:toast]).to include('is scheduled for re-verify')
         expect(synced_registry.reload.pending_verification?).to be_truthy
       end
     end
@@ -147,7 +147,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       it 'flags registry for resync' do
         expect(subject).to redirect_to(admin_geo_projects_path)
-        expect(flash[:notice]).to include('is scheduled for re-sync')
+        expect(flash[:toast]).to include('is scheduled for re-sync')
         expect(synced_registry.reload.resync_repository?).to be_truthy
       end
     end
@@ -173,7 +173,7 @@ describe Admin::Geo::ProjectsController, :geo do
       it 'redirects back and display confirmation' do
         Sidekiq::Testing.inline! do
           expect(subject).to redirect_to(admin_geo_projects_path)
-          expect(flash[:notice]).to include('All projects are being scheduled for re-verify')
+          expect(flash[:toast]).to include('All projects are being scheduled for re-verify')
         end
       end
     end
@@ -198,7 +198,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       it 'redirects back and display confirmation' do
         expect(subject).to redirect_to(admin_geo_projects_path)
-        expect(flash[:notice]).to include('All projects are being scheduled for re-sync')
+        expect(flash[:toast]).to include('All projects are being scheduled for re-sync')
       end
     end
   end
@@ -215,7 +215,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       it 'flags registry for re-download' do
         expect(subject).to redirect_to(admin_geo_projects_path)
-        expect(flash[:notice]).to include('is scheduled for forced re-download')
+        expect(flash[:toast]).to include('is scheduled for forced re-download')
         expect(synced_registry.reload.should_be_redownloaded?('repository')).to be_truthy
       end
     end

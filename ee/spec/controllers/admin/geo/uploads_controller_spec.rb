@@ -108,7 +108,7 @@ describe Admin::Geo::UploadsController, :geo do
           registry.update_column(:file_id, -1)
 
           expect(subject).to redirect_to(admin_geo_uploads_path)
-          expect(flash[:notice]).to include('was successfully removed')
+          expect(flash[:toast]).to include('was successfully removed')
           expect { Geo::UploadRegistry.find(registry.id) }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end

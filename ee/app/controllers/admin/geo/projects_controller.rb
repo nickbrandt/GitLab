@@ -26,52 +26,55 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
 
   def destroy
     unless @registry.project.nil?
-      return redirect_back_or_admin_geo_projects(alert: s_('Geo|Could not remove tracking entry for an existing project.'))
+      flash[:alert] = s_('Geo|Could not remove tracking entry for an existing project.')
+      return redirect_back_or_default(default: admin_geo_projects_path)
     end
 
     @registry.destroy
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|Tracking entry for project (%{project_id}) was successfully removed.') % { project_id: @registry.project_id })
+    flash[:toast] = s_('Geo|Tracking entry for project (%{project_id}) was successfully removed.') % { project_id: @registry.project_id }
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def reverify
     @registry.flag_repository_for_reverify!
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for re-verify') % { name: @registry.project.full_name })
+    flash[:toast] = s_('Geo|%{name} is scheduled for re-verify') % { name: @registry.project.full_name }
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def resync
     @registry.flag_repository_for_resync!
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for re-sync') % { name: @registry.project.full_name })
+    flash[:toast] = s_('Geo|%{name} is scheduled for re-sync') % { name: @registry.project.full_name }
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def force_redownload
     @registry.flag_repository_for_redownload!
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for forced re-download') % { name: @registry.project.full_name })
+    flash[:toast] = s_('Geo|%{name} is scheduled for forced re-download') % { name: @registry.project.full_name }
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def reverify_all
     Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:reverify_repositories)
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-verify'))
+    flash[:toast] = s_('Geo|All projects are being scheduled for re-verify')
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def resync_all
     Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories)
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-sync'))
+    flash[:toast] = s_('Geo|All projects are being scheduled for re-sync')
+    redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   private
 
   def load_registry
     @registry = ::Geo::ProjectRegistry.find_by_id(params[:id])
-  end
-
-  def redirect_back_or_admin_geo_projects(params)
-    redirect_back_or_default(default: admin_geo_projects_path, options: params)
   end
 
   def finder
