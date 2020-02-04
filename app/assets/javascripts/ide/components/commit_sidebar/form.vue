@@ -116,7 +116,6 @@ export default {
       this.componentHeight = null;
     },
   },
-  leftSidebarViews,
 };
 </script>
 
