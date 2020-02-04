@@ -4130,11 +4130,9 @@ describe User, :do_not_mock_admin_mode do
   describe 'internal methods' do
     let!(:user) { create(:user) }
     let!(:ghost) { described_class.ghost }
-    let!(:support_bot) { described_class.support_bot }
     let!(:alert_bot) { described_class.alert_bot }
-    let!(:visual_review_bot) { described_class.visual_review_bot }
     let!(:non_internal) { [user] }
-    let!(:internal) { [ghost, support_bot, alert_bot, visual_review_bot] }
+    let!(:internal) { [ghost, alert_bot] }
 
     it 'returns non internal users' do
       expect(described_class.internal).to eq(internal)
@@ -4151,9 +4149,7 @@ describe User, :do_not_mock_admin_mode do
         expect(user.bot?).to eq(false)
         expect(ghost.bot?).to eq(false)
 
-        expect(support_bot.bot?).to eq(true)
         expect(alert_bot.bot?).to eq(true)
-        expect(visual_review_bot.bot?).to eq(true)
       end
     end
   end

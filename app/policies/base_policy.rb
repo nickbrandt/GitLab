@@ -45,13 +45,7 @@ class BasePolicy < DeclarativePolicy::Base
   end
 
   with_options scope: :user, score: 0
-  condition(:support_bot) { @user&.support_bot? }
-
-  with_options scope: :user, score: 0
   condition(:alert_bot) { @user&.alert_bot? }
-
-  with_options scope: :user, score: 0
-  condition(:visual_review_bot) { @user&.visual_review_bot? }
 
   rule { external_authorization_enabled & ~can?(:read_all_resources) }.policy do
     prevent :read_cross_project

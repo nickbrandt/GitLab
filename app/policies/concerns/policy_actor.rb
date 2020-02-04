@@ -34,15 +34,7 @@ module PolicyActor
     false
   end
 
-  def support_bot?
-    false
-  end
-
   def alert_bot?
-    false
-  end
-
-  def visual_review_bot?
     false
   end
 end

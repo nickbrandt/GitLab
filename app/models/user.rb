@@ -59,11 +59,7 @@ class User < ApplicationRecord
 
   MINIMUM_INACTIVE_DAYS = 180
 
-  enum bot_type: {
-    support_bot: 1,
-    alert_bot: 2,
-    visual_review_bot: 3
-  }
+  enum bot_type: ::UserBotTypeEnums.bots
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -612,24 +608,6 @@ class User < ApplicationRecord
       unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
         u.bio = 'The GitLab alert bot'
         u.name = 'GitLab Alert Bot'
-      end
-    end
-
-    def support_bot
-      email_pattern = "support%s@#{Settings.gitlab.host}"
-
-      unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
-        u.bio = 'The GitLab support bot used for Service Desk'
-        u.name = 'GitLab Support Bot'
-      end
-    end
-
-    def visual_review_bot
-      email_pattern = "visual_review%s@#{Settings.gitlab.host}"
-
-      unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
-        u.bio = 'The Gitlab Visual Review feedback bot'
-        u.name = 'Gitlab Visual Review Bot'
       end
     end
 

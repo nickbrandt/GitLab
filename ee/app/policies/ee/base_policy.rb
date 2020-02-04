@@ -8,6 +8,12 @@ module EE
       with_scope :user
       condition(:auditor, score: 0) { @user&.auditor? }
 
+      with_scope :user
+      condition(:support_bot, score: 0) { @user&.support_bot? }
+
+      with_scope :user
+      condition(:visual_review_bot, score: 0) { @user&.visual_review_bot? }
+
       with_scope :global
       condition(:license_block) { License.block_changes? }
 
