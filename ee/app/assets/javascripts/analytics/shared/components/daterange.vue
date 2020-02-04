@@ -54,23 +54,26 @@ export default {
     containerClasses: {
       type: String,
       required: false,
-      default:
-        'daterange-container d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end',
+      // default: 'daterange-container d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end',
+      default: 'daterange-container d-flex flex-column flex-sm-row',
     },
     datepickerClasses: {
       type: String,
       required: false,
-      default: 'd-flex flex-column flex-lg-row',
+      // default: 'd-flex flex-column flex-lg-row',
+      default: 'd-flex flex-column flex-sm-row',
     },
     startPickerClasses: {
       type: String,
       required: false,
-      default: 'd-flex flex-column flex-lg-row align-items-lg-center mr-lg-2 mb-2 mb-md-0',
+      // default: 'd-flex flex-column flex-lg-row align-items-lg-center mr-lg-2 mb-2 mb-md-0',
+      default: 'd-flex flex-column flex-sm-row',
     },
     endPickerClasses: {
       type: String,
       required: false,
-      default: 'd-flex flex-column flex-lg-row align-items-lg-center',
+      // default: 'd-flex flex-column flex-lg-row align-items-lg-center',
+      default: 'd-flex flex-column flex-sm-row',
     },
   },
   data() {
@@ -78,7 +81,7 @@ export default {
       maxDateRangeTooltip: sprintf(__('Date range cannot exceed %{maxDateRange} days.'), {
         maxDateRange: this.maxDateRange,
       }),
-    }
+    };
   },
   computed: {
     dateRange: {
@@ -111,10 +114,8 @@ export default {
       :start-picker-class="startPickerClasses"
       :end-picker-class="endPickerClasses"
     />
-    <div
-      v-if="maxDateRange"
-      class="daterange-indicator d-flex flex-row flex-lg-row align-items-flex-start align-items-lg-center"
-    >
+    <div v-if="maxDateRange" class="daterange-indicator">
+      <!-- class="daterange-indicator d-flex flex-row flex-lg-row align-items-flex-start align-items-lg-center" -->
       <span class="number-of-days pl-2 pr-1">
         <gl-sprintf :message="n__('1 day', '%d days', numberOfDays)">
           <template #numberOfDays>{{ numberOfDays }}</template>

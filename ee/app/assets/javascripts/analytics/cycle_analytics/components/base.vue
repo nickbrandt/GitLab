@@ -216,22 +216,22 @@ export default {
     </div>
     <div class="mw-100">
       <div
-        class="row-content-block second-block d-flex flex-column flex-sm-row flex-wrap justify-content-between  mt-3 py-2 px-3"
+        class="row-content-block second-block d-flex flex-column flex-lg-row flex-wrap flex-md-nowrap mt-3 py-2 px-3 justify-content-between"
       >
         <div
-          class="d-flex flex-column flex-sm-row flex-grow-1 justify-content-between justify-content-md-start align-items-center mr-2 mt-2 mt-md-0"
+          class="d-flex flex-column flex-sm-row justify-content-between justify-content-md-start align-items-center mr-sm-2 mt-2 mt-md-0 col-12 col-lg-6 px-0"
         >
+          <!-- class="d-flex flex-column flex-sm-row justify-content-between justify-content-md-start align-items-center mr-sm-2 mt-2 mt-md-0 col-12 col-md-6" -->
           <groups-dropdown-filter
             v-if="!hideGroupDropDown"
             class="js-groups-dropdown-filter dropdown-select flex-grow-1 col-12 col-sm-6 col-lg-3 px-0"
-            :query-params="$options.groupsQueryParams"
             :default-group="selectedGroup"
             @selected="onGroupSelect"
           />
           <projects-dropdown-filter
             v-if="shouldDisplayFilters"
             :key="selectedGroup.id"
-            class="js-projects-dropdown-filter dropdown-select flex-grow-1 col-12 col-sm-6 col-lg-3 ml-sm-1 mt-1 mt-sm-0 mr-0 px-0"
+            class="js-projects-dropdown-filter dropdown-select ml-sm-1 mt-1 mt-sm-0 mr-0 px-0 col-12 col-sm-6"
             :group-id="selectedGroup.id"
             :query-params="$options.projectsQueryParams"
             :multi-select="$options.multiProjectSelect"
@@ -260,6 +260,7 @@ export default {
           datepicker-classes="d-flex flex-column flex-sm-row flex-fill"
           start-picker-classes="d-flex flex-column flex-sm-row flex-grow-1 align-items-sm-center"
           end-picker-classes="d-flex flex-column flex-sm-row flex-grow-1 align-items-sm-center w-100 mt-2 m" -->
+        <!-- class="js-daterange-picker flex-column flex-sm-row  col-12 col-md-7" -->
       </div>
     </div>
     <gl-empty-state
