@@ -10,7 +10,7 @@ describe Ci::PipelinePresenter do
     described_class.new(pipeline)
   end
 
-  context '#failure_reason' do
+  describe '.failure_reason' do
     context 'when pipeline has failure reason' do
       it 'represents a failure reason sentence' do
         pipeline.failure_reason = :activity_limit_exceeded
