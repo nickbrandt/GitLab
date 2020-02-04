@@ -29,6 +29,101 @@ describe Namespace do
     end
   end
 
+  describe '.reset_ci_minutes_in_batches!' do
+    it 'returns when there were no failures' do
+      expect { described_class.reset_ci_minutes_in_batches! }.not_to raise_error
+    end
+
+    it 'raises an exception when with a list of namespace ids to investigate if there were any failures' do
+      failed_namespace = create(:namespace)
+
+      allow(described_class).to receive(:transaction).and_raise(ActiveRecord::ActiveRecordError)
+
+      expect { described_class.reset_ci_minutes_in_batches! }.to raise_error(
+        EE::Namespace::NamespaceStatisticsNotResetError,
+        "1 namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: [#{failed_namespace.id}]")
+    end
+  end
+
+  describe '.reset_ci_minutes!' do
+    it 'returns true if there were no exceptions to the db transaction' do
+      result = described_class.reset_ci_minutes!([])
+
+      expect(result).to be true
+    end
+
+    it 'raises an exception if anything in the transaction rolled back' do
+      namespace = create(:namespace)
+
+      allow(described_class).to receive(:transaction).and_raise(ActiveRecord::ActiveRecordError)
+
+      expect { described_class.reset_ci_minutes!([namespace.id]) }.to raise_error(
+        EE::Namespace::NamespaceStatisticsNotResetError,
+        "1 namespace shared runner minutes were not reset and the transaction was rolled back. Namespace Ids: [#{namespace.id}]")
+    end
+  end
+
+  describe '.recalculate_extra_shared_runners_minutes_limits!' do
+    context 'when the namespace had used runner minutes for the month' do
+      let(:namespace) { create(:namespace, shared_runners_minutes_limit: 5000, extra_shared_runners_minutes_limit: 5000) }
+
+      it 'updates the namespace extra_shared_runners_minutes_limit subtracting used minutes above the shared_runners_minutes_limit' do
+        minutes_used = 6000
+        create(:namespace_statistics, namespace: namespace, shared_runners_seconds: minutes_used * 60)
+
+        described_class.recalculate_extra_shared_runners_minutes_limits!([namespace.id])
+
+        expect(namespace.reload.extra_shared_runners_minutes_limit).to eq(4000)
+      end
+    end
+  end
+
+  describe '.reset_shared_runners_seconds!' do
+    let(:namespace) do
+      create(:namespace,
+        shared_runners_minutes_limit: 5000,
+        extra_shared_runners_minutes_limit: 5000)
+    end
+
+    subject do
+      described_class.reset_shared_runners_seconds!([namespace.id])
+    end
+
+    it 'resets NamespaceStatistics shared_runners_seconds and updates the timestamp' do
+      namespace_statistics = create(:namespace_statistics,
+        namespace: namespace,
+        shared_runners_seconds: 360000 )
+
+      expect { subject && namespace_statistics.reload }
+        .to change { namespace_statistics.shared_runners_seconds }.to(0)
+        .and change { namespace_statistics.shared_runners_seconds_last_reset }
+    end
+
+    it 'resets ProjectStatistics shared_runners_seconds and updates the timestamp' do
+      project_statistics = create(:project_statistics,
+        namespace: namespace,
+        shared_runners_seconds: 120)
+
+      expect { subject && project_statistics.reload }
+        .to change { project_statistics.shared_runners_seconds }.to(0)
+        .and change { project_statistics.shared_runners_seconds_last_reset }
+    end
+  end
+
+  describe 'reset_ci_minutes_notifications!' do
+    it 'updates the last_ci_minutes_notification_at and last_ci_minutes_usage_notification_level flags' do
+      namespace = create(:namespace,
+        last_ci_minutes_notification_at: Date.yesterday,
+        last_ci_minutes_usage_notification_level: 50 )
+
+      subject = described_class.reset_ci_minutes_notifications!([namespace.id])
+
+      expect { subject && namespace.reload }
+        .to change { namespace.last_ci_minutes_notification_at }.to(nil)
+        .and change { namespace.last_ci_minutes_usage_notification_level }.to(nil)
+    end
+  end
+
   describe '#use_elasticsearch?' do
     let(:namespace) { create :namespace }
 
