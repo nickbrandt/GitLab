@@ -517,9 +517,9 @@ describe Milestone do
   end
 
   describe '.sort_by_attribute' do
-    set(:milestone_1) { create(:milestone, title: 'Foo') }
-    set(:milestone_2) { create(:milestone, title: 'Bar') }
-    set(:milestone_3) { create(:milestone, title: 'Zoo') }
+    let_it_be(:milestone_1) { create(:milestone, title: 'Foo') }
+    let_it_be(:milestone_2) { create(:milestone, title: 'Bar') }
+    let_it_be(:milestone_3) { create(:milestone, title: 'Zoo') }
 
     context 'ordering by name ascending' do
       it 'sorts by title ascending' do
@@ -555,7 +555,7 @@ describe Milestone do
       end
 
       it 'returns the quantity of milestones in each possible state' do
-        expected_count = { opened: 5, closed: 6, all: 11 }
+        expected_count = { opened: 2, closed: 6, all: 8 }
 
         count = described_class.states_count(Project.all, Group.all)
         expect(count).to eq(expected_count)
