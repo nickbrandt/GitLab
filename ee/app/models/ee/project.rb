@@ -83,7 +83,6 @@ module EE
 
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
 
-      has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
       has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
