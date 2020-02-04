@@ -93,9 +93,18 @@ export const receiveLoadLicenseReportError = ({ commit }, error) => {
 export const requestSetLicenseApproval = ({ commit }) => {
   commit(types.REQUEST_SET_LICENSE_APPROVAL);
 };
-export const receiveSetLicenseApproval = ({ commit, dispatch }) => {
+export const receiveSetLicenseApproval = ({ commit, dispatch, state }) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL);
-  dispatch('loadParsedLicenseReport');
+  // If we have the licenses API endpoint, fetch from there. This corresponds
+  // to the cases that we're viewing the merge request or pipeline pages.
+  // Otherwise, fetch from the managed licenses endpoint, which corresponds to
+  // the project settings page.
+  // https://gitlab.com/gitlab-org/gitlab/issues/201867
+  if (state.licensesApiPath) {
+    dispatch('loadParsedLicenseReport');
+  } else {
+    dispatch('loadManagedLicenses');
+  }
 };
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);

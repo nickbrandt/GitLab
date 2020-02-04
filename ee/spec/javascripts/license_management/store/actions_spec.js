@@ -10,6 +10,7 @@ import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
+  const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
 
   let axiosMock;
   let licenseId;
@@ -177,16 +178,32 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
-      testAction(
-        actions.receiveSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-        [{ type: 'loadParsedLicenseReport' }],
-      )
-        .then(done)
-        .catch(done.fail);
+    describe('given the licensesApiPath is provided', () => {
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          { ...state, licensesApiPath },
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadParsedLicenseReport' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('given the licensesApiPath is not provided', () => {
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadManagedLicenses' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 
@@ -533,7 +550,6 @@ describe('License store actions', () => {
   });
 
   describe('loadParsedLicenseReport', () => {
-    const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
     let licensesApiMock;
     let rawLicenseReport;
 
