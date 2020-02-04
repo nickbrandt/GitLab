@@ -93,6 +93,7 @@ class UpdateAllMirrorsWorker
   # rubocop: disable CodeReuse/ActiveRecord
   def pull_mirrors_batch(freeze_at:, batch_size:, offset_at: nil)
     relation = Project
+      .non_archived
       .mirrors_to_sync(freeze_at)
       .reorder('import_state.next_execution_timestamp')
       .limit(batch_size)

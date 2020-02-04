@@ -182,6 +182,16 @@ describe UpdateAllMirrorsWorker do
 
           schedule_mirrors!(capacity: 4)
         end
+
+        it "does not schedule a mirror of an archived project" do
+          licensed_project1.update!(archived: true)
+
+          schedule_mirrors!(capacity: 4)
+
+          expect_import_scheduled(licensed_project2, licensed_project3)
+          expect_import_not_scheduled(licensed_project1)
+          expect_import_not_scheduled(*unlicensed_projects)
+        end
       end
 
       context 'when capacity is exacly sufficient' do

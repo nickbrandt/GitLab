@@ -230,6 +230,24 @@ describe ProjectImportState, type: :model do
       end
     end
 
+    context 'when the project is archived' do
+      let(:import_state) do
+        create(:import_state,
+               :finished,
+               :mirror,
+               :repository,
+               next_execution_timestamp: Time.now - 2.minutes)
+      end
+
+      before do
+        import_state.project.update!(archived: true)
+      end
+
+      it 'returns false' do
+        expect(import_state.mirror_update_due?).to be false
+      end
+    end
+
     context 'when mirror has no content' do
       it 'returns false' do
         import_state = create(:import_state, :finished, :mirror)
