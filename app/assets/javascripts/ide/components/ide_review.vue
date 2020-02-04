@@ -44,7 +44,7 @@ export default {
 <template>
   <div class="multi-file-commit-panel-inner-content">
     <ide-tree-list :viewer-type="viewer" header-class="ide-review-header">
-      <template slot="header">
+      <template #header>
         <div class="ide-review-button-holder">
           {{ __('Review') }}
           <editor-mode-dropdown
