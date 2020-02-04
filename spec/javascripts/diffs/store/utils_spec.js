@@ -333,10 +333,10 @@ describe('DiffsStoreUtils', () => {
         diff_files: [Object.assign({}, mock, { highlighted_diff_lines: undefined })],
       };
 
-      utils.prepareDiffData({ diff: preparedDiff });
-      utils.prepareDiffData({ diff: splitInlineDiff });
-      utils.prepareDiffData({ diff: splitParallelDiff });
-      utils.prepareDiffData({ diff: completedDiff, priorFiles: [mock] });
+      preparedDiff.diff_files = utils.prepareDiffData({ diff: preparedDiff });
+      splitInlineDiff.diff_files = utils.prepareDiffData({ diff: splitInlineDiff });
+      splitParallelDiff.diff_files = utils.prepareDiffData({ diff: splitParallelDiff });
+      completedDiff.diff_files = utils.prepareDiffData({ diff: completedDiff, priorFiles: [mock] });
     });
 
     it('sets the renderIt and collapsed attribute on files', () => {
@@ -398,33 +398,37 @@ describe('DiffsStoreUtils', () => {
         content_sha: 'ABC',
         file_hash: 'DEF',
       };
+      const updatedFilesList = utils.prepareDiffData({
+        diff: { diff_files: [fakeNewFile] },
+        priorFiles,
+      });
 
-      utils.prepareDiffData({ diff: { diff_files: [fakeNewFile] }, priorFiles, batched: true });
-
-      expect(priorFiles.length).toBe(2);
-      expect(priorFiles[0].content_sha).toBe(mock.content_sha);
-      expect(priorFiles[1].content_sha).toBe('ABC');
+      expect(updatedFilesList.length).toBe(2);
+      expect(updatedFilesList[0].content_sha).toBe(mock.content_sha);
+      expect(updatedFilesList[1].content_sha).toBe('ABC');
     });
 
     it('completes an existing split diff without overwriting existing diffs when loading batched diffs', () => {
       // The current state has a file that has only loaded inline lines
-      const priorFiles = [{ ...mock, parallel_diff_lines: undefined }];
+      const priorFiles = [{ ...mock, parallel_diff_lines: [] }];
       // The next (batch) load loads two files: the other half of that file, and a new file
       const fakeBatch = [
         { ...mock, highlighted_diff_lines: undefined },
         { ...mock, highlighted_diff_lines: undefined, content_sha: 'ABC', file_hash: 'DEF' },
       ];
-
-      utils.prepareDiffData({ diff: { diff_files: fakeBatch }, priorFiles, batched: true });
+      const updatedFilesList = utils.prepareDiffData({
+        diff: { diff_files: fakeBatch },
+        priorFiles,
+      });
 
       // Expect that there are only a total of two files after merging and blending
-      expect(priorFiles.length).toBe(2);
+      expect(updatedFilesList.length).toBe(2);
       // Expect the existing file to have been completed
-      expect(priorFiles[0].parallel_diff_lines.length).toBeGreaterThan(0);
-      expect(priorFiles[0].highlighted_diff_lines.length).toBeGreaterThan(0);
+      expect(updatedFilesList[0].parallel_diff_lines.length).toBeGreaterThan(0);
+      expect(updatedFilesList[0].highlighted_diff_lines.length).toBeGreaterThan(0);
       // Expect the new file to have been added to the state
-      expect(priorFiles[1].parallel_diff_lines.length).toBeGreaterThan(0);
-      expect(priorFiles[1].content_sha).toBe('ABC');
+      expect(updatedFilesList[1].parallel_diff_lines.length).toBeGreaterThan(0);
+      expect(updatedFilesList[1].content_sha).toBe('ABC');
     });
   });
 

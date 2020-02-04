@@ -217,50 +217,22 @@ function diffFileUniqueId(file) {
   return `${file.content_sha}-${file.file_hash}`;
 }
 
-function matchFileToListOfFiles(list, file) {
-  return list.find(matched => diffFileUniqueId(matched) === diffFileUniqueId(file));
-}
-
 function blendTwoFiles(authoritativeFile, overwritingFile) {
-  const missingInline = !authoritativeFile.highlighted_diff_lines;
-  const missingParallel = !authoritativeFile.parallel_diff_lines;
+  const missingInline = !authoritativeFile.highlighted_diff_lines.length;
+  const missingParallel = !authoritativeFile.parallel_diff_lines.length;
 
-  if (missingInline) {
-    Object.assign(authoritativeFile, {
-      highlighted_diff_lines: overwritingFile.highlighted_diff_lines,
-    });
-  }
-
-  if (missingParallel) {
-    Object.assign(authoritativeFile, {
-      parallel_diff_lines: overwritingFile.parallel_diff_lines,
-    });
-  }
+  Object.assign(authoritativeFile, {
+    highlighted_diff_lines: missingInline
+      ? overwritingFile.highlighted_diff_lines
+      : authoritativeFile.highlighted_diff_lines,
+    parallel_diff_lines: missingParallel
+      ? overwritingFile.parallel_diff_lines
+      : authoritativeFile.parallel_diff_lines,
+    renderIt: overwritingFile.renderIt,
+    collapsed: overwritingFile.collapsed,
+  });
 
   return authoritativeFile;
-}
-
-function combineDiffFilesWithPriorFiles(files, prior = [], batched) {
-  const authoritative = batched ? prior : files;
-  const overwrite = batched ? files : prior;
-
-  if (batched) {
-    files.forEach(newFile => {
-      const foundFile = matchFileToListOfFiles(authoritative, newFile);
-      if (!foundFile) {
-        authoritative.push(newFile);
-      } else {
-        blendTwoFiles(foundFile, newFile);
-      }
-    });
-  } else {
-    authoritative.forEach(file => {
-      const matched = matchFileToListOfFiles(overwrite, file) || {};
-      blendTwoFiles(file, matched);
-    });
-  }
-
-  return authoritative;
 }
 
 function ensureBasicDiffFileLines(file) {
@@ -280,13 +252,16 @@ function cleanRichText(text) {
 }
 
 function prepareLine(line) {
-  return Object.assign(line, {
-    rich_text: cleanRichText(line.rich_text),
-    discussionsExpanded: true,
-    discussions: [],
-    hasForm: false,
-    text: undefined,
-  });
+  if (!line.alreadyPrepared) {
+    Object.assign(line, {
+      rich_text: cleanRichText(line.rich_text),
+      discussionsExpanded: true,
+      discussions: [],
+      hasForm: false,
+      text: undefined,
+      alreadyPrepared: true,
+    });
+  }
 }
 
 function prepareDiffFileLines(file) {
@@ -308,11 +283,11 @@ function prepareDiffFileLines(file) {
       parallelLinesCount += 1;
       prepareLine(line.right);
     }
+  });
 
-    Object.assign(file, {
-      inlineLinesCount: inlineLines.length,
-      parallelLinesCount,
-    });
+  Object.assign(file, {
+    inlineLinesCount: inlineLines.length,
+    parallelLinesCount,
   });
 
   return file;
@@ -338,11 +313,29 @@ function finalizeDiffFile(file) {
   return file;
 }
 
-export function prepareDiffData({ diff, priorFiles, batched = false } = {}) {
-  return combineDiffFilesWithPriorFiles(diff.diff_files, priorFiles, batched)
+function deduplicateFilesList(files) {
+  const dedupedFiles = {};
+
+  files.forEach(file => {
+    const id = diffFileUniqueId(file);
+
+    if (dedupedFiles[id]) {
+      dedupedFiles[id] = blendTwoFiles(dedupedFiles[id], file);
+    } else {
+      dedupedFiles[id] = file;
+    }
+  });
+
+  return Object.values(dedupedFiles);
+}
+
+export function prepareDiffData({ diff, priorFiles = [] } = {}) {
+  const cleanedFiles = (diff.diff_files || [])
     .map(ensureBasicDiffFileLines)
     .map(prepareDiffFileLines)
     .map(finalizeDiffFile);
+
+  return deduplicateFilesList([...priorFiles, ...cleanedFiles]);
 }
 
 export function getDiffPositionByLineCode(diffFiles, useSingleDiffStyle) {
