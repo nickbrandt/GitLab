@@ -11944,6 +11944,9 @@ msgstr ""
 msgid "MergeRequests|started a thread on commit %{linkStart}%{commitDisplay}%{linkEnd}"
 msgstr ""
 
+msgid "MergeRequest|Compare %{source} and %{target}"
+msgstr ""
+
 msgid "MergeRequest|Error dismissing suggestion popover. Please try again."
 msgstr ""
 
@@ -22253,9 +22256,6 @@ msgid "already shared with this group"
 msgstr ""
 
 msgid "among other things"
-msgstr ""
-
-msgid "and"
 msgstr ""
 
 msgid "any-approver for the merge request already exists"
