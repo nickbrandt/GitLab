@@ -14,6 +14,10 @@ export default {
       type: String,
       required: true,
     },
+    isMrEdit: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     ...mapState('createModal', {
@@ -41,6 +45,6 @@ export default {
     :cancel-title="__('Cancel')"
     @ok.prevent="submit"
   >
-    <rule-form ref="form" :init-rule="rule" />
+    <rule-form ref="form" :init-rule="rule" :is-mr-edit="isMrEdit" />
   </gl-modal-vuex>
 </template>

@@ -1958,6 +1958,9 @@ msgstr ""
 msgid "Any Milestone"
 msgstr ""
 
+msgid "Any branch"
+msgstr ""
+
 msgid "Any eligible user"
 msgstr ""
 
@@ -2033,6 +2036,9 @@ msgstr ""
 msgid "Apply template"
 msgstr ""
 
+msgid "Apply this approval rule to any branch or a specific protected branch."
+msgstr ""
+
 msgid "Applying a template will replace the existing issue description. Any changes you have made will be lost."
 msgstr ""
 
@@ -2084,6 +2090,9 @@ msgid "ApprovalRule|No. approvals required"
 msgstr ""
 
 msgid "ApprovalRule|Rule name"
+msgstr ""
+
+msgid "ApprovalRule|Target branch"
 msgstr ""
 
 msgid "ApprovalRule|e.g. QA, Security, etc."
@@ -13997,6 +14006,9 @@ msgid "Please select a file"
 msgstr ""
 
 msgid "Please select a group."
+msgstr ""
+
+msgid "Please select a valid target branch"
 msgstr ""
 
 msgid "Please select and add a member"
