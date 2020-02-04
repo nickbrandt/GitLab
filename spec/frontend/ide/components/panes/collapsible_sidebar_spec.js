@@ -153,7 +153,6 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
         store.state.loading = true;
 
         wrapper.vm.$nextTick(() => {
-          expect(wrapper.find('.multi-file-loading-container')).not.toBeNull();
           expect(wrapper.findAll('.multi-file-loading-container').length).toBe(3);
 
           done();
