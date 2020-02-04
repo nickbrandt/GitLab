@@ -148,8 +148,8 @@ export default {
   },
 
   [types.ADD_COLLAPSED_DIFFS](state, { file, data }) {
-    prepareDiffData({ diff: data });
-    const [newFileData] = data.diff_files.filter(f => f.file_hash === file.file_hash);
+    const files = prepareDiffData({ diff: data });
+    const [newFileData] = files.filter(f => f.file_hash === file.file_hash);
     const selectedFile = state.diffFiles.find(f => f.file_hash === file.file_hash);
     Object.assign(selectedFile, { ...newFileData });
   },
