@@ -390,6 +390,42 @@ describe('DiffsStoreUtils', () => {
       expect(completedDiff.diff_files[0].parallel_diff_lines.length).toBeGreaterThan(0);
       expect(completedDiff.diff_files[0].highlighted_diff_lines.length).toBeGreaterThan(0);
     });
+
+    it('leaves files in the existing state when batched diffs are being loaded', () => {
+      const priorFiles = [mock];
+      const fakeNewFile = {
+        ...mock,
+        content_sha: 'ABC',
+        file_hash: 'DEF',
+      };
+
+      utils.prepareDiffData({ diff: { diff_files: [fakeNewFile] }, priorFiles, batched: true });
+
+      expect(priorFiles.length).toBe(2);
+      expect(priorFiles[0].content_sha).toBe(mock.content_sha);
+      expect(priorFiles[1].content_sha).toBe('ABC');
+    });
+
+    it('completes an existing split diff without overwriting existing diffs when loading batched diffs', () => {
+      // The current state has a file that has only loaded inline lines
+      const priorFiles = [{ ...mock, parallel_diff_lines: undefined }];
+      // The next (batch) load loads two files: the other half of that file, and a new file
+      const fakeBatch = [
+        { ...mock, highlighted_diff_lines: undefined },
+        { ...mock, highlighted_diff_lines: undefined, content_sha: 'ABC', file_hash: 'DEF' },
+      ];
+
+      utils.prepareDiffData({ diff: { diff_files: fakeBatch }, priorFiles, batched: true });
+
+      // Expect that there are only a total of two files after merging and blending
+      expect(priorFiles.length).toBe(2);
+      // Expect the existing file to have been completed
+      expect(priorFiles[0].parallel_diff_lines.length).toBeGreaterThan(0);
+      expect(priorFiles[0].highlighted_diff_lines.length).toBeGreaterThan(0);
+      // Expect the new file to have been added to the state
+      expect(priorFiles[1].parallel_diff_lines.length).toBeGreaterThan(0);
+      expect(priorFiles[1].content_sha).toBe('ABC');
+    });
   });
 
   describe('isDiscussionApplicableToLine', () => {
