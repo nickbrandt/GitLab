@@ -102,7 +102,7 @@ module Ci
       end
 
       unless build.forward_deployment?
-        build.drop!(:invalid_deployment_failure)
+        build.drop!(:forward_deployment_failure)
         return false
       end
 

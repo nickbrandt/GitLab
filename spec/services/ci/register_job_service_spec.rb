@@ -602,7 +602,7 @@ module Ci
             pending_job.reload
 
             expect(pending_job).to be_failed
-            expect(pending_job).to be_invalid_deployment_failure
+            expect(pending_job).to be_forward_deployment_failure
           end
         end
       end

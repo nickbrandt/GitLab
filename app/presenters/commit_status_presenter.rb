@@ -14,7 +14,7 @@ class CommitStatusPresenter < Gitlab::View::Presenter::Delegated
     unmet_prerequisites: 'The job failed to complete prerequisite tasks',
     scheduler_failure: 'The scheduler failed to assign job to the runner, please try again or contact system administrator',
     data_integrity_failure: 'There has been a structural integrity problem detected, please contact system administrator',
-    invalid_deployment_failure: 'The deployment job is older than the previously succeeded deployment job, and therefore cannot be run'
+    forward_deployment_failure: 'The deployment job is older than the previously succeeded deployment job, and therefore cannot be run'
   }.freeze
 
   private_constant :CALLOUT_FAILURE_MESSAGES
