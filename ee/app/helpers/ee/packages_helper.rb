@@ -19,8 +19,8 @@ module EE
     end
 
     def nuget_package_registry_url(project_id)
-      project_registry = expose_path(api_v4_projects_packages_nuget_index_path(id: project_id, format: ".json"))
-      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, project_registry)
+      project_registry_path = expose_path(api_v4_projects_packages_nuget_index_path(id: project_id, format: '.json'))
+      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, project_registry_path)
     end
 
     def package_registry_project_url(project_id, registry_type = :maven)
