@@ -10,7 +10,7 @@ describe Geo::HashedStorageAttachmentsMigrationService do
   let!(:project) { create(:project, :legacy_storage) }
 
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
-  let(:hashed_storage) { Storage::HashedProject.new(project) }
+  let(:hashed_storage) { Storage::Hashed.new(project) }
 
   let!(:upload) { Upload.find_by(path: file_uploader.upload_path) }
   let(:file_uploader) { build(:file_uploader, project: project) }
