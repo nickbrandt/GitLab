@@ -61,7 +61,7 @@ export default {
   },
 
   [types.SET_DIFF_DATA_BATCH](state, data) {
-    const files = prepareDiffData({ diff: data, priorFiles: state.diffFiles, batched: true });
+    const files = prepareDiffData({ diff: data, priorFiles: state.diffFiles });
 
     Object.assign(state, {
       ...convertObjectPropsToCamelCase(data),
