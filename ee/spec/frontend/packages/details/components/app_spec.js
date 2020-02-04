@@ -3,10 +3,10 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
+import PackageTitle from 'ee/packages/details/components/package_title.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
-import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
@@ -46,6 +46,7 @@ describe('PackagesApp', () => {
       },
       getters: {
         packageHasPipeline: () => packageEntity.build_info && packageEntity.build_info.pipeline_id,
+        packageTypeDisplay: () => {},
       },
     });
 
@@ -56,7 +57,7 @@ describe('PackagesApp', () => {
     });
   }
 
-  const versionTitle = () => wrapper.find('.js-version-title');
+  const packageTitle = () => wrapper.find(PackageTitle);
   const emptyState = () => wrapper.find('.js-package-empty-state');
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
@@ -68,17 +69,15 @@ describe('PackagesApp', () => {
   const deleteButton = () => wrapper.find('.js-delete-button');
   const deleteModal = () => wrapper.find(GlModal);
   const modalDeleteButton = () => wrapper.find({ ref: 'modal-delete-button' });
-  const packageTags = () => wrapper.find(PackageTags);
 
   afterEach(() => {
     wrapper.destroy();
   });
 
-  it('renders the app and displays the package version as the title', () => {
+  it('renders the app and displays the package title', () => {
     createComponent();
 
-    expect(versionTitle()).toExist();
-    expect(versionTitle().text()).toBe(mavenPackage.version);
+    expect(packageTitle()).toExist();
   });
 
   it('renders an empty state component when no an invalid package is passed as a prop', () => {
@@ -150,23 +149,6 @@ describe('PackagesApp', () => {
 
     it('shows the delete confirmation modal when delete is clicked', () => {
       expect(deleteModal()).toExist();
-    });
-  });
-
-  describe('package tags', () => {
-    it('displays the package-tags component when the package has tags', () => {
-      createComponent({
-        ...npmPackage,
-        tags: [{ name: 'foo' }],
-      });
-
-      expect(packageTags().exists()).toBe(true);
-    });
-
-    it('does not display the package-tags component when there are no tags', () => {
-      createComponent();
-
-      expect(packageTags().exists()).toBe(false);
     });
   });
 

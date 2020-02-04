@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import state from './state';
 import * as actions from './actions';
-import packageHasPipeline from './getters';
+import * as getters from './getters';
 import mutations from './mutations';
 
 Vue.use(Vuex);
@@ -10,9 +10,7 @@ Vue.use(Vuex);
 export default (initialState = {}) =>
   new Vuex.Store({
     actions,
-    getters: {
-      packageHasPipeline,
-    },
+    getters,
     mutations,
     state: {
       ...state(),

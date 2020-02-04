@@ -68,54 +68,46 @@ describe('PackageTags', () => {
   });
 
   describe('tagBadgeStyle', () => {
-    const defaultStyle = {
-      'd-none': true,
-      'd-block': false,
-      'd-md-block': false,
-      'append-right-4': false,
-    };
+    const defaultStyle = ['badge', 'badge-info', 'd-none'];
 
     it('shows tag badge when there is only one', () => {
       createComponent([mockTags[0]]);
 
-      const expectedStyle = {
-        ...defaultStyle,
-        'd-block': true,
-      };
+      const expectedStyle = [...defaultStyle, 'd-block', 'prepend-left-8'];
 
-      expect(wrapper.vm.tagBadgeClass(0)).toEqual(expectedStyle);
+      expect(
+        tagBadges()
+          .at(0)
+          .classes(),
+      ).toEqual(expectedStyle);
     });
 
     it('shows tag badge for medium or heigher resolutions', () => {
       createComponent(mockTags);
 
-      const expectedStyle = {
-        ...defaultStyle,
-        'd-md-block': true,
-      };
+      const expectedStyle = [...defaultStyle, 'd-md-block'];
 
-      expect(wrapper.vm.tagBadgeClass(1)).toEqual(expectedStyle);
+      expect(
+        tagBadges()
+          .at(1)
+          .classes(),
+      ).toEqual(expectedStyle);
     });
 
-    it('correctly appends right when there is more than one tag', () => {
+    it('correctly prepends left and appends right when there is more than one tag', () => {
       createComponent(mockTags, {
         tagDisplayLimit: 4,
       });
 
-      const expectedStyleWithoutAppend = {
-        ...defaultStyle,
-        'd-md-block': true,
-      };
+      const expectedStyleWithoutAppend = [...defaultStyle, 'd-md-block'];
+      const expectedStyleWithAppend = [...expectedStyleWithoutAppend, 'append-right-4'];
 
-      const expectedStyleWithAppend = {
-        ...expectedStyleWithoutAppend,
-        'append-right-4': true,
-      };
+      const allBadges = tagBadges();
 
-      expect(wrapper.vm.tagBadgeClass(0)).toEqual(expectedStyleWithAppend);
-      expect(wrapper.vm.tagBadgeClass(1)).toEqual(expectedStyleWithAppend);
-      expect(wrapper.vm.tagBadgeClass(2)).toEqual(expectedStyleWithAppend);
-      expect(wrapper.vm.tagBadgeClass(3)).toEqual(expectedStyleWithoutAppend);
+      expect(allBadges.at(0).classes()).toEqual([...expectedStyleWithAppend, 'prepend-left-8']);
+      expect(allBadges.at(1).classes()).toEqual(expectedStyleWithAppend);
+      expect(allBadges.at(2).classes()).toEqual(expectedStyleWithAppend);
+      expect(allBadges.at(3).classes()).toEqual(expectedStyleWithoutAppend);
     });
   });
 });

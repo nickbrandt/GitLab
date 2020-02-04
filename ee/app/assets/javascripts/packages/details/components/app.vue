@@ -15,7 +15,7 @@ import PackageInformation from './information.vue';
 import NpmInstallation from './npm_installation.vue';
 import MavenInstallation from './maven_installation.vue';
 import ConanInstallation from './conan_installation.vue';
-import PackageTags from '../../shared/components/package_tags.vue';
+import PackageTitle from './package_title.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
@@ -34,10 +34,10 @@ export default {
     GlTable,
     GlIcon,
     PackageInformation,
-    PackageTags,
     NpmInstallation,
     MavenInstallation,
     ConanInstallation,
+    PackageTitle,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -98,9 +98,6 @@ export default {
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
-    },
-    hasTagsToDisplay() {
-      return Boolean(this.packageEntity.tags && this.packageEntity.tags.length);
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
@@ -205,20 +202,19 @@ export default {
   />
 
   <div v-else class="packages-app">
-    <div class="detail-page-header d-flex justify-content-between">
-      <div class="d-flex align-items-center">
-        <gl-icon name="fork" class="append-right-8" />
-        <strong class="append-right-default js-version-title">{{ packageEntity.version }}</strong>
-        <package-tags v-if="hasTagsToDisplay" :tags="packageEntity.tags" />
+    <div class="detail-page-header d-flex justify-content-between flex-column flex-sm-row">
+      <package-title />
+
+      <div class="mt-sm-2">
+        <gl-button
+          v-if="canDeletePackage"
+          v-gl-modal="'delete-modal'"
+          class="js-delete-button"
+          variant="danger"
+          data-qa-selector="delete_button"
+          >{{ __('Delete') }}</gl-button
+        >
       </div>
-      <gl-button
-        v-if="canDeletePackage"
-        v-gl-modal="'delete-modal'"
-        class="js-delete-button"
-        variant="danger"
-        data-qa-selector="delete_button"
-        >{{ __('Delete') }}</gl-button
-      >
     </div>
 
     <div class="row prepend-top-default" data-qa-selector="package_information_content">

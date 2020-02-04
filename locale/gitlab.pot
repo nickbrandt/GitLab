@@ -13266,6 +13266,18 @@ msgstr ""
 msgid "PackageRegistry|yarn"
 msgstr ""
 
+msgid "PackageType|Conan"
+msgstr ""
+
+msgid "PackageType|Maven"
+msgstr ""
+
+msgid "PackageType|NPM"
+msgstr ""
+
+msgid "PackageType|NuGet"
+msgstr ""
+
 msgid "Packages"
 msgstr ""
 
