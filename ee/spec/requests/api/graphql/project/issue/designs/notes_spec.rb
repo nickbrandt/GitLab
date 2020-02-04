@@ -6,11 +6,11 @@ describe 'Getting designs related to an issue' do
   include GraphqlHelpers
   include DesignManagementTestHelpers
 
-  set(:project) { create(:project, :public) }
-  set(:issue) { create(:issue, project: project) }
-  set(:design) { create(:design, :with_file, versions_count: 1, issue: issue) }
-  set(:current_user) { project.owner }
-  set(:note) { create(:diff_note_on_design, noteable: design, project: project) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:design) { create(:design, :with_file, versions_count: 1, issue: issue) }
+  let_it_be(:current_user) { project.owner }
+  let_it_be(:note) { create(:diff_note_on_design, noteable: design, project: project) }
 
   before do
     enable_design_management

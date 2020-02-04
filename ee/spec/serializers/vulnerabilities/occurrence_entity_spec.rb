@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Vulnerabilities::OccurrenceEntity do
-  set(:user) { create(:user) }
-  set(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
 
   let(:scanner) do
     create(:vulnerabilities_scanner, project: project)

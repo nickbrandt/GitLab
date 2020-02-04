@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'limited indexing is enabled' do
-  set(:project) { create :project, :repository, name: 'test1' }
+  let_it_be(:project) { create :project, :repository, name: 'test1' }
 
   before do
     stub_ee_application_setting(elasticsearch_limit_indexing: true)

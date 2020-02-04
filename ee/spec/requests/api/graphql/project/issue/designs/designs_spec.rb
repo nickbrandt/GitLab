@@ -6,8 +6,8 @@ describe 'Getting designs related to an issue' do
   include GraphqlHelpers
   include DesignManagementTestHelpers
 
-  set(:design) { create(:design, :with_file, versions_count: 1) }
-  set(:current_user) { design.project.owner }
+  let_it_be(:design) { create(:design, :with_file, versions_count: 1) }
+  let_it_be(:current_user) { design.project.owner }
   let(:design_query) do
     <<~NODE
     designs {
@@ -112,7 +112,7 @@ describe 'Getting designs related to an issue' do
     end
 
     context 'with versions' do
-      set(:version) { design.versions.take }
+      let_it_be(:version) { design.versions.take }
       let(:design_query) do
         <<~NODE
         designs {
@@ -151,9 +151,9 @@ describe 'Getting designs related to an issue' do
     end
 
     describe 'viewing a design board at a particular version' do
-      set(:issue) { design.issue }
-      set(:second_design) { create(:design, :with_file, issue: issue, versions_count: 1) }
-      set(:deleted_design) { create(:design, :with_versions, issue: issue, deleted: true, versions_count: 1) }
+      let_it_be(:issue) { design.issue }
+      let_it_be(:second_design) { create(:design, :with_file, issue: issue, versions_count: 1) }
+      let_it_be(:deleted_design) { create(:design, :with_versions, issue: issue, deleted: true, versions_count: 1) }
       let(:all_versions) { issue.design_versions.ordered.reverse }
       let(:design_query) do
         <<~NODE
@@ -318,7 +318,7 @@ describe 'Getting designs related to an issue' do
     end
 
     describe 'a design with note annotations' do
-      set(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
+      let_it_be(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
 
       let(:design_query) do
         <<~NODE

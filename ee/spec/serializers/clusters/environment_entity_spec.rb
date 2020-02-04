@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Clusters::EnvironmentEntity do
-  set(:user) { create(:user) }
-  set(:group) { create(:group) }
-  set(:project) { create(:project, group: group) }
-  set(:cluster) { create(:cluster_for_group, groups: [group]) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
+  let_it_be(:cluster) { create(:cluster_for_group, groups: [group]) }
 
   it 'inherits from API::Entities::EnvironmentBasic' do
     expect(described_class).to be < API::Entities::EnvironmentBasic

@@ -243,11 +243,11 @@ describe API::Namespaces do
       get api("/namespaces/#{namespace.id}/gitlab_subscription", current_user)
     end
 
-    set(:silver_plan) { create(:silver_plan) }
-    set(:owner) { create(:user) }
-    set(:developer) { create(:user) }
-    set(:namespace) { create(:group) }
-    set(:gitlab_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan, namespace: namespace) }
+    let_it_be(:silver_plan) { create(:silver_plan) }
+    let_it_be(:owner) { create(:user) }
+    let_it_be(:developer) { create(:user) }
+    let_it_be(:namespace) { create(:group) }
+    let_it_be(:gitlab_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan, namespace: namespace) }
 
     before do
       namespace.add_owner(owner)
@@ -295,8 +295,9 @@ describe API::Namespaces do
       put api("/namespaces/#{namespace_id}/gitlab_subscription", current_user), params: payload
     end
 
-    set(:namespace) { create(:group, name: 'test.test-group.22') }
-    set(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
+    let_it_be(:silver_plan) { create(:silver_plan) }
+    let_it_be(:namespace) { create(:group, name: 'test.test-group.22') }
+    let_it_be(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
     let(:params) do
       {
@@ -325,7 +326,7 @@ describe API::Namespaces do
       end
 
       context 'when namespace does not have a subscription' do
-        set(:namespace_2) { create(:group) }
+        let_it_be(:namespace_2) { create(:group) }
 
         it 'returns a 404 error' do
           do_put(namespace_2.id, admin, params)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'Insights page' do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   context 'as a permitted user' do
     before(:context) do

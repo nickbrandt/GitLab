@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'groups/edit.html.haml' do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
 
   before do

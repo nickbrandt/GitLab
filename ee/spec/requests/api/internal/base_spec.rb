@@ -4,13 +4,13 @@ require 'spec_helper'
 describe API::Internal::Base do
   include EE::GeoHelpers
 
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:primary_node, reload: true) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node, reload: true) { create(:geo_node) }
 
   describe 'POST /internal/post_receive', :geo do
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
     let(:key) { create(:key, user: user) }
-    set(:project) { create(:project, :repository, :wiki_repo) }
+    let_it_be(:project, reload: true) { create(:project, :repository, :wiki_repo) }
     let(:secret_token) { Gitlab::Shell.secret_token }
     let(:gl_repository) { "project-#{project.id}" }
     let(:reference_counter) { double('ReferenceCounter') }
@@ -112,12 +112,12 @@ describe API::Internal::Base do
   end
 
   describe "POST /internal/allowed" do
-    set(:user) { create(:user) }
-    set(:key) { create(:key, user: user) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:key) { create(:key, user: user) }
     let(:secret_token) { Gitlab::Shell.secret_token }
 
     context "for design repositories" do
-      set(:project) { create(:project) }
+      let_it_be(:project) { create(:project) }
       let(:gl_repository) { EE::Gitlab::GlRepository::DESIGN.identifier_for_container(project) }
 
       it "does not allow access" do
@@ -191,7 +191,7 @@ describe API::Internal::Base do
     end
 
     context 'smartcard session required' do
-      set(:project) { create(:project, :repository, :wiki_repo) }
+      let_it_be(:project) { create(:project, :repository, :wiki_repo) }
 
       subject do
         post(

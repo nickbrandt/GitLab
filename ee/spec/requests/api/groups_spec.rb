@@ -5,11 +5,11 @@ require 'spec_helper'
 describe API::Groups do
   include GroupAPIHelpers
 
-  set(:group) { create(:group) }
-  set(:private_group) { create(:group, :private) }
-  set(:project) { create(:project, group: group) }
-  set(:user) { create(:user) }
-  set(:another_user) { create(:user) }
+  let_it_be(:group, reload: true) { create(:group) }
+  let_it_be(:private_group) { create(:group, :private) }
+  let_it_be(:project) { create(:project, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:another_user) { create(:user) }
   let(:admin) { create(:admin) }
 
   before do

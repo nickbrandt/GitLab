@@ -24,7 +24,7 @@ describe DesignManagement::NewVersionWorker do
     end
 
     context 'the version id is valid' do
-      set(:version) { create(:design_version, :committed, designs_count: 2) }
+      let_it_be(:version) { create(:design_version, :committed, designs_count: 2) }
 
       it 'creates a system note' do
         expect { worker.perform(version.id) }.to change { Note.system.count }.by(1)
@@ -38,7 +38,7 @@ describe DesignManagement::NewVersionWorker do
     end
 
     context 'the version includes multiple types of action' do
-      set(:version) do
+      let_it_be(:version) do
         create(:design_version, :committed,
                created_designs: create_list(:design, 1),
                modified_designs: create_list(:design, 1))

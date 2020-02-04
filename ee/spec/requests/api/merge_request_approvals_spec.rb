@@ -3,14 +3,13 @@
 require 'spec_helper'
 
 describe API::MergeRequestApprovals do
-  set(:user)          { create(:user) }
-  set(:user2)         { create(:user) }
-  set(:admin)         { create(:user, :admin) }
-  set(:project)       { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:user2) { create(:user) }
+  let_it_be(:admin) { create(:user, :admin) }
+  let_it_be(:project, reload: true) { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
+  let_it_be(:approver) { create :user }
+  let_it_be(:group) { create :group }
   let(:merge_request) { create(:merge_request, :simple, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: Time.now) }
-
-  set(:approver) { create :user }
-  set(:group) { create :group }
 
   shared_examples_for 'an API endpoint for getting merge request approval state' do
     context 'when source rule is present' do
@@ -378,7 +377,7 @@ describe API::MergeRequestApprovals do
     end
 
     context 'as a valid approver' do
-      set(:approver) { create(:user) }
+      let_it_be(:approver) { create(:user) }
 
       before do
         project.add_developer(approver)
@@ -481,8 +480,8 @@ describe API::MergeRequestApprovals do
     let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
 
     context 'as a user who has approved the merge request' do
-      set(:approver) { create(:user) }
-      set(:unapprover) { create(:user) }
+      let_it_be(:approver) { create(:user) }
+      let_it_be(:unapprover) { create(:user) }
 
       before do
         project.add_developer(approver)

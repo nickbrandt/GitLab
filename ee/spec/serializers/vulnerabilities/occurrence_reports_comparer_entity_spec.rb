@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Vulnerabilities::OccurrenceReportsComparerEntity do
   describe 'container scanning report comparison' do
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
 
     let(:base_occurrences) { create_list(:vulnerabilities_occurrence, 2) }
     let(:base_combined_reports) { build_list(:ci_reports_security_report, 1, created_at: nil) }

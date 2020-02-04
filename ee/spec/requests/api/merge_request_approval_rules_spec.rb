@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe API::MergeRequestApprovalRules do
-  set(:user) { create(:user) }
-  set(:other_user) { create(:user) }
-  set(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:other_user) { create(:user) }
+  let_it_be(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace) }
   let(:merge_request) { create(:merge_request, author: user, source_project: project, target_project: project) }
 
   shared_examples_for 'a protected API endpoint for merge request approval rule action' do

@@ -8,8 +8,8 @@ RSpec.shared_examples 'report list' do
 
     let(:request) { double('request') }
 
-    set(:project) { create(:project, :repository, :private) }
-    set(:developer) { create(:user) }
+    let_it_be(:project) { create(:project, :repository, :private) }
+    let_it_be(:developer) { create(:user) }
 
     subject { entity.as_json }
 

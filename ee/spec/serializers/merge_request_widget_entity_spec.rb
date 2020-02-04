@@ -5,10 +5,10 @@ require 'spec_helper'
 describe MergeRequestWidgetEntity do
   include ProjectForksHelper
 
-  set(:user) { create(:user) }
-  set(:project) { create :project, :repository }
-  set(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
-  set(:pipeline) { create(:ci_empty_pipeline, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project, reload: true) { create :project, :repository }
+  let_it_be(:merge_request, reload: true) { create(:merge_request, source_project: project, target_project: project) }
+  let_it_be(:pipeline, reload: true) { create(:ci_empty_pipeline, project: project) }
   let(:request) { double('request', current_user: user) }
 
   before do
@@ -226,7 +226,7 @@ describe MergeRequestWidgetEntity do
   end
 
   describe 'blocking merge requests' do
-    set(:merge_request_block) { create(:merge_request_block, blocked_merge_request: merge_request) }
+    let_it_be(:merge_request_block) { create(:merge_request_block, blocked_merge_request: merge_request) }
 
     let(:blocking_mr) { merge_request_block.blocking_merge_request }
 
