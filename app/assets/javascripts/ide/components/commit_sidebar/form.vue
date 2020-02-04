@@ -1,5 +1,5 @@
 <script>
-import { createNamespacedHelpers, mapActions, mapGetters, mapState } from 'vuex';
+import { createNamespacedHelpers, mapGetters, mapState } from 'vuex';
 import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import CommitMessageField from './message_field.vue';
@@ -13,6 +13,10 @@ const {
   mapActions: mapCommitActions,
   mapGetters: mapCommitGetters,
 } = createNamespacedHelpers('commit');
+
+const { mapState: mapLeftPaneState, mapActions: mapLeftPaneActions } = createNamespacedHelpers(
+  'leftPane',
+);
 
 export default {
   components: {
@@ -30,10 +34,8 @@ export default {
   },
   computed: {
     ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
-    ...mapState('leftPane', {
-      leftPaneCurrentView: 'currentView',
-    }),
     ...mapCommitState(['commitMessage', 'submitCommitLoading']),
+    ...mapLeftPaneState(['currentView']),
     ...mapGetters(['hasChanges']),
     ...mapCommitGetters(['discardDraftButtonDisabled', 'preBuiltCommitMessage']),
     overviewText() {
@@ -55,22 +57,22 @@ export default {
       return this.stagedFiles.length ? __('Commit') : __('Stage & Commit');
     },
 
-    leftPaneCurrentViewIsCommitView() {
-      return this.leftPaneCurrentView === leftSidebarViews.commit.name;
+    currentViewIsCommitView() {
+      return this.currentView === leftSidebarViews.commit.name;
     },
   },
   watch: {
-    leftPaneCurrentView() {
+    currentView() {
       if (this.lastCommitMsg) {
         this.isCompact = false;
       } else {
         this.isCompact = !(
-          this.leftPaneCurrentViewIsCommitView && window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
+          this.currentViewIsCommitView && window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
         );
       }
     },
     lastCommitMsg() {
-      this.isCompact = !this.leftPaneCurrentViewIsCommitView && this.lastCommitMsg === '';
+      this.isCompact = !this.currentViewIsCommitView && this.lastCommitMsg === '';
     },
   },
   mounted: function mounted() {
@@ -79,10 +81,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions('leftPane', ['open', 'currentView']),
     ...mapCommitActions(['updateCommitMessage', 'discardDraft', 'commitChanges']),
+    ...mapLeftPaneActions(['open']),
     toggleIsCompact() {
-      if (this.leftPaneCurrentViewIsCommitView) {
+      if (this.currentViewIsCommitView) {
         this.isCompact = !this.isCompact;
       } else {
         this.open(leftSidebarViews.commit)
