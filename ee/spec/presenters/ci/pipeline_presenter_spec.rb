@@ -26,7 +26,11 @@ describe Ci::PipelinePresenter do
   end
 
   describe '#expose_security_dashboard?' do
-    subject { pipeline.expose_security_dashboard? }
+    subject { presenter.expose_security_dashboard? }
+
+    before do
+      stub_licensed_features(dependency_scanning: true, license_management: true)
+    end
 
     context 'when there is an artifact of a right type' do
       let!(:build) { create(:ee_ci_build, :dependency_scanning, pipeline: pipeline) }
