@@ -66,9 +66,6 @@ export default {
   },
   mounted() {
     this.openEditView();
-    // `this.updateViewer('editor')` may not be necessary, it is the default in specs, but
-    // leaving it here for defensive coding safety.
-    this.updateViewer('editor');
   },
   methods: {
     ...mapLeftPaneActions(['open']),
