@@ -17,7 +17,7 @@ module EE
                 insufficient_bridge_permissions: 'no permissions to trigger downstream pipeline',
                 insufficient_upstream_permissions: 'no permissions to read upstream project',
                 bridge_pipeline_is_child_pipeline: 'creation of child pipeline not allowed from another child pipeline',
-                downstream_bridge_pipeline_creation_failed: 'downstream bridge pipeline can not be created'
+                downstream_pipeline_creation_failed: 'downstream pipeline can not be created'
               ).freeze
               EE::Gitlab::Ci::Status::Build::Failed.private_constant :EE_REASONS
             end

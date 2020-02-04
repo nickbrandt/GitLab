@@ -30,7 +30,7 @@ module Ci
         end
 
       downstream_pipeline.tap do |pipeline|
-        @bridge.drop!(:downstream_bridge_pipeline_creation_failed) if pipeline.has_yaml_errors?
+        @bridge.drop!(:downstream_pipeline_creation_failed) if pipeline.has_yaml_errors?
       end
     end
 

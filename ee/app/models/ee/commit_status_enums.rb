@@ -16,7 +16,7 @@ module EE
                     upstream_bridge_project_not_found: 1_004,
                     insufficient_upstream_permissions: 1_005,
                     bridge_pipeline_is_child_pipeline: 1_006,
-                    downstream_bridge_pipeline_creation_failed: 1_007)
+                    downstream_pipeline_creation_failed: 1_007)
       end
     end
   end

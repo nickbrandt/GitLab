@@ -265,6 +265,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
 
         expect(pipeline.reload).to be_failed
         expect(bridge.reload).to be_failed
+        expect(bridge.failure_reason).to eq('downstream_pipeline_creation_failed')
       end
     end
 
