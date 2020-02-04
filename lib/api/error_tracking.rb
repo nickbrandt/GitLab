@@ -24,7 +24,7 @@ module API
         present setting, with: Entities::ErrorTracking::ProjectSetting
       end
 
-      desc 'Enable/Disable error tracking settings for the project' do
+      desc 'Enable or disable error tracking settings for the project' do
         detail 'This feature was introduced in GitLab 12.8.'
         success Entities::ErrorTracking::ProjectSetting
       end
