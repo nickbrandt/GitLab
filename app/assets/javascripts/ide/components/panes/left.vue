@@ -58,8 +58,8 @@ export default {
     },
   },
   watch: {
-    hasChanges() {
-      if (!this.hasChanges) {
+    hasChanges(newVal) {
+      if (!newVal) {
         this.openEditView();
       }
     },
