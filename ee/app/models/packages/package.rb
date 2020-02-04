@@ -84,6 +84,7 @@ class Packages::Package < ApplicationRecord
   def self.sort_by_attribute(method)
     case method.to_s
     when 'created_asc' then order_created
+    when 'created_at_asc' then order_created
     when 'name_asc' then order_name
     when 'name_desc' then order_name_desc
     when 'version_asc' then order_version

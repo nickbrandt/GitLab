@@ -20,9 +20,17 @@ module API
       end
       params do
         use :pagination
+        optional :order_by, type: String, values: %w[created_at name version type], default: 'created_at',
+                            desc: 'Return packages ordered by `created_at`, `name`, `version` or `type` fields.'
+        optional :sort, type: String, values: %w[asc desc], default: 'asc',
+                        desc: 'Return packages sorted in `asc` or `desc` order.'
       end
       get ':id/packages' do
         packages = user_project.packages
+
+        if params[:order_by] && params[:sort]
+          packages = packages.sort_by_attribute("#{params[:order_by]}_#{params[:sort]}")
+        end
 
         present paginate(packages), with: EE::API::Entities::Package, user: current_user
       end
