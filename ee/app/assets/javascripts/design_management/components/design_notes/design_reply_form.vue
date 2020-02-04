@@ -53,6 +53,7 @@ export default {
       :markdown-preview-path="markdownPreviewPath"
       :can-attach-file="false"
       :enable-autocomplete="false"
+      :textarea-value="value"
       markdown-docs-path="/help/user/markdown"
       class="bordered-box"
     >
