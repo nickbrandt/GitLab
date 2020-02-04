@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Analytics::CycleAnalytics::RequestParams do
-  let(:params) { { created_after: '2018-01-01', created_before: '2019-01-01' } }
+  let(:params) { { created_after: '2019-01-01', created_before: '2019-03-01' } }
 
   subject { described_class.new(params) }
 
@@ -30,6 +30,17 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
       it 'is invalid' do
         expect(subject).not_to be_valid
         expect(subject.errors.messages[:created_before]).not_to be_empty
+      end
+    end
+
+    context 'when the date range exceeds 180 days' do
+      before do
+        params[:created_before] = '2019-07-15'
+      end
+
+      it 'is invalid' do
+        expect(subject).not_to be_valid
+        expect(subject.errors.messages[:created_after]).to include(s_('CycleAnalytics|The given date range is larger than 180 days'))
       end
     end
   end

@@ -79,7 +79,7 @@ end
 RSpec.shared_examples 'cycle analytics data endpoint examples' do
   before do
     params[:created_after] = '2019-01-01'
-    params[:created_before] = '2020-01-01'
+    params[:created_before] = '2019-04-01'
   end
 
   context 'when valid parameters are given' do
@@ -149,6 +149,15 @@ RSpec.shared_examples 'cycle analytics data endpoint examples' do
     before do
       params[:created_after] = '2012-01-01'
       params[:created_before] = '2010-01-01'
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+
+  context 'when the date range exceeds 180 days' do
+    before do
+      params[:created_after] = '2019-01-01'
+      params[:created_before] = '2019-08-01'
     end
 
     include_examples 'example for invalid parameter'
