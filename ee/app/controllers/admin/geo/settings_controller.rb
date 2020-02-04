@@ -2,7 +2,7 @@
 
 class Admin::Geo::SettingsController < Admin::ApplicationSettingsController
   helper ::EE::GeoHelper
-  before_action :check_license!
+  before_action :check_license!, except: :show
 
   def show
   end
@@ -11,8 +11,7 @@ class Admin::Geo::SettingsController < Admin::ApplicationSettingsController
 
   def check_license!
     unless Gitlab::Geo.license_allows?
-      flash[:alert] = _('You need a different license to use Geo replication.')
-      redirect_to admin_license_path
+      render_403
     end
   end
 end

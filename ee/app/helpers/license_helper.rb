@@ -88,6 +88,10 @@ module LicenseHelper
     @current_license = License.current
   end
 
+  def current_license_title
+    @current_license_title ||= License.current ? License.current.plan.titleize : 'Core'
+  end
+
   def new_trial_url
     return_to_url = CGI.escape(Gitlab.config.gitlab.url)
     uri = URI.parse(::EE::SUBSCRIPTIONS_URL)
