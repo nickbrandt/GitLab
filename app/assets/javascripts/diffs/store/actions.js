@@ -110,19 +110,28 @@ export const fetchDiffFilesBatch = ({ commit, state }) => {
   commit(types.SET_BATCH_LOADING, true);
   commit(types.SET_RETRIEVING_BATCHES, true);
 
-  const getBatch = page =>
-    axios
+  const getBatch = page => {
+    if (page) {
+      urlParams.page = page;
+    }
+
+    return axios
       .get(state.endpointBatch, {
-        params: { ...urlParams, page },
+        params: urlParams,
       })
       .then(({ data: { pagination, diff_files } }) => {
         commit(types.SET_DIFF_DATA_BATCH, { diff_files });
         commit(types.SET_BATCH_LOADING, false);
-        if (!pagination.next_page) commit(types.SET_RETRIEVING_BATCHES, false);
+
+        if (!pagination.next_page) {
+          commit(types.SET_RETRIEVING_BATCHES, false);
+        }
+
         return pagination.next_page;
       })
       .then(nextPage => nextPage && getBatch(nextPage))
       .catch(() => commit(types.SET_RETRIEVING_BATCHES, false));
+  };
 
   return getBatch()
     .then(handleLocationHash)
@@ -131,6 +140,11 @@ export const fetchDiffFilesBatch = ({ commit, state }) => {
 
 export const fetchDiffFilesMeta = ({ commit, state }) => {
   const worker = new TreeWorker();
+  const urlParams = {};
+
+  if (state.useSingleDiffStyle) {
+    urlParams.view = state.diffViewType;
+  }
 
   commit(types.SET_LOADING, true);
 
@@ -141,16 +155,17 @@ export const fetchDiffFilesMeta = ({ commit, state }) => {
   });
 
   return axios
-    .get(state.endpointMetadata)
+    .get(mergeUrlParams(urlParams, state.endpointMetadata))
     .then(({ data }) => {
       const strippedData = { ...data };
+
       delete strippedData.diff_files;
       commit(types.SET_LOADING, false);
       commit(types.SET_MERGE_REQUEST_DIFFS, data.merge_request_diffs || []);
       commit(types.SET_DIFF_DATA, strippedData);
 
-      prepareDiffData(data);
-      worker.postMessage(data.diff_files);
+      worker.postMessage(prepareDiffData({ diff: data, priorFiles: state.diffFiles }));
+
       return data;
     })
     .catch(() => worker.terminate());
@@ -225,7 +240,7 @@ export const startRenderDiffsQueue = ({ state, commit }) => {
       const nextFile = state.diffFiles.find(
         file =>
           !file.renderIt &&
-          (file.viewer && (!file.viewer.collapsed || !file.viewer.name === diffViewerModes.text)),
+          (file.viewer && (!file.viewer.collapsed || file.viewer.name !== diffViewerModes.text)),
       );
 
       if (nextFile) {

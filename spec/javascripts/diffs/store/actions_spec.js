@@ -158,9 +158,8 @@ describe('DiffsStoreActions', () => {
       const res1 = { diff_files: [], pagination: { next_page: 2 } };
       const res2 = { diff_files: [], pagination: {} };
       mock
-        .onGet(endpointBatch, { params: { page: undefined, per_page: DIFFS_PER_PAGE, w: '1' } })
-        .reply(200, res1);
-      mock
+        .onGet(endpointBatch, { params: { per_page: DIFFS_PER_PAGE, w: '1' } })
+        .reply(200, res1)
         .onGet(endpointBatch, { params: { page: 2, per_page: DIFFS_PER_PAGE, w: '1' } })
         .reply(200, res2);
 
@@ -188,7 +187,7 @@ describe('DiffsStoreActions', () => {
 
   describe('fetchDiffFilesMeta', () => {
     it('should fetch diff meta information', done => {
-      const endpointMetadata = '/fetch/diffs_meta';
+      const endpointMetadata = '/fetch/diffs_meta?view=inline';
       const mock = new MockAdapter(axios);
       const data = { diff_files: [] };
       const res = { data };
