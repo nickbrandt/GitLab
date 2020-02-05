@@ -70,32 +70,6 @@ describe API::ProjectPackages do
       end
 
       context 'with sorting' do
-        shared_examples 'package sorting' do |order_by|
-          subject { get api(url), params: { sort: sort, order_by: order_by } }
-
-          context "sorting by #{order_by}" do
-            context 'ascending order' do
-              let(:sort) { 'asc' }
-
-              it 'returns the sorted packages' do
-                subject
-
-                expect(json_response.map { |package| package['id'] }).to eq(packages.map(&:id))
-              end
-            end
-
-            context 'descending order' do
-              let(:sort) { 'desc' }
-
-              it 'returns the sorted packages' do
-                subject
-
-                expect(json_response.map { |package| package['id'] }).to eq(packages.reverse.map(&:id))
-              end
-            end
-          end
-        end
-
         let(:package3) { create(:maven_package, project: project, version: '1.1.1', name: 'zzz') }
 
         before do

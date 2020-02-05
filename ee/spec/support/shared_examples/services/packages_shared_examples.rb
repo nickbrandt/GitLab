@@ -68,6 +68,32 @@ RSpec.shared_examples 'returns packages with subgroups' do |container_type, user
   end
 end
 
+RSpec.shared_examples 'package sorting' do |order_by|
+  subject { get api(url), params: { sort: sort, order_by: order_by } }
+
+  context "sorting by #{order_by}" do
+    context 'ascending order' do
+      let(:sort) { 'asc' }
+
+      it 'returns the sorted packages' do
+        subject
+
+        expect(json_response.map { |package| package['id'] }).to eq(packages.map(&:id))
+      end
+    end
+
+    context 'descending order' do
+      let(:sort) { 'desc' }
+
+      it 'returns the sorted packages' do
+        subject
+
+        expect(json_response.map { |package| package['id'] }).to eq(packages.reverse.map(&:id))
+      end
+    end
+  end
+end
+
 RSpec.shared_examples 'rejects packages access' do |container_type, user_type, status|
   context "for #{user_type}" do
     before do
