@@ -34,6 +34,7 @@ lib/gitlab/github_import/ @gitlab-org/maintainers/database
 # Engineering Productivity owned files
 /.gitlab-ci.yml @gl-quality/eng-prod
 /.gitlab/ci/ @gl-quality/eng-prod
+/.gitlab/CODEOWNERS @gl-quality/eng-prod
 Dangerfile @gl-quality/eng-prod
 /danger/ @gl-quality/eng-prod
 /lib/gitlab/danger/ @gl-quality/eng-prod
