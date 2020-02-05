@@ -1,8 +1,8 @@
 import Vue from 'vue';
 
 import NodeDetailsSectionMainComponent from 'ee/geo_nodes/components/node_detail_sections/node_details_section_main.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockNode, mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockNode, mockNodeDetails } from '../../mock_data';
 
 const MOCK_VERSION_TEXT = `${mockNodeDetails.version} (${mockNodeDetails.revision})`;
 

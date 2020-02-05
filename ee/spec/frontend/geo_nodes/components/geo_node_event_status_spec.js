@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import geoNodeEventStatusComponent from 'ee/geo_nodes/components/geo_node_event_status.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
 const createComponent = ({

@@ -3,7 +3,7 @@ import Vue from 'vue';
 import DetailsSectionMixin from 'ee/geo_nodes/mixins/details_section_mixin';
 import { STATUS_DELAY_THRESHOLD_MS } from 'ee/geo_nodes/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
 const createComponent = (nodeDetails = mockNodeDetails) => {
@@ -12,7 +12,9 @@ const createComponent = (nodeDetails = mockNodeDetails) => {
     data() {
       return { nodeDetails };
     },
-    template: '<div></div>',
+    render(h) {
+      return h('div');
+    },
   });
 
   return mountComponent(Component);

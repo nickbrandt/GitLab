@@ -1,10 +1,12 @@
 import Vue from 'vue';
 
 import geoNodeActionsComponent from 'ee/geo_nodes/components/geo_node_actions.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import eventHub from 'ee/geo_nodes/event_hub';
 import { NODE_ACTIONS } from 'ee/geo_nodes/constants';
 import { mockNodes } from '../mock_data';
+
+jest.mock('ee/geo_nodes/event_hub');
 
 const createComponent = (
   node = mockNodes[0],
@@ -68,7 +70,6 @@ describe('GeoNodeActionsComponent', () => {
   describe('methods', () => {
     describe('onToggleNode', () => {
       it('emits showNodeActionModal with actionType `toggle`, node reference, modalMessage, modalActionLabel, and modalTitle', () => {
-        spyOn(eventHub, '$emit');
         vm.onToggleNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
@@ -83,7 +84,6 @@ describe('GeoNodeActionsComponent', () => {
 
     describe('onRemovePrimaryNode', () => {
       it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage, modalActionLabel, and modalTitle', () => {
-        spyOn(eventHub, '$emit');
         vm.onRemovePrimaryNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
@@ -100,7 +100,6 @@ describe('GeoNodeActionsComponent', () => {
 
     describe('onRemoveSecondaryNode', () => {
       it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage, modalActionLabel, and modalTitle', () => {
-        spyOn(eventHub, '$emit');
         vm.onRemoveSecondaryNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
@@ -117,7 +116,6 @@ describe('GeoNodeActionsComponent', () => {
 
     describe('onRepairNode', () => {
       it('emits `repairNode` event with node reference', () => {
-        spyOn(eventHub, '$emit');
         vm.onRepairNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('repairNode', vm.node);

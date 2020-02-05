@@ -5,7 +5,7 @@ import appComponent from 'ee/geo_nodes/components/app.vue';
 import eventHub from 'ee/geo_nodes/event_hub';
 import GeoNodesStore from 'ee/geo_nodes/store/geo_nodes_store';
 import GeoNodesService from 'ee/geo_nodes/service/geo_nodes_service';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { NODE_ACTIONS } from 'ee/geo_nodes/constants';
 import axios from '~/lib/utils/axios_utils';
 import {
@@ -15,6 +15,9 @@ import {
   mockNode,
   rawMockNodeDetails,
 } from '../mock_data';
+
+jest.mock('~/smart_interval');
+jest.mock('ee/geo_nodes/event_hub');
 
 const createComponent = () => {
   const Component = Vue.extend(appComponent);
@@ -97,7 +100,7 @@ describe('AppComponent', () => {
 
     describe('fetchGeoNodes', () => {
       it('calls service.getGeoNodes and sets response to the store on success', done => {
-        spyOn(vm.store, 'setNodes');
+        jest.spyOn(vm.store, 'setNodes');
 
         vm.fetchGeoNodes()
           .then(() => {
@@ -127,11 +130,9 @@ describe('AppComponent', () => {
     describe('fetchNodeDetails', () => {
       it('calls service.getGeoNodeDetails and sets response to the store on success', done => {
         mock.onGet(mockNode.statusPath).reply(200, rawMockNodeDetails);
-        spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
-            expect(vm.service.getGeoNodeDetails).toHaveBeenCalled();
             expect(Object.keys(vm.store.state.nodeDetails).length).not.toBe(0);
             expect(vm.store.state.nodeDetails['1']).toBeDefined();
           })
@@ -140,9 +141,8 @@ describe('AppComponent', () => {
       });
 
       it('emits `nodeDetailsLoaded` event with fake nodeDetails object on 404 failure', done => {
-        spyOn(eventHub, '$emit');
         mock.onGet(mockNode.statusPath).reply(404, {});
-        spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
+        jest.spyOn(vm.service, 'getGeoNodeDetails');
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
@@ -158,9 +158,8 @@ describe('AppComponent', () => {
       });
 
       it('emits `nodeDetailsLoaded` event with fake nodeDetails object when a network error occurs', done => {
-        spyOn(eventHub, '$emit');
         mock.onGet(mockNode.statusPath).networkError();
-        spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
+        jest.spyOn(vm.service, 'getGeoNodeDetails');
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
@@ -176,9 +175,8 @@ describe('AppComponent', () => {
       });
 
       it('emits `nodeDetailsLoaded` event with fake nodeDetails object when a timeout occurs', done => {
-        spyOn(eventHub, '$emit');
         mock.onGet(mockNode.statusPath).timeout();
-        spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
+        jest.spyOn(vm.service, 'getGeoNodeDetails');
 
         vm.fetchNodeDetails(mockNode)
           .then(() => {
@@ -201,7 +199,7 @@ describe('AppComponent', () => {
           expect(node.nodeActionActive).toBe(true);
           return [200];
         });
-        spyOn(vm.service, 'repairNode').and.callThrough();
+        jest.spyOn(vm.service, 'repairNode');
 
         vm.repairNode(node)
           .then(() => {
@@ -222,7 +220,7 @@ describe('AppComponent', () => {
           expect(node.nodeActionActive).toBe(true);
           return [500];
         });
-        spyOn(vm.service, 'repairNode').and.callThrough();
+        jest.spyOn(vm.service, 'repairNode');
 
         vm.repairNode(node)
           .then(() => {
@@ -250,7 +248,7 @@ describe('AppComponent', () => {
             },
           ];
         });
-        spyOn(vm.service, 'toggleNode').and.callThrough();
+        jest.spyOn(vm.service, 'toggleNode');
         node.enabled = false;
 
         vm.toggleNode(node)
@@ -269,7 +267,7 @@ describe('AppComponent', () => {
           expect(node.nodeActionActive).toBe(true);
           return [500];
         });
-        spyOn(vm.service, 'toggleNode').and.callThrough();
+        jest.spyOn(vm.service, 'toggleNode');
         node.enabled = false;
 
         vm.toggleNode(node)
@@ -293,8 +291,8 @@ describe('AppComponent', () => {
           expect(node.nodeActionActive).toBe(true);
           return [200];
         });
-        spyOn(vm.service, 'removeNode').and.callThrough();
-        spyOn(vm.store, 'removeNode').and.stub();
+        jest.spyOn(vm.service, 'removeNode');
+        jest.spyOn(vm.store, 'removeNode');
 
         vm.removeNode(node)
           .then(() => {
@@ -314,8 +312,8 @@ describe('AppComponent', () => {
           expect(node.nodeActionActive).toBe(true);
           return [500];
         });
-        spyOn(vm.service, 'removeNode').and.callThrough();
-        spyOn(vm.store, 'removeNode').and.stub();
+        jest.spyOn(vm.service, 'removeNode');
+        jest.spyOn(vm.store, 'removeNode');
 
         vm.removeNode(node)
           .then(() => {
@@ -334,8 +332,8 @@ describe('AppComponent', () => {
       it('calls `toggleNode` and `hideNodeActionModal` when `targetNodeActionType` is `toggle`', () => {
         vm.targetNode = { ...mockNode };
         vm.targetNodeActionType = NODE_ACTIONS.TOGGLE;
-        spyOn(vm, 'hideNodeActionModal');
-        spyOn(vm, 'toggleNode').and.stub();
+        jest.spyOn(vm, 'hideNodeActionModal');
+        jest.spyOn(vm, 'toggleNode');
 
         vm.handleNodeAction();
 
@@ -346,8 +344,8 @@ describe('AppComponent', () => {
       it('calls `removeNode` and `hideNodeActionModal` when `targetNodeActionType` is `remove`', () => {
         vm.targetNode = { ...mockNode };
         vm.targetNodeActionType = NODE_ACTIONS.REMOVE;
-        spyOn(vm, 'hideNodeActionModal');
-        spyOn(vm, 'removeNode').and.stub();
+        jest.spyOn(vm, 'hideNodeActionModal');
+        jest.spyOn(vm, 'removeNode');
 
         vm.handleNodeAction();
 
@@ -370,7 +368,7 @@ describe('AppComponent', () => {
         modalMessage = 'Foobar message';
         modalActionLabel = 'Disable';
         modalTitle = 'Test title';
-        rootEmit = spyOn(vm.$root, '$emit');
+        rootEmit = jest.spyOn(vm.$root, '$emit');
       });
 
       it('sets target node and modal config props on component', () => {
@@ -407,7 +405,7 @@ describe('AppComponent', () => {
 
       it('calls toggleNode when actionType is `toggle` and node.enabled is `false`', () => {
         node.enabled = false;
-        spyOn(vm, 'toggleNode').and.stub();
+        jest.spyOn(vm, 'toggleNode');
 
         vm.showNodeActionModal({
           actionType: NODE_ACTIONS.TOGGLE,
@@ -437,7 +435,7 @@ describe('AppComponent', () => {
 
     describe('hideNodeActionModal', () => {
       it('emits `bv::hide::modal`', () => {
-        const rootEmit = spyOn(vm.$root, '$emit');
+        const rootEmit = jest.spyOn(vm.$root, '$emit');
         vm.hideNodeActionModal();
 
         expect(rootEmit).toHaveBeenCalledWith('bv::hide::modal', vm.modalId);
@@ -447,7 +445,6 @@ describe('AppComponent', () => {
 
   describe('created', () => {
     it('binds event handler for `pollNodeDetails`', () => {
-      spyOn(eventHub, '$on');
       const vmX = createComponent();
 
       expect(eventHub.$on).toHaveBeenCalledWith('pollNodeDetails', jasmine.any(Function));
@@ -459,7 +456,6 @@ describe('AppComponent', () => {
 
   describe('beforeDestroy', () => {
     it('unbinds event handler for `pollNodeDetails`', () => {
-      spyOn(eventHub, '$off');
       const vmX = createComponent();
       vmX.$destroy();
 

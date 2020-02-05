@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import SectionRevealButtonComponent from 'ee/geo_nodes/components/node_detail_sections/section_reveal_button.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 const createComponent = (buttonTitle = 'Foo button') => {
   const Component = Vue.extend(SectionRevealButtonComponent);
@@ -52,7 +52,7 @@ describe('SectionRevealButton', () => {
       });
 
       it('emits `toggleButton` event on component', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
         vm.onClickButton();
 
         expect(vm.$emit).toHaveBeenCalledWith('toggleButton', vm.toggleState);

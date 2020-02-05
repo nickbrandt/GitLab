@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import geoNodeHealthStatusComponent from 'ee/geo_nodes/components/geo_node_health_status.vue';
 import { HEALTH_STATUS_ICON, HEALTH_STATUS_CLASS } from 'ee/geo_nodes/constants';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
 const createComponent = (status = mockNodeDetails.health) => {

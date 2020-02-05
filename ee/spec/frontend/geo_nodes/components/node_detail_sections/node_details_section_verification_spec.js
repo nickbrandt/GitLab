@@ -1,8 +1,8 @@
 import Vue from 'vue';
 
 import NodeDetailsSectionVerificationComponent from 'ee/geo_nodes/components/node_detail_sections/node_details_section_verification.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { mockNodeDetails } from '../../mock_data';
 
 const createComponent = ({ nodeDetails = mockNodeDetails, nodeTypePrimary = false }) => {
   const Component = Vue.extend(NodeDetailsSectionVerificationComponent);
