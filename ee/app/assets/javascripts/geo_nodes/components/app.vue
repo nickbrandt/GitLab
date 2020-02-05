@@ -209,7 +209,7 @@ export default {
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('GeoNodes|Loading nodes')"
-      :size="2"
+      size="md"
       class="loading-animation prepend-top-20 append-bottom-20"
     />
     <geo-node-item

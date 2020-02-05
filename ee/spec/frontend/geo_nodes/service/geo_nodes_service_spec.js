@@ -3,6 +3,8 @@ import axios from '~/lib/utils/axios_utils';
 
 import { NODE_DETAILS_PATH } from '../mock_data';
 
+jest.mock('axios');
+
 describe('GeoNodesService', () => {
   let service;
 
@@ -12,7 +14,6 @@ describe('GeoNodesService', () => {
 
   describe('getGeoNodes', () => {
     it('returns axios instance for Geo nodes path', () => {
-      spyOn(axios, 'get').and.stub();
       service.getGeoNodes();
 
       expect(axios.get).toHaveBeenCalledWith(service.geoNodesPath);
@@ -21,7 +22,6 @@ describe('GeoNodesService', () => {
 
   describe('getGeoNodeDetails', () => {
     it('returns axios instance for Geo node details path', () => {
-      spyOn(axios, 'get').and.stub();
       service.getGeoNodeDetails(2);
 
       expect(axios.get).toHaveBeenCalled();

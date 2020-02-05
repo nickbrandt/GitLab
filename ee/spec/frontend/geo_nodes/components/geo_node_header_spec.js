@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import GeoNodeHeaderComponent from 'ee/geo_nodes/components/geo_node_header.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockNode, mockNodeDetails } from '../mock_data';
 
 const createComponent = ({

@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import geoNodeDetailItemComponent from 'ee/geo_nodes/components/geo_node_detail_item.vue';
 import { VALUE_TYPE, CUSTOM_TYPE } from 'ee/geo_nodes/constants';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { rawMockNodeDetails } from '../mock_data';
 
 const createComponent = config => {

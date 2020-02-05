@@ -2,8 +2,10 @@ import Vue from 'vue';
 
 import geoNodeItemComponent from 'ee/geo_nodes/components/geo_node_item.vue';
 import eventHub from 'ee/geo_nodes/event_hub';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { mockNode, mockNodeDetails } from '../mock_data';
+
+jest.mock('ee/geo_nodes/event_hub');
 
 const createComponent = (node = mockNode) => {
   const Component = Vue.extend(geoNodeItemComponent);
@@ -45,6 +47,7 @@ describe('GeoNodeItemComponent', () => {
     beforeEach(() => {
       // Altered mock data for secure URL
       httpsNode = Object.assign({}, mockNode, {
+        id: mockNodeDetails.id,
         url: 'https://127.0.0.1:3001/',
       });
       vmHttps = createComponent(httpsNode);
@@ -56,23 +59,24 @@ describe('GeoNodeItemComponent', () => {
 
     describe('showNodeDetails', () => {
       it('returns `false` if Node details are still loading', () => {
-        vm.isNodeDetailsLoading = true;
+        vmHttps.isNodeDetailsLoading = true;
 
-        expect(vm.showNodeDetails).toBeFalsy();
+        expect(vmHttps.showNodeDetails).toBeFalsy();
       });
 
       it('returns `false` if Node details failed to load', () => {
-        vm.isNodeDetailsLoading = false;
-        vm.isNodeDetailsFailed = true;
+        vmHttps.isNodeDetailsLoading = false;
+        vmHttps.isNodeDetailsFailed = true;
 
-        expect(vm.showNodeDetails).toBeFalsy();
+        expect(vmHttps.showNodeDetails).toBeFalsy();
       });
 
       it('returns `true` if Node details loaded', () => {
-        vm.isNodeDetailsLoading = false;
-        vm.isNodeDetailsFailed = false;
+        vmHttps.handleNodeDetails(mockNodeDetails);
+        vmHttps.isNodeDetailsLoading = false;
+        vmHttps.isNodeDetailsFailed = false;
 
-        expect(vm.showNodeDetails).toBeTruthy();
+        expect(vmHttps.showNodeDetails).toBeTruthy();
       });
     });
   });
@@ -107,8 +111,6 @@ describe('GeoNodeItemComponent', () => {
 
     describe('handleMounted', () => {
       it('emits `pollNodeDetails` event and passes node ID', () => {
-        spyOn(eventHub, '$emit');
-
         vm.handleMounted();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('pollNodeDetails', vm.node);
@@ -118,8 +120,6 @@ describe('GeoNodeItemComponent', () => {
 
   describe('created', () => {
     it('binds `nodeDetailsLoaded` event handler', () => {
-      spyOn(eventHub, '$on');
-
       const vmX = createComponent();
 
       expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
@@ -129,8 +129,6 @@ describe('GeoNodeItemComponent', () => {
 
   describe('beforeDestroy', () => {
     it('unbinds `nodeDetailsLoaded` event handler', () => {
-      spyOn(eventHub, '$off');
-
       const vmX = createComponent();
       vmX.$destroy();
 
