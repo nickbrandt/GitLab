@@ -201,7 +201,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="js-cycle-analytics">
     <div class="page-title-holder d-flex align-items-center">
       <h3 class="page-title">{{ __('Cycle Analytics') }}</h3>
     </div>

@@ -7,7 +7,7 @@ export default () => {
   const { emptyStateSvgPath, noDataSvgPath, noAccessSvgPath } = el.dataset;
 
   return new Vue({
-    el: '#js-cycle-analytics-app',
+    el,
     name: 'CycleAnalyticsApp',
     store: createStore(),
     components: {

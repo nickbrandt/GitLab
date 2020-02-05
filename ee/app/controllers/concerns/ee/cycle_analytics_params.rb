@@ -11,6 +11,7 @@ module EE
         super.tap do |options|
           options[:branch] = params[:branch_name]
           options[:projects] = params[:project_ids] if params[:project_ids]
+          options[:group] = params[:group_id] if params[:group_id]
         end
       end
     end
