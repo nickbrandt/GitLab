@@ -34,7 +34,7 @@ describe Projects::Settings::OperationsController do
       it 'renders ok' do
         get :show, params: project_params(project)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:show)
       end
     end

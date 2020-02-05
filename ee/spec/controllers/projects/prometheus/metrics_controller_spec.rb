@@ -53,7 +53,7 @@ describe Projects::Prometheus::MetricsController do
       it 'validation data is returned' do
         post :validate_query, params: project_params(format: :json, query: query)
 
-        expect(response).to have_gitlab_http_status(202)
+        expect(response).to have_gitlab_http_status(:accepted)
       end
     end
 
@@ -77,7 +77,7 @@ describe Projects::Prometheus::MetricsController do
       it 'returns a list of metrics' do
         get :index, params: project_params(format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('prometheus/metrics', dir: 'ee')
       end
     end
@@ -86,7 +86,7 @@ describe Projects::Prometheus::MetricsController do
       it 'returns an empty json' do
         get :index, params: project_params(format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq({})
       end
     end
@@ -119,7 +119,7 @@ describe Projects::Prometheus::MetricsController do
       it 'renders new metric page' do
         post :create, params: project_params(invalid_metric)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template('new')
       end
     end
@@ -151,7 +151,7 @@ describe Projects::Prometheus::MetricsController do
       it 'destroys the metric' do
         delete :destroy, params: project_params(id: metric.id, format: :json)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(PrometheusMetric.find_by(id: metric.id)).to be_nil
       end
     end
