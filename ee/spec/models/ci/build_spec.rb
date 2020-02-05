@@ -34,6 +34,10 @@ describe Ci::Build do
     end
   end
 
+  describe 'associations' do
+    it { is_expected.to have_many(:security_scans) }
+  end
+
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 

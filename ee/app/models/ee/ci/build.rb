@@ -21,6 +21,8 @@ module EE
         include UsageStatistics
         include FromUnion
 
+        has_many :security_scans, class_name: 'Security::Scan'
+
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 

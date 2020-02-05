@@ -363,6 +363,12 @@
   :latency_sensitive: true
   :resource_boundary: :cpu
   :weight: 3
+- :name: security_scans:store_security_scans
+  :feature_category: :static_application_security_testing
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 2
 - :name: adjourned_project_deletion
   :feature_category: :authentication_and_authorization
   :has_external_dependencies: 
