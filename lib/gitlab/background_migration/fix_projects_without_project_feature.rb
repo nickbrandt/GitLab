@@ -39,7 +39,7 @@ module Gitlab
               SELECT projects.id,
                 20, 20, 20, 20, 20, 20, 20,
                 #{pages_access_level},
-                NOW(), NOW()
+                TIMEZONE('UTC', NOW()), TIMEZONE('UTC', NOW())
               FROM projects
               WHERE projects.id BETWEEN #{Integer(from_id)} AND #{Integer(to_id)}
               AND NOT EXISTS (
