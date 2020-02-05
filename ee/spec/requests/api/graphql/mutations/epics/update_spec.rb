@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Updating an Epic' do
+describe Mutations::Epics::Update do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
@@ -133,5 +133,10 @@ describe 'Updating an Epic' do
           errors: ['The list of epic attributes is empty']
       end
     end
+  end
+
+  it_behaves_like 'updating health status' do
+    let(:resource) { epic }
+    let(:user) { current_user }
   end
 end
