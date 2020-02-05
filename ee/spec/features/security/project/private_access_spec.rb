@@ -44,7 +44,7 @@ describe '[EE] Private Project Access' do
     it { is_expected.to be_allowed_for(:auditor) }
   end
 
-  describe "GET /:project_path/commit/:sha" do
+  describe "GET /:project_path/-/commit/:sha" do
     subject { project_commit_path(project, project.repository.commit) }
 
     it { is_expected.to be_allowed_for(:auditor) }
