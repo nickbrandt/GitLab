@@ -1,4 +1,4 @@
-import { isString, isNumber } from 'underscore';
+import { isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
@@ -89,14 +89,6 @@ export const transformRawStages = (stages = []) =>
 export const transformRawTasksByTypeData = (data = []) => {
   if (!data.length) return [];
   return data.map(d => convertObjectPropsToCamelCase(d, { deep: true }));
-};
-
-export const nestQueryStringKeys = (obj = null, targetKey = '') => {
-  if (!obj || !isString(targetKey) || !targetKey.length) return {};
-  return Object.entries(obj).reduce((prev, [key, value]) => {
-    const customKey = `${targetKey}[${key}]`;
-    return { ...prev, [customKey]: value };
-  }, {});
 };
 
 /**

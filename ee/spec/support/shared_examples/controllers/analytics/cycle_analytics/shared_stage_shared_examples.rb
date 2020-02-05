@@ -113,12 +113,30 @@ RSpec.shared_examples 'cycle analytics data endpoint examples' do
     end
   end
 
+  context 'when `created_before` is missing' do
+    before do
+      params.delete(:created_before)
+    end
+
+    it 'succeeds' do
+      Timecop.travel '2019-04-01' do
+        subject
+
+        expect(response).to be_successful
+      end
+    end
+  end
+
   context 'when `created_after` is missing' do
     before do
       params.delete(:created_after)
     end
 
-    include_examples 'example for invalid parameter'
+    it 'succeeds' do
+      subject
+
+      expect(response).to be_successful
+    end
   end
 
   context 'when `created_after` is invalid' do
@@ -129,15 +147,7 @@ RSpec.shared_examples 'cycle analytics data endpoint examples' do
     include_examples 'example for invalid parameter'
   end
 
-  context 'when `created_before` is missing' do
-    before do
-      params.delete(:created_before)
-    end
-
-    include_examples 'example for invalid parameter'
-  end
-
-  context 'when `created_after` is invalid' do
+  context 'when `created_before` is invalid' do
     before do
       params[:created_before] = 'not-a-date'
     end

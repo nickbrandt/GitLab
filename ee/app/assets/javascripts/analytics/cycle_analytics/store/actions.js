@@ -6,7 +6,6 @@ import { __ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
-import { nestQueryStringKeys } from '../utils';
 
 const removeError = () => {
   const flashEl = document.querySelector('.flash-alert');
@@ -224,10 +223,10 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
   } = getters;
   dispatch('requestGroupStagesAndEvents');
 
-  return Api.cycleAnalyticsGroupStagesAndEvents(
-    fullPath,
-    nestQueryStringKeys({ start_date: created_after, project_ids }, 'cycle_analytics'),
-  )
+  return Api.cycleAnalyticsGroupStagesAndEvents(fullPath, {
+    start_date: created_after,
+    project_ids,
+  })
     .then(({ data }) => dispatch('receiveGroupStagesAndEventsSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({

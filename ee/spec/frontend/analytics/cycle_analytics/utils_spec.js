@@ -7,7 +7,6 @@ import {
   eventToOption,
   eventsByIdentifier,
   getLabelEventsIdentifiers,
-  nestQueryStringKeys,
   flattenDurationChartData,
   getDurationChartData,
   getDurationChartMedianData,
@@ -123,32 +122,6 @@ describe('Cycle analytics utils', () => {
         expect(eventsByIdentifier(events, items)).toEqual([]);
       });
       expect(eventsByIdentifier([], labelEvents)).toEqual([]);
-    });
-  });
-
-  describe('nestQueryStringKeys', () => {
-    const targetKey = 'foo';
-    const obj = { bar: 10, baz: 'awesome', qux: false, boo: ['lol', 'something'] };
-
-    it('will return an object with each key nested under the targetKey', () => {
-      expect(nestQueryStringKeys(obj, targetKey)).toEqual({
-        'foo[bar]': 10,
-        'foo[baz]': 'awesome',
-        'foo[qux]': false,
-        'foo[boo]': ['lol', 'something'],
-      });
-    });
-
-    it('returns an empty object if the targetKey is not a valid string', () => {
-      ['', null, {}, []].forEach(badStr => {
-        expect(nestQueryStringKeys(obj, badStr)).toEqual({});
-      });
-    });
-
-    it('will return an empty object if given an empty object', () => {
-      [{}, null, [], ''].forEach(tarObj => {
-        expect(nestQueryStringKeys(tarObj, targetKey)).toEqual({});
-      });
     });
   });
 
