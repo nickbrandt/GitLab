@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'promote issue to epic' do
       it 'user promotes issue to an epic' do
         Flow::Login.sign_in
