@@ -115,12 +115,6 @@ module EE
           .last
       end
 
-      def any_report_artifact_for_type(file_type)
-        return unless available_licensed_report_type?(file_type)
-
-        job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
-      end
-
       def expose_license_scanning_data?
         return unless available_licensed_report_type?(:license_management)
 

@@ -62,63 +62,6 @@ describe Ci::Pipeline do
     end
   end
 
-  shared_examples 'unlicensed report type' do
-    context 'when there is no licensed feature for artifact file type' do
-      it 'returns the artifact' do
-        expect(subject).to eq(expected)
-      end
-    end
-  end
-
-  shared_examples 'licensed report type' do |feature|
-    context 'when licensed features is NOT available' do
-      it 'returns nil' do
-        allow(pipeline.project).to receive(:feature_available?)
-          .with(feature).and_return(false)
-
-        expect(subject).to be_nil
-      end
-    end
-
-    context 'when licensed feature is available' do
-      it 'returns the artifact' do
-        allow(pipeline.project).to receive(:feature_available?)
-          .with(feature).and_return(true)
-
-        expect(subject).to eq(expected)
-      end
-    end
-  end
-
-  shared_examples 'multi-licensed report type' do |features|
-    context 'when NONE of the licensed features are available' do
-      it 'returns nil' do
-        features.each do |feature|
-          allow(pipeline.project).to receive(:feature_available?)
-            .with(feature).and_return(false)
-        end
-
-        expect(subject).to be_nil
-      end
-    end
-
-    context 'when at least one licensed feature is available' do
-      features.each do |feature|
-        it 'returns the artifact' do
-          allow(pipeline.project).to receive(:feature_available?)
-              .with(feature).and_return(true)
-
-          features.reject { |f| f == feature }.each do |disabled_feature|
-            allow(pipeline.project).to receive(:feature_available?)
-              .with(disabled_feature).and_return(true)
-          end
-
-          expect(subject).to eq(expected)
-        end
-      end
-    end
-  end
-
   describe '#batch_lookup_report_artifact_for_file_type' do
     subject(:artifact) { pipeline.batch_lookup_report_artifact_for_file_type(file_type) }
 
@@ -167,34 +110,6 @@ describe Ci::Pipeline do
           it 'returns artifact' do
             is_expected.to be_kind_of Ci::JobArtifact
           end
-        end
-      end
-    end
-  end
-
-  describe '#any_report_artifact_for_type' do
-    let!(:build) { create(:ci_build, pipeline: pipeline) }
-
-    let!(:artifact) do
-      create(:ci_job_artifact,
-        job: build,
-        file_type: file_type,
-        file_format: ::Ci::JobArtifact::TYPE_AND_FORMAT_PAIRS[file_type])
-    end
-
-    subject { pipeline.any_report_artifact_for_type(file_type) }
-
-    described_class::REPORT_LICENSED_FEATURES.each do |file_type, licensed_features|
-      context "for file_type: #{file_type}" do
-        let(:file_type) { file_type }
-        let(:expected) { artifact }
-
-        if licensed_features.nil?
-          it_behaves_like 'unlicensed report type'
-        elsif licensed_features.size == 1
-          it_behaves_like 'licensed report type', licensed_features.first
-        else
-          it_behaves_like 'multi-licensed report type', licensed_features
         end
       end
     end
