@@ -36,14 +36,30 @@ class Gitlab::Seeder::Vulnerabilities
   private
 
   def create_vulnerability
-    project.vulnerabilities.create!(
-      state: random_state,
+    vulnerability = project.vulnerabilities.build(
       author: author,
       title: 'Cypher with no integrity',
       severity: random_severity_level,
       confidence: random_confidence_level,
       report_type: random_report_type
     )
+    vulnerability = set_random_vulnerability_state(vulnerability)
+    vulnerability.save!
+    vulnerability
+  end
+
+  def set_random_vulnerability_state(vulnerability)
+    state = ::Vulnerability.states.keys.sample
+    vulnerability.state = state
+    case state
+    when "resolved"
+      vulnerability.resolved_by = vulnerability.author
+      vulnerability.resolved_at = Time.now
+    when "dismissed"
+      vulnerability.closed_by = vulnerability.author
+      vulnerability.closed_at = Time.now
+    end
+    vulnerability
   end
 
   def create_occurrence(vulnerability, rank, primary_identifier)
@@ -117,10 +133,6 @@ class Gitlab::Seeder::Vulnerabilities
 
   def random_report_type
     ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.sample
-  end
-
-  def random_state
-    ::Vulnerability.states.keys.sample
   end
 
   def metadata(line)
