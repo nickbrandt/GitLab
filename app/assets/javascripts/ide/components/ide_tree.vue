@@ -32,33 +32,31 @@ export default {
 </script>
 
 <template>
-  <div class="multi-file-commit-panel-inner-content">
-    <ide-tree-list viewer-type="editor">
-      <template slot="header">
-        {{ __('Edit') }}
-        <div class="ide-tree-actions ml-auto d-flex">
-          <new-entry-button
-            :label="__('New file')"
-            :show-label="false"
-            class="d-flex border-0 p-0 mr-3 qa-new-file"
-            icon="doc-new"
-            @click="openNewEntryModal({ type: 'blob' })"
-          />
-          <upload
-            :show-label="false"
-            class="d-flex mr-3"
-            button-css-classes="border-0 p-0"
-            @create="createTempEntry"
-          />
-          <new-entry-button
-            :label="__('New directory')"
-            :show-label="false"
-            class="d-flex border-0 p-0"
-            icon="folder-new"
-            @click="openNewEntryModal({ type: 'tree' })"
-          />
-        </div>
-      </template>
-    </ide-tree-list>
-  </div>
+  <ide-tree-list viewer-type="editor" class="multi-file-commit-panel-inner-content">
+    <template slot="header">
+      {{ __('Edit') }}
+      <div class="ide-tree-actions ml-auto d-flex">
+        <new-entry-button
+          :label="__('New file')"
+          :show-label="false"
+          class="d-flex border-0 p-0 mr-3 qa-new-file"
+          icon="doc-new"
+          @click="openNewEntryModal({ type: 'blob' })"
+        />
+        <upload
+          :show-label="false"
+          class="d-flex mr-3"
+          button-css-classes="border-0 p-0"
+          @create="createTempEntry"
+        />
+        <new-entry-button
+          :label="__('New directory')"
+          :show-label="false"
+          class="d-flex border-0 p-0"
+          icon="folder-new"
+          @click="openNewEntryModal({ type: 'tree' })"
+        />
+      </div>
+    </template>
+  </ide-tree-list>
 </template>
