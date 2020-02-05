@@ -93,7 +93,6 @@ export default {
       nameGap: X_AXIS_TITLE_OFFSET,
     },
   },
-  today: dateFormat(new Date(), CHART_DATE_FORMAT),
   get chartTitles() {
     const today = dateFormat(new Date(), CHART_DATE_FORMAT);
     const pastDate = timeScale =>
