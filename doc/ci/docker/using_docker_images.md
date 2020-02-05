@@ -229,6 +229,11 @@ test:2.7:
   - bundle exec rake spec
 ```
 
+Pinning images by digest (more detail in Docker's [Images: Tagging vs Digests](https://success.docker.com/article/images-tagging-vs-digests)) is accomplished with syntax like:
+```yaml
+image: ruby:2.6@sha256:a1a2ed1092c70ae6a7faf79863ccd5fe42ef696be49cb8e4f7c9dcf8a7e8b259
+```
+
 Or you can pass some [extended configuration options](#extended-docker-configuration-options)
 for `image` and `services`:
 
