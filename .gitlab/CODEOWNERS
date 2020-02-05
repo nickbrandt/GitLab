@@ -28,9 +28,13 @@ lib/gitlab/github_import/ @gitlab-org/maintainers/database
 /ee/app/models/project_alias.rb @patrickbajao
 /ee/lib/api/project_aliases.rb @patrickbajao
 
+# Quality owned files
+/qa/ @gl-quality
+
 # Engineering Productivity owned files
 /.gitlab-ci.yml @gl-quality/eng-prod
 /.gitlab/ci/ @gl-quality/eng-prod
+/.gitlab/CODEOWNERS @gl-quality/eng-prod
 Dangerfile @gl-quality/eng-prod
 /danger/ @gl-quality/eng-prod
 /lib/gitlab/danger/ @gl-quality/eng-prod
