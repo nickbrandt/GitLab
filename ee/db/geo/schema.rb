@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `rails
-# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
-# be faster and is potentially less error prone than running all of your
-# migrations from scratch. Old migrations may fail to apply correctly if those
-# migrations use external dependencies or application code.
+# Note that this schema.rb definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using db:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_21_194300) do
+ActiveRecord::Schema.define(version: 2019_10_25_194337) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,19 +89,6 @@ ActiveRecord::Schema.define(version: 2020_01_21_194300) do
     t.index ["lfs_object_id"], name: "index_lfs_object_registry_on_lfs_object_id", unique: true
     t.index ["retry_at"], name: "index_lfs_object_registry_on_retry_at"
     t.index ["success"], name: "index_lfs_object_registry_on_success"
-  end
-
-  create_table "package_file_registry", id: :serial, force: :cascade do |t|
-    t.integer "package_file_id", null: false
-    t.integer "state", default: 0, null: false
-    t.integer "retry_count", default: 0
-    t.string "last_sync_failure", limit: 255
-    t.datetime_with_timezone "retry_at"
-    t.datetime_with_timezone "last_synced_at"
-    t.datetime_with_timezone "created_at", null: false
-    t.index ["package_file_id"], name: "index_package_file_registry_on_repository_id"
-    t.index ["retry_at"], name: "index_package_file_registry_on_retry_at"
-    t.index ["state"], name: "index_package_file_registry_on_state"
   end
 
   create_table "project_registry", id: :serial, force: :cascade do |t|

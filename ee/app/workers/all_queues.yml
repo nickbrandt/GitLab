@@ -189,12 +189,6 @@
   :latency_sensitive: 
   :resource_boundary: :unknown
   :weight: 1
-- :name: geo:geo_event
-  :feature_category: :geo_replication
-  :has_external_dependencies: 
-  :latency_sensitive: 
-  :resource_boundary: :unknown
-  :weight: 1
 - :name: geo:geo_file_download
   :feature_category: :geo_replication
   :has_external_dependencies: 

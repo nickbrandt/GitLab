@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
-  include ::Gitlab::Geo::ReplicableModel
 
   delegate :project, :project_id, to: :package
   delegate :conan_file_type, to: :conan_file_metadatum
@@ -29,10 +28,7 @@ class Packages::PackageFile < ApplicationRecord
 
   mount_uploader :file, Packages::PackageFileUploader
 
-  with_replicator Geo::PackageFileReplicator
-
   after_save :update_file_store, if: :saved_change_to_file?
-  after_create_commit -> { replicator.publish_created_event }
 
   def update_file_store
     # The file.object_store is set during `uploader.store!`
