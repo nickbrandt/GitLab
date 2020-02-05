@@ -3,7 +3,6 @@
 require 'optparse'
 require 'logger'
 require 'time'
-require 'concurrent'
 
 module Gitlab
   module SidekiqCluster
@@ -46,12 +45,11 @@ module Gitlab
 
         all_queues = SidekiqConfig::CliMethods.worker_queues(@rails_path)
 
-        # When using the experimental Queue query syntax,
-        # we treat each queue group as a worker attribute
-        # query, and resolve the queues for the queue group
-        # using this query.
+        # When using the experimental queue query syntax, we treat each queue
+        # group as a worker attribute query, and resolve the queues for the
+        # queue group using this query.
         if @queue_query_syntax
-          queue_groups.map! { |queues| SidekiqConfig.query_workers(queues).map(&:queue) }
+          queue_groups = argv.map { |queues| SidekiqConfig.query_workers(queues).map(&:queue) }
         else
           queue_groups.map! { |queues| SidekiqConfig::CliMethods.expand_queues(queues, all_queues) }
         end
@@ -158,7 +156,7 @@ module Gitlab
             @rails_path = path
           end
 
-          opt.on('--[-no-]-experimental-queue-query-syntax', 'Run workers based on the provided selector') do |queue_query_syntax|
+          opt.on('--queue-query-syntax', 'EXPERIMENTAL: Run workers based on the provided selector') do |queue_query_syntax|
             @queue_query_syntax = queue_query_syntax
           end
 

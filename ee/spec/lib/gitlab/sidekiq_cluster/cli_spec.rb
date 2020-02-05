@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fast_spec_helper'
+require 'rspec-parameterized'
 
 describe Gitlab::SidekiqCluster::CLI do
   let(:cli) { described_class.new('/dev/null') }
@@ -75,6 +76,69 @@ describe Gitlab::SidekiqCluster::CLI do
                                               .and_return([])
 
           cli.run(%w(cronjob))
+        end
+      end
+
+      context 'with --queue-query-syntax' do
+        where do
+          {
+            'memory-bound queues' => {
+              query: 'resource_boundary=memory',
+              included_queues: %w(project_export),
+              excluded_queues: %w(merge)
+            },
+            'memory- or CPU-bound queues' => {
+              query: 'resource_boundary=memory|cpu',
+              included_queues: %w(auto_merge:auto_merge_process project_export),
+              excluded_queues: %w(merge)
+            },
+            'latency-sensitive CI queues' => {
+              query: 'feature_category=continuous_integration,latency_sensitive=true',
+              included_queues: %w(pipeline_cache:expire_job_cache pipeline_cache:expire_pipeline_cache),
+              excluded_queues: %w(merge)
+            },
+            'CPU-bound latency-sensitive CI queues' => {
+              query: 'feature_category=continuous_integration,latency_sensitive=true,resource_boundary=cpu',
+              included_queues: %w(pipeline_cache:expire_pipeline_cache),
+              excluded_queues: %w(pipeline_cache:expire_job_cache merge)
+            },
+            'CPU-bound latency-sensitive non-CI queues' => {
+              query: 'feature_category!=continuous_integration,latency_sensitive=true,resource_boundary=cpu',
+              included_queues: %w(new_issue),
+              excluded_queues: %w(pipeline_cache:expire_pipeline_cache)
+            },
+            'CI and SCM queues' => {
+              query: 'feature_category=continuous_integration feature_category=source_code_management',
+              included_queues: %w(pipeline_cache:expire_job_cache merge),
+              excluded_queues: %w(mailers)
+            }
+          }
+        end
+
+        with_them do
+          it 'expands queues by attributes' do
+            expect(Gitlab::SidekiqCluster).to receive(:start) do |queues, opts|
+              expect(opts).to eq(default_options)
+              expect(queues.first).to include(*included_queues)
+              expect(queues.first).not_to include(*excluded_queues)
+
+              []
+            end
+
+            cli.run(%W(--queue-query-syntax #{query}))
+          end
+
+          it 'works when negated' do
+            expect(Gitlab::SidekiqCluster).to receive(:start) do |queues, opts|
+              expect(opts).to eq(default_options)
+              expect(queues.first).not_to include(*included_queues)
+              expect(queues.first).to include(*excluded_queues)
+
+              []
+            end
+
+            cli.run(%W(--negate --queue-query-syntax #{query}))
+          end
         end
       end
     end
