@@ -17,7 +17,7 @@ module Packages
     private
 
     def create_dependency(type)
-      return unless dependencies.key?(type)
+      return unless dependencies[type].is_a?(Hash)
 
       names_and_version_patterns = dependencies[type]
       existing_ids, existing_names = find_existing_ids_and_names(names_and_version_patterns)

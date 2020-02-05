@@ -1,0 +1,5 @@
+---
+title: Fix npm package uploads when bundleDependencies is set to false
+merge_request: 24355
+author:
+type: fixed
