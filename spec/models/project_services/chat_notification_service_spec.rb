@@ -74,5 +74,41 @@ describe ChatNotificationService do
         chat_service.execute(data)
       end
     end
+
+    context 'with channel specified' do
+      let(:channel1) { 'slack-integration' }
+      let(:channel2) { '#slack-test' }
+
+      before do
+        allow(chat_service).to receive(:push_channel).and_return(channel)
+      end
+
+      context 'with single channel name' do
+        let(:channel) { channel1 }
+
+        it 'notifies one channel' do
+          expect(chat_service).to receive(:notify).with(any_args, hash_including(channel: [channel1])).and_return(true)
+          expect(chat_service.execute(data)).to be(true)
+        end
+      end
+
+      context 'with multiple channel names' do
+        let(:channel) { [channel1, channel2].join(',') }
+
+        it 'notifies all channels' do
+          expect(chat_service).to receive(:notify).with(any_args, hash_including(channel: [channel1, channel2])).and_return(true)
+          expect(chat_service.execute(data)).to be(true)
+        end
+      end
+
+      context 'with multiple channel names with spaces' do
+        let(:channel) { [channel1, channel2].join(', ') }
+
+        it 'notifies all channels' do
+          expect(chat_service).to receive(:notify).with(any_args, hash_including(channel: [channel1, channel2])).and_return(true)
+          expect(chat_service.execute(data)).to be(true)
+        end
+      end
+    end
   end
 end
