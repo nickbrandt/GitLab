@@ -59,7 +59,7 @@ describe('ProjectsPipelinesChartsApp', () => {
       it('renders with the correct data', () => {
         const charts = wrapper.findAll(PipelinesAreaChart);
 
-        for (let i = 0; i < charts.length; i = i + 1) {
+        for (let i = 0; i < charts.length; i += 1) {
           const chart = charts.at(i);
 
           expect(chart.exists()).toBeTruthy();
