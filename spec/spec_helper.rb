@@ -121,9 +121,9 @@ RSpec.configure do |config|
   config.include ExpectRequestWithStatus, type: :request
   config.include RailsHelpers
 
-  if ENV['CI']
+  if ENV['CI'] || ENV['RETRIES']
     # This includes the first try, i.e. tests will be run 4 times before failing.
-    config.default_retry_count = 4
+    config.default_retry_count = ENV.fetch('RETRIES', 3).to_i + 1
     config.reporter.register_listener(
       RspecFlaky::Listener.new,
       :example_passed,
