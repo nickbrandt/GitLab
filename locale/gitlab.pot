@@ -8981,9 +8981,6 @@ msgstr ""
 msgid "Geo|Status"
 msgstr ""
 
-msgid "Geo|Sync"
-msgstr ""
-
 msgid "Geo|Synced"
 msgstr ""
 
