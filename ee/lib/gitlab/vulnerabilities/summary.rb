@@ -60,11 +60,13 @@ module Gitlab
       end
 
       def project_ids_to_fetch
-        project_ids = vulnerable.is_a?(Project) ? [vulnerable.id] : []
+        return [vulnerable.id] if vulnerable.is_a?(Project)
 
-        return filters[:project_id] + project_ids if filters.key?('project_id')
-
-        vulnerable.is_a?(Group) ? vulnerable.project_ids_with_security_reports : project_ids
+        if filters.key?('project_id')
+          vulnerable.project_ids_with_security_reports & filters[:project_id].map(&:to_i)
+        else
+          vulnerable.project_ids_with_security_reports
+        end
       end
     end
   end

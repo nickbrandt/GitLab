@@ -3,7 +3,7 @@
 RSpec.shared_examples Vulnerable do
   include VulnerableHelpers
 
-  let(:external_project) { as_external_vulnerable_project(vulnerable) }
+  let(:external_project) { create(:project) }
   let(:failed_pipeline) { create(:ci_pipeline, :failed, project: vulnerable_project) }
 
   let!(:old_vuln) { create_vulnerability(vulnerable_project) }

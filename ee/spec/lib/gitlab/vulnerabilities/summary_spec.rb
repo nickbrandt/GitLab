@@ -60,6 +60,15 @@ describe Gitlab::Vulnerabilities::Summary do
           expect(counter[:high]).to eq(2)
         end
       end
+
+      context 'when a project_id param is passed' do
+        let(:filters) { ActionController::Parameters.new({ project_id: [project1.id.to_s] }) }
+
+        it 'only fetches findings for the given projects' do
+          expect(counter[:high]).to eq(0)
+          expect(counter[:medium]).to eq(1)
+        end
+      end
     end
 
     def create_vulnerabilities(count, project, options = {})

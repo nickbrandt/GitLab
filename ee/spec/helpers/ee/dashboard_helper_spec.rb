@@ -58,9 +58,9 @@ describe DashboardHelper, type: :helper do
       end
 
       where(:ability, :feature_flag, :nav_link) do
-        :read_operations_dashboard                    | nil                     | :operations
-        :read_operations_dashboard                    | :environments_dashboard | :environments
-        :read_application_instance_security_dashboard | :security_dashboard     | :security
+        :read_operations_dashboard        | nil                     | :operations
+        :read_operations_dashboard        | :environments_dashboard | :environments
+        :read_instance_security_dashboard | :security_dashboard     | :security
       end
 
       with_them do
@@ -120,10 +120,9 @@ describe DashboardHelper, type: :helper do
 
           def stub_resource_visibility(feature_flag, read_other_resources:, read_security_dashboard:, security_dashboard_available:)
             if feature_flag == :security_dashboard
-              app_instance = double(ApplicationInstance, feature_available?: security_dashboard_available)
-              allow(ApplicationInstance).to receive(:new).and_return(app_instance)
+              stub_licensed_features(feature_flag => security_dashboard_available)
 
-              allow(helper).to receive(:can?).with(user, ability, app_instance).and_return(read_security_dashboard)
+              allow(helper).to receive(:can?).and_return(read_security_dashboard)
             else
               allow(helper).to receive(:can?).with(user, ability).and_return(read_other_resources)
             end
