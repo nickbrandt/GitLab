@@ -1,3 +1,7 @@
+# When adding a group as a code owner, make sure to invite the group to the
+# project here: https://gitlab.com/gitlab-org/gitlab/-/project_members
+# As described in https://docs.gitlab.com/ee/user/project/code_owners.html
+
 # Backend Maintainers are the default for all ruby files
 *.rb @gitlab-org/maintainers/rails-backend
 *.rake @gitlab-org/maintainers/rails-backend
