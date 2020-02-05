@@ -170,6 +170,20 @@ describe Project do
         expect(described_class.with_active_prometheus_service).not_to include(project_without_active_prometheus_service)
       end
     end
+
+    describe '.find_by_service_desk_project_key' do
+      it 'returns the correct project' do
+        project2 = create(:project)
+        create(:service_desk_setting, project: project, project_key: 'key1')
+        create(:service_desk_setting, project: project2, project_key: 'key2')
+
+        expect(Project.find_by_service_desk_project_key('key2')).to eq(project2)
+      end
+
+      it 'returns nil if there is no project with the key' do
+        expect(Project.find_by_service_desk_project_key('some_key')).to be_nil
+      end
+    end
   end
 
   describe 'validations' do
