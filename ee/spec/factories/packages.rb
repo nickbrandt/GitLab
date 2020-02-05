@@ -170,7 +170,6 @@ FactoryBot.define do
       file { fixture_file_upload('ee/spec/fixtures/nuget/package.nupkg') }
       file_name { 'package.nupkg' }
       file_sha1 { '5fe852b2a6abd96c22c11fa1ff2fb19d9ce58b57' }
-      file_type { 0 }
       size { 300.kilobytes }
     end
 
