@@ -3,7 +3,7 @@
 module VulnerableHelpers
   class BadVulnerableError < StandardError
     def message
-      'The given vulnerable must be either `Project`, `Namespace`, or `ApplicationInstance`'
+      'The given vulnerable must be either `Project`, `Namespace`, or `InstanceSecurityDashboard`'
     end
   end
 
@@ -13,21 +13,8 @@ module VulnerableHelpers
       vulnerable
     when Namespace
       create(:project, namespace: vulnerable)
-    when ApplicationInstance
-      create(:project)
-    else
-      raise BadVulnerableError
-    end
-  end
-
-  def as_external_vulnerable_project(vulnerable)
-    case vulnerable
-    when Project
-      create(:project)
-    when Namespace
-      create(:project)
-    when ApplicationInstance
-      nil
+    when InstanceSecurityDashboard
+      Project.find(vulnerable.project_ids_with_security_reports.first)
     else
       raise BadVulnerableError
     end

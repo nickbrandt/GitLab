@@ -62,11 +62,11 @@ module EE
     end
 
     def security_dashboard_available?
-      app_instance = ApplicationInstance.new
+      security_dashboard = InstanceSecurityDashboard.new(current_user)
 
       ::Feature.enabled?(:security_dashboard, default_enabled: true) &&
-        app_instance.feature_available?(:security_dashboard) &&
-        can?(current_user, :read_application_instance_security_dashboard, app_instance)
+        security_dashboard.feature_available?(:security_dashboard) &&
+        can?(current_user, :read_instance_security_dashboard, security_dashboard)
     end
   end
 end

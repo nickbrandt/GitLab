@@ -16,7 +16,10 @@ module Security
     end
 
     def vulnerable
-      @vulnerable ||= ApplicationInstance.new
+      @vulnerable ||= InstanceSecurityDashboard.new(
+        current_user,
+        project_ids: params.fetch(:project_id, [])
+      )
     end
   end
 end
