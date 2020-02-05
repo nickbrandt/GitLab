@@ -18,7 +18,7 @@ export default () => {
 
       axios
         .post(data.pathLocksToggle, {
-          path: router.currentRoute.params.pathMatch.replace(/^\//, ''),
+          path: router.currentRoute.params.path.replace(/^\//, ''),
         })
         .then(() => window.location.reload())
         .catch(() => {
