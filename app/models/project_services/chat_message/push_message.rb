@@ -48,7 +48,7 @@ module ChatMessage
     end
 
     def format(string)
-      Slack::Notifier::LinkFormatter.format(string)
+      Slack::Notifier::Util::LinkFormatter.format(string)
     end
 
     def commit_messages

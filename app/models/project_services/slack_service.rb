@@ -36,7 +36,10 @@ class SlackService < ChatNotificationService
 
     def notify(message, opts)
       # See https://github.com/stevenosloan/slack-notifier#custom-http-client
-      notifier = Slack::Notifier.new(webhook, opts.merge(http_client: HTTPClient))
+      notifier = Slack::Notifier.new(webhook) do
+        http_client HTTPClient
+        defaults opts
+      end
 
       notifier.ping(
         message.pretext,

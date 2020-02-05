@@ -59,7 +59,7 @@ module ChatMessage
     end
 
     def format(string)
-      Slack::Notifier::LinkFormatter.format(format_relative_links(string))
+      Slack::Notifier::Util::LinkFormatter.format(format_relative_links(string))
     end
 
     def format_relative_links(string)

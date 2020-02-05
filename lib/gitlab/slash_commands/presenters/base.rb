@@ -63,7 +63,7 @@ module Gitlab
 
         # Convert Markdown to slacks format
         def format(string)
-          Slack::Notifier::LinkFormatter.format(string)
+          Slack::Notifier::Util::LinkFormatter.format(string)
         end
 
         def resource_url
