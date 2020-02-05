@@ -24,6 +24,7 @@ module EE
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
+        has_many :security_scans, class_name: 'Security::Scan', through: :builds
 
         has_one :source_bridge, through: :source_pipeline, source: :source_bridge
 
