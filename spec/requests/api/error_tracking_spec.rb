@@ -55,6 +55,14 @@ describe API::ErrorTracking do
           expect(json_response['error'])
             .to eq('active is invalid')
         end
+
+        it 'returns 400 if active is empty' do
+          make_patch_request(active: '')
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['error'])
+            .to eq('active is empty')
+        end
       end
 
       context 'without a project setting' do

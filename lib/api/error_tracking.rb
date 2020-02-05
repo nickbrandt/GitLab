@@ -29,7 +29,7 @@ module API
         success Entities::ErrorTracking::ProjectSetting
       end
       params do
-        requires :active, type: Boolean, desc: 'Specifying whether to enable or disable error tracking settings'
+        requires :active, type: Boolean, desc: 'Specifying whether to enable or disable error tracking settings', allow_blank: false
       end
 
       patch ':id/error_tracking/settings/' do
