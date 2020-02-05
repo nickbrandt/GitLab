@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+
+require_relative '../../replicators/geo/package_file_replicator.rb'
+
 class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
   include ::Gitlab::Geo::ReplicableModel
