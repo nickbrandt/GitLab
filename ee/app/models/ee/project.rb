@@ -196,6 +196,12 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+
+      def find_by_service_desk_project_key(key)
+        # project_key is not indexed for now
+        # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
+        joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
+      end
     end
 
     def can_store_security_reports?

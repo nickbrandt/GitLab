@@ -4,8 +4,15 @@ require 'spec_helper'
 
 describe ServiceDeskSetting do
   describe 'validations' do
+    subject(:service_desk_setting) { create(:service_desk_setting) }
+
     it { is_expected.to validate_presence_of(:project_id) }
     it { is_expected.to validate_length_of(:outgoing_name).is_at_most(255) }
+    it { is_expected.to validate_length_of(:project_key).is_at_most(255) }
+    it { is_expected.to validate_uniqueness_of(:project_key) }
+    it { is_expected.to allow_value('abc123_').for(:project_key) }
+    it { is_expected.not_to allow_value('abc 12').for(:project_key) }
+    it { is_expected.not_to allow_value('Big val').for(:project_key) }
 
     describe '.valid_issue_template' do
       let_it_be(:project) { create(:project, :custom_repo, files: { '.gitlab/issue_templates/service_desk.md' => 'template' }) }
