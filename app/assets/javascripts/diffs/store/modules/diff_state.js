@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { getParameterValues } from '~/lib/utils/url_utility';
-import { INLINE_DIFF_VIEW_TYPE, DIFF_VIEW_COOKIE_NAME } from '../../constants';
+import { INLINE_DIFF_VIEW_TYPE, DIFF_VIEW_COOKIE_NAME, DIFFS_PER_PAGE } from '../../constants';
 
 const viewTypeFromQueryString = getParameterValues('view')[0];
 const viewTypeFromCookie = Cookies.get(DIFF_VIEW_COOKIE_NAME);
@@ -10,6 +10,7 @@ export default () => ({
   isLoading: true,
   isBatchLoading: false,
   retrievingBatches: false,
+  batchPageSize: (gon && gon.diffs_batch_page_size) || DIFFS_PER_PAGE,
   addedLines: null,
   removedLines: null,
   endpoint: '',

@@ -34,7 +34,6 @@ import {
   START_RENDERING_INDEX,
   INLINE_DIFF_LINES_KEY,
   PARALLEL_DIFF_LINES_KEY,
-  DIFFS_PER_PAGE,
 } from '../constants';
 import { diffViewerModes } from '~/ide/constants';
 
@@ -100,7 +99,7 @@ export const fetchDiffFiles = ({ state, commit }) => {
 
 export const fetchDiffFilesBatch = ({ commit, state }) => {
   const urlParams = {
-    per_page: DIFFS_PER_PAGE,
+    per_page: state.batchPageSize,
     w: state.showWhitespace ? '0' : '1',
   };
 
