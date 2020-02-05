@@ -51,6 +51,33 @@ describe Elastic::Latest::GitInstanceProxy do
     end
   end
 
+  describe '#elastic_search_as_found_blob' do
+    let(:params) do
+      {
+        page: 2,
+        per: 30,
+        options: { foo: :bar }
+      }
+    end
+
+    it 'provides repository_id if not provided' do
+      expected_params = params.deep_dup
+      expected_params[:options][:repository_id] = project.id
+
+      expect(subject.class).to receive(:elastic_search_as_found_blob).with('foo', expected_params)
+
+      subject.elastic_search_as_found_blob('foo', params)
+    end
+
+    it 'uses provided repository_id' do
+      params[:options][:repository_id] = 42
+
+      expect(subject.class).to receive(:elastic_search_as_found_blob).with('foo', params)
+
+      subject.elastic_search_as_found_blob('foo', params)
+    end
+  end
+
   describe '#delete_index_for_commits_and_blobs' do
     let(:write_targets) { [double(:write_target_1), double(:write_target_2)] }
     let(:read_target) { double(:read_target) }

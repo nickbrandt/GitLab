@@ -16,8 +16,16 @@ module Elastic
       end
 
       def elastic_search(query, type: :all, page: 1, per: 20, options: {})
-        options[:repository_id] = repository_id if options[:repository_id].nil?
+        options = repository_specific_options(options)
+
         self.class.elastic_search(query, type: type, page: page, per: per, options: options)
+      end
+
+      # @return [Kaminari::PaginatableArray]
+      def elastic_search_as_found_blob(query, page: 1, per: 20, options: {})
+        options = repository_specific_options(options)
+
+        self.class.elastic_search_as_found_blob(query, page: page, per: per, options: options)
       end
 
       def delete_index_for_commits_and_blobs(wiki: false)
@@ -61,6 +69,14 @@ module Elastic
 
       def repository_id
         raise NotImplementedError
+      end
+
+      def repository_specific_options(options)
+        if options[:repository_id].nil?
+          options = options.merge(repository_id: repository_id)
+        end
+
+        options
       end
     end
   end

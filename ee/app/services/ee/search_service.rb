@@ -7,8 +7,7 @@ module EE
     # doesn't seem to be a common ancestor to check.
     REDACTABLE_RESULTS = [
       Kaminari::PaginatableArray,
-      Elasticsearch::Model::Response::Records,
-      Elasticsearch::Model::Response::Response
+      Elasticsearch::Model::Response::Records
     ].freeze
 
     # This is a proper method instead of a `delegate` in order to

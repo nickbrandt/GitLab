@@ -37,9 +37,9 @@ module Gitlab
         when 'notes'
           eager_load(notes, page, eager: { project: [:route, :namespace] })
         when 'blobs'
-          blobs.page(page).per(per_page)
+          blobs(page: page, per_page: per_page)
         when 'wiki_blobs'
-          wiki_blobs.page(page).per(per_page)
+          wiki_blobs(page: page, per_page: per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
         when 'users'
@@ -112,7 +112,7 @@ module Gitlab
         false
       end
 
-      def self.parse_search_result(result)
+      def self.parse_search_result(result, project)
         ref = result["_source"]["blob"]["commit_sha"]
         path = result["_source"]["blob"]["path"]
         extname = File.extname(path)
@@ -156,6 +156,7 @@ module Gitlab
           ref: ref,
           startline: from + 1,
           data: data.join,
+          project: project,
           project_id: project_id
         )
       end
@@ -225,7 +226,7 @@ module Gitlab
         end
       end
 
-      def blobs
+      def blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:blobs) do
@@ -233,15 +234,16 @@ module Gitlab
             additional_filter: repository_filter(limit_project_ids)
           )
 
-          Repository.elastic_search(
+          Repository.__elasticsearch__.elastic_search_as_found_blob(
             query,
-            type: :blob,
-            options: options.merge({ highlight: true })
-          )[:blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page,
+            options: options
+          )
         end
       end
 
-      def wiki_blobs
+      def wiki_blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:wiki_blobs) do
@@ -249,11 +251,12 @@ module Gitlab
             additional_filter: wiki_filter(limit_project_ids)
           )
 
-          ProjectWiki.elastic_search(
+          ProjectWiki.__elasticsearch__.elastic_search_as_wiki_page(
             query,
-            type: :wiki_blob,
-            options: options.merge({ highlight: true })
-          )[:wiki_blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page,
+            options: options
+          )
         end
       end
 
