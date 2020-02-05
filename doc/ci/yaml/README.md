@@ -651,7 +651,6 @@ With `only`, individual keys are logically joined by an OR:
 
 > NOT((any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active))
 
-
 #### `only:refs`/`except:refs`
 
 > `refs` policy introduced in GitLab 10.0.
