@@ -11,7 +11,8 @@ module EE
         downstream_bridge_project_not_found: 'This job could not be executed because downstream bridge project could not be found.',
         upstream_bridge_project_not_found: 'This job could not be executed because upstream bridge project could not be found.',
         invalid_bridge_trigger: 'This job could not be executed because downstream pipeline trigger definition is invalid.',
-        bridge_pipeline_is_child_pipeline: 'This job belongs to a child pipeline and cannot create further child pipelines.'
+        bridge_pipeline_is_child_pipeline: 'This job belongs to a child pipeline and cannot create further child pipelines.',
+        downstream_pipeline_creation_failed: 'The downstream pipeline could not be created.'
       ).freeze
 
       EE::CommitStatusPresenter.private_constant :EE_CALLOUT_FAILURE_MESSAGES

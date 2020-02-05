@@ -18,7 +18,7 @@ module Ci
         current_user,
         pipeline_params.fetch(:target_revision))
 
-      service.execute(
+      downstream_pipeline = service.execute(
         pipeline_params.fetch(:source), pipeline_params[:execute_params]) do |pipeline|
           @bridge.sourced_pipelines.build(
             source_pipeline: @bridge.pipeline,
@@ -28,6 +28,10 @@ module Ci
 
           pipeline.variables.build(@bridge.downstream_variables)
         end
+
+      downstream_pipeline.tap do |pipeline|
+        @bridge.drop!(:downstream_pipeline_creation_failed) if pipeline.has_yaml_errors?
+      end
     end
 
     private
