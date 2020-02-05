@@ -259,6 +259,8 @@ class Deployment < ApplicationRecord
   end
 
   def forward?
+    return true unless environment.last_deployment
+
     self.id > environment.last_deployment.id
   end
 

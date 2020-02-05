@@ -554,31 +554,43 @@ describe Deployment do
 
   describe '#forward?' do
     let_it_be(:project) { create(:project, :repository) }
-    let_it_be(:environment) { create(:environment, project: project) }
-    let(:last_deployment) { create(:deployment, environment: environment ) }
+    let(:environment) { create(:environment, project: project) }
+    let(:last_deployment) { create(:deployment, :success, environment: environment ) }
     let(:deployment) { create(:deployment, environment: environment) }
 
     subject { deployment.forward? }
 
-    context 'when this deployment is later than the environment last deployment' do
+    context 'when there is no last deployment for this environment' do
       it 'is true' do
-        last_deployment
         deployment
-
-        allow(environment).to receive(:last_deployment).and_return(last_deployment)
 
         is_expected.to be_truthy
       end
     end
 
     context 'when this deployment is later than the environment last deployment' do
-      it 'is false' do
+      it 'is true' do
+        last_deployment
+        deployment
+
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when this deployment is older than the environment last deployment' do
+      before do
         deployment
         last_deployment
+      end
 
-        allow(environment).to receive(:last_deployment).and_return(last_deployment)
+      context 'and this last deployment is running' do
+        let(:last_deployment) { create(:deployment, :running, environment: environment ) }
 
-        is_expected.to be_falsey
+        it { is_expected.to be_truthy }
+      end
+
+      context 'and this last deployment is successful' do
+        it { is_expected.to be_falsey }
       end
     end
   end
