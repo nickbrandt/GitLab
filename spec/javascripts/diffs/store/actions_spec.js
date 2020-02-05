@@ -167,7 +167,7 @@ describe('DiffsStoreActions', () => {
       testAction(
         fetchDiffFilesBatch,
         {},
-        { endpointBatch },
+        { endpointBatch, batchPageSize: DIFFS_PER_PAGE },
         [
           { type: types.SET_BATCH_LOADING, payload: true },
           { type: types.SET_RETRIEVING_BATCHES, payload: true },
