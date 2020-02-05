@@ -19,7 +19,7 @@ describe Issue, :elastic do
     end
 
     context 'when the project is not enabled specifically' do
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns false' do
           expect(issue.searchable?).to be_falsey
         end
@@ -31,7 +31,7 @@ describe Issue, :elastic do
         create :elasticsearch_indexed_project, project: project
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           expect(issue.searchable?).to be_truthy
         end
@@ -45,7 +45,7 @@ describe Issue, :elastic do
         create :elasticsearch_indexed_namespace, namespace: group
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           project = create :project, name: 'test1', group: group
           issue = create :issue, project: project

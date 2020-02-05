@@ -12,7 +12,7 @@ describe EpicTreeSorting do
   let!(:epic2) { create(:epic, parent: base_epic, group: group, relative_position: 1000) }
   let!(:epic3) { create(:epic, parent: base_epic, group: group, relative_position: 1001) }
 
-  context '#move_after' do
+  describe '#move_after' do
     it 'moves an epic' do
       epic1.move_after(epic_issue2)
 
@@ -27,7 +27,7 @@ describe EpicTreeSorting do
     end
   end
 
-  context '#move_before' do
+  describe '#move_before' do
     it 'moves an epic' do
       epic2.move_before(epic_issue2)
 
@@ -41,7 +41,7 @@ describe EpicTreeSorting do
     end
   end
 
-  context '#move_between' do
+  describe '#move_between' do
     it 'moves an epic' do
       epic1.move_between(epic_issue1, epic_issue2)
 
@@ -55,7 +55,7 @@ describe EpicTreeSorting do
     end
   end
 
-  context '#move_sequence' do
+  describe '#move_sequence' do
     let!(:epic_issue1) { create(:epic_issue, epic: base_epic, relative_position: 1000) }
     let!(:epic_issue2) { create(:epic_issue, epic: base_epic, relative_position: 1001) }
     let!(:epic_issue3) { create(:epic_issue, epic: base_epic, relative_position: 1004) }

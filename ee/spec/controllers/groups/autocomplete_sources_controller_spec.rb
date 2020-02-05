@@ -13,7 +13,7 @@ describe Groups::AutocompleteSourcesController do
     sign_in(user)
   end
 
-  context '#epics' do
+  describe '#epics' do
     it 'returns 200 status' do
       get :epics, params: { group_id: group }
 
@@ -30,7 +30,7 @@ describe Groups::AutocompleteSourcesController do
     end
   end
 
-  context '#milestones' do
+  describe '#milestones' do
     it 'returns correct response' do
       parent_group = create(:group, :private)
       group.update!(parent: parent_group)
@@ -49,7 +49,7 @@ describe Groups::AutocompleteSourcesController do
     end
   end
 
-  context '#commands' do
+  describe '#commands' do
     it 'returns 200 status' do
       get :commands, params: { group_id: group, type: 'Epic', type_id: epic.iid }
 

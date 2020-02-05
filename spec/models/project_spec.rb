@@ -4966,7 +4966,7 @@ describe Project do
     end
   end
 
-  context '#members_among' do
+  describe '#members_among' do
     let(:users) { create_list(:user, 3) }
 
     set(:group) { create(:group) }

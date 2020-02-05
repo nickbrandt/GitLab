@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::ContributionAnalytics::DataCollector do
-  context '#totals' do
+  describe '#totals' do
     it 'collects event counts grouped by users by calling #base_query' do
       group = create(:group)
       user = create(:user)

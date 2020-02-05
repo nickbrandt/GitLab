@@ -19,7 +19,7 @@ describe ApprovalWrappedAnyApproverRule do
     create(:approval, merge_request: merge_request, user: approver2)
   end
 
-  context '#approvals_approvers' do
+  describe '#approvals_approvers' do
     it 'contains every approved user' do
       expect(subject.approved_approvers).to contain_exactly(approver1, approver2)
     end

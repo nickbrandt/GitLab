@@ -82,7 +82,7 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
       end
     end
 
-    context '#include' do
+    describe '#include' do
       context 'with simple include' do
         let(:config) { { include: 'path/to/config.yml' } }
 

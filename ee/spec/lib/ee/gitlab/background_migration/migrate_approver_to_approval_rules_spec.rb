@@ -195,7 +195,7 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
         end
       end
 
-      context '#sync_code_owners_with_approvers' do
+      describe '#sync_code_owners_with_approvers' do
         let(:owners) { create_list(:user, 2) }
 
         before do

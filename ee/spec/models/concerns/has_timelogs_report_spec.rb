@@ -7,7 +7,7 @@ describe HasTimelogsReport do
   let(:group)     { create(:group) }
   let(:issue)     { create(:issue, project: create(:project, :public, group: group)) }
 
-  context '#timelogs' do
+  describe '#timelogs' do
     let!(:timelog1) { create_timelog(15.days.ago) }
     let!(:timelog2) { create_timelog(10.days.ago) }
     let!(:timelog3) { create_timelog(5.days.ago) }
@@ -31,7 +31,7 @@ describe HasTimelogsReport do
     end
   end
 
-  context '#user_can_access_group_timelogs?' do
+  describe '#user_can_access_group_timelogs?' do
     before do
       group.add_developer(user)
       stub_licensed_features(group_timelogs: true)

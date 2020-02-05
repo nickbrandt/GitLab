@@ -47,7 +47,7 @@ describe Projects::UpdateService, '#execute' do
       }
     end
 
-    context '#name' do
+    describe '#name' do
       include_examples 'audit event logging' do
         let!(:old_name) { project.full_name }
         let(:operation) { update_project(project, user, name: 'foobar') }
@@ -67,7 +67,7 @@ describe Projects::UpdateService, '#execute' do
       end
     end
 
-    context '#path' do
+    describe '#path' do
       include_examples 'audit event logging' do
         let(:operation) { update_project(project, user, path: 'foobar1') }
         let(:fail_condition!) do
@@ -86,7 +86,7 @@ describe Projects::UpdateService, '#execute' do
       end
     end
 
-    context '#visibility' do
+    describe '#visibility' do
       include_examples 'audit event logging' do
         let(:operation) do
           update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)

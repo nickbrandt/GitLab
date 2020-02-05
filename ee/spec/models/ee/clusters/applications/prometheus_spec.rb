@@ -16,7 +16,7 @@ describe Clusters::Applications::Prometheus do
     end
   end
 
-  context '#updated_since?' do
+  describe '#updated_since?' do
     let(:cluster) { create(:cluster) }
     let(:prometheus_app) { build(:clusters_applications_prometheus, cluster: cluster) }
     let(:timestamp) { Time.now - 5.minutes }

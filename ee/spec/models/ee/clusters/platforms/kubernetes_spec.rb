@@ -310,7 +310,7 @@ describe Clusters::Platforms::Kubernetes do
       end
     end
 
-    context '#reactive_cache_updated' do
+    describe '#reactive_cache_updated' do
       let(:opts) do
         {
           'environment_id' => environment.id,

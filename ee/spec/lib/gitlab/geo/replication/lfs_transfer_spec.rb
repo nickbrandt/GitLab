@@ -13,7 +13,7 @@ describe Gitlab::Geo::Replication::LfsTransfer do
     described_class.new(lfs_object)
   end
 
-  context '#download_from_primary' do
+  describe '#download_from_primary' do
     before do
       stub_current_geo_node(secondary_node)
     end
