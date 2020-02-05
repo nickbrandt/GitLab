@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Group issue boards' do
       let(:board_1) { "Board-#{SecureRandom.hex(4)}" }
       let(:board_2) { "Board-#{SecureRandom.hex(4)}" }

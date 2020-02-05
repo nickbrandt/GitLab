@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Issues list' do
       let(:project) do
         Resource::Project.fabricate_via_api! do |project|
