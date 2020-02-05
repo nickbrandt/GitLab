@@ -7,7 +7,7 @@
 #   2. Performs Sidekiq job synchronously
 #
 # @example
-#   bundle exec rake "gitlab:import_export:import[root, root, imported_project, /path/to/file.tar.gz]"
+#   bundle exec rake "gitlab:import_export:import[root, root, imported_project, /path/to/file.tar.gz, true]"
 #
 namespace :gitlab do
   namespace :import_export do
