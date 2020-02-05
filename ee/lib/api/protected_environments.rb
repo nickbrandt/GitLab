@@ -8,17 +8,13 @@ module API
 
     before { authorize_admin_project }
 
-    before do
-      not_found! unless Feature.enabled?(:protected_environments_api, user_project)
-    end
-
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc "Get a project's protected environments" do
-        detail 'This feature is gated by the :protected_environments_api feature flag.'
+        detail 'This feature was introduced in GitLab 12.8.'
         success ::EE::API::Entities::ProtectedEnvironment
       end
       params do
@@ -31,7 +27,7 @@ module API
       end
 
       desc 'Get a single protected environment' do
-        detail 'This feature is gated by the :protected_environments_api feature flag.'
+        detail 'This feature was introduced in GitLab 12.8.'
         success ::EE::API::Entities::ProtectedEnvironment
       end
       params do
@@ -42,7 +38,7 @@ module API
       end
 
       desc 'Protect a single environment' do
-        detail 'This feature is gated by the :protected_environments_api feature flag.'
+        detail 'This feature was introduced in GitLab 12.8.'
         success ::EE::API::Entities::ProtectedEnvironment
       end
       params do
@@ -77,7 +73,7 @@ module API
       end
 
       desc 'Unprotect a single environment' do
-        detail 'This feature is gated by the :protected_environments_api feature flag.'
+        detail 'This feature was introduced in GitLab 12.8.'
       end
       params do
         requires :name, type: String, desc: 'The name of the protected environment'

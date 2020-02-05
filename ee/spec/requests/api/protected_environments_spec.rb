@@ -39,14 +39,6 @@ describe API::ProtectedEnvironments do
         protected_environment_names = json_response.map { |x| x['name'] }
         expect(protected_environment_names).to match_array([protected_environment_name])
       end
-
-      context 'when feature is disabled' do
-        before do
-          stub_feature_flags(protected_environments_api: false)
-        end
-
-        it_behaves_like '404 response'
-      end
     end
 
     it_behaves_like 'requests for non-maintainers'
