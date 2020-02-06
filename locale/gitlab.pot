@@ -13963,6 +13963,9 @@ msgstr ""
 msgid "Preferences|Layout width"
 msgstr ""
 
+msgid "Preferences|Must be a number between %{min} and %{max}"
+msgstr ""
+
 msgid "Preferences|Navigation theme"
 msgstr ""
 
@@ -13979,6 +13982,9 @@ msgid "Preferences|Sourcegraph"
 msgstr ""
 
 msgid "Preferences|Syntax highlighting theme"
+msgstr ""
+
+msgid "Preferences|Tab width"
 msgstr ""
 
 msgid "Preferences|These settings will update how dates and times are displayed for you."

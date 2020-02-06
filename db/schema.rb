@@ -4142,6 +4142,7 @@ ActiveRecord::Schema.define(version: 2020_02_04_131054) do
     t.boolean "sourcegraph_enabled"
     t.boolean "setup_for_company"
     t.boolean "render_whitespace_in_code"
+    t.integer "tab_width", limit: 2
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true
   end
 
