@@ -10,10 +10,9 @@ module QA
               attribute :assignee
 
               def api_post_body
-                {
-                  board_id: board.id,
+                super.merge({
                   assignee_id: assignee.id
-                }
+                })
               end
             end
           end
