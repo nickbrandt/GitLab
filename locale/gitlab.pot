@@ -618,6 +618,9 @@ msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 month"
+msgstr ""
+
 msgid "1 open issue"
 msgid_plural "%{issues} open issues"
 msgstr[0] ""
@@ -653,9 +656,6 @@ msgid "10-19 contributions"
 msgstr ""
 
 msgid "1st contribution!"
-msgstr ""
-
-msgid "2 weeks"
 msgstr ""
 
 msgid "20-29 contributions"
