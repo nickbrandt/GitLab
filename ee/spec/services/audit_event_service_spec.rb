@@ -85,6 +85,16 @@ describe AuditEventService do
       it 'creates an event' do
         expect { service.security_event }.to change(SecurityEvent, :count).by(1)
       end
+
+      context 'on a read-only instance' do
+        before do
+          allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+        end
+
+        it 'does not create an event' do
+          expect { service.security_event }.not_to change(SecurityEvent, :count)
+        end
+      end
     end
   end
 
