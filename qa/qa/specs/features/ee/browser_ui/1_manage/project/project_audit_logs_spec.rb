@@ -80,7 +80,7 @@ module QA
         it_behaves_like 'project audit event logs', ["Change visibility from public to internal"]
       end
 
-      context "Export file download" do
+      context "Export file download", quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/202249' do
         before do
           project.visit!
 
