@@ -116,12 +116,6 @@ module EE
           .last
       end
 
-      def any_report_artifact_for_type(file_type)
-        return unless available_licensed_report_type?(file_type)
-
-        job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
-      end
-
       def expose_license_scanning_data?
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
