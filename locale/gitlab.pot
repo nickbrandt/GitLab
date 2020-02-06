@@ -14587,6 +14587,9 @@ msgstr ""
 msgid "Project path"
 msgstr ""
 
+msgid "Project scanning help page"
+msgstr ""
+
 msgid "Project security status"
 msgstr ""
 
@@ -20402,6 +20405,21 @@ msgid "Unresolve discussion"
 msgstr ""
 
 msgid "Unresolve thread"
+msgstr ""
+
+msgid "UnscannedProjects|Default branch scanning by project"
+msgstr ""
+
+msgid "UnscannedProjects|Out of date"
+msgstr ""
+
+msgid "UnscannedProjects|Project scanning"
+msgstr ""
+
+msgid "UnscannedProjects|Untested"
+msgstr ""
+
+msgid "UnscannedProjects|Your projects are up do date! Nice job!"
 msgstr ""
 
 msgid "Unschedule job"
