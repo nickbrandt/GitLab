@@ -113,7 +113,7 @@ export default {
         />
         <apollo-mutation
           v-else
-          v-slot="{ mutate, loading }"
+          v-slot="{ mutate, loading, error }"
           :mutation="$options.createNoteMutation"
           :variables="{
             input: mutationPayload,
