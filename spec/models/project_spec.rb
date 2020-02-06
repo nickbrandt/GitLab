@@ -5507,6 +5507,18 @@ describe Project do
     end
   end
 
+  describe '#limited_protected_branches' do
+    let(:project) { create(:project) }
+    let!(:protected_branch) { create(:protected_branch, project: project) }
+    let!(:another_protected_branch) { create(:protected_branch, project: project) }
+
+    subject { project.limited_protected_branches(1) }
+
+    it 'returns limited number of protected branches based on specified limit' do
+      expect(subject).to eq([another_protected_branch])
+    end
+  end
+
   def rugged_config
     rugged_repo(project.repository).config
   end
