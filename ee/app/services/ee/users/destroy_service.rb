@@ -11,7 +11,9 @@ module EE
           mirror_cleanup(delete_user)
         end
 
-        log_audit_event(user) if result.destroyed?
+        log_audit_event(user) if result
+
+        result
       end
 
       def mirror_cleanup(user)

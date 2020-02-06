@@ -3,6 +3,17 @@
 require 'spec_helper'
 
 describe Users::DestroyService do
+  let(:current_user) { create(:admin) }
+  let(:user) { create(:user) }
+
+  subject(:service) { described_class.new(current_user) }
+
+  it 'returns result' do
+    allow(user).to receive(:destroy).and_return(user)
+
+    expect(service.execute(user)).to eq(user)
+  end
+
   context 'when project is a mirror' do
     it 'assigns mirror_user to a project owner' do
       mirror_user = create(:user)
@@ -18,11 +29,6 @@ describe Users::DestroyService do
   end
 
   describe 'audit events' do
-    let(:current_user) { create(:admin) }
-    let(:user) { create(:user) }
-
-    subject(:service) { described_class.new(current_user) }
-
     before do
       stub_licensed_features(admin_audit_log: true)
     end
@@ -44,7 +50,7 @@ describe Users::DestroyService do
 
       context 'when user destroy operation fails' do
         before do
-          allow(user).to receive(:destroy).and_return(user)
+          allow(user).to receive(:destroy).and_return(false)
         end
 
         it 'logs audit events for ghost user migration operation' do
@@ -72,7 +78,7 @@ describe Users::DestroyService do
 
       context 'when user destroy operation fails' do
         before do
-          allow(user).to receive(:destroy).and_return(user)
+          allow(user).to receive(:destroy).and_return(false)
         end
 
         it 'does not log any audit event' do
