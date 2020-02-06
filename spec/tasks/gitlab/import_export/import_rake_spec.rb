@@ -82,7 +82,7 @@ describe 'gitlab:import_export:import rake task' do
       let(:measurement_enabled) { false }
 
       it 'output measurement results' do
-        expect { subject }.to_not output(/Measuring enabled.../).to_stdout
+        expect { subject }.not_to output(/Measuring enabled.../).to_stdout
       end
     end
 
