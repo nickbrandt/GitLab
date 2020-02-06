@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :group_saml, :orchestrated, :requires_admin do
+  # These tests are temporarily skipped due to: https://gitlab.com/gitlab-org/gitlab-qa/-/merge_requests/379
+  context 'Manage', :group_saml, :orchestrated, :requires_admin, :skip do
     describe 'Group SAML SSO' do
       include Support::Api
 
