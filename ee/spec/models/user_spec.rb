@@ -74,16 +74,6 @@ describe User do
       end
     end
 
-    describe 'bots & humans' do
-      it 'returns corresponding users' do
-        human = create(:user)
-        bot = create(:user, :bot)
-
-        expect(described_class.humans).to match_array([human])
-        expect(described_class.bots).to match_array([bot])
-      end
-    end
-
     describe 'with_invalid_expires_at_tokens' do
       it 'only includes users with invalid tokens' do
         valid_pat = create(:personal_access_token, expires_at: 7.days.from_now)
