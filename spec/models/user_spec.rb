@@ -4128,7 +4128,7 @@ describe User, :do_not_mock_admin_mode do
   end
 
   describe 'internal methods' do
-    let!(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
     let!(:ghost) { described_class.ghost }
     let!(:alert_bot) { described_class.alert_bot }
     let!(:non_internal) { [user] }
