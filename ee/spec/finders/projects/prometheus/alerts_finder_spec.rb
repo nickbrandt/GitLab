@@ -99,12 +99,52 @@ describe Projects::Prometheus::AlertsFinder do
 
           it { is_expected.to be_empty }
         end
+
+        context 'with matching id' do
+          before do
+            params[:id] = alert.id
+          end
+
+          it { is_expected.to eq([alert]) }
+        end
+
+        context 'with a nil id' do
+          before do
+            params[:id] = nil
+          end
+
+          it { is_expected.to eq([alert, alert2]) }
+        end
       end
 
       context 'with non-matching project-environment pair' do
         before do
           params[:project] = project
           params[:environment] = other_env
+        end
+
+        it { is_expected.to be_empty }
+      end
+
+      context 'with id' do
+        before do
+          params[:id] = alert.id
+        end
+
+        it { is_expected.to eq([alert]) }
+      end
+
+      context 'with multiple ids' do
+        before do
+          params[:id] = [alert.id, other_alert.id]
+        end
+
+        it { is_expected.to eq([alert, other_alert]) }
+      end
+
+      context 'with non-matching id' do
+        before do
+          params[:id] = -5
         end
 
         it { is_expected.to be_empty }
@@ -123,7 +163,7 @@ describe Projects::Prometheus::AlertsFinder do
 
     it 'raises an error' do
       expect { subject }
-        .to raise_error(ArgumentError, 'Please provide either :project or :environment, or both')
+        .to raise_error(ArgumentError, 'Please provide one or more of the following params: :project, :environment, :id')
     end
   end
 end

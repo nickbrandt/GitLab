@@ -355,6 +355,30 @@ describe Projects::Prometheus::AlertsController do
     it_behaves_like 'project non-specific metric', :not_found
   end
 
+  describe 'GET #metrics_dashboard' do
+    let!(:alert) do
+      create(:prometheus_alert,
+             project: project,
+             environment: environment,
+             prometheus_metric: metric)
+    end
+
+    it 'returns a json object with the correct keys' do
+      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response.keys).to contain_exactly('dashboard', 'status')
+    end
+
+    it 'is the correct embed' do
+      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+
+      title = json_response['dashboard']['panel_groups'][0]['panels'][0]['title']
+
+      expect(title).to eq(metric.title)
+    end
+  end
+
   def project_params(opts = {})
     opts.reverse_merge(namespace_id: project.namespace, project_id: project)
   end

@@ -2,7 +2,8 @@
 
 module Projects
   module Prometheus
-    # Find Prometheus alerts by +project+, by +environment+, or both.
+    # Find Prometheus alerts by +project+, +environment+, +id+,
+    # or any combo thereof.
     #
     # Optionally filter by +metric+.
     #
@@ -13,9 +14,9 @@ module Projects
     #     metric: PrometheusMetric | integer
     class AlertsFinder
       def initialize(params = {})
-        unless params[:project] || params[:environment]
+        unless params[:project] || params[:environment] || params[:id]
           raise ArgumentError,
-            'Please provide either :project or :environment, or both'
+            'Please provide one or more of the following params: :project, :environment, :id'
         end
 
         @params = params
@@ -28,6 +29,7 @@ module Projects
         relation = by_project(PrometheusAlert)
         relation = by_environment(relation)
         relation = by_metric(relation)
+        relation = by_id(relation)
         relation = ordered(relation)
 
         relation
@@ -53,6 +55,12 @@ module Projects
         return relation unless params[:metric]
 
         relation.for_metric(params[:metric])
+      end
+
+      def by_id(relation)
+        return relation unless params[:id]
+
+        relation.id_in(params[:id])
       end
 
       def ordered(relation)
