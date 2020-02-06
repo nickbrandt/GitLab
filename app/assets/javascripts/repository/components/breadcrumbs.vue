@@ -45,7 +45,7 @@ export default {
     currentPath: {
       type: String,
       required: false,
-      default: '/',
+      default: '',
     },
     canCollaborate: {
       type: Boolean,
@@ -107,7 +107,7 @@ export default {
             return acc.concat({
               name,
               path,
-              to: `/-/tree/${escape(this.ref)}${path}`,
+              to: `/-/tree/${escape(this.ref)}${escape(path)}`,
             });
           },
           [
@@ -133,7 +133,7 @@ export default {
           },
           {
             attrs: {
-              href: `${this.newBlobPath}${this.currentPath}`,
+              href: `${this.newBlobPath}/${this.currentPath ? escape(this.currentPath) : ''}`,
               class: 'qa-new-file-option',
             },
             text: __('New file'),
