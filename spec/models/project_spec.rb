@@ -156,6 +156,12 @@ describe Project do
         expect(project.pages_metadatum).to be_an_instance_of(ProjectPagesMetadatum)
         expect(project.pages_metadatum).to be_persisted
       end
+
+      it 'creates settings if needed when accessed' do
+        expect do
+          expect(project.settings).to be_persisted
+        end.to change { ProjectSettings.count }.by(1)
+      end
     end
 
     context 'updating cd_cd_settings' do
