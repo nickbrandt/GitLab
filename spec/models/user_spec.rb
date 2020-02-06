@@ -20,6 +20,9 @@ describe User, :do_not_mock_admin_mode do
 
   describe 'delegations' do
     it { is_expected.to delegate_method(:path).to(:namespace).with_prefix }
+
+    it { is_expected.to delegate_method(:tab_width).to(:user_preference) }
+    it { is_expected.to delegate_method(:tab_width=).to(:user_preference).with_arguments(5) }
   end
 
   describe 'associations' do
