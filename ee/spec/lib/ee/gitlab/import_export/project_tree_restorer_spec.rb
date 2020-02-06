@@ -70,8 +70,8 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
   end
 
   describe 'restoring design management data' do
-    let_it_be(:user) { create(:admin, username: 'user_1') }
-    let_it_be(:second_user) { create(:user, username: 'user_2' )}
+    let_it_be(:user) { create(:admin, email: 'user_1@gitlabexample.com') }
+    let_it_be(:second_user) { create(:user, email: 'user_2@gitlabexample.com') }
     let_it_be(:project) do
       create(:project, :builds_disabled, :issues_disabled,
              { name: 'project', path: 'project' })
@@ -91,9 +91,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     describe 'restores issue associations correctly' do
       let(:issue) { project.issues.offset(index).first }
 
-      where(:index, :design_filenames, :version_shas, :events, :author_usernames) do
-        0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6] | %w[creation creation creation modification modification deletion] | %w[user_1 user_1 user_2]
-        1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8] | %w[creation creation creation creation modification] | %w[user_1 user_2 user_2]
+      where(:index, :design_filenames, :version_shas, :events, :author_emails) do
+        0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6] | %w[creation creation creation modification modification deletion] | %w[user_1@gitlabexample.com user_1@gitlabexample.com user_2@gitlabexample.com]
+        1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8] | %w[creation creation creation creation modification] | %w[user_1@gitlabexample.com user_2@gitlabexample.com user_2@gitlabexample.com]
       end
 
       with_them do
@@ -101,7 +101,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
           expect(issue.designs.pluck(:filename)).to contain_exactly(*design_filenames)
           expect(issue.design_versions.pluck(:sha)).to contain_exactly(*version_shas)
           expect(issue.design_versions.flat_map(&:actions).map(&:event)).to contain_exactly(*events)
-          expect(issue.design_versions.map(&:author).map(&:username)).to contain_exactly(*author_usernames)
+          expect(issue.design_versions.map(&:author).map(&:email)).to contain_exactly(*author_emails)
         end
       end
     end
