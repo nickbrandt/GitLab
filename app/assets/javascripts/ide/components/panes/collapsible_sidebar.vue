@@ -85,6 +85,9 @@ export default {
     isActiveTab(tab) {
       return tab.views.some(view => this.isActiveView(view.name));
     },
+    sidebarClasses() {
+      return [`ide-${this.side}-sidebar`, this.side === 'right' ? '' : 'flex-row-reverse'];
+    },
     buttonClasses(tab) {
       return [
         this.side === 'right' ? 'is-right' : '',
@@ -98,7 +101,7 @@ export default {
 
 <template>
   <div
-    :class="`ide-${side}-sidebar`"
+    :class="sidebarClasses()"
     :data-qa-selector="`ide_${side}_sidebar`"
     class="multi-file-commit-panel ide-sidebar"
   >

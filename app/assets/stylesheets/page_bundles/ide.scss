@@ -1085,8 +1085,6 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-left-sidebar {
-  flex-direction: row-reverse;
-
   &.multi-file-commit-panel {
     padding-right: 0;
   }

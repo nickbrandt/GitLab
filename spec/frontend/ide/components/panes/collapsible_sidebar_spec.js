@@ -86,8 +86,10 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
           if (side === 'right') {
             // this class is only needed on the right side; there is no 'is-left'
             expect(button.classes()).toContain('is-right');
+            expect(wrapper.classes()).not.toContain('flex-row-reverse');
           } else {
             expect(button.classes()).not.toContain('is-right');
+            expect(wrapper.classes()).toContain('flex-row-reverse');
           }
         });
       });
