@@ -116,7 +116,7 @@ export default {
     <template v-else>
       <div v-if="hasLegacyAppLabel" class="bs-callout bs-callout-warning mb-0 mt-0">
         <span v-html="legacyLabelWarningMessage"></span>
-        <gl-link target="blank" :href="deployBoardsHelpPath">
+        <gl-link target="_blank" :href="deployBoardsHelpPath">
           <strong>{{ __('More Information') }}</strong>
         </gl-link>
       </div>
