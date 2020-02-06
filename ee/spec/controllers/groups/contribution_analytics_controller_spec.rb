@@ -45,7 +45,7 @@ describe Groups::ContributionAnalyticsController do
 
     get :show, params: { group_id: group.path }
 
-    expect(response).to have_gitlab_http_status(404)
+    expect(response).to have_gitlab_http_status(:not_found)
   end
 
   context 'unlicensed but we show promotions' do
@@ -60,14 +60,14 @@ describe Groups::ContributionAnalyticsController do
 
       get :show, params: { group_id: group.path }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
   it 'sets instance variables properly', :aggregate_failures do
     get :show, params: { group_id: group.path }
 
-    expect(response).to have_gitlab_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
 
     expect(assigns[:data_collector].users).to match_array([user, user2, user3])
     expect(assigns[:data_collector].total_events_by_author_count.values.sum).to eq(6)

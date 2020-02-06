@@ -42,7 +42,7 @@ describe Groups::ClustersController do
         it 'renders not found' do
           get :prometheus_proxy, params: prometheus_proxy_params
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         context 'with invalid clusterable id' do

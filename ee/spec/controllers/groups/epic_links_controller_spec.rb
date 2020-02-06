@@ -22,7 +22,7 @@ describe Groups::EpicLinksController do
     end
 
     it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -50,7 +50,7 @@ describe Groups::EpicLinksController do
         it 'returns the correct JSON response' do
           list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq(list_service_response.as_json)
         end
       end
@@ -61,7 +61,7 @@ describe Groups::EpicLinksController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -90,7 +90,7 @@ describe Groups::EpicLinksController do
           subject
           list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq('message' => nil, 'issuables' => list_service_response.as_json)
         end
 
@@ -103,7 +103,7 @@ describe Groups::EpicLinksController do
         it 'returns 403 status' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not update parent attribute' do
@@ -140,7 +140,7 @@ describe Groups::EpicLinksController do
         it 'returns status 200' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'updates the epic position' do
@@ -153,7 +153,7 @@ describe Groups::EpicLinksController do
           it 'returns status 404' do
             subject
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -162,7 +162,7 @@ describe Groups::EpicLinksController do
         it 'returns status 403' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end

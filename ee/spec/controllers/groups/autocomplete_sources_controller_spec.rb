@@ -17,7 +17,7 @@ describe Groups::AutocompleteSourcesController do
     it 'returns 200 status' do
       get :epics, params: { group_id: group }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'returns the correct response' do
@@ -41,7 +41,7 @@ describe Groups::AutocompleteSourcesController do
 
       get :milestones, params: { group_id: group }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response.count).to eq(1)
       expect(json_response.first).to include(
         'iid' => group_milestone.iid, 'title' => group_milestone.title
@@ -53,7 +53,7 @@ describe Groups::AutocompleteSourcesController do
     it 'returns 200 status' do
       get :commands, params: { group_id: group, type: 'Epic', type_id: epic.iid }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'returns the correct response' do

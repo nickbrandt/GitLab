@@ -25,7 +25,7 @@ describe Groups::EpicIssuesController do
     end
 
     it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -59,7 +59,7 @@ describe Groups::EpicIssuesController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -84,7 +84,7 @@ describe Groups::EpicIssuesController do
           subject
           list_service_response = EpicIssues::ListService.new(epic, user).execute
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq('message' => nil, 'issuables' => list_service_response.as_json)
         end
 
@@ -97,7 +97,7 @@ describe Groups::EpicIssuesController do
         it 'returns correct response for the correct issue reference' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not create a new EpicIssue record' do
