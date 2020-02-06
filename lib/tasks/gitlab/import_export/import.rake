@@ -27,7 +27,7 @@ namespace :gitlab do
         project_path:   args.project_path,
         username:       args.username,
         file_path:      args.archive_path,
-        measurement_enabled: args.measurement_enabled
+        measurement_enabled: args.measurement_enabled == 'true'
       ).import
     end
   end
@@ -39,7 +39,7 @@ class GitlabProjectImport
     @file_path    = opts.fetch(:file_path)
     @namespace    = Namespace.find_by_full_path(opts.fetch(:namespace_path))
     @current_user = User.find_by_username(opts.fetch(:username))
-    @measurement_enabled = opts.fetch(:measurement_enabled || false)
+    @measurement_enabled = opts.fetch(:measurement_enabled)
   end
 
   def import
@@ -119,7 +119,7 @@ class GitlabProjectImport
   end
 
   def measurement_enabled?
-    @measurement_enabled
+    @measurement_enabled != false
   end
 
   # We want to ensure that all Sidekiq jobs are executed
