@@ -120,6 +120,40 @@ compile-assets pull-cache as-if-foss:
     policy: pull
     key: "assets-compile:v9:foss"
 
+.frontend-fixtures-base:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .default-cache
+    - .default-before_script
+    - .use-pg9
+  stage: fixtures
+  needs: ["setup-test-env", "compile-assets pull-cache"]
+  script:
+    - date
+    - scripts/gitaly-test-spawn
+    - date
+    - bundle exec rake frontend:fixtures
+  artifacts:
+    name: frontend-fixtures
+    expire_in: 31d
+    when: always
+    paths:
+      - node_modules
+      - public/assets
+      - tmp/tests/frontend/
+
+frontend-fixtures:
+  extends:
+    - .frontend-fixtures-base
+    - .frontend:rules:default-frontend-jobs
+
+frontend-fixtures-as-if-foss:
+  extends:
+    - .frontend-fixtures-base
+    - .frontend:rules:default-frontend-jobs-as-if-foss
+    - .as-if-foss
+
 .frontend-job-base:
   extends:
     - .default-tags
@@ -128,7 +162,6 @@ compile-assets pull-cache as-if-foss:
     - .default-before_script
     - .use-pg9
   stage: test
-  needs: ["setup-test-env", "compile-assets pull-cache"]
 
 .karma-base:
   extends: .frontend-job-base
@@ -167,9 +200,6 @@ karma-as-if-foss:
 .jest-base:
   extends: .frontend-job-base
   script:
-    - scripts/gitaly-test-spawn
-    - date
-    - bundle exec rake frontend:fixtures
     - date
     - yarn jest --ci --coverage
   cache:
@@ -182,6 +212,7 @@ jest:
   extends:
     - .jest-base
     - .frontend:rules:default-frontend-jobs
+  needs: ["frontend-fixtures"]
   artifacts:
     name: coverage-frontend
     expire_in: 31d
@@ -198,6 +229,7 @@ jest-as-if-foss:
     - .jest-base
     - .frontend:rules:default-frontend-jobs-as-if-foss
     - .as-if-foss
+  needs: ["frontend-fixtures-as-if-foss"]
   cache:
     policy: pull
 
