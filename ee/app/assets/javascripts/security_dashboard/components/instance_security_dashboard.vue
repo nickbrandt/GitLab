@@ -52,6 +52,11 @@ export default {
       type: String,
       required: true,
     },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -143,6 +148,7 @@ export default {
           :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
           :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
           :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+          :vulnerable-projects-endpoint="vulnerableProjectsEndpoint"
         />
       </template>
     </template>

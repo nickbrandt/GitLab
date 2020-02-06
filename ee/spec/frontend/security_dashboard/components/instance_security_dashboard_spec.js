@@ -17,6 +17,7 @@ const vulnerabilitiesEndpoint = '/vulnerabilities';
 const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
+const vulnerableProjectsEndpoint = '/vulnerable_projects_endpoint';
 
 describe('Instance Security Dashboard component', () => {
   let store;
@@ -60,6 +61,7 @@ describe('Instance Security Dashboard component', () => {
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       },
     });
   };
@@ -164,6 +166,7 @@ describe('Instance Security Dashboard component', () => {
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       });
     });
 

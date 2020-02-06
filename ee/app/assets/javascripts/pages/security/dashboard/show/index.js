@@ -18,6 +18,7 @@ if (gon.features && gon.features.securityDashboard) {
       vulnerabilitiesEndpoint,
       vulnerabilitiesHistoryEndpoint,
       vulnerabilityFeedbackHelpPath,
+      vulnerableProjectsEndpoint,
     } = el.dataset;
     const router = createRouter();
     const store = createStore({ plugins: [projectSelector, syncWithRouter(router)] });
@@ -41,6 +42,7 @@ if (gon.features && gon.features.securityDashboard) {
             vulnerabilitiesEndpoint,
             vulnerabilitiesHistoryEndpoint,
             vulnerabilityFeedbackHelpPath,
+            vulnerableProjectsEndpoint,
           },
         });
       },
