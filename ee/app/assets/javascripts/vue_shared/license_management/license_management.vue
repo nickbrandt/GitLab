@@ -37,10 +37,10 @@ export default {
     this.setAPISettings({
       apiUrlManageLicenses: this.apiUrl,
     });
-    this.loadManagedLicenses();
+    this.fetchManagedLicenses();
   },
   methods: {
-    ...mapActions(['loadManagedLicenses', 'setAPISettings', 'setLicenseApproval']),
+    ...mapActions(['fetchManagedLicenses', 'setAPISettings', 'setLicenseApproval']),
     openAddLicenseForm() {
       this.formIsOpen = true;
     },

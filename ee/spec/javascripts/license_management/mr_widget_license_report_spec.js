@@ -51,8 +51,8 @@ describe('License Report MR Widget', () => {
 
   const defaultActions = {
     setAPISettings: () => {},
-    loadManagedLicenses: () => {},
-    loadParsedLicenseReport: () => {},
+    fetchManagedLicenses: () => {},
+    fetchParsedLicenseReport: () => {},
   };
 
   const mountComponent = ({
@@ -219,7 +219,9 @@ describe('License Report MR Widget', () => {
   it('should init store after mount', () => {
     const actions = {
       setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
-      loadParsedLicenseReport: jasmine.createSpy('loadParsedLicenseReport').and.callFake(() => {}),
+      fetchParsedLicenseReport: jasmine
+        .createSpy('fetchParsedLicenseReport')
+        .and.callFake(() => {}),
     };
     vm = mountComponent({ actions });
 
@@ -233,7 +235,7 @@ describe('License Report MR Widget', () => {
       undefined,
     );
 
-    expect(actions.loadParsedLicenseReport).toHaveBeenCalledWith(
+    expect(actions.fetchParsedLicenseReport).toHaveBeenCalledWith(
       jasmine.any(Object),
       undefined,
       undefined,
