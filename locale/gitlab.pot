@@ -361,6 +361,12 @@ msgstr ""
 msgid "%{percent}%{percentSymbol} complete"
 msgstr ""
 
+msgid "%{placeholder} is not a valid color scheme"
+msgstr ""
+
+msgid "%{placeholder} is not a valid theme"
+msgstr ""
+
 msgid "%{primary} (%{secondary})"
 msgstr ""
 
