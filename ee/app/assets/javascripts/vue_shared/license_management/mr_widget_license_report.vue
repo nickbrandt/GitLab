@@ -95,10 +95,10 @@ export default {
       licensesApiPath,
     });
 
-    this.loadParsedLicenseReport();
+    this.fetchParsedLicenseReport();
   },
   methods: {
-    ...mapActions(['setAPISettings', 'loadParsedLicenseReport']),
+    ...mapActions(['setAPISettings', 'fetchParsedLicenseReport']),
   },
 };
 </script>

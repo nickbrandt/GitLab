@@ -37,7 +37,7 @@ describe('LicenseManagement', () => {
         ...state,
       },
       actions: {
-        loadManagedLicenses: noop,
+        fetchManagedLicenses: noop,
         setAPISettings: noop,
         setLicenseApproval: noop,
         ...actionMocks,
@@ -111,13 +111,13 @@ describe('LicenseManagement', () => {
 
   it('should set api settings after mount and init API calls', () => {
     const setAPISettingsMock = jest.fn();
-    const loadManagedLicensesMock = jest.fn();
+    const fetchManagedLicensesMock = jest.fn();
 
     createComponent({
       state: { isLoadingManagedLicenses: false },
       actionMocks: {
         setAPISettings: setAPISettingsMock,
-        loadManagedLicenses: loadManagedLicensesMock,
+        fetchManagedLicenses: fetchManagedLicensesMock,
       },
     });
 
@@ -129,6 +129,6 @@ describe('LicenseManagement', () => {
       undefined,
     );
 
-    expect(loadManagedLicensesMock).toHaveBeenCalledWith(expect.any(Object), undefined, undefined);
+    expect(fetchManagedLicensesMock).toHaveBeenCalledWith(expect.any(Object), undefined, undefined);
   });
 });
