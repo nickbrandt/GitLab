@@ -7,7 +7,6 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
-      has_many :prometheus_alerts, inverse_of: :environment
       has_many :self_managed_prometheus_alert_events, inverse_of: :environment
 
       # Returns environments where its latest deployment is to a cluster
@@ -74,14 +73,6 @@ module EE
       rollout_status.instances.map do |instance|
         instance[:pod_name]
       end
-    end
-
-    def clear_prometheus_reactive_cache!(query_name)
-      cluster_prometheus_adapter&.clear_prometheus_reactive_cache!(query_name, self)
-    end
-
-    def cluster_prometheus_adapter
-      @cluster_prometheus_adapter ||= ::Gitlab::Prometheus::Adapter.new(project, deployment_platform&.cluster).cluster_prometheus_adapter
     end
 
     def protected?

@@ -31,8 +31,8 @@ describe PrometheusAlert do
   end
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project).required }
-    it { is_expected.to belong_to(:environment).required }
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:environment) }
   end
 
   describe 'project validations' do
@@ -42,6 +42,10 @@ describe PrometheusAlert do
     subject do
       build(:prometheus_alert, prometheus_metric: metric, environment: environment, project: project)
     end
+
+    it { is_expected.to validate_presence_of(:environment) }
+    it { is_expected.to validate_presence_of(:project) }
+    it { is_expected.to validate_presence_of(:prometheus_metric) }
 
     context 'when environment and metric belongs same project' do
       it { is_expected.to be_valid }

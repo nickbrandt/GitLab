@@ -9,9 +9,9 @@ class PrometheusAlert < ApplicationRecord
     gt: ">"
   }.freeze
 
-  belongs_to :environment, required: true, validate: true, inverse_of: :prometheus_alerts
-  belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alerts
-  belongs_to :prometheus_metric, required: true, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :environment, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :project, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :prometheus_metric, validate: true, inverse_of: :prometheus_alerts
 
   has_many :prometheus_alert_events, inverse_of: :prometheus_alert
   has_many :related_issues, through: :prometheus_alert_events
@@ -19,10 +19,11 @@ class PrometheusAlert < ApplicationRecord
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
 
+  validates :environment, :project, :prometheus_metric, presence: true
   validate :require_valid_environment_project!
   validate :require_valid_metric_project!
 
-  enum operator: [:lt, :eq, :gt]
+  enum operator: { lt: 0, eq: 1, gt: 2 }
 
   delegate :title, :query, to: :prometheus_metric
 
