@@ -1670,6 +1670,9 @@ msgstr ""
 msgid "An error occurred fetching the dropdown data."
 msgstr ""
 
+msgid "An error occurred loading code navigation"
+msgstr ""
+
 msgid "An error occurred previewing the blob"
 msgstr ""
 
@@ -9295,6 +9298,9 @@ msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
 msgid "Go to commits"
+msgstr ""
+
+msgid "Go to definition"
 msgstr ""
 
 msgid "Go to environments"
