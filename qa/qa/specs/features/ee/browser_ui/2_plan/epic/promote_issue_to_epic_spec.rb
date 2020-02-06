@@ -3,7 +3,7 @@
 module QA
   context 'Plan', :reliable do
     describe 'promote issue to epic' do
-      it 'user promotes issue to an epic' do
+      it 'promotes issue to epic' do
         Flow::Login.sign_in
 
         project = Resource::Project.fabricate_via_api! do |project|
