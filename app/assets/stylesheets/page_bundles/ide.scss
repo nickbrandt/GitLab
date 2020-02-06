@@ -757,6 +757,11 @@ $ide-commit-header-height: 48px;
     margin: 0 auto;
   }
 
+  &:hover {
+    color: $gl-text-color;
+    background-color: $gray-100;
+  }
+
   &:focus {
     color: $gl-text-color;
     background-color: $gray-200;
