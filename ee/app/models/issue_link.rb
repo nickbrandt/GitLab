@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class IssueLink < ApplicationRecord
+  include FromUnion
+
   belongs_to :source, class_name: 'Issue'
   belongs_to :target, class_name: 'Issue'
 
@@ -27,6 +29,13 @@ class IssueLink < ApplicationRecord
     else
       type
     end
+  end
+
+  def self.blocked_issue_ids(issue_ids)
+    from_union([
+      IssueLink.select('target_id as issue_id').where(link_type: IssueLink::TYPE_BLOCKS).where(target_id: issue_ids),
+      IssueLink.select('source_id as issue_id').where(link_type: IssueLink::TYPE_IS_BLOCKED_BY).where(source_id: issue_ids)
+    ]).pluck(:issue_id)
   end
 
   private
