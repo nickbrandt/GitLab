@@ -236,6 +236,9 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
     );
 };
 
+export const clearCustomStageFormErrors = ({ commit }) =>
+  commit(types.CLEAR_CUSTOM_STAGE_FORM_ERRORS);
+
 export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
 export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
   commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
@@ -244,19 +247,18 @@ export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { 
   return dispatch('fetchGroupStagesAndEvents').then(() => dispatch('fetchSummaryData'));
 };
 
-export const receiveCreateCustomStageError = ({ commit }, { error, data }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
+export const receiveCreateCustomStageError = ({ commit }, { status, message, errors, data }) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE, { status, message, errors, data });
 
   const { name } = data;
-  const { status } = error;
   // TODO: check for 403, 422 etc
   // Follow up issue to investigate https://gitlab.com/gitlab-org/gitlab/issues/36685
-  const message =
+  const flashMessage =
     status !== httpStatus.UNPROCESSABLE_ENTITY
       ? __(`'${name}' stage already exists'`)
       : __('There was a problem saving your custom stage, please try again');
 
-  createFlash(message);
+  createFlash(flashMessage);
 };
 
 export const createCustomStage = ({ dispatch, state }, data) => {
@@ -267,7 +269,14 @@ export const createCustomStage = ({ dispatch, state }, data) => {
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
     .then(response => dispatch('receiveCreateCustomStageSuccess', response))
-    .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
+    .catch(({ response }) => {
+      const {
+        data: { message, errors },
+        status,
+      } = response;
+
+      dispatch('receiveCreateCustomStageError', { data, message, errors, status });
+    });
 };
 
 export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {

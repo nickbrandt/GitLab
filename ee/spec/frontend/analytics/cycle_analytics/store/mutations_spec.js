@@ -52,7 +52,9 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}            | ${[]}
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'}            | ${[]}
     ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}              | ${true}
-    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}              | ${false}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS}   | ${'isSavingCustomStage'}              | ${false}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'isSavingCustomStage'}              | ${false}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'customStageFormErrors'}            | ${{ errors: [] }}
     ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'}        | ${true}
     ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'}        | ${false}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                        | ${true}

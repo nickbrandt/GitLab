@@ -63,6 +63,11 @@ export default {
       type: Array,
       required: true,
     },
+    customStageFormErrors: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     labels: {
       type: Array,
       required: true,
@@ -209,9 +214,11 @@ export default {
             :is-saving-custom-stage="isSavingCustomStage"
             :initial-fields="customStageInitialData"
             :is-editing-custom-stage="isEditingCustomStage"
+            :errors="customStageFormErrors"
             @submit="$emit('submit', $event)"
             @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
             @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
+            @clearErrors="$emit('clearCustomStageFormErrors')"
           />
           <template v-else>
             <stage-event-list

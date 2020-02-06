@@ -31,6 +31,8 @@ export default () => ({
   medians: {},
 
   customStageFormEvents: [],
+  customStageFormErrors: null,
+
   tasksByType: {
     subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
     labelIds: [],

@@ -55,6 +55,11 @@ export default {
       required: false,
       default: false,
     },
+    errors: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -167,6 +172,15 @@ export default {
     handleClearLabel(key) {
       this.fields[key] = null;
     },
+    isValid(key) {
+      return !this.isDirty || !this.errors || !this.errors[key];
+    },
+    fieldErrors(key) {
+      return !this.isValid(key) ? this.errors[key].join('\n') : null;
+    },
+    onUpdateFormField() {
+      if (this.errors) this.$emit('clearErrors');
+    },
   },
 };
 </script>
@@ -175,7 +189,11 @@ export default {
     <div class="mb-1">
       <h4>{{ formTitle }}</h4>
     </div>
-    <gl-form-group :label="s__('CustomCycleAnalytics|Name')">
+    <gl-form-group
+      :label="s__('CustomCycleAnalytics|Name')"
+      :state="isValid('name')"
+      :invalid-feedback="fieldErrors('name')"
+    >
       <gl-form-input
         v-model="fields.name"
         class="form-control"
@@ -183,27 +201,38 @@ export default {
         name="custom-stage-name"
         :placeholder="s__('CustomCycleAnalytics|Enter a name for the stage')"
         required
+        @change="onUpdateFormField"
       />
     </gl-form-group>
     <div class="d-flex" :class="{ 'justify-content-between': startEventRequiresLabel }">
       <div :class="[startEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Start event')">
+        <gl-form-group
+          :label="s__('CustomCycleAnalytics|Start event')"
+          :state="isValid('startEventIdentifier')"
+          :invalid-feedback="fieldErrors('startEventIdentifier')"
+        >
           <gl-form-select
             v-model="fields.startEventIdentifier"
             name="custom-stage-start-event"
             :required="true"
             :options="startEventOptions"
+            @change="onUpdateFormField"
           />
         </gl-form-group>
       </div>
       <div v-if="startEventRequiresLabel" class="w-50 ml-1">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Start event label')">
+        <gl-form-group
+          :label="s__('CustomCycleAnalytics|Start event label')"
+          :state="isValid('startEventLabelId')"
+          :invalid-feedback="fieldErrors('startEventLabelId')"
+        >
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.startEventLabelId"
             name="custom-stage-start-event-label"
             @selectLabel="handleSelectLabel('startEventLabelId', $event)"
             @clearLabel="handleClearLabel('startEventLabelId')"
+            @change="onUpdateFormField"
           />
         </gl-form-group>
       </div>
@@ -215,26 +244,34 @@ export default {
           :description="
             !hasStartEvent ? s__('CustomCycleAnalytics|Please select a start event first') : ''
           "
-          :state="hasValidStartAndEndEventPair"
-          :invalid-feedback="endEventError"
+          :state="isValid('endEventIdentifier')"
+          :invalid-feedback="fieldErrors('endEventIdentifier')"
         >
+          <!-- :state="hasValidStartAndEndEventPair"
+          :invalid-feedback="endEventError" -->
           <gl-form-select
             v-model="fields.endEventIdentifier"
             name="custom-stage-stop-event"
             :options="endEventOptions"
             :required="true"
             :disabled="!hasStartEvent"
+            @change="onUpdateFormField"
           />
         </gl-form-group>
       </div>
       <div v-if="endEventRequiresLabel" class="w-50 ml-1">
-        <gl-form-group :label="s__('CustomCycleAnalytics|Stop event label')">
+        <gl-form-group
+          :label="s__('CustomCycleAnalytics|Stop event label')"
+          :state="isValid('endEventLabelId')"
+          :invalid-feedback="fieldErrors('endEventLabelId')"
+        >
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.endEventLabelId"
             name="custom-stage-stop-event-label"
             @selectLabel="handleSelectLabel('endEventLabelId', $event)"
             @clearLabel="handleClearLabel('endEventLabelId')"
+            @change="onUpdateFormField"
           />
         </gl-form-group>
       </div>

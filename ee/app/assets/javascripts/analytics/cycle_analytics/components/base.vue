@@ -68,6 +68,7 @@ export default {
       'endDate',
       'tasksByType',
       'medians',
+      'customStageFormErrors',
     ]),
     ...mapGetters([
       'hasNoAccessError',
@@ -143,6 +144,7 @@ export default {
       'removeStage',
       'setFeatureFlags',
       'editCustomStage',
+      'clearCustomStageFormErrors',
       'updateStage',
       'setTasksByTypeFilters',
     ]),
@@ -278,6 +280,8 @@ export default {
             :is-editing-custom-stage="isEditingCustomStage"
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
+            :custom-stage-form-errors="customStageFormErrors"
+            @clearCustomStageFormErrors="clearCustomStageFormErrors"
             :labels="labels"
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
