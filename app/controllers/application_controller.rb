@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
   around_action :set_current_admin
 
   after_action :set_page_title_header, if: :json_request?
+  after_action :set_referrer_policy_header
   after_action :limit_session_time, if: -> { !current_user }
 
   protect_from_forgery with: :exception, prepend: true
@@ -558,6 +559,10 @@ class ApplicationController < ActionController::Base
     store_location_for :user, request.fullpath
 
     redirect_to users_sign_up_welcome_path
+  end
+
+  def set_referrer_policy_header
+    response.headers['Referrer-Policy'] = 'origin-when-cross-origin'
   end
 end
 

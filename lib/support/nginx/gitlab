@@ -72,6 +72,8 @@ server {
   server_tokens off; ## Don't show the nginx version number, a security best practice
 
   ## See app/controllers/application_controller.rb for headers set
+ 
+  add_header Referrer-Policy origin-when-cross-origin;
 
   ## Real IP Module Config
   ## http://nginx.org/en/docs/http/ngx_http_realip_module.html

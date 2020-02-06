@@ -1,0 +1,5 @@
+---
+title: Move Referrer-Policy from HTML to header
+merge_request: 26065
+author: nhirokinet
+type: changed
