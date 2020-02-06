@@ -358,7 +358,7 @@ module EE
     def has_group_hooks?(hooks_scope = :push_hooks)
       return unless group && feature_available?(:group_webhooks)
 
-      group.hooks.hooks_for(hooks_scope).any?
+      group_hooks.hooks_for(hooks_scope).any?
     end
 
     def execute_hooks(data, hooks_scope = :push_hooks)
@@ -366,7 +366,7 @@ module EE
 
       if group && feature_available?(:group_webhooks)
         run_after_commit_or_now do
-          group.hooks.hooks_for(hooks_scope).each do |hook|
+          group_hooks.hooks_for(hooks_scope).each do |hook|
             hook.async_execute(data, hooks_scope.to_s)
           end
         end
@@ -736,6 +736,12 @@ module EE
     end
 
     private
+
+    def group_hooks
+      return group.hooks unless ::Feature.enabled?(:sub_group_webhooks, self)
+
+      GroupHook.where(group_id: group.self_and_ancestors)
+    end
 
     def set_override_pull_mirror_available
       self.pull_mirror_available_overridden = read_attribute(:mirror)
