@@ -28,26 +28,36 @@ describe Ci::PipelinePresenter do
   describe '#expose_security_dashboard?' do
     subject { presenter.expose_security_dashboard? }
 
-    before do
-      stub_licensed_features(dependency_scanning: true, license_management: true)
+    context 'when features are available' do
+      before do
+        stub_licensed_features(dependency_scanning: true, license_management: true)
+      end
+
+      context 'when there is an artifact of a right type' do
+        let!(:build) { create(:ee_ci_build, :dependency_scanning, pipeline: pipeline) }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when there is an artifact of a wrong type' do
+        let!(:build) { create(:ee_ci_build, :license_scanning, pipeline: pipeline) }
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when there is no found artifact' do
+        let!(:build) { create(:ee_ci_build, pipeline: pipeline) }
+
+        it { is_expected.to be_falsey }
+      end
     end
 
-    context 'when there is an artifact of a right type' do
-      let!(:build) { create(:ee_ci_build, :dependency_scanning, pipeline: pipeline) }
+    context 'when features are disabled' do
+      context 'when there is an artifact of a right type' do
+        let!(:build) { create(:ee_ci_build, :dependency_scanning, pipeline: pipeline) }
 
-      it { is_expected.to be_truthy }
-    end
-
-    context 'when there is an artifact of a wrong type' do
-      let!(:build) { create(:ee_ci_build, :license_scanning, pipeline: pipeline) }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when there is no found artifact' do
-      let!(:build) { create(:ee_ci_build, pipeline: pipeline) }
-
-      it { is_expected.to be_falsey }
+        it { is_expected.to be_falsey }
+      end
     end
   end
 end
