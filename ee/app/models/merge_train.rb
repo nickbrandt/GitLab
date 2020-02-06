@@ -95,8 +95,9 @@ class MergeTrain < ApplicationRecord
     end
 
     def sha_exists_in_history?(target_project_id, target_branch, newrev, limit: 20)
-      MergeRequest.exists?(id: complete_merge_trains(target_project_id, target_branch, limit: limit),
-                           merge_commit_sha: newrev)
+      MergeRequest.where(id: complete_merge_trains(target_project_id, target_branch, limit: limit))
+                  .where('merge_commit_sha = ? OR in_progress_merge_commit_sha = ?', newrev, newrev)
+                  .exists?
     end
 
     def total_count_in_train(merge_request)
