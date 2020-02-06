@@ -242,7 +242,7 @@ export default {
           <template slot="button-content">
             <span class="sr-only">{{ __('Add to tree') }}</span>
             <icon name="plus" :size="16" class="float-left" />
-            <icon name="arrow-down" :size="16" class="float-left" />
+            <icon name="chevron-down" :size="16" class="float-left" />
           </template>
           <template v-for="(item, i) in dropdownItems">
             <component :is="getComponent(item.type)" :key="i" v-bind="item.attrs">
