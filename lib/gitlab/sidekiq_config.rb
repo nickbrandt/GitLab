@@ -104,59 +104,5 @@ module Gitlab
         ns.camelize.constantize
       end
     end
-
-    def self.query_workers(query_string)
-      predicate = query_string_to_lambda(query_string)
-
-      workers.filter(&predicate)
-    end
-
-    def self.query_string_to_lambda(query_string)
-      or_clauses = query_string.split(%r{\s+}).map do |and_clauses_string|
-        and_clauses_predicates = and_clauses_string.split(',').map do |term|
-          match = term.match(%r{^(\w+)(!?=)([\w|]+)})
-          raise "invalid term #{term}" unless match
-
-          lhs = match[1]
-          op = match[2]
-          rhs = match[3]
-
-          predicate_for_op(op, predicate_factory(lhs, rhs.split('|')))
-        end
-
-        lambda { |worker| and_clauses_predicates.all? { |predicate| predicate.call(worker) } }
-      end
-
-      lambda { |worker| or_clauses.any? { |predicate| predicate.call(worker) } }
-    end
-
-    def self.predicate_for_op(op, predicate)
-      case op
-      when "="
-        predicate
-      when "!="
-        lambda { |worker| !predicate.call(worker) }
-      else
-        raise "unknown op #{op}"
-      end
-    end
-
-    def self.predicate_factory(lhs, values)
-      case lhs
-      when "resource_boundary"
-        values_sym = values.map(&:to_sym)
-        lambda { |worker| values_sym.include? worker.get_worker_resource_boundary }
-
-      when "latency_sensitive"
-        values_bool = values.map { |v| v.casecmp("true").zero? }
-        lambda { |worker| values_bool.include? worker.latency_sensitive_worker? }
-
-      when "feature_category"
-        values_sym = values.map(&:to_sym)
-        lambda { |worker| values_sym.include? worker.get_feature_category }
-      else
-        raise "unknown predicate #{lhs}"
-      end
-    end
   end
 end

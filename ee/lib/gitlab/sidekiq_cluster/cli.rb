@@ -41,21 +41,25 @@ module Gitlab
 
         option_parser.parse!(argv)
 
-        queue_groups = SidekiqCluster.parse_queues(argv)
+        all_queues = SidekiqConfig::CliMethods.all_queues(@rails_path)
+        queue_names = SidekiqConfig::CliMethods.worker_queues(@rails_path)
 
-        all_queues = SidekiqConfig::CliMethods.worker_queues(@rails_path)
-
-        # When using the experimental queue query syntax, we treat each queue
-        # group as a worker attribute query, and resolve the queues for the
-        # queue group using this query.
-        if @queue_query_syntax
-          queue_groups = argv.map { |queues| SidekiqConfig.query_workers(queues).map(&:queue) }
-        else
-          queue_groups.map! { |queues| SidekiqConfig::CliMethods.expand_queues(queues, all_queues) }
-        end
+        queue_groups =
+          if @queue_query_syntax
+            # When using the experimental queue query syntax, we treat
+            # each queue group as a worker attribute query, and resolve
+            # the queues for the queue group using this query.
+            argv.map do |queues|
+              SidekiqConfig::CliMethods.query_workers(queues, all_queues)
+            end
+          else
+            SidekiqCluster.parse_queues(argv).map do |queues|
+              SidekiqConfig::CliMethods.expand_queues(queues, queue_names)
+            end
+          end
 
         if @negate_queues
-          queue_groups.map! { |queues| all_queues - queues }
+          queue_groups.map! { |queues| queue_names - queues }
         end
 
         @logger.info("Starting cluster with #{queue_groups.length} processes")

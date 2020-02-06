@@ -22,9 +22,9 @@ describe Gitlab::SidekiqCluster::CLI do
 
     context 'with arguments' do
       before do
-        expect(cli).to receive(:write_pid)
-        expect(cli).to receive(:trap_signals)
-        expect(cli).to receive(:start_loop)
+        allow(cli).to receive(:write_pid)
+        allow(cli).to receive(:trap_signals)
+        allow(cli).to receive(:start_loop)
       end
 
       it 'starts the Sidekiq workers' do
@@ -139,6 +139,22 @@ describe Gitlab::SidekiqCluster::CLI do
 
             cli.run(%W(--negate --queue-query-syntax #{query}))
           end
+        end
+
+        it 'expands multiple queue groups correctly' do
+          expect(Gitlab::SidekiqCluster)
+            .to receive(:start)
+                  .with([['chat_notification'], ['project_export']], default_options)
+                  .and_return([])
+
+          cli.run(%w(--queue-query-syntax feature_category=chatops,latency_sensitive=true resource_boundary=memory,feature_category=source_code_management))
+        end
+
+        it 'errors on an invalid query multiple queue groups correctly' do
+          expect(Gitlab::SidekiqCluster).not_to receive(:start)
+
+          expect { cli.run(%w(--queue-query-syntax unknown_field=chatops)) }
+            .to raise_error(Gitlab::SidekiqConfig::CliMethods::QueryError)
         end
       end
     end
