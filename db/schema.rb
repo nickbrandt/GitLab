@@ -465,7 +465,7 @@ ActiveRecord::Schema.define(version: 2020_02_04_131054) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["created_at", "author_id"], name: "analytics_index_audit_events_on_created_at_and_author_id"
-    t.index ["entity_id", "entity_type"], name: "index_audit_events_on_entity_id_and_entity_type"
+    t.index ["entity_id", "entity_type", "id"], name: "index_audit_events_on_entity_id_and_entity_type_and_id_desc", order: { id: :desc }
   end
 
   create_table "award_emoji", id: :serial, force: :cascade do |t|
