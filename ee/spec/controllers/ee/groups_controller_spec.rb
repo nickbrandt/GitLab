@@ -35,7 +35,7 @@ describe GroupsController do
         it 'includes events from group and subgroups' do
           get :activity, params: { id: group.to_param }, format: :json
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['count']).to eq(4)
         end
       end
@@ -48,7 +48,7 @@ describe GroupsController do
         it 'does not include events from group and subgroups' do
           get :activity, params: { id: group.to_param }, format: :json
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['count']).to eq(1)
         end
       end
@@ -62,7 +62,7 @@ describe GroupsController do
       it 'includes only events visible to user' do
         get :activity, params: { id: group.to_param }, format: :json
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['count']).to eq(2)
       end
     end
@@ -130,7 +130,7 @@ describe GroupsController do
         it 'returns 404' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -143,7 +143,7 @@ describe GroupsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -230,7 +230,7 @@ describe GroupsController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

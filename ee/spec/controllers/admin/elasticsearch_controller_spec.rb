@@ -29,7 +29,7 @@ describe Admin::ElasticsearchController do
 
         post :enqueue_index
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

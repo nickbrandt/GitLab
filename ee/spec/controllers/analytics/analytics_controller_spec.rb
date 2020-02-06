@@ -36,7 +36,7 @@ describe Analytics::AnalyticsController do
     it 'renders 404 all the analytics feature flags are disabled' do
       get :index
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 end

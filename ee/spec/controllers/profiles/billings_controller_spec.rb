@@ -17,7 +17,7 @@ describe Profiles::BillingsController do
 
       get :index
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to render_template(:index)
     end
 

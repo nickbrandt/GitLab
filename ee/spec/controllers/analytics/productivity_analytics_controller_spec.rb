@@ -43,7 +43,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     it 'renders show template regardless of license' do
@@ -61,7 +61,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       get :show
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -86,7 +86,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'when invalid params are given' do
@@ -108,7 +108,7 @@ describe Analytics::ProductivityAnalyticsController do
       it 'returns 403' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -118,7 +118,7 @@ describe Analytics::ProductivityAnalyticsController do
       it 'renders 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -128,7 +128,7 @@ describe Analytics::ProductivityAnalyticsController do
       it 'renders 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
