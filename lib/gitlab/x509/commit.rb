@@ -45,6 +45,10 @@ module Gitlab
         strong_memoize(:cert_store) do
           store = OpenSSL::X509::Store.new
           store.set_default_paths
+          # valid_signing_time? checks the time attributes already
+          # this flag is required, otherwise expired certificates would become
+          # unverified when notAfter within certificate attribute is reached
+          store.flags = OpenSSL::X509::V_FLAG_NO_CHECK_TIME
           store
         end
       end
