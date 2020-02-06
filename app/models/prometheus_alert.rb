@@ -9,9 +9,9 @@ class PrometheusAlert < ApplicationRecord
     gt: ">"
   }.freeze
 
-  belongs_to :environment, optional: false, validate: true, inverse_of: :prometheus_alerts
-  belongs_to :project, optional: false, validate: true, inverse_of: :prometheus_alerts
-  belongs_to :prometheus_metric, optional: false, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :environment, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :project, validate: true, inverse_of: :prometheus_alerts
+  belongs_to :prometheus_metric, validate: true, inverse_of: :prometheus_alerts
 
   has_many :prometheus_alert_events, inverse_of: :prometheus_alert
   has_many :related_issues, through: :prometheus_alert_events
@@ -19,6 +19,7 @@ class PrometheusAlert < ApplicationRecord
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
 
+  validates :environment, :project, :prometheus_metric, presence: true
   validate :require_valid_environment_project!
   validate :require_valid_metric_project!
 
