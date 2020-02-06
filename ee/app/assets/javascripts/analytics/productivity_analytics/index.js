@@ -11,6 +11,7 @@ import {
   buildGroupFromDataset,
   buildProjectFromDataset,
 } from './utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -39,6 +40,8 @@ export default () => {
     : null;
 
   const group = buildGroupFromDataset(container.dataset);
+  const hideGroupDropDown = parseBoolean(container.dataset.hideGroupDropDown);
+
   let project = null;
 
   let initialData = {
@@ -126,6 +129,7 @@ export default () => {
         props: {
           group,
           project,
+          hideGroupDropDown,
         },
         on: {
           groupSelected: this.onGroupSelected,

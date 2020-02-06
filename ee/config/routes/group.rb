@@ -31,6 +31,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         get :production
       end
     end
+    namespace :analytics do
+      resource :productivity_analytics, only: :show, constraints: -> (req) { Feature.enabled?(:group_level_productivity_analytics) && Gitlab::Analytics.productivity_analytics_enabled? }
+    end
 
     resource :ldap, only: [] do
       member do

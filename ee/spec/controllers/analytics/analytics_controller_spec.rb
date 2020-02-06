@@ -8,6 +8,8 @@ describe Analytics::AnalyticsController do
   let(:user) { create(:user) }
 
   before do
+    stub_feature_flags(group_level_productivity_analytics: false)
+
     sign_in(user)
     disable_all_analytics_feature_flags
   end

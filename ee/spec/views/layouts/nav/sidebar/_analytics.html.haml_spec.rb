@@ -7,6 +7,10 @@ describe 'layouts/nav/sidebar/_analytics' do
 
   it_behaves_like 'has nav sidebar'
 
+  before do
+    stub_feature_flags(group_level_productivity_analytics: false)
+  end
+
   context 'top-level items' do
     context 'when feature flags are enabled' do
       it 'has `Analytics` link' do

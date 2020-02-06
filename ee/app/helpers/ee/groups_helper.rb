@@ -112,6 +112,10 @@ module EE
         links << :group_insights
       end
 
+      if @group.feature_available?(:productivity_analytics) && can?(current_user, :view_productivity_analytics, @group)
+        links << :productivity_analytics
+      end
+
       links
     end
   end

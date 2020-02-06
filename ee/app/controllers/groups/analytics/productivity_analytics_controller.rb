@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
-class Analytics::ProductivityAnalyticsController < Analytics::ApplicationController
+class Groups::Analytics::ProductivityAnalyticsController < Groups::Analytics::ApplicationController
   check_feature_flag Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG
   increment_usage_counter Gitlab::UsageDataCounters::ProductivityAnalyticsCounter,
     :views, only: :show, if: -> { request.format.html? }
+
+  layout 'group'
 
   before_action :load_group
   before_action :load_project
   before_action :build_request_params
   before_action -> {
     check_feature_availability!(:productivity_analytics)
-  }, if: -> { request.format.json? }
+  }
 
   before_action -> {
     authorize_view_by_action!(:view_productivity_analytics)
   }
-
   before_action -> {
     push_frontend_feature_flag(:productivity_analytics_scatterplot_enabled, default_enabled: true)
   }
@@ -81,7 +82,7 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
   end
 
   def build_request_params
-    @request_params ||= Analytics::ProductivityAnalyticsRequestParams.new(allowed_request_params.merge(group: @group, project: @project))
+    @request_params ||= ::Analytics::ProductivityAnalyticsRequestParams.new(allowed_request_params.merge(group: @group, project: @project))
   end
 
   def allowed_request_params

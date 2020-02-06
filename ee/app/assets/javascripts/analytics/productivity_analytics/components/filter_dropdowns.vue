@@ -21,6 +21,10 @@ export default {
       required: false,
       default: null,
     },
+    hideGroupDropDown: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -76,6 +80,7 @@ export default {
 <template>
   <div class="dropdown-container d-flex flex-column flex-lg-row">
     <groups-dropdown-filter
+      v-if="!hideGroupDropDown"
       class="group-select"
       :query-params="$options.groupsQueryParams"
       :default-group="group"

@@ -89,5 +89,16 @@ describe 'Group active tab' do
       it_behaves_like 'page has active tab', _('Analytics')
       it_behaves_like 'page has active sub tab', _('Contribution Analytics')
     end
+
+    context 'on group Productivity Analytics' do
+      before do
+        stub_licensed_features(productivity_analytics: true)
+
+        visit group_analytics_productivity_analytics_path(group)
+      end
+
+      it_behaves_like 'page has active tab', _('Analytics')
+      it_behaves_like 'page has active sub tab', _('Productivity Analytics')
+    end
   end
 end
