@@ -1,5 +1,5 @@
 ---
-title: added an overflow:hidden to prevent h2 and h1 lines from overlapping images
+title: Do not draw heading borders over floated images in markdown
 merge_request:
 author: Gwen_
 type: fixed
