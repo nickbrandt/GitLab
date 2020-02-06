@@ -1,5 +1,3 @@
-// Copied from spec/javasripts/diffs/mock_data/diff_file.js
-
 export default {
   submodule: false,
   submodule_link: null,
