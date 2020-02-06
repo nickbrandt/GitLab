@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
 
 import EpicSidebar from 'ee/epic/components/epic_sidebar.vue';
 import createStore from 'ee/epic/store';
@@ -235,6 +236,21 @@ describe('EpicSidebarComponent', () => {
 
     it('renders subscription toggle element', () => {
       expect(vm.$el.querySelector('.block.subscription')).not.toBeNull();
+    });
+  });
+
+  describe('mounted', () => {
+    it('makes request to get epic details', () => {
+      const methodSpies = {
+        fetchEpicDetails: jest.fn(),
+      };
+
+      shallowMount(EpicSidebar, {
+        store,
+        methods: methodSpies,
+      });
+
+      expect(methodSpies.fetchEpicDetails).toHaveBeenCalled();
     });
   });
 });

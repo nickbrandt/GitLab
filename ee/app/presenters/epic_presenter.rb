@@ -44,7 +44,6 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
   def initial_data
     {
       labels: epic.labels,
-      participants: participants,
       subscribed: subscribed?
     }
   end
@@ -120,10 +119,6 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
         due_date: epic.due_date_from_inherited_source
       }
     }
-  end
-
-  def participants
-    UserEntity.represent(epic.participants)
   end
 
   def epic_pending_todo
