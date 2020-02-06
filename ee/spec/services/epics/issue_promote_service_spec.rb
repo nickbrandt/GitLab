@@ -55,6 +55,9 @@ describe Epics::IssuePromoteService do
         end
 
         context 'when issue is promoted' do
+          let!(:issue_mentionable_note) { create(:note, noteable: issue, author: user, project: project, note: "note with mention #{user.to_reference}") }
+          let!(:issue_note) { create(:note, noteable: issue, author: user, project: project, note: "note without mention") }
+
           before do
             allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
 
@@ -87,6 +90,17 @@ describe Epics::IssuePromoteService do
           it 'marks the old issue as promoted' do
             expect(issue).to be_promoted
             expect(issue.promoted_to_epic).to eq(epic)
+          end
+
+          context 'when issue description has mentions and has notes with mentions' do
+            let(:issue) { create(:issue, project: project, description: "description with mention to #{user.to_reference}") }
+
+            it 'only saves user mentions with actual mentions' do
+              expect(epic.user_mentions.where(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
+              expect(epic.user_mentions.where.not(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
+              expect(epic.user_mentions.where.not(note_id: nil).count).to eq 1
+              expect(epic.user_mentions.count).to eq 2
+            end
           end
         end
 

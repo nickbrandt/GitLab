@@ -17,7 +17,7 @@ module DesignManagement
     # This is a polymorphic association, so we can't count on FK's to delete the
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
-    has_many :user_mentions, class_name: "DesignUserMention"
+    has_many :user_mentions, class_name: "DesignUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
     validates :project, :filename, presence: true
     validates :issue, presence: true, unless: :importing?

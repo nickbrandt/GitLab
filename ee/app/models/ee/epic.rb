@@ -52,7 +52,7 @@ module EE
 
       has_many :epic_issues
       has_many :issues, through: :epic_issues
-      has_many :user_mentions, class_name: "EpicUserMention"
+      has_many :user_mentions, class_name: "EpicUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
       validates :group, presence: true
       validate :validate_parent, on: :create
