@@ -1031,11 +1031,10 @@ $ide-commit-header-height: 48px;
   display: flex;
   background-color: $gray-light;
 
-  > a,
-  > button {
+  > a {
     &:hover,
     &:focus {
-      background-color: $gray-light;  // disable hover highlight in IDE
+      background-color: $gray-light; // disable hover highlight in IDE
     }
   }
 
