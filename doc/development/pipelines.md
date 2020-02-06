@@ -71,8 +71,8 @@ These common definitions are:
 
 - `.default-tags`: Ensures a job has the `gitlab-org` tag to ensure it's using
   our dedicated runners.
-- `.default-retry`: Allows a job to retry upon `unknown_failure`, `api_failure`,
-  `runner_system_failure`.
+- `.default-retry`: Allows a job to [retry](../ci/yaml/README.md#retry) upon `unknown_failure`, `api_failure`,
+  `runner_system_failure`, `job_execution_timeout`, or `stuck_or_timeout_failure`.
 - `.default-before_script`: Allows a job to use a default `before_script` definition
   suitable for Ruby/Rails tasks that may need a database running (e.g. tests).
 - `.default-cache`: Allows a job to use a default `cache` definition suitable for
