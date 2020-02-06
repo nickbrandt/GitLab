@@ -114,14 +114,14 @@ describe API::NpmPackages do
         get_file_with_token(package_file)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'returns the file with a job token' do
         get_file_with_job_token(package_file)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download with no token' do
@@ -138,7 +138,7 @@ describe API::NpmPackages do
         subject
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
@@ -514,7 +514,7 @@ describe API::NpmPackages do
 
   def expect_a_valid_package_response
     expect(response).to have_gitlab_http_status(200)
-    expect(response.content_type.to_s).to eq('application/json')
+    expect(response.media_type).to eq('application/json')
     expect(response).to match_response_schema('public_api/v4/packages/npm_package', dir: 'ee')
     expect(json_response['name']).to eq(package.name)
     expect(json_response['versions'][package.version]).to match_schema('public_api/v4/packages/npm_package_version', dir: 'ee')

@@ -49,7 +49,7 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
     it 'returns a valid json response' do
       subject
 
-      expect(response.content_type.to_s).to eq('application/json')
+      expect(response.media_type).to eq('application/json')
       expect(json_response).to match_schema('public_api/v4/packages/nuget/service_index', dir: 'ee')
       expect(json_response).to be_a(Hash)
     end
@@ -66,7 +66,7 @@ RSpec.shared_examples 'returning nuget metadata json response with json schema' 
   it 'returns a valid json response' do
     subject
 
-    expect(response.content_type.to_s).to eq('application/json')
+    expect(response.media_type).to eq('application/json')
     expect(json_response).to match_schema(json_schema, dir: 'ee')
     expect(json_response).to be_a(Hash)
   end
@@ -135,7 +135,7 @@ RSpec.shared_examples 'process nuget workhorse authorization' do |user_type, sta
     it 'has the proper content type' do
       subject
 
-      expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+      expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
     end
 
     context 'with a request that bypassed gitlab-workhorse' do
@@ -227,7 +227,7 @@ RSpec.shared_examples 'process nuget download versions request' do |user_type, s
     it 'returns a valid json response' do
       subject
 
-      expect(response.content_type.to_s).to eq('application/json')
+      expect(response.media_type).to eq('application/json')
       expect(json_response).to match_schema('public_api/v4/packages/nuget/download_versions', dir: 'ee')
       expect(json_response).to be_a(Hash)
       expect(json_response['versions']).to match_array(packages.map(&:version).sort)
@@ -270,7 +270,7 @@ RSpec.shared_examples 'process nuget download content request' do |user_type, st
     it 'returns a valid package archive' do
       subject
 
-      expect(response.content_type.to_s).to eq('application/octet-stream')
+      expect(response.media_type).to eq('application/octet-stream')
     end
 
     context 'with invalid format' do
@@ -287,7 +287,7 @@ RSpec.shared_examples 'process nuget download content request' do |user_type, st
       it 'returns a valid package archive' do
         subject
 
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
   end
