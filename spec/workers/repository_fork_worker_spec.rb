@@ -72,8 +72,8 @@ describe RepositoryForkWorker do
         perform!
       end
 
-      it "handles bad fork" do
-        error_message = "Unable to fork project #{forked_project.id} for repository #{project.disk_path} -> #{forked_project.disk_path}"
+      it 'handles bad fork' do
+        error_message = "Unable to fork project #{forked_project.id} for repository #{project.disk_path} -> #{forked_project.disk_path}: Failed to create fork repository"
 
         expect_fork_repository.and_return(false)
 
@@ -83,10 +83,21 @@ describe RepositoryForkWorker do
       it 'calls Projects::LfsPointers::LfsLinkService#execute with OIDs of source project LFS objects' do
         expect_fork_repository.and_return(true)
         expect_next_instance_of(Projects::LfsPointers::LfsLinkService) do |service|
-          expect(service).to receive(:execute).with(project.lfs_objects.map(&:oid))
+          expect(service).to receive(:execute).with(project.lfs_objects_oids)
         end
 
         perform!
+      end
+
+      it "handles LFS objects link failure" do
+        error_message = "Unable to fork project #{forked_project.id} for repository #{project.disk_path} -> #{forked_project.disk_path}: Source project has too many LFS objects"
+
+        expect_fork_repository.and_return(true)
+        expect_next_instance_of(Projects::LfsPointers::LfsLinkService) do |service|
+          expect(service).to receive(:execute).and_raise(Projects::LfsPointers::LfsLinkService::TooManyOidsError)
+        end
+
+        expect { perform! }.to raise_error(StandardError, error_message)
       end
     end
 

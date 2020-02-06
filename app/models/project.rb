@@ -1388,6 +1388,14 @@ class Project < ApplicationRecord
       .where(lfs_objects_projects: { project_id: [self, lfs_storage_project] })
   end
 
+  # TODO: Call `#lfs_objects` instead once all LfsObjectsProject records are
+  # backfilled. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
+  def lfs_objects_oids
+    all_lfs_objects.pluck(:oid)
+  end
+
   def personal?
     !group
   end

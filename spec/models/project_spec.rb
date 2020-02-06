@@ -5547,6 +5547,31 @@ describe Project do
     end
   end
 
+  describe '#lfs_objects_oids' do
+    let(:project) { create(:project) }
+    let(:lfs_object) { create(:lfs_object) }
+    let(:another_lfs_object) { create(:lfs_object) }
+
+    subject { project.lfs_objects_oids }
+
+    context 'when project has associated LFS objects' do
+      before do
+        create(:lfs_objects_project, lfs_object: lfs_object, project: project)
+        create(:lfs_objects_project, lfs_object: another_lfs_object, project: project)
+      end
+
+      it 'returns OIDs of LFS objects' do
+        expect(subject).to match_array([lfs_object.oid, another_lfs_object.oid])
+      end
+    end
+
+    context 'when project has no associated LFS objects' do
+      it 'returns empty array' do
+        expect(subject).to be_empty
+      end
+    end
+  end
+
   def rugged_config
     rugged_repo(project.repository).config
   end

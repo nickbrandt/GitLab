@@ -30,11 +30,13 @@ class RepositoryForkWorker
     result = gitlab_shell.fork_repository(source_project, target_project)
 
     if result
-      Projects::LfsPointers::LfsLinkService
-        .new(target_project)
-        .execute(lfs_pointers(source_project))
+      link_lfs_objects(source_project, target_project)
     else
-      raise "Unable to fork project #{target_project.id} for repository #{source_project.disk_path} -> #{target_project.disk_path}"
+      raise_fork_failure(
+        source_project,
+        target_project,
+        'Failed to create fork repository'
+      )
     end
 
     target_project.after_import
@@ -47,7 +49,19 @@ class RepositoryForkWorker
     false
   end
 
-  def lfs_pointers(project)
-    project.lfs_objects.map(&:oid)
+  def link_lfs_objects(source_project, target_project)
+    Projects::LfsPointers::LfsLinkService
+        .new(target_project)
+        .execute(source_project.lfs_objects_oids)
+  rescue Projects::LfsPointers::LfsLinkService::TooManyOidsError
+    raise_fork_failure(
+      source_project,
+      target_project,
+      'Source project has too many LFS objects'
+    )
+  end
+
+  def raise_fork_failure(source_project, target_project, reason)
+    raise "Unable to fork project #{target_project.id} for repository #{source_project.disk_path} -> #{target_project.disk_path}: #{reason}"
   end
 end
