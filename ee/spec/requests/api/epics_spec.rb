@@ -338,7 +338,7 @@ describe API::Epics do
         expect_paginated_array_response(epic.id)
       end
 
-      context "#to_reference" do
+      describe "#to_reference" do
         it 'exposes reference path' do
           get api(url)
 

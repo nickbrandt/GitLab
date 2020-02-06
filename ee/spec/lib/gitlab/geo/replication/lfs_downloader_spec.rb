@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::LfsDownloader, :geo do
   let(:lfs_object) { create(:lfs_object) }
 
-  context '#execute' do
+  describe '#execute' do
     context 'with LFS object' do
       it 'returns a FileDownloader::Result object' do
         downloader = described_class.new(:lfs, lfs_object.id)

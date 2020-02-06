@@ -8,7 +8,7 @@ RSpec.shared_examples 'limited indexing is enabled' do
   end
 
   context 'when the project is not enabled specifically' do
-    context '#searchable?' do
+    describe '#searchable?' do
       it 'returns false' do
         expect(object.searchable?).to be_falsey
       end
@@ -20,7 +20,7 @@ RSpec.shared_examples 'limited indexing is enabled' do
       create :elasticsearch_indexed_project, project: project
     end
 
-    context '#searchable?' do
+    describe '#searchable?' do
       it 'returns true' do
         expect(object.searchable?).to be_truthy
       end
@@ -32,7 +32,7 @@ RSpec.shared_examples 'limited indexing is enabled' do
       create :elasticsearch_indexed_namespace, namespace: group
     end
 
-    context '#searchable?' do
+    describe '#searchable?' do
       it 'returns true' do
         expect(group_object.searchable?).to be_truthy
       end

@@ -138,7 +138,7 @@ describe User do
       end
     end
 
-    context '#auditor?' do
+    describe '#auditor?' do
       it "returns true for an auditor user if the addon is enabled" do
         stub_licensed_features(auditor_user: true)
 

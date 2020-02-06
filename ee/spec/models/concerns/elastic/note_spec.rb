@@ -15,7 +15,7 @@ describe Note, :elastic do
       create :note, project: project
     end
 
-    context '#searchable?' do
+    describe '#searchable?' do
       before do
         create :elasticsearch_indexed_project, project: project
       end

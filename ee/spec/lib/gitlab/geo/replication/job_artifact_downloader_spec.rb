@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::JobArtifactDownloader, :geo do
   let(:job_artifact) { create(:ci_job_artifact) }
 
-  context '#execute' do
+  describe '#execute' do
     context 'with job artifact' do
       it 'returns a FileDownloader::Result object' do
         downloader = described_class.new(:job_artifact, job_artifact.id)

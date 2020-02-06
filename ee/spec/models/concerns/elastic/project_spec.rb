@@ -15,13 +15,13 @@ describe Project, :elastic do
     end
 
     context 'when the project is not enabled specifically' do
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns false' do
           expect(project.searchable?).to be_falsey
         end
       end
 
-      context '#use_elasticsearch?' do
+      describe '#use_elasticsearch?' do
         it 'returns false' do
           expect(project.use_elasticsearch?).to be_falsey
         end
@@ -33,13 +33,13 @@ describe Project, :elastic do
         create :elasticsearch_indexed_project, project: project
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           expect(project.searchable?).to be_truthy
         end
       end
 
-      context '#use_elasticsearch?' do
+      describe '#use_elasticsearch?' do
         it 'returns true' do
           expect(project.use_elasticsearch?).to be_truthy
         end
@@ -68,7 +68,7 @@ describe Project, :elastic do
         create :elasticsearch_indexed_namespace, namespace: group
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           project = create :project, name: 'test1', group: group
 

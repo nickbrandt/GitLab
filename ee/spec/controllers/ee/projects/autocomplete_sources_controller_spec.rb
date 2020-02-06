@@ -26,7 +26,7 @@ describe Projects::AutocompleteSourcesController do
       stub_licensed_features(epics: true)
     end
 
-    context '#epics' do
+    describe '#epics' do
       it 'returns the correct response' do
         get :epics, params: { namespace_id: project.namespace, project_id: project }
 

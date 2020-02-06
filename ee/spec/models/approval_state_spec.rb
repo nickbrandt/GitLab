@@ -99,7 +99,7 @@ describe ApprovalState do
     it { expect(subject.can_approve?(nil)).to be_falsey }
   end
 
-  context '#approval_rules_overwritten?' do
+  describe '#approval_rules_overwritten?' do
     context 'when approval rule on the merge request does not exist' do
       it 'returns false' do
         expect(subject.approval_rules_overwritten?).to eq(false)

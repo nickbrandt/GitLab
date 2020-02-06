@@ -21,7 +21,7 @@ describe Groups::UpdateService, '#execute' do
       }
     end
 
-    context '#visibility' do
+    describe '#visibility' do
       before do
         group.add_owner(user)
       end

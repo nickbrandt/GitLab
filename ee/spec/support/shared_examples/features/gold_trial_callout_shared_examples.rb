@@ -13,7 +13,7 @@ RSpec.shared_examples 'dashboard gold trial callout' do
     expect(page).not_to have_selector '.promotion-callout'
   end
 
-  context '.com' do
+  describe '.com' do
     before do
       allow(Gitlab).to receive(:com?).and_return(true)
     end

@@ -13,7 +13,7 @@ describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
     described_class.new(job_artifact)
   end
 
-  context '#initialize' do
+  describe '#initialize' do
     it 'sets file_type to :ci_trace' do
       expect(subject.file_type).to eq(:job_artifact)
     end
@@ -35,7 +35,7 @@ describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
     end
   end
 
-  context '#download_from_primary' do
+  describe '#download_from_primary' do
     before do
       stub_current_geo_node(secondary_node)
     end

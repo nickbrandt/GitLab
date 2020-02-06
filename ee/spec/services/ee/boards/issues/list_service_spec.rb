@@ -78,7 +78,7 @@ describe Boards::Issues::ListService, services: true do
       end
     end
 
-    context '#metadata' do
+    describe '#metadata' do
       it 'returns issues count and weight for list' do
         params = { board_id: board.id, id: backlog.id }
 
