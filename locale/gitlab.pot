@@ -19227,6 +19227,9 @@ msgstr ""
 msgid "This GitLab instance is licensed at the %{insufficient_license} tier. Geo is only available for users who have at least a Premium license."
 msgstr ""
 
+msgid "This Project is currently archived and read-only. Please unarchive the project first if you want to resume Pull mirroring"
+msgstr ""
+
 msgid "This action can lead to data loss. To prevent accidental actions we ask you to confirm your intention."
 msgstr ""
 
