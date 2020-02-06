@@ -160,7 +160,7 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
         >
           <icon-stub
             class="align-top text-secondary-700 d-none d-md-inline"
-            name="arrow-down"
+            name="chevron-down"
             size="16"
           />
           
