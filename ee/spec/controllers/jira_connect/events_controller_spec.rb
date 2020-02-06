@@ -12,7 +12,7 @@ describe JiraConnect::EventsController do
       it 'returns 404' do
         post :installed
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -20,7 +20,7 @@ describe JiraConnect::EventsController do
       it 'returns 404' do
         post :uninstalled
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -58,7 +58,7 @@ describe JiraConnect::EventsController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(422)
+          expect(response).to have_gitlab_http_status(:unprocessable_entity)
         end
       end
     end
@@ -79,7 +79,7 @@ describe JiraConnect::EventsController do
         it 'returns 403' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'does not delete the installation' do

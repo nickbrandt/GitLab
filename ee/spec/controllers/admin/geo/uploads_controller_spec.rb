@@ -41,13 +41,13 @@ describe Admin::Geo::UploadsController, :geo do
       end
 
       it 'renders the index template' do
-        expect(subject).to have_gitlab_http_status(200)
+        expect(subject).to have_gitlab_http_status(:ok)
         expect(subject).to render_template(:index)
       end
 
       context 'without sync_status specified' do
         it 'renders all registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).to have_css(css_id(synced_registry))
           expect(response.body).to have_css(css_id(failed_registry))
           expect(response.body).to have_css(css_id(never_registry))
@@ -58,7 +58,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'synced' } }
 
         it 'renders only synced registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).to have_css(css_id(synced_registry))
           expect(response.body).not_to have_css(css_id(failed_registry))
           expect(response.body).not_to have_css(css_id(never_registry))
@@ -69,7 +69,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'failed' } }
 
         it 'renders only failed registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).not_to have_css(css_id(synced_registry))
           expect(response.body).to have_css(css_id(failed_registry))
           expect(response.body).not_to have_css(css_id(never_registry))
@@ -80,7 +80,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'never' } }
 
         it 'renders only never synced registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).not_to have_css(css_id(synced_registry))
           expect(response.body).not_to have_css(css_id(failed_registry))
           expect(response.body).to have_css(css_id(never_registry))

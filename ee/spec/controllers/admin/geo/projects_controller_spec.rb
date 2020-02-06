@@ -39,7 +39,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
       context 'without sync_status specified' do
         it 'renders all template when no extra get params is specified' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(subject).to render_template(:index)
           expect(subject).to render_template(partial: 'admin/geo/projects/_all')
         end
@@ -49,7 +49,7 @@ describe Admin::Geo::ProjectsController, :geo do
         subject { get :index, params: { sync_status: 'pending' } }
 
         it 'renders pending template' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(subject).to render_template(:index)
           expect(subject).to render_template(partial: 'admin/geo/projects/_pending')
         end
@@ -59,7 +59,7 @@ describe Admin::Geo::ProjectsController, :geo do
         subject { get :index, params: { sync_status: 'failed' } }
 
         it 'renders failed template' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(subject).to render_template(:index)
           expect(subject).to render_template(partial: 'admin/geo/projects/_failed')
         end
@@ -69,7 +69,7 @@ describe Admin::Geo::ProjectsController, :geo do
         subject { get :index, params: { sync_status: 'never' } }
 
         it 'renders failed template' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(subject).to render_template(:index)
           expect(subject).to render_template(partial: 'admin/geo/projects/_never')
         end
@@ -79,7 +79,7 @@ describe Admin::Geo::ProjectsController, :geo do
         subject { get :index, params: { sync_status: 'synced' } }
 
         it 'renders synced template' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(subject).to render_template(:index)
           expect(subject).to render_template(partial: 'admin/geo/projects/_synced')
         end

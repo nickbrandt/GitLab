@@ -26,7 +26,7 @@ describe Security::ProjectsController do
         get :index
 
         aggregate_failures 'expect successful response containing the project with a remove path' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['projects'].count).to be(1)
 
           dashboard_project = json_response['projects'].first
@@ -38,7 +38,7 @@ describe Security::ProjectsController do
       it 'sets a polling interval header' do
         get :index
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.headers['Poll-Interval']).to eq('120000')
       end
     end
@@ -67,7 +67,7 @@ describe Security::ProjectsController do
         subject
 
         aggregate_failures 'expect successful response and project added to dashboard' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(user.reload.security_dashboard_projects).to contain_exactly(project)
           expect(json_response).to eq({
             'added' => [project.id],
@@ -84,7 +84,7 @@ describe Security::ProjectsController do
           subject
 
           aggregate_failures 'expect successful response and no duplicate project added to dashboard' do
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(user.reload.security_dashboard_projects.count).to be(1)
             expect(json_response).to eq({
               'added' => [],
@@ -102,7 +102,7 @@ describe Security::ProjectsController do
           subject
 
           aggregate_failures 'expect successful response and no project added to dashboard' do
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(user.reload.security_dashboard_projects).to be_empty
             expect(json_response).to eq({
               'added' => [],
@@ -124,7 +124,7 @@ describe Security::ProjectsController do
         post :create, params: { project_ids: [project.id] }
 
         aggregate_failures 'expect successful response and project added to dashboard' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(auditor.reload.security_dashboard_projects).to contain_exactly(project)
         end
       end
@@ -167,7 +167,7 @@ describe Security::ProjectsController do
         subject
 
         aggregate_failures 'expect successful response and project removed from dashboard' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(user.reload.security_dashboard_projects).to be_empty
         end
       end
@@ -176,7 +176,7 @@ describe Security::ProjectsController do
         it 'does nothing and returns 204' do
           delete :destroy, params: { id: -1 }
 
-          expect(response).to have_gitlab_http_status(204)
+          expect(response).to have_gitlab_http_status(:no_content)
         end
       end
     end
