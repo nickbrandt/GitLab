@@ -506,22 +506,70 @@ describe Project do
     end
   end
 
+  describe '#has_group_hooks?' do
+    subject { project.has_group_hooks? }
+
+    let(:project) { create(:project) }
+
+    it { is_expected.to eq(nil) }
+
+    context 'project is in a group' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, namespace: group) }
+
+      shared_examples 'returns nil when the feature is not available' do
+        specify do
+          stub_licensed_features(group_webhooks: false)
+
+          expect(subject).to eq(nil)
+        end
+      end
+
+      it_behaves_like 'returns nil when the feature is not available'
+
+      it { is_expected.to eq(false) }
+
+      context 'the group has hooks' do
+        let!(:group_hook) { create(:group_hook, group: group, push_events: true) }
+
+        it { is_expected.to eq(true) }
+
+        it_behaves_like 'returns nil when the feature is not available'
+
+        context 'but the hook is not in scope' do
+          subject { project.has_group_hooks?(:issue_hooks) }
+
+          it_behaves_like 'returns nil when the feature is not available'
+
+          it { is_expected.to eq(false) }
+        end
+      end
+
+      context 'the group inherits a hook' do
+        let(:parent_group) { create(:group) }
+        let!(:group_hook) { create(:group_hook, group: parent_group) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        it_behaves_like 'returns nil when the feature is not available'
+
+        it { is_expected.to eq(true) }
+
+        context 'when sub_group_webhooks feature flag is disabled' do
+          before do
+            stub_feature_flags(sub_group_webhooks: false)
+          end
+
+          it { is_expected.to eq(false) }
+        end
+      end
+    end
+  end
+
   describe "#execute_hooks" do
     context "group hooks" do
       let(:group) { create(:group) }
       let(:project) { create(:project, namespace: group) }
       let(:group_hook) { create(:group_hook, group: group, push_events: true) }
-
-      it 'executes the hook when the feature is enabled' do
-        stub_licensed_features(group_webhooks: true)
-
-        fake_service = double
-        expect(WebHookService).to receive(:new)
-                                    .with(group_hook, { some: 'info' }, 'push_hooks') { fake_service }
-        expect(fake_service).to receive(:async_execute)
-
-        project.execute_hooks(some: 'info')
-      end
 
       it 'does not execute the hook when the feature is disabled' do
         stub_licensed_features(group_webhooks: false)
@@ -531,23 +579,54 @@ describe Project do
 
         project.execute_hooks(some: 'info')
       end
-    end
-  end
 
-  describe '#execute_hooks' do
-    it "triggers project and group hooks" do
-      group = create :group, name: 'gitlab'
-      project = create(:project, name: 'gitlabhq', namespace: group)
-      project_hook = create(:project_hook, push_events: true, project: project)
-      group_hook = create(:group_hook, push_events: true, group: group)
+      context 'when group_webhooks frature is enabled' do
+        before do
+          stub_licensed_features(group_webhooks: true)
+        end
+        let(:fake_service) { double }
 
-      stub_request(:post, project_hook.url)
-      stub_request(:post, group_hook.url)
+        shared_examples 'triggering group webhook' do
+          it 'executes the hook' do
+            expect(fake_service).to receive(:async_execute).once
 
-      expect_any_instance_of(GroupHook).to receive(:async_execute).and_return(true)
-      expect_any_instance_of(ProjectHook).to receive(:async_execute).and_return(true)
+            expect(WebHookService).to receive(:new)
+                                        .with(group_hook, { some: 'info' }, 'push_hooks') { fake_service }
 
-      project.execute_hooks({}, :push_hooks)
+            project.execute_hooks(some: 'info')
+          end
+        end
+
+        it_behaves_like 'triggering group webhook'
+
+        context 'when sub_group_webhooks feature flag is disabled' do
+          before do
+            stub_feature_flags(sub_group_webhooks: false)
+          end
+
+          it_behaves_like 'triggering group webhook'
+        end
+
+        context 'in sub group' do
+          let(:sub_group) { create :group, parent: group }
+          let(:sub_sub_group) { create :group, parent: sub_group }
+          let(:project) { create(:project, namespace: sub_sub_group) }
+
+          it_behaves_like 'triggering group webhook'
+
+          context 'when sub_group_webhooks feature flag is disabled' do
+            before do
+              stub_feature_flags(sub_group_webhooks: false)
+            end
+
+            it 'does not execute the hook' do
+              expect(WebHookService).not_to receive(:new).with(group_hook, { some: 'info' }, 'push_hooks')
+
+              project.execute_hooks(some: 'info')
+            end
+          end
+        end
+      end
     end
   end
 
