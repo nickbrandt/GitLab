@@ -120,7 +120,7 @@ module API
           projects = current_user.can_read_all_resources? ? Project.all : current_user.authorized_projects
           projects = projects.in_namespace(namespace.self_and_descendants)
 
-          projects_cte = Project.wrap_authorized_projects_with_cte(projects)
+          projects_cte = Project.wrap_with_cte(projects)
                                 .eager_load_namespace_and_owner
                                 .with_route
 
