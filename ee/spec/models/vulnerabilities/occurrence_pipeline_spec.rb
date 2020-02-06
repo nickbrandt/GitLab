@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Vulnerabilities::OccurrencePipeline do
   describe 'associations' do
     it { is_expected.to belong_to(:pipeline).class_name('Ci::Pipeline') }
-    it { is_expected.to belong_to(:occurrence).class_name('Vulnerabilities::Occurrence') }
+    it { is_expected.to belong_to(:occurrence).class_name('Vulnerabilities::Finding') }
   end
 
   describe 'validations' do

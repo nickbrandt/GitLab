@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Occurrence < ApplicationRecord
+  class Finding < ApplicationRecord
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
     include Presentable
@@ -118,7 +118,7 @@ module Vulnerabilities
     end
 
     def self.with_vulnerabilities_for_state(project:, report_type:, project_fingerprints:)
-      Vulnerabilities::Occurrence
+      Vulnerabilities::Finding
         .joins(:vulnerability)
         .where(
           project: project,

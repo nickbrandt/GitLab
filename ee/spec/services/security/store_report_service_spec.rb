@@ -39,7 +39,7 @@ describe Security::StoreReportService, '#execute' do
       end
 
       it 'inserts all occurrences' do
-        expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(occurrences)
+        expect { subject }.to change { Vulnerabilities::Finding.count }.by(occurrences)
       end
 
       it 'inserts all occurrence identifiers (join model)' do
@@ -91,7 +91,7 @@ describe Security::StoreReportService, '#execute' do
     end
 
     it 'inserts only new occurrences and reuse existing ones' do
-      expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(32)
+      expect { subject }.to change { Vulnerabilities::Finding.count }.by(32)
     end
 
     it 'inserts all occurrence pipelines (join model) for this new pipeline' do

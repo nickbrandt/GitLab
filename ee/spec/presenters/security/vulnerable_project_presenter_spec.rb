@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 describe Security::VulnerableProjectPresenter do
-  SEVERITY_LEVELS = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys
+  SEVERITY_LEVELS = ::Vulnerabilities::Finding::SEVERITY_LEVELS.keys
 
   let(:project) { create(:project) }
 
   before do
-    allow(::Vulnerabilities::Occurrence).to receive(:batch_count_by_project_and_severity).and_return(1)
+    allow(::Vulnerabilities::Finding).to receive(:batch_count_by_project_and_severity).and_return(1)
   end
 
   subject { described_class.new(project) }

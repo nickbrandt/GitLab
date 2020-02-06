@@ -3,7 +3,7 @@
 # Security::PipelineVulnerabilitiesFinder
 #
 # Used to retrieve security vulnerabilities from an associated Pipeline,
-# This involves normalizing Report::Occurrence POROs to Vulnerabilities::Occurrence
+# This involves normalizing Report::Occurrence POROs to Vulnerabilities::Finding
 #
 # Arguments:
 #   pipeline - object to filter vulnerabilities
@@ -63,7 +63,7 @@ module Security
     end
 
     def vulnerabilities_by_finding_fingerprint(report_type, report)
-      Vulnerabilities::Occurrence
+      Vulnerabilities::Finding
         .with_vulnerabilities_for_state(
           project: pipeline.project,
           report_type: report_type,
@@ -78,7 +78,7 @@ module Security
         occurrence_hash = report_occurrence.to_hash
           .except(:compare_key, :identifiers, :location, :scanner)
 
-        occurrence = Vulnerabilities::Occurrence.new(occurrence_hash)
+        occurrence = Vulnerabilities::Finding.new(occurrence_hash)
         # assigning Vulnerabilities to Findings to enable the computed state
         occurrence.location_fingerprint = report_occurrence.location.fingerprint
         occurrence.vulnerability = vulnerabilities[occurrence.project_fingerprint]
@@ -125,15 +125,15 @@ module Security
     end
 
     def confidence_levels
-      Array(params.fetch(:confidence, Vulnerabilities::Occurrence.confidences.keys))
+      Array(params.fetch(:confidence, Vulnerabilities::Finding.confidences.keys))
     end
 
     def report_types
-      Array(params.fetch(:report_type, Vulnerabilities::Occurrence.report_types.keys))
+      Array(params.fetch(:report_type, Vulnerabilities::Finding.report_types.keys))
     end
 
     def severity_levels
-      Array(params.fetch(:severity, Vulnerabilities::Occurrence.severities.keys))
+      Array(params.fetch(:severity, Vulnerabilities::Finding.severities.keys))
     end
   end
 end

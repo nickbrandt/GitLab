@@ -98,8 +98,8 @@ module Security
         if a_severity == b_severity
           a.compare_key <=> b.compare_key
         else
-          Vulnerabilities::Occurrence::SEVERITY_LEVELS[b_severity] <=>
-            Vulnerabilities::Occurrence::SEVERITY_LEVELS[a_severity]
+          Vulnerabilities::Finding::SEVERITY_LEVELS[b_severity] <=>
+            Vulnerabilities::Finding::SEVERITY_LEVELS[a_severity]
         end
       end
     end

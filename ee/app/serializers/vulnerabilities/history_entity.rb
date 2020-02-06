@@ -3,7 +3,7 @@
 class Vulnerabilities::HistoryEntity < Grape::Entity
   present_collection true
 
-  Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |level|
+  Vulnerabilities::Finding::SEVERITY_LEVELS.keys.each do |level|
     expose level do |object|
       counts(by_severity[level]&.group_by(&:day) || {})
     end
