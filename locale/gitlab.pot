@@ -484,7 +484,7 @@ msgstr ""
 msgid "%{username}'s avatar"
 msgstr ""
 
-msgid "%{value} ms"
+msgid "%{value} s"
 msgstr ""
 
 msgid "%{verb} %{time_spent_value} spent time."
