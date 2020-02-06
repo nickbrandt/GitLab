@@ -1,7 +1,8 @@
 export const PackageType = {
+  CONAN: 'conan',
   MAVEN: 'maven',
   NPM: 'npm',
-  CONAN: 'conan',
+  NUGET: 'nuget',
 };
 
 export const TrackingActions = {

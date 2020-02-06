@@ -11,17 +11,21 @@ module EE
     end
 
     def npm_package_registry_url
-      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, expose_path(api_v4_packages_npm_package_name_path))
+      expose_url(api_v4_packages_npm_package_name_path)
     end
 
     def conan_package_registry_url
-      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, "api/#{::API::API.version}/packages/conan")
+      expose_url("api/#{::API::API.version}/packages/conan")
+    end
+
+    def nuget_package_registry_url(project_id)
+      expose_url(api_v4_projects_packages_nuget_index_path(id: project_id, format: '.json'))
     end
 
     def package_registry_project_url(project_id, registry_type = :maven)
       project_api_path = expose_path(api_v4_projects_path(id: project_id))
       package_registry_project_path = "#{project_api_path}/packages/#{registry_type}"
-      ::Gitlab::Utils.append_path(::Gitlab.config.gitlab.url, package_registry_project_path)
+      expose_url(package_registry_project_path)
     end
   end
 end

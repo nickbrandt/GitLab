@@ -12,10 +12,11 @@ import {
 import _ from 'underscore';
 import Tracking from '~/tracking';
 import PackageInformation from './information.vue';
-import NpmInstallation from './npm_installation.vue';
-import MavenInstallation from './maven_installation.vue';
-import ConanInstallation from './conan_installation.vue';
 import PackageTitle from './package_title.vue';
+import ConanInstallation from './conan_installation.vue';
+import MavenInstallation from './maven_installation.vue';
+import NpmInstallation from './npm_installation.vue';
+import NugetInstallation from './nuget_installation.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
@@ -34,10 +35,11 @@ export default {
     GlTable,
     GlIcon,
     PackageInformation,
-    NpmInstallation,
-    MavenInstallation,
-    ConanInstallation,
     PackageTitle,
+    ConanInstallation,
+    MavenInstallation,
+    NpmInstallation,
+    NugetInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -84,6 +86,14 @@ export default {
       type: String,
       required: true,
     },
+    nugetPath: {
+      type: String,
+      required: true,
+    },
+    nugetHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['packageEntity', 'packageFiles']),
@@ -95,6 +105,9 @@ export default {
     },
     isConanPackage() {
       return this.packageEntity.package_type === PackageType.CONAN;
+    },
+    isNugetPackage() {
+      return this.packageEntity.package_type === PackageType.NUGET;
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
@@ -248,6 +261,13 @@ export default {
           :package-entity="packageEntity"
           :registry-url="conanPath"
           :help-url="conanHelpPath"
+        />
+
+        <nuget-installation
+          v-else-if="isNugetPackage"
+          :package-entity="packageEntity"
+          :registry-url="nugetPath"
+          :help-url="nugetHelpPath"
         />
       </div>
     </div>

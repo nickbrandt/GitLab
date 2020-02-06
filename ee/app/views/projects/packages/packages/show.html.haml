@@ -16,4 +16,6 @@
       maven_help_path: help_page_path('user/packages/maven_repository/index'),
       conan_path: conan_package_registry_url,
       conan_help_path: help_page_path('user/packages/conan_repository/index'),
+      nuget_path: nuget_package_registry_url(@project.id),
+      nuget_help_path: help_page_path('user/packages/nuget_repository/index'),
       package_file_download_path: download_project_package_file_path(@project, @package_files.first) } }

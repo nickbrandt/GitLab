@@ -3,6 +3,7 @@ export const TrackingLabels = {
   CONAN_INSTALLATION: 'conan_installation',
   MAVEN_INSTALLATION: 'maven_installation',
   NPM_INSTALLATION: 'npm_installation',
+  NUGET_INSTALLATION: 'nuget_installation',
 };
 
 export const TrackingActions = {
@@ -21,4 +22,7 @@ export const TrackingActions = {
 
   COPY_YARN_INSTALL_COMMAND: 'copy_yarn_install_command',
   COPY_YARN_SETUP_COMMAND: 'copy_yarn_setup_command',
+
+  COPY_NUGET_INSTALL_COMMAND: 'copy_nuget_install_command',
+  COPY_NUGET_SETUP_COMMAND: 'copy_nuget_setup_command',
 };

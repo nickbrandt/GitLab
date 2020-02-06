@@ -32,6 +32,8 @@ export default () => {
         mavenHelpPath: dataset.mavenHelpPath,
         conanPath: dataset.conanPath,
         conanHelpPath: dataset.conanHelpPath,
+        nugetPath: dataset.nugetPath,
+        nugetHelpPath: dataset.nugetHelpPath,
       };
     },
     render(createElement) {
@@ -46,6 +48,8 @@ export default () => {
           mavenHelpPath: this.mavenHelpPath,
           conanPath: this.conanPath,
           conanHelpPath: this.conanHelpPath,
+          nugetPath: this.nugetPath,
+          nugetHelpPath: this.nugetHelpPath,
         },
       });
     },
