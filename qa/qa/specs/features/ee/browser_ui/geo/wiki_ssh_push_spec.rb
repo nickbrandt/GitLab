@@ -47,6 +47,8 @@ module QA
             validate_content(push_content)
           end
 
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner

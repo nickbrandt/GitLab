@@ -39,6 +39,8 @@ module QA
             project.visit!
           end
 
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
@@ -126,6 +128,8 @@ module QA
               push.commit_message = "Add #{file_name_primary}"
             end
           end
+
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
