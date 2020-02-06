@@ -1,4 +1,4 @@
-import { leftSidebarViews } from '../../../constants';
+import { leftSidebarViews } from '~/ide/constants';
 import { __ } from '~/locale';
 
 export const templateTypes = () => [
