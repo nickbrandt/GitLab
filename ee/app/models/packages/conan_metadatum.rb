@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Packages::ConanMetadatum < ApplicationRecord
-  belongs_to :package, inverse_of: :conan_metadatum
+  belongs_to :package, -> { where(package_type: :conan) }, inverse_of: :conan_metadatum
 
   validates :package, presence: true
 
@@ -12,6 +12,8 @@ class Packages::ConanMetadatum < ApplicationRecord
   validates :package_channel,
     presence: true,
     format: { with: Gitlab::Regex.conan_recipe_component_regex }
+
+  validate :conan_package_type
 
   def recipe
     "#{package.name}/#{package.version}@#{package_username}/#{package_channel}"
@@ -27,5 +29,13 @@ class Packages::ConanMetadatum < ApplicationRecord
 
   def self.full_path_from(package_username:)
     package_username.tr('+', '/')
+  end
+
+  private
+
+  def conan_package_type
+    unless package && package.conan?
+      errors.add(:base, 'Package type must be Conan')
+    end
   end
 end
