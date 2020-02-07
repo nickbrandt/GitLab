@@ -2347,7 +2347,7 @@ ActiveRecord::Schema.define(version: 2020_02_06_111847) do
     t.datetime "updated_at"
     t.integer "repository_type", limit: 2
     t.index ["lfs_object_id"], name: "index_lfs_objects_projects_on_lfs_object_id"
-    t.index ["project_id"], name: "index_lfs_objects_projects_on_project_id"
+    t.index ["project_id", "lfs_object_id"], name: "index_lfs_objects_projects_on_project_id_and_lfs_object_id"
   end
 
   create_table "licenses", id: :serial, force: :cascade do |t|

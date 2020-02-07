@@ -1359,6 +1359,10 @@ class Project < ApplicationRecord
     forked_from_project || fork_network&.root_project
   end
 
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def lfs_storage_project
     @lfs_storage_project ||= begin
       result = self
@@ -1371,14 +1375,27 @@ class Project < ApplicationRecord
     end
   end
 
-  # This will return all `lfs_objects` that are accessible to the project.
-  # So this might be `self.lfs_objects` if the project is not part of a fork
-  # network, or it is the base of the fork network.
+  # This will return all `lfs_objects` that are accessible to the project and
+  # the fork source. This is needed since older forks won't have access to some
+  # LFS objects directly and have to get it from the fork source.
   #
-  # TODO: refactor this to get the correct lfs objects when implementing
-  #       https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def all_lfs_objects
-    lfs_storage_project.lfs_objects
+    LfsObject
+      .distinct
+      .joins(:lfs_objects_projects)
+      .where(lfs_objects_projects: { project_id: [self, lfs_storage_project] })
+  end
+
+  # TODO: Call `#lfs_objects` instead once all LfsObjectsProject records are
+  # backfilled. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
+  def lfs_objects_oids
+    all_lfs_objects.pluck(:oid)
   end
 
   def personal?
