@@ -1,0 +1,53 @@
+- add_to_breadcrumbs _("Security Dashboard"), project_security_dashboard_index_path(@project)
+- breadcrumb_title _("Vulnerabilities")
+- page_title _("Vulnerabilities")
+
+.issue-details.issuable-details
+  %h2.title= _("Vulnerabilities")
+
+  %table.table.b-table.b-table-stacked-sm.gl-table.vulnerabilities-list{ "aria-colcount" => "3", :role => "table" }
+    - if @vulnerabilities.blank?
+      %tbody{ :role => "rowgroup" }
+        %tr.b-table-empty-row{ :role => "row" }
+          %td{ :role => "cell" }
+            .empty-state
+              .svg-250.svg-content
+                = image_tag 'illustrations/security-dashboard-empty-state.svg', alt: _("No vulnerabilities found for this project")
+              .text-content
+                %h4.center= _("No vulnerabilities found for this project")
+                %p= _("While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.")
+
+    - else
+      %thead{ :role => "rowgroup" }
+        %tr{ :role => "row" }
+          %th.gl-w-64{ "aria-colindex" => "1", :role => "columnheader", :scope => "col" }= s_("Vulnerability|Status")
+          %th.gl-w-64{ "aria-colindex" => "2", :role => "columnheader", :scope => "col" }= s_("Vulnerability|Severity")
+          %th{ "aria-colindex" => "3", :role => "columnheader", :scope => "col" }= _("Description")
+      %tbody{ :role => "rowgroup" }
+        - @vulnerabilities.each do |vulnerability|
+          %tr.js-vulnerability{ :role => "row" }
+            %td{ "aria-colindex" => "1", :role => "cell", "data-label" => s_("Vulnerability|Status") }
+              .text-capitalize= vulnerability.state
+            %td{ "aria-colindex" => "2", :role => "cell", "data-label" => s_("Vulnerability|Severity") }
+              .text-nowrap
+                - if vulnerability.severity === 'critical'
+                  = sprite_icon("severity-critical", size: 12, css_class: "align-middle text-danger-800")
+                - elsif vulnerability.severity === 'high'
+                  = sprite_icon("severity-high", size: 12, css_class: "align-middle text-danger-600")
+                - elsif vulnerability.severity === 'medium'
+                  = sprite_icon("severity-medium", size: 12, css_class: "align-middle text-warning-400")
+                - elsif vulnerability.severity === 'low'
+                  = sprite_icon("severity-low", size: 12, css_class: "align-middle text-warning-300")
+                - elsif vulnerability.severity === 'info'
+                  = sprite_icon("severity-info", size: 12, css_class: "align-middle text-primary-400")
+                - else
+                  = sprite_icon("severity-unknown", size: 12, css_class: "align-middle text-secondary-400")
+                %span.align-middle.ml-1.text-capitalize= vulnerability.severity
+            %td{ "aria-colindex" => "2", :role => "cell", "data-label" => _("Description") }
+              %div
+                = link_to vulnerability.title, vulnerability_path(vulnerability), :class => "text-body"
+                - if vulnerability.finding
+                  %br
+                  %span.text-muted.small= vulnerability.finding.location["file"]
+
+  = paginate @vulnerabilities, theme: "gitlab"
