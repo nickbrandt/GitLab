@@ -8,7 +8,7 @@ class ServiceDeskSetting < ApplicationRecord
   validate :valid_issue_template
   validates :outgoing_name, length: { maximum: 255 }, allow_blank: true
   validates :project_key, length: { maximum: 255 }, allow_blank: true, format: { with: /\A[a-z0-9_]+\z/ }
-  validates_uniqueness_of :project_key
+  validates_uniqueness_of :project_key, allow_nil: true
 
   def issue_template_content
     strong_memoize(:issue_template_content) do

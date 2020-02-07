@@ -9,7 +9,7 @@ describe ServiceDeskSetting do
     it { is_expected.to validate_presence_of(:project_id) }
     it { is_expected.to validate_length_of(:outgoing_name).is_at_most(255) }
     it { is_expected.to validate_length_of(:project_key).is_at_most(255) }
-    it { is_expected.to validate_uniqueness_of(:project_key) }
+    it { is_expected.to validate_uniqueness_of(:project_key).allow_nil }
     it { is_expected.to allow_value('abc123_').for(:project_key) }
     it { is_expected.not_to allow_value('abc 12').for(:project_key) }
     it { is_expected.not_to allow_value('Big val').for(:project_key) }
