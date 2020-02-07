@@ -66,5 +66,11 @@ FactoryBot.define do
                project_fingerprint: finding.project_fingerprint)
       end
     end
+
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |security_report_type|
+      trait security_report_type do
+        report_type { security_report_type }
+      end
+    end
   end
 end

@@ -43,6 +43,18 @@ describe Groups::Security::VulnerableProjectsController do
       expect(json_response.first['critical_vulnerability_count']).to eq(2)
     end
 
+    it 'includes projects in subgroups' do
+      subgroup = create(:group, parent: group)
+      project = create(:project, namespace: subgroup)
+      create(:vulnerabilities_occurrence, project: project)
+
+      subject
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response.count).to be(1)
+      expect(json_response.first['id']).to eq(project.id)
+    end
+
     it 'does not include archived or deleted projects' do
       archived_project = create(:project, :archived, namespace: group)
       deleted_project = create(:project, namespace: group, pending_delete: true)
