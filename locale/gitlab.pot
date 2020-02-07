@@ -10064,6 +10064,9 @@ msgstr ""
 msgid "IDE|Commit"
 msgstr ""
 
+msgid "IDE|Commit to %{branchName} branch"
+msgstr ""
+
 msgid "IDE|Edit"
 msgstr ""
 
@@ -10089,6 +10092,9 @@ msgid "IDE|Review"
 msgstr ""
 
 msgid "IDE|Successful commit"
+msgstr ""
+
+msgid "IDE|This option is disabled because you don't have write permissions for the current branch."
 msgstr ""
 
 msgid "IP Address"
@@ -19525,9 +19531,6 @@ msgid "This merge request is locked."
 msgstr ""
 
 msgid "This namespace has already been taken! Please choose another one."
-msgstr ""
-
-msgid "This option is disabled as you don't have write permissions for the current branch"
 msgstr ""
 
 msgid "This option is only available on GitLab.com"
