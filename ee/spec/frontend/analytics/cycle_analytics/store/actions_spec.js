@@ -22,20 +22,20 @@ import {
 
 const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
-const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
+const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
 const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
 const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
-  summaryData: '/analytics/cycle_analytics/summary',
-  durationData: /analytics\/cycle_analytics\/stages\/\d+\/duration_chart/,
-  stageData: /analytics\/cycle_analytics\/stages\/\d+\/records/,
-  stageMedian: /analytics\/cycle_analytics\/stages\/\d+\/median/,
-  baseStagesEndpoint: '/analytics/cycle_analytics/stages',
+  summaryData: '/analytics/value_stream_analytics/summary',
+  durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
+  stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
+  stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
+  baseStagesEndpoint: '/analytics/value_stream_analytics/stages',
 };
 
-const stageEndpoint = ({ stageId }) => `/-/analytics/cycle_analytics/stages/${stageId}`;
+const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stages/${stageId}`;
 
 describe('Cycle analytics actions', () => {
   let state;
@@ -276,7 +276,7 @@ describe('Cycle analytics actions', () => {
       state = { ...state, selectedGroup, startDate, endDate };
     });
 
-    it(`dispatches actions for required cycle analytics data`, done => {
+    it(`dispatches actions for required value stream analytics analytics data`, done => {
       testAction(
         actions.fetchCycleAnalyticsData,
         state,
@@ -368,7 +368,9 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAMessage('There was an error while fetching cycle analytics summary data.');
+          shouldFlashAMessage(
+            'There was an error while fetching value stream analytics summary data.',
+          );
           done();
         })
         .catch(done.fail);
@@ -394,7 +396,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAMessage('There was an error fetching cycle analytics stages.');
+          shouldFlashAMessage('There was an error fetching value stream analytics stages.');
           done();
         })
         .catch(done.fail);
@@ -425,7 +427,9 @@ describe('Cycle analytics actions', () => {
         {},
       );
 
-      shouldFlashAMessage('There was an error while fetching cycle analytics duration data.');
+      shouldFlashAMessage(
+        'There was an error while fetching value stream analytics duration data.',
+      );
     });
 
     describe('with an existing error', () => {
@@ -925,7 +929,9 @@ describe('Cycle analytics actions', () => {
         commit: () => {},
       });
 
-      shouldFlashAMessage('There was an error while fetching cycle analytics duration data.');
+      shouldFlashAMessage(
+        'There was an error while fetching value stream analytics duration data.',
+      );
     });
   });
 
@@ -1149,7 +1155,7 @@ describe('Cycle analytics actions', () => {
       });
 
       shouldFlashAMessage(
-        'There was an error while fetching cycle analytics duration median data.',
+        'There was an error while fetching value stream analytics duration median data.',
       );
     });
   });

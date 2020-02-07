@@ -140,7 +140,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
 
     default_stages.each do |endpoint|
-      it "cycle_analytics/events/#{endpoint}.json" do
+      it "value_stream_analytics/events/#{endpoint}.json" do
         get endpoint, params: { group_id: group, format: :json }
 
         expect(response).to be_successful
@@ -160,7 +160,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       sign_in(user)
     end
 
-    it 'cycle_analytics/mock_data.json' do
+    it 'value_stream_analytics/mock_data.json' do
       get(:show, params: {
         group_id: group.name,
         cycle_analytics: { start_date: 30 }
@@ -194,21 +194,21 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       sign_in(user)
     end
 
-    it 'analytics/cycle_analytics/stages.json' do
+    it 'analytics/value_stream_analytics/stages.json' do
       get(:index, params: { group_id: group.name }, format: :json)
 
       expect(response).to be_successful
     end
 
     Gitlab::Analytics::CycleAnalytics::DefaultStages.all.each do |stage|
-      it "analytics/cycle_analytics/stages/#{stage[:name]}/records.json" do
+      it "analytics/value_stream_analytics/stages/#{stage[:name]}/records.json" do
         stage_id = group.cycle_analytics_stages.find_by(name: stage[:name]).id
         get(:records, params: params.merge({ id: stage_id }), format: :json)
 
         expect(response).to be_successful
       end
 
-      it "analytics/cycle_analytics/stages/#{stage[:name]}/median.json" do
+      it "analytics/value_stream_analytics/stages/#{stage[:name]}/median.json" do
         stage_id = group.cycle_analytics_stages.find_by(name: stage[:name]).id
         get(:median, params: params.merge({ id: stage_id }), format: :json)
 
@@ -216,13 +216,13 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       end
     end
 
-    it "analytics/cycle_analytics/stages/label-based-stage/records.json" do
+    it "analytics/value_stream_analytics/stages/label-based-stage/records.json" do
       get(:records, params: params.merge({ id: label_based_stage.id }), format: :json)
 
       expect(response).to be_successful
     end
 
-    it "analytics/cycle_analytics/stages/label-based-stage/median.json" do
+    it "analytics/value_stream_analytics/stages/label-based-stage/median.json" do
       get(:median, params: params.merge({ id: label_based_stage.id }), format: :json)
 
       expect(response).to be_successful
@@ -243,7 +243,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       sign_in(user)
     end
 
-    it 'analytics/cycle_analytics/summary.json' do
+    it 'analytics/value_stream_analytics/summary.json' do
       get(:show, params: params, format: :json)
 
       expect(response).to be_successful

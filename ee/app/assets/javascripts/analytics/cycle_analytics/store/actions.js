@@ -119,7 +119,7 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
 
   if (status !== httpStatus.FORBIDDEN)
-    createFlash(__('There was an error while fetching cycle analytics data.'));
+    createFlash(__('There was an error while fetching value stream analytics data.'));
 };
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
@@ -147,7 +147,7 @@ export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_D
 
 export const receiveSummaryDataError = ({ commit }, error) => {
   commit(types.RECEIVE_SUMMARY_DATA_ERROR, error);
-  createFlash(__('There was an error while fetching cycle analytics summary data.'));
+  createFlash(__('There was an error while fetching value stream analytics summary data.'));
 };
 
 export const receiveSummaryDataSuccess = ({ commit }, data) =>
@@ -198,7 +198,7 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
 
 export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
   commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR, error);
-  createFlash(__('There was an error fetching cycle analytics stages.'));
+  createFlash(__('There was an error fetching value stream analytics stages.'));
 };
 
 export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, data) => {
@@ -209,7 +209,7 @@ export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, 
     dispatch('setSelectedStage', firstStage);
     dispatch('fetchStageData', firstStage.slug);
   } else {
-    createFlash(__('There was an error while fetching cycle analytics data.'));
+    createFlash(__('There was an error while fetching value stream analytics data.'));
   }
 };
 
@@ -386,7 +386,7 @@ export const receiveDurationDataSuccess = ({ commit, state, dispatch }, data) =>
 
 export const receiveDurationDataError = ({ commit }) => {
   commit(types.RECEIVE_DURATION_DATA_ERROR);
-  createFlash(__('There was an error while fetching cycle analytics duration data.'));
+  createFlash(__('There was an error while fetching value stream analytics duration data.'));
 };
 
 export const fetchDurationData = ({ state, dispatch, getters }) => {
@@ -430,7 +430,7 @@ export const receiveDurationMedianDataSuccess = ({ commit }, data) =>
 
 export const receiveDurationMedianDataError = ({ commit }) => {
   commit(types.RECEIVE_DURATION_MEDIAN_DATA_ERROR);
-  createFlash(__('There was an error while fetching cycle analytics duration median data.'));
+  createFlash(__('There was an error while fetching value stream analytics duration median data.'));
 };
 
 export const fetchDurationMedianData = ({ state, dispatch }) => {

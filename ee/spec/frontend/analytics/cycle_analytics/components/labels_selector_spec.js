@@ -4,7 +4,7 @@ import { groupLabels } from '../mock_data';
 
 const selectedLabel = groupLabels[groupLabels.length - 1];
 
-describe('Cycle Analytics LabelsSelector', () => {
+describe('Value Stream Analytics LabelsSelector', () => {
   function createComponent({ props = {}, shallow = true } = {}) {
     const func = shallow ? shallowMount : mount;
     return func(LabelsSelector, {
