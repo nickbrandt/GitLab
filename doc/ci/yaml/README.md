@@ -1571,7 +1571,7 @@ allowing you to cache data between different jobs or even different branches.
 
 The `cache:key` variable can use any of the
 [predefined variables](../variables/README.md), and the default key, if not
-set, is just literal `default` which means everything is shared between all
+set, is just literal `default` which means everything is shared between
 pipelines and jobs by default, starting from GitLab 9.0.
 
 NOTE: **Note:**
