@@ -161,15 +161,7 @@ In the following example:
 
 #### Custom collapsible sections
 
-Build scripts can introduce their own collapsible sections like so:
-
-```text
-section_start:1560896352:my_first_section\r\e[0KHeader of the 1st collapsible section
-this line should be hidden when collapsed
-section_end:1560896353:my_first_section\r\e[0K
-```
-
-Where `1560896352` is the unix time the section started or ended; `my_first_section` is a section name; and `\e[0K` is the clear line ANSI escape code. For example, a shell script can demark a collapsible section with:
+Build scripts can introduce their own collapsible sections by marking the start and end of the section:
 
 ```yaml
 job1:
@@ -177,6 +169,14 @@ job1:
     - echo -e "section_start:`date +%s`:my_first_section\r\e[0KHeader of the 1st collapsible section"
     - echo 'this line should be hidden when collapsed'
     - echo -e "section_end:`date +%s`:my_first_section\r\e[0K"
+```
+
+This produces the following output, where `1560896352` is the unix time the section started or ended; `my_first_section` is a section name; and `\e[0K` is the clear line ANSI escape code.
+
+```plaintext
+section_start:1560896352:my_first_section\r\e[0KHeader of the 1st collapsible section
+this line should be hidden when collapsed
+section_end:1560896353:my_first_section\r\e[0K
 ```
 
 ## Configuring pipelines
