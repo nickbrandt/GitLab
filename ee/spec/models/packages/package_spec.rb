@@ -47,23 +47,7 @@ RSpec.describe Packages::Package, type: :model do
       end
     end
 
-    context "recipe uniqueness for conan packages" do
-      let!(:package) { create('conan_package') }
-
-      it "will allow a conan package with same project, name, version and package_type" do
-        new_package = build('conan_package', project: package.project, name: package.name, version: package.version)
-        new_package.conan_metadatum.package_channel = 'beta'
-        expect(new_package).to be_valid
-      end
-
-      it "will not allow a conan package with same recipe (name, version, metadatum.package_channel, metadatum.package_username, and package_type)" do
-        new_package = build('conan_package', project: package.project, name: package.name, version: package.version)
-        expect(new_package).not_to be_valid
-        expect(new_package.errors.to_a).to include("Package recipe already exists")
-      end
-    end
-
-    Packages::Package.package_types.keys.without('conan').each do |pt|
+    Packages::Package.package_types.keys.each do |pt|
       context "project id, name, version and package type uniqueness for package type #{pt}" do
         let(:package) { create("#{pt}_package") }
 
@@ -135,28 +119,24 @@ RSpec.describe Packages::Package, type: :model do
       end
     end
 
-    context 'conan scopes' do
+    describe '.with_conan_channel' do
       let!(:package) { create(:conan_package) }
 
-      describe '.with_conan_channel' do
-        subject { described_class.with_conan_channel('stable') }
+      subject { described_class.with_conan_channel('stable') }
 
-        it 'includes only packages with specified version' do
-          is_expected.to match_array([package])
-        end
+      it 'includes only packages with specified version' do
+        is_expected.to match_array([package])
       end
+    end
+  end
 
-      describe '.with_conan_username' do
-        subject do
-          described_class.with_conan_username(
-            Packages::ConanMetadatum.package_username_from(full_path: package.project.full_path)
-          )
-        end
+  describe '.with_conan_channel' do
+    let!(:package) { create(:conan_package) }
 
-        it 'includes only packages with specified version' do
-          is_expected.to match_array([package])
-        end
-      end
+    subject { described_class.with_conan_channel('stable') }
+
+    it 'includes only packages with specified version' do
+      is_expected.to eq([package])
     end
   end
 
