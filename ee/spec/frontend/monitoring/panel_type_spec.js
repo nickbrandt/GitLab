@@ -17,7 +17,6 @@ describe('Panel Type', () => {
   let axiosMock;
   let panelType;
   let store;
-  const dashboardWidth = 100;
   const exampleText = 'example_text';
 
   const createWrapper = propsData => {
@@ -46,7 +45,6 @@ describe('Panel Type', () => {
       beforeEach(() => {
         createWrapper({
           clipboardText: exampleText,
-          dashboardWidth,
           graphData: graphDataPrometheusQueryRange,
           alertsEndpoint: '/endpoint',
           prometheusAlertsAvailable: true,
@@ -89,7 +87,6 @@ describe('Panel Type', () => {
       beforeEach(() => {
         createWrapper({
           clipboardText: exampleText,
-          dashboardWidth,
           graphData: graphDataPrometheusQueryRange,
           alertsEndpoint: '/endpoint',
           prometheusAlertsAvailable: false,

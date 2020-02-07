@@ -131,6 +131,9 @@ describe('EnvironmentLogs', () => {
 
     expect(actionMocks.setInitData).toHaveBeenCalledTimes(1);
     expect(actionMocks.setInitData).toHaveBeenLastCalledWith({
+      timeRange: expect.objectContaining({
+        default: true,
+      }),
       environmentName: mockEnvName,
       podName: null,
     });

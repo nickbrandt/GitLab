@@ -31,7 +31,10 @@ const requestLogsUntilData = params =>
       });
   });
 
-export const setInitData = ({ commit }, { environmentName, podName }) => {
+export const setInitData = ({ commit }, { timeRange, environmentName, podName }) => {
+  if (timeRange) {
+    commit(types.SET_TIME_RANGE, timeRange);
+  }
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
   commit(types.SET_CURRENT_POD_NAME, podName);
 };

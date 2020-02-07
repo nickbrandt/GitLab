@@ -1,6 +1,7 @@
 <script>
 import { mapState } from 'vuex';
 import { pickBy } from 'lodash';
+import invalidUrl from '~/lib/utils/invalid_url';
 import {
   GlDropdown,
   GlDropdownItem,
@@ -18,7 +19,7 @@ import MonitorColumnChart from './charts/column.vue';
 import MonitorStackedColumnChart from './charts/stacked_column.vue';
 import MonitorEmptyChart from './charts/empty_chart.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
-import { downloadCSVOptions, generateLinkToChartOptions } from '../utils';
+import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
 export default {
   components: {
@@ -59,7 +60,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('monitoringDashboard', ['deploymentData', 'projectPath']),
+    ...mapState('monitoringDashboard', ['deploymentData', 'projectPath', 'logsPath', 'timeRange']),
     alertWidgetAvailable() {
       return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint && this.graphData;
     },
@@ -69,6 +70,12 @@ export default {
         this.graphData.metrics[0].result &&
         this.graphData.metrics[0].result.length > 0
       );
+    },
+    logsPathWithTimeRange() {
+      if (this.logsPath && this.logsPath !== invalidUrl && this.timeRange) {
+        return timeRangeToUrl(this.timeRange, this.logsPath);
+      }
+      return null;
     },
     csvText() {
       const chartData = this.graphData.metrics[0].result[0].values;
@@ -157,6 +164,15 @@ export default {
         <template slot="button-content">
           <icon name="ellipsis_v" class="text-secondary" />
         </template>
+
+        <gl-dropdown-item
+          v-if="logsPathWithTimeRange"
+          ref="viewLogsLink"
+          :href="logsPathWithTimeRange"
+        >
+          {{ s__('Metrics|View logs') }}
+        </gl-dropdown-item>
+
         <gl-dropdown-item
           v-track-event="downloadCSVOptions(graphData.title)"
           :href="downloadCsv"
