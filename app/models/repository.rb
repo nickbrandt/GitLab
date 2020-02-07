@@ -1131,10 +1131,9 @@ class Repository
   end
 
   def create_from_bundle(bundle_path)
-    raw.create_from_bundle(bundle_path)
-    after_create
-
-    true
+    raw.create_from_bundle(bundle_path).tap do |result|
+      after_create if result
+    end
   end
 
   def blobs_metadata(paths, ref = 'HEAD')
