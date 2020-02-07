@@ -1,18 +1,24 @@
 <script>
 import tooltip from '~/vue_shared/directives/tooltip';
 
+import CommonMixin from '../mixins/common_mixin';
 import QuartersPresetMixin from '../mixins/quarters_preset_mixin';
 import MonthsPresetMixin from '../mixins/months_preset_mixin';
 import WeeksPresetMixin from '../mixins/weeks_preset_mixin';
 
-import { TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from '../constants';
+import CurrentDayIndicator from './current_day_indicator.vue';
+
+import { TIMELINE_CELL_MIN_WIDTH } from '../constants';
 
 export default {
   cellWidth: TIMELINE_CELL_MIN_WIDTH,
   directives: {
     tooltip,
   },
-  mixins: [QuartersPresetMixin, MonthsPresetMixin, WeeksPresetMixin],
+  components: {
+    CurrentDayIndicator,
+  },
+  mixins: [CommonMixin, QuartersPresetMixin, MonthsPresetMixin, WeeksPresetMixin],
   props: {
     presetType: {
       type: String,
@@ -55,11 +61,11 @@ export default {
       };
     },
     hasStartDate() {
-      if (this.presetType === PRESET_TYPES.QUARTERS) {
+      if (this.presetTypeQuarters) {
         return this.hasStartDateForQuarter();
-      } else if (this.presetType === PRESET_TYPES.MONTHS) {
+      } else if (this.presetTypeMonths) {
         return this.hasStartDateForMonth();
-      } else if (this.presetType === PRESET_TYPES.WEEKS) {
+      } else if (this.presetTypeWeeks) {
         return this.hasStartDateForWeek();
       }
       return false;
@@ -68,14 +74,14 @@ export default {
       let barStyles = {};
 
       if (this.hasStartDate) {
-        if (this.presetType === PRESET_TYPES.QUARTERS) {
+        if (this.presetTypeQuarters) {
           // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForQuarters()}px; ${this.getTimelineBarStartOffsetForQuarters()}`;
-        } else if (this.presetType === PRESET_TYPES.MONTHS) {
+        } else if (this.presetTypeMonths) {
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths()}`;
-        } else if (this.presetType === PRESET_TYPES.WEEKS) {
+        } else if (this.presetTypeWeeks) {
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks()}`;
         }
@@ -88,6 +94,7 @@ export default {
 
 <template>
   <span class="epic-timeline-cell" data-qa-selector="epic_timeline_cell">
+    <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
     <div class="timeline-bar-wrapper">
       <a
         v-if="hasStartDate"
