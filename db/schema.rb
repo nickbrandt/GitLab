@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_06_091544) do
+ActiveRecord::Schema.define(version: 2020_02_06_111847) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -3827,7 +3827,6 @@ ActiveRecord::Schema.define(version: 2020_02_06_091544) do
     t.datetime "updated_at"
     t.boolean "active", default: false, null: false
     t.text "properties"
-    t.boolean "template", default: false
     t.boolean "push_events", default: true
     t.boolean "issues_events", default: true
     t.boolean "merge_requests_events", default: true
@@ -3844,9 +3843,10 @@ ActiveRecord::Schema.define(version: 2020_02_06_091544) do
     t.boolean "deployment_events", default: false, null: false
     t.string "description", limit: 500
     t.boolean "comment_on_event_enabled", default: true, null: false
+    t.boolean "instance", default: false
+    t.index ["instance"], name: "index_services_on_instance"
     t.index ["project_id"], name: "index_services_on_project_id"
     t.index ["project_id"], name: "tmp_index_on_project_id_partial_with_prometheus_services", where: "((type)::text = 'PrometheusService'::text)"
-    t.index ["template"], name: "index_services_on_template"
     t.index ["type"], name: "index_services_on_type"
   end
 
