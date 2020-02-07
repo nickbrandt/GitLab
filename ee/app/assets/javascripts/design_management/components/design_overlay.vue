@@ -1,10 +1,10 @@
 <script>
-import Icon from '~/vue_shared/components/icon.vue';
+import DesignNotePin from './design_note_pin.vue';
 
 export default {
   name: 'DesignOverlay',
   components: {
-    Icon,
+    DesignNotePin,
   },
   props: {
     dimensions: {
@@ -60,23 +60,12 @@ export default {
       data-qa-selector="design_image_button"
       @click="clickedImage($event.offsetX, $event.offsetY)"
     ></button>
-    <button
+    <design-note-pin
       v-for="(note, index) in notes"
       :key="note.id"
-      :style="getNotePosition(note.position)"
-      class="js-image-badge badge badge-pill position-absolute"
-      type="button"
-    >
-      {{ index + 1 }}
-    </button>
-    <button
-      v-if="currentCommentForm"
-      :style="getNotePosition(currentCommentForm)"
-      :aria-label="__('Comment form position')"
-      class="btn-transparent comment-indicator position-absolute"
-      type="button"
-    >
-      <icon name="image-comment-dark" />
-    </button>
+      :label="`${index + 1}`"
+      :position="getNotePosition(note.position)"
+    />
+    <design-note-pin v-if="currentCommentForm" :position="getNotePosition(currentCommentForm)" />
   </div>
 </template>

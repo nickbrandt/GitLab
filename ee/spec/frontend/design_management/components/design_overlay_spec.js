@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import DesignOverlay from 'ee/design_management/components/design_overlay.vue';
 
 describe('Design overlay component', () => {
@@ -29,7 +29,7 @@ describe('Design overlay component', () => {
   const findSecondBadge = () => findAllNotes().at(1);
 
   function createComponent(props = {}) {
-    wrapper = shallowMount(DesignOverlay, {
+    wrapper = mount(DesignOverlay, {
       propsData: {
         dimensions: {
           width: 100,
