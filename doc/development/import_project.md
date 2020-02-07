@@ -61,7 +61,7 @@ Parameters:
 | `namespace_path` | string | yes | Namespace path |
 | `project_path` | string | yes | Project name |
 | `archive_path` | string | yes | Path to the exported project tarball you want to import |
-| `measurement_enabled` | boolean | no | If enabled, it will measure execution time, number of sql calls and GC count. It's false by default |
+| `measurement_enabled` | boolean | no | Measure execution time, number of SQL calls and GC count |
 
 ```shell
 bundle exec rake "gitlab:import_export:import[root, root, testingprojectimport, /path/to/file.tar.gz, true]"
