@@ -120,19 +120,6 @@ describe IssueLinks::CreateService do
 
         subject
       end
-
-      context 'when issue_link_types is disabled' do
-        before do
-          stub_feature_flags(issue_link_types: false)
-        end
-
-        it 'creates links with default type' do
-          expect { subject }.to change(IssueLink, :count).from(0).to(2)
-
-          expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue, link_type: 'relates_to')
-          expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue, link_type: 'relates_to')
-        end
-      end
     end
 
     context 'when reference of any already related issue is present' do

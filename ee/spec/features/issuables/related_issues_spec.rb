@@ -421,7 +421,7 @@ describe 'Related issues', :js do
         end
       end
 
-      context 'with issue_link_types feature flag enabled' do
+      describe 'issue link types' do
         def add_linked_issue(issue, radio_input_value)
           find('.js-issue-count-badge-add-button').click
           find('.js-add-issuable-form-input').set "#{issue.to_reference(project)} "
@@ -432,7 +432,6 @@ describe 'Related issues', :js do
         end
 
         before do
-          stub_feature_flags(issue_link_types: true)
           visit project_issue_path(project, issue_a)
           wait_for_requests
         end
@@ -518,35 +517,6 @@ describe 'Related issues', :js do
 
             expect(items.count).to eq(3)
             expect(find('.js-related-issues-header-issue-count')).to have_content('3')
-          end
-        end
-      end
-
-      context 'with issue_link_types feature flag disabled' do
-        before do
-          stub_feature_flags(issue_link_types: false)
-          visit project_issue_path(project, issue_b)
-          wait_for_requests
-        end
-
-        context 'when adding an issue' do
-          before do
-            find('.js-issue-count-badge-add-button').click
-            find('.js-add-issuable-form-input').set "#{issue_c.to_reference(project)} "
-            find('.js-add-issuable-form-add-button').click
-            wait_for_requests
-          end
-
-          it 'does not group it into "Blocks", "Is blocked by", or "Relates to" headings' do
-            headings = all('.linked-issues-card-body h4')
-
-            expect(headings.count).to eq(0)
-          end
-
-          it 'shows the added issue' do
-            items = all('.item-title a')
-
-            expect(items.count).to eq(1)
           end
         end
       end
