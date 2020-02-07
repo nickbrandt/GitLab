@@ -20,7 +20,8 @@ class SlackService < ChatNotificationService
       <li><a href="https://slack.com/apps/A0F7XDUAZ-incoming-webhooks">Add an incoming webhook</a> in your Slack team. The default channel can be overridden for each event.</li>
       <li>Paste the <strong>Webhook URL</strong> into the field below.</li>
       <li>Select events below to enable notifications. The <strong>Channel names</strong> and <strong>Username</strong> fields are optional.</li>
-    </ol>'
+    </ol>
+    <strong>Note:</strong> Usernames and private channels are not supported.'
   end
 
   def default_channel_placeholder
