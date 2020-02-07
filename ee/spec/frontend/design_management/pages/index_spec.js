@@ -218,6 +218,8 @@ describe('Design management index page', () => {
                 },
               },
             ],
+            skippedDesigns: [],
+            errors: [],
           },
         },
       };

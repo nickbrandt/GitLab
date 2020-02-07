@@ -98,6 +98,8 @@ describe('optimistic responses', () => {
             },
           },
         ],
+        errors: [],
+        skippedDesigns: [],
       },
     };
     expect(designUploadOptimisticResponse([{ name: 'test' }])).toEqual(expectedResponse);

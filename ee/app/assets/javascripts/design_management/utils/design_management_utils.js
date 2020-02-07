@@ -83,6 +83,8 @@ export const designUploadOptimisticResponse = files => {
     designManagementUpload: {
       __typename: 'DesignManagementUploadPayload',
       designs,
+      skippedDesigns: [],
+      errors: [],
     },
   };
 };
