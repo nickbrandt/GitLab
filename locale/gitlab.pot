@@ -6426,6 +6426,9 @@ msgstr ""
 msgid "DeployTokens|Expires"
 msgstr ""
 
+msgid "DeployTokens|Group deploy tokens allow read-only access to the repositories and registry images within the group."
+msgstr ""
+
 msgid "DeployTokens|Name"
 msgstr ""
 

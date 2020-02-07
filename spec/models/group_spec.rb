@@ -1233,4 +1233,8 @@ describe Group do
       expect(groups).to contain_exactly(parent_group1, parent_group2, child_group1, child_group2, child_group3)
     end
   end
+
+  it_behaves_like 'deploy token accessible model' do
+    let(:entity) { build(:group) }
+  end
 end

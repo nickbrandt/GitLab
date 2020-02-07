@@ -249,20 +249,10 @@ describe Projects::Settings::CiCdController do
   end
 
   describe 'POST create_deploy_token' do
-    let(:deploy_token_params) do
-      {
-        name: 'deployer_token',
-        expires_at: 1.month.from_now.to_date.to_s,
-        username: 'deployer',
-        read_repository: '1',
-        deploy_token_type: '2'
-      }
-    end
-
-    subject(:create_deploy_token) { post :create_deploy_token, params: { namespace_id: project.namespace, project_id: project, deploy_token: deploy_token_params } }
-
     it_behaves_like 'a created deploy token' do
-      let(:deploy_token) { create_deploy_token }
+      let(:entity) { project }
+      let(:create_entity_params) { { namespace_id: project.namespace, project_id: project } }
+      let(:deploy_token_type) { DeployToken.deploy_token_types[:project_type] }
     end
   end
 end

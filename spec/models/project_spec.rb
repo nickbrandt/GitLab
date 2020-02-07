@@ -5652,6 +5652,10 @@ describe Project do
     end
   end
 
+  it_behaves_like 'deploy token accessible model' do
+    let(:entity) { build(:project) }
+  end
+
   def rugged_config
     rugged_repo(project.repository).config
   end

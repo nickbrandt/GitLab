@@ -6,7 +6,7 @@
     %button.btn.js-settings-toggle.qa-expand-deploy-keys{ type: 'button' }
       = expanded ? 'Collapse' : 'Expand'
     %p
-      = s_('DeployTokens|Deploy tokens allow read-only access to your repository and registry images.')
+      = description
   .settings-content
     - if @new_deploy_token.persisted?
       = render 'shared/deploy_tokens/new_deploy_token', deploy_token: @new_deploy_token
