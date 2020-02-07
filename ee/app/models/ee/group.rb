@@ -150,15 +150,6 @@ module EE
       ip_restrictions.map(&:range).join(",")
     end
 
-    def vulnerable_projects
-      vulnerabilities = ::Vulnerabilities::Occurrence
-        .select(1)
-        .undismissed
-        .where('vulnerability_occurrences.project_id = projects.id')
-
-      ::Project.for_group_and_its_subgroups(self).where("EXISTS(?)", vulnerabilities)
-    end
-
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
