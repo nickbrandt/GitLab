@@ -22,4 +22,8 @@ export default {
     const normalizedHeaders = normalizeHeaders(headers);
     state.pagination = parseIntPagination(normalizedHeaders);
   },
+
+  [types.SET_SORTING](state, sorting) {
+    state.sorting = { ...state.sorting, ...sorting };
+  },
 };

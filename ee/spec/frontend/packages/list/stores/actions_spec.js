@@ -28,11 +28,15 @@ describe('Actions Package list store', () => {
   });
 
   describe('requestPackagesList', () => {
+    const sorting = {
+      sort: 'asc',
+      orderBy: 'version',
+    };
     it('should fetch the project packages list when isGroupPage is false', done => {
       testAction(
         actions.requestPackagesList,
         undefined,
-        { config: { isGroupPage: false, resourceId: 1 } },
+        { config: { isGroupPage: false, resourceId: 1 }, sorting },
         [],
         [
           { type: 'setLoading', payload: true },
@@ -41,7 +45,7 @@ describe('Actions Package list store', () => {
         ],
         () => {
           expect(Api.projectPackages).toHaveBeenCalledWith(1, {
-            params: { page: 1, per_page: 20 },
+            params: { page: 1, per_page: 20, sort: sorting.sort, order_by: sorting.orderBy },
           });
           done();
         },
@@ -52,7 +56,7 @@ describe('Actions Package list store', () => {
       testAction(
         actions.requestPackagesList,
         undefined,
-        { config: { isGroupPage: true, resourceId: 2 } },
+        { config: { isGroupPage: true, resourceId: 2 }, sorting },
         [],
         [
           { type: 'setLoading', payload: true },
@@ -61,7 +65,7 @@ describe('Actions Package list store', () => {
         ],
         () => {
           expect(Api.groupPackages).toHaveBeenCalledWith(2, {
-            params: { page: 1, per_page: 20 },
+            params: { page: 1, per_page: 20, sort: sorting.sort, order_by: sorting.orderBy },
           });
           done();
         },
@@ -73,7 +77,7 @@ describe('Actions Package list store', () => {
       testAction(
         actions.requestPackagesList,
         undefined,
-        { config: { isGroupPage: false, resourceId: 2 } },
+        { config: { isGroupPage: false, resourceId: 2 }, sorting },
         [],
         [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         () => {
@@ -177,6 +181,19 @@ describe('Actions Package list store', () => {
         expect(createFlash).toHaveBeenCalledWith(DELETE_PACKAGE_ERROR_MESSAGE);
         done();
       });
+    });
+  });
+
+  describe('setSorting', () => {
+    it('should commit SET_SORTING', done => {
+      testAction(
+        actions.setSorting,
+        'foo',
+        null,
+        [{ type: types.SET_SORTING, payload: 'foo' }],
+        [],
+        done,
+      );
     });
   });
 });
