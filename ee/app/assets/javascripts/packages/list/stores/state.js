@@ -32,4 +32,15 @@ export default () => ({
    * }
    */
   pagination: {},
+  /**
+   * Sorting object has the following structure:
+   * {
+   *  sort: String,
+   *  orderBy: String
+   * }
+   */
+  sorting: {
+    sort: 'desc',
+    orderBy: 'version',
+  },
 });
