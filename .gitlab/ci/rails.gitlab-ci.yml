@@ -344,7 +344,7 @@ rspec unit pg10:
 
 rspec integration pg10:
   extends: .rspec-base-pg10
-  parallel: 6
+  parallel: 8
 
 rspec system pg10:
   extends: .rspec-base-pg10
@@ -422,7 +422,7 @@ rspec migration pg9-as-if-foss:
   extends:
     - .rspec-base-pg9-as-if-foss
     - .rspec-base-migration
-  parallel: 4
+  parallel: 5
 
 rspec unit pg9-as-if-foss:
   extends: .rspec-base-pg9-as-if-foss
@@ -430,7 +430,7 @@ rspec unit pg9-as-if-foss:
 
 rspec integration pg9-as-if-foss:
   extends: .rspec-base-pg9-as-if-foss
-  parallel: 6
+  parallel: 8
 
 rspec system pg9-as-if-foss:
   extends: .rspec-base-pg9-as-if-foss
@@ -448,11 +448,11 @@ rspec-ee unit pg9:
 
 rspec-ee integration pg9:
   extends: .rspec-ee-base-pg9
-  parallel: 3
+  parallel: 4
 
 rspec-ee system pg9:
   extends: .rspec-ee-base-pg9
-  parallel: 5
+  parallel: 6
 
 .rspec-ee-base-geo:
   extends: .rspec-base-ee
