@@ -6,20 +6,24 @@ import store from '~/ide/stores';
 import CommitForm from '~/ide/components/commit_sidebar/form.vue';
 import { leftSidebarViews } from '~/ide/constants';
 import { resetStore } from '../../helpers';
+import consts from '~/ide/stores/modules/commit/constants';
 
 describe('IDE commit form', () => {
   const Component = Vue.extend(CommitForm);
   let vm;
 
-  beforeEach(() => {
-    spyOnProperty(window, 'innerHeight').and.returnValue(800);
-
+  const createComponent = () => {
     store.state.changedFiles.push('test');
     store.state.currentProjectId = 'abcproject';
     store.state.currentBranchId = 'master';
     Vue.set(store.state.projects, 'abcproject', { ...projectData });
 
     vm = createComponentWithStore(Component, store).$mount();
+  };
+
+  beforeEach(() => {
+    spyOnProperty(window, 'innerHeight').and.returnValue(800);
+    createComponent();
   });
 
   afterEach(() => {
@@ -94,6 +98,16 @@ describe('IDE commit form', () => {
 
           done();
         });
+      });
+    });
+
+    it('is set to false on mount if lastCommitMsg is set', done => {
+      store.state.lastCommitMsg = { commitAction: consts.COMMIT_TO_CURRENT_BRANCH };
+      createComponent();
+
+      vm.$nextTick(() => {
+        expect(vm.isCompact).toBe(false);
+        done();
       });
     });
   });
