@@ -167,9 +167,10 @@ module EE
     def sidebar_security_paths
       %w[
         projects/security/configuration#show
-        projects/security/dashboard#show
-        projects/dependencies#show
-        projects/licenses#show
+        projects/security/dashboard#index
+        projects/security/vulnerabilities#index
+        projects/dependencies#index
+        projects/licenses#index
         projects/threat_monitoring#show
       ]
     end

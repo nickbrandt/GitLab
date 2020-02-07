@@ -14,7 +14,7 @@
         - pipeline_link = '<a href="%{url}">%{id}</a>'.html_safe % { url: pipeline_url(@pipeline), id: @pipeline.id }
         = _('Detected %{timeago} in pipeline %{pipeline_link}').html_safe % { pipeline_link: pipeline_link, timeago: timeago }
     - else
-      %spa#js-vulnerability-created
+      %span#js-vulnerability-created
         = time_ago_with_tooltip(@vulnerability.created_at)
 
 .issue-details.issuable-details

@@ -87,6 +87,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
               get :summary
             end
           end
+
+          resources :vulnerabilities, only: [:index]
         end
 
         namespace :analytics do
