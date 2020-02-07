@@ -1219,13 +1219,13 @@ class Project < ApplicationRecord
     service = find_service(services, name)
     return service if service
 
-    # We should check if template for the service exists
-    template = find_service(services_templates, name)
+    # We should check if an instance-level service exists
+    instance_level_service = find_service(instance_level_services, name)
 
-    if template
-      Service.build_from_template(id, template)
+    if instance_level_service
+      Service.build_from_instance(id, instance_level_service)
     else
-      # If no template, we should create an instance. Ex `build_gitlab_ci_service`
+      # If no instance-level service exists, we should create a new service. Ex `build_gitlab_ci_service`
       public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
     end
   end
@@ -2438,8 +2438,8 @@ class Project < ApplicationRecord
     end
   end
 
-  def services_templates
-    @services_templates ||= Service.where(template: true)
+  def instance_level_services
+    @instance_level_services ||= Service.where(instance: true)
   end
 
   def ensure_pages_metadatum
