@@ -22,7 +22,9 @@ namespace :analytics do
 
   constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG)) do
     scope :type_of_work do
-      resource :tasks_by_type, controller: :tasks_by_type, only: :show
+      resource :tasks_by_type, controller: :tasks_by_type, only: :show do
+        get :top_labels
+      end
     end
   end
 end
