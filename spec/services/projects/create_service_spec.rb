@@ -47,7 +47,7 @@ describe Projects::CreateService, '#execute' do
     it 'creates associated project settings' do
       project = create_project(user, opts)
 
-      expect(project.settings).to be_persisted
+      expect(project.project_setting).to be_persisted
     end
   end
 
