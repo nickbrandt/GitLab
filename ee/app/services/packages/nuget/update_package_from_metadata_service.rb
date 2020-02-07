@@ -17,7 +17,10 @@ module Packages
         raise InvalidMetadataError.new('package name and/or package version not found in metadata') unless valid_metadata?
 
         package_file.transaction do
-          package_file.update!(file_name: package_filename) if package_filename
+          package_file.update!(
+            file_name: package_filename,
+            file: package_file.file
+          )
 
           if existing_package_id
             link_to_existing_package
@@ -74,8 +77,6 @@ module Packages
       end
 
       def package_filename
-        return unless package_name && package_version
-
         "#{package_name.downcase}.#{package_version.downcase}.nupkg"
       end
     end

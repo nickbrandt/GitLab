@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Packages::Nuget::UpdatePackageFromMetadataService do
-  let!(:package) { create(:nuget_package) }
+  let(:package) { create(:nuget_package) }
   let(:package_file) { package.package_files.first }
   let(:service) { described_class.new(package_file) }
   let(:package_name) { 'DummyProject.DummyPackage' }
@@ -13,12 +13,18 @@ describe Packages::Nuget::UpdatePackageFromMetadataService do
   describe '#execute' do
     subject { service.execute }
 
+    before do
+      stub_package_file_object_storage(enabled: true, direct_upload: true)
+    end
+
     it 'updates package and package file' do
       subject
 
       expect(package.reload.name).to eq(package_name)
       expect(package.version).to eq(package_version)
       expect(package_file.reload.file_name).to eq(package_file_name)
+      # hard reset needed to properly reload package_file.file
+      expect(Packages::PackageFile.find(package_file.id).file.size).not_to eq 0
     end
 
     context 'with exisiting package' do
