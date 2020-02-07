@@ -391,15 +391,31 @@ module API
         present_carrierwave_file!(package_file.file)
       end
 
+      def find_or_create_package
+        package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+      end
+
+      def track_push_package_event
+        if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+          track_event('push_package')
+        end
+      end
+
+      def create_package_file_with_type(file_type, current_package)
+        unless params['file.size'] == 0
+          # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
+          ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_package_file, params.merge(conan_file_type: file_type)).execute
+        end
+      end
+
       def upload_package_file(file_type)
         authorize_upload!(project)
 
-        current_package = package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+        current_package = find_or_create_package
 
-        track_event('push_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+        track_push_package_event
 
-        # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
-        ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_package_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0
+        create_package_file_with_type(file_type, current_package)
       rescue ObjectStorage::RemoteStoreError => e
         Gitlab::ErrorTracking.track_exception(e, file_name: params[:file_name], project_id: project.id)
 
@@ -416,9 +432,7 @@ module API
       def find_user_from_job_token
         return unless route_authentication_setting[:job_token_allowed]
 
-        job = find_job_from_token
-
-        raise ::Gitlab::Auth::UnauthorizedError unless job
+        job = find_job_from_token || raise(::Gitlab::Auth::UnauthorizedError)
 
         job.user
       end
