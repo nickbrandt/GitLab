@@ -59,6 +59,11 @@ export default {
       default: 'panel-type-chart',
     },
   },
+  data() {
+    return {
+      zoomedTimeRange: null,
+    };
+  },
   computed: {
     ...mapState('monitoringDashboard', ['deploymentData', 'projectPath', 'logsPath', 'timeRange']),
     alertWidgetAvailable() {
@@ -72,8 +77,10 @@ export default {
       );
     },
     logsPathWithTimeRange() {
-      if (this.logsPath && this.logsPath !== invalidUrl && this.timeRange) {
-        return timeRangeToUrl(this.timeRange, this.logsPath);
+      const timeRange = this.zoomedTimeRange || this.timeRange;
+
+      if (this.logsPath && this.logsPath !== invalidUrl && timeRange) {
+        return timeRangeToUrl(timeRange, this.logsPath);
       }
       return null;
     },
@@ -114,6 +121,10 @@ export default {
     },
     downloadCSVOptions,
     generateLinkToChartOptions,
+
+    onDatazoom({ start, end }) {
+      this.zoomedTimeRange = { start, end };
+    },
   },
 };
 </script>
@@ -137,11 +148,13 @@ export default {
   <component
     :is="monitorChartComponent"
     v-else-if="graphDataHasMetrics"
+    ref="timeChart"
     :graph-data="graphData"
     :deployment-data="deploymentData"
     :project-path="projectPath"
     :thresholds="getGraphAlertValues(graphData.metrics)"
     :group-id="groupId"
+    @datazoom="onDatazoom"
   >
     <div class="d-flex align-items-center">
       <alert-widget

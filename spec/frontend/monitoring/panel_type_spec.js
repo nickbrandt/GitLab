@@ -122,6 +122,7 @@ describe('Panel Type component', () => {
     const mockLogsPath = '/path/to/logs';
     const mockTimeRange = { duration: { seconds: 120 } };
 
+    const findTimeChart = () => wrapper.find({ ref: 'timeChart' });
     const findViewLogsLink = () => wrapper.find({ ref: 'viewLogsLink' });
 
     beforeEach(() => {
@@ -168,8 +169,28 @@ describe('Panel Type component', () => {
       state.timeRange = mockTimeRange;
 
       return wrapper.vm.$nextTick(() => {
-        expect(findViewLogsLink().exists()).toBe(true);
-        expect(findViewLogsLink().attributes('href')).toEqual('/path/to/logs?duration_seconds=120');
+        const href = `${mockLogsPath}?duration_seconds=${mockTimeRange.duration.seconds}`;
+        expect(findViewLogsLink().attributes('href')).toMatch(href);
+      });
+    });
+
+    it('it is overriden when a datazoom event is received', () => {
+      state.logsPath = mockLogsPath;
+      state.timeRange = mockTimeRange;
+
+      const zoomedTimeRange = {
+        start: '2020-01-01T00:00:00.000Z',
+        end: '2020-01-01T01:00:00.000Z',
+      };
+
+      findTimeChart().vm.$emit('datazoom', zoomedTimeRange);
+
+      return wrapper.vm.$nextTick(() => {
+        const start = encodeURIComponent(zoomedTimeRange.start);
+        const end = encodeURIComponent(zoomedTimeRange.end);
+        expect(findViewLogsLink().attributes('href')).toMatch(
+          `${mockLogsPath}?start=${start}&end=${end}`,
+        );
       });
     });
   });
