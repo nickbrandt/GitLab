@@ -1,0 +1,5 @@
+---
+title: Store daily code coverages into daily_code_coverages table
+merge_request: 24695
+author:
+type: added

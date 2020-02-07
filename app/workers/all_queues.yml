@@ -605,6 +605,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: pipeline_background:daily_code_coverage
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :urgency: :default
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: pipeline_cache:expire_job_cache
   :feature_category: :continuous_integration
   :has_external_dependencies: 

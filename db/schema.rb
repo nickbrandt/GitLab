@@ -1327,6 +1327,16 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.float "percentage_service_desk_issues", default: 0.0, null: false
   end
 
+  create_table "daily_code_coverages", force: :cascade do |t|
+    t.date "date", null: false
+    t.integer "project_id", null: false
+    t.integer "last_pipeline_id", null: false
+    t.float "coverage", null: false
+    t.string "ref", null: false
+    t.string "name", null: false
+    t.index ["project_id", "ref", "name", "date"], name: "index_daily_code_coverage_unique_columns", unique: true, order: { date: :desc }
+  end
+
   create_table "dependency_proxy_blobs", id: :serial, force: :cascade do |t|
     t.integer "group_id", null: false
     t.datetime_with_timezone "created_at", null: false
@@ -4832,6 +4842,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
   add_foreign_key "commit_user_mentions", "notes", on_delete: :cascade
   add_foreign_key "container_expiration_policies", "projects", on_delete: :cascade
   add_foreign_key "container_repositories", "projects"
+  add_foreign_key "daily_code_coverages", "ci_pipelines", column: "last_pipeline_id", on_delete: :cascade
+  add_foreign_key "daily_code_coverages", "projects", on_delete: :cascade
   add_foreign_key "dependency_proxy_blobs", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "dependency_proxy_group_settings", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
