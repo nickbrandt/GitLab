@@ -18,11 +18,15 @@ module Gitlab
       private
 
       def raw_diff
-        "#{diff_header}\n#{from_content_as_diff}#{to_content_as_diff}"
+        "#{diff_header}\n#{from_content_as_diff}#{spacer}#{to_content_as_diff}"
       end
 
       def diff_header
         "@@ -#{from_line} +#{from_line}"
+      end
+
+      def spacer
+        "\n" unless from_content_as_diff[-1, 3] == "\n"
       end
 
       def from_content_as_diff
