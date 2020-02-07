@@ -25,12 +25,12 @@
             .nav-icon-container
               = sprite_icon('repeat')
             %span.nav-item-name
-              = _('Cycle Analytics')
+              = _('Value Stream Analytics')
           %ul.sidebar-sub-level-items.is-fly-out-only
             = nav_link(controller: :cycle_analytics, html_options: { class: "fly-out-top-item qa-sidebar-cycle-analytics-fly-out" } ) do
               = link_to analytics_cycle_analytics_path do
                 %strong.fly-out-top-item-name
-                  = _('Cycle Analytics')
+                  = _('Value Stream Analytics')
 
       = render_ce 'layouts/nav/sidebar/instance_statistics_links'
 

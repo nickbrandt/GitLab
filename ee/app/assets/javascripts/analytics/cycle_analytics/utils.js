@@ -45,7 +45,7 @@ export const getLabelEventsIdentifiers = (events = []) =>
 /**
  * Checks if the specified stage is in memory or persisted to storage based on the id
  *
- * Default cycle analytics stages are initially stored in memory, when they are first
+ * Default value stream analytics stages are initially stored in memory, when they are first
  * created the id for the stage is the name of the stage in lowercase. This string id
  * is used to fetch stage data (events, median calculation)
  *

@@ -424,12 +424,12 @@ describe('Cycle Analytics component', () => {
       const defaultRequests = {
         fetchSummaryData: {
           status: defaultStatus,
-          endpoint: `/-/analytics/cycle_analytics/summary`,
+          endpoint: `/-/analytics/value_stream_analytics/summary`,
           response: [...mockData.summaryData],
         },
         fetchGroupStagesAndEvents: {
           status: defaultStatus,
-          endpoint: `/-/analytics/cycle_analytics/stages`,
+          endpoint: `/-/analytics/value_stream_analytics/stages`,
           response: { ...mockData.customizableStagesAndEvents },
         },
         fetchGroupLabels: {
@@ -448,19 +448,19 @@ describe('Cycle Analytics component', () => {
 
       if (mockFetchDurationData) {
         mock
-          .onGet(/analytics\/cycle_analytics\/stages\/\d+\/duration_chart/)
+          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/)
           .reply(defaultStatus, [...mockData.rawDurationData]);
       }
 
       if (mockFetchStageMedian) {
         mock
-          .onGet(/analytics\/cycle_analytics\/stages\/\d+\/median/)
+          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/median/)
           .reply(defaultStatus, { value: null });
       }
 
       if (mockFetchStageData) {
         mock
-          .onGet(/analytics\/cycle_analytics\/stages\/\d+\/records/)
+          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/records/)
           .reply(defaultStatus, mockData.issueEvents);
       }
 
@@ -497,14 +497,14 @@ describe('Cycle Analytics component', () => {
         overrides: {
           fetchSummaryData: {
             status: httpStatusCodes.NOT_FOUND,
-            endpoint: '/-/analytics/cycle_analytics/summary',
+            endpoint: '/-/analytics/value_stream_analytics/summary',
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },
         },
       });
 
       return selectGroupAndFindError(
-        'There was an error while fetching cycle analytics summary data.',
+        'There was an error while fetching value stream analytics summary data.',
       );
     });
 
@@ -531,14 +531,14 @@ describe('Cycle Analytics component', () => {
       mockRequestCycleAnalyticsData({
         overrides: {
           fetchGroupStagesAndEvents: {
-            endPoint: '/-/analytics/cycle_analytics/stages',
+            endPoint: '/-/analytics/value_stream_analytics/stages',
             status: httpStatusCodes.NOT_FOUND,
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },
         },
       });
 
-      return selectGroupAndFindError('There was an error fetching cycle analytics stages.');
+      return selectGroupAndFindError('There was an error fetching value stream analytics stages.');
     });
 
     it('will display an error if the fetchStageData request fails', () => {
@@ -572,7 +572,7 @@ describe('Cycle Analytics component', () => {
 
       return waitForPromises().catch(() => {
         expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching cycle analytics duration data.',
+          'There was an error while fetching value stream analytics duration data.',
         );
       });
     });
@@ -588,7 +588,7 @@ describe('Cycle Analytics component', () => {
 
       return waitForPromises().catch(() => {
         expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching cycle analytics duration data.',
+          'There was an error while fetching value stream analytics duration data.',
         );
       });
     });

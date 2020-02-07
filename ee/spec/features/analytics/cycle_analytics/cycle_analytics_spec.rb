@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'Group Cycle Analytics', :js do
+describe 'Group Value Stream Analytics', :js do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, name: "CA-test-group") }
   let!(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
@@ -32,7 +32,7 @@ describe 'Group Cycle Analytics', :js do
   it 'displays an empty state before a group is selected' do
     element = page.find('.row.empty-state')
 
-    expect(element).to have_content("Cycle Analytics can help you determine your team’s velocity")
+    expect(element).to have_content("Value Stream Analytics can help you determine your team’s velocity")
     expect(element.find('.svg-content img')['src']).to have_content('illustrations/analytics/cycle-analytics-empty-chart')
   end
 
@@ -78,7 +78,7 @@ describe 'Group Cycle Analytics', :js do
 
   it 'displays empty text' do
     [
-      'Cycle Analytics can help you determine your team’s velocity',
+      'Value Stream Analytics can help you determine your team’s velocity',
       'Start by choosing a group to see how your team is spending time. You can then drill down to the project level.'
     ].each do |content|
       expect(page).to have_content(content)

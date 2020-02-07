@@ -16,7 +16,7 @@ describe Analytics::AnalyticsController do
 
   describe 'GET index' do
     describe 'redirects to the first enabled analytics page' do
-      it 'redirects to cycle analytics' do
+      it 'redirects to value stream analytics' do
         stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
 
         get :index

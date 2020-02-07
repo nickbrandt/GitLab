@@ -203,7 +203,7 @@ export default {
 <template>
   <div class="js-cycle-analytics">
     <div class="page-title-holder d-flex align-items-center">
-      <h3 class="page-title">{{ __('Cycle Analytics') }}</h3>
+      <h3 class="page-title">{{ __('Value Stream Analytics') }}</h3>
     </div>
     <div class="mw-100">
       <div
@@ -239,7 +239,7 @@ export default {
     </div>
     <gl-empty-state
       v-if="shouldRenderEmptyState"
-      :title="__('Cycle Analytics can help you determine your team’s velocity')"
+      :title="__('Value Stream Analytics can help you determine your team’s velocity')"
       :description="
         __(
           'Start by choosing a group to see how your team is spending time. You can then drill down to the project level.',
@@ -251,11 +251,11 @@ export default {
       <gl-empty-state
         v-if="hasNoAccessError"
         class="js-empty-state"
-        :title="__('You don’t have access to Cycle Analytics for this group')"
+        :title="__('You don’t have access to Value Stream Analytics for this group')"
         :svg-path="noAccessSvgPath"
         :description="
           __(
-            'Only \'Reporter\' roles and above on tiers Premium / Silver and above can see Cycle Analytics.',
+            'Only \'Reporter\' roles and above on tiers Premium / Silver and above can see Value Stream Analytics.',
           )
         "
       />

@@ -380,13 +380,13 @@ describe('Api', () => {
     });
 
     describe('cycleAnalyticsSummaryData', () => {
-      it('fetches cycle analytics summary data', done => {
+      it('fetches value stream analytics summary data', done => {
         const response = [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }];
         const params = {
           ...defaultParams,
         };
 
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/summary`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/summary`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsSummaryData(params)
@@ -410,7 +410,7 @@ describe('Api', () => {
           'cycle_analytics[created_after]': createdAfter,
           'cycle_analytics[created_before]': createdBefore,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsGroupStagesAndEvents(groupId, params)
@@ -432,7 +432,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/records`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/records`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageEvents(groupId, stageId, params)
@@ -454,7 +454,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/median`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/median`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageMedian(groupId, stageId, params)
@@ -480,7 +480,7 @@ describe('Api', () => {
           end_event_identifier: 'issue_closed',
           end_event_label_id: null,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onPost(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsCreateStage(groupId, customStage)
@@ -502,7 +502,7 @@ describe('Api', () => {
           name: 'nice-stage',
           hidden: true,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
         mock.onPut(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsUpdateStage(stageId, groupId, stageData)
@@ -520,7 +520,7 @@ describe('Api', () => {
     describe('cycleAnalyticsRemoveStage', () => {
       it('deletes the specified data', done => {
         const response = { id: stageId, hidden: true, custom: true };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
         mock.onDelete(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsRemoveStage(stageId, groupId)
@@ -541,7 +541,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/thursday/duration_chart`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/thursday/duration_chart`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsDurationChart(stageId, params)
