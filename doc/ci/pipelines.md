@@ -171,7 +171,7 @@ job1:
     - echo -e "section_end:`date +%s`:my_first_section\r\e[0K"
 ```
 
-This produces the following output, where `1560896352` is the unix time the section started or ended; `my_first_section` is a section name; and `\e[0K` is the clear line ANSI escape code.
+This produces the following output, where `1560896352` is the unix time the section started or ended; `my_first_section` is the name of the section, allowing the start and end markers to be matched up; `\r` is carriage return and `\e[0K` is the clear line ANSI escape code. The carriage return and clear line mean the section markers will not be visible at the console, but they can be seen in the job's raw output.
 
 ```plaintext
 section_start:1560896352:my_first_section\r\e[0KHeader of the 1st collapsible section
