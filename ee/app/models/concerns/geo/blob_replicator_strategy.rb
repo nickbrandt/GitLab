@@ -27,9 +27,6 @@ module Geo
 
     private
 
-    # Example:
-    #
-    #   package_file.replicator.download
     def download
       ::Geo::BlobDownloadService.new(replicator: self).execute
     end
