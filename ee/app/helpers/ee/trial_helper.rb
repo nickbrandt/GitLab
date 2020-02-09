@@ -13,7 +13,7 @@ module EE
       ], selected)
     end
 
-    def namespace_options_for_select
+    def namespace_options_for_select(selected = nil)
       groups = current_user.manageable_groups.map { |g| [g.name, g.id] }
       users = [[current_user.namespace.name, current_user.namespace_id]]
 
@@ -23,7 +23,7 @@ module EE
         'Users' => users
       }
 
-      grouped_options_for_select(grouped_options, nil, prompt: _('Please select'))
+      grouped_options_for_select(grouped_options, selected, prompt: _('Please select'))
     end
 
     def show_trial_errors?(namespace, service_result)

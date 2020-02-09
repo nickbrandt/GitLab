@@ -136,11 +136,14 @@ describe 'Trial Select Namespace', :js do
 
           expect(find('.flash-text')).to have_text(error_message)
           expect(current_path).to eq(apply_trials_path)
+          expect(find('#namespace_id', visible: false).value).to eq(user.namespace.id.to_s)
 
           # new group name should be functional
           select2 '0', from: '#namespace_id'
 
           expect(page).to have_field('New Group Name')
+          expect(find('#trial_entity_individual').checked?).to be(false)
+          expect(find('#trial_entity_company').checked?).to be(true)
         end
       end
     end
