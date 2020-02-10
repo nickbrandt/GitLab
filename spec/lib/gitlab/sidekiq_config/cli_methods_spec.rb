@@ -173,6 +173,12 @@ describe Gitlab::SidekiqConfig::CliMethods do
         'latency_sensitive=true latency_sensitive=false' | %w(a a_2 b c)
         'latency_sensitive!=true' | %w(a c)
 
+        # name
+        'name=a' | %w(a)
+        'name=a|b' | %w(a b)
+        'name=a|a_2 name=b' | %w(a a_2 b)
+        'name!=a|a_2' | %w(b c)
+
         # resource_boundary
         'resource_boundary=memory' | %w(b c)
         'resource_boundary=memory|cpu' | %w(a b c)
@@ -197,7 +203,7 @@ describe Gitlab::SidekiqConfig::CliMethods do
         'feature_category="category_a"' | described_class::InvalidTerm
         'feature_category=' | described_class::InvalidTerm
         'feature_category~category_a' | described_class::InvalidTerm
-        'name=a' | described_class::UnknownPredicate
+        'worker_name=a' | described_class::UnknownPredicate
       end
 
       with_them do

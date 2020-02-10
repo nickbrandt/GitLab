@@ -109,6 +109,9 @@ attributes](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_q
   latency, which also means that its jobs should run quickly. For example, the
   `authorized_projects` queue is used to refresh user permissions, and is
   latency sensitive.
+- `name` - the queue name. The other attributes are typically more useful as
+  they are more general, but this is available in case a particular queue needs
+  to be selected.
 - `resource_boundary` - if the worker is bound by `cpu`, `memory`, or
   `unknown`. For example, the `project_export` queue is memory bound as it has
   to load data in memory before saving it for export.

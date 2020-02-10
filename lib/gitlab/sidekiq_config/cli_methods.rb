@@ -23,6 +23,14 @@ module Gitlab
       QUERY_CONCATENATE_OPERATOR = '|'
       QUERY_TERM_REGEX = %r{^(\w+)(!?=)([\w|]+)}.freeze
 
+      QUERY_PREDICATES = {
+        feature_category: :to_sym,
+        has_external_dependencies: lambda { |value| value == 'true' },
+        latency_sensitive: lambda { |value| value == 'true' },
+        name: :to_s,
+        resource_boundary: :to_sym
+      }.freeze
+
       QueryError = Class.new(StandardError)
       InvalidTerm = Class.new(QueryError)
       UnknownOperator = Class.new(QueryError)
@@ -102,24 +110,11 @@ module Gitlab
       end
 
       def predicate_factory(lhs, values)
-        to_bool = lambda { |value| value == 'true' }
+        values_block = QUERY_PREDICATES[lhs.to_sym]
 
-        case lhs
-        when 'feature_category'
-          lambda { |worker| values.map(&:to_sym).include?(worker[:feature_category]) }
+        raise UnknownPredicate.new("Unknown predicate: #{lhs}") unless values_block
 
-        when 'has_external_dependencies'
-          lambda { |worker| values.map(&to_bool).include?(worker[:has_external_dependencies]) }
-
-        when 'latency_sensitive'
-          lambda { |worker| values.map(&to_bool).include?(worker[:latency_sensitive]) }
-
-        when 'resource_boundary'
-          lambda { |worker| values.map(&:to_sym).include?(worker[:resource_boundary]) }
-
-        else
-          raise UnknownPredicate.new("Unknown predicate: #{lhs}")
-        end
+        lambda { |queue| values.map(&values_block).include?(queue[lhs.to_sym]) }
       end
     end
   end
