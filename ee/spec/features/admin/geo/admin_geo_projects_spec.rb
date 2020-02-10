@@ -157,4 +157,27 @@ describe 'admin Geo Projects', :js, :geo do
 
     it_behaves_like 'shows tab specific projects and correct labels'
   end
+
+  describe 'remove an orphaned Tracking Entry' do
+    before do
+      synced_registry.project.destroy!
+      visit(admin_geo_projects_path(sync_status: :synced))
+      wait_for_requests
+    end
+
+    it 'removes an existing Geo Project' do
+      card_count = page.all(:css, '.project-card').length
+
+      page.within(find('.project-card', match: :first)) do
+        page.click_button('Remove')
+      end
+      page.within('.modal') do
+        page.click_button('Remove entry')
+      end
+      # Wait for remove confirmation
+      expect(page.find('.gl-toast')).to have_text('removed')
+
+      expect(page.all(:css, '.project-card').length).to be(card_count - 1)
+    end
+  end
 end
