@@ -42,7 +42,7 @@ describe Admin::ApplicationSettingsController do
 
       put :update, params: { application_setting: settings }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       settings.except(:elasticsearch_url, :repository_size_limit).each do |setting, value|
         expect(ApplicationSetting.current.public_send(setting)).to eq(value)
       end
@@ -136,7 +136,7 @@ describe Admin::ApplicationSettingsController do
     it 'updates repository_size_limit' do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       expect(response).to set_flash[:notice].to('Application settings saved successfully')
     end
 
