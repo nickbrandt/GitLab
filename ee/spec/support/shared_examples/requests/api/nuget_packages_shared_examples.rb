@@ -50,13 +50,8 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
       subject
 
       expect(response.content_type.to_s).to eq('application/json')
-      expect(json_response).to be_a(Hash)
-    end
-
-    it 'returns a valid nuget service index json' do
-      subject
-
       expect(json_response).to match_schema('public_api/v4/packages/nuget/service_index', dir: 'ee')
+      expect(json_response).to be_a(Hash)
     end
 
     context 'with invalid format' do
@@ -64,6 +59,16 @@ RSpec.shared_examples 'process nuget service index request' do |user_type, statu
 
       it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
     end
+  end
+end
+
+RSpec.shared_examples 'returning nuget metadata json response with json schema' do |json_schema|
+  it 'returns a valid json response' do
+    subject
+
+    expect(response.content_type.to_s).to eq('application/json')
+    expect(json_response).to match_schema(json_schema, dir: 'ee')
+    expect(json_response).to be_a(Hash)
   end
 end
 
@@ -75,23 +80,20 @@ RSpec.shared_examples 'process nuget metadata request at package name level' do 
 
     it_behaves_like 'returning response status', status
 
-    it 'returns a valid json response' do
-      subject
-
-      expect(response.content_type.to_s).to eq('application/json')
-      expect(json_response).to be_a(Hash)
-    end
-
-    it 'returns a valid nuget packages metadata json' do
-      subject
-
-      expect(json_response).to match_schema('public_api/v4/packages/nuget/packages_metadata', dir: 'ee')
-    end
+    it_behaves_like 'returning nuget metadata json response with json schema', 'public_api/v4/packages/nuget/packages_metadata'
 
     context 'with invalid format' do
       let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/index.xls" }
 
       it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
+    end
+
+    context 'with lower case package name' do
+      let_it_be(:package_name) { 'dummy.package' }
+
+      it_behaves_like 'returning response status', status
+
+      it_behaves_like 'returning nuget metadata json response with json schema', 'public_api/v4/packages/nuget/packages_metadata'
     end
   end
 end
@@ -104,23 +106,20 @@ RSpec.shared_examples 'process nuget metadata request at package name and packag
 
     it_behaves_like 'returning response status', status
 
-    it 'returns a valid json response' do
-      subject
-
-      expect(response.content_type.to_s).to eq('application/json')
-      expect(json_response).to be_a(Hash)
-    end
-
-    it 'returns a valid nuget package metadata json' do
-      subject
-
-      expect(json_response).to match_schema('public_api/v4/packages/nuget/package_metadata', dir: 'ee')
-    end
+    it_behaves_like 'returning nuget metadata json response with json schema', 'public_api/v4/packages/nuget/package_metadata'
 
     context 'with invalid format' do
       let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/#{package.version}.xls" }
 
       it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
+    end
+
+    context 'with lower case package name' do
+      let_it_be(:package_name) { 'dummy.package' }
+
+      it_behaves_like 'returning response status', status
+
+      it_behaves_like 'returning nuget metadata json response with json schema', 'public_api/v4/packages/nuget/package_metadata'
     end
   end
 end
@@ -219,6 +218,77 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
       end
 
       it_behaves_like 'background upload schedules a file migration'
+    end
+  end
+end
+
+RSpec.shared_examples 'process nuget download versions request' do |user_type, status, add_member = true|
+  RSpec.shared_examples 'returns a valid nuget download versions json response' do
+    it 'returns a valid json response' do
+      subject
+
+      expect(response.content_type.to_s).to eq('application/json')
+      expect(json_response).to match_schema('public_api/v4/packages/nuget/download_versions', dir: 'ee')
+      expect(json_response).to be_a(Hash)
+      expect(json_response['versions']).to match_array(packages.map(&:version).sort)
+    end
+  end
+
+  context "for user type #{user_type}" do
+    before do
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it_behaves_like 'returning response status', status
+
+    it_behaves_like 'returns a valid nuget download versions json response'
+
+    context 'with invalid format' do
+      let(:url) { "/projects/#{project.id}/packages/nuget/download/#{package_name}/index.xls" }
+
+      it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
+    end
+
+    context 'with lower case package name' do
+      let_it_be(:package_name) { 'dummy.package' }
+
+      it_behaves_like 'returning response status', status
+
+      it_behaves_like 'returns a valid nuget download versions json response'
+    end
+  end
+end
+
+RSpec.shared_examples 'process nuget download content request' do |user_type, status, add_member = true|
+  context "for user type #{user_type}" do
+    before do
+      project.send("add_#{user_type}", user) if add_member && user_type != :anonymous
+    end
+
+    it_behaves_like 'returning response status', status
+
+    it 'returns a valid package archive' do
+      subject
+
+      expect(response.content_type.to_s).to eq('application/octet-stream')
+    end
+
+    context 'with invalid format' do
+      let(:url) { "/projects/#{project.id}/packages/nuget/download/#{package.name}/#{package.version}/#{package.name}.#{package.version}.xls" }
+
+      it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
+    end
+
+    context 'with lower case package name' do
+      let_it_be(:package_name) { 'dummy.package' }
+
+      it_behaves_like 'returning response status', status
+
+      it 'returns a valid package archive' do
+        subject
+
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
     end
   end
 end

@@ -81,6 +81,10 @@ class Packages::Package < ApplicationRecord
     pluck(:name)
   end
 
+  def self.pluck_versions
+    pluck(:version)
+  end
+
   def self.sort_by_attribute(method)
     case method.to_s
     when 'created_asc' then order_created

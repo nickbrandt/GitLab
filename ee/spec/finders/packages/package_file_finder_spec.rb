@@ -2,32 +2,52 @@
 require 'spec_helper'
 
 describe Packages::PackageFileFinder do
-  let(:package) { create(:maven_package) }
-  let(:package_file) { package.package_files.first }
+  let_it_be(:package) { create(:maven_package) }
+  let_it_be(:package_file) { package.package_files.first }
+  let(:package_file_name) { package_file.file_name }
+  let(:params) { {} }
 
-  describe '#execute!' do
-    it 'returns a package file' do
-      finder = described_class.new(package, package_file.file_name)
-
-      expect(finder.execute!).to eq(package_file)
-    end
-
-    it 'raises an error' do
-      finder = described_class.new(package, 'unknown.jpg')
-
-      expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
-    end
+  RSpec.shared_examples 'package file finder examples' do
+    it { is_expected.to eq(package_file) }
 
     context 'with conan_file_type' do
-      let(:package) { create(:conan_package) }
+      let_it_be(:package) { create(:conan_package) }
+      # conan packages contain a conanmanifest.txt file for both conan_file_types
+      let(:package_file_name) { 'conanmanifest.txt' }
+      let(:params) { { conan_file_type: :recipe_file } }
 
-      it 'returns a package of the correct file_type' do
-        # conan packages contain a conanmanifest.txt file for both conan_file_types
-        result = described_class.new(package, 'conanmanifest.txt', conan_file_type: :recipe_file).execute!
+      it { expect(subject.conan_file_type).to eq('recipe_file') }
+    end
 
-        expect(result.conan_file_type).to eq('recipe_file')
-        expect(result.conan_file_type).not_to eq('package_file')
-      end
+    context 'with file_name_like' do
+      let(:package_file_name) { package_file.file_name.upcase }
+      let(:params) { { with_file_name_like: true } }
+
+      it { is_expected.to eq(package_file) }
+    end
+  end
+
+  describe '#execute' do
+    subject { described_class.new(package, package_file_name, params).execute }
+
+    it_behaves_like 'package file finder examples'
+
+    context 'with unknown file_name' do
+      let(:package_file_name) { 'unknown.jpg' }
+
+      it { expect(subject).to be_nil }
+    end
+  end
+
+  describe '#execute!' do
+    subject { described_class.new(package, package_file_name, params).execute! }
+
+    it_behaves_like 'package file finder examples'
+
+    context 'with unknown file_name' do
+      let(:package_file_name) { 'unknown.jpg' }
+
+      it { expect { subject }.to raise_error(ActiveRecord::RecordNotFound) }
     end
   end
 end

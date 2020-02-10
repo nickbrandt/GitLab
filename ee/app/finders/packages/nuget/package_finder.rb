@@ -4,14 +4,15 @@ module Packages
     class PackageFinder
       MAX_PACKAGES_COUNT = 50
 
-      def initialize(project, package_name:, package_version: nil)
+      def initialize(project, package_name:, package_version: nil, limit: MAX_PACKAGES_COUNT)
         @project = project
         @package_name = package_name
         @package_version = package_version
+        @limit = limit
       end
 
       def execute
-        packages.limit_recent(MAX_PACKAGES_COUNT)
+        packages.limit_recent(@limit)
       end
 
       private
@@ -19,7 +20,9 @@ module Packages
       def packages
         result = @project.packages
                          .nuget
-                         .with_name(@package_name)
+                         .has_version
+                         .processed
+                         .with_name_like(@package_name)
         result = result.with_version(@package_version) if @package_version.present?
         result
       end
