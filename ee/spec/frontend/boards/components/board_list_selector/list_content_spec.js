@@ -1,9 +1,9 @@
 import Vue from 'vue';
 
 import ListContent from 'ee/boards/components/boards_list_selector/list_content.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
-import { mockAssigneesList } from 'spec/boards/mock_data';
+import { mockAssigneesList } from 'jest/boards/mock_data';
 
 const createComponent = () => {
   const Component = Vue.extend(ListContent);
@@ -28,7 +28,7 @@ describe('ListContent', () => {
   describe('methods', () => {
     describe('handleItemClick', () => {
       it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick(assignee);

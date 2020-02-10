@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import ListFilter from 'ee/boards/components/boards_list_selector/list_filter.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 const createComponent = () => {
   const Component = Vue.extend(ListFilter);
@@ -23,7 +23,7 @@ describe('ListFilter', () => {
   describe('methods', () => {
     describe('handleInputChange', () => {
       it('emits `onSearchInput` event on component and sends `query` as event param', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
         const query = 'foobar';
         vm.query = query;
 
@@ -35,7 +35,7 @@ describe('ListFilter', () => {
 
     describe('handleInputClear', () => {
       it('clears value of prop `query` and calls `handleInputChange` method on component', () => {
-        spyOn(vm, 'handleInputChange');
+        jest.spyOn(vm, 'handleInputChange');
         vm.query = 'foobar';
 
         vm.handleInputClear();
@@ -51,24 +51,18 @@ describe('ListFilter', () => {
       expect(vm.$el.classList.contains('dropdown-input')).toBe(true);
     });
 
-    it('renders class `has-value` on container element when prop `query` is not empty', done => {
+    it('renders class `has-value` on container element when prop `query` is not empty', () => {
       vm.query = 'foobar';
-      Vue.nextTick()
-        .then(() => {
-          expect(vm.$el.classList.contains('has-value')).toBe(true);
-        })
-        .then(done)
-        .catch(done.fail);
+      return Vue.nextTick().then(() => {
+        expect(vm.$el.classList.contains('has-value')).toBe(true);
+      });
     });
 
-    it('removes class `has-value` from container element when prop `query` is empty', done => {
+    it('removes class `has-value` from container element when prop `query` is empty', () => {
       vm.query = '';
-      Vue.nextTick()
-        .then(() => {
-          expect(vm.$el.classList.contains('has-value')).toBe(false);
-        })
-        .then(done)
-        .catch(done.fail);
+      return Vue.nextTick().then(() => {
+        expect(vm.$el.classList.contains('has-value')).toBe(false);
+      });
     });
 
     it('renders search input element', () => {
