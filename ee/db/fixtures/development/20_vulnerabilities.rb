@@ -5,6 +5,8 @@ class Gitlab::Seeder::Vulnerabilities
 
   def initialize(project)
     @project = project
+    FactoryBot.definition_file_paths << Rails.root.join('ee', 'spec', 'factories')
+    FactoryBot.reload # rubocop:disable Cop/ActiveRecordAssociationReload
   end
 
   def seed!
@@ -63,10 +65,12 @@ class Gitlab::Seeder::Vulnerabilities
   end
 
   def create_occurrence(vulnerability, rank, primary_identifier)
+    scanner = FactoryBot.create(:vulnerabilities_scanner, project: vulnerability.project)
     FactoryBot.create(
       :vulnerabilities_occurrence,
       project: project,
       vulnerability: vulnerability,
+      scanner: scanner,
       severity: random_severity_level,
       confidence: random_confidence_level,
       primary_identifier: primary_identifier,
@@ -78,7 +82,7 @@ class Gitlab::Seeder::Vulnerabilities
 
   def create_identifier(rank)
     FactoryBot.create(
-      :vulnerability_identifier,
+      :vulnerabilities_identifier,
       external_type: "SECURITY_ID",
       external_id: "SECURITY_#{rank}",
       fingerprint: random_fingerprint,
