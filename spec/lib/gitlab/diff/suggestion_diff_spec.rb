@@ -61,11 +61,9 @@ describe Gitlab::Diff::SuggestionDiff do
                                                  to_content: to_content)
 
         diff_lines = described_class.new(suggestion).diff_lines
-        bad_string = "-One line test+Successful test!"
 
-        diff_lines.each do |diff_line|
-          expect(diff_line.to_hash).not_to include(bad_string)
-        end
+        expect(diff_lines.first.text).to eq("-One line test")
+        expect(diff_lines.last.text).to eq("+Successful test!")
       end
     end
   end
