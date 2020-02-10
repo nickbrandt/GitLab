@@ -40,10 +40,6 @@ export default {
       type: String,
       required: true,
     },
-    vulnerabilitiesCountEndpoint: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesHistoryEndpoint: {
       type: String,
       required: true,
@@ -140,7 +136,6 @@ export default {
         <security-dashboard
           v-else
           :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
-          :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
           :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
           :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
         />
