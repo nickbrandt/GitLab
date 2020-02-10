@@ -115,6 +115,7 @@ class License < ApplicationRecord
     group_level_compliance_dashboard
     incident_management
     insights
+    issuable_health_status
     license_management
     personal_access_token_expiration_policy
     pod_logs
