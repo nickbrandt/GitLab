@@ -36,55 +36,55 @@ class Gitlab::Seeder::Vulnerabilities
   private
 
   def create_vulnerability
-    vulnerability = project.vulnerabilities.build(
+    state_symbol = ::Vulnerability.states.keys.sample.to_sym
+    vulnerability = build_vulnerability(state_symbol)
+
+    case state_symbol
+    when :resolved
+      vulnerability.resolved_by = author
+    when :dismissed
+      vulnerability.closed_by = author
+    end
+
+    vulnerability.tap(&:save!)
+  end
+
+  def build_vulnerability(state_symbol)
+    FactoryBot.build(
+      :vulnerability,
+      state_symbol,
+      project: project,
       author: author,
       title: 'Cypher with no integrity',
       severity: random_severity_level,
       confidence: random_confidence_level,
       report_type: random_report_type
     )
-    vulnerability = set_random_vulnerability_state(vulnerability)
-    vulnerability.save!
-    vulnerability
-  end
-
-  def set_random_vulnerability_state(vulnerability)
-    state = ::Vulnerability.states.keys.sample
-    vulnerability.state = state
-    case state
-    when "resolved"
-      vulnerability.resolved_by = vulnerability.author
-      vulnerability.resolved_at = Time.now
-    when "dismissed"
-      vulnerability.closed_by = vulnerability.author
-      vulnerability.closed_at = Time.now
-    end
-    vulnerability
   end
 
   def create_occurrence(vulnerability, rank, primary_identifier)
-    project.vulnerability_findings.create!(
+    FactoryBot.create(
+      :vulnerabilities_occurrence,
+      project: project,
       vulnerability: vulnerability,
-      uuid: random_uuid,
-      name: 'Cipher with no integrity',
-      report_type: :sast,
       severity: random_severity_level,
       confidence: random_confidence_level,
+      primary_identifier: primary_identifier,
       project_fingerprint: random_fingerprint,
       location_fingerprint: random_fingerprint,
-      primary_identifier: primary_identifier,
-      raw_metadata: metadata(rank).to_json,
-      metadata_version: 'sast:1.0',
-      scanner: scanner)
+      raw_metadata: metadata(rank).to_json
+    )
   end
 
   def create_identifier(rank)
-    project.vulnerability_identifiers.create!(
+    FactoryBot.create(
+      :vulnerability_identifier,
       external_type: "SECURITY_ID",
       external_id: "SECURITY_#{rank}",
       fingerprint: random_fingerprint,
       name: "SECURITY_IDENTIFIER #{rank}",
-      url: "https://security.example.com/#{rank}"
+      url: "https://security.example.com/#{rank}",
+      project: project
     )
   end
 
@@ -94,33 +94,33 @@ class Gitlab::Seeder::Vulnerabilities
       create_vulnerability_issue_link(vulnerability, issue)
     end
 
-    project.vulnerability_feedback.create!(
+    FactoryBot.create(
+      :vulnerability_feedback,
       feedback_type: type,
-      category: 'sast',
+      project: project,
       author: author,
       issue: issue,
       pipeline: pipeline,
-      project_fingerprint: occurrence.project_fingerprint,
-      vulnerability_data: { category: 'sast' })
-  end
-
-  def create_vulnerability_issue_link(vulnerability, issue)
-    ::Vulnerabilities::IssueLink.create!(
-      vulnerability: vulnerability,
-      issue: issue,
-      link_type: :created
+      project_fingerprint: occurrence.project_fingerprint
     )
   end
 
-  def scanner
-    @scanner ||= project.vulnerability_scanners.create!(
+  def create_issue(title)
+    FactoryBot.create(
+      :issue,
       project: project,
-      external_id: 'security-scanner',
-      name: 'Security Scanner')
+      author: author,
+      title: title
+    )
   end
 
-  def create_issue(title)
-    project.issues.create!(author: author, title: title)
+  def create_vulnerability_issue_link(vulnerability, issue)
+    FactoryBot.create(
+      :vulnerabilities_issue_link,
+      :created,
+      vulnerability: vulnerability,
+      issue: issue
+    )
   end
 
   def random_confidence_level
@@ -153,10 +153,6 @@ class Gitlab::Seeder::Vulnerabilities
         }
       ]
     }
-  end
-
-  def random_uuid
-    SecureRandom.hex(18)
   end
 
   def random_fingerprint
