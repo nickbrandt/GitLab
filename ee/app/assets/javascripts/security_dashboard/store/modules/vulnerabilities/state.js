@@ -29,7 +29,6 @@ export default () => ({
       file: { text: s__('Vulnerability|File') },
       identifiers: { text: s__('Vulnerability|Identifiers') },
       severity: { text: s__('Vulnerability|Severity') },
-      confidence: { text: s__('Vulnerability|Confidence') },
       reportType: { text: s__('Vulnerability|Report Type') },
       className: { text: s__('Vulnerability|Class') },
       image: { text: s__('Vulnerability|Image') },

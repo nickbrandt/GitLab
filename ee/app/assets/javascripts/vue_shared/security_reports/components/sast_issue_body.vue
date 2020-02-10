@@ -1,7 +1,7 @@
 <script>
 /**
  * Renders SAST body text
- * [severity] ([confidence]): [name] in [link] : [line]
+ * [severity]: [name] in [link] : [line]
  */
 import ReportLink from '~/reports/components/report_link.vue';
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
@@ -29,17 +29,10 @@ export default {
 
   computed: {
     title() {
-      const { severity, confidence, priority } = this.issue;
-
+      const { severity, priority } = this.issue;
       if (severity) {
-        if (confidence) {
-          return `${humanize(severity)} (${humanize(confidence)})`;
-        }
         return humanize(severity);
-      } else if (confidence) {
-        return `(${humanize(confidence)})`;
       }
-
       return priority;
     },
   },

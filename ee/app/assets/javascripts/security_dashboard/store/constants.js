@@ -11,17 +11,6 @@ export const SEVERITY_LEVELS = {
   none: s__('severity|None'),
 };
 
-export const CONFIDENCE_LEVELS = {
-  confirmed: s__('confidence|Confirmed'),
-  high: s__('confidence|High'),
-  medium: s__('confidence|Medium'),
-  low: s__('confidence|Low'),
-  unknown: s__('confidence|Unknown'),
-  ignore: s__('confidence|Ignore'),
-  experimental: s__('confidence|Experimental'),
-  undefined: s__('confidence|Undefined'),
-};
-
 export const REPORT_TYPES = {
   container_scanning: s__('ciReport|Container Scanning'),
   dast: s__('ciReport|DAST'),

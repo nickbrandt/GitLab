@@ -49,9 +49,6 @@ export default {
       role="row"
     >
       <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-section section-10 ml-md-2" role="rowheader">
-        {{ s__('Reports|Confidence') }}
-      </div>
       <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>

@@ -1,0 +1,5 @@
+---
+title: Remove confidence labels from security report
+merge_request: 24033
+author:
+type: removed

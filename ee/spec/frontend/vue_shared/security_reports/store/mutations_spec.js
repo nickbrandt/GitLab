@@ -125,10 +125,6 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.data.severity.text).toEqual('Severity');
       expect(stateCopy.modal.data.severity.isLink).toEqual(false);
 
-      expect(stateCopy.modal.data.confidence.value).toEqual(null);
-      expect(stateCopy.modal.data.confidence.text).toEqual('Confidence');
-      expect(stateCopy.modal.data.confidence.isLink).toEqual(false);
-
       expect(stateCopy.modal.data.links.value).toEqual([]);
       expect(stateCopy.modal.data.links.text).toEqual('Links');
       expect(stateCopy.modal.data.links.isLink).toEqual(false);
@@ -207,7 +203,6 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.data.image.value).toEqual(issue.location.image);
       expect(stateCopy.modal.data.identifiers.value).toEqual(issue.identifiers);
       expect(stateCopy.modal.data.severity.value).toEqual(issue.severity);
-      expect(stateCopy.modal.data.confidence.value).toEqual(issue.confidence);
       expect(stateCopy.modal.data.links.value).toEqual(issue.links);
       expect(stateCopy.modal.data.instances.value).toEqual(issue.instances);
       expect(stateCopy.modal.data.url.value).toEqual(
