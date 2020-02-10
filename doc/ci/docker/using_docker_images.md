@@ -209,7 +209,7 @@ test:
 
 The image name must be in one of the following formats:
 
-- `image: <image-name>`
+- `image: <image-name>` (Use <image-name> with the `latest` tag)
 - `image: <image-name>:<tag>`
 - `image: <image-name>@<digest>`
 
