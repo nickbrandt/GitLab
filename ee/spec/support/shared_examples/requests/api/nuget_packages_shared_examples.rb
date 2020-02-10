@@ -166,7 +166,6 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
 
       package_file = project.packages.last.package_files.reload.last
       expect(package_file.file_name).to eq('package.nupkg')
-      expect(package_file.file_type).to eq(0)
     end
   end
 

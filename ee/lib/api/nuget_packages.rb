@@ -15,7 +15,6 @@ module API
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
 
     PACKAGE_FILENAME = 'package.nupkg'
-    PACKAGE_FILETYPE = 'application/octet-stream'
 
     default_format :json
 
@@ -95,8 +94,7 @@ module API
 
           file_params = params.merge(
             file: uploaded_package_file(:package),
-            file_name: PACKAGE_FILENAME,
-            file_type: PACKAGE_FILETYPE
+            file_name: PACKAGE_FILENAME
           )
 
           package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user)
