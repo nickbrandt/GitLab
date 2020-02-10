@@ -9,14 +9,6 @@ module EE
         belongs_to :upstream_pipeline, class_name: "::Ci::Pipeline"
 
         state_machine :status do
-          after_transition created: :pending do |bridge|
-            next unless bridge.downstream_project
-
-            bridge.run_after_commit do
-              bridge.schedule_downstream_pipeline!
-            end
-          end
-
           after_transition any => :pending do |bridge|
             next unless bridge.upstream_project
 
@@ -25,12 +17,6 @@ module EE
             end
           end
         end
-      end
-
-      def schedule_downstream_pipeline!
-        raise InvalidBridgeTypeError unless downstream_project
-
-        ::Ci::CreateCrossProjectPipelineWorker.perform_async(self.id)
       end
 
       def subscribe_to_upstream!
