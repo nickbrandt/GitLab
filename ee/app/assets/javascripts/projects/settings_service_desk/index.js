@@ -18,6 +18,7 @@ export default () => {
           endpoint: dataset.endpoint,
           incomingEmail: dataset.incomingEmail,
           selectedTemplate: dataset.selectedTemplate,
+          outgoingName: dataset.outgoingName,
           templates: JSON.parse(dataset.templates),
         };
       },
@@ -28,6 +29,7 @@ export default () => {
             endpoint: this.endpoint,
             initialIncomingEmail: this.incomingEmail,
             selectedTemplate: this.selectedTemplate,
+            outgoingName: this.outgoingName,
             templates: this.templates,
           },
         });
