@@ -99,6 +99,8 @@ module API
         at_least_one_of :title, :description, :start_date_fixed, :start_date_is_fixed, :due_date_fixed, :due_date_is_fixed, :labels, :state_event
       end
       put ':id/(-/)epics/:epic_iid' do
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/194104')
+
         authorize_can_admin!
         update_params = declared_params(include_missing: false)
         update_params.delete(:epic_iid)
