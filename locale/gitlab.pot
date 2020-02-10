@@ -21435,6 +21435,9 @@ msgstr ""
 msgid "Web terminal"
 msgstr ""
 
+msgid "WebIDE|Merge request"
+msgstr ""
+
 msgid "Webhooks"
 msgstr ""
 
