@@ -19,7 +19,8 @@ module EE
         contribution_analytics_navbar_link(group, current_user),
         group_insights_navbar_link(group, current_user),
         issues_analytics_navbar_link(group, current_user),
-        productivity_analytics_navbar_link(group, current_user)
+        productivity_analytics_navbar_link(group, current_user),
+        group_cycle_analytics_navbar_link(group, current_user)
       ].compact
     end
 
@@ -36,6 +37,18 @@ module EE
       )
     end
 
+    def group_cycle_analytics_navbar_link(group, current_user)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
+      return unless ::Feature.enabled?(:group_level_cycle_analytics)
+      return unless group_sidebar_link?(:cycle_analytics)
+
+      navbar_sub_item(
+        title: _('Value Stream Analytics'),
+        path: 'groups/analytics/cycle_analytics#show',
+        link: group_analytics_cycle_analytics_path(group)
+      )
+    end
+
     def productivity_analytics_navbar_link(group, current_user)
       return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless ::Feature.enabled?(:group_level_productivity_analytics, default_enabled: true)
@@ -44,7 +57,7 @@ module EE
       navbar_sub_item(
         title: _('Productivity Analytics'),
         path: 'groups/analytics/productivity_analytics#show',
-        link: group_analytics_productivity_analytics_path(@group)
+        link: group_analytics_productivity_analytics_path(group)
       )
     end
 
