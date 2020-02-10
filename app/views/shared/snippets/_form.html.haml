@@ -10,11 +10,17 @@
       = f.label :title, class: 'label-bold'
       = f.text_field :title, class: 'form-control qa-snippet-title', required: true, autofocus: true
 
-    .form-group
+    .form-group.js-description-input
+      - description_placeholder = s_('Snippets|Optionally add a description about what your snippet does or how to use it...')
+      - is_expanded = @snippet.description && !@snippet.description.empty?
       = f.label :description, s_("Snippets|Description (optional)"), class: 'label-bold'
-      = render layout: 'projects/md_preview', locals: { url: preview_markdown_path(@project), referenced_users: true } do
-        = render 'projects/zen', f: f, attr: :description, classes: 'note-textarea', placeholder: s_('Snippets|Optionally add a description about what your snippet does or how to use it...')
-        = render 'shared/notes/hints'
+      .js-collapsible-input
+        .js-collapsed{ class: ('d-none' if is_expanded) }
+          = text_field_tag nil, nil, class: 'form-control', placeholder: description_placeholder
+        .js-expanded{ class: ('d-none' if !is_expanded) }
+          = render layout: 'projects/md_preview', locals: { url: preview_markdown_path(@project), referenced_users: true } do
+            = render 'projects/zen', f: f, attr: :description, classes: 'note-textarea', placeholder: description_placeholder
+            = render 'shared/notes/hints'
 
     .form-group.file-editor
       = f.label :file_name, s_('Snippets|File')
