@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import GLForm from '~/gl_form';
 import ZenMode from '~/zen_mode';
+import setupCollapsibleInputs from '~/collapsible_input';
 
 export default () => {
   // eslint-disable-next-line no-new
@@ -14,4 +15,6 @@ export default () => {
     snippets: false,
   });
   new ZenMode(); // eslint-disable-line no-new
+
+  setupCollapsibleInputs();
 };
