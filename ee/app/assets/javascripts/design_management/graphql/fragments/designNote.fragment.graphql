@@ -1,5 +1,5 @@
 #import "./diffRefs.fragment.graphql"
-#import "./author.fragment.graphql"
+#import "~/graphql_shared/fragments/author.fragment.graphql"
 
 fragment DesignNote on Note {
   id
