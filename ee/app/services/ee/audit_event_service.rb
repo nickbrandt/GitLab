@@ -120,6 +120,10 @@ module EE
       )
     end
 
+    def for_user(full_path = @entity.full_path)
+      for_custom_model('user', full_path)
+    end
+
     def for_project
       for_custom_model('project', @entity.full_path)
     end

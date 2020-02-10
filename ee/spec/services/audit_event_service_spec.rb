@@ -214,6 +214,61 @@ describe AuditEventService do
     end
   end
 
+  describe '#for_user' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { instance_spy(User, name: author_name) }
+    let(:target_user_full_path) { 'ejohn' }
+    let(:user) { instance_spy(User, full_path: target_user_full_path) }
+    let(:custom_message) { 'Some strange event has occurred' }
+    let(:ip_address) { '127.0.0.1' }
+    let(:options) { { action: action, custom_message: custom_message, ip_address: ip_address } }
+
+    subject(:service) { described_class.new(current_user, user, options).for_user }
+
+    context 'with destroy action' do
+      let(:action) { :destroy }
+
+      it 'sets the details attribute' do
+        expect(service.instance_variable_get(:@details)).to eq(
+          remove: 'user',
+          author_name: author_name,
+          target_id: target_user_full_path,
+          target_type: 'User',
+          target_details: target_user_full_path
+        )
+      end
+    end
+
+    context 'with create action' do
+      let(:action) { :create }
+
+      it 'sets the details attribute' do
+        expect(service.instance_variable_get(:@details)).to eq(
+          add: 'user',
+          author_name: author_name,
+          target_id: target_user_full_path,
+          target_type: 'User',
+          target_details: target_user_full_path
+        )
+      end
+    end
+
+    context 'with custom action' do
+      let(:action) { :custom }
+
+      it 'sets the details attribute' do
+        expect(service.instance_variable_get(:@details)).to eq(
+          custom_message: custom_message,
+          author_name: author_name,
+          target_id: target_user_full_path,
+          target_type: 'User',
+          target_details: target_user_full_path,
+          ip_address: ip_address
+        )
+      end
+    end
+  end
+
   describe 'license' do
     let(:project) { create(:project) }
     let(:user) { create(:user) }
