@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Geo', :orchestrated, :geo, quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/201948' do
+  context 'Geo', :orchestrated, :geo do
     let(:git_push_http_path_prefix) { '/-/push_from_secondary' }
 
     describe 'GitLab Geo HTTP push secondary' do
