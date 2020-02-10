@@ -326,29 +326,27 @@ module EE
     end
 
     def valid_parent?(parent_epic: nil, parent_group_descendants: nil)
-      parent_epic ||= parent
+      self.parent = parent_epic if parent_epic
 
-      return true unless parent_epic
-
-      validate_parent(parent_epic, parent_group_descendants)
+      validate_parent(parent_group_descendants)
 
       errors.empty?
     end
 
-    def validate_parent(parent_epic = parent, parent_group_descendents = nil)
-      return unless parent_epic
+    def validate_parent(preloaded_parent_group_and_descendants = nil)
+      return unless parent
 
-      parent_group_descendants ||= parent_epic.group.self_and_descendants
+      preloaded_parent_group_and_descendants ||= parent.group.self_and_descendants
 
-      if self == parent_epic
+      if self == parent
         errors.add :parent, 'Cannot add an epic as a child of itself'
-      elsif parent_epic.children.to_a.include?(self)
+      elsif parent.children.to_a.include?(self)
         errors.add :parent, "This epic can't be added as it is already assigned to the parent"
-      elsif parent_epic.has_ancestor?(self)
+      elsif parent.has_ancestor?(self)
         errors.add :parent, "This epic can't be added as it is already assigned to this epic's ancestor"
-      elsif !parent_group_descendants.include?(group)
+      elsif !preloaded_parent_group_and_descendants.include?(group)
         errors.add :parent, "This epic can't be added because parent and child epics must belong to the same group"
-      elsif level_depth_exceeded?(parent_epic)
+      elsif level_depth_exceeded?(parent)
         errors.add :parent, "This epic can't be added as the maximum depth of nested epics would be exceeded"
       end
     end
