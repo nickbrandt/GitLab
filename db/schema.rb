@@ -3296,6 +3296,11 @@ ActiveRecord::Schema.define(version: 2020_02_06_111847) do
     t.index ["project_id"], name: "index_project_repository_states_on_project_id", unique: true
   end
 
+  create_table "project_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+  end
+
   create_table "project_statistics", id: :serial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "namespace_id", null: false
@@ -4881,6 +4886,7 @@ ActiveRecord::Schema.define(version: 2020_02_06_111847) do
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
+  add_foreign_key "project_settings", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
