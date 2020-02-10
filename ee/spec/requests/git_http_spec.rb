@@ -10,7 +10,7 @@ describe 'Git HTTP requests' do
     it do
       download(path, env) do |response|
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+        expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
       end
     end
   end
@@ -19,7 +19,7 @@ describe 'Git HTTP requests' do
     it do
       upload(path, env) do |response|
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+        expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
       end
     end
   end
