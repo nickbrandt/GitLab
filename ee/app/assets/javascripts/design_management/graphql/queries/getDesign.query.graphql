@@ -1,5 +1,5 @@
 #import "../fragments/design.fragment.graphql"
-#import "../fragments/author.fragment.graphql"
+#import "~/graphql_shared/fragments/author.fragment.graphql"
 
 query getDesign($fullPath: ID!, $iid: String!, $atVersion: ID, $filenames: [String!]) {
   project(fullPath: $fullPath) {
