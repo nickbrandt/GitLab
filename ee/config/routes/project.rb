@@ -127,8 +127,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      post 'alerts/notify', to: 'alerting/notifications#create'
-
       resource :tracing, only: [:show]
 
       resources :web_ide_terminals, path: :ide_terminals, only: [:create, :show], constraints: { id: /\d+/, format: :json } do
