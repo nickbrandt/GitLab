@@ -129,6 +129,11 @@ class GitlabProjectImport
   def with_isolated_sidekiq_job
     Sidekiq::Testing.fake! do
       with_request_store do
+        # If you are attempting to import a large project into a development environment,
+        # you may see Gitaly throw an error about too many calls or invocations.
+        # This is due to a n+1 calls limit being set for development setups (not enforced in production)
+        # https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24475#note_283090635
+        # For development setups, this code-path will be excluded from n+1 detection.
         ::Gitlab::GitalyClient.allow_n_plus_1_calls do
           measurement_enabled? ? with_measuring { yield } : yield
         end
