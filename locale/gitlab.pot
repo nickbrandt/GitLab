@@ -10106,6 +10106,9 @@ msgstr ""
 msgid "Identities"
 msgstr ""
 
+msgid "If any indexed field exceeds this limit it will be truncated to this number of characters and the rest will not be indexed or searchable. This does not apply to repository and wiki indexing. Setting this to 0 means it is unlimited."
+msgstr ""
+
 msgid "If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like \"1 hour\". Values without specification represent seconds."
 msgstr ""
 
@@ -11711,6 +11714,9 @@ msgid "Maximum delay (Minutes)"
 msgstr ""
 
 msgid "Maximum duration of a session."
+msgstr ""
+
+msgid "Maximum field length"
 msgstr ""
 
 msgid "Maximum job timeout"

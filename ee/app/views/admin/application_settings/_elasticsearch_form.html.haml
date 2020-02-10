@@ -57,6 +57,12 @@
               = _('How many replicas each Elasticsearch shard has.')
               = recreate_index_text
 
+          .form-group
+            = f.label :elasticsearch_indexed_field_length_limit, _('Maximum field length'), class: 'label-bold'
+            = f.number_field :elasticsearch_indexed_field_length_limit, value: @application_setting.elasticsearch_indexed_field_length_limit, class: 'form-control'
+            .form-text.text-muted
+              = _('If any indexed field exceeds this limit it will be truncated to this number of characters and the rest will not be indexed or searchable. This does not apply to repository and wiki indexing. Setting this to 0 means it is unlimited.')
+
         .sub-section
           %h4= _('Elasticsearch indexing restrictions')
           .form-group

@@ -27,6 +27,7 @@ module EE
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_indexing,
         :elasticsearch_replicas,
+        :elasticsearch_indexed_field_length_limit,
         :elasticsearch_search,
         :elasticsearch_shards,
         :elasticsearch_url,

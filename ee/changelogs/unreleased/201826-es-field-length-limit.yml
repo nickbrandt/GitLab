@@ -1,0 +1,5 @@
+---
+title: Add application limit for ES indexed field length
+merge_request: 24345
+author:
+type: added

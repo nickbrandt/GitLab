@@ -68,6 +68,7 @@ describe 'Admin updates EE-only settings' do
         check 'Search with Elasticsearch enabled'
         fill_in 'Number of Elasticsearch shards', with: '120'
         fill_in 'Number of Elasticsearch replicas', with: '2'
+        fill_in 'Maximum field length', with: '100000'
 
         click_button 'Save changes'
       end
@@ -77,6 +78,7 @@ describe 'Admin updates EE-only settings' do
         expect(current_settings.elasticsearch_search).to be_truthy
         expect(current_settings.elasticsearch_shards).to eq(120)
         expect(current_settings.elasticsearch_replicas).to eq(2)
+        expect(current_settings.elasticsearch_indexed_field_length_limit).to eq(100000)
         expect(page).to have_content 'Application settings saved successfully'
       end
     end

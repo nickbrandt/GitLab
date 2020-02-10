@@ -41,6 +41,12 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
 
+    it { is_expected.to allow_value(10).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.to allow_value(0).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_indexed_field_length_limit) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_indexed_field_length_limit) }
+
     it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("  ").for(:required_instance_ci_template) }

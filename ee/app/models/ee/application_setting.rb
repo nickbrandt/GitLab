@@ -56,6 +56,10 @@ module EE
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
                 if: ->(setting) { setting.elasticsearch_indexing? && setting.elasticsearch_aws? }
 
+      validates :elasticsearch_indexed_field_length_limit,
+                presence: true,
+                numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
       validates :email_additional_text,
                 allow_blank: true,
                 length: { maximum: EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT }
@@ -85,6 +89,7 @@ module EE
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
+          elasticsearch_indexed_field_length_limit: 0,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
           lock_memberships_to_ldap: false,
