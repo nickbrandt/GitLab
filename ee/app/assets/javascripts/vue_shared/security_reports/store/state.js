@@ -96,11 +96,6 @@ export default () => ({
         text: s__('ciReport|Severity'),
         isLink: false,
       },
-      confidence: {
-        value: null,
-        text: s__('ciReport|Confidence'),
-        isLink: false,
-      },
       className: {
         value: null,
         text: s__('ciReport|Class'),

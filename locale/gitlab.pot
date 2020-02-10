@@ -15962,9 +15962,6 @@ msgstr ""
 msgid "Reports|Classname"
 msgstr ""
 
-msgid "Reports|Confidence"
-msgstr ""
-
 msgid "Reports|Execution time"
 msgstr ""
 
@@ -16825,9 +16822,6 @@ msgid "SecurityDashboard|Add or remove projects from your dashboard"
 msgstr ""
 
 msgid "SecurityDashboard|Add projects"
-msgstr ""
-
-msgid "SecurityDashboard|Confidence"
 msgstr ""
 
 msgid "SecurityDashboard|Edit dashboard"
@@ -21318,9 +21312,6 @@ msgstr ""
 msgid "Vulnerability|Class"
 msgstr ""
 
-msgid "Vulnerability|Confidence"
-msgstr ""
-
 msgid "Vulnerability|Description"
 msgstr ""
 
@@ -22406,9 +22397,6 @@ msgstr ""
 msgid "ciReport|(is loading, errors when loading results)"
 msgstr ""
 
-msgid "ciReport|All confidence levels"
-msgstr ""
-
 msgid "ciReport|All projects"
 msgstr ""
 
@@ -22428,9 +22416,6 @@ msgid "ciReport|Class"
 msgstr ""
 
 msgid "ciReport|Code quality"
-msgstr ""
-
-msgid "ciReport|Confidence"
 msgstr ""
 
 msgid "ciReport|Container Scanning"
@@ -22568,30 +22553,6 @@ msgid "commented on %{link_to_project}"
 msgstr ""
 
 msgid "commit %{commit_id}"
-msgstr ""
-
-msgid "confidence|Confirmed"
-msgstr ""
-
-msgid "confidence|Experimental"
-msgstr ""
-
-msgid "confidence|High"
-msgstr ""
-
-msgid "confidence|Ignore"
-msgstr ""
-
-msgid "confidence|Low"
-msgstr ""
-
-msgid "confidence|Medium"
-msgstr ""
-
-msgid "confidence|Undefined"
-msgstr ""
-
-msgid "confidence|Unknown"
 msgstr ""
 
 msgid "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue."

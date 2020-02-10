@@ -266,10 +266,6 @@ describe('vulnerabilities module mutations', () => {
         expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
       });
 
-      it('should set the modal confidence', () => {
-        expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
-      });
-
       it('should set the modal class', () => {
         expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
       });

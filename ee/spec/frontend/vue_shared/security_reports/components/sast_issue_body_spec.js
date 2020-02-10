@@ -26,14 +26,13 @@ describe('Sast Issue Body', () => {
   it('matches snapshot', () => {
     createComponent({
       severity: 'medium',
-      confidence: 'low',
       priority: 'high',
     });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('renders priority if no security and confidence are passed', () => {
+  it('renders priority if no security are passed', () => {
     createComponent({
       priority: 'high',
     });
@@ -41,29 +40,12 @@ describe('Sast Issue Body', () => {
     expect(findDescriptionText().text()).toBe('high:');
   });
 
-  it('renders confidence if no severity is passed', () => {
-    createComponent({
-      confidence: 'low',
-    });
-
-    expect(findDescriptionText().text()).toBe('(Low):');
-  });
-
-  it('renders severity if no confidence is passed', () => {
+  it('renders severity', () => {
     createComponent({
       severity: 'medium',
     });
 
     expect(findDescriptionText().text()).toBe('Medium:');
-  });
-
-  it('renders severity and confidence if both are passed', () => {
-    createComponent({
-      severity: 'medium',
-      confidence: 'low',
-    });
-
-    expect(findDescriptionText().text()).toBe('Medium (Low):');
   });
 
   it('does not render report link if no path is passed', () => {

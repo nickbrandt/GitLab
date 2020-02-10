@@ -30,11 +30,6 @@ describe('Security Dashboard Table Row', () => {
       expect(vm.$el.querySelectorAll('.table-mobile-content')[0].textContent).toContain(' ');
     });
 
-    it('should render a `–` for confidence', () => {
-      expect(vm.confidence).toEqual('–');
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain('–');
-    });
-
     it('should not render action buttons', () => {
       expect(vm.$el.querySelectorAll('.action-buttons button').length).toBe(0);
     });
@@ -62,21 +57,15 @@ describe('Security Dashboard Table Row', () => {
       ).toContain(props.vulnerability.severity);
     });
 
-    it('should render the confidence', () => {
-      expect(
-        vm.$el.querySelectorAll('.table-mobile-content')[1].textContent.toLowerCase(),
-      ).toContain(props.vulnerability.confidence);
-    });
-
     describe('the project name', () => {
       it('should render the name', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
           props.vulnerability.name,
         );
       });
 
       it('should render the project namespace', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
           props.vulnerability.location.file,
         );
       });
@@ -106,7 +95,7 @@ describe('Security Dashboard Table Row', () => {
       });
 
       it('should contain project name as the namespace', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
           props.vulnerability.project.full_name,
         );
       });
@@ -126,7 +115,7 @@ describe('Security Dashboard Table Row', () => {
       });
 
       it('should contain container image as the namespace', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
           props.vulnerability.location.image,
         );
       });

@@ -30,9 +30,6 @@ export default {
     },
   },
   computed: {
-    confidence() {
-      return this.vulnerability.confidence || '–';
-    },
     severity() {
       return this.vulnerability.severity || ' ';
     },
@@ -72,11 +69,6 @@ export default {
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
-    </div>
-
-    <div class="table-section section-10 ml-md-2">
-      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
-      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section flex-grow-1">

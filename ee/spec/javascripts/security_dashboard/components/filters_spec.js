@@ -18,7 +18,7 @@ describe('Filter component', () => {
     });
 
     it('should display all filters', () => {
-      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(4);
+      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(3);
     });
 
     it('should display "Hide dismissed vulnerabilities" toggle', () => {

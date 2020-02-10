@@ -1,4 +1,4 @@
-import { SEVERITY_LEVELS, CONFIDENCE_LEVELS, REPORT_TYPES, BASE_FILTERS } from './constants';
+import { SEVERITY_LEVELS, REPORT_TYPES, BASE_FILTERS } from './constants';
 import { s__ } from '~/locale';
 
 const optionsObjectToArray = obj => Object.entries(obj).map(([id, name]) => ({ id, name }));
@@ -11,13 +11,6 @@ export default () => ({
       options: [BASE_FILTERS.severity, ...optionsObjectToArray(SEVERITY_LEVELS)],
       hidden: false,
       selection: new Set([BASE_FILTERS.severity.id]),
-    },
-    {
-      name: s__('SecurityDashboard|Confidence'),
-      id: 'confidence',
-      options: [BASE_FILTERS.confidence, ...optionsObjectToArray(CONFIDENCE_LEVELS)],
-      hidden: false,
-      selection: new Set([BASE_FILTERS.confidence.id]),
     },
     {
       name: s__('SecurityDashboard|Report type'),

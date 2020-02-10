@@ -124,7 +124,6 @@ export default {
 
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
     Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
-    Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(
       state.modal.vulnerability,
