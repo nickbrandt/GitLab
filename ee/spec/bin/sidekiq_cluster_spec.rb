@@ -7,7 +7,7 @@ describe 'ee/bin/sidekiq-cluster' do
 
   where(:args, :included, :excluded) do
     %w[--negate cronjob] | '-qdefault,1' | '-qcronjob,1'
-    %w[--queue-query-syntax resource_boundary=cpu] | '-qupdate_merge_requests,1' | '-qdefault,1'
+    %w[--queue-selector resource_boundary=cpu] | '-qupdate_merge_requests,1' | '-qdefault,1'
   end
 
   with_them do

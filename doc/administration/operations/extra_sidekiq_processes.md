@@ -82,11 +82,11 @@ you list:
    sudo gitlab-ctl reconfigure
    ```
 
-## Queue query syntax (experimental)
+## Queue selector (experimental)
 
 > [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/issues/45) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.8.
 
-In addition to selecting queues by name, as above, the `queue_query_syntax`
+In addition to selecting queues by name, as above, the `queue_selector`
 option allows queue groups to be selected in a more general way using
 the following components:
 
@@ -97,7 +97,7 @@ the following components:
 
 From the [list of all available
 attributes](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml),
-`queue_query_syntax` allows selecting of queues by the following attributes:
+`queue_selector` allows selecting of queues by the following attributes:
 
 - `feature_category` - the [GitLab feature
   category](https://about.gitlab.com/direction/maturity/#category-maturity) the
@@ -122,8 +122,8 @@ considered false.
 
 ### Available operators
 
-`queue_query_syntax` supports the following operators, listed from highest to
-lowest precedence:
+`queue_selector` supports the following operators, listed from highest
+to lowest precedence:
 
 - <code> </code>&nbsp;(space) - the logical OR operator. For example, `query_a
   query_b` (where `query_a` and `query_b` are queries made up of the other
@@ -151,7 +151,7 @@ In `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 sidekiq_cluster['enable'] = true
-sidekiq_cluster['queue_query_syntax'] = true
+sidekiq_cluster['queue_selector'] = true
 sidekiq_cluster['queue_groups'] = [
   # Run all non-CPU-bound, queues that are latency sensitive
   'resource_boundary!=cpu,latency_sensitive=true',

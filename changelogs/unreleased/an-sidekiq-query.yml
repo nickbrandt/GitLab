@@ -1,5 +1,5 @@
 ---
-title: Add experimental --queue-query-syntax option to sidekiq-cluster
+title: Add experimental --queue-selector option to sidekiq-cluster
 merge_request: 18877
 author:
 type: changed

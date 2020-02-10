@@ -45,7 +45,7 @@ module Gitlab
         queue_names = SidekiqConfig::CliMethods.worker_queues(@rails_path)
 
         queue_groups =
-          if @queue_query_syntax
+          if @queue_selector
             # When using the experimental queue query syntax, we treat
             # each queue group as a worker attribute query, and resolve
             # the queues for the queue group using this query.
@@ -160,8 +160,8 @@ module Gitlab
             @rails_path = path
           end
 
-          opt.on('--queue-query-syntax', 'EXPERIMENTAL: Run workers based on the provided selector') do |queue_query_syntax|
-            @queue_query_syntax = queue_query_syntax
+          opt.on('--queue-selector', 'EXPERIMENTAL: Run workers based on the provided selector') do |queue_selector|
+            @queue_selector = queue_selector
           end
 
           opt.on('-n', '--negate', 'Run workers for all queues in sidekiq_queues.yml except the given ones') do
