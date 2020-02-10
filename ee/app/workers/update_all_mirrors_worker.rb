@@ -2,7 +2,7 @@
 
 class UpdateAllMirrorsWorker
   include ApplicationWorker
-  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
+  include CronjobQueue
 
   feature_category :source_code_management
 

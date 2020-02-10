@@ -2,7 +2,10 @@
 
 class LdapAllGroupsSyncWorker
   include ApplicationWorker
-  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
+  # rubocop:disable Scalability/CronWorkerContext
+  # This worker does not perform work scoped to a context
+  include CronjobQueue
+  # rubocop:enable Scalability/CronWorkerContext
 
   feature_category :authentication_and_authorization
   worker_has_external_dependencies!
