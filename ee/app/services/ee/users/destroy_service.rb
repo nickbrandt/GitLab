@@ -11,7 +11,7 @@ module EE
           mirror_cleanup(delete_user)
         end
 
-        log_audit_event(user) if result
+        log_audit_event(user) if result.try(:destroyed?)
 
         result
       end
