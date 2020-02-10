@@ -52,4 +52,12 @@ FactoryBot.define do
       )
     end
   end
+
+  factory :group_with_managed_accounts, parent: :group do
+    after(:create) do |group, evaluator|
+      create(:saml_provider,
+        :enforced_group_managed_accounts,
+        group: group)
+    end
+  end
 end
