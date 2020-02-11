@@ -9,6 +9,7 @@ describe MergeTrains::CheckStatusService do
   let(:previous_ref) { 'refs/heads/master' }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.update!(merge_pipelines_enabled: true)
   end

@@ -11,6 +11,7 @@ describe MergeRequestPollWidgetEntity do
   let(:request) { double('request', current_user: user) }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_developer(user)
   end
 
@@ -33,7 +34,7 @@ describe MergeRequestPollWidgetEntity do
 
     context 'when the merge train feature is disabled' do
       before do
-        stub_feature_flags(merge_trains_enabled: false)
+        stub_feature_flags(disable_merge_trains: true)
       end
 
       it 'does not have merge trains count' do
