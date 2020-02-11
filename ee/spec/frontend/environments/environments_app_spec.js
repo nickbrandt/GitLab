@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { environment, folder } from 'spec/environments/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { environment, folder } from './mock_data';
 import axios from '~/lib/utils/axios_utils';
 import environmentsComponent from '~/environments/components/environments_app.vue';
 
@@ -41,9 +41,9 @@ describe('Environment', () => {
 
         component = mountComponent(EnvironmentsComponent, mockData);
 
-        setTimeout(() => {
+        setImmediate(() => {
           done();
-        }, 0);
+        });
       });
 
       it('should render the empty state', () => {
@@ -78,9 +78,9 @@ describe('Environment', () => {
 
         component = mountComponent(EnvironmentsComponent, mockData);
 
-        setTimeout(() => {
+        setImmediate(() => {
           done();
-        }, 0);
+        });
       });
 
       it('should render a table with environments', () => {
@@ -96,34 +96,34 @@ describe('Environment', () => {
         });
 
         it('should make an API request when page is clicked', done => {
-          spyOn(component, 'updateContent');
-          setTimeout(() => {
+          jest.spyOn(component, 'updateContent').mockImplementation(() => {});
+          setImmediate(() => {
             component.$el.querySelector('.gl-pagination li:nth-child(3) .page-link').click();
 
             expect(component.updateContent).toHaveBeenCalledWith({ scope: 'available', page: '2' });
             done();
-          }, 0);
+          });
         });
 
         it('should make an API request when using tabs', done => {
-          setTimeout(() => {
-            spyOn(component, 'updateContent');
+          setImmediate(() => {
+            jest.spyOn(component, 'updateContent').mockImplementation(() => {});
             component.$el.querySelector('.js-environments-tab-stopped').click();
 
             expect(component.updateContent).toHaveBeenCalledWith({ scope: 'stopped', page: '1' });
             done();
-          }, 0);
+          });
         });
       });
 
       describe('deploy boards', () => {
         it('should render arrow to open deploy boards', done => {
-          setTimeout(() => {
+          setImmediate(() => {
             expect(
               component.$el.querySelector('.deploy-board-icon.ic-chevron-right'),
             ).toBeDefined();
             done();
-          }, 0);
+          });
         });
       });
     });
@@ -150,14 +150,14 @@ describe('Environment', () => {
 
         component = mountComponent(EnvironmentsComponent, mockData);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             component.$el
               .querySelector('.canary-deployment-callout')
               .getAttribute('data-js-canary-promo-key'),
           ).toBe('1');
           done();
-        }, 0);
+        });
       });
 
       it('should render banner underneath first environment', done => {
@@ -180,14 +180,14 @@ describe('Environment', () => {
 
         component = mountComponent(EnvironmentsComponent, mockData);
 
-        setTimeout(() => {
+        setImmediate(() => {
           expect(
             component.$el
               .querySelector('.canary-deployment-callout')
               .getAttribute('data-js-canary-promo-key'),
           ).toBe('0');
           done();
-        }, 0);
+        });
       });
     });
     // ee-only end
@@ -199,9 +199,9 @@ describe('Environment', () => {
 
       component = mountComponent(EnvironmentsComponent, mockData);
 
-      setTimeout(() => {
+      setImmediate(() => {
         done();
-      }, 0);
+      });
     });
 
     it('should render empty state', () => {
@@ -236,18 +236,18 @@ describe('Environment', () => {
     });
 
     it('should open a closed folder', done => {
-      setTimeout(() => {
+      setImmediate(() => {
         component.$el.querySelector('.folder-name').click();
 
         Vue.nextTick(() => {
           expect(component.$el.querySelector('.folder-icon.ic-chevron-right')).toBe(null);
           done();
         });
-      }, 0);
+      });
     });
 
     it('should close an opened folder', done => {
-      setTimeout(() => {
+      setImmediate(() => {
         // open folder
         component.$el.querySelector('.folder-name').click();
 
@@ -260,17 +260,17 @@ describe('Environment', () => {
             done();
           });
         });
-      }, 0);
+      });
     });
 
     it('should show children environments and a button to show all environments', done => {
-      setTimeout(() => {
+      setImmediate(() => {
         // open folder
         component.$el.querySelector('.folder-name').click();
 
         Vue.nextTick(() => {
           // wait for next async request
-          setTimeout(() => {
+          setImmediate(() => {
             expect(component.$el.querySelectorAll('.js-child-row').length).toEqual(1);
             expect(component.$el.querySelector('.text-center > a.btn').textContent).toContain(
               'Show all',
@@ -278,7 +278,7 @@ describe('Environment', () => {
             done();
           });
         });
-      }, 0);
+      });
     });
   });
 
@@ -295,7 +295,7 @@ describe('Environment', () => {
       );
 
       component = mountComponent(EnvironmentsComponent, mockData);
-      spyOn(window.history, 'pushState').and.stub();
+      jest.spyOn(window.history, 'pushState');
     });
 
     describe('updateContent', () => {
@@ -315,7 +315,7 @@ describe('Environment', () => {
 
     describe('onChangeTab', () => {
       it('should set page to 1', () => {
-        spyOn(component, 'updateContent');
+        jest.spyOn(component, 'updateContent').mockImplementation(() => {});
         component.onChangeTab('stopped');
 
         expect(component.updateContent).toHaveBeenCalledWith({ scope: 'stopped', page: '1' });
@@ -324,7 +324,7 @@ describe('Environment', () => {
 
     describe('onChangePage', () => {
       it('should update page and keep scope', () => {
-        spyOn(component, 'updateContent');
+        jest.spyOn(component, 'updateContent').mockImplementation(() => {});
         component.onChangePage(4);
 
         expect(component.updateContent).toHaveBeenCalledWith({ scope: component.scope, page: '4' });
