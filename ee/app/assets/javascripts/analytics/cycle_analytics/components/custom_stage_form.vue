@@ -14,7 +14,7 @@ import {
   getLabelEventsIdentifiers,
 } from '../utils';
 
-const initFields = {
+const defaultFields = {
   id: null,
   name: null,
   startEventIdentifier: null,
@@ -58,18 +58,22 @@ export default {
     errors: {
       type: Object,
       required: false,
-      default: null,
+      default: () => {},
     },
   },
   data() {
     return {
-      fields: {
-        ...initFields,
-        ...this.initialFields,
-      },
+      labelEvents: getLabelEventsIdentifiers(this.events),
+      fields: {},
     };
   },
   computed: {
+    defaultFieldData() {
+      return {
+        ...defaultFields,
+        ...this.initialFields,
+      };
+    },
     startEventOptions() {
       return [
         { value: null, text: s__('CustomCycleAnalytics|Select start event') },
@@ -118,7 +122,7 @@ export default {
       );
     },
     isDirty() {
-      return !isEqual(this.initialFields, this.fields) && !isEqual(initFields, this.fields);
+      return !isEqual(this.initialFields, this.fields) && !isEqual(defaultFields, this.fields);
     },
     hasValidStartAndEndEventPair() {
       const {
@@ -147,14 +151,26 @@ export default {
     },
   },
   mounted() {
-    this.labelEvents = getLabelEventsIdentifiers(this.events);
+    this.resetFormFields();
   },
+  // updated() {
+  //   this.resetFormFields();
+  // },
   methods: {
+    resetFormFields() {
+      this.fields = this.defaultFieldData;
+      // console.log('this.fields', this.fields);
+      // console.log('this.initialFields', this.initialFields);
+      // console.log('defaultFields', defaultFields);
+      // Object.entries(this.defaultFieldData).
+      // for (let [key, value] of Object.entries(this.defaultFieldData)) {
+      //   // console.log('setting', key, value);
+      //   this.$set(this.fields, key, value);
+      // }
+      // console.log('this.fields', this.fields);
+    },
     handleCancel() {
-      this.fields = {
-        ...initFields,
-        ...this.initialFields,
-      };
+      this.resetFormFields();
       this.$emit('cancel');
     },
     handleSave() {
@@ -245,7 +261,7 @@ export default {
             !hasStartEvent ? s__('CustomCycleAnalytics|Please select a start event first') : ''
           "
           :state="isValid('endEventIdentifier')"
-          :invalid-feedback="fieldErrors('endEventIdentifier')"
+          :invalid-feedback="fieldErrors('endEventIdentifier') || endEventError"
         >
           <!-- :state="hasValidStartAndEndEventPair"
           :invalid-feedback="endEventError" -->

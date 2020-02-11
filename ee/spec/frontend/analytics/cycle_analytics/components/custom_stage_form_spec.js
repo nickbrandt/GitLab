@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
@@ -21,11 +21,14 @@ const initData = {
 };
 
 describe('CustomStageForm', () => {
-  function createComponent(props) {
-    return mount(CustomStageForm, {
+  function createComponent(props, shallow = false) {
+    const func = shallow ? shallowMount : mount;
+    return func(CustomStageForm, {
       propsData: {
         events,
         labels: groupLabels,
+        errors: {},
+        initialFields: {},
         ...props,
       },
     });
@@ -248,7 +251,7 @@ describe('CustomStageForm', () => {
 
       describe('with a stop event selected and a change to the start event', () => {
         beforeEach(() => {
-          wrapper = createComponent({}, false);
+          wrapper = createComponent({});
 
           wrapper.setData({
             fields: {
@@ -299,7 +302,7 @@ describe('CustomStageForm', () => {
 
       describe('Stop event label', () => {
         beforeEach(() => {
-          wrapper = createComponent({}, false);
+          wrapper = createComponent({});
         });
 
         afterEach(() => {
@@ -353,24 +356,32 @@ describe('CustomStageForm', () => {
       });
     });
 
-    describe('Add stage button', () => {
-      beforeEach(() => {
-        wrapper = createComponent({}, false);
+    describe.only('Add stage button', () => {
+      beforeEach(done => {
+        wrapper = createComponent({}, true);
 
         selectDropdownOption(wrapper, sel.startEvent, 1);
 
-        return Vue.nextTick(() => {
-          selectDropdownOption(wrapper, sel.endEvent, 1);
-          return Vue.nextTick();
-        });
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            selectDropdownOption(wrapper, sel.endEvent, 1);
+          })
+          .then(wrapper.vm.$nextTick)
+          .then(done)
+          .catch(err => {
+            console.log('ERRRRRRR', err);
+            done.fail();
+          });
       });
 
       afterEach(() => {
         wrapper.destroy();
       });
 
-      it('has text `Add stage`', () => {
-        expect(wrapper.find(sel.submit).text('value')).toEqual('Add stage');
+      it.only('has text `Add stage`', () => {
+        const txt = wrapper.find(sel.submit).text();
+        expect(txt).toEqual('Add stage');
       });
 
       it('is enabled when all required fields are filled', done => {
@@ -391,7 +402,7 @@ describe('CustomStageForm', () => {
         const stopEventIndex = 1;
 
         beforeEach(() => {
-          wrapper = createComponent({}, false);
+          wrapper = createComponent({});
 
           selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
 
@@ -452,7 +463,7 @@ describe('CustomStageForm', () => {
 
     describe('Cancel button', () => {
       beforeEach(() => {
-        wrapper = createComponent({}, false);
+        wrapper = createComponent({});
       });
 
       afterEach(() => {

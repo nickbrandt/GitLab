@@ -241,18 +241,16 @@ export const clearCustomStageFormErrors = ({ commit }) =>
 
 export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
 export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS);
   createFlash(__(`Your custom stage '${title}' was created`), 'notice');
 
   return dispatch('fetchGroupStagesAndEvents').then(() => dispatch('fetchSummaryData'));
 };
 
 export const receiveCreateCustomStageError = ({ commit }, { status, message, errors, data }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE, { status, message, errors, data });
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, { status, message, errors, data });
 
   const { name } = data;
-  // TODO: check for 403, 422 etc
-  // Follow up issue to investigate https://gitlab.com/gitlab-org/gitlab/issues/36685
   const flashMessage =
     status !== httpStatus.UNPROCESSABLE_ENTITY
       ? __(`'${name}' stage already exists'`)
@@ -322,7 +320,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
 export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
-  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
 
   dispatch('fetchGroupStagesAndEvents');
@@ -333,7 +331,7 @@ export const receiveUpdateStageError = (
   { commit },
   { error: { response: { status = 400, data: errorData } = {} } = {}, data },
 ) => {
-  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  commit(types.RECEIVE_UPDATE_STAGE_ERROR);
   const ERROR_NAME_RESERVED = 'is reserved';
 
   let message = __('There was a problem saving your custom stage, please try again');

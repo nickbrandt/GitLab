@@ -66,7 +66,7 @@ export default {
     customStageFormErrors: {
       type: Object,
       required: false,
-      default: null,
+      default: () => {},
     },
     labels: {
       type: Array,

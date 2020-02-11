@@ -54,11 +54,18 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}              | ${true}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS}   | ${'isSavingCustomStage'}              | ${false}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'isSavingCustomStage'}              | ${false}
-    ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'customStageFormErrors'}            | ${{ errors: [] }}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR}     | ${'customStageFormErrors'}            | ${{}}
     ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'}        | ${true}
     ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'}        | ${false}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                        | ${true}
-    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}                        | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isSavingCustomStage'}              | ${true}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'customStageFormErrors'}            | ${{}}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isLoading'}                        | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isSavingCustomStage'}              | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isEditingCustomStage'}             | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'customStageFormErrors'}            | ${{}}
+    ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isLoading'}                        | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isSavingCustomStage'}              | ${false}
     ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}                        | ${true}
     ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}                        | ${false}
     ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'}           | ${true}
@@ -115,6 +122,18 @@ describe('Cycle analytics mutations', () => {
       mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state);
 
       expect(state.isEmptyStage).toEqual(true);
+    });
+  });
+
+  describe(`types.RECEIVE_UPDATE_STAGE_ERROR`, () => {
+    const mockFormError = { errors: { start_identifier: ['Cant be blank'] } };
+    it('will set customStageFormErrors', () => {
+      state = {};
+      mutations[types.RECEIVE_UPDATE_STAGE_ERROR](state, mockFormError);
+
+      expect(state.customStageFormErrors).toEqual(
+        convertObjectPropsToCamelCase(mockFormError.errors),
+      );
     });
   });
 
