@@ -298,6 +298,7 @@ describe Notify do
         end
         it_behaves_like 'it should show Gmail Actions View Epic link'
         it_behaves_like 'an unsubscribeable thread'
+        it_behaves_like 'having group identification headers'
 
         it 'has the correct subject and body' do
           prefix = "#{epic.group.name} | "
@@ -328,6 +329,8 @@ describe Notify do
         it_behaves_like 'a note email'
 
         it_behaves_like 'an unsubscribeable thread'
+
+        it_behaves_like 'having group identification headers'
 
         it 'has the characteristics of a threaded reply' do
           host = Gitlab.config.gitlab.host
