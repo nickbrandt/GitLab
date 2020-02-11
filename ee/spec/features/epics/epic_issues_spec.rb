@@ -199,7 +199,7 @@ describe 'Epic Issues', :js do
         add_epics(references)
 
         expect(page).to have_selector('.gl-field-error')
-        expect(find('.gl-field-error')).to have_text("This epic already has the maximum number of child epics.")
+        expect(find('.gl-field-error')).to have_text("This epic can't be added because the parent is already at the maximum depth from its most distant ancestor")
       end
     end
 
