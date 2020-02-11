@@ -816,6 +816,7 @@ module EE
           expose :plan_name, as: :code
           expose :plan_title, as: :name
           expose :trial
+          expose :auto_renew
           expose :upgradable?, as: :upgradable
         end
 
