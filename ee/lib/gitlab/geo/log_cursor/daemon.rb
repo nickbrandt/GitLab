@@ -48,7 +48,11 @@ module Gitlab
           # Wrap this with the connection to make it possible to reconnect if
           # PGbouncer dies: https://github.com/rails/rails/issues/29189
           ActiveRecord::Base.connection_pool.with_connection do
-            LogCursor::EventLogs.new.fetch_in_batches { |batch, last_id| handle_events(batch, last_id) }
+            LogCursor::EventLogs.new.fetch_in_batches do |batch, last_id|
+              break if exit?
+
+              handle_events(batch, last_id)
+            end
           end
         end
 
