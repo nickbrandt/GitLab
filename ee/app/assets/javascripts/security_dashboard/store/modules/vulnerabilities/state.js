@@ -3,6 +3,7 @@ import { __, s__ } from '~/locale';
 export default () => ({
   isLoadingVulnerabilities: true,
   errorLoadingVulnerabilities: false,
+  loadingVulnerabilitiesErrorCode: null,
   vulnerabilities: [],
   isLoadingVulnerabilitiesCount: true,
   errorLoadingVulnerabilitiesCount: false,

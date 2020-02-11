@@ -1,9 +1,17 @@
+import { LOADING_VULNERABILITIES_ERROR_CODES } from './constants';
+
 export const dashboardError = state =>
   state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
 export const dashboardListError = state =>
   state.errorLoadingVulnerabilities && !state.errorLoadingVulnerabilitiesCount;
 export const dashboardCountError = state =>
   !state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
+
+export const loadingVulnerabilitiesFailedWithRecognizedErrorCode = state =>
+  state.errorLoadingVulnerabilities &&
+  Object.values(LOADING_VULNERABILITIES_ERROR_CODES).includes(
+    state.loadingVulnerabilitiesErrorCode,
+  );
 
 export const getVulnerabilityHistoryByName = state => name =>
   state.vulnerabilitiesHistory[name.toLowerCase()];

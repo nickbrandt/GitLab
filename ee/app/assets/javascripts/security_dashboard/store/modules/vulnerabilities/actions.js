@@ -81,8 +81,8 @@ export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
       const { headers, data } = response;
       dispatch('receiveVulnerabilitiesSuccess', { headers, data });
     })
-    .catch(() => {
-      dispatch('receiveVulnerabilitiesError');
+    .catch(error => {
+      dispatch('receiveVulnerabilitiesError', error.response.status);
     });
 };
 
@@ -98,8 +98,8 @@ export const receiveVulnerabilitiesSuccess = ({ commit }, { headers, data }) => 
   commit(types.RECEIVE_VULNERABILITIES_SUCCESS, { pageInfo, vulnerabilities });
 };
 
-export const receiveVulnerabilitiesError = ({ commit }) => {
-  commit(types.RECEIVE_VULNERABILITIES_ERROR);
+export const receiveVulnerabilitiesError = ({ commit }, errorCode) => {
+  commit(types.RECEIVE_VULNERABILITIES_ERROR, errorCode);
 };
 
 export const openModal = ({ commit }, payload = {}) => {
