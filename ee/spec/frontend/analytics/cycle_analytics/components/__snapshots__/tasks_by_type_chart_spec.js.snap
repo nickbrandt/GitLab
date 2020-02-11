@@ -12,41 +12,41 @@ exports[`TasksByTypeChart no data available should render the no data available 
 `;
 
 exports[`TasksByTypeChart with data available filters labels has label filters 1`] = `
-"<div class=\\"js-tasks-by-type-chart-filters-labels mb-3 mx-3\\">
+"<div class=\\"js-tasks-by-type-chart-filters-labels mb-3 mx-3 w-100\\">
   <p class=\\"font-weight-bold text-left my-2\\">
     Select labels
-  </p>
+    <br> <small>3 selected (15 max)</small></p>
   <div class=\\"dropdown-input px-0\\"><input type=\\"search\\" class=\\"dropdown-input-field\\"> <svg aria-hidden=\\"true\\" class=\\"dropdown-input-search s16 ic-search\\" data-hidden=\\"true\\">
       <use xlink:href=\\"#search\\"></use>
     </svg></div>
-  <div class=\\"dropdown-content px-0\\"></div>
+  <div class=\\"dropdown-content px-0 w-100\\"></div>
 </div>"
 `;
 
 exports[`TasksByTypeChart with data available filters labels with label dropdown open renders the group labels as dropdown items 1`] = `
-"<div class=\\"dropdown-content px-0\\">
+"<div class=\\"dropdown-content px-0 w-100\\">
   <ul>
     <li>
-      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+      <a href=\\"#\\" class=\\"dropdown-menu-link \\">
         <span style=\\"background-color: #FF0000;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-
+        roses
       </a>
     </li>
 
     <li>
-      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+      <a href=\\"#\\" class=\\"dropdown-menu-link \\">
         <span style=\\"background-color: #FFFFFF;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-
+        some space
       </a>
     </li>
 
     <li>
-      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+      <a href=\\"#\\" class=\\"dropdown-menu-link \\">
         <span style=\\"background-color: #0000FF;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-
+        violets
       </a>
     </li>
   </ul>

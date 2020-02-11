@@ -58,8 +58,34 @@ export default {
   },
   [types.REQUEST_GROUP_LABELS](state) {
     state.labels = [];
+  },
+  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
+    state.labels = data.map(convertObjectPropsToCamelCase);
+  },
+  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
+    state.labels = [];
+  },
+  [types.REQUEST_TOP_RANKED_GROUP_LABELS](state) {
+    state.topRankedLabels = [];
     state.tasksByType = {
       ...state.tasksByType,
+      labelIds: [],
+    };
+  },
+  [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
+    const { tasksByType } = state;
+    state.topRankedLabels = data.length ? data.map(convertObjectPropsToCamelCase) : [];
+    // TODO: Should probably append as many labels from `labels` as we need if we dont get enough returned
+    state.tasksByType = {
+      ...tasksByType,
+      labelIds: data.length ? data.map(({ id }) => id) : [],
+    };
+  },
+  [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
+    const { tasksByType } = state;
+    state.topRankedLabels = [];
+    state.tasksByType = {
+      ...tasksByType,
       labelIds: [],
     };
   },
@@ -77,22 +103,6 @@ export default {
   },
   [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
     state.medians = {};
-  },
-  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
-    const { tasksByType } = state;
-    state.labels = data.map(convertObjectPropsToCamelCase);
-    state.tasksByType = {
-      ...tasksByType,
-      labelIds: data.map(({ id }) => id),
-    };
-  },
-  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
-    const { tasksByType } = state;
-    state.labels = [];
-    state.tasksByType = {
-      ...tasksByType,
-      labelIds: [],
-    };
   },
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
     state.isCreatingCustomStage = true;

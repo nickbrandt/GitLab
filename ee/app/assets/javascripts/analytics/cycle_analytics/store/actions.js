@@ -172,6 +172,7 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
     .then(() => dispatch('fetchGroupLabels'))
+    .then(() => dispatch('fetchTopRankedGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
@@ -261,6 +262,45 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
+    );
+};
+
+export const receiveTopRankedGroupLabelsSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
+
+export const receiveTopRankedGroupLabelsError = ({ commit }, error) => {
+  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR, error);
+  createFlash(__('There was an error fetching label data for the selected group'));
+};
+
+export const requestTopRankedGroupLabels = ({ commit }) =>
+  commit(types.REQUEST_TOP_RANKED_GROUP_LABELS);
+
+export const fetchTopRankedGroupLabels = ({
+  dispatch,
+  state,
+  getters: {
+    currentGroupPath,
+    cycleAnalyticsRequestParams: { created_after, created_before },
+  },
+}) => {
+  dispatch('requestTopRankedGroupLabels');
+  const {
+    tasksByType: { subject },
+  } = state;
+
+  return Api.cycleAnalyticsTopLabels({
+    subject,
+    created_after,
+    created_before,
+    group_id: currentGroupPath,
+  })
+    .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
+    .catch(error =>
+      handleErrorOrRethrow({
+        error,
+        action: () => dispatch('receiveTopRankedGroupLabelsError', error),
+      }),
     );
 };
 
@@ -370,6 +410,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
   } = getters;
+
 
   const {
     tasksByType: { labelIds, subject },

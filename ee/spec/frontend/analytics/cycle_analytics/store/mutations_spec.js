@@ -146,19 +146,6 @@ describe('Cycle analytics mutations', () => {
     });
   });
 
-  describe.each`
-    mutation                            | value
-    ${types.REQUEST_GROUP_LABELS}       | ${[]}
-    ${types.RECEIVE_GROUP_LABELS_ERROR} | ${[]}
-  `('$mutation', ({ mutation, value }) => {
-    it(`will set tasksByType.labelIds to ${value}`, () => {
-      state = { tasksByType: {} };
-      mutations[mutation](state);
-
-      expect(state.tasksByType.labelIds).toEqual(value);
-    });
-  });
-
   describe(`${types.RECEIVE_GROUP_LABELS_SUCCESS}`, () => {
     it('will set the labels state item with the camelCased group labels', () => {
       mutations[types.RECEIVE_GROUP_LABELS_SUCCESS](state, groupLabels);

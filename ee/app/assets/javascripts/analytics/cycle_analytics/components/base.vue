@@ -64,6 +64,7 @@ export default {
       'stages',
       'summary',
       'labels',
+      'topRankedLabels',
       'currentStageEvents',
       'customStageFormEvents',
       'errorCode',

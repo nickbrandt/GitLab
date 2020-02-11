@@ -8,6 +8,7 @@ import {
   TASKS_BY_TYPE_FILTERS,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS,
+  TASKS_BY_TYPE_MAX_LABELS,
 } from '../constants';
 
 export default {
@@ -60,6 +61,13 @@ export default {
         },
       );
     },
+    selectedLabelLimitText() {
+      const { selectedLabelIds } = this;
+      return sprintf(s__('CycleAnalytics|%{selectedLabelsCount} selected (%{maxLabels} max)'), {
+        selectedLabelsCount: selectedLabelIds.length,
+        maxLabels: TASKS_BY_TYPE_MAX_LABELS,
+      });
+    },
   },
   mounted() {
     $(this.$refs.labelsDropdown).glDropdown({
@@ -85,14 +93,16 @@ export default {
       callback(this.labels);
     },
     rowTemplate(label) {
+      const isActiveClass =
+        this.selectedLabelIds.length && this.selectedLabelIds.includes(label.id) ? 'is-active' : '';
       return `
           <li>
-            <a href='#' class='dropdown-menu-link is-active'>
+            <a href='#' class='dropdown-menu-link ${isActiveClass}'>
               <span style="background-color: ${
                 label.color
               };" class="d-inline-block dropdown-label-box">
               </span>
-              ${_.escape(label.title)}
+              ${_.escape(label.name)}
             </a>
           </li>
         `;
@@ -122,7 +132,7 @@ export default {
           <icon :size="16" name="settings" />
           <icon :size="16" name="chevron-down" />
         </gl-button>
-        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-right">
+        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-right min-width-300">
           <div class="js-tasks-by-type-chart-filters-subject mb-3 mx-3">
             <p class="font-weight-bold text-left mb-2">{{ s__('CycleAnalytics|Show') }}</p>
             <gl-segmented-control
@@ -135,15 +145,17 @@ export default {
             />
           </div>
           <gl-dropdown-divider />
-          <div class="js-tasks-by-type-chart-filters-labels mb-3 mx-3">
+          <div class="js-tasks-by-type-chart-filters-labels mb-3 mx-3 w-100">
             <p class="font-weight-bold text-left my-2">
               {{ s__('CycleAnalytics|Select labels') }}
+              <br />
+              <small>{{ selectedLabelLimitText }}</small>
             </p>
             <div class="dropdown-input px-0">
               <input class="dropdown-input-field" type="search" />
               <icon name="search" class="dropdown-input-search" data-hidden="true" />
             </div>
-            <div class="dropdown-content px-0"></div>
+            <div class="dropdown-content px-0 w-100"></div>
           </div>
         </div>
       </div>

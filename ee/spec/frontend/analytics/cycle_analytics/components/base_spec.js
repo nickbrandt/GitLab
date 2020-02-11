@@ -425,6 +425,7 @@ describe('Cycle Analytics component', () => {
       mockFetchStageMedian = true,
       mockFetchDurationData = true,
       mockFetchTasksByTypeData = true,
+      mockFetchTasksByTypeTopLabelsData = true,
     }) {
       const defaultStatus = 200;
       const defaultRequests = {
@@ -450,6 +451,12 @@ describe('Cycle Analytics component', () => {
         mock
           .onGet(mockData.endpoints.tasksByTypeData)
           .reply(defaultStatus, { ...mockData.tasksByTypeData });
+      }
+
+      if (mockFetchTasksByTypeTopLabelsData) {
+        mock
+          .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
+          .reply(defaultStatus, mockData.groupLabels);
       }
 
       if (mockFetchDurationData) {

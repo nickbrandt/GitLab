@@ -373,6 +373,7 @@ describe('Cycle analytics actions', () => {
         [
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchGroupLabels' },
+          { type: 'fetchTopRankedGroupLabels' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'fetchSummaryData' },
