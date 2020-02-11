@@ -14,7 +14,7 @@ module Projects
       prepend_before_action :repository, :project_without_auth, only: [:notify]
 
       before_action :authorize_read_prometheus_alerts!, except: [:notify]
-      before_action :alert, only: [:update, :show, :destroy]
+      before_action :alert, only: [:update, :show, :destroy, :metrics_dashboard]
 
       def index
         render json: serialize_as_json(alerts)
@@ -140,7 +140,7 @@ module Projects
       def metrics_dashboard_params
         {
           embedded: true,
-          prometheus_alert_id: params[:id].to_i
+          prometheus_alert_id: alert.id
         }
       end
     end
