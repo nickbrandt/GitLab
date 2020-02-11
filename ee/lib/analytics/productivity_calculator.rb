@@ -19,7 +19,9 @@ module Analytics
 
     # rubocop: disable CodeReuse/ActiveRecord
     def first_comment_at
-      merge_request.related_notes.by_humans.where.not(author_id: merge_request.author_id).fresh.first&.created_at
+      merge_request.related_notes.by_humans
+        .where.not(author_id: merge_request.author_id)
+        .fresh.first&.created_at
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
