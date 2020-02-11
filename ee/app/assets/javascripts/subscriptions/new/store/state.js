@@ -16,14 +16,15 @@ const determineSelectedPlan = (planId, plans) => {
   return plans[0] && plans[0].value;
 };
 
-export default ({ planData = '[]', planId, setupForCompany, fullName }) => {
-  const plans = parsePlanData(planData);
+export default ({ planData = '[]', planId, setupForCompany, fullName, newUser }) => {
+  const availablePlans = parsePlanData(planData);
 
   return {
     currentStep: STEPS[0],
-    availablePlans: plans,
-    selectedPlan: determineSelectedPlan(planId, plans),
     isSetupForCompany: parseBoolean(setupForCompany),
+    availablePlans,
+    selectedPlan: determineSelectedPlan(planId, availablePlans),
+    newUser: parseBoolean(newUser),
     fullName,
     organizationName: null,
     numberOfUsers: parseBoolean(setupForCompany) ? 0 : 1,
