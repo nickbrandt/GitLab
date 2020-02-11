@@ -294,24 +294,22 @@ module API
       include Gitlab::Utils::StrongMemoize
       include ::API::Helpers::RelatedResourcesHelpers
 
-      def present_package_download_urls
+      def present_download_urls(entity)
         authorize!(:read_package, project)
 
         presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
-        render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
+        render_api_error!("No recipe manifest found", 404) if yield(presenter).empty?
 
-        present presenter, with: EE::API::Entities::ConanPackage::ConanPackageManifest
+        present presenter, with: entity
+      end
+
+      def present_package_download_urls
+        present_download_urls(EE::API::Entities::ConanPackage::ConanPackageManifest, &:package_urls)
       end
 
       def present_recipe_download_urls
-        authorize!(:read_package, project)
-
-        presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
-
-        render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
-
-        present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeManifest
+        present_download_urls(EE::API::Entities::ConanPackage::ConanRecipeManifest, &:recipe_urls)
       end
 
       def recipe_upload_urls(file_names)
