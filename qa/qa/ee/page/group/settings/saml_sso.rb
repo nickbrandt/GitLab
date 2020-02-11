@@ -31,11 +31,15 @@ module QA
             end
 
             def has_enforced_sso_button?
-              has_element?(:enforced_sso_toggle_button, wait: 1.0)
+              has_button = has_element?(:enforced_sso_toggle_button, wait: 5)
+              QA::Runtime::Logger.debug "has_enforced_sso_button?: #{has_button}"
+              has_button
             end
 
             def enforce_sso_enabled?
-              has_enforced_sso_button? && find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+              enabled = has_enforced_sso_button? && find_element(:enforced_sso_toggle_button).find('input', visible: :all)[:value] == 'true'
+              QA::Runtime::Logger.debug "enforce_sso_enabled?: #{enabled}"
+              enabled
             end
 
             def enforce_sso
@@ -49,11 +53,11 @@ module QA
             end
 
             def has_group_managed_accounts_button?
-              has_element?(:group_managed_accounts_toggle_button, wait: 1.0)
+              has_element?(:group_managed_accounts_toggle_button, wait: 5)
             end
 
             def group_managed_accounts_enabled?
-              enforce_sso_enabled? && has_group_managed_accounts_button? && find_element(:group_managed_accounts_toggle_button)[:class].include?('is-checked')
+              enforce_sso_enabled? && has_group_managed_accounts_button? && find_element(:group_managed_accounts_toggle_button).find('input', visible: :all)[:value] == 'true'
             end
 
             def enable_group_managed_accounts

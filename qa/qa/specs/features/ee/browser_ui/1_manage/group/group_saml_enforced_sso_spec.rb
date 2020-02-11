@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :group_saml, :orchestrated, :requires_admin do
+  context 'Manage', :group_saml, :orchestrated do
     describe 'Group SAML SSO - Enforced SSO' do
       include Support::Api
 
       before(:all) do
-        @group = Resource::Sandbox.fabricate_via_api! do |sandbox_group|
-          sandbox_group.path = "saml_sso_group_#{SecureRandom.hex(8)}"
+        Support::Retrier.retry_on_exception do
+          Flow::Saml.remove_saml_idp_service(@saml_idp_service) if @saml_idp_service
+
+          @group = Resource::Sandbox.fabricate_via_api! do |sandbox_group|
+            sandbox_group.path = "saml_sso_group_#{SecureRandom.hex(8)}"
+          end
+
+          @developer_user = Resource::User.fabricate_via_api!
+
+          @group.add_member(@developer_user)
+
+          @saml_idp_service = Flow::Saml.run_saml_idp_service(@group.path)
+
+          @managed_group_url = setup_and_enable_enforce_sso
         end
-
-        @developer_user = Resource::User.fabricate_via_api!
-
-        @group.add_member(@developer_user)
-
-        @saml_idp_service = Flow::Saml.run_saml_idp_service(@group.path)
-
-        @managed_group_url = setup_and_enable_enforce_sso
       end
 
       before do
@@ -143,18 +147,11 @@ module QA
 
       Support::Retrier.retry_on_exception do
         Flow::Saml.visit_saml_sso_settings(@group)
+        ensure_enforced_sso_button_shown
 
         managed_group_url = EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
-          # Once the feature flags are enabled, it takes some time for the toggle buttons to show on the UI.
-          # This issue does not happen manually. Only happens with the test as they are too fast.
-          Support::Retrier.retry_until(sleep_interval: 1, raise_on_failure: true) do
-            condition_met = saml_sso.has_enforced_sso_button?
-            page.refresh unless condition_met
-
-            condition_met
-          end
-
           saml_sso.enforce_sso
+
           saml_sso.set_id_provider_sso_url(@saml_idp_service.idp_sso_url)
           saml_sso.set_cert_fingerprint(@saml_idp_service.idp_certificate_fingerprint)
 
@@ -164,9 +161,28 @@ module QA
         end
 
         Flow::Saml.visit_saml_sso_settings(@group, direct: true)
-        raise "Enforced SSO not setup correctly" unless EE::Page::Group::Settings::SamlSSO.perform(&:enforce_sso_enabled?)
+        ensure_enforced_sso_button_shown
+
+        unless EE::Page::Group::Settings::SamlSSO.perform(&:enforce_sso_enabled?)
+          QA::Runtime::Logger.debug "Enforced SSO not setup correctly. About to raise failure."
+          QA::Runtime::Logger.debug Capybara::Screenshot.screenshot_and_save_page
+          QA::Runtime::Logger.debug Runtime::Feature.get_features
+
+          raise "Enforced SSO not setup correctly"
+        end
 
         managed_group_url
+      end
+    end
+
+    def ensure_enforced_sso_button_shown
+      # Sometimes, the toggle button for SAML SSO does not appear and only appears after a refresh
+      # This issue can only be reproduced manually if you are too quick to go to the group setting page
+      # after enabling the feature flags.
+      Support::Retrier.retry_until(sleep_interval: 1, raise_on_failure: true) do
+        condition_met = EE::Page::Group::Settings::SamlSSO.perform(&:has_enforced_sso_button?)
+        page.refresh unless condition_met
+        condition_met
       end
     end
   end
