@@ -17,7 +17,7 @@ const endpoints = {
   summaryData: 'analytics/value_stream_analytics/summary.json',
 };
 
-export const groupLabels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
+export const groupLabels = mockLabels;
 
 export const group = {
   id: 1,

@@ -16,7 +16,7 @@ describe('Value Stream Analytics LabelsSelector', () => {
   }
 
   let wrapper = null;
-  const labelNames = groupLabels.map(({ name }) => name);
+  const labelNames = groupLabels.map(({ title }) => title);
 
   describe('with no item selected', () => {
     beforeEach(() => {
@@ -27,8 +27,8 @@ describe('Value Stream Analytics LabelsSelector', () => {
       wrapper.destroy();
     });
 
-    it.each(labelNames)('generate a label item for the label %s', name => {
-      expect(wrapper.text()).toContain(name);
+    it.each(labelNames)('generate a label item for the label %s', title => {
+      expect(wrapper.text()).toContain(title);
     });
 
     it('will render with the default option selected', () => {
@@ -81,7 +81,7 @@ describe('Value Stream Analytics LabelsSelector', () => {
       const activeItem = wrapper.find('[active="true"]');
 
       expect(activeItem.exists()).toBe(true);
-      expect(activeItem.text()).toEqual(selectedLabel.name);
+      expect(activeItem.text()).toEqual(selectedLabel.title);
     });
   });
 });

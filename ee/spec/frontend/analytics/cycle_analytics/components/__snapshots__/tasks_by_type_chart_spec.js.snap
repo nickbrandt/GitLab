@@ -30,7 +30,7 @@ exports[`TasksByTypeChart with data available filters labels with label dropdown
       <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
         <span style=\\"background-color: #BADA55;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-
+        Foo Label
       </a>
     </li>
 
@@ -38,7 +38,7 @@ exports[`TasksByTypeChart with data available filters labels with label dropdown
       <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
         <span style=\\"background-color: #0033CC;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-
+        Foo::Bar
       </a>
     </li>
   </ul>

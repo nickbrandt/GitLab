@@ -120,7 +120,25 @@ export default {
       ];
     },
     customStageInitialData() {
-      return this.isEditingCustomStage ? this.currentStage : {};
+      if (this.isEditingCustomStage) {
+        const {
+          id = null,
+          name = null,
+          startEventIdentifier = null,
+          startEventLabel: { id: startEventLabelId = null } = {},
+          endEventIdentifier = null,
+          endEventLabel: { id: endEventLabelId = null } = {},
+        } = this.currentStage;
+        return {
+          id,
+          name,
+          startEventIdentifier,
+          startEventLabelId,
+          endEventIdentifier,
+          endEventLabelId,
+        };
+      }
+      return {};
     },
   },
   methods: {

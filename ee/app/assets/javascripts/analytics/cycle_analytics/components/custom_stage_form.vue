@@ -43,9 +43,7 @@ export default {
     initialFields: {
       type: Object,
       required: false,
-      default: () => ({
-        ...initFields,
-      }),
+      default: () => {},
     },
     isSavingCustomStage: {
       type: Boolean,
@@ -61,6 +59,7 @@ export default {
   data() {
     return {
       fields: {
+        ...initFields,
         ...this.initialFields,
       },
     };
@@ -114,7 +113,7 @@ export default {
       );
     },
     isDirty() {
-      return !isEqual(this.initialFields, this.fields);
+      return !isEqual(this.initialFields, this.fields) && !isEqual(initFields, this.fields);
     },
     hasValidStartAndEndEventPair() {
       const {
@@ -147,7 +146,10 @@ export default {
   },
   methods: {
     handleCancel() {
-      this.fields = { ...this.initialFields };
+      this.fields = {
+        ...initFields,
+        ...this.initialFields,
+      };
       this.$emit('cancel');
     },
     handleSave() {
