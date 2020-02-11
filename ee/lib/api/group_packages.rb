@@ -21,7 +21,7 @@ module API
       end
       params do
         use :pagination
-        optional :order_by, type: String, values: %w[created_at name version type], default: 'created_at',
+        optional :order_by, type: String, values: %w[created_at name version type project_path], default: 'created_at',
                             desc: 'Return packages ordered by `created_at`, `name`, `version` or `type` fields.'
         optional :sort, type: String, values: %w[asc desc], default: 'asc',
                         desc: 'Return packages sorted in `asc` or `desc` order.'

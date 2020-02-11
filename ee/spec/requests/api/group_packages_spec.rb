@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe API::GroupPackages do
   let(:group) { create(:group, :public) }
-  let(:project) { create(:project, :public, namespace: group) }
+  let(:project) { create(:project, :public, namespace: group, name: 'project A') }
   let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
   let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
   let(:user) { create(:user) }
@@ -53,6 +53,13 @@ describe API::GroupPackages do
 
         it_behaves_like 'package sorting', 'type' do
           let(:packages) { [package3, package1, package2] }
+        end
+
+        it_behaves_like 'package sorting', 'project_path' do
+          let(:another_project) { create(:project, :public, namespace: group, name: 'project B') }
+          let!(:package4) { create(:npm_package, project: another_project, version: '3.1.0', name: "@#{project.root_namespace.path}/bar") }
+
+          let(:packages) { [package1, package2, package3, package4] }
         end
       end
 
