@@ -13741,6 +13741,9 @@ msgstr ""
 msgid "Pipeline|Coverage"
 msgstr ""
 
+msgid "Pipeline|Date"
+msgstr ""
+
 msgid "Pipeline|Detached merge request pipeline"
 msgstr ""
 
@@ -13760,6 +13763,9 @@ msgid "Pipeline|Merged result pipeline"
 msgstr ""
 
 msgid "Pipeline|Pipeline"
+msgstr ""
+
+msgid "Pipeline|Pipelines"
 msgstr ""
 
 msgid "Pipeline|Run Pipeline"

@@ -1,11 +1,13 @@
 <script>
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
-import { __ } from '~/locale';
+import { s__ } from '~/locale';
+import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 import { CHART_CONTAINER_HEIGHT } from '../constants';
 
 export default {
   components: {
     GlAreaChart,
+    ResizableChartContainer,
   },
   props: {
     chartData: {
@@ -15,11 +17,11 @@ export default {
   },
   areaChartOptions: {
     xAxis: {
-      name: __('Date'),
+      name: s__('Pipeline|Date'),
       type: 'category',
     },
     yAxis: {
-      name: __('Pipelines'),
+      name: s__('Pipeline|Pipelines'),
     },
   },
   chartContainerHeight: CHART_CONTAINER_HEIGHT,
@@ -30,13 +32,15 @@ export default {
     <p>
       <slot></slot>
     </p>
-    <div>
+    <resizable-chart-container>
       <gl-area-chart
+        slot-scope="{ width }"
+        :width="width"
         :height="$options.chartContainerHeight"
         :data="chartData"
         :include-legend-avg-max="false"
         :option="$options.areaChartOptions"
       />
-    </div>
+    </resizable-chart-container>
   </div>
 </template>
