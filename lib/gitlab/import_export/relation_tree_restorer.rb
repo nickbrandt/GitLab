@@ -163,7 +163,7 @@ module Gitlab
 
         # create relation objects recursively for all sub-objects
         relation_definition.each do |sub_relation_key, sub_relation_definition|
-          transform_sub_relations!(data_hash, sub_relation_key, sub_relation_definition)
+          transform_sub_relations!(data_hash, relation_key, sub_relation_key, sub_relation_definition)
         end
 
         @relation_factory.create(relation_factory_params(relation_key, data_hash))
@@ -176,7 +176,7 @@ module Gitlab
         !relation_item.is_a?(Hash)
       end
 
-      def transform_sub_relations!(data_hash, sub_relation_key, sub_relation_definition)
+      def transform_sub_relations!(data_hash, relation_key, sub_relation_key, sub_relation_definition)
         sub_data_hash = data_hash[sub_relation_key]
         return unless sub_data_hash
 
@@ -195,11 +195,16 @@ module Gitlab
               sub_data_hash)
           end
 
+        relation_class = relation_key.to_s.classify.constantize rescue nil
         # persist object(s) or delete from relation
-        if sub_data_hash
-          data_hash[sub_relation_key] = sub_data_hash
-        else
+        if sub_data_hash.nil?
           data_hash.delete(sub_relation_key)
+        elsif relation_class.try(:supports_bulk_insert?, sub_relation_key)
+          attributes = sub_data_hash.map(&:attributes)
+          relation_class.bulk_insert_on_save(sub_relation_key, attributes)
+          data_hash.delete(sub_relation_key)
+        else
+          data_hash[sub_relation_key] = sub_data_hash
         end
       end
 

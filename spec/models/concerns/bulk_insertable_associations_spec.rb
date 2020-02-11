@@ -5,14 +5,10 @@ require 'fast_spec_helper'
 describe BulkInsertableAssociations do
   class BulkInsertableItem < ApplicationRecord
     include BulkInsertSafe
-
-    belongs_to :bulk_insert_parent
   end
 
   class OtherBulkInsertableItem < ApplicationRecord
     include BulkInsertSafe
-
-    belongs_to :bulk_insert_parent
   end
 
   class BulkInsertParent < ApplicationRecord
@@ -41,6 +37,7 @@ describe BulkInsertableAssociations do
       create_table :bulk_insertable_items, force: true do |t|
         t.string :name, null: true
         t.belongs_to :bulk_insert_parent, null: false
+        t.belongs_to :other_bulk_insert_parent, null: true
       end
 
       create_table :other_bulk_insertable_items, force: true do |t|

@@ -41,7 +41,7 @@ module BulkInsertableAssociations
         # remove any `id` fields that are nil since these won't insert cleanly
         item.delete('id') unless item['id']
         # wire up foreign key ID
-        owner_id_attribute = model_class.reflections[association].foreign_key
+        owner_id_attribute = model_class.reflections[association.to_s].foreign_key
         item[owner_id_attribute] = model_instance.id
       end
       association_class = association_class_for(model_class, association)
