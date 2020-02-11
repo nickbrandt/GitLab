@@ -97,8 +97,20 @@ describe IssuesFinder do
         context 'filter issues by epic' do
           let(:params) { { epic_id: epic_1.id } }
 
-          it 'returns all issues in the epic, subepic issues excluded' do
-            expect(issues).to contain_exactly(issue_1)
+          context 'when include_subepics param is not included' do
+            it 'returns all issues in the epic, subepic issues excluded' do
+              expect(issues).to contain_exactly(issue_1)
+            end
+          end
+
+          context 'when include_subepics param is set to true' do
+            before do
+              params[:include_subepics] = true
+            end
+
+            it 'returns all issues in the epic including subepic issues' do
+              expect(issues).to contain_exactly(issue_1, issue_subepic)
+            end
           end
         end
       end
