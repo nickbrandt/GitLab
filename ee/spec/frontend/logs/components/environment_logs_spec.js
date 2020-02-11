@@ -215,14 +215,7 @@ describe('EnvironmentLogs', () => {
     });
 
     it('displays a disabled search bar', () => {
-      expect(findSearchBar().exists()).toBe(true);
       expect(findSearchBar().attributes('disabled')).toBe('true');
-
-      // input a query and click `search`
-      findSearchBar().vm.$emit('input', mockSearch);
-      findSearchBar().vm.$emit('submit');
-
-      expect(actionMocks.setSearch).not.toHaveBeenCalled();
     });
   });
 
