@@ -47,6 +47,18 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_indexed_field_length_limit) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_indexed_field_length_limit) }
 
+    it { is_expected.to allow_value(25).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(0).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_max_bulk_size_mb) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_max_bulk_size_mb) }
+
+    it { is_expected.to allow_value(2).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(0).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_max_bulk_concurrency) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_max_bulk_concurrency) }
+
     it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("  ").for(:required_instance_ci_template) }
@@ -208,7 +220,9 @@ describe ApplicationSetting do
         elasticsearch_aws: false,
         elasticsearch_aws_region:     'test-region',
         elasticsearch_aws_access_key: 'test-access-key',
-        elasticsearch_aws_secret_access_key: 'test-secret-access-key'
+        elasticsearch_aws_secret_access_key: 'test-secret-access-key',
+        elasticsearch_max_bulk_size_mb: 67,
+        elasticsearch_max_bulk_concurrency: 8
       )
 
       expect(setting.elasticsearch_config).to eq(
@@ -216,7 +230,9 @@ describe ApplicationSetting do
         aws: false,
         aws_region:     'test-region',
         aws_access_key: 'test-access-key',
-        aws_secret_access_key: 'test-secret-access-key'
+        aws_secret_access_key: 'test-secret-access-key',
+        max_bulk_size_bytes: 67.megabytes,
+        max_bulk_concurrency: 8
       )
     end
 

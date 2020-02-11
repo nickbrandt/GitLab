@@ -170,6 +170,9 @@ module EE
           expose :trial_ends_on, if: can_admin_namespace do |namespace, _|
             namespace.trial_ends_on
           end
+          expose :trial, if: can_admin_namespace do |namespace, _|
+            namespace.trial?
+          end
         end
       end
 
