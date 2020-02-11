@@ -28,7 +28,7 @@ describe 'Epic Issues', :js do
   end
 
   def visit_epic
-    stub_licensed_features(epics: true)
+    stub_licensed_features(epics: true, subepics: true)
 
     sign_in(user)
     visit group_epic_path(group, epic)
@@ -182,7 +182,7 @@ describe 'Epic Issues', :js do
       let(:epic4) { create(:epic, group: group, parent_id: epic3.id) }
 
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
 
         sign_in(user)
         visit group_epic_path(group, epic4)

@@ -24,8 +24,8 @@ describe Groups::EpicIssuesController do
       subject
     end
 
-    it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(:not_found)
+    it 'returns 403 status' do
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 

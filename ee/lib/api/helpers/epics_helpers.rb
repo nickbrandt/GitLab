@@ -7,12 +7,20 @@ module API
         forbidden! unless user_group.feature_available?(:epics)
       end
 
+      def authorize_subepics_feature!
+        forbidden! unless user_group.feature_available?(:subepics)
+      end
+
       def authorize_can_read!
         authorize!(:read_epic, epic)
       end
 
-      def authorize_can_admin!
+      def authorize_can_admin_epic!
         authorize!(:admin_epic, epic)
+      end
+
+      def authorize_can_admin_epic_link!
+        authorize!(:admin_epic_link, epic)
       end
 
       def authorize_can_create!
