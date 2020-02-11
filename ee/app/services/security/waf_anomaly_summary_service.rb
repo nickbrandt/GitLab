@@ -18,16 +18,19 @@ module Security
       # Use multi-search with single query as we'll be adding nginx later
       # with https://gitlab.com/gitlab-org/gitlab/issues/14707
       aggregate_results = elasticsearch_client.msearch(body: body)
-      nginx_results = aggregate_results['responses'].first
+      nginx_results, modsec_results = aggregate_results['responses']
 
       nginx_total_requests = nginx_results.dig('hits', 'total').to_f
+      modsec_total_requests = modsec_results.dig('hits', 'total').to_f
+
+      anomalous_traffic_count = nginx_total_requests.zero? ? 0 : (modsec_total_requests / nginx_total_requests).round(2)
 
       {
         total_traffic: nginx_total_requests,
-        anomalous_traffic: 0.0,
+        anomalous_traffic: anomalous_traffic_count,
         history: {
           nominal: histogram_from(nginx_results),
-          anomalous: []
+          anomalous: histogram_from(modsec_results)
         },
         interval: @interval,
         from: @from,
@@ -37,7 +40,7 @@ module Security
     end
 
     def elasticsearch_client
-      @client ||= @environment.deployment_platform.cluster.application_elastic_stack&.elasticsearch_client
+      @client ||= @environment.deployment_platform&.cluster&.application_elastic_stack&.elasticsearch_client
     end
 
     private
@@ -47,6 +50,12 @@ module Security
         { index: indices },
         {
           query: nginx_requests_query,
+          aggs: aggregations(@interval),
+          size: 0 # no docs needed, only counts
+        },
+        { index: indices },
+        {
+          query: modsec_requests_query,
           aggs: aggregations(@interval),
           size: 0 # no docs needed, only counts
         }
@@ -110,6 +119,42 @@ module Security
       }
     end
 
+    def modsec_requests_query
+      {
+        bool: {
+          must: [
+            {
+              range: {
+                '@timestamp' => {
+                  gte: @from,
+                  lte: @to
+                }
+              }
+            },
+            {
+              prefix: {
+                'transaction.unique_id': application_server_name
+              }
+            },
+            {
+              match_phrase: {
+                'kubernetes.container.name' => {
+                  query: ::Clusters::Applications::Ingress::MODSECURITY_LOG_CONTAINER_NAME
+                }
+              }
+            },
+            {
+              match_phrase: {
+                'kubernetes.namespace' => {
+                  query: Gitlab::Kubernetes::Helm::NAMESPACE
+                }
+              }
+            }
+          ]
+        }
+      }
+    end
+
     def aggregations(interval)
       {
         counts: {
@@ -128,6 +173,11 @@ module Security
       buckets = results.dig('aggregations', 'counts', 'buckets') || []
 
       buckets.map { |bucket| [bucket['key_as_string'], bucket['doc_count']] }
+    end
+
+    # Derive server_name to filter modsec audit log by environment
+    def application_server_name
+      "#{@environment.project.full_path_slug}.#{@environment.deployment_platform.cluster.base_domain}"
     end
 
     # Derive proxy upstream name to filter nginx log by environment
