@@ -3,8 +3,8 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import createStore from 'ee/subscriptions/new/store';
 import * as constants from 'ee/subscriptions/new/constants';
-import Component from 'ee/subscriptions/new/components/checkout/components/step.vue';
-import StepSummary from 'ee/subscriptions/new/components/checkout/components/step_summary.vue';
+import Component from 'ee/subscriptions/new/components/checkout/step.vue';
+import StepSummary from 'ee/subscriptions/new/components/checkout/step_summary.vue';
 
 describe('Step', () => {
   const localVue = createLocalVue();
