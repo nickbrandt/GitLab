@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::Ci::Config::Entry::Trigger do
+describe Gitlab::Ci::Config::Entry::Trigger do
   subject { described_class.new(config) }
 
   context 'when trigger config is a non-empty string' do
