@@ -290,8 +290,10 @@ describe('vulnerabilities actions', () => {
     });
 
     describe('on error', () => {
+      const errorCode = 404;
+
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesEndpoint).replyOnce(404, {});
+        mock.onGet(state.vulnerabilitiesEndpoint).replyOnce(errorCode, {});
       });
 
       it('should dispatch the request and error actions', done => {
@@ -300,7 +302,10 @@ describe('vulnerabilities actions', () => {
           {},
           state,
           [],
-          [{ type: 'requestVulnerabilities' }, { type: 'receiveVulnerabilitiesError' }],
+          [
+            { type: 'requestVulnerabilities' },
+            { type: 'receiveVulnerabilitiesError', payload: errorCode },
+          ],
           done,
         );
       });
@@ -337,11 +342,13 @@ describe('vulnerabilities actions', () => {
 
   describe('receiveVulnerabilitiesError', () => {
     it('should commit the error mutation', done => {
+      const errorCode = 403;
+
       testAction(
         actions.receiveVulnerabilitiesError,
-        {},
+        errorCode,
         state,
-        [{ type: types.RECEIVE_VULNERABILITIES_ERROR }],
+        [{ type: types.RECEIVE_VULNERABILITIES_ERROR, payload: errorCode }],
         [],
         done,
       );

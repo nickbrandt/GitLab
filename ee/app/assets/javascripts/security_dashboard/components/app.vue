@@ -7,6 +7,7 @@ import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
 import VulnerabilitySeverity from './vulnerability_severity.vue';
+import LoadingError from './loading_error.vue';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -17,6 +18,7 @@ export default {
     VulnerabilityChart,
     VulnerabilityCountList,
     VulnerabilitySeverity,
+    LoadingError,
   },
   props: {
     vulnerabilitiesEndpoint: {
@@ -55,8 +57,9 @@ export default {
     },
   },
   computed: {
-    ...mapState('vulnerabilities', ['modal', 'pageInfo']),
+    ...mapState('vulnerabilities', ['modal', 'pageInfo', 'loadingVulnerabilitiesErrorCode']),
     ...mapGetters('filters', ['activeFilters']),
+    ...mapGetters('vulnerabilities', ['loadingVulnerabilitiesFailedWithRecognizedErrorCode']),
     canCreateIssue() {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
       return Boolean(path);
@@ -138,48 +141,54 @@ export default {
 
 <template>
   <section>
-    <header>
-      <filters />
-    </header>
-
-    <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
-
-    <div class="row mt-4">
-      <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-        <security-dashboard-table>
-          <template #emptyState>
-            <slot name="emptyState"></slot>
-          </template>
-        </security-dashboard-table>
-      </article>
-
-      <aside v-if="shouldShowAside" class="col-xl-5">
-        <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
-        <vulnerability-severity
-          v-if="shouldShowVulnerabilitySeverities"
-          :endpoint="vulnerableProjectsEndpoint"
-        />
-      </aside>
-    </div>
-
-    <issue-modal
-      :modal="modal"
-      :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-      :can-create-issue="canCreateIssue"
-      :can-create-merge-request="canCreateMergeRequest"
-      :can-dismiss-vulnerability="canDismissVulnerability"
-      @addDismissalComment="addDismissalComment({ vulnerability, comment: $event })"
-      @editVulnerabilityDismissalComment="openDismissalCommentBox()"
-      @showDismissalDeleteButtons="showDismissalDeleteButtons"
-      @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
-      @deleteDismissalComment="deleteDismissalComment({ vulnerability })"
-      @closeDismissalCommentBox="closeDismissalCommentBox()"
-      @createMergeRequest="createMergeRequest({ vulnerability })"
-      @createNewIssue="createIssue({ vulnerability })"
-      @dismissVulnerability="dismissVulnerability({ vulnerability, comment: $event })"
-      @openDismissalCommentBox="openDismissalCommentBox()"
-      @revertDismissVulnerability="undoDismiss({ vulnerability })"
-      @downloadPatch="downloadPatch({ vulnerability })"
+    <loading-error
+      v-if="loadingVulnerabilitiesFailedWithRecognizedErrorCode"
+      :error-code="loadingVulnerabilitiesErrorCode"
     />
+    <template v-else>
+      <header>
+        <filters />
+      </header>
+
+      <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
+
+      <div class="row mt-4">
+        <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
+          <security-dashboard-table>
+            <template #emptyState>
+              <slot name="emptyState"></slot>
+            </template>
+          </security-dashboard-table>
+        </article>
+
+        <aside v-if="shouldShowAside" class="col-xl-5">
+          <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
+          <vulnerability-severity
+            v-if="shouldShowVulnerabilitySeverities"
+            :endpoint="vulnerableProjectsEndpoint"
+          />
+        </aside>
+      </div>
+
+      <issue-modal
+        :modal="modal"
+        :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+        :can-create-issue="canCreateIssue"
+        :can-create-merge-request="canCreateMergeRequest"
+        :can-dismiss-vulnerability="canDismissVulnerability"
+        @addDismissalComment="addDismissalComment({ vulnerability, comment: $event })"
+        @editVulnerabilityDismissalComment="openDismissalCommentBox()"
+        @showDismissalDeleteButtons="showDismissalDeleteButtons"
+        @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
+        @deleteDismissalComment="deleteDismissalComment({ vulnerability })"
+        @closeDismissalCommentBox="closeDismissalCommentBox()"
+        @createMergeRequest="createMergeRequest({ vulnerability })"
+        @createNewIssue="createIssue({ vulnerability })"
+        @dismissVulnerability="dismissVulnerability({ vulnerability, comment: $event })"
+        @openDismissalCommentBox="openDismissalCommentBox()"
+        @revertDismissVulnerability="undoDismiss({ vulnerability })"
+        @downloadPatch="downloadPatch({ vulnerability })"
+      />
+    </template>
   </section>
 </template>
