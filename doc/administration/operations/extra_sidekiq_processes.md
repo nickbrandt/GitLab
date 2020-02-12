@@ -125,19 +125,18 @@ considered false.
 `queue_selector` supports the following operators, listed from highest
 to lowest precedence:
 
-- <code> </code>&nbsp;(space) - the logical OR operator. For example, `query_a
-  query_b` (where `query_a` and `query_b` are queries made up of the other
-  operators here) will include queues that match either query.
-- `,` - the logical AND operator. For example, `query_a,query_b` (where
+- `|` - the logical OR operator. For example, `query_a|query_b` (where `query_a`
+  and `query_b` are queries made up of the other operators here) will include
+  queues that match either query.
+- `&` - the logical AND operator. For example, `query_a&query_b` (where
   `query_a` and `query_b` are queries made up of the other operators here) will
   only include queues that match both queries.
-- `!=` - the not equal to operator. For example,
-  `feature_category!=issue_tracking` excludes all queues from the
-  `issue_tracking` feature category.
-- `=` - the equal to operator. For example, `resource_boundary=cpu` includes all
+- `!=` - the NOT IN operator. For example, `feature_category!=issue_tracking`
+  excludes all queues from the `issue_tracking` feature category.
+- `=` - the IN operator. For example, `resource_boundary=cpu` includes all
   queues that are CPU bound.
-- `|` - the concatenate set operator. For example,
-  `feature_category=continuous_integration|pages` includes all queues from
+- `,` - the concatenate set operator. For example,
+  `feature_category=continuous_integration,pages` includes all queues from
   either the `continuous_integration` category or the `pages` category. This
   example is also possible using the OR operator, but allows greater brevity, as
   well as being lower precedence.
@@ -153,10 +152,10 @@ In `/etc/gitlab/gitlab.rb`:
 sidekiq_cluster['enable'] = true
 sidekiq_cluster['queue_selector'] = true
 sidekiq_cluster['queue_groups'] = [
-  # Run all non-CPU-bound, queues that are latency sensitive
-  'resource_boundary!=cpu,latency_sensitive=true',
+  # Run all non-CPU-bound queues that are latency sensitive
+  'resource_boundary!=cpu&latency_sensitive=true',
   # Run all continuous integration and pages queues that are not latency sensitive
-  'feature_category=continuous_integration|pages,latency_sensitive=false'
+  'feature_category=continuous_integration,pages&latency_sensitive=false'
 ]
 ```
 

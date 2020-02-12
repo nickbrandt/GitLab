@@ -88,27 +88,27 @@ describe Gitlab::SidekiqCluster::CLI do
               excluded_queues: %w(merge)
             },
             'memory- or CPU-bound queues' => {
-              query: 'resource_boundary=memory|cpu',
+              query: 'resource_boundary=memory,cpu',
               included_queues: %w(auto_merge:auto_merge_process project_export),
               excluded_queues: %w(merge)
             },
             'latency-sensitive CI queues' => {
-              query: 'feature_category=continuous_integration,latency_sensitive=true',
+              query: 'feature_category=continuous_integration&latency_sensitive=true',
               included_queues: %w(pipeline_cache:expire_job_cache pipeline_cache:expire_pipeline_cache),
               excluded_queues: %w(merge)
             },
             'CPU-bound latency-sensitive CI queues' => {
-              query: 'feature_category=continuous_integration,latency_sensitive=true,resource_boundary=cpu',
+              query: 'feature_category=continuous_integration&latency_sensitive=true&resource_boundary=cpu',
               included_queues: %w(pipeline_cache:expire_pipeline_cache),
               excluded_queues: %w(pipeline_cache:expire_job_cache merge)
             },
             'CPU-bound latency-sensitive non-CI queues' => {
-              query: 'feature_category!=continuous_integration,latency_sensitive=true,resource_boundary=cpu',
+              query: 'feature_category!=continuous_integration&latency_sensitive=true&resource_boundary=cpu',
               included_queues: %w(new_issue),
               excluded_queues: %w(pipeline_cache:expire_pipeline_cache)
             },
             'CI and SCM queues' => {
-              query: 'feature_category=continuous_integration feature_category=source_code_management',
+              query: 'feature_category=continuous_integration|feature_category=source_code_management',
               included_queues: %w(pipeline_cache:expire_job_cache merge),
               excluded_queues: %w(mailers)
             }
@@ -147,7 +147,7 @@ describe Gitlab::SidekiqCluster::CLI do
                   .with([['chat_notification'], ['project_export']], default_options)
                   .and_return([])
 
-          cli.run(%w(--queue-selector feature_category=chatops,latency_sensitive=true resource_boundary=memory,feature_category=source_code_management))
+          cli.run(%w(--queue-selector feature_category=chatops&latency_sensitive=true resource_boundary=memory&feature_category=source_code_management))
         end
 
         it 'errors on an invalid query multiple queue groups correctly' do

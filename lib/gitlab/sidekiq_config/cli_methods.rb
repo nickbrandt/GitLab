@@ -18,10 +18,10 @@ module Gitlab
         result
       end.freeze
 
-      QUERY_OR_OPERATOR = %r{\s+}.freeze
-      QUERY_AND_OPERATOR = ','
-      QUERY_CONCATENATE_OPERATOR = '|'
-      QUERY_TERM_REGEX = %r{^(\w+)(!?=)([\w|]+)}.freeze
+      QUERY_OR_OPERATOR = '|'
+      QUERY_AND_OPERATOR = '&'
+      QUERY_CONCATENATE_OPERATOR = ','
+      QUERY_TERM_REGEX = %r{^(\w+)(!?=)([\w#{QUERY_CONCATENATE_OPERATOR}]+)}.freeze
 
       QUERY_PREDICATES = {
         feature_category: :to_sym,
@@ -81,19 +81,23 @@ module Gitlab
       def query_string_to_lambda(query_string)
         or_clauses = query_string.split(QUERY_OR_OPERATOR).map do |and_clauses_string|
           and_clauses_predicates = and_clauses_string.split(QUERY_AND_OPERATOR).map do |term|
-            match = term.match(QUERY_TERM_REGEX)
-
-            raise InvalidTerm.new("Invalid term: #{term}") unless match
-
-            _, lhs, op, rhs = *match
-
-            predicate_for_op(op, predicate_factory(lhs, rhs.split(QUERY_CONCATENATE_OPERATOR)))
+            predicate_for_term(term)
           end
 
           lambda { |worker| and_clauses_predicates.all? { |predicate| predicate.call(worker) } }
         end
 
         lambda { |worker| or_clauses.any? { |predicate| predicate.call(worker) } }
+      end
+
+      def predicate_for_term(term)
+        match = term.match(QUERY_TERM_REGEX)
+
+        raise InvalidTerm.new("Invalid term: #{term}") unless match
+
+        _, lhs, op, rhs = *match
+
+        predicate_for_op(op, predicate_factory(lhs, rhs.split(QUERY_CONCATENATE_OPERATOR)))
       end
 
       def predicate_for_op(op, predicate)
