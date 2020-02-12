@@ -86,9 +86,18 @@ you list:
 
 > [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/issues/45) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.8.
 
-In addition to selecting queues by name, as above, the `queue_selector`
-option allows queue groups to be selected in a more general way using
-the following components:
+CAUTION: **Caution:**
+As this is marked as **experimental**, it is subject to change at any
+time, including **breaking backwards compatibility**. This is so that we
+can react to changes we need for our GitLab.com deployment. We have a
+tracking issue open to [remove the experimental
+designation](https://gitlab.com/gitlab-com/gl-infra/scalability/issues/147)
+from this feature; please comment there if you are interested in using
+this in your own deployment.
+
+In addition to selecting queues by name, as above, the
+`experimental_queue_selector` option allows queue groups to be selected
+in a more general way using the following components:
 
 - Attributes that can be selected.
 - Operators used to construct a query.
@@ -97,7 +106,8 @@ the following components:
 
 From the [list of all available
 attributes](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml),
-`queue_selector` allows selecting of queues by the following attributes:
+`experimental_queue_selector` allows selecting of queues by the
+following attributes:
 
 - `feature_category` - the [GitLab feature
   category](https://about.gitlab.com/direction/maturity/#category-maturity) the
@@ -122,8 +132,8 @@ considered false.
 
 ### Available operators
 
-`queue_selector` supports the following operators, listed from highest
-to lowest precedence:
+`experimental_queue_selector` supports the following operators, listed
+from highest to lowest precedence:
 
 - `|` - the logical OR operator. For example, `query_a|query_b` (where `query_a`
   and `query_b` are queries made up of the other operators here) will include
@@ -150,7 +160,7 @@ In `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 sidekiq_cluster['enable'] = true
-sidekiq_cluster['queue_selector'] = true
+sidekiq_cluster['experimental_queue_selector'] = true
 sidekiq_cluster['queue_groups'] = [
   # Run all non-CPU-bound queues that are latency sensitive
   'resource_boundary!=cpu&latency_sensitive=true',

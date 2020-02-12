@@ -79,7 +79,7 @@ describe Gitlab::SidekiqCluster::CLI do
         end
       end
 
-      context 'with --queue-selector' do
+      context 'with --experimental-queue-selector' do
         where do
           {
             'memory-bound queues' => {
@@ -125,7 +125,7 @@ describe Gitlab::SidekiqCluster::CLI do
               []
             end
 
-            cli.run(%W(--queue-selector #{query}))
+            cli.run(%W(--experimental-queue-selector #{query}))
           end
 
           it 'works when negated' do
@@ -137,7 +137,7 @@ describe Gitlab::SidekiqCluster::CLI do
               []
             end
 
-            cli.run(%W(--negate --queue-selector #{query}))
+            cli.run(%W(--negate --experimental-queue-selector #{query}))
           end
         end
 
@@ -147,13 +147,13 @@ describe Gitlab::SidekiqCluster::CLI do
                   .with([['chat_notification'], ['project_export']], default_options)
                   .and_return([])
 
-          cli.run(%w(--queue-selector feature_category=chatops&latency_sensitive=true resource_boundary=memory&feature_category=source_code_management))
+          cli.run(%w(--experimental-queue-selector feature_category=chatops&latency_sensitive=true resource_boundary=memory&feature_category=importers))
         end
 
         it 'errors on an invalid query multiple queue groups correctly' do
           expect(Gitlab::SidekiqCluster).not_to receive(:start)
 
-          expect { cli.run(%w(--queue-selector unknown_field=chatops)) }
+          expect { cli.run(%w(--experimental-queue-selector unknown_field=chatops)) }
             .to raise_error(Gitlab::SidekiqConfig::CliMethods::QueryError)
         end
       end
