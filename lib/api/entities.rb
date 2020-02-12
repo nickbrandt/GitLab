@@ -391,32 +391,6 @@ module API
       expose :content
     end
 
-    class TemplatesList < Grape::Entity
-      expose :key
-      expose :name
-    end
-
-    class Template < Grape::Entity
-      expose :name, :content
-    end
-
-    class BroadcastMessage < Grape::Entity
-      expose :id, :message, :starts_at, :ends_at, :color, :font
-      expose :active?, as: :active
-    end
-
-    class PersonalAccessToken < Grape::Entity
-      expose :id, :name, :revoked, :created_at, :scopes
-      expose :active?, as: :active
-      expose :expires_at do |personal_access_token|
-        personal_access_token.expires_at ? personal_access_token.expires_at.strftime("%Y-%m-%d") : nil
-      end
-    end
-
-    class PersonalAccessTokenWithToken < PersonalAccessToken
-      expose :token
-    end
-
     class ImpersonationToken < PersonalAccessToken
       expose :impersonation
     end
