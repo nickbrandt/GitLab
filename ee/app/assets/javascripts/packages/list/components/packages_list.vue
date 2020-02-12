@@ -210,20 +210,20 @@ export default {
             <gl-link
               v-gl-tooltip.hover
               :title="value"
-              class="flex-truncate-child"
               :href="item._links.web_path"
               data-qa-selector="package_link"
             >
               {{ value }}
             </gl-link>
+
+            <package-tags
+              v-if="item.tags && item.tags.length"
+              class="prepend-left-8"
+              :tags="item.tags"
+              hide-label
+              :tag-display-limit="1"
+            />
           </div>
-          <package-tags
-            v-if="item.tags && item.tags.length"
-            class="prepend-left-8"
-            :tags="item.tags"
-            hide-label
-            :tag-display-limit="1"
-          />
         </template>
 
         <template #cell(project_path)="{item}">
