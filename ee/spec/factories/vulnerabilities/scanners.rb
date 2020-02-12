@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   sequence(:vulnerability_scanner_external_id) do |n|
-    "find_sec_bugs ##{n}"
+    "find_sec_bugs_#{n}"
   end
 
   factory :vulnerabilities_scanner, class: 'Vulnerabilities::Scanner' do
