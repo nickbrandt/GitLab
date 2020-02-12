@@ -5,6 +5,7 @@ module QA
     module Feature
       extend self
       extend Support::Api
+      extend Capybara::DSL
 
       SetFeatureError = Class.new(RuntimeError)
       AuthorizationError = Class.new(RuntimeError)
@@ -20,10 +21,12 @@ module QA
       end
 
       def remove(key)
-        request = Runtime::API::Request.new(api_client, "/features/#{key}")
-        response = delete(request.url)
-        unless response.code == QA::Support::Api::HTTP_STATUS_NO_CONTENT
-          raise SetFeatureError, "Deleting feature flag #{key} failed with `#{response}`."
+        with_current_url do
+          request = Runtime::API::Request.new(api_client, "/features/#{key}")
+          response = delete(request.url)
+          unless response.code == QA::Support::Api::HTTP_STATUS_NO_CONTENT
+            raise SetFeatureError, "Deleting feature flag #{key} failed with `#{response}`."
+          end
         end
       end
 
@@ -44,14 +47,16 @@ module QA
       end
 
       def enabled?(key)
-        feature = JSON.parse(get_features).find { |flag| flag["name"] == key }
+        feature = JSON.parse(get_features).find { |flag| flag["name"] == key.to_s }
         feature && feature["state"] == "on"
       end
 
       def get_features
-        request = Runtime::API::Request.new(api_client, "/features")
-        response = get(request.url)
-        response.body
+        with_current_url do
+          request = Runtime::API::Request.new(api_client, "/features")
+          response = get(request.url)
+          response.body
+        end
       end
 
       private
@@ -75,11 +80,18 @@ module QA
         end
       end
 
+      def with_current_url
+        back_to_url = current_url
+        yield.tap { visit(back_to_url) }
+      end
+
       def set_feature(key, value)
-        request = Runtime::API::Request.new(api_client, "/features/#{key}")
-        response = post(request.url, { value: value })
-        unless response.code == QA::Support::Api::HTTP_STATUS_CREATED
-          raise SetFeatureError, "Setting feature flag #{key} to #{value} failed with `#{response}`."
+        with_current_url do
+          request = Runtime::API::Request.new(api_client, "/features/#{key}")
+          response = post(request.url, { value: value })
+          unless response.code == QA::Support::Api::HTTP_STATUS_CREATED
+            raise SetFeatureError, "Setting feature flag #{key} to #{value} failed with `#{response}`."
+          end
         end
       end
     end
