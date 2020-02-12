@@ -346,7 +346,7 @@ module EE
       elsif parent.has_ancestor?(self)
         errors.add :parent, "This epic can't be added as it is already assigned to this epic's ancestor"
       elsif !preloaded_parent_group_and_descendants.include?(group)
-        errors.add :parent, "This epic can't be added because parent and child epics must belong to the same group"
+        errors.add :parent, "This epic can't be added because it must belong to the same group as the parent, or subgroup of the parent epic’s group"
       elsif level_depth_exceeded?(parent)
         errors.add :parent, "This epic can't be added as the maximum depth of nested epics would be exceeded"
       end
