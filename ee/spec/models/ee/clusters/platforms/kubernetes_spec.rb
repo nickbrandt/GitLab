@@ -174,7 +174,7 @@ describe Clusters::Platforms::Kubernetes do
 
       context 'when ElasticSearch is enabled' do
         let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
-        let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
+        let!(:elastic_stack) { create(:clusters_applications_elastic_stack, :installed, cluster: cluster) }
 
         before do
           expect_any_instance_of(::Clusters::Applications::ElasticStack).to receive(:elasticsearch_client).at_least(:once).and_return(Elasticsearch::Transport::Client.new)

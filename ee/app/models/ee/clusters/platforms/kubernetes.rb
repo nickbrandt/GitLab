@@ -100,7 +100,7 @@ module EE
         end
 
         def elastic_stack_available?
-          !!cluster.application_elastic_stack
+          !!cluster.application_elastic_stack&.installed?
         end
 
         private
