@@ -20,6 +20,7 @@ const defaultClient = createDefaultClient(
         return defaultDataIdFromObject(object);
       },
     },
+    assumeImmutableResults: true,
   },
 );
 
