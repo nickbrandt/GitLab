@@ -200,8 +200,7 @@ module Gitlab
         if sub_data_hash.nil?
           data_hash.delete(sub_relation_key)
         elsif relation_class.try(:supports_bulk_insert?, sub_relation_key)
-          attributes = sub_data_hash.map(&:attributes)
-          relation_class.bulk_insert_on_save(sub_relation_key, attributes)
+          relation_class.bulk_insert_on_save(sub_relation_key, sub_data_hash)
           data_hash.delete(sub_relation_key)
         else
           data_hash[sub_relation_key] = sub_data_hash
