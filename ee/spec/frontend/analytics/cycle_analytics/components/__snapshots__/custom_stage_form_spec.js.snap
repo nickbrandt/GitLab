@@ -6,6 +6,58 @@ exports[`CustomStageForm Editing a custom stage isSavingCustomStage=true display
 </button>"
 `;
 
+exports[`CustomStageForm Empty form Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__123\\">
+  <option value=\\"\\">Select start event</option>
+  <option value=\\"issue_created\\">Issue created</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"code_stage_start\\">Issue first mentioned in a commit</option>
+  <option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+</select>"
+`;
+
+exports[`CustomStageForm Empty form Start event with events selects events with canBeStartEvent=true for the start events dropdown 1`] = `
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__95\\">
+  <option value=\\"\\">Select start event</option>
+  <option value=\\"issue_created\\">Issue created</option>
+  <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
+  <option value=\\"merge_request_created\\">Merge request created</option>
+  <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
+  <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
+  <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
+  <option value=\\"merge_request_merged\\">Merge request merged</option>
+  <option value=\\"code_stage_start\\">Issue first mentioned in a commit</option>
+  <option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option>
+  <option value=\\"issue_closed\\">Issue closed</option>
+  <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
+  <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
+  <option value=\\"issue_label_added\\">Issue label was added</option>
+  <option value=\\"issue_label_removed\\">Issue label was removed</option>
+  <option value=\\"merge_request_closed\\">Merge request closed</option>
+  <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
+  <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
+</select>"
+`;
+
+exports[`CustomStageForm Empty form isSavingCustomStage=true displays a loading icon 1`] = `
+"<button disabled=\\"disabled\\" type=\\"button\\" class=\\"js-save-stage btn btn-success\\"><span class=\\"gl-spinner-container\\"><span aria-label=\\"Loading\\" aria-hidden=\\"true\\" class=\\"gl-spinner gl-spinner-orange gl-spinner-sm\\"></span></span>
+  Add stage
+</button>"
+`;
+
 exports[`CustomStageForm Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `
 "<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__123\\">
   <option value=\\"\\">Select start event</option>
@@ -50,48 +102,6 @@ exports[`CustomStageForm Start event with events selects events with canBeStartE
   <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
   <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
 </select>"
-`;
-
-exports[`CustomStageForm With errors renders the errors for the relevant fields 1`] = `
-"<fieldset aria-invalid=\\"true\\" class=\\"form-group gl-form-group is-invalid\\" id=\\"__BVID__1372\\" aria-describedby=\\"__BVID__1372__BV_feedback_invalid_\\">
-  <legend tabindex=\\"-1\\" class=\\"col-form-label pt-0 col-form-label\\" id=\\"__BVID__1372__BV_label_\\">Name</legend>
-  <div tabindex=\\"-1\\" role=\\"group\\"><input name=\\"custom-stage-name\\" type=\\"text\\" placeholder=\\"Enter a name for the stage\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-input form-control form-control\\" id=\\"__BVID__1374\\">
-    <div tabindex=\\"-1\\" role=\\"alert\\" aria-live=\\"assertive\\" aria-atomic=\\"true\\" class=\\"invalid-feedback d-block\\" id=\\"__BVID__1372__BV_feedback_invalid_\\">is reserved
-      cant be blank</div>
-    <!---->
-    <!---->
-  </div>
-</fieldset>"
-`;
-
-exports[`CustomStageForm With errors renders the errors for the relevant fields 2`] = `
-"<fieldset aria-invalid=\\"true\\" class=\\"form-group gl-form-group is-invalid\\" id=\\"__BVID__1376\\" aria-describedby=\\"__BVID__1376__BV_feedback_invalid_\\">
-  <legend tabindex=\\"-1\\" class=\\"col-form-label pt-0 col-form-label\\" id=\\"__BVID__1376__BV_label_\\">Start event</legend>
-  <div tabindex=\\"-1\\" role=\\"group\\"><select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__1378\\">
-      <option value=\\"\\">Select start event</option>
-      <option value=\\"issue_created\\">Issue created</option>
-      <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
-      <option value=\\"merge_request_created\\">Merge request created</option>
-      <option value=\\"merge_request_first_deployed_to_production\\">Merge request first deployed to production</option>
-      <option value=\\"merge_request_last_build_finished\\">Merge request last build finish time</option>
-      <option value=\\"merge_request_last_build_started\\">Merge request last build start time</option>
-      <option value=\\"merge_request_merged\\">Merge request merged</option>
-      <option value=\\"code_stage_start\\">Issue first mentioned in a commit</option>
-      <option value=\\"plan_stage_start\\">Issue first associated with a milestone or issue first added to a board</option>
-      <option value=\\"issue_closed\\">Issue closed</option>
-      <option value=\\"issue_first_added_to_board\\">Issue first added to a board</option>
-      <option value=\\"issue_first_associated_with_milestone\\">Issue first associated with a milestone</option>
-      <option value=\\"issue_label_added\\">Issue label was added</option>
-      <option value=\\"issue_label_removed\\">Issue label was removed</option>
-      <option value=\\"merge_request_closed\\">Merge request closed</option>
-      <option value=\\"merge_request_label_added\\">Merge Request label was added</option>
-      <option value=\\"merge_request_label_removed\\">Merge Request label was removed</option>
-    </select>
-    <div tabindex=\\"-1\\" role=\\"alert\\" aria-live=\\"assertive\\" aria-atomic=\\"true\\" class=\\"invalid-feedback d-block\\" id=\\"__BVID__1376__BV_feedback_invalid_\\">cant be blank</div>
-    <!---->
-    <!---->
-  </div>
-</fieldset>"
 `;
 
 exports[`CustomStageForm isSavingCustomStage=true displays a loading icon 1`] = `

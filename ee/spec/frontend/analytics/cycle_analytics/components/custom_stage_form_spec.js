@@ -668,6 +668,7 @@ describe('CustomStageForm', () => {
     beforeEach(() => {
       wrapper = createComponent({
         initialFields: initData,
+        errors: customStageFormErrors,
       });
 
       return Vue.nextTick();
@@ -678,14 +679,9 @@ describe('CustomStageForm', () => {
     });
 
     it('renders the errors for the relevant fields', () => {
-      console.log('wrapper', wrapper.html());
-
-      // const errorMessages = wrapper.findAll(sel.invalidFeedback);
-      // expect(errorMessages.length).toEqual(2);
-      wrapper.setProps({ errors: customStageFormErrors });
-
-      expect(wrapper.find({ ref: 'startEventIdentifier' }).html()).toContain('CAnt be beelebel');
-      expect(wrapper.find({ ref: 'name' }).html()).toContain('CAnt be beelebel');
+      expect(wrapper.find({ ref: 'name' }).html()).toContain('is reserved');
+      expect(wrapper.find({ ref: 'name' }).html()).toContain('cant be blank');
+      expect(wrapper.find({ ref: 'startEventIdentifier' }).html()).toContain('cant be blank');
     });
   });
 });

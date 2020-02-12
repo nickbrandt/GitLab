@@ -626,6 +626,7 @@ describe('Cycle analytics actions', () => {
       it('dispatches receiveUpdateStageError', done => {
         const data = {
           id: stageId,
+          name: 'issue',
           ...payload,
         };
         testAction(
@@ -637,7 +638,10 @@ describe('Cycle analytics actions', () => {
             { type: 'requestUpdateStage' },
             {
               type: 'receiveUpdateStageError',
-              payload: { error, data },
+              payload: {
+                status: 404,
+                data,
+              },
             },
           ],
           done,
@@ -651,13 +655,9 @@ describe('Cycle analytics actions', () => {
             state,
           },
           {
-            error: {
-              response: {
-                status: 422,
-                data: {
-                  errors: { name: ['is reserved'] },
-                },
-              },
+            status: 422,
+            responseData: {
+              errors: { name: ['is reserved'] },
             },
             data: {
               name: stageId,
@@ -675,7 +675,7 @@ describe('Cycle analytics actions', () => {
             commit: () => {},
             state,
           },
-          {},
+          { status: 400 },
         );
 
         shouldFlashAMessage('There was a problem saving your custom stage, please try again');

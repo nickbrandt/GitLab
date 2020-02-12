@@ -37,10 +37,15 @@ describe('Cycle analytics mutations', () => {
   it.each`
     mutation                                       | stateKey                              | value
     ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${false}
+    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isEditingCustomStage'}             | ${false}
+    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'customStageFormErrors'}            | ${null}
+    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'customStageFormInitialData'}       | ${null}
     ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${true}
     ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isEditingCustomStage'}             | ${false}
+    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'customStageFormErrors'}            | ${null}
     ${types.SHOW_EDIT_CUSTOM_STAGE_FORM}           | ${'isEditingCustomStage'}             | ${true}
     ${types.SHOW_EDIT_CUSTOM_STAGE_FORM}           | ${'isCreatingCustomStage'}            | ${false}
+    ${types.SHOW_EDIT_CUSTOM_STAGE_FORM}           | ${'customStageFormErrors'}            | ${null}
     ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}                   | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}                     | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}                   | ${false}
@@ -61,11 +66,11 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'}        | ${false}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                        | ${true}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isSavingCustomStage'}              | ${true}
-    ${types.REQUEST_UPDATE_STAGE}                  | ${'customStageFormErrors'}            | ${{}}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'customStageFormErrors'}            | ${null}
     ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isLoading'}                        | ${false}
     ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isSavingCustomStage'}              | ${false}
     ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isEditingCustomStage'}             | ${false}
-    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'customStageFormErrors'}            | ${{}}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'customStageFormErrors'}            | ${null}
     ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isLoading'}                        | ${false}
     ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isSavingCustomStage'}              | ${false}
     ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}                        | ${true}

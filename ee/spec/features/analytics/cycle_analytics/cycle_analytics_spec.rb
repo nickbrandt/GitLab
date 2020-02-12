@@ -322,7 +322,7 @@ describe 'Group Value Stream Analytics', :js do
 
     def select_dropdown_label(field, index = 2)
       page.find("[name=#{field}] .dropdown-toggle").click
-      page.find("[name=#{field}] .dropdown-menu").all('.dropdown-item')[2].click
+      page.find("[name=#{field}] .dropdown-menu").all('.dropdown-item')[index].click
     end
 
     context 'enabled' do
@@ -378,12 +378,6 @@ describe 'Group Value Stream Analytics', :js do
             select_dropdown_option 'custom-stage-start-event', 'option', 2
 
             expect(page).to have_button('Add stage', disabled: true)
-          end
-
-          it 'an error message is displayed if the start event is changed' do
-            select_dropdown_option 'custom-stage-start-event', 'option', 2
-
-            expect(page).to have_text 'Start event changed, please select a valid stop event'
           end
 
           it 'the custom stage is saved' do
