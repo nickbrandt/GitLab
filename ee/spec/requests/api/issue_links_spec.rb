@@ -53,7 +53,7 @@ describe API::IssueLinks do
           target_issue = create(:issue)
 
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: 999, target_issue_iid: target_issue.iid }
+               params: { target_project_id: -1, target_issue_iid: target_issue.iid }
 
           expect(response).to have_gitlab_http_status(404)
           expect(json_response['message']).to eq('404 Project Not Found')
