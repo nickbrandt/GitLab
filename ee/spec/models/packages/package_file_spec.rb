@@ -34,5 +34,26 @@ RSpec.describe Packages::PackageFile, type: :model do
 
   it_behaves_like 'UpdateProjectStatistics' do
     subject { build(:package_file, :jar, size: 42) }
+
+    before do
+      allow_any_instance_of(Packages::PackageFileUploader).to receive(:size).and_return(42)
+    end
+  end
+
+  describe '#update_file_metadata callback' do
+    let(:package_file) { build(:package_file, :nuget, file_store: 0, size: nil) }
+
+    subject { package_file.save! }
+
+    it 'updates metadata columns' do
+      expect(package_file)
+        .to receive(:update_file_metadata)
+        .and_call_original
+
+      subject
+
+      expect(package_file.file_store).to eq 1
+      expect(package_file.size).to eq 3513
+    end
   end
 end

@@ -9,8 +9,6 @@ class Packages::PackageFile < ApplicationRecord
   delegate :project, :project_id, to: :package
   delegate :conan_file_type, to: :conan_file_metadatum
 
-  update_project_statistics project_statistics_name: :packages_size
-
   belongs_to :package
 
   has_one :conan_file_metadatum, inverse_of: :package_file
@@ -36,13 +34,16 @@ class Packages::PackageFile < ApplicationRecord
 
   with_replicator Geo::PackageFileReplicator
 
-  after_save :update_file_store, if: :saved_change_to_file?
+  after_save :update_file_metadata, if: :saved_change_to_file?
   after_create_commit -> { replicator.publish_created_event }
 
-  def update_file_store
+  update_project_statistics project_statistics_name: :packages_size
+
+  def update_file_metadata
     # The file.object_store is set during `uploader.store!`
     # which happens after object is inserted/updated
     self.update_column(:file_store, file.object_store)
+    self.update_column(:size, file.size) unless file.size == self.size
   end
 
   def log_geo_deleted_event
