@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   sequence :vulnerability_occurrence_uuid do |n|
-    Digest::SHA1.hexdigest("uuid-#{n}")[0..35]
+    SecureRandom.uuid
   end
 
   factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
