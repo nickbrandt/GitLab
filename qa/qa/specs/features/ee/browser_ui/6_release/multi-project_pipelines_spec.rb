@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module QA
-  context 'Release', :docker do
+  context 'Release', :docker, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/204838', type: :flaky } do
     describe 'Multi-project pipelines' do
       let(:upstream_project_name) { "upstream-project-#{SecureRandom.hex(8)}" }
       let(:downstream_project_name) { "downstream-project-#{SecureRandom.hex(8)}" }
