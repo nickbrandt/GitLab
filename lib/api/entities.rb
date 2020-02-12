@@ -549,40 +549,6 @@ module API
       expose :id, :token
     end
 
-    class JobArtifactFile < Grape::Entity
-      expose :filename
-      expose :cached_size, as: :size
-    end
-
-    class JobArtifact < Grape::Entity
-      expose :file_type, :size, :filename, :file_format
-    end
-
-    class JobBasic < Grape::Entity
-      expose :id, :status, :stage, :name, :ref, :tag, :coverage, :allow_failure
-      expose :created_at, :started_at, :finished_at
-      expose :duration
-      expose :user, with: Entities::User
-      expose :commit, with: Entities::Commit
-      expose :pipeline, with: Entities::PipelineBasic
-
-      expose :web_url do |job, _options|
-        Gitlab::Routing.url_helpers.project_job_url(job.project, job)
-      end
-    end
-
-    class Job < JobBasic
-      # artifacts_file is included in job_artifacts, but kept for backward compatibility (remove in api/v5)
-      expose :artifacts_file, using: JobArtifactFile, if: -> (job, opts) { job.artifacts? }
-      expose :job_artifacts, as: :artifacts, using: JobArtifact
-      expose :runner, with: Runner
-      expose :artifacts_expire_at
-    end
-
-    class JobBasicWithProject < JobBasic
-      expose :project, with: Entities::ProjectIdentity
-    end
-
     class Trigger < Grape::Entity
       include ::API::Helpers::Presentable
 
