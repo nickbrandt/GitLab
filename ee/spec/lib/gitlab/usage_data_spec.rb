@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
+  before do
+    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+  end
+
   describe '#data' do
     # using Array.new to create a different creator User for each of the projects
     let_it_be(:projects) { Array.new(3) { create(:project, :repository, creator: create(:user, group_view: :security_dashboard)) } }
