@@ -171,14 +171,13 @@ frontend-fixtures-as-if-foss:
   script:
     - export BABEL_ENV=coverage CHROME_LOG_FILE=chrome_debug.log
     - date
-    - scripts/gitaly-test-spawn
-    - date
-    - bundle exec rake karma
+    - yarn karma
 
 karma:
   extends:
     - .karma-base
     - .frontend:rules:default-frontend-jobs
+  needs: ["frontend-fixtures"]
   coverage: '/^Statements *: (\d+\.\d+%)/'
   artifacts:
     name: coverage-javascript
@@ -196,6 +195,7 @@ karma-as-if-foss:
     - .karma-base
     - .frontend:rules:default-frontend-jobs-as-if-foss
     - .as-if-foss
+  needs: ["frontend-fixtures-as-if-foss"]
 
 .jest-base:
   extends: .frontend-job-base
