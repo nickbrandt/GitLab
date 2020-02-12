@@ -3,6 +3,10 @@
 module EpicLinks
   class CreateService < IssuableLinks::CreateService
     def execute
+      unless can?(current_user, :admin_epic, issuable.group)
+        return error(issuables_not_found_message, 404)
+      end
+
       if issuable.max_hierarchy_depth_achieved?
         return error("This epic can't be added because the parent is already at the maximum depth from its most distant ancestor", 409)
       end
@@ -54,8 +58,6 @@ module EpicLinks
 
     def linkable_issuables(epics)
       @linkable_issuables ||= begin
-        return [] unless can?(current_user, :admin_epic, issuable.group)
-
         epics.select do |epic|
           linkable_epic?(epic)
         end
