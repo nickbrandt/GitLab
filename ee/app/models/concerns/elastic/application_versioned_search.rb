@@ -19,6 +19,10 @@ module Elastic
       self.project&.use_elasticsearch?
     end
 
+    def maintaining_elasticsearch?
+      Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
+    end
+
     def es_type
       self.class.es_type
     end
@@ -34,21 +38,17 @@ module Elastic
       Elasticsearch::Model::Registry.add(self) if self.is_a?(Class)
 
       if self < ActiveRecord::Base
-        after_commit :maintain_elasticsearch_create, on: :create
-        after_commit :maintain_elasticsearch_update, on: :update
-        after_commit :maintain_elasticsearch_destroy, on: :destroy
+        after_commit :maintain_elasticsearch_create, on: :create, if: :maintaining_elasticsearch?
+        after_commit :maintain_elasticsearch_update, on: :update, if: :maintaining_elasticsearch?
+        after_commit :maintain_elasticsearch_destroy, on: :destroy, if: :maintaining_elasticsearch?
       end
     end
 
     def maintain_elasticsearch_create
-      return unless Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-
       ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
     end
 
     def maintain_elasticsearch_update
-      return unless Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-
       ElasticIndexerWorker.perform_async(
         :update,
         self.class.to_s,
@@ -59,8 +59,6 @@ module Elastic
     end
 
     def maintain_elasticsearch_destroy
-      return unless Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-
       ElasticIndexerWorker.perform_async(
         :delete, self.class.to_s, self.id, self.es_id, es_parent: self.es_parent
       )
