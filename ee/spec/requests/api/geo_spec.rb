@@ -139,6 +139,18 @@ describe API::Geo do
           expect(response).to have_gitlab_http_status(404)
         end
       end
+
+      context 'avatar has mount_point nil' do
+        it 'responds with 200 with X-Sendfile' do
+          upload.update(mount_point: nil)
+
+          get api("/geo/transfers/avatar/#{upload.id}"), headers: req_header
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response.headers['Content-Type']).to eq('application/octet-stream')
+          expect(response.headers['X-Sendfile']).to eq(user.avatar.path)
+        end
+      end
     end
 
     describe 'GET /geo/transfers/file/1' do
