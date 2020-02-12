@@ -138,8 +138,8 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
 export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
 
-export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
-  commit(types.EDIT_CUSTOM_STAGE);
+export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}) => {
+  commit(types.SHOW_EDIT_CUSTOM_STAGE_FORM);
   dispatch('setSelectedStage', selectedStage);
 };
 

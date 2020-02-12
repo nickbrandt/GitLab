@@ -98,7 +98,7 @@ export default {
     state.isCreatingCustomStage = true;
     state.isEditingCustomStage = false;
   },
-  [types.EDIT_CUSTOM_STAGE](state) {
+  [types.SHOW_EDIT_CUSTOM_STAGE_FORM](state) {
     state.isEditingCustomStage = true;
     state.isCreatingCustomStage = false;
   },

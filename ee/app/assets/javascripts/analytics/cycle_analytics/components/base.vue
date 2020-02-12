@@ -136,6 +136,7 @@ export default {
       'setSelectedStage',
       'hideCustomStageForm',
       'showCustomStageForm',
+      'showEditCustomStageForm',
       'setDateRange',
       'fetchTasksByTypeData',
       'updateSelectedDurationChartStages',
@@ -143,7 +144,6 @@ export default {
       'updateStage',
       'removeStage',
       'setFeatureFlags',
-      'editCustomStage',
       'clearCustomStageFormErrors',
       'updateStage',
       'setTasksByTypeFilters',
@@ -166,7 +166,7 @@ export default {
       this.showCustomStageForm();
     },
     onShowEditStageForm(initData = {}) {
-      this.editCustomStage(initData);
+      this.showEditCustomStageForm(initData);
     },
     initDateRange() {
       const endDate = new Date(Date.now());
@@ -281,11 +281,11 @@ export default {
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :custom-stage-form-errors="customStageFormErrors"
-            @clearCustomStageFormErrors="clearCustomStageFormErrors"
             :labels="labels"
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
+            @clearCustomStageFormErrors="clearCustomStageFormErrors"
             @selectStage="onStageSelect"
             @editStage="onShowEditStageForm"
             @showAddStageForm="onShowAddStageForm"

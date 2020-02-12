@@ -38,7 +38,9 @@ describe('Cycle analytics mutations', () => {
     mutation                                       | stateKey                              | value
     ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${false}
     ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${true}
-    ${types.EDIT_CUSTOM_STAGE}                     | ${'isEditingCustomStage'}             | ${true}
+    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isEditingCustomStage'}             | ${false}
+    ${types.SHOW_EDIT_CUSTOM_STAGE_FORM}           | ${'isEditingCustomStage'}             | ${true}
+    ${types.SHOW_EDIT_CUSTOM_STAGE_FORM}           | ${'isCreatingCustomStage'}            | ${false}
     ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}                   | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}                     | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}                   | ${false}
