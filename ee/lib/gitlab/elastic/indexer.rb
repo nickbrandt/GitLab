@@ -55,15 +55,7 @@ module Gitlab
       end
 
       def run_indexer!(to_sha, target)
-        # We accept any form of settings, including string and array
-        # This is why JSON is needed
-        vars = {
-          'RAILS_ENV'               => Rails.env,
-          'ELASTIC_CONNECTION_INFO' => elasticsearch_config(target),
-          'GITALY_CONNECTION_INFO'  => gitaly_connection_info,
-          'FROM_SHA'                => from_sha,
-          'TO_SHA'                  => to_sha
-        }
+        vars = build_envvars(to_sha, target)
 
         if index_status && !repository_contains_last_indexed_commit?
           target.delete_index_for_commits_and_blobs(wiki: wiki?)
@@ -81,6 +73,23 @@ module Gitlab
         output, status = Gitlab::Popen.popen(command, nil, vars)
 
         raise Error, output unless status&.zero?
+      end
+
+      def build_envvars(to_sha, target)
+        # We accept any form of settings, including string and array
+        # This is why JSON is needed
+        vars = {
+          'RAILS_ENV'               => Rails.env,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config(target),
+          'GITALY_CONNECTION_INFO'  => gitaly_connection_info,
+          'FROM_SHA'                => from_sha,
+          'TO_SHA'                  => to_sha
+        }
+
+        # SSL certificates related env will be sent to child process if configured
+        %w(SSL_CERT_FILE SSL_CERT_DIR).each_with_object(vars) do |key, hash|
+          hash[key] = ENV[key] if ENV.key?(key)
+        end
       end
 
       def last_commit
