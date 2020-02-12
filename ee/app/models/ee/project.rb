@@ -44,7 +44,6 @@ module EE
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
-      has_one :alerts_service
 
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
@@ -688,6 +687,7 @@ module EE
       feature_available?(:incident_management)
     end
 
+    override :alerts_service_activated?
     def alerts_service_activated?
       alerts_service_available? && alerts_service&.active?
     end
