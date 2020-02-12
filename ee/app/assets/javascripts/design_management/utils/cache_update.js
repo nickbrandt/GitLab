@@ -1,3 +1,6 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
+
+import produce from 'immer';
 import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
 import {
@@ -7,13 +10,20 @@ import {
   designDeletionError,
 } from './error_messages';
 
-const deleteDesignsFromStore = (store, query, selectedDesigns) => {
-  const data = store.readQuery(query);
+const designsOf = data => data.project.issue.designCollection.designs;
 
-  const changedDesigns = data.project.issue.designCollection.designs.edges.filter(
-    ({ node }) => !selectedDesigns.includes(node.filename),
-  );
-  data.project.issue.designCollection.designs.edges = [...changedDesigns];
+const isParticipating = (design, username) =>
+  design.issue.participants.edges.some(participant => participant.node.username === username);
+
+const deleteDesignsFromStore = (store, query, selectedDesigns) => {
+  const sourceData = store.readQuery(query);
+
+  const data = produce(sourceData, draftData => {
+    const changedDesigns = designsOf(sourceData).edges.filter(
+      ({ node }) => !selectedDesigns.includes(node.filename),
+    );
+    designsOf(draftData).edges = [...changedDesigns];
+  });
 
   store.writeQuery({
     ...query,
@@ -31,13 +41,13 @@ const deleteDesignsFromStore = (store, query, selectedDesigns) => {
 const addNewVersionToStore = (store, query, version) => {
   if (!version) return;
 
-  const data = store.readQuery(query);
-  const newEdge = { node: version, __typename: 'DesignVersionEdge' };
+  const sourceData = store.readQuery(query);
 
-  data.project.issue.designCollection.versions.edges = [
-    newEdge,
-    ...data.project.issue.designCollection.versions.edges,
-  ];
+  const newVersion = { node: version, __typename: 'DesignVersionEdge' };
+
+  const data = produce(sourceData, draftData => {
+    draftData.project.issue.designCollection.versions.edges.unshift(newVersion);
+  });
 
   store.writeQuery({
     ...query,
@@ -46,56 +56,48 @@ const addNewVersionToStore = (store, query, version) => {
 };
 
 const addDiscussionCommentToStore = (store, createNote, query, queryVariables, discussionId) => {
-  const data = store.readQuery({
+  const sourceData = store.readQuery({
     query,
     variables: queryVariables,
   });
 
-  const design = extractDesign(data);
-  const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
-  currentDiscussion.node.notes.edges = [
-    ...currentDiscussion.node.notes.edges,
-    {
+  const newParticipant = {
+    __typename: 'UserEdge',
+    node: {
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      __typename: 'User',
+      ...createNote.note.author,
+    },
+  };
+
+  const data = produce(sourceData, draftData => {
+    const design = extractDesign(draftData);
+    const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
+    currentDiscussion.node.notes.edges.push({
       __typename: 'NoteEdge',
       node: createNote.note,
-    },
-  ];
+    });
 
-  design.notesCount += 1;
-  if (
-    !design.issue.participants.edges.some(
-      participant => participant.node.username === createNote.note.author.username,
-    )
-  ) {
-    design.issue.participants.edges = [
-      ...design.issue.participants.edges,
-      {
-        __typename: 'UserEdge',
-        node: {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          __typename: 'User',
-          ...createNote.note.author,
-        },
-      },
-    ];
-  }
+    if (!isParticipating(design, createNote.note.author.username)) {
+      design.issue.participants.edges.push(newParticipant);
+    }
+
+    design.notesCount += 1;
+  });
+
   store.writeQuery({
     query,
     variables: queryVariables,
-    data: {
-      ...data,
-      design: {
-        ...design,
-      },
-    },
+    data,
   });
 };
 
 const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) => {
-  const data = store.readQuery({
+  const sourceData = store.readQuery({
     query,
     variables,
   });
+
   const newDiscussion = {
     __typename: 'DiscussionEdge',
     node: {
@@ -115,43 +117,38 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
       },
     },
   };
-  const design = extractDesign(data);
-  const notesCount = design.notesCount + 1;
-  design.discussions.edges = [...design.discussions.edges, newDiscussion];
-  if (
-    !design.issue.participants.edges.some(
-      participant => participant.node.username === createImageDiffNote.note.author.username,
-    )
-  ) {
-    design.issue.participants.edges = [
-      ...design.issue.participants.edges,
-      {
-        __typename: 'UserEdge',
-        node: {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          __typename: 'User',
-          ...createImageDiffNote.note.author,
-        },
-      },
-    ];
-  }
+
+  const newParticipant = {
+    __typename: 'UserEdge',
+    node: {
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      __typename: 'User',
+      ...createImageDiffNote.note.author,
+    },
+  };
+
+  const data = produce(sourceData, draftData => {
+    const design = extractDesign(draftData);
+    design.discussions.edges.push(newDiscussion);
+
+    if (!isParticipating(design, createImageDiffNote.note.author.username)) {
+      design.issue.participants.edges.push(newParticipant);
+    }
+
+    design.notesCount += 1;
+  });
+
   store.writeQuery({
     query,
     variables,
-    data: {
-      ...data,
-      design: {
-        ...design,
-        notesCount,
-      },
-    },
+    data,
   });
 };
 
 const addNewDesignToStore = (store, designManagementUpload, query) => {
-  const data = store.readQuery(query);
+  const sourceData = store.readQuery(query);
 
-  const newDesigns = data.project.issue.designCollection.designs.edges.reduce((acc, design) => {
+  const newDesigns = designsOf(sourceData).edges.reduce((acc, design) => {
     if (!acc.find(d => d.filename === design.node.filename)) {
       acc.push(design.node);
     }
@@ -172,7 +169,7 @@ const addNewDesignToStore = (store, designManagementUpload, query) => {
 
   const newVersions = [
     ...(newVersionNode || []),
-    ...data.project.issue.designCollection.versions.edges,
+    ...sourceData.project.issue.designCollection.versions.edges,
   ];
 
   const updatedDesigns = {
@@ -190,7 +187,9 @@ const addNewDesignToStore = (store, designManagementUpload, query) => {
     },
   };
 
-  data.project.issue.designCollection = updatedDesigns;
+  const data = produce(sourceData, draftData => {
+    draftData.project.issue.designCollection = updatedDesigns;
+  });
 
   store.writeQuery({
     ...query,
