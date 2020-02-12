@@ -3,7 +3,7 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import GeoNodeForm from 'ee/geo_node_form/components/geo_node_form.vue';
 import GeoNodeFormCore from 'ee/geo_node_form/components/geo_node_form_core.vue';
 import GeoNodeFormCapacities from 'ee/geo_node_form/components/geo_node_form_capacities.vue';
-import { MOCK_NODE } from '../mock_data';
+import { MOCK_NODE, MOCK_SELECTIVE_SYNC_TYPES, MOCK_SYNC_SHARDS } from '../mock_data';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   visitUrl: jest.fn().mockName('visitUrlMock'),
@@ -14,6 +14,8 @@ describe('GeoNodeForm', () => {
 
   const propsData = {
     node: MOCK_NODE,
+    selectiveSyncTypes: MOCK_SELECTIVE_SYNC_TYPES,
+    syncShardsOptions: MOCK_SYNC_SHARDS,
   };
 
   const createComponent = () => {
@@ -53,7 +55,9 @@ describe('GeoNodeForm', () => {
         showObjectStorage,
       }) => {
         beforeEach(() => {
-          wrapper.vm.nodeData.primary = primaryNode;
+          wrapper.setData({
+            nodeData: { ...wrapper.vm.nodeData, primary: primaryNode },
+          });
         });
 
         it(`it ${showCore ? 'shows' : 'hides'} the Core Field`, () => {
@@ -90,6 +94,33 @@ describe('GeoNodeForm', () => {
         expect(visitUrl).toHaveBeenCalled();
       });
     });
+
+    describe('addSyncOption', () => {
+      beforeEach(() => {
+        createComponent();
+      });
+
+      it('should add value to nodeData', () => {
+        expect(wrapper.vm.nodeData.selectiveSyncShards).toEqual([]);
+        wrapper.vm.addSyncOption({ key: 'selectiveSyncShards', value: MOCK_SYNC_SHARDS[0].value });
+        expect(wrapper.vm.nodeData.selectiveSyncShards).toEqual([MOCK_SYNC_SHARDS[0].value]);
+      });
+    });
+
+    describe('removeSyncOption', () => {
+      beforeEach(() => {
+        createComponent();
+        wrapper.setData({
+          nodeData: { ...wrapper.vm.nodeData, selectiveSyncShards: [MOCK_SYNC_SHARDS[0].value] },
+        });
+      });
+
+      it('should remove value from nodeData', () => {
+        expect(wrapper.vm.nodeData.selectiveSyncShards).toEqual([MOCK_SYNC_SHARDS[0].value]);
+        wrapper.vm.removeSyncOption({ key: 'selectiveSyncShards', index: 0 });
+        expect(wrapper.vm.nodeData.selectiveSyncShards).toEqual([]);
+      });
+    });
   });
 
   describe('created', () => {
@@ -99,7 +130,7 @@ describe('GeoNodeForm', () => {
       });
 
       it('sets nodeData to the correct node', () => {
-        expect(wrapper.vm.nodeData.id).toBe(propsData.node.id);
+        expect(wrapper.vm.nodeData.id).toBe(wrapper.vm.node.id);
       });
     });
 

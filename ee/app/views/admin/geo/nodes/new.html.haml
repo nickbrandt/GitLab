@@ -1,7 +1,8 @@
 - page_title _('New Geo Node')
 
 - if Feature.enabled?(:enable_geo_node_form_js)
-  #js-geo-node-form
+  #js-geo-node-form{ data: { "selective-sync-types" => selective_sync_types_json,
+    "sync-shards-options" => repository_storages_options_json } }
 - else
   %h2.page-title
     %span.title-text

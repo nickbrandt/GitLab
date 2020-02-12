@@ -1,4 +1,33 @@
-// eslint-disable-next-line import/prefer-default-export
+export const MOCK_SELECTIVE_SYNC_TYPES = {
+  ALL: {
+    label: 'All projects',
+    value: '',
+  },
+  NAMESPACES: {
+    label: 'Projects in certain groups',
+    value: 'namespaces',
+  },
+  SHARDS: {
+    label: 'Projects in certain storage shards',
+    value: 'shards',
+  },
+};
+
+export const MOCK_SYNC_SHARDS = [
+  {
+    label: 'Shard 1',
+    value: 'shard1',
+  },
+  {
+    label: 'Shard 2',
+    value: 'shard2',
+  },
+  {
+    label: 'Shard 3',
+    value: 'shard3',
+  },
+];
+
 export const MOCK_NODE = {
   id: 1,
   name: 'Mock Node',

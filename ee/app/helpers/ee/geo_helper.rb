@@ -65,6 +65,25 @@ module EE
       )
     end
 
+    def selective_sync_types_json
+      options = {
+        ALL: {
+          label: s_('Geo|All projects'),
+          value: ''
+        },
+        NAMESPACES: {
+          label: s_('Geo|Projects in certain groups'),
+          value: 'namespaces'
+        },
+        SHARDS: {
+          label: s_('Geo|Projects in certain storage shards'),
+          value: 'shards'
+        }
+      }
+
+      options.to_json
+    end
+
     def status_loading_icon
       icon "spinner spin fw", class: 'js-geo-node-loading'
     end
