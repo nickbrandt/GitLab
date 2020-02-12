@@ -1,0 +1,5 @@
+---
+title: Set SSL certificates path env when calling ES indexer
+merge_request: 24213
+author:
+type: fixed
