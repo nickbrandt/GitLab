@@ -905,8 +905,7 @@ module Ci
     end
 
     def cacheable?
-      source_enum = Ci::PipelineEnums.config_sources[config_source.to_sym]
-      Ci::PipelineEnums.ci_config_sources_values.include?(source_enum)
+      Ci::PipelineEnums.ci_config_sources.key?(config_source.to_sym)
     end
 
     private
