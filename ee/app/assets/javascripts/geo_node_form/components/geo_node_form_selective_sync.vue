@@ -1,5 +1,6 @@
 <script>
 import { GlFormGroup, GlFormSelect } from '@gitlab/ui';
+import GeoNodeFormNamespaces from './geo_node_form_namespaces.vue';
 import GeoNodeFormShards from './geo_node_form_shards.vue';
 
 export default {
@@ -7,6 +8,7 @@ export default {
   components: {
     GlFormGroup,
     GlFormSelect,
+    GeoNodeFormNamespaces,
     GeoNodeFormShards,
   },
   props: {
@@ -24,6 +26,9 @@ export default {
     },
   },
   computed: {
+    selectiveSyncNamespaces() {
+      return this.nodeData.selectiveSyncType === this.selectiveSyncTypes.NAMESPACES.value;
+    },
     selectiveSyncShards() {
       return this.nodeData.selectiveSyncType === this.selectiveSyncTypes.SHARDS.value;
     },
@@ -52,6 +57,19 @@ export default {
         value-field="value"
         text-field="label"
         class="col-sm-6"
+      />
+    </gl-form-group>
+    <gl-form-group
+      v-if="selectiveSyncNamespaces"
+      :label="__('Groups to synchronize')"
+      label-for="node-synchronization-namespaces-field"
+      :description="__('Choose which groups you wish to synchronize to this secondary node')"
+    >
+      <geo-node-form-namespaces
+        id="node-synchronization-namespaces-field"
+        :selected-namespaces="nodeData.selectiveSyncNamespaceIds"
+        @addSyncOption="addSyncOption"
+        @removeSyncOption="removeSyncOption"
       />
     </gl-form-group>
     <gl-form-group
