@@ -1,13 +1,14 @@
 - page_title "Audit Events"
 - feature_available = @project.feature_available?(:audit_events)
 
-- if !feature_available && show_promotions?
-  = render 'shared/promotions/promote_audit_events'
-
-%h3.page-title Project Audit Events
-%p.light Events in #{@project.full_path}
-
 - if feature_available
+  %h3.page-title
+    = _('Project Audit Events')
+  %p.light
+    = _('Events in %{project_path}') % { project_path: @project.full_path }
+
   = render 'shared/audit_events/event_filter', path: project_audit_events_path(@project)
   = render 'shared/audit_events/event_sort'
   = render 'shared/audit_events/event_table', events: @events
+- elsif show_promotions?
+  = render 'shared/promotions/promote_audit_events'
