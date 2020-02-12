@@ -54,6 +54,17 @@ describe Projects::CleanupService do
         expect(MergeRequestDiff.exists?(diff.id)).to be_falsy
       end
 
+      it 'creates new merge request diff after the clean up' do
+        old_merge_request_diff_id = merge_request.merge_request_diff.id
+
+        service.execute
+
+        merge_request_diff = merge_request.reload.merge_request_diff
+
+        expect(merge_request_diff).to be_present
+        expect(merge_request_diff.id).not_to eq(old_merge_request_diff_id)
+      end
+
       it 'ignores non-commit responses from Gitaly' do
         entry.type = :UNKNOWN
 

@@ -212,6 +212,7 @@ class MergeRequest < ApplicationRecord
   validate :validate_fork, unless: :closed_without_fork?
   validate :validate_target_project, on: :create
 
+  scope :by_ids, ->(ids) { where(id: ids) }
   scope :by_source_or_target_branch, ->(branch_name) do
     where("source_branch = :branch OR target_branch = :branch", branch: branch_name)
   end

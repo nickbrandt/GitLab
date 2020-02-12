@@ -63,12 +63,19 @@ module Projects
         .by_commit_sha(old_commit_shas)
 
       # It's important to run the ActiveRecord callbacks here
-      merge_request_diffs.destroy_all # rubocop:disable Cop/DestroyAll
+      destroyed_merge_request_diffs = merge_request_diffs.destroy_all # rubocop:disable Cop/DestroyAll
+      ensure_merge_request_diffs(destroyed_merge_request_diffs)
 
       # TODO: ensure the highlight cache is removed immediately. It's too hard
       # to calculate the Redis keys at present.
       #
       # https://gitlab.com/gitlab-org/gitlab-foss/issues/61115
+    end
+
+    def ensure_merge_request_diffs(merge_request_diffs)
+      MergeRequest
+        .by_ids(merge_request_diffs.map(&:merge_request_id).uniq)
+        .each(&:ensure_merge_request_diff)
     end
 
     def cleanup_note_diff_files(old_commit_shas)
