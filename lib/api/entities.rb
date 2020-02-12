@@ -163,42 +163,6 @@ module API
       end
     end
 
-    class LabelBasic < Grape::Entity
-      expose :id, :name, :color, :description, :description_html, :text_color
-    end
-
-    class Label < LabelBasic
-      with_options if: lambda { |_, options| options[:with_counts] } do
-        expose :open_issues_count do |label, options|
-          label.open_issues_count(options[:current_user])
-        end
-
-        expose :closed_issues_count do |label, options|
-          label.closed_issues_count(options[:current_user])
-        end
-
-        expose :open_merge_requests_count do |label, options|
-          label.open_merge_requests_count(options[:current_user])
-        end
-      end
-
-      expose :subscribed do |label, options|
-        label.subscribed?(options[:current_user], options[:parent])
-      end
-    end
-
-    class GroupLabel < Label
-    end
-
-    class ProjectLabel < Label
-      expose :priority do |label, options|
-        label.priority(options[:parent])
-      end
-      expose :is_project_label do |label, options|
-        label.is_a?(::ProjectLabel)
-      end
-    end
-
     class List < Grape::Entity
       expose :id
       expose :label, using: Entities::LabelBasic
