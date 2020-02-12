@@ -33,7 +33,7 @@ export default () => {
           class="text-center loading"
           v-if="loading && !error">
           <i
-            class="fa fa-spinner fa-spin"
+            class="spinner spinner-sm"
             aria-hidden="true"
             aria-label="PDF loading">
           </i>
