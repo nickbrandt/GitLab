@@ -82,13 +82,13 @@ module Gitlab
           (@before_fork_hooks ||= []) << block
         end
 
-        # Read the config/initializers/cluster_events_before_phased_restart.rb
+        # Read the config/initializers_with_autoload/cluster_events_before_phased_restart.rb
         def on_before_blackout_period(&block)
           # Defer block execution
           (@master_blackout_period ||= []) << block
         end
 
-        # Read the config/initializers/cluster_events_before_phased_restart.rb
+        # Read the config/initializers_with_autoload/cluster_events_before_phased_restart.rb
         def on_before_graceful_shutdown(&block)
           # Defer block execution
           (@master_graceful_shutdown ||= []) << block

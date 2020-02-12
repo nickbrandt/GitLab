@@ -3,7 +3,7 @@
 require 'fast_spec_helper'
 
 # Patching ActiveSupport::Concern
-require_relative '../../../../config/initializers/0_as_concern'
+require_relative '../../../../config/initializers_with_autoload/0_as_concern'
 
 describe Gitlab::Patch::Prependable do
   before do

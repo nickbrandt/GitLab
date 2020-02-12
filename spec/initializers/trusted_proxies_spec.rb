@@ -64,6 +64,6 @@ describe 'trusted_proxies' do
 
   def set_trusted_proxies(proxies = [])
     stub_config_setting('trusted_proxies' => proxies)
-    load File.join(__dir__, '../../config/initializers/trusted_proxies.rb')
+    load File.join(__dir__, '../../config/initializers_with_autoload/trusted_proxies.rb')
   end
 end

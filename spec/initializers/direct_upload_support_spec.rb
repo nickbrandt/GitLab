@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'Direct upload support' do
   subject do
-    load Rails.root.join('config/initializers/direct_upload_support.rb')
+    load Rails.root.join('config/initializers_with_autoload/direct_upload_support.rb')
   end
 
   where(:config_name) do

@@ -285,6 +285,14 @@ module Gitlab
       g.factory_bot false
     end
 
+    initializer :initializers_with_autoload, before: :engines_blank_point, after: :let_zeitwerk_take_over do |app|
+      Dir[Rails.root.join('config/initializers_with_autoload/*.rb')].sort.each do |initializer|
+        ActiveSupport::Notifications.instrument('load_config_initializer.railties', initializer: initializer) do
+          load(initializer)
+        end
+      end
+    end
+
     config.after_initialize do
       Rails.application.reload_routes!
 

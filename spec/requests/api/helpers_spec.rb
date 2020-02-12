@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require 'raven/transports/dummy'
-require_relative '../../../config/initializers/sentry'
+require_relative '../../../config/initializers_with_autoload/sentry'
 
 describe API::Helpers do
   include API::APIGuard::HelperMethods

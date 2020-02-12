@@ -16,8 +16,8 @@ ALLOWED = [
   'lib/gitlab/gitaly_client/storage_settings.rb',
 
   # Needed for logging
-  'config/initializers/peek.rb',
-  'config/initializers/lograge.rb',
+  'config/initializers_with_autoload/peek.rb',
+  'config/initializers_with_autoload/lograge.rb',
   'lib/gitlab/grape_logging/loggers/perf_logger.rb',
   'lib/gitlab/instrumentation_helper.rb',
   'lib/gitlab/rugged_instrumentation.rb',

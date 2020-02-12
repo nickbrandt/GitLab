@@ -42,6 +42,7 @@ module SimpleCovEnv
       add_filter '/vendor/ruby/'
       add_filter 'app/controllers/sherlock/'
       add_filter 'config/initializers/'
+      add_filter 'config/initializers_with_autoload/'
       add_filter 'db/fixtures/'
       add_filter 'lib/gitlab/sidekiq_middleware/'
       add_filter 'lib/system_check/'

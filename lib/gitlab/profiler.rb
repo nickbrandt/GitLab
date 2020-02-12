@@ -8,6 +8,7 @@ module Gitlab
       lib/gitlab/i18n.rb
       lib/gitlab/request_context.rb
       config/initializers
+      config/initializers_with_autoload
       lib/gitlab/database/load_balancing/
       lib/gitlab/etag_caching/
       lib/gitlab/metrics/

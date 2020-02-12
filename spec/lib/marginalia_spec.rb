@@ -92,7 +92,7 @@ describe 'Marginalia spec' do
     before(:all) do
       add_sidekiq_middleware
 
-      # Because of faking, 'Sidekiq.server?' does not work so implicitly set application name which is done in config/initializers/0_marginalia.rb
+      # Because of faking, 'Sidekiq.server?' does not work so implicitly set application name which is done in config/initializers_with_autoload/0_marginalia.rb
       Marginalia.application_name = "sidekiq"
     end
 

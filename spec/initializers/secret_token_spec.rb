@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../../config/initializers/01_secret_token'
+require_relative '../../config/initializers_with_autoload/01_secret_token'
 
 describe 'create_tokens' do
   include StubENV

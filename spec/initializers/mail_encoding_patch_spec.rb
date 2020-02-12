@@ -3,7 +3,7 @@
 require 'fast_spec_helper'
 
 require 'mail'
-require_relative '../../config/initializers/mail_encoding_patch.rb'
+require_relative '../../config/initializers/000_mail_encoding_patch.rb'
 
 describe 'Mail quoted-printable transfer encoding patch and Unicode characters' do
   shared_examples 'email encoding' do |email|
@@ -187,7 +187,7 @@ describe 'Mail quoted-printable transfer encoding patch and Unicode characters' 
 
       email.parts << part
 
-      # The Mail patch in `config/initializers/mail_encoding_patch.rb` fixes
+      # The Mail patch in `config/initializers/000_mail_encoding_patch.rb` fixes
       # encoding of non-binary content. The failure below is expected since we
       # reverted some upstream changes in order to properly support SMIME signatures
       # See https://gitlab.com/gitlab-org/gitlab/issues/197386

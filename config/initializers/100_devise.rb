@@ -205,27 +205,11 @@ Devise.setup do |config|
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :post
 
-  # ==> OmniAuth
-  # To configure a new OmniAuth provider copy and edit omniauth.rb.sample
-  # selecting the provider you require.
-  # Check the wiki for more information on setting up on your models
-
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.
   #
   config.warden do |manager|
     manager.failure_app = Gitlab::DeviseFailure
-  end
-
-  if Gitlab::Auth::LDAP::Config.enabled?
-    Gitlab::Auth::LDAP::Config.providers.each do |provider|
-      ldap_config = Gitlab::Auth::LDAP::Config.new(provider)
-      config.omniauth(provider, ldap_config.omniauth_options)
-    end
-  end
-
-  if Gitlab::Auth.omniauth_enabled?
-    Gitlab::OmniauthInitializer.new(config).execute(Gitlab.config.omniauth.providers)
   end
 end

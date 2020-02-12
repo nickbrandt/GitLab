@@ -56,7 +56,7 @@ namespace :gitlab do
           #
           # This configuration file should be exclusively used to set queue settings for
           # Sidekiq. Any other setting should be specified using the Sidekiq CLI or the
-          # Sidekiq Ruby API (see config/initializers/sidekiq.rb).
+          # Sidekiq Ruby API (see config/initializers_with_autoload/sidekiq.rb).
           #
           # All the queues to process and their weights. Every queue _must_ have a weight
           # defined.

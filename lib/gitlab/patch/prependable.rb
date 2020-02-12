@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # We're patching `ActiveSupport::Concern` in
-# config/initializers/0_as_concern.rb
+# config/initializers_with_autoload/0_as_concern.rb
 #
 # We want to patch `ActiveSupport::Concern` for two reasons:
 # 1. Allow defining class methods via: `class_methods` method

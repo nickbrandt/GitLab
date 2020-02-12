@@ -111,7 +111,7 @@ gem 'mini_magick'
 # for backups
 gem 'fog-aws', '~> 3.5'
 # Locked until fog-google resolves https://github.com/fog/fog-google/issues/421.
-# Also see config/initializers/fog_core_patch.rb.
+# Also see config/initializers/000_fog_core_patch.rb.
 gem 'fog-core', '= 2.1.0'
 gem 'fog-google', '~> 1.9'
 gem 'fog-local', '~> 0.6'
@@ -489,6 +489,6 @@ gem 'lru_redux'
 gem 'erubi', '~> 1.9.0'
 
 # Locked as long as quoted-printable encoding issues are not resolved
-# Monkey-patched in `config/initializers/mail_encoding_patch.rb`
+# Monkey-patched in `config/initializers/000_mail_encoding_patch.rb`
 # See https://gitlab.com/gitlab-org/gitlab/issues/197386
 gem 'mail', '= 2.7.1'

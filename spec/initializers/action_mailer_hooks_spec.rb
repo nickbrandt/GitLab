@@ -9,7 +9,7 @@ describe 'ActionMailer hooks' do
     end
 
     it 'is disabled by default' do
-      load Rails.root.join('config/initializers/action_mailer_hooks.rb')
+      load Rails.root.join('config/initializers_with_autoload/action_mailer_hooks.rb')
 
       expect(ActionMailer::Base).not_to(
         have_received(:register_interceptor).with(Gitlab::Email::Hook::SmimeSignatureInterceptor))
@@ -32,7 +32,7 @@ describe 'ActionMailer hooks' do
         end
 
         it 'is enabled depending on settings' do
-          load Rails.root.join('config/initializers/action_mailer_hooks.rb')
+          load Rails.root.join('config/initializers_with_autoload/action_mailer_hooks.rb')
 
           if smime_interceptor_enabled
             # Premailer must be registered before S/MIME or signatures will be mangled

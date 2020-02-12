@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe './config/initializers/google_api_client.rb' do
+describe './config/initializers_with_autoload/google_api_client.rb' do
   subject { Google::Apis::ContainerV1beta1 }
 
   it 'is needed' do |example|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../../config/initializers/doorkeeper'
+require_relative '../../config/initializers_with_autoload/doorkeeper'
 
 describe Doorkeeper.configuration do
   describe '#default_scopes' do

@@ -107,7 +107,7 @@ class Feature
       Flipper.new(flipper_adapter).tap { |flip| flip.memoize = true }
     end
 
-    # This method is called from config/initializers/flipper.rb and can be used
+    # This method is called from config/initializers_with_autoload/flipper.rb and can be used
     # to register Flipper groups.
     # See https://docs.gitlab.com/ee/development/feature_flags.html#feature-groups
     def register_feature_groups

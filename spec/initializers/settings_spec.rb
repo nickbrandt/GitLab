@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../../config/initializers/1_settings' unless defined?(Settings)
+require_relative '../../config/initializers_with_autoload/1_settings' unless defined?(Settings)
 
 describe Settings do
   describe '#ldap' do

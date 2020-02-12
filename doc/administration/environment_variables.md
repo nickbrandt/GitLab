@@ -55,7 +55,7 @@ Variable | Default value | Overridden by `DATABASE_URL`?
 ## Adding more variables
 
 We welcome merge requests to make more settings configurable via variables.
-Please make changes in the `config/initializers/1_settings.rb` file and stick
+Please make changes in the `config/initializers_with_autoload/1_settings.rb` file and stick
 to the naming scheme `GITLAB_#{name in 1_settings.rb in upper case}`.
 
 ## Omnibus configuration

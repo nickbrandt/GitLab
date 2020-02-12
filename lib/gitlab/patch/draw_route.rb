@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # We're patching `ActionDispatch::Routing::Mapper` in
-# config/initializers/routing_draw.rb
+# config/initializers_with_autoload/routing_draw.rb
 module Gitlab
   module Patch
     module DrawRoute

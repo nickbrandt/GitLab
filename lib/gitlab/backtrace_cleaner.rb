@@ -4,6 +4,7 @@ module Gitlab
   module BacktraceCleaner
     IGNORE_BACKTRACES = %w[
       config/initializers
+      config/initializers_with_autoload
       ee/lib/gitlab/middleware/
       lib/gitlab/correlation_id.rb
       lib/gitlab/database/load_balancing/

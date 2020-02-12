@@ -115,7 +115,7 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def after_inactive_sign_up_path_for(resource)
-    # With the current `allow_unconfirmed_access_for` Devise setting in config/initializers/8_devise.rb,
+    # With the current `allow_unconfirmed_access_for` Devise setting in config/initializers_with_autoload/8_devise.rb,
     # this method is never called. Leaving this here in case that value is set to 0.
     Gitlab::AppLogger.info(user_created_message)
     users_almost_there_path

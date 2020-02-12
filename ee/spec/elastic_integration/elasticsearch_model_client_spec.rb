@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-# This module is monkey-patched in config/initializers/elastic_client_setup.rb
+# This module is monkey-patched in config/initializers_with_autoload/elastic_client_setup.rb
 describe "Monkey-patches to ::Elasticsearch::Model::Client" do
   before do
     stub_ee_application_setting(elasticsearch_url: ['http://localhost:9200'])
