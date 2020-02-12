@@ -9,7 +9,7 @@ import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/muta
 import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/actions';
 import axios from '~/lib/utils/axios_utils';
 
-import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
+import mockDataVulnerabilities from './data/mock_data_vulnerabilities';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
 import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 

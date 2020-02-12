@@ -2,7 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/vulnerabilities/sta
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
-import mockData from './data/mock_data_vulnerabilities.json';
+import mockData from './data/mock_data_vulnerabilities';
 
 describe('vulnerabilities module mutations', () => {
   let state;
