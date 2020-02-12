@@ -32,11 +32,11 @@ export default () => {
         <div
           class="text-center loading"
           v-if="loading && !error">
-          <i
+          <span
             class="spinner spinner-sm"
             aria-hidden="true"
             aria-label="PDF loading">
-          </i>
+          </span>
         </div>
         <pdf-lab
           v-if="!loadError"
