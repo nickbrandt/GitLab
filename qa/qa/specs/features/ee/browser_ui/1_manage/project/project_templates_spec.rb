@@ -106,7 +106,7 @@ module QA
         end
       end
 
-      context 'group level' do
+      context 'group level', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/198690', type: :flaky } do
         before do
           Flow::Login.sign_in
 
