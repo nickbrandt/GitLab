@@ -54,7 +54,7 @@ describe 'Epic Issues', :js do
     end
 
     it 'user cannot add new issues to the epic' do
-      expect(page).not_to have_selector('.related-items-tree-container .js-add-issues-button')
+      expect(page).not_to have_selector('.related-items-tree-container .js-issue-actions-split-button > button:first-child')
     end
 
     it 'user cannot add new epics to the epic' do
@@ -67,7 +67,7 @@ describe 'Epic Issues', :js do
     let(:issue_invalid) { create(:issue) }
     let(:epic_to_add) { create(:epic, group: group) }
 
-    def add_issues(references, button_selector: '.js-add-issues-button')
+    def add_issues(references, button_selector: '.js-issue-actions-split-button > button:first-child')
       find(".related-items-tree-container #{button_selector}").click
       find('.related-items-tree-container .js-add-issuable-form-input').set(references)
       # When adding long references, for some reason the input gets stuck
