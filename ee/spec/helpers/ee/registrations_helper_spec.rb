@@ -7,10 +7,12 @@ describe EE::RegistrationsHelper do
 
   describe '#in_paid_signup_flow?' do
     where(:user_return_to_path, :paid_signup_flow_enabled, :expected_result) do
-      '/-/subscriptions/new' | true  | true
-      '/-/subscriptions/new' | false | false
-      '/'                    | true  | false
-      '/'                    | false | false
+      '/-/subscriptions/new?plan_id=bronze_plan' | true  | true
+      '/-/subscriptions/new?plan_id=bronze_plan' | false | false
+      '/foo'                                     | true  | false
+      '/foo'                                     | false | false
+      nil                                        | true  | nil
+      nil                                        | false | false
     end
 
     with_them do
