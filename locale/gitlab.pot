@@ -13351,9 +13351,6 @@ msgstr ""
 msgid "PackageRegistry|NuGet Command"
 msgstr ""
 
-msgid "PackageRegistry|Package installation"
-msgstr ""
-
 msgid "PackageRegistry|Registry Setup"
 msgstr ""
 

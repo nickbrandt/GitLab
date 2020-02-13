@@ -1,35 +1,40 @@
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
-import { nugetPackage } from '../../mock_data';
-import { registryUrl } from '../mock_data';
+import { nugetPackage as packageEntity } from '../../mock_data';
+import { registryUrl as nugetPath } from '../mock_data';
 import { TrackingActions, TrackingLabels } from 'ee/packages/details/constants';
 import Tracking from '~/tracking';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('NugetInstallation', () => {
   let wrapper;
 
-  const defaultProps = {
-    packageEntity: nugetPackage,
-    registryUrl,
-    helpUrl: 'foo',
-  };
+  const nugetInstallationCommandStr = 'foo/command';
+  const nugetSetupCommandStr = 'foo/setup';
 
-  const nugetInstallationCommandStr = `nuget install ${nugetPackage.name} -Source "GitLab"`;
-  const nugetSetupCommandStr = `nuget source Add -Name "GitLab" -Source "${registryUrl}" -UserName <your_username> -Password <your_token>`;
+  const store = new Vuex.Store({
+    state: {
+      packageEntity,
+      nugetPath,
+    },
+    getters: {
+      nugetInstallationCommand: () => nugetInstallationCommandStr,
+      nugetSetupCommand: () => nugetSetupCommandStr,
+    },
+  });
 
   const installationTab = () => wrapper.find('.js-installation-tab > a');
   const setupTab = () => wrapper.find('.js-setup-tab > a');
   const nugetInstallationCommand = () => wrapper.find('.js-nuget-command > input');
   const nugetSetupCommand = () => wrapper.find('.js-nuget-setup > input');
 
-  function createComponent(props = {}) {
-    const propsData = {
-      ...defaultProps,
-      ...props,
-    };
-
+  function createComponent() {
     wrapper = mount(NugetInstallation, {
-      propsData,
+      localVue,
+      store,
     });
   }
 
