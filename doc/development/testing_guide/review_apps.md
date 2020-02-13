@@ -244,7 +244,7 @@ Any secrets or config maps older than 5 days are suspect and should be deleted.
 
 **Useful commands:**
 
-```
+```shell
 # List secrets and config maps ordered by created date
 › kubectl get secret,cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-'
 
@@ -287,7 +287,7 @@ This in turn prevented other components of the Review App to properly start
 After some digging, we found that new mounts were failing, when being performed
 with transient scopes (e.g. pods) of `systemd-mount`:
 
-```
+```plaintext
 MountVolume.SetUp failed for volume "dns-gitlab-review-app-external-dns-token-sj5jm" : mount failed: exit status 1
 Mounting command: systemd-run
 Mounting arguments: --description=Kubernetes transient mount for /var/lib/kubelet/pods/06add1c3-87b4-11e9-80a9-42010a800107/volumes/kubernetes.io~secret/dns-gitlab-review-app-external-dns-token-sj5jm --scope -- mount -t tmpfs tmpfs /var/lib/kubelet/pods/06add1c3-87b4-11e9-80a9-42010a800107/volumes/kubernetes.io~secret/dns-gitlab-review-app-external-dns-token-sj5jm
@@ -335,7 +335,7 @@ clean up the list of non-`Running` pods.
 Following is a command to delete Review Apps based on their last deployment date
 (current date was June 6th at the time) with
 
-```
+```shell
 helm ls -d | grep "Jun  4" | cut -f1 | xargs helm delete --purge
 ```
 
