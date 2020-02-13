@@ -7,7 +7,7 @@ describe 'Environment > Pod Logs', :js do
 
   SCROLL_DISTANCE = 400
 
-  let(:pod_names) { %w(foo bar) }
+  let(:pod_names) { %w(kube-pod) }
   let(:pod_name) { pod_names.first }
   let(:project) { create(:project, :repository) }
   let(:environment) { create(:environment, project: project) }
@@ -19,17 +19,8 @@ describe 'Environment > Pod Logs', :js do
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)
 
-    stub_kubeclient_pod_details(pod_name, environment.deployment_namespace)
+    stub_kubeclient_pods(environment.deployment_namespace)
     stub_kubeclient_logs(pod_name, environment.deployment_namespace, container: 'container-0')
-
-    # rollout_status_instances = [{ pod_name: foo }, {pod_name: bar}]
-    rollout_status_instances = pod_names.collect { |name| { pod_name: name } }
-    rollout_status = instance_double(
-      ::Gitlab::Kubernetes::RolloutStatus, instances: rollout_status_instances
-    )
-
-    allow_any_instance_of(EE::Environment).to receive(:rollout_status_with_reactive_cache)
-      .and_return(rollout_status)
 
     sign_in(project.owner)
   end
@@ -64,7 +55,7 @@ describe 'Environment > Pod Logs', :js do
         find(".dropdown-menu-toggle:not([disabled])").click
 
         dropdown_items = find(".dropdown-menu").all(".dropdown-item")
-        expect(dropdown_items.size).to eq(2)
+        expect(dropdown_items.size).to eq(1)
 
         dropdown_items.each_with_index do |item, i|
           expect(item.text).to eq(pod_names[i])

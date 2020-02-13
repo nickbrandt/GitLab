@@ -5068,6 +5068,9 @@ msgstr ""
 msgid "Container Scanning"
 msgstr ""
 
+msgid "Container does not exist"
+msgstr ""
+
 msgid "Container registry images"
 msgstr ""
 
@@ -12659,6 +12662,9 @@ msgstr ""
 msgid "No connection could be made to a Gitaly Server, please check your logs!"
 msgstr ""
 
+msgid "No containers available"
+msgstr ""
+
 msgid "No contributions"
 msgstr ""
 
@@ -13997,6 +14003,9 @@ msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
+msgstr ""
+
+msgid "Pod does not exist"
 msgstr ""
 
 msgid "Pod logs"
@@ -20386,6 +20395,9 @@ msgstr ""
 msgid "Unable to collect memory info"
 msgstr ""
 
+msgid "Unable to connect to Elasticsearch"
+msgstr ""
+
 msgid "Unable to connect to Prometheus server"
 msgstr ""
 
@@ -20453,6 +20465,9 @@ msgid "Unknown"
 msgstr ""
 
 msgid "Unknown Error"
+msgstr ""
+
+msgid "Unknown cache key"
 msgstr ""
 
 msgid "Unknown encryption strategy: %{encrypted_strategy}!"
