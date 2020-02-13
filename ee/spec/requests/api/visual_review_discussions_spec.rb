@@ -50,7 +50,7 @@ describe API::VisualReviewDiscussions do
       end
 
       it 'responds with a status 201 Created' do
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
 
       it 'returns the persisted note body' do
@@ -72,7 +72,7 @@ describe API::VisualReviewDiscussions do
       it 'returns a 400 bad request error if body not given' do
         expect { request }.not_to change(merge_request.notes, :count)
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
 
@@ -87,7 +87,7 @@ describe API::VisualReviewDiscussions do
         it 'responds with a status 404' do
           request
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -107,7 +107,7 @@ describe API::VisualReviewDiscussions do
         end
 
         it 'responds 403' do
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'returns error messaging specifying that the feature is disabled' do
@@ -133,7 +133,7 @@ describe API::VisualReviewDiscussions do
         end
 
         it 'responds with a status 201 Created' do
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
         end
 
         it 'returns the persisted note body' do
