@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+export NODE_ENV=development
+export NODE_OPTIONS="--max-old-space-size=3584"
+export DEV_SERVER_PORT=${DEV_SERVER_PORT:=3808}
+export DEV_SERVER_HOST=${DEV_SERVER_HOST:=localhost}
+export DEV_SERVER_STATIC=${DEV_SERVER_STATIC:=false}
+export WEBPACK_VENDOR_DLL=${WEBPACK_VENDOR_DLL:=false}
+
+GITLAB_ROOT="$(cd "$(dirname "$0")/.." >/dev/null 2>&1 && pwd)"
+
+# Change into gitlab directory
+cd "$GITLAB_ROOT" || exit 1
+
+# Common function for nodemon, which calls the executable from node_modules, as
+# `yarn run` creates one more intermediate process noone needs.
+#
+# We replace this bash script's process with the nodemon one's with the help of exec
+#
+# We ignore nodemons update check
+#
+# Watching for changes on config/webpack.config.js
+# If we change the webpack config, we restart the process.
+#
+# We define SIGTERM as the signal for killing processes created by nodemon
+function nodemon() {
+  exec node_modules/.bin/nodemon \
+    --config "$DIR/webpack-dev-server.json" \
+    --watch 'config/webpack.config.js' \
+    "$@"
+}
+
+# Clean up static assets that were left in the directory
+rm -rf public/assets/webpack
+
+if [[ "$DEV_SERVER_STATIC" != "false" ]]; then
+  echo "Starting webserver on http://$DEV_SERVER_HOST:$DEV_SERVER_PORT"
+  echo "You are starting webpack in compile-once mode"
+  echo "The JavaScript assets are recompiled only if they change"
+  echo "If you change them often, you might wanna unset DEV_SERVER_STATIC"
+  echo "You can force webpack to recompile by running \`pgrep -f nodemon | xargs kill -USR2\`"
+
+  # We only compile once at the start and serve the assets with a static file server
+  #
+  # In order to make branch switches or updates a bit more convienent, we watch for
+  # changes in the source folders in order to recompile the assets
+  nodemon --watch "app/assets/javascripts" \
+    --watch "ee/app/assets/javascripts" \
+    --watch "node_modules/.yarn-integrity" \
+    --ext js,json,vue \
+    --exec "rm -rf public/assets/webpack ; yarn run webpack && exec ruby -run -e httpd public/ -p $DEV_SERVER_PORT"
+
+elif [[ "$WEBPACK_VENDOR_DLL" != "false" ]]; then
+  # Utilizing webpack dev server with DLLs.
+  nodemon --watch "config/webpack.vendor.config.js" \
+    --watch "node_modules/.yarn-integrity" \
+    --watch "package.json" \
+    --watch "yarn.lock" \
+    --exec "webpack-dev-server --config config/webpack.config.js"
+
+else
+  # Default case. Utilizing webpack dev server with no DLLs.
+  nodemon --exec "webpack-dev-server --config config/webpack.config.js"
+fi
