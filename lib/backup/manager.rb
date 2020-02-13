@@ -156,14 +156,13 @@ module Backup
           tar_file = backup_file_list.first
         end
 
-          progress.print 'Unpacking backup ... '
+        progress.print 'Unpacking backup ... '
 
-          if Kernel.system(*%W(tar -xf #{tar_file}))
-            progress.puts 'done'.color(:green)
-          else
-            progress.puts 'unpacking backup failed'.color(:red)
-            exit 1
-          end
+        if Kernel.system(*%W(tar -xf #{tar_file}))
+          progress.puts 'done'.color(:green)
+        else
+          progress.puts 'unpacking backup failed'.color(:red)
+          exit 1
         end
       end
       true
