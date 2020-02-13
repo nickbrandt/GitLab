@@ -44,7 +44,7 @@ export default {
         data-qa-selector="start_new_mr_checkbox"
         @change="toggleShouldCreateMR"
       />
-      <span class="prepend-left-10 ide-radio-label">
+      <span class="prepend-left-10 ide-option-label">
         {{ __('Start a new merge request') }}
       </span>
     </label>
