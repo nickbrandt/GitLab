@@ -50,12 +50,12 @@
     .todo-actions
       = link_to dashboard_todo_path(todo), method: :delete, class: 'btn btn-loading js-done-todo', data: { href: dashboard_todo_path(todo) } do
         Done
-        = icon('spinner spin')
+        %i{class:"spinner"}
       = link_to restore_dashboard_todo_path(todo), method: :patch, class: 'btn btn-loading js-undo-todo hidden', data: { href: restore_dashboard_todo_path(todo) } do
         Undo
-        = icon('spinner spin')
+        %i{class:"spinner"}
   - else
     .todo-actions
       = link_to restore_dashboard_todo_path(todo), method: :patch, class: 'btn btn-loading js-add-todo', data: { href: restore_dashboard_todo_path(todo) } do
         Add a To Do
-        = icon('spinner spin')
+        %i{class:"spinner"}
