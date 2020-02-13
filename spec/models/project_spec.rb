@@ -5593,6 +5593,24 @@ describe Project do
     it { is_expected.to be_falsey }
   end
 
+  describe '#self_monitoring?' do
+    let_it_be(:project) { create(:project) }
+
+    subject { project.self_monitoring? }
+
+    context 'when the project is instance self monitoring' do
+      before do
+        stub_application_setting(self_monitoring_project_id: project.id)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'when the project is not self monitoring' do
+      it { is_expected.to be false }
+    end
+  end
+
   def rugged_config
     rugged_repo(project.repository).config
   end
