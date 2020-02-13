@@ -19,6 +19,7 @@ GitLab uses the following tools to scan and report known vulnerabilities found i
 
 | Secure scanning tool                                                         | Description                                                            |
 |:-----------------------------------------------------------------------------|:-----------------------------------------------------------------------|
+| [Compliance Dashboard](compliance_dashboard/index.md) **(ULTIMATE)**         | View the most recent Merge Request activity in a group.                |
 | [Container Scanning](container_scanning/index.md) **(ULTIMATE)**             | Scan Docker containers for known vulnerabilities.                      |
 | [Dependency List](dependency_list/index.md) **(ULTIMATE)**                   | View your project's dependencies and their known vulnerabilities.      |
 | [Dependency Scanning](dependency_scanning/index.md) **(ULTIMATE)**           | Analyze your dependencies for known vulnerabilities.                   |
