@@ -2,6 +2,7 @@
 import _ from 'underscore';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { mapState, mapGetters, mapActions } from 'vuex';
+import { NEW_GROUP } from 'ee/subscriptions/new/constants';
 import { GlFormGroup, GlFormSelect, GlFormInput, GlSprintf, GlLink } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Step from './step.vue';
@@ -22,17 +23,33 @@ export default {
     ...mapState([
       'availablePlans',
       'selectedPlan',
+      'isNewUser',
+      'groupData',
+      'selectedGroup',
       'isSetupForCompany',
       'organizationName',
       'numberOfUsers',
     ]),
-    ...mapGetters(['selectedPlanText']),
+    ...mapGetters([
+      'selectedPlanText',
+      'isGroupSelected',
+      'selectedGroupUsers',
+      'selectedGroupName',
+    ]),
     selectedPlanModel: {
       get() {
         return this.selectedPlan;
       },
       set(selectedPlan) {
         this.updateSelectedPlan(selectedPlan);
+      },
+    },
+    selectedGroupModel: {
+      get() {
+        return this.selectedGroup;
+      },
+      set(selectedGroup) {
+        this.updateSelectedGroup(selectedGroup);
       },
     },
     numberOfUsersModel: {
@@ -58,16 +75,42 @@ export default {
       if (this.isSetupForCompany) {
         return (
           !_.isEmpty(this.selectedPlan) &&
-          !_.isEmpty(this.organizationName) &&
-          this.numberOfUsers > 0
+          (!_.isEmpty(this.organizationName) || this.isGroupSelected) &&
+          this.numberOfUsers > 0 &&
+          this.numberOfUsers >= this.selectedGroupUsers
         );
       }
       return !_.isEmpty(this.selectedPlan) && this.numberOfUsers === 1;
+    },
+    isShowingGroupSelector() {
+      return !this.isNewUser && this.groupData.length;
+    },
+    isShowingNameOfCompanyInput() {
+      return this.isSetupForCompany && (!this.groupData.length || this.selectedGroup === NEW_GROUP);
+    },
+    groupOptionsWithDefault() {
+      return [
+        {
+          text: this.$options.i18n.groupSelectPrompt,
+          value: null,
+        },
+        ...this.groupData,
+        {
+          text: this.$options.i18n.groupSelectCreateNewOption,
+          value: NEW_GROUP,
+        },
+      ];
+    },
+    groupSelectDescription() {
+      return this.selectedGroup === NEW_GROUP
+        ? this.$options.i18n.createNewGroupDescription
+        : this.$options.i18n.selectedGroupDescription;
     },
   },
   methods: {
     ...mapActions([
       'updateSelectedPlan',
+      'updateSelectedGroup',
       'toggleIsSetupForCompany',
       'updateNumberOfUsers',
       'updateOrganizationName',
@@ -77,6 +120,11 @@ export default {
     stepTitle: s__('Checkout|Subscription details'),
     nextStepButtonText: s__('Checkout|Continue to billing'),
     selectedPlanLabel: s__('Checkout|GitLab plan'),
+    selectedGroupLabel: s__('Checkout|GitLab group'),
+    groupSelectPrompt: s__('Checkout|Select'),
+    groupSelectCreateNewOption: s__('Checkout|Create a new group'),
+    selectedGroupDescription: s__('Checkout|Your subscription will be applied to this group'),
+    createNewGroupDescription: s__("Checkout|You'll create your new group after checkout"),
     organizationNameLabel: s__('Checkout|Name of company or organization using GitLab'),
     numberOfUsersLabel: s__('Checkout|Number of users'),
     needMoreUsersLink: s__('Checkout|Need more users? Purchase GitLab for your %{company}.'),
@@ -95,46 +143,44 @@ export default {
     :next-step-button-text="$options.i18n.nextStepButtonText"
   >
     <template #body>
+      <gl-form-group :label="$options.i18n.selectedPlanLabel" label-size="sm" class="mb-3">
+        <gl-form-select v-model="selectedPlanModel" v-autofocusonshow :options="availablePlans" />
+      </gl-form-group>
       <gl-form-group
-        :label="$options.i18n.selectedPlanLabel"
+        v-if="isShowingGroupSelector"
+        :label="$options.i18n.selectedGroupLabel"
+        :description="groupSelectDescription"
         label-size="sm"
-        label-for="selectedPlan"
-        class="append-bottom-default"
+        class="mb-3"
       >
         <gl-form-select
-          id="selectedPlan"
-          v-model="selectedPlanModel"
-          v-autofocusonshow
-          :options="availablePlans"
+          ref="group-select"
+          v-model="selectedGroupModel"
+          :options="groupOptionsWithDefault"
         />
       </gl-form-group>
       <gl-form-group
-        v-if="isSetupForCompany"
+        v-if="isShowingNameOfCompanyInput"
         :label="$options.i18n.organizationNameLabel"
         label-size="sm"
-        label-for="organizationName"
-        class="append-bottom-default"
+        class="mb-3"
       >
-        <gl-form-input id="organizationName" v-model="organizationNameModel" type="text" />
+        <gl-form-input ref="organization-name" v-model="organizationNameModel" type="text" />
       </gl-form-group>
       <div class="combined d-flex">
-        <gl-form-group
-          :label="$options.i18n.numberOfUsersLabel"
-          label-size="sm"
-          label-for="numberOfUsers"
-          class="number"
-        >
+        <gl-form-group :label="$options.i18n.numberOfUsersLabel" label-size="sm" class="number">
           <gl-form-input
-            id="numberOfUsers"
+            ref="number-of-users"
             v-model.number="numberOfUsersModel"
             type="number"
-            min="0"
+            :min="selectedGroupUsers"
             :disabled="!isSetupForCompany"
           />
         </gl-form-group>
         <gl-form-group
           v-if="!isSetupForCompany"
-          class="label prepend-left-default align-self-end company-link"
+          ref="company-link"
+          class="label ml-3 align-self-end"
         >
           <gl-sprintf :message="$options.i18n.needMoreUsersLink">
             <template #company>
@@ -145,13 +191,13 @@ export default {
       </div>
     </template>
     <template #summary>
-      <strong class="js-summary-line-1">
+      <strong ref="summary-line-1">
         {{ selectedPlanTextLine }}
       </strong>
-      <div v-if="isSetupForCompany" class="js-summary-line-2">
-        {{ $options.i18n.group }}: {{ organizationName }}
+      <div v-if="isSetupForCompany" ref="summary-line-2">
+        {{ $options.i18n.group }}: {{ organizationName || selectedGroupName }}
       </div>
-      <div class="js-summary-line-3">{{ $options.i18n.users }}: {{ numberOfUsers }}</div>
+      <div ref="summary-line-3">{{ $options.i18n.users }}: {{ numberOfUsers }}</div>
     </template>
   </step>
 </template>

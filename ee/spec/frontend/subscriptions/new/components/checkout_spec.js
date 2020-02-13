@@ -28,9 +28,9 @@ describe('Checkout', () => {
     wrapper.destroy();
   });
 
-  describe.each([[true, true], [false, false]])('when newUser=%s', (newUser, visible) => {
+  describe.each([[true, true], [false, false]])('when isNewUser=%s', (isNewUser, visible) => {
     beforeEach(() => {
-      store.state.newUser = newUser;
+      store.state.isNewUser = isNewUser;
     });
 
     it(`progress bar visibility is ${visible}`, () => {

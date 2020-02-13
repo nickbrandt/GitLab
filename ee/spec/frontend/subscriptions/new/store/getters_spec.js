@@ -6,6 +6,7 @@ constants.STEPS = ['firstStep', 'secondStep'];
 const state = {
   currentStep: 'secondStep',
   isSetupForCompany: true,
+  isNewUser: true,
   availablePlans: [
     {
       value: 'firstPlan',
@@ -99,17 +100,30 @@ describe('Subscriptions Getters', () => {
 
   describe('name', () => {
     it('returns the organization name when setting up for a company and when it is present', () => {
-      expect(getters.name({ isSetupForCompany: true, organizationName: 'My organization' })).toBe(
-        'My organization',
-      );
+      expect(
+        getters.name({ isSetupForCompany: true, organizationName: 'My organization' }, getters),
+      ).toBe('My organization');
+    });
+
+    it('returns the selected group name a group is selected', () => {
+      expect(
+        getters.name(
+          { isSetupForCompany: true },
+          { isGroupSelected: true, selectedGroupName: 'Selected group' },
+        ),
+      ).toBe('Selected group');
     });
 
     it('returns the default text when setting up for a company and the organization name is not present', () => {
-      expect(getters.name({ isSetupForCompany: true })).toBe('Your organization');
+      expect(getters.name({ isSetupForCompany: true }, { isGroupSelected: false })).toBe(
+        'Your organization',
+      );
     });
 
     it('returns the full name when not setting up for a company', () => {
-      expect(getters.name({ isSetupForCompany: false, fullName: 'My name' })).toBe('My name');
+      expect(
+        getters.name({ isSetupForCompany: false, fullName: 'My name' }, { isGroupSelected: false }),
+      ).toBe('My name');
     });
   });
 
@@ -123,10 +137,78 @@ describe('Subscriptions Getters', () => {
     });
   });
 
+  describe('isGroupSelected', () => {
+    it('returns true when the selectedGroup is not null and does not equal "true"', () => {
+      expect(getters.isGroupSelected({ selectedGroup: 1 })).toBe(true);
+    });
+
+    it('returns false when the selectedGroup is null', () => {
+      expect(getters.isGroupSelected({ selectedGroup: null })).toBe(false);
+    });
+
+    it('returns false when the selectedGroup equals "new"', () => {
+      expect(getters.isGroupSelected({ selectedGroup: constants.NEW_GROUP })).toBe(false);
+    });
+  });
+
+  describe('selectedGroupUsers', () => {
+    it('returns 1 when no group is selected', () => {
+      expect(
+        getters.selectedGroupUsers(
+          { groupData: [{ numberOfUsers: 3, value: 123 }], selectedGroup: 123 },
+          { isGroupSelected: false },
+        ),
+      ).toBe(1);
+    });
+
+    it('returns the number of users of the selected group when a group is selected', () => {
+      expect(
+        getters.selectedGroupUsers(
+          { groupData: [{ numberOfUsers: 3, value: 123 }], selectedGroup: 123 },
+          { isGroupSelected: true },
+        ),
+      ).toBe(3);
+    });
+  });
+
+  describe('selectedGroupName', () => {
+    it('returns null when no group is selected', () => {
+      expect(
+        getters.selectedGroupName(
+          { groupData: [{ text: 'Selected group', value: 123 }], selectedGroup: 123 },
+          { isGroupSelected: false },
+        ),
+      ).toBe(null);
+    });
+
+    it('returns the text attribute of the selected group when a group is selected', () => {
+      expect(
+        getters.selectedGroupName(
+          { groupData: [{ text: 'Selected group', value: 123 }], selectedGroup: 123 },
+          { isGroupSelected: true },
+        ),
+      ).toBe('Selected group');
+    });
+  });
+
+  describe('selectedGroupId', () => {
+    it('returns null when no group is selected', () => {
+      expect(getters.selectedGroupId({ selectedGroup: 123 }, { isGroupSelected: false })).toBe(
+        null,
+      );
+    });
+
+    it('returns the id of the selected group when a group is selected', () => {
+      expect(getters.selectedGroupId({ selectedGroup: 123 }, { isGroupSelected: true })).toBe(123);
+    });
+  });
+
   describe('confirmOrderParams', () => {
     it('returns the params to confirm the order', () => {
-      expect(getters.confirmOrderParams(state)).toEqual({
+      expect(getters.confirmOrderParams(state, { selectedGroupId: 11 })).toEqual({
         setup_for_company: true,
+        selected_group: 11,
+        new_user: true,
         customer: {
           country: 'Country',
           address_1: 'Street address line 1',
