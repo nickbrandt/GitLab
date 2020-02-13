@@ -44,7 +44,7 @@ describe API::Jobs do
           it 'returns specific job artifacts' do
             subject
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response.headers.to_h).to include(download_headers)
             expect(response.body).to match_file(job.artifacts_file.file.file)
           end
@@ -57,7 +57,7 @@ describe API::Jobs do
             subject
 
             expect(project).to be_private
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -68,7 +68,7 @@ describe API::Jobs do
         it 'disallows access to the artifacts' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -98,7 +98,7 @@ describe API::Jobs do
             it 'returns specific job artifacts', :sidekiq_might_not_need_inline do
               subject
 
-              expect(response).to have_gitlab_http_status(200)
+              expect(response).to have_gitlab_http_status(:ok)
               expect(response.headers.to_h).to include(download_headers)
               expect(response.body).to match_file(job.artifacts_file.file.file)
             end
@@ -128,7 +128,7 @@ describe API::Jobs do
           it 'does not allow to see that artfiact is present' do
             subject
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
