@@ -16,6 +16,7 @@ describe Gitlab::Template::GitlabCiYmlTemplate do
 
     it 'finds the Verify templates' do
       expect(templates).to include('Browser-Performance')
+      expect(templates).to include('Accessibility')
     end
   end
 end
