@@ -31,7 +31,7 @@ module Audit
     def action_text
       action = @details.slice(*ACTIONS)
 
-      case action.keys.first
+      case action.each_key.first
       when :add
         "Added #{target_name}#{@details[:as] ? " as #{@details[:as]}" : ''}"
       when :remove
@@ -103,7 +103,7 @@ module Audit
     end
 
     def detail_value
-      @details.values.first
+      @details.each_value.first
     end
 
     def oauth_label

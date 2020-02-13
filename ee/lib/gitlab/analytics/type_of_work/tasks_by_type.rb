@@ -26,7 +26,7 @@ module Gitlab
         attr_reader :group, :params, :finder
 
         def finder_class
-          FINDER_CLASSES.fetch(params[:subject], FINDER_CLASSES.keys.first)
+          FINDER_CLASSES.fetch(params[:subject], FINDER_CLASSES.each_key.first)
         end
 
         def format_result(result)
