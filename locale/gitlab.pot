@@ -5071,6 +5071,9 @@ msgstr ""
 msgid "Container repositories sync capacity"
 msgstr ""
 
+msgid "ContainerRegistry|%{imageName} tags"
+msgstr ""
+
 msgid "ContainerRegistry|Automatically remove extra images that aren't designed to be kept."
 msgstr ""
 
@@ -5120,6 +5123,9 @@ msgid "ContainerRegistry|Keep and protect the images that matter most."
 msgstr ""
 
 msgid "ContainerRegistry|Last Updated"
+msgstr ""
+
+msgid "ContainerRegistry|Missing or insufficient permission, delete button disabled"
 msgstr ""
 
 msgid "ContainerRegistry|Number of tags to retain:"
@@ -5187,10 +5193,19 @@ msgstr ""
 msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images. %{docLinkStart}More Information%{docLinkEnd}"
 msgstr ""
 
+msgid "ContainerRegistry|You are about to remove %{item} tags. Are you sure?"
+msgstr ""
+
+msgid "ContainerRegistry|You are about to remove %{item}. Are you sure?"
+msgstr ""
+
 msgid "ContainerRegistry|You are about to remove <b>%{count}</b> tags. Are you sure?"
 msgstr ""
 
 msgid "ContainerRegistry|You are about to remove <b>%{title}</b>. Are you sure?"
+msgstr ""
+
+msgid "ContainerRegistry|You are about to remove repository %{title}. Once you confirm, this repository will be permanently deleted."
 msgstr ""
 
 msgid "ContainerRegistry|You are about to remove repository <b>%{title}</b>. Once you confirm, this repository will be permanently deleted."
