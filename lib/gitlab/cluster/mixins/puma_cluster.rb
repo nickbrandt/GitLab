@@ -6,7 +6,6 @@ module Gitlab
       module PumaCluster
         def self.prepended(base)
           raise 'missing method Puma::Cluster#stop_workers' unless base.method_defined?(:stop_workers)
-          raise 'ActiveRecord connection not established. Unable to start.' unless ActiveRecord::Base.connected?
         end
 
         # This looks at internal status of `Puma::Cluster`

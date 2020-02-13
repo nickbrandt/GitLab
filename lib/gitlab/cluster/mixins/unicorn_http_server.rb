@@ -8,8 +8,6 @@ module Gitlab
           unless base.method_defined?(:reexec) && base.method_defined?(:stop)
             raise 'missing method Unicorn::HttpServer#reexec or Unicorn::HttpServer#stop'
           end
-
-          raise 'ActiveRecord connection not established. Unable to start.' unless ::ActiveRecord::Base.connected?
         end
 
         def reexec
