@@ -654,4 +654,23 @@ describe('Api', () => {
       });
     });
   });
+
+  describe('changeVulnerabilityState', () => {
+    it.each`
+      id    | action
+      ${5}  | ${'dismiss'}
+      ${7}  | ${'confirm'}
+      ${38} | ${'resolve'}
+    `('POSTS to correct endpoint ($id, $action)', ({ id, action }) => {
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/vulnerabilities/${id}/${action}`;
+      const expectedResponse = { id, action, test: 'test' };
+
+      mock.onPost(expectedUrl).replyOnce(200, expectedResponse);
+
+      return Api.changeVulnerabilityState(id, action).then(({ data }) => {
+        expect(mock.history.post).toContainEqual(expect.objectContaining({ url: expectedUrl }));
+        expect(data).toEqual(expectedResponse);
+      });
+    });
+  });
 });

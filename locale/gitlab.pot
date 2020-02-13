@@ -6830,7 +6830,7 @@ msgstr ""
 msgid "Detect host keys"
 msgstr ""
 
-msgid "Detected %{timeago} in pipeline %{pipeline_link}"
+msgid "Detected %{timeago} in pipeline %{pipelineLink}"
 msgstr ""
 
 msgid "DevOps Score"

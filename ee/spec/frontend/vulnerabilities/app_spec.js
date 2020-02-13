@@ -1,42 +1,48 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlBadge } from '@gitlab/ui';
+import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import { redirectTo } from '~/lib/utils/url_utility';
+import * as urlUtility from '~/lib/utils/url_utility';
 
 import createFlash from '~/flash';
-import MockAdapter from 'axios-mock-adapter';
 import App from 'ee/vulnerabilities/components/app.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
+import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
 
+const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATES);
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');
-jest.mock('~/lib/utils/url_utility');
 
 describe('Vulnerability management app', () => {
   let wrapper;
 
   const vulnerability = {
     id: 1,
-    state: 'doesnt matter',
+    created_at: new Date().toISOString(),
     report_type: 'sast',
   };
-  const finding = {
-    project_fingerprint: 'abc123',
-    report_type: 'sast',
+
+  const dataset = {
+    createIssueUrl: 'create_issue_url',
+    projectFingerprint: 'abc123',
+    pipeline: {
+      id: 2,
+      created_at: new Date().toISOString(),
+      url: 'pipeline_url',
+    },
   };
-  const createIssueUrl = 'create_issue_path';
 
   const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
 
-  beforeEach(() => {
+  const createWrapper = (state = 'detected') => {
     wrapper = shallowMount(App, {
       propsData: {
-        vulnerability,
-        finding,
-        createIssueUrl,
+        vulnerability: Object.assign({ state }, vulnerability),
+        ...dataset,
       },
     });
-  });
+  };
 
   afterEach(() => {
     wrapper.destroy();
@@ -45,6 +51,8 @@ describe('Vulnerability management app', () => {
   });
 
   describe('state dropdown', () => {
+    beforeEach(createWrapper);
+
     it('the vulnerability state dropdown is rendered', () => {
       expect(wrapper.find(VulnerabilityStateDropdown).exists()).toBe(true);
     });
@@ -74,34 +82,37 @@ describe('Vulnerability management app', () => {
   });
 
   describe('create issue button', () => {
+    beforeEach(createWrapper);
+
     it('renders properly', () => {
       expect(findCreateIssueButton().exists()).toBe(true);
     });
 
     it('calls create issue endpoint on click and redirects to new issue', () => {
       const issueUrl = '/group/project/issues/123';
-      mockAxios.onPost(createIssueUrl).reply(200, {
+      const spy = jest.spyOn(urlUtility, 'redirectTo');
+      mockAxios.onPost(dataset.createIssueUrl).reply(200, {
         issue_url: issueUrl,
       });
       findCreateIssueButton().vm.$emit('click');
       return waitForPromises().then(() => {
         expect(mockAxios.history.post).toHaveLength(1);
         const [postRequest] = mockAxios.history.post;
-        expect(postRequest.url).toBe(createIssueUrl);
+        expect(postRequest.url).toBe(dataset.createIssueUrl);
         expect(JSON.parse(postRequest.data)).toMatchObject({
           vulnerability_feedback: {
             feedback_type: 'issue',
             category: vulnerability.report_type,
-            project_fingerprint: finding.project_fingerprint,
+            project_fingerprint: dataset.projectFingerprint,
             vulnerability_data: { ...vulnerability, category: vulnerability.report_type },
           },
         });
-        expect(redirectTo).toHaveBeenCalledWith(issueUrl);
+        expect(spy).toHaveBeenCalledWith(issueUrl);
       });
     });
 
     it('shows an error message when issue creation fails', () => {
-      mockAxios.onPost(createIssueUrl).reply(500);
+      mockAxios.onPost(dataset.createIssueUrl).reply(500);
       findCreateIssueButton().vm.$emit('click');
       return waitForPromises().then(() => {
         expect(mockAxios.history.post).toHaveLength(1);
@@ -110,5 +121,18 @@ describe('Vulnerability management app', () => {
         );
       });
     });
+  });
+
+  describe('state badge', () => {
+    test.each(vulnerabilityStateEntries)(
+      'the vulnerability state badge has the correct variant for the %s state',
+      (stateString, stateObject) => {
+        createWrapper(stateString);
+        const badge = wrapper.find(GlBadge);
+
+        expect(badge.attributes('variant')).toBe(stateObject.variant);
+        expect(badge.text()).toBe(stateString);
+      },
+    );
   });
 });

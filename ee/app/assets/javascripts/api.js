@@ -30,6 +30,7 @@ export default {
   paymentFormPath: '/-/subscriptions/payment_form',
   paymentMethodPath: '/-/subscriptions/payment_method',
   confirmOrderPath: '/-/subscriptions',
+  vulnerabilitiesActionPath: '/api/:version/vulnerabilities/:id/:action',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -242,5 +243,13 @@ export default {
   confirmOrder(params = {}) {
     const url = Api.buildUrl(this.confirmOrderPath);
     return axios.post(url, params);
+  },
+
+  changeVulnerabilityState(id, state) {
+    const url = Api.buildUrl(this.vulnerabilitiesActionPath)
+      .replace(':id', id)
+      .replace(':action', state);
+
+    return axios.post(url);
   },
 };
