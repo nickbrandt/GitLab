@@ -36,7 +36,7 @@ describe API::Deployments do
           }
         )
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'creates the deployment when the user is a maintainer' do
@@ -53,7 +53,7 @@ describe API::Deployments do
           }
         )
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
     end
 
@@ -81,7 +81,7 @@ describe API::Deployments do
           }
         )
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'creates the deployment when the user is a developer' do
@@ -98,7 +98,7 @@ describe API::Deployments do
           }
         )
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
     end
   end
@@ -132,7 +132,7 @@ describe API::Deployments do
           params: { status: 'success' }
         )
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'updates the deployment when the user is a maintainer' do
@@ -143,7 +143,7 @@ describe API::Deployments do
           params: { status: 'success' }
         )
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -165,7 +165,7 @@ describe API::Deployments do
           params: { status: 'success' }
         )
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       it 'updates the deployment when the user is a developer' do
@@ -176,7 +176,7 @@ describe API::Deployments do
           params: { status: 'success' }
         )
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end

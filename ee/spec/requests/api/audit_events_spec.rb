@@ -35,7 +35,7 @@ describe API::AuditEvents do
         it 'returns 200 response' do
           get api(url, admin)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'includes the correct pagination headers' do
@@ -147,7 +147,7 @@ describe API::AuditEvents do
           it 'returns 200 response' do
             get api(url, admin)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           context 'attributes' do

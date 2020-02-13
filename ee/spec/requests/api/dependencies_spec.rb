@@ -25,7 +25,7 @@ describe API::Dependencies do
       end
 
       it 'returns all dependencies' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/dependencies', dir: 'ee')
 
         expect(json_response.length).to eq(21)
@@ -75,7 +75,7 @@ describe API::Dependencies do
       end
 
       it 'responds with 403 Forbidden' do
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -87,7 +87,7 @@ describe API::Dependencies do
       end
 
       it 'responds with 404 Not Found' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
