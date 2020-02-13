@@ -339,12 +339,10 @@ class Note < ApplicationRecord
     super
   end
 
-  def cross_reference_not_visible_for?(user)
-    cross_reference? && !all_referenced_mentionables_allowed?(user)
-  end
-
-  def visible_for?(user)
-    !cross_reference_not_visible_for?(user) && system_note_viewable_by?(user)
+  # This method is to be used for checking read permissions on a note instead of `visible_for?`
+  def readable_by?(user)
+    # note_policy accounts for #visible_for?(user) check when granting read access
+    Ability.allowed?(user, :read_note, self)
   end
 
   def award_emoji?
@@ -502,6 +500,16 @@ class Note < ApplicationRecord
     return Note.none unless noteable.present?
 
     noteable.user_mentions.where(note: self)
+  end
+
+  def cross_reference_not_visible_for?(user)
+    cross_reference? && !all_referenced_mentionables_allowed?(user)
+  end
+
+  # Using this method for checking `read` access on a note may result in incorrect permission granting
+  # check `spec/models/note_spec.rb` and `ee/spec/models/note_spec.rb` for corresponding specs
+  def visible_for?(user)
+    !cross_reference_not_visible_for?(user) && system_note_viewable_by?(user)
   end
 
   private

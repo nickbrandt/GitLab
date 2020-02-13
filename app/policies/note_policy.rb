@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class NotePolicy < BasePolicy
-  delegate { @subject.project }
+  delegate { @subject.resource_parent }
   delegate { @subject.noteable if DeclarativePolicy.has_policy?(@subject.noteable) }
 
   condition(:is_author) { @user && @subject.author == @user }

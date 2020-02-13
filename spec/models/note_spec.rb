@@ -288,8 +288,14 @@ describe Note do
   describe "#visible_for?" do
     using RSpec::Parameterized::TableSyntax
 
-    let_it_be(:note) { create(:note) }
-    let_it_be(:user) { create(:user) }
+    let(:project) { create(:project, :public) }
+    let(:user) { create(:user) }
+    let(:guest) { create(:project_member, :guest, project: project, user: create(:user)).user }
+    let(:reporter) { create(:project_member, :reporter, project: project, user: create(:user)).user }
+    let(:maintainer) { create(:project_member, :maintainer, project: project, user: create(:user)).user }
+    let(:non_member) { create(:user) }
+
+    let(:note) { create(:note, project: project) }
 
     where(:cross_reference_visible, :system_note_viewable, :result) do
       true  | true  | false
@@ -299,14 +305,39 @@ describe Note do
 
     with_them do
       it "returns expected result" do
-        expect(note).to receive(:cross_reference_not_visible_for?).and_return(cross_reference_visible)
+        expect(note).to receive(:cross_reference_not_visible_for?).twice.and_return(cross_reference_visible)
 
         unless cross_reference_visible
-          expect(note).to receive(:system_note_viewable_by?)
-            .with(user).and_return(system_note_viewable)
+          expect(note).to receive(:system_note_viewable_by?).twice
+                            .with(user).and_return(system_note_viewable)
         end
 
         expect(note.visible_for?(user)).to eq result
+        expect(note.readable_by?(user)).to eq result
+      end
+    end
+
+    context 'when project is public' do
+      it_behaves_like 'users with note access' do
+        let(:users) { [reporter, maintainer, guest, non_member, nil] }
+      end
+    end
+
+    context 'when group is private' do
+      let(:project) { create(:project, :private) }
+
+      it_behaves_like 'users with note access' do
+        let(:users) { [reporter, maintainer, guest] }
+      end
+
+      it 'returns visible but not readable for non-member user' do
+        expect(note.visible_for?(non_member)).to be_truthy
+        expect(note.readable_by?(non_member)).to be_falsy
+      end
+
+      it 'returns visible but not readable for a nil user' do
+        expect(note.visible_for?(nil)).to be_truthy
+        expect(note.readable_by?(nil)).to be_falsy
       end
     end
   end

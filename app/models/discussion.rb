@@ -20,6 +20,7 @@ class Discussion
             :to_ability_name,
             :editable?,
             :visible_for?,
+            :resource_parent,
 
             to: :first_note
 

@@ -87,7 +87,7 @@ module API
           # They're not presented on Jira Dev Panel ATM. A comments count with a
           # redirect link is presented.
           notes = paginate(noteable.notes.user.reorder(nil))
-          notes.select { |n| n.visible_for?(current_user) }
+          notes.select { |n| n.readable_by?(current_user) }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
