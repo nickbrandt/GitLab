@@ -114,35 +114,38 @@ module Backup
     def unpack
       cleanup_required = true
       Dir.chdir(backup_path) do
-        # check for existing backups in the backup dir
-        if File.exist?(File.join(backup_path, 'backup_information.yml')) && !ENV['BACKUP'].present?
-          progress.puts "Non tarred backup found in #{backup_path}, using that"
-          cleanup_required = false
-        else
-          if backup_file_list.empty?
-            progress.puts "No backups found in #{backup_path}"
-            progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
-            exit 1
-          elsif backup_file_list.many? && ENV["BACKUP"].nil?
-            progress.puts 'Found more than one backup:'
-            # print list of available backups
-            progress.puts " " + available_timestamps.join("\n ")
-            progress.puts 'Please specify which one you want to restore:'
-            progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
-            exit 1
-          end
-
-          tar_file = if ENV['BACKUP'].present?
-                       File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
-                     else
-                       backup_file_list.first
-                     end
+        if ENV['BACKUP'].present?
+          # User has indicated which backup he/she wants restored
+          tar_file = File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
 
           unless File.exist?(tar_file)
             progress.puts "The backup file #{tar_file} does not exist!"
             exit 1
           end
 
+        else
+          # check for existing backups in the backup dir
+          if File.exist?(File.join(backup_path, 'backup_information.yml'))
+            tar_file = 'SKIP'
+            progress.puts "Non tarred backup found in #{backup_path}, using that"
+            cleanup_required = false
+          elsif backup_file_list.empty?
+            progress.puts "No backups found in #{backup_path}"
+            progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
+            exit 1
+          elsif backup_file_list.many?
+            progress.puts 'Found more than one backup:'
+            # print list of available backups
+            progress.puts " " + available_timestamps.join("\n ")
+            progress.puts 'Please specify which one you want to restore:'
+            progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
+            exit 1
+          else
+            tar_file = backup_file_list.first
+          end
+        end
+
+        unless tar_file == 'SKIP'
           progress.print 'Unpacking backup ... '
 
           if Kernel.system(*%W(tar -xf #{tar_file}))
