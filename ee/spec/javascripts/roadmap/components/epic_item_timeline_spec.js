@@ -74,6 +74,15 @@ describe('EpicItemTimelineComponent', () => {
       expect(vm.$el.classList.contains('epic-timeline-cell')).toBe(true);
     });
 
+    it('renders current day indicator element', () => {
+      const currentDate = new Date();
+      vm = createComponent({
+        timeframeItem: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+      });
+
+      expect(vm.$el.querySelector('span.current-day-indicator')).not.toBeNull();
+    });
+
     it('renders timeline bar element with class `timeline-bar` and class `timeline-bar-wrapper` as container element', () => {
       vm = createComponent({
         epic: Object.assign({}, mockEpic, { startDate: mockTimeframeMonths[1] }),

@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import WeeksHeaderSubItemComponent from 'ee/roadmap/components/preset_weeks/weeks_header_sub_item.vue';
 import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
+import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
@@ -27,6 +28,15 @@ describe('MonthsHeaderSubItemComponent', () => {
     vm.$destroy();
   });
 
+  describe('data', () => {
+    it('initializes `presetType` and `indicatorStyles` data props', () => {
+      vm = createComponent({});
+
+      expect(vm.presetType).toBe(PRESET_TYPES.WEEKS);
+      expect(vm.indicatorStyle).toBeDefined();
+    });
+  });
+
   describe('computed', () => {
     describe('headerSubItems', () => {
       it('returns `headerSubItems` array of dates containing days of week from timeframeItem', () => {
@@ -37,23 +47,6 @@ describe('MonthsHeaderSubItemComponent', () => {
         vm.headerSubItems.forEach(subItem => {
           expect(subItem instanceof Date).toBe(true);
         });
-      });
-    });
-
-    describe('hasToday', () => {
-      it('returns true when current week is same as timeframe week', () => {
-        vm = createComponent({});
-
-        expect(vm.hasToday).toBe(true);
-      });
-
-      it('returns false when current week is different from timeframe week', () => {
-        vm = createComponent({
-          currentDate: new Date(2017, 10, 1), // Nov 1, 2017
-          timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
-        });
-
-        expect(vm.hasToday).toBe(false);
       });
     });
   });
@@ -92,6 +85,10 @@ describe('MonthsHeaderSubItemComponent', () => {
 
     it('renders sub item element with class `sublabel-value`', () => {
       expect(vm.$el.querySelector('.sublabel-value')).not.toBeNull();
+    });
+
+    it('renders element with class `current-day-indicator-header` when hasToday is true', () => {
+      expect(vm.$el.querySelector('.current-day-indicator-header.preset-weeks')).not.toBeNull();
     });
   });
 });
