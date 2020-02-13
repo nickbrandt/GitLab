@@ -263,6 +263,188 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
   end
 
   context 'finds all the things' do
+    describe '#find_registry_differences' do
+      context 'untracked IDs' do
+        before do
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
+          create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id)
+          create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
+
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_3)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_4)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
+        end
+
+        it 'includes LFS object IDs without an entry on the tracking database' do
+          untracked_ids, _ = subject.find_registry_differences(LfsObject.first.id..LfsObject.last.id)
+
+          expect(untracked_ids).to match_array(
+            [lfs_object_2.id, lfs_object_5.id, lfs_object_remote_1.id,
+             lfs_object_remote_2.id, lfs_object_remote_3.id])
+        end
+
+        it 'excludes LFS objects outside the ID range' do
+          untracked_ids, _ = subject.find_registry_differences(lfs_object_3.id..lfs_object_remote_2.id)
+
+          expect(untracked_ids).to match_array(
+            [lfs_object_5.id, lfs_object_remote_1.id,
+             lfs_object_remote_2.id])
+        end
+
+        context 'with selective sync by namespace' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+
+          it 'excludes LFS object IDs that are not in selectively synced projects' do
+            untracked_ids, _ = subject.find_registry_differences(LfsObject.first.id..LfsObject.last.id)
+
+            expect(untracked_ids).to match_array([lfs_object_2.id])
+          end
+        end
+
+        context 'with selective sync by shard' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
+
+          it 'excludes LFS object IDs that are not in selectively synced projects' do
+            untracked_ids, _ = subject.find_registry_differences(LfsObject.first.id..LfsObject.last.id)
+
+            expect(untracked_ids).to match_array([lfs_object_5.id])
+          end
+        end
+
+        context 'with object storage sync disabled' do
+          let(:secondary) { create(:geo_node, :local_storage_only) }
+
+          it 'excludes LFS objects in object storage' do
+            untracked_ids, _ = subject.find_registry_differences(LfsObject.first.id..LfsObject.last.id)
+
+            expect(untracked_ids).to match_array([lfs_object_2.id, lfs_object_5.id])
+          end
+        end
+      end
+
+      context 'unused tracked IDs' do
+        context 'with an orphaned registry' do
+          let!(:orphaned) { create(:geo_lfs_object_registry, lfs_object_id: 1234567) }
+
+          it 'includes tracked IDs that do not exist in the model table' do
+            range = 1234567..1234567
+
+            _, unused_tracked_ids = subject.find_registry_differences(range)
+
+            expect(unused_tracked_ids).to match_array([1234567])
+          end
+
+          it 'excludes IDs outside the ID range' do
+            range = 1..1000
+
+            _, unused_tracked_ids = subject.find_registry_differences(range)
+
+            expect(unused_tracked_ids).to be_empty
+          end
+        end
+
+        context 'with selective sync by namespace' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
+
+          context 'with a tracked LFS object' do
+            let!(:registry_entry) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id) }
+            let(:range) { lfs_object_1.id..lfs_object_1.id }
+
+            context 'excluded from selective sync' do
+              it 'includes tracked LFS object IDs that exist but are not in a selectively synced project' do
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to match_array([lfs_object_1.id])
+              end
+            end
+
+            context 'included in selective sync' do
+              let!(:join_record) { create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1) }
+
+              it 'excludes tracked LFS object IDs that are in selectively synced projects' do
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to be_empty
+              end
+            end
+          end
+        end
+
+        context 'with selective sync by shard' do
+          let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
+
+          context 'with a tracked LFS object' do
+            let!(:registry_entry) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id) }
+            let(:range) { lfs_object_1.id..lfs_object_1.id }
+
+            context 'excluded from selective sync' do
+              it 'includes tracked LFS object IDs that exist but are not in a selectively synced project' do
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to match_array([lfs_object_1.id])
+              end
+            end
+
+            context 'included in selective sync' do
+              let!(:join_record) { create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_1) }
+
+              it 'excludes tracked LFS object IDs that are in selectively synced projects' do
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to be_empty
+              end
+            end
+          end
+        end
+
+        context 'with object storage sync disabled' do
+          let(:secondary) { create(:geo_node, :local_storage_only) }
+
+          context 'with a tracked LFS object' do
+            context 'in object storage' do
+              it 'includes tracked LFS object IDs that are in object storage' do
+                create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
+                range = lfs_object_remote_1.id..lfs_object_remote_1.id
+
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to match_array([lfs_object_remote_1.id])
+              end
+            end
+
+            context 'not in object storage' do
+              it 'excludes tracked LFS object IDs that are not in object storage' do
+                create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
+                range = lfs_object_1.id..lfs_object_1.id
+
+                _, unused_tracked_ids = subject.find_registry_differences(range)
+
+                expect(unused_tracked_ids).to be_empty
+              end
+            end
+          end
+        end
+      end
+    end
+
+    describe '#find_never_synced_registries' do
+      let!(:registry_lfs_object_1) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_1.id) }
+      let!(:registry_lfs_object_2) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_2.id) }
+      let!(:registry_lfs_object_3) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id) }
+      let!(:registry_lfs_object_4) { create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id) }
+      let!(:registry_lfs_object_remote_1) { create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_1.id) }
+
+      it 'returns registries for LFS objects that have never been synced' do
+        registries = subject.find_never_synced_registries(batch_size: 10)
+
+        expect(registries).to match_ids(registry_lfs_object_1, registry_lfs_object_2, registry_lfs_object_remote_1)
+      end
+    end
+
     describe '#find_unsynced' do
       before do
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_1.id)
