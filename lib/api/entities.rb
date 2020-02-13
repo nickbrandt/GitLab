@@ -163,49 +163,6 @@ module API
       end
     end
 
-    class List < Grape::Entity
-      expose :id
-      expose :label, using: Entities::LabelBasic
-      expose :position
-    end
-
-    class Board < Grape::Entity
-      expose :id
-      expose :project, using: Entities::BasicProjectDetails
-
-      expose :lists, using: Entities::List do |board|
-        board.destroyable_lists
-      end
-    end
-
-    class Compare < Grape::Entity
-      expose :commit, using: Entities::Commit do |compare, _|
-        compare.commits.last
-      end
-
-      expose :commits, using: Entities::Commit do |compare, _|
-        compare.commits
-      end
-
-      expose :diffs, using: Entities::Diff do |compare, _|
-        compare.diffs.diffs.to_a
-      end
-
-      expose :compare_timeout do |compare, _|
-        compare.diffs.diffs.overflow?
-      end
-
-      expose :same, as: :compare_same_ref
-    end
-
-    class Contributor < Grape::Entity
-      expose :name, :email, :commits, :additions, :deletions
-    end
-
-    class BroadcastMessage < Grape::Entity
-      expose :message, :starts_at, :ends_at, :color, :font, :target_path, :broadcast_type
-    end
-
     class Trigger < Grape::Entity
       include ::API::Helpers::Presentable
 
