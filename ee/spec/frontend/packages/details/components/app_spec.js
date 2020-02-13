@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import { GlModal } from '@gitlab/ui';
+import { GlEmptyState, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageTitle from 'ee/packages/details/components/package_title.vue';
@@ -19,6 +19,7 @@ import {
   npmFiles,
   nugetPackage,
 } from '../../mock_data';
+import stubChildren from 'helpers/stub_children';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -27,25 +28,7 @@ describe('PackagesApp', () => {
   let wrapper;
   let store;
 
-  const defaultProps = {
-    canDelete: true,
-    destroyPath: 'destroy-package-path',
-    emptySvgPath: 'empty-illustration',
-    npmPath: 'foo',
-    npmHelpPath: 'foo',
-    mavenPath: 'foo',
-    mavenHelpPath: 'foo',
-    conanPath: 'foo',
-    conanHelpPath: 'foo',
-    nugetPath: 'foo',
-    nugetHelpPath: 'foo',
-  };
-
   function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
-    const propsData = {
-      ...defaultProps,
-    };
-
     store = new Vuex.Store({
       state: {
         isLoading: false,
@@ -53,22 +36,29 @@ describe('PackagesApp', () => {
         packageFiles,
         pipelineInfo: {},
         pipelineError: null,
-      },
-      getters: {
-        packageHasPipeline: () => packageEntity.build_info && packageEntity.build_info.pipeline_id,
-        packageTypeDisplay: () => {},
+        canDelete: true,
+        destroyPath: 'destroy-package-path',
+        emptySvgPath: 'empty-illustration',
+        npmPath: 'foo',
+        npmHelpPath: 'foo',
       },
     });
 
     wrapper = mount(PackagesApp, {
       localVue,
-      propsData,
       store,
+      stubs: {
+        ...stubChildren(PackagesApp),
+        GlButton: false,
+        GlLink: false,
+        GlModal: false,
+        GlTable: false,
+      },
     });
   }
 
   const packageTitle = () => wrapper.find(PackageTitle);
-  const emptyState = () => wrapper.find('.js-package-empty-state');
+  const emptyState = () => wrapper.find(GlEmptyState);
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
   const npmInstallation = () => wrapper.find(NpmInstallation);

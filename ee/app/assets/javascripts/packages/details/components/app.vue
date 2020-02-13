@@ -47,56 +47,16 @@ export default {
   },
   mixins: [timeagoMixin, Tracking.mixin()],
   trackingActions: { ...TrackingActions },
-  props: {
-    canDelete: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
-    destroyPath: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    emptySvgPath: {
-      type: String,
-      required: true,
-    },
-    npmPath: {
-      type: String,
-      required: true,
-    },
-    npmHelpPath: {
-      type: String,
-      required: true,
-    },
-    mavenPath: {
-      type: String,
-      required: true,
-    },
-    mavenHelpPath: {
-      type: String,
-      required: true,
-    },
-    conanPath: {
-      type: String,
-      required: true,
-    },
-    conanHelpPath: {
-      type: String,
-      required: true,
-    },
-    nugetPath: {
-      type: String,
-      required: true,
-    },
-    nugetHelpPath: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
-    ...mapState(['packageEntity', 'packageFiles']),
+    ...mapState([
+      'packageEntity',
+      'packageFiles',
+      'canDelete',
+      'destroyPath',
+      'svgPath',
+      'npmPath',
+      'npmHelpPath',
+    ]),
     isNpmPackage() {
       return this.packageEntity.package_type === PackageType.NPM;
     },
@@ -210,8 +170,7 @@ export default {
     v-if="!isValidPackage"
     :title="s__('PackageRegistry|Unable to load package')"
     :description="s__('PackageRegistry|There was a problem fetching the details for this package.')"
-    :svg-path="emptySvgPath"
-    class="js-package-empty-state"
+    :svg-path="svgPath"
   />
 
   <div v-else class="packages-app">
@@ -249,26 +208,9 @@ export default {
           :help-url="npmHelpPath"
         />
 
-        <maven-installation
-          v-else-if="isMavenPackage"
-          :maven-metadata="packageEntity.maven_metadatum"
-          :registry-url="mavenPath"
-          :help-url="mavenHelpPath"
-        />
-
-        <conan-installation
-          v-else-if="isConanPackage"
-          :package-entity="packageEntity"
-          :registry-url="conanPath"
-          :help-url="conanHelpPath"
-        />
-
-        <nuget-installation
-          v-else-if="isNugetPackage"
-          :package-entity="packageEntity"
-          :registry-url="nugetPath"
-          :help-url="nugetHelpPath"
-        />
+        <maven-installation v-else-if="isMavenPackage" />
+        <conan-installation v-else-if="isConanPackage" />
+        <nuget-installation v-else-if="isNugetPackage" />
       </div>
     </div>
 

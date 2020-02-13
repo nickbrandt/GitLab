@@ -1,15 +1,18 @@
 <script>
-import { GlTab, GlTabs } from '@gitlab/ui';
-import { s__, sprintf } from '~/locale';
+import { GlLink, GlSprintf, GlTab, GlTabs } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
 import Tracking from '~/tracking';
 import { TrackingActions, TrackingLabels } from '../constants';
-import { generateConanRecipe, trackInstallationTabChange } from '../utils';
+import { trackInstallationTabChange } from '../utils';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'ConanInstallation',
   components: {
     CodeInstruction,
+    GlLink,
+    GlSprintf,
     GlTab,
     GlTabs,
   },
@@ -19,48 +22,14 @@ export default {
     }),
     trackInstallationTabChange,
   ],
-  props: {
-    heading: {
-      type: String,
-      default: s__('PackageRegistry|Package installation'),
-      required: false,
-    },
-    packageEntity: {
-      type: Object,
-      required: true,
-    },
-    registryUrl: {
-      type: String,
-      required: true,
-    },
-    helpUrl: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
-    conanCommand() {
-      const recipe = generateConanRecipe(this.packageEntity);
-
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-      return `conan install ${recipe} --remote=gitlab`;
-    },
-    setupCommand() {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-      return `conan remote add gitlab ${this.registryUrl}`;
-    },
-    helpText() {
-      return sprintf(
-        s__(
-          `PackageRegistry|For more information on the Conan registry, %{linkStart}see the documentation%{linkEnd}.`,
-        ),
-        {
-          linkStart: `<a href="${this.helpUrl}" target="_blank" rel="noopener noreferer">`,
-          linkEnd: '</a>',
-        },
-        false,
-      );
-    },
+    ...mapState(['conanHelpPath']),
+    ...mapGetters(['conanInstallationCommand', 'conanSetupCommand']),
+  },
+  i18n: {
+    helpText: s__(
+      'PackageRegistry|For more information on the Conan registry, %{linkStart}see the documentation%{linkEnd}.',
+    ),
   },
   trackingActions: { ...TrackingActions },
 };
@@ -73,7 +42,7 @@ export default {
         <div class="prepend-left-default append-right-default">
           <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Conan Command') }}</p>
           <code-instruction
-            :instruction="conanCommand"
+            :instruction="conanInstallationCommand"
             :copy-text="s__('PackageRegistry|Copy Conan Command')"
             class="js-conan-command"
             :tracking-action="$options.trackingActions.COPY_CONAN_COMMAND"
@@ -86,12 +55,16 @@ export default {
             {{ s__('PackageRegistry|Add Conan Remote') }}
           </p>
           <code-instruction
-            :instruction="setupCommand"
+            :instruction="conanSetupCommand"
             :copy-text="s__('PackageRegistry|Copy Conan Setup Command')"
             class="js-conan-setup"
             :tracking-action="$options.trackingActions.COPY_CONAN_SETUP_COMMAND"
           />
-          <p v-html="helpText"></p>
+          <gl-sprintf :message="$options.i18n.helpText">
+            <template #link="{ content }">
+              <gl-link :href="conanHelpPath" target="_blank">{{ content }}</gl-link>
+            </template>
+          </gl-sprintf>
         </div>
       </gl-tab>
     </gl-tabs>
