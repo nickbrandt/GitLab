@@ -2335,6 +2335,10 @@ class Project < ApplicationRecord
     false
   end
 
+  def self_monitoring?
+    Gitlab::CurrentSettings.self_monitoring_project_id == id
+  end
+
   private
 
   def closest_namespace_setting(name)
