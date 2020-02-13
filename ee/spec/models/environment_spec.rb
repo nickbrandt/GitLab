@@ -57,31 +57,6 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
-  describe '#pod_names' do
-    context 'when environment does not have a rollout status' do
-      it 'returns an empty array' do
-        expect(environment.pod_names).to eq([])
-      end
-    end
-
-    context 'when environment has a rollout status' do
-      let(:pod_name) { 'pod_1' }
-      let(:rollout_status) { instance_double(::Gitlab::Kubernetes::RolloutStatus, instances: [{ pod_name: pod_name }]) }
-
-      before do
-        create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
-        create(:deployment, :success, environment: environment)
-      end
-
-      it 'returns the pod_names' do
-        allow(environment).to receive(:rollout_status_with_reactive_cache)
-          .and_return(rollout_status)
-
-        expect(environment.pod_names).to eq([pod_name])
-      end
-    end
-  end
-
   describe '#protected?' do
     subject { environment.protected? }
 

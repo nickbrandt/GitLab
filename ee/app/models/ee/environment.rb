@@ -61,20 +61,6 @@ module EE
       end
     end
 
-    def pod_names
-      return [] unless rollout_status_available?
-
-      rollout_status = rollout_status_with_reactive_cache
-
-      # If cache has not been populated yet, rollout_status will be nil and the
-      # caller should try again later.
-      return unless rollout_status
-
-      rollout_status.instances.map do |instance|
-        instance[:pod_name]
-      end
-    end
-
     def protected?
       project.protected_environment_by_name(name).present?
     end
