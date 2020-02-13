@@ -14,12 +14,33 @@ describe 'Trial Select Namespace', :js do
   end
 
   context 'when user' do
+    let(:setup_for_company) { nil }
+
+    before do
+      user.update! setup_for_company: setup_for_company
+
+      visit select_trials_path
+      wait_for_all_requests
+
+      choose :trial_entity_company if setup_for_company.nil?
+    end
+
+    context 'when setup_for_company is not chosen' do
+      it 'shows company/individual duplicate question' do
+        expect(page).to have_content('Is this GitLab trial for your company?')
+      end
+    end
+
+    context 'when setup_for_company is already chosen' do
+      let(:setup_for_company) { true }
+
+      it 'hides company/individual duplicate question' do
+        expect(page).not_to have_content('Is this GitLab trial for your company?')
+      end
+    end
+
     context 'selects create a new group' do
       before do
-        visit select_trials_path
-        wait_for_all_requests
-
-        choose :trial_entity_company
         select2 '0', from: '#namespace_id'
       end
 
@@ -98,10 +119,6 @@ describe 'Trial Select Namespace', :js do
 
     context 'selects an existing group' do
       before do
-        visit select_trials_path
-        wait_for_all_requests
-
-        choose :trial_entity_company
         select2 user.namespace.id, from: '#namespace_id'
       end
 

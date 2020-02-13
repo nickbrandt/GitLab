@@ -16,15 +16,16 @@
   #group_name.form-group.hidden
     = label_tag :new_group_name, _('New Group Name'), for: :new_group_name, class: 'col-form-label'
     = text_field_tag :new_group_name, nil, class: 'form-control'
-  .form-group
-    = label_tag :trial_entity, _('Is this GitLab trial for your company?')
-    .gl-form-checkbox-group
-      .gl-form-checkbox.form-check.form-check-inline
-        = radio_button_tag :trial_entity, :company, params[:trial_entity]=='company', required: true, class: 'form-check-input'
-        = label_tag :trial_entity_company, _('Yes'), class: 'form-check-label'
-      .gl-form-checkbox.form-check.form-check-inline
-        = radio_button_tag :trial_entity, :individual, params[:trial_entity]=='individual', required: true, class: 'form-check-input'
-        = label_tag :trial_entity_individual, _('No'), class: 'form-check-label'
+  - if current_user.setup_for_company.nil?
+    .form-group
+      = label_tag :trial_entity, _('Is this GitLab trial for your company?')
+      .gl-form-checkbox-group
+        .gl-form-checkbox.form-check.form-check-inline
+          = radio_button_tag :trial_entity, :company, params[:trial_entity]=='company', required: true, class: 'form-check-input'
+          = label_tag :trial_entity_company, _('Yes'), class: 'form-check-label'
+        .gl-form-checkbox.form-check.form-check-inline
+          = radio_button_tag :trial_entity, :individual, params[:trial_entity]=='individual', required: true, class: 'form-check-input'
+          = label_tag :trial_entity_individual, _('No'), class: 'form-check-label'
   = submit_tag _('Start your free trial'), class: 'btn btn-success btn-block'
 
 = render 'skip_trial'
