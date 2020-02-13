@@ -3,10 +3,7 @@
 module QA
   # This test was quarantined because relative URL isn't supported
   # See https://gitlab.com/gitlab-org/gitlab/issues/13833
-  # It's now skipped because another bug breaks the projects list and
-  # causes subsequent tests to fail
-  # See https://gitlab.com/gitlab-org/gitlab/issues/197130
-  context 'Create', :skip do
+  context 'Create', :quarantine do
     describe 'Web IDE web terminal', :docker do
       before do
         project = Resource::Project.fabricate_via_api! do |project|
