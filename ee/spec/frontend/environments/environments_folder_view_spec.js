@@ -1,14 +1,12 @@
-import Vue from 'vue';
-import MockAdapter from 'axios-mock-adapter';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { environmentsList } from 'spec/environments/mock_data';
+import { mount } from '@vue/test-utils';
 import axios from '~/lib/utils/axios_utils';
-import environmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
+import MockAdapter from 'axios-mock-adapter';
+import { environmentsList } from './mock_data';
+import EnvironmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
 
 describe('Environments Folder View', () => {
-  let Component;
-  let component;
   let mock;
+  let wrapper;
 
   const mockData = {
     endpoint: 'environments.json',
@@ -24,14 +22,11 @@ describe('Environments Folder View', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-
-    Component = Vue.extend(environmentsFolderViewComponent);
   });
 
   afterEach(() => {
     mock.restore();
-
-    component.$destroy();
+    wrapper.destroy();
   });
 
   describe('successful request', () => {
@@ -53,15 +48,13 @@ describe('Environments Folder View', () => {
         },
       );
 
-      component = mountComponent(Component, mockData);
+      wrapper = mount(EnvironmentsFolderViewComponent, { propsData: mockData });
+      return axios.waitForAll();
     });
 
     describe('deploy boards', () => {
-      it('should render arrow to open deploy boards', done => {
-        setTimeout(() => {
-          expect(component.$el.querySelector('.folder-icon.ic-chevron-right')).not.toBeNull();
-          done();
-        }, 0);
+      it('should render arrow to open deploy boards', () => {
+        expect(wrapper.find('.folder-icon.ic-chevron-right').exists()).toBe(true);
       });
     });
   });
