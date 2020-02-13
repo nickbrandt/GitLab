@@ -19,7 +19,7 @@ describe API::V3::Github do
 
       jira_get v3_api("/orgs/#{group.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
 
@@ -28,7 +28,7 @@ describe API::V3::Github do
 
       jira_get v3_api("/orgs/#{group.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -36,7 +36,7 @@ describe API::V3::Github do
     it 'returns an empty array' do
       jira_get v3_api('/user/repos', user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
   end
@@ -54,7 +54,7 @@ describe API::V3::Github do
         it 'returns an array of notes' do
           jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(1)
         end
@@ -70,7 +70,7 @@ describe API::V3::Github do
         it 'returns 404' do
           jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -79,7 +79,7 @@ describe API::V3::Github do
       it 'returns an empty array' do
         jira_get v3_api("/repos/#{path}/pulls/xpto/commits", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq([])
       end
     end
@@ -88,7 +88,7 @@ describe API::V3::Github do
       it 'returns an empty array' do
         jira_get v3_api("/repos/#{path}/pulls/xpto/comments", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to eq([])
       end
     end
@@ -104,7 +104,7 @@ describe API::V3::Github do
     it 'returns an empty Array for events' do
       jira_get v3_api('/repos/-/jira/events', user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response).to eq([])
     end
   end
@@ -121,7 +121,7 @@ describe API::V3::Github do
         it 'responds with the expected user' do
           jira_get v3_api("/users/#{user.username}", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/github/user', dir: 'ee')
         end
       end
@@ -130,7 +130,7 @@ describe API::V3::Github do
         it 'responds with the expected status' do
           jira_get v3_api('/users/unknown_user_name', user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -143,7 +143,7 @@ describe API::V3::Github do
         it 'responds with forbidden' do
           jira_get v3_api("/users/#{user.username}", unauthorized_user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -157,7 +157,7 @@ describe API::V3::Github do
         it 'returns an empty array' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq([])
         end
       end
@@ -168,7 +168,7 @@ describe API::V3::Github do
         it 'returns an event' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(1)
         end
@@ -181,7 +181,7 @@ describe API::V3::Github do
         it 'returns the expected amount of events' do
           jira_get v3_api(events_path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to be_an(Array)
           expect(json_response.size).to eq(2)
         end
@@ -215,7 +215,7 @@ describe API::V3::Github do
       it 'returns an array of merge requests with github format' do
         jira_get v3_api('/repos/-/jira/pulls', user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(2)
         expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
@@ -226,7 +226,7 @@ describe API::V3::Github do
       it 'returns an array of merge requests for the proper project in github format' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(1)
         expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
@@ -238,7 +238,7 @@ describe API::V3::Github do
         it 'returns the requested merge request in github format' do
           jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
         end
       end
@@ -249,7 +249,7 @@ describe API::V3::Github do
 
           jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", unauthorized_user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -257,7 +257,7 @@ describe API::V3::Github do
         it 'returns the requested merge request in github format' do
           jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", admin)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
         end
       end
@@ -270,7 +270,7 @@ describe API::V3::Github do
     def expect_project_under_namespace(projects, namespace, user)
       jira_get v3_api("/users/#{namespace.path}/repos", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to include_pagination_headers
       expect(response).to match_response_schema('entities/github/repositories', dir: 'ee')
 
@@ -325,7 +325,7 @@ describe API::V3::Github do
           it 'returns not found' do
             jira_get v3_api("/users/#{group.parent.path}/repos", user)
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -343,7 +343,7 @@ describe API::V3::Github do
             create(:project, :repository, group: new_group, creator: user)
 
             expect { jira_get v3_api("/users/#{group.parent.path}/repos", user) }.not_to exceed_query_limit(control)
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
       end
@@ -374,7 +374,7 @@ describe API::V3::Github do
       it 'returns 401' do
         jira_get v3_api('/users/foo/repos', nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -394,7 +394,7 @@ describe API::V3::Github do
       it 'responds with not found status' do
         jira_get v3_api('/users/noo/repos', user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -426,7 +426,7 @@ describe API::V3::Github do
       it 'returns an array of project branches with github format' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an(Array)
 
@@ -438,7 +438,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns 200 when namespace path include a dot' do
@@ -448,7 +448,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{group.path}/#{project.path}/branches", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -456,7 +456,7 @@ describe API::V3::Github do
       it 'returns 401' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -466,7 +466,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns 404 when not licensed' do
@@ -475,7 +475,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -488,7 +488,7 @@ describe API::V3::Github do
       it 'returns commit with github format' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('entities/github/commit', dir: 'ee')
       end
 
@@ -497,7 +497,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'returns 200 when namespace path include a dot' do
@@ -507,7 +507,7 @@ describe API::V3::Github do
 
         jira_get v3_api("/repos/#{group.path}/#{project.path}/commits/#{commit_id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -515,7 +515,7 @@ describe API::V3::Github do
       it 'returns 401' do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", nil)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -526,7 +526,7 @@ describe API::V3::Github do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns 404 when not licensed' do
@@ -536,7 +536,7 @@ describe API::V3::Github do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
