@@ -4169,6 +4169,7 @@ ActiveRecord::Schema.define(version: 2020_02_12_052620) do
     t.boolean "setup_for_company"
     t.boolean "render_whitespace_in_code"
     t.integer "tab_width", limit: 2
+    t.bigint "feature_filter_type"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true
   end
 
