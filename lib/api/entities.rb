@@ -244,49 +244,6 @@ module API
       expose :project_id
     end
 
-    class BasicBadgeDetails < Grape::Entity
-      expose :name
-      expose :link_url
-      expose :image_url
-      expose :rendered_link_url do |badge, options|
-        badge.rendered_link_url(options.fetch(:project, nil))
-      end
-      expose :rendered_image_url do |badge, options|
-        badge.rendered_image_url(options.fetch(:project, nil))
-      end
-    end
-
-    class Badge < BasicBadgeDetails
-      expose :id
-      expose :kind do |badge|
-        badge.type == 'ProjectBadge' ? 'project' : 'group'
-      end
-    end
-
-    class ResourceLabelEvent < Grape::Entity
-      expose :id
-      expose :user, using: Entities::UserBasic
-      expose :created_at
-      expose :resource_type do |event, options|
-        event.issuable.class.name
-      end
-      expose :resource_id do |event, options|
-        event.issuable.id
-      end
-      expose :label, using: Entities::LabelBasic
-      expose :action
-    end
-
-    class Suggestion < Grape::Entity
-      expose :id
-      expose :from_line
-      expose :to_line
-      expose :appliable?, as: :appliable
-      expose :applied
-      expose :from_content
-      expose :to_content
-    end
-
     module Platform
       class Kubernetes < Grape::Entity
         expose :api_url
