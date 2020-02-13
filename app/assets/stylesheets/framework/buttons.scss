@@ -371,11 +371,15 @@
 }
 
 .btn-loading {
-  display: flex;
-  align-items: center;
+  &:not(.disabled) {
+    .fa,
+    .spinner {
+      display: none;
+    }
+  }
 
-  &:not(.disabled) .spinner {
-    display: none;
+  .fa {
+    margin-right: 5px;
   }
 
   .spinner {
