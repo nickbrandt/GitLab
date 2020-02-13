@@ -132,7 +132,7 @@ module EE
 
       override :merge_request_event_type
       def merge_request_event_type
-        return unless merge_request_event?
+        return unless merge_request?
 
         strong_memoize(:merge_request_event_type) do
           merge_train_pipeline? ? :merge_train : super
