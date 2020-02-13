@@ -111,6 +111,13 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating npm packages request forwarding setting' do
+      let(:settings) { { npm_package_requests_forwarding: true } }
+      let(:feature) { :packages }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
       let(:feature) { :adjourned_deletion_for_projects_and_groups }

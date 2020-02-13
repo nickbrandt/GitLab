@@ -176,4 +176,11 @@ describe API::Settings, 'EE Settings' do
 
     it_behaves_like 'settings for licensed features'
   end
+
+  context 'updating npm packages request forwarding' do
+    let(:settings) { { npm_package_requests_forwarding: true } }
+    let(:feature) { :packages }
+
+    it_behaves_like 'settings for licensed features'
+  end
 end

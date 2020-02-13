@@ -94,6 +94,7 @@ module EE
         default_project_deletion_protection
         deletion_adjourned_period
         updating_name_disabled_for_users
+        npm_package_requests_forwarding
       ]
     end
 
