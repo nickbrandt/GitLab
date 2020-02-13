@@ -1,5 +1,5 @@
 import Store from 'ee/environments/stores/environments_store';
-import { serverData, deployBoardMockData } from './mock_data';
+import { serverDataList, deployBoardMockData } from './mock_data';
 
 describe('Store', () => {
   let store;
@@ -84,13 +84,13 @@ describe('Store', () => {
 
   describe('canaryCallout', () => {
     it('should add banner underneath the second environment', () => {
-      store.storeEnvironments(serverData);
+      store.storeEnvironments(serverDataList);
 
       expect(store.state.environments[1].showCanaryCallout).toEqual(true);
     });
 
     it('should add banner underneath first environment when only one environment', () => {
-      store.storeEnvironments(serverData.slice(0, 1));
+      store.storeEnvironments(serverDataList.slice(0, 1));
 
       expect(store.state.environments[0].showCanaryCallout).toEqual(true);
     });

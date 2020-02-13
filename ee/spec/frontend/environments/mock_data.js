@@ -132,3 +132,18 @@ export const environmentsList = [
     ...sharedEnvironmentData(12),
   },
 ];
+
+export const serverDataList = [
+  {
+    name: 'build',
+    size: 1,
+    latest: {
+      name: 'build/update-README',
+      environment_type: 'build',
+      created_at: '2017-02-01T19:42:18.400Z',
+      updated_at: '2017-02-01T19:42:18.400Z',
+      ...sharedEnvironmentData(15),
+    },
+  },
+  ...environmentsList,
+];
