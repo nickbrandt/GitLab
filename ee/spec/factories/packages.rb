@@ -66,6 +66,10 @@ FactoryBot.define do
         create :conan_package_file, :conan_package_manifest, package: package
         create :conan_package_file, :conan_package, package: package
       end
+
+      trait(:without_loaded_metadatum) do
+        conan_metadatum { build(:conan_metadatum, package: nil) }
+      end
     end
   end
 
@@ -187,7 +191,7 @@ FactoryBot.define do
   end
 
   factory :conan_metadatum, class: 'Packages::ConanMetadatum' do
-    association :package, package_type: :conan
+    association :package, factory: [:conan_package, :without_loaded_metadatum]
     package_username { 'username' }
     package_channel { 'stable' }
   end

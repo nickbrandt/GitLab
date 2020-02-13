@@ -23,8 +23,9 @@ class Packages::Package < ApplicationRecord
     format: { with: Gitlab::Regex.package_name_regex }
 
   validates :name,
-    uniqueness: { scope: %i[project_id version package_type] }
+    uniqueness: { scope: %i[project_id version package_type] }, unless: :conan?
 
+  validate :valid_conan_package_recipe, if: :conan?
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
 
@@ -37,6 +38,10 @@ class Packages::Package < ApplicationRecord
 
   scope :with_conan_channel, ->(package_channel) do
     joins(:conan_metadatum).where(packages_conan_metadata: { package_channel: package_channel })
+  end
+
+  scope :with_conan_username, ->(package_username) do
+    joins(:conan_metadatum).where(packages_conan_metadata: { package_username: package_username })
   end
 
   scope :has_version, -> { where.not(version: nil) }
@@ -103,6 +108,20 @@ class Packages::Package < ApplicationRecord
   end
 
   private
+
+  def valid_conan_package_recipe
+    recipe_exists = project.packages
+                           .conan
+                           .includes(:conan_metadatum)
+                           .with_name(name)
+                           .with_version(version)
+                           .with_conan_channel(conan_metadatum.package_channel)
+                           .with_conan_username(conan_metadatum.package_username)
+                           .id_not_in(id)
+                           .exists?
+
+    errors.add(:base, 'Package recipe already exists') if recipe_exists
+  end
 
   def valid_npm_package_name
     return unless project&.root_namespace
