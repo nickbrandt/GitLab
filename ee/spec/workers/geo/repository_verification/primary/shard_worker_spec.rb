@@ -7,7 +7,7 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :clean_gitlab_redis_
   include ExclusiveLeaseHelpers
 
   let!(:primary)   { create(:geo_node, :primary) }
-  let(:shard_name) { Gitlab.config.repositories.storages.keys.first }
+  let(:shard_name) { Gitlab.config.repositories.storages.each_key.first }
   let(:primary_singleworker) { Geo::RepositoryVerification::Primary::SingleWorker }
 
   before do

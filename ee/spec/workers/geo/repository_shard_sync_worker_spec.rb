@@ -9,7 +9,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
   let!(:primary) { create(:geo_node, :primary) }
   let!(:secondary) { create(:geo_node) }
 
-  let(:shard_name) { Gitlab.config.repositories.storages.keys.first }
+  let(:shard_name) { Gitlab.config.repositories.storages.each_key.first }
 
   before do
     stub_current_geo_node(secondary)
