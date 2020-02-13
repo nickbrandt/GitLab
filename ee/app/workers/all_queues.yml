@@ -93,6 +93,12 @@
   :latency_sensitive: 
   :resource_boundary: :unknown
   :weight: 1
+- :name: cronjob:geo_secondary_registry_consistency
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
 - :name: cronjob:geo_sidekiq_cron_config
   :feature_category: :geo_replication
   :has_external_dependencies: 
