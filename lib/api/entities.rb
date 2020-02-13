@@ -358,39 +358,6 @@ module API
       expose :variables, using: Entities::Variable
     end
 
-    class EnvironmentBasic < Grape::Entity
-      expose :id, :name, :slug, :external_url
-    end
-
-    class Deployment < Grape::Entity
-      expose :id, :iid, :ref, :sha, :created_at, :updated_at
-      expose :user,        using: Entities::UserBasic
-      expose :environment, using: Entities::EnvironmentBasic
-      expose :deployable,  using: Entities::Job
-      expose :status
-    end
-
-    class Environment < EnvironmentBasic
-      expose :project, using: Entities::BasicProjectDetails
-      expose :last_deployment, using: Entities::Deployment, if: { last_deployment: true }
-      expose :state
-    end
-
-    class LicenseBasic < Grape::Entity
-      expose :key, :name, :nickname
-      expose :url, as: :html_url
-      expose(:source_url) { |license| license.meta['source'] }
-    end
-
-    class License < LicenseBasic
-      expose :popular?, as: :popular
-      expose(:description) { |license| license.meta['description'] }
-      expose(:conditions) { |license| license.meta['conditions'] }
-      expose(:permissions) { |license| license.meta['permissions'] }
-      expose(:limitations) { |license| license.meta['limitations'] }
-      expose :content
-    end
-
     class ImpersonationToken < PersonalAccessToken
       expose :impersonation
     end
