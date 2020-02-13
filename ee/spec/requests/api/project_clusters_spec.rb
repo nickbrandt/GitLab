@@ -90,7 +90,7 @@ describe API::ProjectClusters do
       end
 
       it 'responds with 201' do
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
 
       it 'allows multiple clusters to be associated to project' do
