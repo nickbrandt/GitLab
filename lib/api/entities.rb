@@ -129,40 +129,6 @@ module API
       end
     end
 
-    class Namespace < NamespaceBasic
-      expose :members_count_with_descendants, if: -> (namespace, opts) { expose_members_count_with_descendants?(namespace, opts) } do |namespace, _|
-        namespace.users_with_descendants.count
-      end
-
-      def expose_members_count_with_descendants?(namespace, opts)
-        namespace.kind == 'group' && Ability.allowed?(opts[:current_user], :admin_group, namespace)
-      end
-    end
-
-    class MemberAccess < Grape::Entity
-      expose :access_level
-      expose :notification_level do |member, options|
-        if member.notification_setting
-          ::NotificationSetting.levels[member.notification_setting.level]
-        end
-      end
-    end
-
-    class ProjectAccess < MemberAccess
-    end
-
-    class GroupAccess < MemberAccess
-    end
-
-    class NotificationSetting < Grape::Entity
-      expose :level
-      expose :events, if: ->(notification_setting, _) { notification_setting.custom? } do
-        ::NotificationSetting.email_events.each do |event|
-          expose event
-        end
-      end
-    end
-
     class Trigger < Grape::Entity
       include ::API::Helpers::Presentable
 
