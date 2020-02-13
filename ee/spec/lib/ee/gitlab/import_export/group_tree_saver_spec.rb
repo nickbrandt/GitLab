@@ -11,6 +11,7 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     let_it_be(:epic) { create(:epic, group: group, parent: parent_epic) }
     let_it_be(:epic_event) { create(:event, :created, target: epic, group: group, author: user) }
     let_it_be(:epic_push_event) { create(:event, :pushed, target: epic, group: group, author: user) }
+    let_it_be(:milestone) { create(:milestone, group: group) }
     let_it_be(:board) { create(:board, group: group, assignee: user, labels: [label]) }
     let_it_be(:note) { create(:note, noteable: epic) }
     let_it_be(:note_event) { create(:event, :created, target: note, author: user) }
@@ -101,23 +102,40 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     end
 
     context 'boards relation' do
-      it 'saves top level boards' do
+      before do
+        stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
+
+        create(:list, board: board, user: user, list_type: List.list_types[:assignee], position: 0)
+        create(:list, board: board, milestone: milestone, list_type: List.list_types[:milestone], position: 1)
+
         expect_successful_save(group_tree_saver)
+      end
+
+      it 'saves top level boards' do
         expect(saved_group_json['boards'].size).to eq(1)
       end
 
       it 'saves board assignee' do
-        expect_successful_save(group_tree_saver)
         expect(saved_group_json['boards'].first['board_assignee']['assignee_id']).to eq(user.id)
       end
 
       it 'saves board labels' do
-        expect_successful_save(group_tree_saver)
-
         labels = saved_group_json['boards'].first['labels']
 
         expect(labels).not_to be_empty
         expect(labels.first['title']).to eq(label.title)
+      end
+
+      it 'saves board lists' do
+        lists = saved_group_json['boards'].first['lists']
+
+        expect(lists).not_to be_empty
+
+        milestone_list = lists.find { |list| list['list_type'] == 'milestone' }
+        assignee_list = lists.find { |list| list['list_type'] == 'assignee' }
+
+        expect(milestone_list['milestone_id']).to eq(milestone.id)
+        expect(assignee_list['user_id']).to eq(user.id)
       end
     end
   end
