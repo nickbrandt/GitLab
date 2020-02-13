@@ -212,12 +212,6 @@ describe API::MergeRequests do
   end
 
   context 'when authenticated' do
-    def expect_response_contain_exactly(*items)
-      expect(response).to have_gitlab_http_status(200)
-      expect(json_response.map { |element| element['id'] }).to contain_exactly(*items.map(&:id))
-      expect(json_response.length).to eq(items.size)
-    end
-
     context 'filter merge requests by assignee ID' do
       let!(:merge_request2) do
         create(:merge_request, :simple, assignees: [user2], source_project: project, target_project: project, source_branch: 'other-branch-2')
@@ -226,7 +220,7 @@ describe API::MergeRequests do
       it 'returns merge requests with given assignee ID' do
         get api('/merge_requests', user), params: { assignee_id: user2.id }
 
-        expect_response_contain_exactly(merge_request, merge_request2)
+        expect_paginated_array_response([merge_request2.id, merge_request.id])
       end
     end
 
@@ -243,7 +237,7 @@ describe API::MergeRequests do
         let(:approvers_param) { [merge_request_with_approver.approvers.first.user_id] }
 
         it 'returns an array of merge requests which have specified the user as an approver' do
-          expect_response_contain_exactly(merge_request_with_approver)
+          expect_paginated_array_response([merge_request_with_approver.id])
         end
       end
 
@@ -251,7 +245,7 @@ describe API::MergeRequests do
         let(:approvers_param) { 'None' }
 
         it 'returns an array of merge requests with no approvers' do
-          expect_response_contain_exactly(merge_request)
+          expect_paginated_array_response([merge_request.id])
         end
       end
 
@@ -259,7 +253,7 @@ describe API::MergeRequests do
         let(:approvers_param) { 'Any' }
 
         it 'returns an array of merge requests with any approver' do
-          expect_response_contain_exactly(merge_request_with_approver)
+          expect_paginated_array_response([merge_request_with_approver.id])
         end
       end
 
@@ -288,7 +282,7 @@ describe API::MergeRequests do
         let(:approvals_param) { [user2.id] }
 
         it 'returns an array of merge requests which have specified the user as an approver' do
-          expect_response_contain_exactly(merge_request_with_approval)
+          expect_paginated_array_response([merge_request_with_approval.id])
         end
       end
 
@@ -296,7 +290,7 @@ describe API::MergeRequests do
         let(:approvals_param) { 'None' }
 
         it 'returns an array of merge requests with no approvers' do
-          expect_response_contain_exactly(merge_request)
+          expect_paginated_array_response([merge_request.id])
         end
       end
 
@@ -304,7 +298,7 @@ describe API::MergeRequests do
         let(:approvals_param) { 'Any' }
 
         it 'returns an array of merge requests with any approver' do
-          expect_response_contain_exactly(merge_request_with_approval)
+          expect_paginated_array_response([merge_request_with_approval.id])
         end
       end
 
