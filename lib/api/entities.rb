@@ -655,23 +655,6 @@ module API
       end
     end
 
-    class Cluster < Grape::Entity
-      expose :id, :name, :created_at, :domain
-      expose :provider_type, :platform_type, :environment_scope, :cluster_type
-      expose :user, using: Entities::UserBasic
-      expose :platform_kubernetes, using: Entities::Platform::Kubernetes
-      expose :provider_gcp, using: Entities::Provider::Gcp
-      expose :management_project, using: Entities::ProjectIdentity
-    end
-
-    class ClusterProject < Cluster
-      expose :project, using: Entities::BasicProjectDetails
-    end
-
-    class ClusterGroup < Cluster
-      expose :group, using: Entities::BasicGroupDetails
-    end
-
     module InternalPostReceive
       class Message < Grape::Entity
         expose :message
