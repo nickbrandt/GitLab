@@ -207,7 +207,7 @@ karma-as-if-foss:
   extends: .frontend-job-base
   script:
     - date
-    - yarn jest --ci --coverage
+    - yarn jest --ci --coverage --testSequencer ./scripts/frontend/parallel_ci_sequencer.js
   cache:
     key: jest
     paths:
@@ -229,6 +229,7 @@ jest:
       - tmp/tests/frontend/
     reports:
       junit: junit_jest.xml
+  parallel: 2
 
 jest-as-if-foss:
   extends:
