@@ -801,6 +801,130 @@ describe('Epic Store Actions', () => {
     });
   });
 
+  describe('requestEpicLabelsSelect', () => {
+    it('should set `state.epicLabelsSelectInProgress` flag to `true`', done => {
+      testAction(
+        actions.requestEpicLabelsSelect,
+        {},
+        state,
+        [{ type: 'REQUEST_EPIC_LABELS_SELECT' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveEpicLabelsSelectSuccess', () => {
+    it('should set provided labels param to `state.labels`', done => {
+      const labels = [{ id: 1, set: false }, { id: 2, set: true }];
+
+      testAction(
+        actions.receiveEpicLabelsSelectSuccess,
+        labels,
+        state,
+        [
+          {
+            type: 'RECEIVE_EPIC_LABELS_SELECT_SUCCESS',
+            payload: labels,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveEpicLabelsSelectFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('should set `state.epicLabelsSelectInProgress` flag to `false`', done => {
+      testAction(
+        actions.receiveEpicLabelsSelectFailure,
+        {},
+        state,
+        [{ type: 'RECEIVE_EPIC_LABELS_SELECT_FAILURE' }],
+        [],
+        done,
+      );
+    });
+
+    it('should show flash error with message "An error occurred while updating labels."', () => {
+      actions.receiveEpicLabelsSelectFailure(
+        {
+          commit: () => {},
+        },
+        {},
+      );
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'An error occurred while updating labels.',
+      );
+    });
+  });
+
+  describe('updateEpicLabels', () => {
+    const labels = [{ id: 1, set: false }, { id: 2, set: true }];
+
+    it('dispatches `requestEpicLabelsSelect` and `receiveEpicLabelsSelectSuccess` actions when request succeeds', done => {
+      jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
+        Promise.resolve({
+          data: {
+            updateEpic: {
+              errors: [],
+            },
+          },
+        }),
+      );
+
+      testAction(
+        actions.updateEpicLabels,
+        labels,
+        state,
+        [],
+        [
+          {
+            type: 'requestEpicLabelsSelect',
+          },
+          {
+            type: 'receiveEpicLabelsSelectSuccess',
+            payload: labels,
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches `requestEpicLabelsSelect` and `receiveEpicLabelsSelectFailure` actions when request fails', done => {
+      jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
+        Promise.resolve({
+          data: {
+            updateEpic: {
+              errors: [{ foo: 1 }],
+            },
+          },
+        }),
+      );
+
+      testAction(
+        actions.updateEpicLabels,
+        labels,
+        state,
+        [],
+        [
+          {
+            type: 'requestEpicLabelsSelect',
+          },
+          {
+            type: 'receiveEpicLabelsSelectFailure',
+          },
+        ],
+        done,
+      );
+    });
+  });
+
   describe('requestEpicSubscriptionToggle', () => {
     it('should set `state.epicSubscriptionToggleInProgress` flag to `true`', done => {
       testAction(

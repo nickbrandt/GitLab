@@ -343,4 +343,69 @@ describe('Epic Store Mutations', () => {
       expect(state.epicCreateInProgress).toBe(false);
     });
   });
+
+  describe('REQUEST_EPIC_LABELS_SELECT', () => {
+    it('Should set `epicLabelsSelectInProgress` flag on state to `true`', () => {
+      const state = {
+        epicLabelsSelectInProgress: false,
+      };
+
+      mutations[types.REQUEST_EPIC_LABELS_SELECT](state);
+
+      expect(state.epicLabelsSelectInProgress).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_EPIC_LABELS_SELECT_SUCCESS', () => {
+    it('Should update `labels` array on state when new labels are added', () => {
+      const addedLabels = [{ id: 1, set: true }, { id: 2, set: true }];
+      const state = {
+        labels: [],
+      };
+
+      mutations[types.RECEIVE_EPIC_LABELS_SELECT_SUCCESS](state, addedLabels);
+
+      expect(state.labels).toEqual(expect.arrayContaining(addedLabels));
+    });
+
+    it('Should update `labels` array on state when existing labels are removed', () => {
+      const removedLabels = [{ id: 1, set: false }];
+      const state = {
+        labels: [{ id: 1, set: true }, { id: 2, set: true }],
+      };
+
+      mutations[types.RECEIVE_EPIC_LABELS_SELECT_SUCCESS](state, removedLabels);
+
+      expect(state.labels).toEqual(expect.arrayContaining([{ id: 2, set: true }]));
+    });
+
+    it('Should update `labels` array on state when some labels are added and some are removed', () => {
+      const removedLabels = [{ id: 1, set: false }];
+      const addedLabels = [{ id: 3, set: true }];
+      const state = {
+        labels: [{ id: 1, set: true }, { id: 2, set: true }],
+      };
+
+      mutations[types.RECEIVE_EPIC_LABELS_SELECT_SUCCESS](state, [
+        ...addedLabels,
+        ...removedLabels,
+      ]);
+
+      expect(state.labels).toEqual(
+        expect.arrayContaining([{ id: 2, set: true }, { id: 3, set: true }]),
+      );
+    });
+  });
+
+  describe('RECEIVE_EPIC_LABELS_SELECT_FAILURE', () => {
+    it('Should set `epicLabelsSelectInProgress` flag on state to `false`', () => {
+      const state = {
+        epicLabelsSelectInProgress: true,
+      };
+
+      mutations[types.RECEIVE_EPIC_LABELS_SELECT_FAILURE](state);
+
+      expect(state.epicLabelsSelectInProgress).toBe(false);
+    });
+  });
 });
