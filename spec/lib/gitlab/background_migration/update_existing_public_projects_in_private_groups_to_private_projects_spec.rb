@@ -55,7 +55,7 @@ describe Gitlab::BackgroundMigration::UpdateExistingPublicProjectsInPrivateGroup
     let(:name) { 'no-namespace' }
 
     it 'does not update the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::PRIVATE, type: nil)
+      create_namespace(name, Gitlab::VisibilityLevel::PRIVATE, type: 'User')
       create_project(name, Gitlab::VisibilityLevel::PUBLIC)
 
       expect { subject.perform(Gitlab::VisibilityLevel::PRIVATE) }.not_to change { project.reload.visibility_level }
