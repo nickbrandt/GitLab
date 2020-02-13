@@ -744,45 +744,6 @@ module API
       expose :expiration
     end
 
-    class PagesDomainCertificate < Grape::Entity
-      expose :subject
-      expose :expired?, as: :expired
-      expose :certificate
-      expose :certificate_text
-    end
-
-    class PagesDomainBasic < Grape::Entity
-      expose :domain
-      expose :url
-      expose :project_id
-      expose :verified?, as: :verified
-      expose :verification_code, as: :verification_code
-      expose :enabled_until
-      expose :auto_ssl_enabled
-
-      expose :certificate,
-        as: :certificate_expiration,
-        if: ->(pages_domain, _) { pages_domain.certificate? },
-        using: PagesDomainCertificateExpiration do |pages_domain|
-        pages_domain
-      end
-    end
-
-    class PagesDomain < Grape::Entity
-      expose :domain
-      expose :url
-      expose :verified?, as: :verified
-      expose :verification_code, as: :verification_code
-      expose :enabled_until
-      expose :auto_ssl_enabled
-
-      expose :certificate,
-        if: ->(pages_domain, _) { pages_domain.certificate? },
-        using: PagesDomainCertificate do |pages_domain|
-        pages_domain
-      end
-    end
-
     class Application < Grape::Entity
       expose :id
       expose :uid, as: :application_id
