@@ -9,7 +9,6 @@ class Project < ApplicationRecord
   include AccessRequestable
   include Avatarable
   include CacheMarkdownField
-  include Referable
   include Sortable
   include AfterCommitQueue
   include CaseSensitivity
