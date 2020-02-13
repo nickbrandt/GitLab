@@ -160,7 +160,9 @@ frontend-fixtures-as-if-foss:
     - .default-retry
     - .default-cache
     - .default-before_script
-    - .use-pg9
+  variables:
+    USE_BUNDLE_INSTALL: "false"
+    SETUP_DB: "false"
   stage: test
 
 .karma-base:
