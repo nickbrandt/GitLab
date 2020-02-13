@@ -421,7 +421,7 @@ describe 'Related issues', :js do
         end
       end
 
-      describe 'issue link types' do
+      context 'with "Relates to", "Blocks", "Is blocked by" groupings' do
         def add_linked_issue(issue, radio_input_value)
           find('.js-issue-count-badge-add-button').click
           find('.js-add-issuable-form-input').set "#{issue.to_reference(project)} "

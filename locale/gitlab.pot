@@ -15750,9 +15750,6 @@ msgstr ""
 msgid "Related Merged Requests"
 msgstr ""
 
-msgid "Related issues"
-msgstr ""
-
 msgid "Related merge requests"
 msgstr ""
 
