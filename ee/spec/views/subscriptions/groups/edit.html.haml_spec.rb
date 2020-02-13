@@ -13,9 +13,9 @@ describe 'subscriptions/groups/edit' do
     allow(view).to receive(:current_user).and_return(User.new)
   end
 
-  context 'a single user' do
-    let(:quantity) { '1' }
+  let(:quantity) { '1' }
 
+  context 'a single user' do
     it 'displays the correct notification for 1 user' do
       render
 
@@ -30,6 +30,26 @@ describe 'subscriptions/groups/edit' do
       render
 
       expect(rendered).to have_text('You have successfully purchased a Bronze plan subscription for 2 users. You’ll receive a receipt via email.')
+    end
+  end
+
+  context 'with new_user in the params' do
+    before do
+      allow(view).to receive(:params).and_return(new_user: 'true')
+    end
+
+    it 'displays the progress bar' do
+      render
+
+      expect(rendered).to have_selector('#progress-bar')
+    end
+  end
+
+  context 'without new_user in the params' do
+    it 'does not display the progress bar' do
+      render
+
+      expect(rendered).not_to have_selector('#progress-bar')
     end
   end
 end

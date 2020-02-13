@@ -68,6 +68,14 @@ describe Subscriptions::GroupsController do
         expect(subject).to have_gitlab_http_status(:redirect)
         expect(subject).to redirect_to('/new-path')
       end
+
+      it { is_expected.to set_flash[:notice].to('Subscription successfully applied to "New name"') }
+
+      context 'with new_user param' do
+        subject { post :update, params: { id: group.to_param, group: params, new_user: 'true' } }
+
+        it { is_expected.to set_flash[:notice].to("Welcome to GitLab, #{user.first_name}!") }
+      end
     end
 
     context 'when the group cannot be saved' do
