@@ -27,7 +27,7 @@ describe EnvironmentsHelper do
         'custom-metrics-available' => 'false',
         'alerts-endpoint' => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
         'prometheus-alerts-available' => 'true',
-        'logs-path' => project_logs_path(project)
+        'logs-path' => project_logs_path(project, environment_name: environment.name)
       )
     end
   end

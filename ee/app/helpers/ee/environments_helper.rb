@@ -46,7 +46,7 @@ module EE
         "custom-metrics-available" => "#{custom_metrics_available?(project)}",
         "alerts-endpoint" => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
         "prometheus-alerts-available" => "#{can?(current_user, :read_prometheus_alerts, project)}",
-        "logs-path" => project_logs_path(project)
+        "logs-path" => project_logs_path(project, environment_name: environment.name)
       }
 
       super.merge(ee_metrics_data)

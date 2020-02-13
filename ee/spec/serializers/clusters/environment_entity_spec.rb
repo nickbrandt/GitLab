@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Clusters::EnvironmentEntity do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
-  let_it_be(:project) { create(:project, group: group) }
+  let_it_be(:project, refind: true) { create(:project, group: group) }
   let_it_be(:cluster) { create(:cluster_for_group, groups: [group]) }
 
   it 'inherits from API::Entities::EnvironmentBasic' do
@@ -16,11 +16,11 @@ describe Clusters::EnvironmentEntity do
     let(:environment) { create(:environment, project: project) }
     let(:request) { double('request', current_user: user, cluster: cluster) }
 
+    subject { described_class.new(environment, request: request).as_json }
+
     before do
       group.add_maintainer(user)
     end
-
-    subject { described_class.new(environment, request: request).as_json }
 
     context 'deploy board available' do
       before do
@@ -48,6 +48,23 @@ describe Clusters::EnvironmentEntity do
 
       it 'does not expose rollout_status' do
         expect(subject).not_to include(:rollout_status)
+      end
+    end
+
+    context 'when pod_logs are available' do
+      before do
+        stub_licensed_features(pod_logs: true)
+        project.add_maintainer(user)
+      end
+
+      it 'exposes logs_path' do
+        expect(subject).to include(:logs_path)
+      end
+    end
+
+    context 'when pod_logs are not available' do
+      it 'does not expose logs_path' do
+        expect(subject).not_to include(:logs_path)
       end
     end
   end
