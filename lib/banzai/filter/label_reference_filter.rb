@@ -80,15 +80,7 @@ module Banzai
         end
       end
 
-      def label_link_text(object, matches)
-        parent = project || group
-
-        presenter = object.present(issuable_subject: parent)
-
-        presenter
-      end
-
-      def label_link_suffix(object, matches)
+      def object_link_text(object, matches)
         label_suffix = ''
         parent = project || group
 
@@ -100,12 +92,7 @@ module Banzai
           label_suffix = " <i>in #{ERB::Util.html_escape(reference)}</i>" if reference.present?
         end
 
-        label_suffix
-      end
-
-      def object_link_text(object, matches)
-        presenter = label_link_text(object, matches)
-        label_suffix = label_link_suffix(object, matches)
+        presenter = object.present(issuable_subject: parent)
         LabelsHelper.render_colored_label(presenter, label_suffix: label_suffix)
       end
 
@@ -114,10 +101,6 @@ module Banzai
         content = %(<span class="gl-label gl-label-sm">#{content}</span>)
 
         content
-      end
-
-      def tooltip_title(label)
-        nil
       end
 
       def full_path_ref?(matches)

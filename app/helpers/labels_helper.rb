@@ -46,7 +46,7 @@ module LabelsHelper
     end
   end
 
-  def render_label(label, tooltip: true, link: nil, dataset: nil, small: false)
+  def render_label(label, tooltip: true, link: nil, dataset: nil, small: false, wrapper_class: nil, wrapper_style: nil)
     # if scoped label is used then EE wraps label tag with scoped label
     # doc link
     html = render_colored_label(label)
@@ -60,10 +60,11 @@ module LabelsHelper
       )
     end
 
-    wrapper_class = "gl-label"
-    wrapper_class += " gl-label-sm" if small
+    wrapper_classes = Array.wrap(wrapper_class)
+    wrapper_classes << 'gl-label'
+    wrapper_classes << 'gl-label-sm' if small
 
-    content_tag(:span, html.html_safe, class: wrapper_class)
+    content_tag(:span, html.html_safe, class: wrapper_classes.join(' '), style: wrapper_style)
   end
 
   def render_colored_label(label, label_suffix: '')
@@ -290,9 +291,6 @@ module LabelsHelper
     css = 'gl-link gl-label-link'
     tooltip ? "#{css} has-tooltip" : css
   end
-
-  # Required for Banzai::Filter::LabelReferenceFilter
-  module_function :render_colored_label, :text_color_for_bg, :escape_once, :label_tooltip_title
 end
 
 LabelsHelper.prepend_if_ee('EE::LabelsHelper')

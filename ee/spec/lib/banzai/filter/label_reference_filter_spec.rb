@@ -33,11 +33,10 @@ describe Banzai::Filter::LabelReferenceFilter do
       stub_licensed_features(scoped_labels: false)
     end
 
-    it 'does not include link to scoped labels documentation' do
+    it 'renders label as a common label' do
       doc = reference_filter("See #{scoped_label.to_reference}")
-      scoped = scoped_label.name.split('::')
 
-      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped.first}</span><span.+>#{scoped.last}</span></a></span>$))
+      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped_label.name}</span></a></span>$))
     end
   end
 end
