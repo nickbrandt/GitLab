@@ -230,10 +230,10 @@ Look at a recent `review-deploy` job log, and at the Tiller logs.
 
 ```shell
 # Identify if node spikes are common or load on specific nodes which may get rebalanced by the Kubernetes scheduler
-› kubectl top nodes | sort --key 3 --numeric
+kubectl top nodes | sort --key 3 --numeric
 
 # Identify pods under heavy CPU load
-› kubectl top pods | sort --key 2 --numeric
+kubectl top pods | sort --key 2 --numeric
 ```
 
 ### The `logging/user/events/FailedMount` chart is going up
@@ -253,19 +253,19 @@ Any secrets or config maps older than 5 days are suspect and should be deleted.
 
 ```shell
 # List secrets and config maps ordered by created date
-› kubectl get secret,cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-'
+kubectl get secret,cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-'
 
 # Delete all secrets that are 5 to 9 days old
-› kubectl get secret --sort-by='{.metadata.creationTimestamp}' | grep '^review-' | grep '[5-9]d$' | cut -d' ' -f1 | xargs kubectl delete secret
+kubectl get secret --sort-by='{.metadata.creationTimestamp}' | grep '^review-' | grep '[5-9]d$' | cut -d' ' -f1 | xargs kubectl delete secret
 
 # Delete all secrets that are 10 to 99 days old
-› kubectl get secret --sort-by='{.metadata.creationTimestamp}' | grep '^review-' | grep '[1-9][0-9]d$' | cut -d' ' -f1 | xargs kubectl delete secret
+kubectl get secret --sort-by='{.metadata.creationTimestamp}' | grep '^review-' | grep '[1-9][0-9]d$' | cut -d' ' -f1 | xargs kubectl delete secret
 
 # Delete all config maps that are 5 to 9 days old
-› kubectl get cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-' | grep -v 'dns-gitlab-review-app' | grep '[5-9]d$' | cut -d' ' -f1 | xargs kubectl delete cm
+kubectl get cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-' | grep -v 'dns-gitlab-review-app' | grep '[5-9]d$' | cut -d' ' -f1 | xargs kubectl delete cm
 
 # Delete all config maps that are 10 to 99 days old
-› kubectl get cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-' | grep -v 'dns-gitlab-review-app' | grep '[1-9][0-9]d$' | cut -d' ' -f1 | xargs kubectl delete cm
+kubectl get cm --sort-by='{.metadata.creationTimestamp}' | grep 'review-' | grep -v 'dns-gitlab-review-app' | grep '[1-9][0-9]d$' | cut -d' ' -f1 | xargs kubectl delete cm
 ```
 
 ### Using K9s
