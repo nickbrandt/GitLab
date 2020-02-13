@@ -1494,10 +1494,12 @@ ActiveRecord::Schema.define(version: 2020_02_12_052620) do
     t.string "state", default: "available", null: false
     t.string "slug", null: false
     t.datetime_with_timezone "auto_stop_at"
+    t.index ["auto_stop_at"], name: "index_environments_on_auto_stop_at", where: "(auto_stop_at IS NOT NULL)"
     t.index ["name"], name: "index_environments_on_name_varchar_pattern_ops", opclass: :varchar_pattern_ops
     t.index ["project_id", "name"], name: "index_environments_on_project_id_and_name", unique: true
     t.index ["project_id", "slug"], name: "index_environments_on_project_id_and_slug", unique: true
     t.index ["project_id", "state", "environment_type"], name: "index_environments_on_project_id_state_environment_type"
+    t.index ["state", "auto_stop_at"], name: "index_environments_on_state_and_auto_stop_at", where: "((auto_stop_at IS NOT NULL) AND ((state)::text = 'available'::text))"
   end
 
   create_table "epic_issues", id: :serial, force: :cascade do |t|
