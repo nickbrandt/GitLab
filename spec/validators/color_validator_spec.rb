@@ -6,14 +6,12 @@ describe ColorValidator do
   using RSpec::Parameterized::TableSyntax
 
   subject do
-    # rubocop:disable RSpec/ClassMutation
     Class.new do
       include ActiveModel::Model
       include ActiveModel::Validations
       attr_accessor :color
-      validates :color, color: true
+      validates :color, color: true # rubocop:disable RSpec/ClassMutation
     end.new
-    # rubocop:enable RSpec/ClassMutation
   end
 
   where(:color, :is_valid) do
