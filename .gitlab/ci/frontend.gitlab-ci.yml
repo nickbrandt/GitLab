@@ -211,7 +211,7 @@ karma-as-if-foss:
   cache:
     key: jest
     paths:
-      - tmp/jest/jest/
+      - tmp/cache/jest/
     policy: pull-push
 
 jest:
