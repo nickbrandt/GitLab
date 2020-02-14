@@ -14,9 +14,7 @@ end
 
 if defined?(ActiveRecord::Base) && Gitlab::Runtime.web_server?
   Gitlab::Cluster::LifecycleEvents.on_before_fork do
-    ActiveSupport.on_load(:active_record) do
-      raise 'ActiveRecord connection not established. Unable to start.' unless ::ActiveRecord::Base.connected?
-    end
+    raise 'ActiveRecord connection not established. Unable to start.' unless GitLab::Database.exists?
   end
 end
 
