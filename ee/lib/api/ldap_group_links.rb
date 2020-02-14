@@ -8,6 +8,21 @@ module API
       requires :id, type: String, desc: 'The ID of a group'
     end
     resource :groups do
+      desc 'Get LDAP group links for a group' do
+        success EE::API::Entities::LdapGroupLink
+      end
+      get ":id/ldap_group_links" do
+        group = find_group(params[:id])
+        authorize! :admin_group, group
+
+        ldap_group_links = group.ldap_group_links
+        if ldap_group_links && ldap_group_links != []
+          present ldap_group_links, with: EE::API::Entities::LdapGroupLink
+        else
+          render_api_error!('No linked LDAP groups found', 404)
+        end
+      end
+
       desc 'Add a linked LDAP group to group' do
         success EE::API::Entities::LdapGroupLink
       end
