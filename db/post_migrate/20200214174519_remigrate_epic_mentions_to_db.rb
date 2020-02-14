@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MigrateEpicMentionsToDb < ActiveRecord::Migration[5.2]
+class RemigrateEpicMentionsToDb < ActiveRecord::Migration[5.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

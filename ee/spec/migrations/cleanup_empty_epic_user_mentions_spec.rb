@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'post_migrate', '20191115115522_migrate_epic_notes_mentions_to_db')
-require Rails.root.join('db', 'post_migrate', '20200214174607_remigrate_epic_notes_mentions_to_db')
+require Rails.root.join('db', 'post_migrate', '20200214173000_cleanup_empty_epic_user_mentions')
 
-describe 'epic notes mentions migration' do
+describe CleanupEmptyEpicUserMentions, :migration, :sidekiq do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }
@@ -24,14 +23,17 @@ describe 'epic notes mentions migration' do
   # this note is already migrated, as it has a record in the epic_user_mentions table
   let!(:resource4) { notes.create!(note: 'note3 for @root to check', noteable_id: epic.id, noteable_type: 'Epic') }
   let!(:user_mention) { epic_user_mentions.create!(epic_id: epic.id, note_id: resource4.id, mentioned_users_ids: [1]) }
-  # this note points to an innexistent noteable record
-  let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic') }
 
-  describe MigrateEpicNotesMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, true
-  end
+  # these should get cleanup, by the migration
+  let!(:blank_epic_user_mention1) { epic_user_mentions.create!(epic_id: epic.id, note_id: resource1.id)}
+  let!(:blank_epic_user_mention2) { epic_user_mentions.create!(epic_id: epic.id, note_id: resource2.id)}
+  let!(:blank_epic_user_mention3) { epic_user_mentions.create!(epic_id: epic.id, note_id: resource3.id)}
 
-  describe RemigrateEpicNotesMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, true
+  it 'cleans blank user mentions' do
+    expect(epic_user_mentions.count).to eq 4
+
+    migrate!
+
+    expect(epic_user_mentions.count).to eq 1
   end
 end
