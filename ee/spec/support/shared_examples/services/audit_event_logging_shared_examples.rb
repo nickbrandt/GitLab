@@ -5,19 +5,19 @@ RSpec.shared_examples 'audit event logging' do
     stub_licensed_features(extended_audit_events: true)
   end
 
-  context 'if operation succeed' do
-    it 'logs an audit event if operation succeed' do
+  context 'when operation succeeds' do
+    it 'logs an audit event' do
       expect { operation }.to change(AuditEvent, :count).by(1)
     end
 
-    it 'logs the project info' do
+    it 'logs the audit event info' do
       @resource = operation
 
       expect(AuditEvent.last).to have_attributes(attributes)
     end
   end
 
-  it 'does not log audit event if project operation fails' do
+  it 'does not log audit event if operation fails' do
     fail_condition!
 
     expect { operation }.not_to change(AuditEvent, :count)
