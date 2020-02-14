@@ -1,6 +1,6 @@
-= render 'shared/push_rules/commit_committer_check_setting', form: f, push_rule: f.object
+= render 'shared/push_rules/commit_committer_check_setting', form: f, push_rule: f.object, context: context
 
-= render 'shared/push_rules/reject_unsigned_commits_setting', form: f, push_rule: f.object
+= render 'shared/push_rules/reject_unsigned_commits_setting', form: f, push_rule: f.object, context: context
 
 .form-check
   = f.check_box :deny_delete_tag, class: "form-check-input", data: { qa_selector: 'deny_delete_tag_checkbox' }

@@ -137,10 +137,10 @@ module EE
       ::Gitlab.config.alternative_gitlab_kerberos_url?
     end
 
-    def can_change_push_rule?(push_rule, rule)
+    def can_change_push_rule?(push_rule, rule, context)
       return true if push_rule.global?
 
-      can?(current_user, :"change_#{rule}", @project)
+      can?(current_user, :"change_#{rule}", context)
     end
 
     def ci_cd_projects_available?

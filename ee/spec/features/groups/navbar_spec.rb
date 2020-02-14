@@ -13,6 +13,7 @@ describe 'Group navbar' do
 
   before do
     group.add_maintainer(user)
+    stub_feature_flags(group_push_rules: false)
     sign_in(user)
   end
 
@@ -154,7 +155,6 @@ describe 'Group navbar' do
           nav_sub_items: [_('Package Registry')]
         }
       )
-
       visit group_path(group)
     end
 
@@ -175,5 +175,28 @@ describe 'Group navbar' do
 
       it_behaves_like 'verified navigation bar'
     end
+  end
+
+  context 'when push_rules for groups are available' do
+    before do
+      group.add_owner(user)
+
+      stub_feature_flags(group_push_rules: true)
+
+      insert_after_nav_item(
+        _('Merge Requests'),
+        new_nav_item: {
+          nav_item: _('Push Rules'),
+          nav_sub_items: []
+        }
+      )
+
+      insert_after_nav_item(_('Members'), new_nav_item: settings_nav_item)
+      insert_after_nav_item(_('Settings'), new_nav_item: administration_nav_item)
+
+      visit group_path(group)
+    end
+
+    it_behaves_like 'verified navigation bar'
   end
 end

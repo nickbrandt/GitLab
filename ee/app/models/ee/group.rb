@@ -351,9 +351,9 @@ module EE
 
     def predefined_push_rule
       strong_memoize(:predefined_push_rule) do
-        if push_rule.present?
-          push_rule
-        elsif has_parent?
+        next push_rule if push_rule
+
+        if has_parent?
           parent.predefined_push_rule
         else
           PushRule.global

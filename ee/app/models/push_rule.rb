@@ -21,7 +21,6 @@ class PushRule < ApplicationRecord
 
   belongs_to :project
 
-  validates :project, presence: true, unless: :is_sample?
   validates :max_file_size, numericality: { greater_than_or_equal_to: 0, only_integer: true }
   validates(*REGEX_COLUMNS, untrusted_regexp: true)
 
@@ -91,11 +90,12 @@ class PushRule < ApplicationRecord
     is_sample?
   end
 
-  def available?(feature_sym)
+  def available?(feature_sym, object: nil)
     if global?
       License.feature_available?(feature_sym)
     else
-      project&.feature_available?(feature_sym)
+      object ||= project
+      object&.feature_available?(feature_sym)
     end
   end
 
