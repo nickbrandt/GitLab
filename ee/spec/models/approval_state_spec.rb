@@ -323,6 +323,15 @@ describe ApprovalState do
       end
     end
 
+    describe '#approvals_required' do
+      it "correctly sums the approvals" do
+        create_rule(approvals_required: 3)
+        create_rule(approvals_required: 10)
+
+        expect(subject.approvals_required).to eq(13)
+      end
+    end
+
     describe '#approvers' do
       it 'includes all approvers, including code owner and group members' do
         create_rule(users: [approver1])
