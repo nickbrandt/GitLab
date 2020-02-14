@@ -13,14 +13,14 @@ module EE
 
           if label.scoped_label? && parent && parent.feature_available?(:scoped_labels)
             presenter = label.present(issuable_parent: parent)
-            content = ::EE::LabelsHelper.scoped_label_wrapper(content, presenter)
+            content = ::LabelsHelper.scoped_label_wrapper(content, presenter)
           end
 
           content
         end
 
         def tooltip_title(label)
-          ::EE::LabelsHelper.label_tooltip_title(label)
+          ::LabelsHelper.label_tooltip_title(label)
         end
       end
     end
