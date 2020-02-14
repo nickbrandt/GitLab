@@ -8,6 +8,7 @@ module Projects
     def index
       respond_to do |format|
         format.html do
+          @licenses_app_data = licenses_app_data
           render status: :ok
         end
         format.json do
@@ -79,6 +80,14 @@ module Projects
 
     def truthy?(value)
       value.in?(%w[true 1])
+    end
+
+    def licenses_app_data
+      {
+        endpoint: project_licenses_path(project, detected: true, format: :json),
+        documentation_path: help_page_path('user/application_security/license_compliance/index'),
+        empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg')
+      }
     end
   end
 end
