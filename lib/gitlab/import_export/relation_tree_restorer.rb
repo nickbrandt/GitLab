@@ -195,12 +195,11 @@ module Gitlab
               sub_data_hash)
           end
 
+        # we can't always deduce a class from a relation, since it might have been renamed
         relation_class = relation_key.to_s.classify.constantize rescue nil
-        # persist object(s) or delete from relation
-        if sub_data_hash.nil?
-          data_hash.delete(sub_relation_key)
-        elsif relation_class.try(:supports_bulk_insert?, sub_relation_key)
-          relation_class.bulk_insert_on_save(sub_relation_key, sub_data_hash)
+        # When the child relation data is missing or can be postponed for bulk-insertion
+        # we consider it processed and clear out the key; otherwise, we map it to the key.
+        if sub_data_hash.nil? || relation_class&.try_bulk_insert_on_save(sub_relation_key, sub_data_hash)
           data_hash.delete(sub_relation_key)
         else
           data_hash[sub_relation_key] = sub_data_hash

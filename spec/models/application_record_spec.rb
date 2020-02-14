@@ -58,4 +58,45 @@ describe ApplicationRecord do
       expect(MergeRequest.underscore).to eq('merge_request')
     end
   end
+
+  describe '.try_bulk_insert_on_save' do
+    let(:items) { [1, 2, 3] }
+
+    class WithBulkInsertSupport < ApplicationRecord
+      include ::BulkInsertableAssociations
+    end
+
+    describe WithBulkInsertSupport do
+      context 'when the given association is bulk-insert safe' do
+        it 'queues up items for bulk-insertion and returns true' do
+          expect(described_class).to receive(:supports_bulk_insert?).and_return true
+          expect(described_class).to receive(:bulk_insert_on_save).with(:association, items).and_return(items)
+
+          expect(described_class.try_bulk_insert_on_save(:association, items)).to be_truthy
+        end
+      end
+
+      context 'when the given association is not bulk-insert safe' do
+        it 'does not queue up items for bulk-insertion and returns false' do
+          expect(described_class).to receive(:supports_bulk_insert?).and_return false
+          expect(described_class).not_to receive(:bulk_insert_on_save)
+
+          expect(described_class.try_bulk_insert_on_save(:association, items)).to be_falsey
+        end
+      end
+    end
+
+    class WithoutBulkInsertSupport < ApplicationRecord
+      has_many :projects
+      has_many :label_links
+    end
+
+    describe WithoutBulkInsertSupport do
+      it 'does not queue up items for bulk-insertion and returns false' do
+        expect(described_class).not_to receive(:bulk_insert_on_save)
+
+        expect(described_class.try_bulk_insert_on_save(:label_links, items)).to be_falsey
+      end
+    end
+  end
 end

@@ -45,4 +45,12 @@ class ApplicationRecord < ActiveRecord::Base
   def self.underscore
     Gitlab::SafeRequestStore.fetch("model:#{self}:underscore") { self.to_s.underscore }
   end
+
+  def self.try_bulk_insert_on_save(association, items)
+    if try(:supports_bulk_insert?, association)
+      bulk_insert_on_save(association, items)
+    else
+      false
+    end
+  end
 end
