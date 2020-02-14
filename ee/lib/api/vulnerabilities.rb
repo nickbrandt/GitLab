@@ -59,6 +59,17 @@ module API
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
       end
+
+      desc 'Confirm a vulnerability' do
+        success EE::API::Entities::Vulnerability
+      end
+      post ':id/confirm' do
+        vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
+        break not_modified! if vulnerability.confirmed?
+
+        vulnerability = ::Vulnerabilities::ConfirmService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
+      end
     end
 
     params do
