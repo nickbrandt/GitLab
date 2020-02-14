@@ -46,10 +46,8 @@ module RuboCop
         ].freeze
 
         def on_send(node)
-          if node.send_type?
-            if BLACKLISTED_METHODS.include?(node.method_name)
-              add_offense(node, location: :expression, message: MESSAGE)
-            end
+          if node.send_type? && BLACKLISTED_METHODS.include?(node.method_name)
+            add_offense(node, location: :expression, message: MESSAGE)
           end
         end
       end
