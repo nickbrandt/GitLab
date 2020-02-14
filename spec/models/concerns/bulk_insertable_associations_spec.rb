@@ -87,6 +87,26 @@ describe BulkInsertableAssociations do
       end
     end
 
+    context 'flushing explicitly' do
+      let(:items) { create_items(parent: parent) }
+
+      before do
+        parent.save! # we need the parent to have a valid row ID when flushing explicitly
+        parent.bulk_insert_on_save(:bulk_foos, items)
+      end
+
+      it 'returns all stored items' do
+        flushed_items = items.each { |item| item.bulk_parent_id = parent.id }
+        expect(BulkParent.flush_pending_bulk_inserts(parent)).to eq(bulk_foos: flushed_items)
+      end
+
+      it 'clears all pending items' do
+        BulkParent.flush_pending_bulk_inserts(parent)
+        # should be empty when flushing again
+        expect(BulkParent.flush_pending_bulk_inserts(parent)).to be_empty
+      end
+    end
+
     context 'with multiple threads' do
       it 'isolates writes between threads' do
         attributes1 = create_items(parent: parent)
