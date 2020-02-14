@@ -1977,13 +1977,13 @@ describe Repository do
     it 'calls expire_status_cache' do
       expect(repository).to receive(:expire_status_cache)
 
-      repository.after_create
+      repository.after_create # rubocop:disable RSpec/ClassMutation
     end
 
     it 'logs an event' do
       expect(repository).to receive(:repository_event).with(:create_repository)
 
-      repository.after_create
+      repository.after_create # rubocop:disable RSpec/ClassMutation
     end
   end
 
