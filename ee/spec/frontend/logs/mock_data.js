@@ -6,9 +6,9 @@ export const mockDocumentationPath = '/documentation.md';
 
 const makeMockEnvironment = (id, name, advancedQuerying) => ({
   id,
-  logs_path: `${mockProjectPath}/environments/${id}/logs`,
   project_path: mockProjectPath,
   name,
+  logs_api_path: '/dummy_logs_path.json',
   enable_advanced_logs_querying: advancedQuerying,
 });
 
