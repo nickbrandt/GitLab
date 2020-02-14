@@ -12,7 +12,7 @@ class Groups::LdapsController < Groups::ApplicationController
     # likely the group will never transition out of its current state,
     # so we should tell the group owner.
     if @group.pending_ldap_sync
-      LdapGroupSyncWorker.perform_async(@group.id)
+      LdapGroupSyncWorker.perform_async(@group.id) # rubocop:disable CodeReuse/Worker
       message = 'The group sync has been scheduled'
     elsif @group.valid?
       message = 'The group sync is already scheduled'

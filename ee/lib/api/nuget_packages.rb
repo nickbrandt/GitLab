@@ -129,7 +129,7 @@ module API
 
           track_event('push_package')
 
-          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id)
+          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id) # rubocop:disable CodeReuse/Worker
 
           created!
         rescue ObjectStorage::RemoteStoreError => e
