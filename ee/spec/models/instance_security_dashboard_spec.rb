@@ -89,4 +89,21 @@ describe InstanceSecurityDashboard do
       end
     end
   end
+
+  describe '#projects' do
+    context 'when the user cannot read all resources' do
+      it 'returns only projects on their dashboard that they can read' do
+        expect(subject.projects).to contain_exactly(project1)
+      end
+    end
+
+    context 'when the user can read all resources' do
+      let(:project_ids) { [project1.id, project2.id] }
+      let(:user) { create(:auditor) }
+
+      it "returns all projects on the user's dashboard" do
+        expect(subject.projects).to contain_exactly(project1, project2)
+      end
+    end
+  end
 end

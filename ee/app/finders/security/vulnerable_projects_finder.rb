@@ -2,12 +2,14 @@
 
 module Security
   class VulnerableProjectsFinder
+    PROJECTS_LIMIT = 5000
+
     def initialize(projects)
       @projects = projects
     end
 
     def execute
-      projects.where("EXISTS(?)", vulnerabilities) # rubocop:disable CodeReuse/ActiveRecord
+      projects.where("EXISTS(?)", vulnerabilities).limit(PROJECTS_LIMIT) # rubocop:disable CodeReuse/ActiveRecord
     end
 
     private
