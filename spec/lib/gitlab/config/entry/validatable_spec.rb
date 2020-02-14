@@ -15,9 +15,7 @@ describe Gitlab::Config::Entry::Validatable do
         attr_accessor :test_attribute
 
         validations do
-          # rubocop:disable RSpec/ClassMutation
-          validates :test_attribute, presence: true
-          # rubocop:enable RSpec/ClassMutation
+          validates :test_attribute, presence: true # rubocop:disable RSpec/ClassMutation
         end
       end
     end

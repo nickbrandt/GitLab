@@ -15,9 +15,7 @@ describe Gitlab::Config::Entry::Validator do
   describe 'delegated validator' do
     before do
       validator.class_eval do
-        # rubocop:disable RSpec/ClassMutation
-        validates :test_attribute, presence: true
-        # rubocop:enable RSpec/ClassMutation
+        validates :test_attribute, presence: true # rubocop:disable RSpec/ClassMutation
       end
     end
 
