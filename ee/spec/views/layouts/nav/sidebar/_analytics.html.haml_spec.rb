@@ -7,30 +7,14 @@ describe 'layouts/nav/sidebar/_analytics' do
 
   it_behaves_like 'has nav sidebar'
 
-  before do
-    stub_feature_flags(group_level_productivity_analytics: false)
-  end
-
   context 'top-level items' do
     context 'when feature flags are enabled' do
       it 'has `Analytics` link' do
-        stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true)
-
         render
 
         expect(rendered).to have_content('Analytics')
         expect(rendered).to include(analytics_root_path)
         expect(rendered).to match(/<use xlink:href=".+?icons-.+?#chart">/)
-      end
-
-      it 'has `Productivity Analytics` link' do
-        stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true)
-
-        render
-
-        expect(rendered).to have_content('Productivity Analytics')
-        expect(rendered).to include(analytics_productivity_analytics_path)
-        expect(rendered).to match(/<use xlink:href=".+?icons-.+?#comment">/)
       end
 
       it 'has `Value Stream Analytics` link' do
@@ -83,7 +67,6 @@ describe 'layouts/nav/sidebar/_analytics' do
       it 'no analytics links are rendered' do
         disable_all_analytics_feature_flags
 
-        expect(rendered).not_to have_content('Productivity Analytics')
         expect(rendered).not_to have_content('Value Stream Analytics')
       end
 

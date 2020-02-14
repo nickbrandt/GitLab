@@ -2,7 +2,7 @@
 
 - data_attributes = @request_params.valid? ? @request_params.to_data_attributes : @request_params.to_default_data_attributes
 
-#js-productivity-analytics{ data: data_attributes.merge(hide_group_drop_down: 'true') }
+#js-productivity-analytics{ data: data_attributes }
   .page-title-holder.d-flex.align-items-center
     .page-title
       = _('Productivity Analytics')

@@ -40,7 +40,6 @@ export default () => {
     : null;
 
   const group = buildGroupFromDataset(container.dataset);
-  const hideGroupDropDown = parseBoolean(container.dataset.hideGroupDropDown);
 
   let project = null;
 
@@ -129,7 +128,6 @@ export default () => {
         props: {
           group,
           project,
-          hideGroupDropDown,
         },
         on: {
           groupSelected: this.onGroupSelected,

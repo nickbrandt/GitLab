@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import FilterDropdowns from 'ee/analytics/productivity_analytics/components/filter_dropdowns.vue';
-import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
 import store from 'ee/analytics/productivity_analytics/store';
 import resetStore from '../helpers';
@@ -39,10 +38,6 @@ describe('FilterDropdowns component', () => {
   });
 
   describe('template', () => {
-    it('renders the groups dropdown', () => {
-      expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
-    });
-
     describe('without a group selected', () => {
       beforeEach(() => {
         wrapper.vm.groupId = null;

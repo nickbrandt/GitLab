@@ -1,13 +1,11 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import { accessLevelReporter, projectsPerPage } from '../constants';
 import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   components: {
-    GroupsDropdownFilter,
     ProjectsDropdownFilter,
   },
   props: {
@@ -20,11 +18,7 @@ export default {
       type: Object,
       required: false,
       default: null,
-    },
-    hideGroupDropDown: {
-      type: Boolean,
-      default: false,
-    },
+    }
   },
   data() {
     return {
@@ -42,11 +36,6 @@ export default {
   },
   methods: {
     ...mapActions('filters', ['setGroupNamespace', 'setProjectPath']),
-    onGroupSelected({ id, full_path }) {
-      this.groupId = id;
-      this.setGroupNamespace(full_path);
-      this.$emit('groupSelected', { groupId: id, groupNamespace: full_path });
-    },
     onProjectsSelected(selectedProjects) {
       let projectNamespace = null;
       let projectId = null;
@@ -65,9 +54,6 @@ export default {
       });
     },
   },
-  groupsQueryParams: {
-    min_access_level: accessLevelReporter,
-  },
   projectsQueryParams: {
     per_page: projectsPerPage,
     with_shared: false, // exclude forks
@@ -79,13 +65,6 @@ export default {
 
 <template>
   <div class="dropdown-container d-flex flex-column flex-lg-row">
-    <groups-dropdown-filter
-      v-if="!hideGroupDropDown"
-      class="group-select"
-      :query-params="$options.groupsQueryParams"
-      :default-group="group"
-      @selected="onGroupSelected"
-    />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"

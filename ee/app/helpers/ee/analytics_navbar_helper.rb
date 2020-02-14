@@ -26,7 +26,6 @@ module EE
 
     def productivity_analytics_navbar_link(group, current_user)
       return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
-      return unless ::Feature.enabled?(:group_level_productivity_analytics)
       return unless group_sidebar_link?(:productivity_analytics)
 
       navbar_sub_item(
