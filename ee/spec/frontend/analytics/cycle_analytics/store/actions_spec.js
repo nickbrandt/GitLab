@@ -682,6 +682,53 @@ describe('Cycle analytics actions', () => {
         done();
       });
     });
+
+    describe('receiveUpdateStageSuccess', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+      });
+
+      const response = {
+        title: 'NEW - COOL',
+      };
+
+      it('will dispatch fetchGroupStagesAndEvents and fetchSummaryData', () =>
+        testAction(
+          actions.receiveUpdateStageSuccess,
+          response,
+          state,
+          [{ type: types.RECEIVE_UPDATE_STAGE_SUCCESS }],
+          [{ type: 'fetchGroupStagesAndEvents' }, { type: 'setSelectedStage', payload: response }],
+        ));
+
+      it('will flash a success message', () =>
+        actions
+          .receiveUpdateStageSuccess(
+            {
+              dispatch: () => {},
+              commit: () => {},
+            },
+            response,
+          )
+          .then(() => {
+            shouldFlashAMessage('Stage data updated');
+          }));
+
+      describe('with an error', () => {
+        it('will flash an error message', () =>
+          actions
+            .receiveUpdateStageSuccess(
+              {
+                dispatch: () => Promise.reject(),
+                commit: () => {},
+              },
+              response,
+            )
+            .then(() => {
+              shouldFlashAMessage('There was a problem refreshing the data, please try again');
+            }));
+      });
+    });
   });
 
   describe('removeStage', () => {
@@ -1274,6 +1321,152 @@ describe('Cycle analytics actions', () => {
         ],
         done,
       );
+    });
+  });
+
+  describe('createCustomStage', () => {
+    describe('with valid data', () => {
+      const customStageData = {
+        startEventIdentifier: 'start_event',
+        endEventIdentifier: 'end_event',
+        name: 'cool-new-stage',
+      };
+
+      beforeEach(() => {
+        state = { ...state, selectedGroup };
+        mock.onPost(endpoints.baseStagesEndpointstageData).reply(201, customStageData);
+      });
+
+      it(`dispatches the 'receiveCreateCustomStageSuccess' action`, () =>
+        testAction(
+          actions.createCustomStage,
+          customStageData,
+          state,
+          [],
+          [
+            { type: 'requestCreateCustomStage' },
+            {
+              type: 'receiveCreateCustomStageSuccess',
+              payload: { data: customStageData, status: 201 },
+            },
+          ],
+        ));
+    });
+
+    describe('with errors', () => {
+      const message = 'failed';
+      const errors = {
+        endEventIdentifier: ['Cant be blank'],
+      };
+      const customStageData = {
+        startEventIdentifier: 'start_event',
+        endEventIdentifier: '',
+        name: 'cool-new-stage',
+      };
+
+      beforeEach(() => {
+        state = { ...state, selectedGroup };
+        mock.onPost(endpoints.baseStagesEndpointstageData).reply(422, {
+          message,
+          errors,
+        });
+      });
+
+      it(`dispatches the 'receiveCreateCustomStageError' action`, () =>
+        testAction(
+          actions.createCustomStage,
+          customStageData,
+          state,
+          [],
+          [
+            { type: 'requestCreateCustomStage' },
+            {
+              type: 'receiveCreateCustomStageError',
+              payload: {
+                data: customStageData,
+                errors,
+                message,
+                status: 422,
+              },
+            },
+          ],
+        ));
+    });
+  });
+
+  describe('receiveCreateCustomStageError', () => {
+    const response = {
+      data: { name: 'uh oh' },
+    };
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('will commit the RECEIVE_CREATE_CUSTOM_STAGE_ERROR mutation', () =>
+      testAction(actions.receiveCreateCustomStageError, response, state, [
+        { type: types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, payload: { errors: {} } },
+      ]));
+
+    it('will flash an error message', done => {
+      actions.receiveCreateCustomStageError(
+        {
+          commit: () => {},
+        },
+        response,
+      );
+
+      shouldFlashAMessage('There was a problem saving your custom stage, please try again');
+      done();
+    });
+
+    describe('with a stage name error', () => {
+      it('will flash an error message', done => {
+        actions.receiveCreateCustomStageError(
+          {
+            commit: () => {},
+          },
+          { ...response, status: 422, errors: { name: ['is reserved'] } },
+        );
+
+        shouldFlashAMessage("'uh oh' stage already exists");
+        done();
+      });
+    });
+  });
+
+  describe('receiveCreateCustomStageSuccess', () => {
+    const response = {
+      data: {
+        title: 'COOL',
+      },
+    };
+
+    it('will dispatch fetchGroupStagesAndEvents and fetchSummaryData', () =>
+      testAction(
+        actions.receiveCreateCustomStageSuccess,
+        response,
+        state,
+        [{ type: types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS }],
+        [{ type: 'fetchGroupStagesAndEvents' }, { type: 'fetchSummaryData' }],
+      ));
+
+    describe('with an error', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+      });
+      it('will flash an error message', () =>
+        actions
+          .receiveCreateCustomStageSuccess(
+            {
+              dispatch: () => Promise.reject(),
+              commit: () => {},
+            },
+            response,
+          )
+          .then(() => {
+            shouldFlashAMessage('There was a problem refreshing the data, please try again');
+          }));
     });
   });
 });

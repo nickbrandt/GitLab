@@ -435,8 +435,8 @@ describe 'Group Value Stream Analytics', :js do
 
           context 'with all required fields set' do
             before do
-              select_dropdown_label 'custom-stage-start-event-label', 2
-              select_dropdown_label 'custom-stage-stop-event-label', 3
+              select_dropdown_label 'custom-stage-start-event-label', 1
+              select_dropdown_label 'custom-stage-stop-event-label', 2
             end
 
             it_behaves_like 'submits the form successfully', custom_stage_with_labels_name

@@ -24,7 +24,7 @@ const handleErrorOrRethrow = ({ action, error }) => {
 const isStageNameExistsError = ({ status, errors }) => {
   const ERROR_NAME_RESERVED = 'is reserved';
   if (status === httpStatus.UNPROCESSABLE_ENTITY) {
-    if (errors.name && errors.name[0] === ERROR_NAME_RESERVED) return true;
+    if (errors?.name.includes(ERROR_NAME_RESERVED)) return true;
   }
   return false;
 };
@@ -278,16 +278,24 @@ export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { 
   commit(types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS);
   createFlash(sprintf(__(`Your custom stage '%{title}' was created`), { title }), 'notice');
 
-  return dispatch('fetchGroupStagesAndEvents').then(() => dispatch('fetchSummaryData'));
+  return Promise.resolve()
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchSummaryData'))
+    .catch(() => {
+      createFlash(__('There was a problem refreshing the data, please try again'));
+    });
 };
 
-export const receiveCreateCustomStageError = ({ commit }, { status, message, errors, data }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, { status, message, errors, data });
-
-  const { name } = data;
-  const flashMessage = isStageNameExistsError({ status, errors })
-    ? sprintf(__(`'%{name}' stage already exists`), { name })
-    : __('There was a problem saving your custom stage, please try again');
+export const receiveCreateCustomStageError = (
+  { commit },
+  { status = 400, errors = {}, data = {} } = {},
+) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, { errors });
+  const { name = null } = data;
+  const flashMessage =
+    name && isStageNameExistsError({ status, errors })
+      ? sprintf(__(`'%{name}' stage already exists`), { name })
+      : __('There was a problem saving your custom stage, please try again');
 
   createFlash(flashMessage);
 };
@@ -299,12 +307,12 @@ export const createCustomStage = ({ dispatch, state }, data) => {
   dispatch('requestCreateCustomStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
-    .then(response => dispatch('receiveCreateCustomStageSuccess', response))
-    .catch(({ response }) => {
-      const {
-        data: { message, errors },
-        status,
-      } = response;
+    .then(response => {
+      const { status, data: responseData } = response;
+      return dispatch('receiveCreateCustomStageSuccess', { status, data: responseData });
+    })
+    .catch(({ response } = {}) => {
+      const { data: { message, errors } = null, status = 400 } = response;
 
       dispatch('receiveCreateCustomStageError', { data, message, errors, status });
     });
@@ -356,8 +364,12 @@ export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => 
   commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
 
-  dispatch('fetchGroupStagesAndEvents');
-  dispatch('setSelectedStage', updatedData);
+  return Promise.all([
+    dispatch('fetchGroupStagesAndEvents'),
+    dispatch('setSelectedStage', updatedData),
+  ]).catch(() => {
+    createFlash(__('There was a problem refreshing the data, please try again'));
+  });
 };
 
 export const receiveUpdateStageError = (
