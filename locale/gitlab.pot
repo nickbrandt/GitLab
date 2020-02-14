@@ -17112,9 +17112,6 @@ msgstr ""
 msgid "Self monitoring project does not exist"
 msgstr ""
 
-msgid "Self-monitoring is not enabled on this GitLab server, contact your administrator."
-msgstr ""
-
 msgid "Self-monitoring project does not exist. Please check logs for any error messages"
 msgstr ""
 
