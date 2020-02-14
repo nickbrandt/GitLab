@@ -199,22 +199,6 @@ module API
         end.compact
       end
     end
-
-    class UserAgentDetail < Grape::Entity
-      expose :user_agent
-      expose :ip_address
-      expose :submitted, as: :akismet_submitted
-    end
-
-    class CustomAttribute < Grape::Entity
-      expose :key
-      expose :value
-    end
-
-    class PagesDomainCertificateExpiration < Grape::Entity
-      expose :expired?, as: :expired
-      expose :expiration
-    end
   end
 end
 
