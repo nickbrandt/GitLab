@@ -4,6 +4,7 @@ import { createStoreOptions } from 'ee/approvals/stores';
 import projectSettingsModule from 'ee/approvals/stores/modules/project_settings';
 import ApproversSelect from 'ee/approvals/components/approvers_select.vue';
 import ApproversList from 'ee/approvals/components/approvers_list.vue';
+import BranchesSelect from 'ee/approvals/components/branches_select.vue';
 import RuleForm from 'ee/approvals/components/rule_form.vue';
 import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from 'ee/approvals/constants';
 
@@ -14,6 +15,11 @@ const TEST_RULE = {
   approvalsRequired: 2,
   users: [{ id: 1 }, { id: 2 }, { id: 3 }],
   groups: [{ id: 1 }, { id: 2 }],
+};
+const TEST_PROTECTED_BRANCHES = [{ id: 2 }];
+const TEST_RULE_WITH_PROTECTED_BRANCHES = {
+  ...TEST_RULE,
+  protectedBranches: TEST_PROTECTED_BRANCHES,
 };
 const TEST_APPROVERS = [{ id: 7, type: TYPE_USER }];
 const TEST_APPROVALS_REQUIRED = 3;
@@ -37,12 +43,16 @@ describe('EE Approvals RuleForm', () => {
       propsData: props,
       store: new Vuex.Store(store),
       localVue,
+      provide: {
+        glFeatures: { scopedApprovalRules: true },
+      },
     });
   };
   const findValidation = (node, hasProps = false) => ({
     feedback: node.element.nextElementSibling.textContent,
     isValid: hasProps ? !node.props('isInvalid') : !node.classes('is-invalid'),
   });
+
   const findNameInput = () => wrapper.find('input[name=name]');
   const findNameValidation = () => findValidation(findNameInput(), false);
   const findApprovalsRequiredInput = () => wrapper.find('input[name=approvals_required]');
@@ -50,10 +60,19 @@ describe('EE Approvals RuleForm', () => {
   const findApproversSelect = () => wrapper.find(ApproversSelect);
   const findApproversValidation = () => findValidation(findApproversSelect(), true);
   const findApproversList = () => wrapper.find(ApproversList);
+  const findBranchesSelect = () => wrapper.find(BranchesSelect);
+  const findBranchesValidation = () => findValidation(findBranchesSelect(), true);
   const findValidations = () => [
     findNameValidation(),
     findApprovalsRequiredValidation(),
     findApproversValidation(),
+  ];
+
+  const findValidationsWithBranch = () => [
+    findNameValidation(),
+    findApprovalsRequiredValidation(),
+    findApproversValidation(),
+    findBranchesValidation(),
   ];
 
   beforeEach(() => {
@@ -73,6 +92,83 @@ describe('EE Approvals RuleForm', () => {
   describe('when allow multiple rules', () => {
     beforeEach(() => {
       store.state.settings.allowMultiRule = true;
+    });
+
+    describe('when has protected branch feature', () => {
+      describe('with initial rule', () => {
+        beforeEach(() => {
+          createComponent({
+            isMrEdit: false,
+            initRule: TEST_RULE_WITH_PROTECTED_BRANCHES,
+          });
+        });
+
+        it('on load, it populates initial protected branch ids', () => {
+          expect(wrapper.vm.branches).toEqual(TEST_PROTECTED_BRANCHES.map(x => x.id));
+        });
+      });
+
+      describe('without initRule', () => {
+        beforeEach(() => {
+          store.state.settings.protectedBranches = TEST_PROTECTED_BRANCHES;
+          createComponent({
+            isMrEdit: false,
+          });
+        });
+
+        it('at first, shows no validation', () => {
+          const inputs = findValidationsWithBranch();
+          const invalidInputs = inputs.filter(x => !x.isValid);
+          const feedbacks = inputs.map(x => x.feedback);
+
+          expect(invalidInputs.length).toBe(0);
+          expect(feedbacks.every(str => !str.length)).toBe(true);
+        });
+
+        it('on submit, shows branches validation', done => {
+          wrapper.vm.branches = ['3'];
+          wrapper.vm.submit();
+
+          localVue
+            .nextTick()
+            .then(() => {
+              expect(findBranchesValidation()).toEqual({
+                isValid: false,
+                feedback: 'Please select a valid target branch',
+              });
+            })
+            .then(done)
+            .catch(done.fail);
+        });
+
+        it('on submit with data, posts rule', () => {
+          const users = [1, 2];
+          const groups = [2, 3];
+          const userRecords = users.map(id => ({ id, type: TYPE_USER }));
+          const groupRecords = groups.map(id => ({ id, type: TYPE_GROUP }));
+          const branches = TEST_PROTECTED_BRANCHES.map(x => x.id);
+          const expected = {
+            id: null,
+            name: 'Lorem',
+            approvalsRequired: 2,
+            users,
+            groups,
+            userRecords,
+            groupRecords,
+            removeHiddenGroups: false,
+            protectedBranchIds: branches,
+          };
+
+          findNameInput().setValue(expected.name);
+          findApprovalsRequiredInput().setValue(expected.approvalsRequired);
+          wrapper.vm.approvers = groupRecords.concat(userRecords);
+          wrapper.vm.branches = expected.protectedBranchIds;
+
+          wrapper.vm.submit();
+
+          expect(actions.postRule).toHaveBeenCalledWith(jasmine.anything(), expected, undefined);
+        });
+      });
     });
 
     describe('without initRule', () => {
@@ -150,6 +246,7 @@ describe('EE Approvals RuleForm', () => {
         const groups = [2, 3];
         const userRecords = users.map(id => ({ id, type: TYPE_USER }));
         const groupRecords = groups.map(id => ({ id, type: TYPE_GROUP }));
+        const branches = TEST_PROTECTED_BRANCHES.map(x => x.id);
         const expected = {
           id: null,
           name: 'Lorem',
@@ -159,11 +256,13 @@ describe('EE Approvals RuleForm', () => {
           userRecords,
           groupRecords,
           removeHiddenGroups: false,
+          protectedBranchIds: branches,
         };
 
         findNameInput().setValue(expected.name);
         findApprovalsRequiredInput().setValue(expected.approvalsRequired);
         wrapper.vm.approvers = groupRecords.concat(userRecords);
+        wrapper.vm.branches = expected.protectedBranchIds;
 
         wrapper.vm.submit();
 
@@ -215,6 +314,7 @@ describe('EE Approvals RuleForm', () => {
           userRecords,
           groupRecords,
           removeHiddenGroups: false,
+          protectedBranchIds: [],
         };
 
         wrapper.vm.submit();
