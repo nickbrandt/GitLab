@@ -11,7 +11,7 @@ module EE
     def render_label(label, tooltip: true, link: nil, dataset: nil, small: false)
       return super unless label.scoped_label?
 
-      scoped_label_doc_wrapper(
+      scoped_label_wrapper(
         super(
           label,
           tooltip: tooltip,
@@ -19,7 +19,8 @@ module EE
           dataset: dataset,
           small: small,
           wrapper_class: 'gl-label-scoped',
-          wrapper_style: "color: #{label.color}"
+          wrapper_style: "color: #{label.color}",
+          extra: scoped_labels_doc_link(label)
         ),
         label
       )
@@ -39,13 +40,12 @@ module EE
         bg_color: label.color
       ) + render_partial_label(
         label, label_suffix: label_suffix,
-        label_name: label_name,
-        css_class: 'gl-label-scoped-text'
+        label_name: label_name
       )
     end
 
-    def scoped_label_doc_wrapper(link, label)
-      %(<span class="d-inline-block position-relative scoped-label-wrapper">#{link}#{scoped_labels_doc_link(label)}</span>).html_safe
+    def scoped_label_wrapper(link, label)
+      %(<span class="d-inline-block position-relative scoped-label-wrapper">#{link}</span>).html_safe
     end
 
     def label_tooltip_title(label)
@@ -84,13 +84,11 @@ module EE
       super + ['epics']
     end
 
-    private
-
     def scoped_labels_doc_link(label)
       content = %(<i class="fa fa-question-circle"></i>)
       help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels')
 
-      %(<a href="#{help_url}" class="label scoped-label gl-link gl-label-icon" target="_blank" rel="noopener">#{content}</a>)
+      %(<a href="#{help_url}" class="gl-link gl-label-icon" target="_blank" rel="noopener">#{content}</a>)
     end
   end
 end

@@ -8,8 +8,7 @@
     %span.no-value{ "v-if" => "issue.labels && issue.labels.length === 0" }
       = _("None")
     %span{ "v-for" => "label in issue.labels" }
-      %gl-label{ ":id" => "label.id",
-        ":key" => "label.id",
+      %gl-label{ ":key" => "label.id",
         ":background-color" => "label.color",
         ":title" => "label.title",
         ":description" => "label.description",

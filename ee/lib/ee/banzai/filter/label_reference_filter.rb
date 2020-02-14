@@ -13,6 +13,8 @@ module EE
 
           if label.scoped_label? && parent && parent.feature_available?(:scoped_labels)
             presenter = label.present(issuable_parent: parent)
+            doc_link = ::LabelsHelper.scoped_labels_doc_link(label)
+            content = %(<span class="gl-label gl-label-scoped gl-label-sm" style="color: #{label.color}">#{link}#{doc_link}</span>)
             content = ::LabelsHelper.scoped_label_wrapper(content, presenter)
           end
 

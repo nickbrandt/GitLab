@@ -97,6 +97,8 @@
     .color-label {
       padding: 4px $grid-size;
       border-radius: $label-border-radius;
+      margin-right: 4px;
+      margin-bottom: 4px;
     }
 
     &:hover .color-label {
@@ -123,8 +125,7 @@
       padding-right: $gl-padding-24;
     }
 
-    .scoped-label,
-    .gl-label-icon {
+    .scoped-label {
       right: 12px;
     }
   }
@@ -166,14 +167,22 @@
     }
   }
 
-  .gl-label .gl-label-link:hover,
-  .gl-label + .gl-label-icon:hover {
+  a.gl-label-icon {
+    color: $gray-500;
+  }
+
+  .gl-label .gl-label-link:hover {
     text-decoration: none;
     color: inherit;
 
     .gl-label-text:last-of-type {
       text-decoration: underline;
     }
+  }
+
+  .gl-label .gl-label-icon:hover {
+    text-decoration: none;
+    color: $gray-500;
   }
 
   .btn-link {
@@ -824,6 +833,10 @@
             text-decoration: underline;
           }
         }
+      }
+
+      .gl-label-icon {
+        color: $gray-500;
       }
     }
 

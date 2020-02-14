@@ -46,7 +46,7 @@ module LabelsHelper
     end
   end
 
-  def render_label(label, tooltip: true, link: nil, dataset: nil, small: false, wrapper_class: nil, wrapper_style: nil)
+  def render_label(label, tooltip: true, link: nil, dataset: nil, small: false, wrapper_class: nil, wrapper_style: nil, extra: nil)
     # if scoped label is used then EE wraps label tag with scoped label
     # doc link
     html = render_colored_label(label)
@@ -59,6 +59,8 @@ module LabelsHelper
         data: label_dataset(label, dataset, tooltip)
       )
     end
+
+    html += extra.html_safe if extra
 
     wrapper_classes = Array.wrap(wrapper_class)
     wrapper_classes << 'gl-label'
@@ -136,7 +138,7 @@ module LabelsHelper
     end
 
     if (r + g + b) > 500
-      'gl-label-text-black'
+      'gl-label-text-dark'
     else
       'gl-label-text-light'
     end

@@ -13,14 +13,13 @@
 
   .page-title,
   .modal-title {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     .modal-title-with-label span {
       vertical-align: middle;
       display: inline-block;
-    }
-
-    .gl-label {
-      vertical-align: top;
-      line-height: 16px;
     }
   }
 
