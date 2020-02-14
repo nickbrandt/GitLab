@@ -25,6 +25,10 @@ class InstanceSecurityDashboard
     License.feature_available?(feature)
   end
 
+  def projects
+    Project.where(id: visible_users_security_dashboard_projects)
+  end
+
   private
 
   attr_reader :project_ids, :user
