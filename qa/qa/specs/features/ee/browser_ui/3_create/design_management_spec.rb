@@ -2,7 +2,7 @@
 
 module QA
   context 'Create' do
-    describe 'Design management', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/205205', type: :investigating } do
+    describe 'Design management' do
       let(:issue) { Resource::Issue.fabricate_via_api! }
       let(:design_filename) { 'banana_sample.gif' }
       let(:design) { File.absolute_path(File.join('spec', 'fixtures', design_filename)) }
