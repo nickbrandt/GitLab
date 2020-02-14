@@ -30,6 +30,7 @@ export default {
   computed: {
     ...mapState([
       'canUpdate',
+      'allowSubEpics',
       'sidebarCollapsed',
       'participants',
       'startDateSourcingMilestoneTitle',
@@ -186,7 +187,7 @@ export default {
         @toggleCollapse="toggleSidebar({ sidebarCollapsed })"
       />
       <sidebar-labels :can-update="canUpdate" :sidebar-collapsed="sidebarCollapsed" />
-      <div class="block ancestors">
+      <div v-if="allowSubEpics" class="block ancestors">
         <ancestors-tree :ancestors="ancestors" :is-fetching="false" />
       </div>
       <div class="block participants">

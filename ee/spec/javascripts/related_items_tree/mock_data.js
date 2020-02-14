@@ -7,6 +7,7 @@ export const mockInitialConfig = {
   autoCompleteEpics: true,
   autoCompleteIssues: false,
   userSignedIn: true,
+  allowSubEpics: true,
 };
 
 export const mockParentItem = {
