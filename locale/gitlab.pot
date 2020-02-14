@@ -10130,6 +10130,9 @@ msgstr ""
 msgid "IDE|Successful commit"
 msgstr ""
 
+msgid "IDE|This option is disabled because you are not allowed to create merge requests in this project."
+msgstr ""
+
 msgid "IDE|This option is disabled because you don't have write permissions for the current branch."
 msgstr ""
 
