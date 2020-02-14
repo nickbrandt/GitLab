@@ -28,12 +28,9 @@ export default {
       return this.label === null;
     },
     pinStyle() {
-      const style = this.position;
-      if (this.repositioning) {
-        style.cursor = 'move';
-      }
-
-      return style;
+      return this.repositioning
+        ? Object.assign({}, this.position, { cursor: 'move' })
+        : this.position;
     },
     pinLabel() {
       return this.isNewNote

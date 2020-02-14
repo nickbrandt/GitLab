@@ -38,7 +38,7 @@ export default {
     return {
       overlayDimensions: null,
       overlayPosition: null,
-      currentAnnotationCoordinates: null,
+      currentAnnotationPosition: null,
       zoomFocalPoint: {
         x: 0,
         y: 0,
@@ -53,7 +53,7 @@ export default {
       return this.discussions.map(discussion => discussion.notes[0]);
     },
     currentCommentForm() {
-      return (this.isAnnotating && this.currentAnnotationCoordinates) || null;
+      return (this.isAnnotating && this.currentAnnotationPosition) || null;
     },
   },
   beforeDestroy() {
@@ -73,8 +73,22 @@ export default {
     presentationViewport.addEventListener('scroll', this.scrollThrottled, false);
   },
   methods: {
+    syncCurrentAnnotationPosition() {
+      if (!this.currentAnnotationPosition) return;
+
+      const widthRatio = this.overlayDimensions.width / this.currentAnnotationPosition.width;
+      const heightRatio = this.overlayDimensions.height / this.currentAnnotationPosition.height;
+      const x = this.currentAnnotationPosition.x * widthRatio;
+      const y = this.currentAnnotationPosition.y * heightRatio;
+
+      this.currentAnnotationPosition = this.getAnnotationPositon({ x, y });
+    },
     setOverlayDimensions(overlayDimensions) {
       this.overlayDimensions = overlayDimensions;
+
+      // every time we set overlay dimensions, we need to
+      // update the current annotation as well
+      this.syncCurrentAnnotationPosition();
     },
     setOverlayPosition() {
       if (!this.overlayDimensions) {
@@ -174,16 +188,19 @@ export default {
         }
       });
     },
-    openCommentForm(position) {
-      const { x, y } = position;
+    getAnnotationPositon(coordinates) {
+      const { x, y } = coordinates;
       const { width, height } = this.overlayDimensions;
-      this.currentAnnotationCoordinates = {
+      return {
         x,
         y,
         width,
         height,
       };
-      this.$emit('openCommentForm', this.currentAnnotationCoordinates);
+    },
+    openCommentForm(coordinates) {
+      this.currentAnnotationPosition = this.getAnnotationPositon(coordinates);
+      this.$emit('openCommentForm', this.currentAnnotationPosition);
     },
   },
 };
