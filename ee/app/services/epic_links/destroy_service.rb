@@ -26,8 +26,8 @@ module EpicLinks
     def permission_to_remove_relation?
       child_epic.present? &&
         parent_epic.present? &&
-        can?(current_user, :admin_epic_link, parent_epic) &&
-        can?(current_user, :admin_epic_link, child_epic)
+        can?(current_user, :admin_epic, parent_epic) &&
+        can?(current_user, :admin_epic, child_epic)
     end
 
     def not_found_message

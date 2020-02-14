@@ -45,9 +45,9 @@ describe EpicLinks::DestroyService do
       described_class.new(child_epic, user).execute
     end
 
-    context 'when subepics feature is disabled' do
+    context 'when epics feature is disabled' do
       before do
-        stub_licensed_features(epics: true, subepics: false)
+        stub_licensed_features(epics: false)
       end
 
       subject { remove_epic_relation(child_epic) }
@@ -55,9 +55,9 @@ describe EpicLinks::DestroyService do
       include_examples 'returns not found error'
     end
 
-    context 'when subepics feature is enabled' do
+    context 'when epics feature is enabled' do
       before do
-        stub_licensed_features(epics: true, subepics: true)
+        stub_licensed_features(epics: true)
       end
 
       context 'when the user has no permissions to remove epic relation' do
