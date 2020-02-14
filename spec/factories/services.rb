@@ -145,13 +145,13 @@ FactoryBot.define do
     create_data { false }
 
     after(:build) do |service|
-      IssueTrackerService.skip_callback(:validation, :before, :handle_properties)
+      IssueTrackerService.skip_callback(:validation, :before, :handle_properties) # rubocop:disable RSpec/ClassMutation
     end
 
     to_create { |instance| instance.save(validate: false) }
 
     after(:create) do
-      IssueTrackerService.set_callback(:validation, :before, :handle_properties)
+      IssueTrackerService.set_callback(:validation, :before, :handle_properties) # rubocop:disable RSpec/ClassMutation
     end
   end
 end

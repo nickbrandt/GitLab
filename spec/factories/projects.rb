@@ -141,7 +141,9 @@ FactoryBot.define do
 
     trait :without_container_expiration_policy do
       after(:build) do |project|
-        project.class.skip_callback(:create, :after, :create_container_expiration_policy, raise: false)
+        # the cop should be enabled again as part of or as a follow-up to:
+        # https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22962
+        project.class.skip_callback(:create, :after, :create_container_expiration_policy, raise: false) # rubocop:disable RSpec/ClassMutation
       end
     end
 
