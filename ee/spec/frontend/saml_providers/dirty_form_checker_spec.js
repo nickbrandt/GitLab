@@ -2,7 +2,6 @@ import DirtyFormChecker from 'ee/saml_providers/dirty_form_checker';
 
 describe('DirtyFormChecker', () => {
   const FIXTURE = 'groups/saml_providers/show.html';
-  preloadFixtures(FIXTURE);
 
   beforeEach(() => {
     loadFixtures(FIXTURE);
@@ -34,7 +33,7 @@ describe('DirtyFormChecker', () => {
     let onChangeCallback;
 
     beforeEach(() => {
-      onChangeCallback = jasmine.createSpy('onChangeCallback');
+      onChangeCallback = jest.fn();
       dirtyFormChecker = new DirtyFormChecker('#js-saml-settings-form', onChangeCallback);
     });
 
