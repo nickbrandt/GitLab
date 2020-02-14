@@ -8,7 +8,9 @@ describe Gitlab::Config::Entry::Factory do
       include Gitlab::Config::Entry::Validatable
 
       validations do
+        # rubocop:disable RSpec/ClassMutation
         validates :config, array_of_strings: true
+        # rubocop:enable RSpec/ClassMutation
       end
     end
 

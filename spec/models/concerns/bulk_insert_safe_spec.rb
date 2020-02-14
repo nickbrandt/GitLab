@@ -10,17 +10,21 @@ describe BulkInsertSafe do
   module InheritedUnsafeMethods
     extend ActiveSupport::Concern
 
+    # rubocop:disable RSpec/ClassMutation
     included do
       after_save -> { "unsafe" }
     end
+    # rubocop:enable RSpec/ClassMutation
   end
 
   module InheritedSafeMethods
     extend ActiveSupport::Concern
 
+    # rubocop:disable RSpec/ClassMutation
     included do
       after_initialize -> { "safe" }
     end
+    # rubocop:enable RSpec/ClassMutation
   end
 
   it_behaves_like 'a BulkInsertSafe model', BulkInsertItem
