@@ -132,3 +132,39 @@ export const environmentsList = [
     ...sharedEnvironmentData(12),
   },
 ];
+
+export const serverDataList = [
+  {
+    name: 'DEV',
+    size: 1,
+    latest: {
+      name: 'DEV',
+      environment_type: null,
+      created_at: '2017-01-31T10:53:46.894Z',
+      updated_at: '2017-01-31T10:53:46.894Z',
+      ...sharedEnvironmentData(7),
+    },
+  },
+  {
+    name: 'build',
+    size: 5,
+    latest: {
+      name: 'build/update-README',
+      environment_type: 'build',
+      created_at: '2017-02-01T19:42:18.400Z',
+      updated_at: '2017-02-01T19:42:18.400Z',
+      ...sharedEnvironmentData(12),
+    },
+  },
+  {
+    name: 'build',
+    size: 1,
+    latest: {
+      name: 'build/update-README',
+      environment_type: 'build',
+      created_at: '2017-02-01T19:42:18.400Z',
+      updated_at: '2017-02-01T19:42:18.400Z',
+      ...sharedEnvironmentData(15),
+    },
+  },
+];
