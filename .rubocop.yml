@@ -279,6 +279,17 @@ RSpec/BeSuccessMatcher:
     - 'spec/support/controllers/**/*'
     - 'ee/spec/support/controllers/**/*'
 
+RSpec/ClassMutation:
+  Enable: true
+  Include:
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+  Exclude:
+    - 'spec/**/fast_spec_helper.rb'
+    - 'ee/spec/**/fast_spec_helper.rb'
+    - 'spec/**/spec_helper.rb'
+    - 'ee/spec/**/spec_helper.rb'
+
 Scalability/FileUploads:
   Enabled: true
   Include:
