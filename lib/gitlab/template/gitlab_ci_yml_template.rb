@@ -34,7 +34,7 @@ module Gitlab
 
         def finder(project = nil)
           Gitlab::Template::Finders::GlobalTemplateFinder.new(
-            self.base_dir, self.extension, self.categories, self.disabled_templates
+            self.base_dir, self.extension, self.categories, exclusions: self.disabled_templates
           )
         end
       end

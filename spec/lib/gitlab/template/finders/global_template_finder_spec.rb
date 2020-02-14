@@ -15,7 +15,7 @@ describe Gitlab::Template::Finders::GlobalTemplateFinder do
     FileUtils.rm_rf(base_dir)
   end
 
-  subject(:finder) { described_class.new(base_dir, '', { 'General' => '', 'Bar' => 'Bar' }, exclusions) }
+  subject(:finder) { described_class.new(base_dir, '', { 'General' => '', 'Bar' => 'Bar' }, exclusions: exclusions) }
 
   let(:exclusions) { [] }
 
@@ -29,7 +29,7 @@ describe Gitlab::Template::Finders::GlobalTemplateFinder do
         expect(finder.find('test-template')).to be_present
       end
 
-      it 'it does not find a prefixed template' do
+      it 'does not find a prefixed template' do
         expect(finder.find('Bar/test-template')).to be_nil
       end
 
@@ -67,7 +67,8 @@ describe Gitlab::Template::Finders::GlobalTemplateFinder do
       end
 
       # NOTE: This spec fails, the template Bar/test-template is found
-      xit 'it does not find the template without a prefix' do
+      # See Gitlab issue: https://gitlab.com/gitlab-org/gitlab/issues/205719
+      xit 'does not find the template without a prefix' do
         expect(finder.find('test-template')).to be_nil
       end
 
@@ -83,6 +84,7 @@ describe Gitlab::Template::Finders::GlobalTemplateFinder do
         end
 
         # NOTE: This spec fails, the template Bar/test-template is found
+        # See Gitlab issue: https://gitlab.com/gitlab-org/gitlab/issues/205719
         xit 'does not find the template without a prefix' do
           expect(finder.find('test-template')).to be_nil
         end

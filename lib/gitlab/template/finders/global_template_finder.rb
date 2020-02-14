@@ -5,7 +5,7 @@ module Gitlab
   module Template
     module Finders
       class GlobalTemplateFinder < BaseTemplateFinder
-        def initialize(base_dir, extension, categories = {}, exclusions = [])
+        def initialize(base_dir, extension, categories = {}, exclusions: [])
           @categories = categories
           @extension  = extension
           @exclusions = exclusions
