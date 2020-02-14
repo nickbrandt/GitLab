@@ -23,18 +23,26 @@ describe('Design overlay component', () => {
     },
   ];
 
+  const mockDimensions = { width: 100, height: 100 };
+
+  const findOverlay = () => wrapper.find('.image-diff-overlay');
   const findAllNotes = () => wrapper.findAll('.js-image-badge');
   const findCommentBadge = () => wrapper.find('.comment-indicator');
   const findFirstBadge = () => findAllNotes().at(0);
   const findSecondBadge = () => findAllNotes().at(1);
 
+  const clickAndDragBadge = (elem, fromPoint, toPoint) => {
+    elem.trigger('mousedown', { clientX: fromPoint.x, clientY: fromPoint.y });
+    return wrapper.vm.$nextTick().then(() => {
+      elem.trigger('mousemove', { clientX: toPoint.x, clientY: toPoint.y });
+      return wrapper.vm.$nextTick();
+    });
+  };
+
   function createComponent(props = {}) {
     wrapper = mount(DesignOverlay, {
       propsData: {
-        dimensions: {
-          width: 100,
-          height: 100,
-        },
+        dimensions: mockDimensions,
         position: {
           top: '0',
           left: '0',
@@ -52,16 +60,24 @@ describe('Design overlay component', () => {
     );
   });
 
-  it('should emit a correct event when clicking on overlay', () => {
+  it('should emit `openCommentForm` when clicking on overlay', () => {
     createComponent();
-    wrapper.find('.image-diff-overlay-add-comment').trigger('click', { offsetX: 10, offsetY: 10 });
+    const newCoordinates = {
+      x: 10,
+      y: 10,
+    };
+    wrapper
+      .find('.image-diff-overlay-add-comment')
+      .trigger('click', { offsetX: newCoordinates.x, offsetY: newCoordinates.y });
 
     return wrapper.vm.$nextTick().then(() => {
-      expect(wrapper.emitted('openCommentForm')).toEqual([[{ x: 10, y: 10 }]]);
+      expect(wrapper.emitted('openCommentForm')).toEqual([
+        [{ x: newCoordinates.x, y: newCoordinates.y }],
+      ]);
     });
   });
 
-  describe('when has notes', () => {
+  describe('with notes', () => {
     beforeEach(() => {
       createComponent({
         notes,
@@ -74,45 +90,169 @@ describe('Design overlay component', () => {
 
     it('should have a correct style for each note badge', () => {
       expect(findFirstBadge().attributes().style).toBe('left: 10px; top: 15px;');
-
       expect(findSecondBadge().attributes().style).toBe('left: 50px; top: 50px;');
     });
+
+    it('should recalculate badges positions on window resize', () => {
+      createComponent({
+        notes,
+        dimensions: {
+          width: 400,
+          height: 400,
+        },
+      });
+
+      expect(findFirstBadge().attributes().style).toBe('left: 40px; top: 60px;');
+
+      wrapper.setProps({
+        dimensions: {
+          width: 200,
+          height: 200,
+        },
+      });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findFirstBadge().attributes().style).toBe('left: 20px; top: 30px;');
+      });
+    });
   });
 
-  it('should render a new comment badge when there is a new form', () => {
-    createComponent({
-      currentCommentForm: {
-        height: 100,
-        width: 100,
-        x: 25,
-        y: 25,
-      },
+  describe('with a new form', () => {
+    it('should render a new comment badge', () => {
+      createComponent({
+        currentCommentForm: {
+          ...notes[0].position,
+        },
+      });
+
+      expect(findCommentBadge().exists()).toBe(true);
+      expect(findCommentBadge().attributes().style).toBe('left: 10px; top: 15px;');
     });
 
-    expect(findCommentBadge().exists()).toBe(true);
-    expect(findCommentBadge().attributes().style).toBe('left: 25px; top: 25px;');
+    describe('when moving the comment badge', () => {
+      it('should update badge style to reflect new position', () => {
+        const { position } = notes[0];
+
+        createComponent({
+          currentCommentForm: {
+            ...position,
+          },
+        });
+
+        return clickAndDragBadge(
+          findCommentBadge(),
+          { x: position.x, y: position.y },
+          { x: 20, y: 20 },
+        ).then(() => {
+          expect(findCommentBadge().attributes().style).toBe(
+            'left: 20px; top: 20px; cursor: move;',
+          );
+        });
+      });
+
+      it('should update badge style when note-moving action ends', () => {
+        const { position } = notes[0];
+        createComponent({
+          currentCommentForm: {
+            ...position,
+          },
+        });
+
+        const commentBadge = findCommentBadge();
+        const toPoint = { x: 20, y: 20 };
+
+        return clickAndDragBadge(commentBadge, { x: position.x, y: position.y }, toPoint)
+          .then(() => {
+            commentBadge.trigger('mouseup');
+            // simulates the currentCommentForm being updated in index.vue component, and
+            // propagated back down to this prop
+            wrapper.setProps({
+              currentCommentForm: { height: position.height, width: position.width, ...toPoint },
+            });
+            return wrapper.vm.$nextTick();
+          })
+          .then(() => {
+            expect(commentBadge.attributes().style).toBe('left: 20px; top: 20px;');
+          });
+      });
+
+      it.each`
+        element            | getElementFunc      | event
+        ${'overlay'}       | ${findOverlay}      | ${'mouseleave'}
+        ${'comment badge'} | ${findCommentBadge} | ${'mouseup'}
+      `(
+        'should emit `openCommentForm` event when $event fired on $element element',
+        ({ getElementFunc, event }) => {
+          createComponent({
+            notes,
+            currentCommentForm: {
+              ...notes[0].position,
+            },
+          });
+
+          const newCoordinates = { x: 20, y: 20 };
+          wrapper.setData({
+            movingNoteStartPosition: {
+              ...notes[0].position,
+            },
+            movingNoteNewPosition: {
+              ...notes[0].position,
+              ...newCoordinates,
+            },
+          });
+
+          getElementFunc().trigger(event);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.emitted('openCommentForm')).toEqual([[newCoordinates]]);
+          });
+        },
+      );
+    });
   });
 
-  it('should recalculate badges positions on window resize', () => {
-    createComponent({
-      notes,
-      dimensions: {
-        width: 400,
-        height: 400,
-      },
+  describe('getMovingNotePositionDelta', () => {
+    it('should calculate delta correctly from state', () => {
+      createComponent();
+
+      wrapper.setData({
+        movingNoteStartPosition: {
+          clientX: 10,
+          clientY: 20,
+        },
+      });
+
+      const mockMouseEvent = {
+        clientX: 30,
+        clientY: 10,
+      };
+
+      expect(wrapper.vm.getMovingNotePositionDelta(mockMouseEvent)).toEqual({
+        deltaX: 20,
+        deltaY: -10,
+      });
     });
+  });
 
-    expect(findFirstBadge().attributes().style).toBe('left: 40px; top: 60px;');
+  describe('isPositionInOverlay', () => {
+    createComponent({ dimensions: mockDimensions });
 
-    wrapper.setProps({
-      dimensions: {
-        width: 200,
-        height: 200,
-      },
+    it.each`
+      test                        | coordinates           | expectedResult
+      ${'within overlay bounds'}  | ${{ x: 50, y: 50 }}   | ${true}
+      ${'outside overlay bounds'} | ${{ x: 101, y: 101 }} | ${false}
+    `('returns [$expectedResult] when position is $test', ({ coordinates, expectedResult }) => {
+      const position = { ...mockDimensions, ...coordinates };
+
+      expect(wrapper.vm.isPositionInOverlay(position)).toBe(expectedResult);
     });
+  });
 
-    return wrapper.vm.$nextTick().then(() => {
-      expect(findFirstBadge().attributes().style).toBe('left: 20px; top: 30px;');
+  describe('getNoteRelativePosition', () => {
+    it('calculates position correctly', () => {
+      createComponent({ dimensions: mockDimensions });
+      const position = { x: 50, y: 50, width: 200, height: 200 };
+
+      expect(wrapper.vm.getNoteRelativePosition(position)).toEqual({ left: 25, top: 25 });
     });
   });
 });
