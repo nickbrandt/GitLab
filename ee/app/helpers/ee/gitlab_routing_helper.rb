@@ -40,7 +40,7 @@ module EE
     end
 
     def vulnerability_path(entity, *args)
-      project_security_dashboard_path(entity.project, entity, *args)
+      project_security_vulnerability_path(entity.project, entity, *args)
     end
 
     def self.url_helper(route_name)
