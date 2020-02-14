@@ -21,6 +21,7 @@ module RuboCop
 
         BLACKLISTED_METHODS = Set[
           :set_callback,
+          :skip_callback,
           :validates,
           # Methods below taken from ActiveRecord::Callbacks::CALLBACKS
           :after_initialize,
