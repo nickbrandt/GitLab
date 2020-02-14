@@ -34,8 +34,15 @@ to be enabled:
   and enable **Git Large File Storage**.
 
 Design Management requires that projects are using
-[hashed storage](../../../administration/repository_storage_types.html#hashed-storage)
+[hashed storage](../../../administration/repository_storage_types.md#hashed-storage)
 (the default storage type since v10.0).
+
+### Feature Flags
+
+- Reference Parsing
+
+  Designs support short references in Markdown, but this needs to be enabled by setting
+  the `:design_management_reference_filter_gfm_pipeline` feature flag.
 
 ## Limitations
 
@@ -47,8 +54,8 @@ Design Management requires that projects are using
 - Design Management data [won't be moved](https://gitlab.com/gitlab-org/gitlab/issues/13426)
   when an issue is moved, nor [deleted](https://gitlab.com/gitlab-org/gitlab/issues/13427)
   when an issue is deleted.
-- Design Management
-  [isn't supported by Geo](https://gitlab.com/groups/gitlab-org/-/epics/1633) yet.
+- From GitLab 12.7, Design Management data [can be replicated](../../../administration/geo/replication/datatypes.md#limitations-on-replicationverification)
+  by Geo but [not verified](https://gitlab.com/gitlab-org/gitlab/issues/32467).
 - Only the latest version of the designs can be deleted.
 - Deleted designs cannot be recovered but you can see them on previous designs versions.
 
@@ -68,9 +75,17 @@ of the design, and will replace the previous version.
 Designs cannot be added if the issue has been moved, or its
 [discussion is locked](../../discussions/#lock-discussions).
 
+### Skipped designs
+
+Designs with the same filename as an existing uploaded design _and_ whose content has not changed will be skipped.
+This means that no new version of the design will be created. When designs are skipped, you will be made aware via a warning
+message on the Issue.
+
 ## Viewing designs
 
 Images on the Design Management page can be enlarged by clicking on them.
+You can navigate through designs by clicking on the navigation buttons on the
+top-right corner or with <kbd>Left</kbd>/<kbd>Right</kbd> keyboard buttons.
 
 The number of comments on a design — if any — is listed to the right
 of the design filename. Clicking on this number enlarges the design
@@ -83,6 +98,14 @@ to help summarize changes between versions.
 | Comments | ![Comments Icon](img/design_comments_v12_3.png) |
 | Modified (in the selected version) | ![Design Modified](img/design_modified_v12_3.png) |
 | Added (in the selected version) | ![Design Added](img/design_added_v12_3.png) |
+
+### Exploring designs by zooming
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/13217) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
+
+Designs can be explored in greater detail by zooming in and out of the image. Control the amount of zoom with the `+` and `-` buttons at the bottom of the image. While zoomed, you can still [add new annotations](#adding-annotations-to-designs) to the image, and see any existing ones.
+
+![Design zooming](img/design_zooming_v12_7.png)
 
 ## Deleting designs
 
@@ -107,7 +130,7 @@ Once selected, click the **Delete selected** button to confirm the deletion:
 
 ![Delete multiple designs](img/delete_multiple_designs_v12_4.png)
 
-NOTE: **Note:**
+**Note:**
 Only the latest version of the designs can be deleted.
 Deleted designs are not permanently lost; they can be
 viewed by browsing previous versions.
@@ -121,9 +144,41 @@ which you can start a new discussion:
 
 ![Starting a new discussion on design](img/adding_note_to_design_1.png)
 
+From GitLab 12.8 on, when you are starting a new discussion, you can adjust the badge's position by
+dragging it around the image.
+
 Different discussions have different badge numbers:
 
 ![Discussions on design annotations](img/adding_note_to_design_2.png)
 
 From GitLab 12.5 on, new annotations will be outputted to the issue activity,
 so that everyone involved can participate in the discussion.
+
+## References
+
+GitLab Flavored Markdown supports references to designs. The syntax for this is:
+
+  `#123[file.jpg]` - the issue reference, with the filename in square braces
+
+File names may contain a variety of odd characters, so two escaping mechanisms are supported:
+
+### Quoting
+
+File names may be quoted with double quotation marks, eg:
+
+  `#123["file.jpg"]`
+
+This is useful if, for instance, your filename has square braces in its name. In this scheme, all
+double quotation marks in the file name need to be escaped with backslashes, and backslashes need
+to be escaped likewise:
+
+  `#123["with with \"quote\" marks and a backslash \\.png"]`
+
+### Base64 Encoding
+
+In the case of file names that include HTML elements, you will need to escape these names to avoid
+them being processed as HTML literals. To do this, we support base64 encoding, eg.
+
+  The file `<a>.jpg` can be referenced as `#123[base64:PGE+LmpwZwo=]`
+
+Obviously we would advise against using such filenames.

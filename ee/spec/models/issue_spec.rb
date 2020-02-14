@@ -9,7 +9,7 @@ describe Issue do
 
   context 'callbacks' do
     describe '.after_create' do
-      set(:project) { create(:project) }
+      let_it_be(:project) { create(:project) }
       let(:author) { User.alert_bot }
 
       context 'when issue title is "New: Incident"' do
@@ -127,6 +127,8 @@ describe Issue do
     it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
     it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
     it { is_expected.to have_many(:resource_weight_events) }
+    it { is_expected.to have_many(:blocked_by_issue_links) }
+    it { is_expected.to have_many(:blocked_by_issues).through(:blocked_by_issue_links).source(:source) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
@@ -205,6 +207,17 @@ describe Issue do
       issue = build(:issue)
 
       expect(issue.allows_multiple_assignees?).to be_truthy
+    end
+  end
+
+  describe '.simple_sorts' do
+    it 'includes weight with other base keys' do
+      expect(Issue.simple_sorts.keys).to match_array(
+        %w(created_asc created_at_asc created_date created_desc created_at_desc
+           closest_future_date closest_future_date_asc due_date due_date_asc due_date_desc
+           id_asc id_desc relative_position relative_position_asc
+           updated_desc updated_asc updated_at_asc updated_at_desc
+           weight weight_asc weight_desc))
     end
   end
 
@@ -559,4 +572,6 @@ describe Issue do
       it { is_expected.to eq(expected) }
     end
   end
+
+  it_behaves_like 'having health status'
 end

@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { GROUP_PAGE_TYPE } from '../constants';
@@ -8,9 +7,6 @@ export default {
     state.config = {
       ...config,
       isGroupPage: config.pageType === GROUP_PAGE_TYPE,
-      canDestroyPackage: !(
-        _.isNull(config.canDestroyPackage) || _.isUndefined(config.canDestroyPackage)
-      ),
     };
   },
 
@@ -25,5 +21,9 @@ export default {
   [types.SET_PAGINATION](state, headers) {
     const normalizedHeaders = normalizeHeaders(headers);
     state.pagination = parseIntPagination(normalizedHeaders);
+  },
+
+  [types.SET_SORTING](state, sorting) {
+    state.sorting = { ...state.sorting, ...sorting };
   },
 };

@@ -38,8 +38,8 @@ export default {
     onPageChanged(page) {
       return this.requestPackagesList({ page });
     },
-    onPackageDeleteRequest(packageId) {
-      return this.requestDeletePackage({ projectId: this.resourceId, packageId });
+    onPackageDeleteRequest(item) {
+      return this.requestDeletePackage(item);
     },
   },
 };
@@ -47,7 +47,12 @@ export default {
 
 <template>
   <gl-loading-icon v-if="isLoading" class="mt-2" />
-  <package-list v-else @page:changed="onPageChanged" @package:delete="onPackageDeleteRequest">
+  <package-list
+    v-else
+    @page:changed="onPageChanged"
+    @package:delete="onPackageDeleteRequest"
+    @sort:changed="requestPackagesList"
+  >
     <template #empty-state>
       <gl-empty-state
         :title="s__('PackageRegistry|There are no packages yet')"

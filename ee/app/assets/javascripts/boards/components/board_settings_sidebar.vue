@@ -1,7 +1,15 @@
 <script>
-import { GlDrawer, GlLabel, GlButton, GlFormInput } from '@gitlab/ui';
+import {
+  GlDrawer,
+  GlLabel,
+  GlButton,
+  GlFormInput,
+  GlAvatarLink,
+  GlAvatarLabeled,
+  GlLink,
+} from '@gitlab/ui';
 import { mapActions, mapState } from 'vuex';
-import { __ } from '~/locale';
+import { __, n__ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import boardsStoreEE from '../stores/boards_store_ee';
 import flash from '~/flash';
@@ -9,16 +17,26 @@ import flash from '~/flash';
 // NOTE: need to revisit how we handle headerHeight, because we have so many different header and footer options.
 export default {
   headerHeight: process.env.NODE_ENV === 'development' ? '75px' : '40px',
-  listSettingsText: __('List Settings'),
-  labelListText: __('List Label'),
+  listSettingsText: __('List settings'),
+  assignee: 'assignee',
+  milestone: 'milestone',
+  label: 'label',
+  labelListText: __('Label'),
+  labelMilestoneText: __('Milestone'),
+  labelAssigneeText: __('Assignee'),
   editLinkText: __('Edit'),
   noneText: __('None'),
-  wipLimitText: __('Work in Progress Limit'),
+  wipLimitText: __('Work in progress Limit'),
+  removeLimitText: __('Remove limit'),
+  inputPlaceholderText: __('Enter number of issues'),
   components: {
     GlDrawer,
     GlLabel,
     GlButton,
     GlFormInput,
+    GlAvatarLink,
+    GlAvatarLabeled,
+    GlLink,
   },
   directives: {
     autofocusonshow,
@@ -26,7 +44,7 @@ export default {
   data() {
     return {
       edit: false,
-      currentWipLimit: 0,
+      currentWipLimit: null,
       updating: false,
     };
   },
@@ -37,27 +55,47 @@ export default {
         Warning: Though a computed property it is not reactive because we are
         referencing a List Model class. Reactivity only applies to plain JS objects
       */
-
       return boardsStoreEE.store.state.lists.find(({ id }) => id === this.activeListId);
     },
     isSidebarOpen() {
       return this.activeListId > 0;
     },
     activeListLabel() {
-      if (this.activeList) {
-        return this.activeList.label;
-      }
-
-      return { color: '', title: '' };
+      return this.activeList.label;
+    },
+    activeListMilestone() {
+      return this.activeList.milestone;
+    },
+    activeListAssignee() {
+      return this.activeList.assignee;
+    },
+    wipLimitTypeText() {
+      return n__('%d issue', '%d issues', this.activeList.maxIssueCount);
+    },
+    wipLimitIsSet() {
+      return this.activeList.maxIssueCount !== 0;
     },
     activeListWipLimit() {
-      if (this.activeList) {
-        return this.activeList.maxIssueCount === 0
-          ? this.$options.noneText
-          : this.activeList.maxIssueCount;
+      return this.activeList.maxIssueCount === 0 ? this.$options.noneText : this.wipLimitTypeText;
+    },
+    boardListType() {
+      return this.activeList.type || null;
+    },
+    listTypeTitle() {
+      switch (this.boardListType) {
+        case this.$options.milestone: {
+          return this.$options.labelMilestoneText;
+        }
+        case this.$options.label: {
+          return this.$options.labelListText;
+        }
+        case this.$options.assignee: {
+          return this.$options.labelAssigneeText;
+        }
+        default: {
+          return '';
+        }
       }
-
-      return this.$options.noneText;
     },
   },
   methods: {
@@ -68,23 +106,24 @@ export default {
     },
     showInput() {
       this.edit = true;
-      this.currentWipLimit = this.activeList.maxIssueCount;
+      this.currentWipLimit =
+        this.activeList.maxIssueCount > 0 ? this.activeList.maxIssueCount : null;
     },
     resetStateAfterUpdate() {
       this.edit = false;
       this.updating = false;
-      this.currentWipLimit = 0;
+      this.currentWipLimit = null;
     },
     offFocus() {
-      if (this.currentWipLimit !== this.activeList.maxIssueCount) {
+      if (this.currentWipLimit !== this.activeList.maxIssueCount && this.currentWipLimit !== null) {
         this.updating = true;
+        // need to reassign bc were clearing the ref in resetStateAfterUpdate.
+        const wipLimit = this.currentWipLimit;
+        const id = this.activeListId;
 
-        this.updateListWipLimit({ maxIssueCount: this.currentWipLimit, id: this.activeListId })
-          .then(({ config }) => {
-            boardsStoreEE.setMaxIssueCountOnList(
-              this.activeListId,
-              JSON.parse(config.data).list.max_issue_count,
-            );
+        this.updateListWipLimit({ maxIssueCount: this.currentWipLimit, id })
+          .then(() => {
+            boardsStoreEE.setMaxIssueCountOnList(id, wipLimit);
             this.resetStateAfterUpdate();
           })
           .catch(() => {
@@ -94,6 +133,25 @@ export default {
           });
       } else {
         this.edit = false;
+      }
+    },
+    clearWipLimit() {
+      this.updateListWipLimit({ maxIssueCount: 0, id: this.activeListId })
+        .then(() => {
+          boardsStoreEE.setMaxIssueCountOnList(this.activeListId, 0);
+          this.resetStateAfterUpdate();
+        })
+        .catch(() => {
+          this.resetStateAfterUpdate();
+          this.setActiveListId(0);
+          flash(__('Something went wrong while updating your list settings'));
+        });
+    },
+    handleWipLimitChange(wipLimit) {
+      if (wipLimit === '') {
+        this.currentWipLimit = null;
+      } else {
+        this.currentWipLimit = Number(wipLimit);
       }
     },
     onEnter() {
@@ -111,34 +169,65 @@ export default {
     @close="closeSidebar"
   >
     <template #header>{{ $options.listSettingsText }}</template>
-    <template>
+    <template v-if="isSidebarOpen">
       <div class="d-flex flex-column align-items-start">
-        <label>{{ $options.labelListText }}</label>
-        <gl-label
-          :title="activeListLabel.title"
-          :background-color="activeListLabel.color"
-          color="light"
-        />
-      </div>
-      <div class="d-flex justify-content-between">
-        <div>
-          <label>{{ $options.wipLimitText }}</label>
-          <gl-form-input
-            v-if="edit"
-            v-model.number="currentWipLimit"
-            v-autofocusonshow
-            :disabled="updating"
-            type="number"
-            min="0"
-            trim
-            @keydown.enter.native="onEnter"
-            @blur="offFocus"
+        <label class="js-list-label">{{ listTypeTitle }}</label>
+        <template v-if="boardListType === $options.label">
+          <gl-label
+            :title="activeListLabel.title"
+            :background-color="activeListLabel.color"
+            color="light"
           />
-          <p v-else class="js-wip-limit bold">{{ activeListWipLimit }}</p>
+        </template>
+        <template v-else-if="boardListType === $options.assignee">
+          <gl-avatar-link class="js-assignee" :href="activeListAssignee.webUrl">
+            <gl-avatar-labeled
+              :size="32"
+              :label="activeListAssignee.name"
+              :sub-label="`@${activeListAssignee.username}`"
+              :src="activeListAssignee.avatar"
+            />
+          </gl-avatar-link>
+        </template>
+        <template v-else-if="boardListType === $options.milestone">
+          <gl-link class="js-milestone" :href="activeListMilestone.webUrl">{{
+            activeListMilestone.title
+          }}</gl-link>
+        </template>
+      </div>
+      <div class="d-flex justify-content-between flex-column">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="m-0">{{ $options.wipLimitText }}</label>
+          <gl-button
+            class="js-edit-button h-100 border-0 gl-line-height-14 text-dark"
+            variant="link"
+            @click="showInput"
+            >{{ $options.editLinkText }}</gl-button
+          >
         </div>
-        <gl-button class="h-100 border-0 gl-line-height-14" variant="link" @click="showInput">
-          {{ $options.editLinkText }}
-        </gl-button>
+        <gl-form-input
+          v-if="edit"
+          v-autofocusonshow
+          :value="currentWipLimit"
+          :disabled="updating"
+          :placeholder="$options.inputPlaceholderText"
+          trim
+          @input="handleWipLimitChange"
+          @keydown.enter.native="onEnter"
+          @blur="offFocus"
+        />
+        <div v-else class="d-flex align-items-center">
+          <p class="js-wip-limit bold m-0 text-secondary">{{ activeListWipLimit }}</p>
+          <template v-if="wipLimitIsSet">
+            <span class="m-1">-</span>
+            <gl-button
+              class="js-remove-limit h-100 border-0 gl-line-height-14 text-secondary"
+              variant="link"
+              @click="clearWipLimit"
+              >{{ $options.removeLimitText }}</gl-button
+            >
+          </template>
+        </div>
       </div>
     </template>
   </gl-drawer>

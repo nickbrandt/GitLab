@@ -44,7 +44,7 @@ specific guidelines (should there be any) are covered separately.
 
 NOTE: If you installed GitLab from source, make sure `rsync` is installed.
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake gitlab:backup:create RAILS_ENV=production
@@ -52,7 +52,7 @@ sudo -u git -H bundle exec rake gitlab:backup:create RAILS_ENV=production
 
 ### 2. Stop server
 
-```bash
+```shell
 sudo service gitlab stop
 ```
 
@@ -65,7 +65,7 @@ You can check which version you are running with `ruby -v`.
 
 Download Ruby and compile it:
 
-```bash
+```shell
 mkdir /tmp/ruby && cd /tmp/ruby
 curl --remote-name --progress https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.gz
 echo '1416ce288fb8bfeae07a12b608540318c9cace71  ruby-2.6.5.tar.gz' | shasum -c - && tar xzf ruby-2.6.5.tar.gz
@@ -78,65 +78,55 @@ sudo make install
 
 Install Bundler:
 
-```bash
+```shell
 sudo gem install bundler --no-document --version '< 2'
 ```
 
-### 4. Update Node
+### 4. Update Node.js
 
-NOTE: Beginning in GitLab 11.8, we only support node 8 or higher, and dropped
-support for node 6. Be sure to upgrade if necessary.
+NOTE: To check the minimum required Node.js version, see [Node.js versions](../install/requirements.md#nodejs-versions).
 
-GitLab utilizes [webpack](https://webpack.js.org/) to compile frontend assets.
-This requires a minimum version of node v8.10.0.
-
-You can check which version you are running with `node -v`. If you are running
-a version older than `v8.10.0` you will need to update to a newer version. You
-can find instructions to install from community maintained packages or compile
-from source at the nodejs.org website.
-
-<https://nodejs.org/en/download/>
-
-GitLab also requires the use of yarn `>= v1.10.0` to manage JavaScript
+GitLab also requires the use of Yarn `>= v1.10.0` to manage JavaScript
 dependencies.
 
-```bash
+In Debian or Ubuntu:
+
+```shell
 curl --silent --show-error https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update
 sudo apt-get install yarn
 ```
 
-More information can be found on the [yarn website](https://yarnpkg.com/en/docs/install).
+More information can be found on the [Yarn website](https://yarnpkg.com/en/docs/install).
 
 ### 5. Update Go
 
-NOTE: GitLab 11.4 and higher only supports Go 1.10.x and newer, and dropped support for Go
-1.9.x. Be sure to upgrade your installation if necessary.
+NOTE: To check the minimum required Go version, see [Go versions](../install/requirements.md#go-versions).
 
 You can check which version you are running with `go version`.
 
-Download and install Go:
+Download and install Go (for Linux, 64-bit):
 
-```bash
+```shell
 # Remove former Go installation folder
 sudo rm -rf /usr/local/go
 
-curl --remote-name --progress https://dl.google.com/go/go1.11.10.linux-amd64.tar.gz
-echo 'aefaa228b68641e266d1f23f1d95dba33f17552ba132878b65bb798ffa37e6d0  go1.11.10.linux-amd64.tar.gz' | shasum -a256 -c - && \
-  sudo tar -C /usr/local -xzf go1.11.10.linux-amd64.tar.gz
+curl --remote-name --progress https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
+echo '512103d7ad296467814a6e3f635631bd35574cab3369a97a323c9a585ccaa569  go1.13.5.linux-amd64.tar.gz' | shasum -a256 -c - && \
+  sudo tar -C /usr/local -xzf go1.13.5.linux-amd64.tar.gz
 sudo ln -sf /usr/local/go/bin/{go,godoc,gofmt} /usr/local/bin/
-rm go1.11.10.linux-amd64.tar.gz
+rm go1.13.5.linux-amd64.tar.gz
+
 ```
 
 ### 6. Update Git
 
-NOTE: **Note:**
-GitLab 11.11 and higher only supports Git 2.21.x and newer, and
-[dropped support for older versions](https://gitlab.com/gitlab-org/gitlab-foss/issues/54255).
-Be sure to upgrade your installation if necessary.
+NOTE: To check the minimum required Git version, see [Git versions](../install/requirements.md#git-versions).
 
-```bash
+In Debian or Ubuntu:
+
+```shell
 # Make sure Git is version 2.21.0 or higher
 git --version
 
@@ -171,7 +161,7 @@ sudo make prefix=/usr/local install
 
 ### 7. Get latest code
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H git fetch --all --prune
@@ -181,7 +171,7 @@ sudo -u git -H git checkout -- locale
 
 For GitLab Community Edition:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H git checkout BRANCH
@@ -191,7 +181,7 @@ OR
 
 For GitLab Enterprise Edition:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H git checkout BRANCH-ee
@@ -199,7 +189,7 @@ sudo -u git -H git checkout BRANCH-ee
 
 ### 8. Update GitLab Shell
 
-```bash
+```shell
 cd /home/git/gitlab-shell
 
 sudo -u git -H git fetch --all --tags --prune
@@ -214,7 +204,7 @@ Install and compile GitLab Workhorse. GitLab Workhorse uses
 If you are not using Linux you may have to run `gmake` instead of
 `make` below.
 
-```bash
+```shell
 cd /home/git/gitlab-workhorse
 
 sudo -u git -H git fetch --all --tags --prune
@@ -242,7 +232,7 @@ Install and compile GitLab Pages. GitLab Pages uses
 If you are not using Linux you may have to run `gmake` instead of
 `make` below.
 
-```bash
+```shell
 cd /home/git/gitlab-pages
 
 sudo -u git -H git fetch --all --tags --prune
@@ -254,11 +244,10 @@ sudo -u git -H make
 
 #### New configuration options for `gitlab.yml`
 
-There might be configuration options available for [`gitlab.yml`][yaml]. View
-them with the command below and apply them manually to your current
-`gitlab.yml`:
+There might be configuration options available for [`gitlab.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example)).
+View them with the command below and apply them manually to your current `gitlab.yml`:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 git diff origin/PREVIOUS_BRANCH:config/gitlab.yml.example origin/BRANCH:config/gitlab.yml.example
@@ -268,7 +257,7 @@ git diff origin/PREVIOUS_BRANCH:config/gitlab.yml.example origin/BRANCH:config/g
 
 Ensure you're still up-to-date with the latest NGINX configuration changes:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 # For HTTPS configurations
@@ -282,7 +271,7 @@ If you are using Strict-Transport-Security in your installation to continue
 using it you must enable it in your NGINX configuration as GitLab application no
 longer handles setting it.
 
-If you are using Apache instead of NGINX please see the updated [Apache templates].
+If you are using Apache instead of NGINX see the updated [Apache templates](https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache).
 Also note that because Apache does not support upstreams behind Unix sockets you
 will need to let GitLab Workhorse listen on a TCP port. You can do this
 via [`/etc/default/gitlab`](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/support/init.d/gitlab.default.example#L38).
@@ -296,15 +285,15 @@ add the following line to `config/initializers/smtp_settings.rb`:
 ActionMailer::Base.delivery_method = :smtp
 ```
 
-See [smtp_settings.rb.sample] as an example.
+See [smtp_settings.rb.sample](https://gitlab.com/gitlab-org/gitlab/blob/master/config/initializers/smtp_settings.rb.sample#L13) as an example.
 
 #### Init script
 
 There might be new configuration options available for
-[`gitlab.default.example`][gl-example]. View them with the command below and
-apply them manually to your current `/etc/default/gitlab`:
+[`gitlab.default.example`](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/support/init.d/gitlab.default.example).
+View them with the command below and apply them manually to your current `/etc/default/gitlab`:
 
-```sh
+```shell
 cd /home/git/gitlab
 
 git diff origin/PREVIOUS_BRANCH:lib/support/init.d/gitlab.default.example origin/BRANCH:lib/support/init.d/gitlab.default.example
@@ -312,7 +301,7 @@ git diff origin/PREVIOUS_BRANCH:lib/support/init.d/gitlab.default.example origin
 
 Ensure you're still up-to-date with the latest init script changes:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
@@ -320,13 +309,13 @@ sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
 
 For Ubuntu 16.04.1 LTS:
 
-```bash
+```shell
 sudo systemctl daemon-reload
 ```
 
 ### 13. Install libs, migrations, etc
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle install --deployment --without development test mysql aws kerberos
@@ -350,7 +339,7 @@ sudo -u git -H bundle exec rake cache:clear RAILS_ENV=production
 
 ### 14. Start application
 
-```bash
+```shell
 sudo service gitlab start
 sudo service nginx restart
 ```
@@ -359,7 +348,7 @@ sudo service nginx restart
 
 Check if GitLab and its environment are configured correctly:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
@@ -367,7 +356,7 @@ sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
 
 To make sure you didn't miss anything run a more thorough check:
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake gitlab:check RAILS_ENV=production
@@ -389,29 +378,26 @@ Example:
 Additional instructions here.
 -->
 
-## Things went south? Revert to previous version
+## Troubleshooting
 
 ### 1. Revert the code to the previous version
 
-To revert to a previous version, you'll need to following the upgrading guides
-for the previous version. If you upgraded to 11.8 and want to revert back to
-11.7, you'll need to follow the guides for upgrading from 11.6 to 11.7. You can
+To revert to a previous version, you need to follow the upgrading guides
+for the previous version.
+
+For example, if you have upgraded to GitLab 12.6 and want to revert back to
+12.5, you need to follow the guides for upgrading from 12.4 to 12.5. You can
 use the version dropdown at the top of the page to select the right version.
 
-When reverting, you should _not_ follow the database migration guides, as the
-backup is already migrated to the previous version.
+When reverting, you should **not** follow the database migration guides, as the
+backup has already been migrated to the previous version.
 
 ### 2. Restore from the backup
 
-```bash
+```shell
 cd /home/git/gitlab
 
 sudo -u git -H bundle exec rake gitlab:backup:restore RAILS_ENV=production
 ```
 
-If you have more than one backup `*.tar` file(s) please add `BACKUP=timestamp_of_backup` to the command above.
-
-[yaml]: https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example
-[gl-example]: https://gitlab.com/gitlab-org/gitlab/blob/master/lib/support/init.d/gitlab.default.example
-[smtp_settings.rb.sample]: https://gitlab.com/gitlab-org/gitlab/blob/master/config/initializers/smtp_settings.rb.sample#L13
-[Apache templates]: https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache
+If you have more than one backup `*.tar` file, add `BACKUP=timestamp_of_backup` to the above.

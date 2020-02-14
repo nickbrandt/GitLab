@@ -1,7 +1,8 @@
 <script>
 import eventHub from '../event_hub';
 
-import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from '../constants';
+import CommonMixin from '../mixins/common_mixin';
+import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH } from '../constants';
 
 import QuartersHeaderItem from './preset_quarters/quarters_header_item.vue';
 import MonthsHeaderItem from './preset_months/months_header_item.vue';
@@ -13,6 +14,7 @@ export default {
     MonthsHeaderItem,
     WeeksHeaderItem,
   },
+  mixins: [CommonMixin],
   props: {
     presetType: {
       type: String,
@@ -34,11 +36,11 @@ export default {
   },
   computed: {
     headerItemComponentForPreset() {
-      if (this.presetType === PRESET_TYPES.QUARTERS) {
+      if (this.presetTypeQuarters) {
         return 'quarters-header-item';
-      } else if (this.presetType === PRESET_TYPES.MONTHS) {
+      } else if (this.presetTypeMonths) {
         return 'months-header-item';
-      } else if (this.presetType === PRESET_TYPES.WEEKS) {
+      } else if (this.presetTypeWeeks) {
         return 'weeks-header-item';
       }
       return '';

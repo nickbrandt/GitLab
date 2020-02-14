@@ -40,15 +40,18 @@ export default {
         };
       },
       update: data => {
-        const pipelines = data.project.repository.tree.lastCommit.pipelines.edges;
+        const pipelines = data.project?.repository?.tree?.lastCommit?.pipelines?.edges;
 
         return {
-          ...data.project.repository.tree.lastCommit,
-          pipeline: pipelines.length && pipelines[0].node,
+          ...data.project?.repository?.tree?.lastCommit,
+          pipeline: pipelines?.length && pipelines[0].node,
         };
       },
       context: {
         isSingleRequest: true,
+      },
+      error(error) {
+        throw error;
       },
     },
   },
@@ -62,7 +65,7 @@ export default {
   data() {
     return {
       projectPath: '',
-      commit: {},
+      commit: null,
       showDescription: false,
     };
   },
@@ -79,6 +82,11 @@ export default {
       return this.commit.sha.substr(0, 8);
     },
   },
+  watch: {
+    currentPath() {
+      this.commit = null;
+    },
+  },
   methods: {
     toggleShowDescription() {
       this.showDescription = !this.showDescription;
@@ -90,8 +98,8 @@ export default {
 
 <template>
   <div class="info-well d-none d-sm-flex project-last-commit commit p-3">
-    <gl-loading-icon v-if="isLoading" size="md" class="m-auto" />
-    <template v-else>
+    <gl-loading-icon v-if="isLoading" size="md" color="dark" class="m-auto" />
+    <template v-else-if="commit">
       <user-avatar-link
         v-if="commit.author"
         :link-href="commit.author.webUrl"
@@ -100,11 +108,20 @@ export default {
         class="avatar-cell"
       />
       <span v-else class="avatar-cell user-avatar-link">
-        <img :src="$options.defaultAvatarUrl" width="40" height="40" class="avatar s40" />
+        <img
+          :src="commit.authorGravatar || $options.defaultAvatarUrl"
+          width="40"
+          height="40"
+          class="avatar s40"
+        />
       </span>
       <div class="commit-detail flex-list">
         <div class="commit-content qa-commit-content">
-          <gl-link :href="commit.webUrl" class="commit-row-message item-title">
+          <gl-link
+            :href="commit.webUrl"
+            :class="{ 'font-italic': !commit.message }"
+            class="commit-row-message item-title"
+          >
             {{ commit.title }}
           </gl-link>
           <gl-button
@@ -134,9 +151,8 @@ export default {
             v-if="commit.description"
             :class="{ 'd-block': showDescription }"
             class="commit-row-description append-bottom-8"
+            >{{ commit.description }}</pre
           >
-            {{ commit.description }}
-          </pre>
         </div>
         <div class="commit-actions flex-row">
           <div v-if="commit.signatureHtml" v-html="commit.signatureHtml"></div>

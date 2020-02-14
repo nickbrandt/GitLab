@@ -5,7 +5,8 @@ module Types
     class DesignAtVersionType < BaseObject
       graphql_name 'DesignAtVersion'
 
-      description 'A design pinned to a specific version'
+      description 'A design pinned to a specific version. ' \
+                  'The image field reflects the design as of the associated version.'
 
       authorize :read_design
 

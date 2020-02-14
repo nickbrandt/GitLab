@@ -9,6 +9,7 @@ describe MergeTrains::CheckStatusService do
   let(:previous_ref) { 'refs/heads/master' }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.update!(merge_pipelines_enabled: true)
   end
@@ -25,7 +26,7 @@ describe MergeTrains::CheckStatusService do
         create(:merge_request, :on_train, train_creator: maintainer,
           source_branch: 'feature', source_project: project,
           target_branch: 'master', target_project: project,
-          merge_status: 'unchecked')
+          merge_status: 'unchecked', status: MergeTrain.state_machines[:status].states[:merged].value)
       end
 
       let!(:active_merge_request) do
@@ -43,9 +44,9 @@ describe MergeTrains::CheckStatusService do
       context 'when new revision is included in merge train history' do
         let!(:merge_commit_sha_1) { Digest::SHA1.hexdigest 'test' }
 
-        it 'does not mark merge train as stale' do
+        it 'does not outdate the merge train pipeline' do
           expect(MergeTrain).to receive(:sha_exists_in_history?).and_return(true).and_call_original
-          expect_any_instance_of(MergeTrain).not_to receive(:stale!)
+          expect_any_instance_of(MergeTrain).not_to receive(:outdate_pipeline)
 
           subject
         end
@@ -54,9 +55,9 @@ describe MergeTrains::CheckStatusService do
       context 'when new revision is not included in merge train history' do
         let!(:merge_commit_sha_1) { Digest::SHA1.hexdigest 'other' }
 
-        it 'marks the merge train as stale' do
+        it 'outdates the merge train pipeline' do
           expect(MergeTrain).to receive(:sha_exists_in_history?).and_return(false).and_call_original
-          expect_any_instance_of(MergeTrain).to receive(:stale!)
+          expect_any_instance_of(MergeTrain).to receive(:outdate_pipeline)
 
           subject
         end

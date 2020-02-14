@@ -3,7 +3,7 @@ import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_
 import DependencyVulnerability from 'ee/dependencies/components/dependency_vulnerability.vue';
 import { MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY } from 'ee/dependencies/components/constants';
 import { makeDependency } from './utils';
-import mockDataVulnerabilities from '../../../javascripts/security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities.json';
+import mockDataVulnerabilities from '../../security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities';
 
 describe('DependenciesTableRow component', () => {
   let wrapper;

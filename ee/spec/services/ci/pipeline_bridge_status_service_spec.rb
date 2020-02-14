@@ -24,20 +24,6 @@ describe Ci::PipelineBridgeStatusService do
       end
     end
 
-    context 'when pipeline has upstream bridge' do
-      let(:bridge) { build(:ci_bridge) }
-
-      before do
-        pipeline.source_bridge = bridge
-      end
-
-      it 'calls inherit_status_from_downstream on upstream bridge' do
-        expect(bridge).to receive(:inherit_status_from_downstream!).with(pipeline)
-
-        subject
-      end
-    end
-
     context 'when pipeline has both downstream and upstream bridge' do
       let(:downstream_bridge) { build(:ci_bridge) }
       let(:upstream_bridge) { build(:ci_bridge) }

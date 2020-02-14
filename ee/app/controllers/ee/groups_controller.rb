@@ -6,7 +6,10 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
+      alias_method :ee_authorize_admin_group!, :authorize_admin_group!
+
       before_action :set_allowed_domain, only: [:edit]
+      before_action :ee_authorize_admin_group!, only: [:restore]
     end
 
     override :render_show_html
@@ -20,6 +23,34 @@ module EE
 
     def group_params_attributes
       super + group_params_ee
+    end
+
+    override :destroy
+    def destroy
+      return super unless group.adjourned_deletion?
+
+      result = ::Groups::MarkForDeletionService.new(group, current_user).execute
+
+      if result[:status] == :success
+        redirect_to group_path(group),
+          status: :found,
+          notice: "'#{group.name}' has been scheduled for removal on #{permanent_deletion_date(Time.now.utc)}."
+      else
+        redirect_to edit_group_path(group), status: :found, alert: result[:message]
+      end
+    end
+
+    def restore
+      return render_404 unless group.marked_for_deletion?
+
+      result = ::Groups::RestoreService.new(group, current_user).execute
+
+      if result[:status] == :success
+        redirect_to edit_group_path(group),
+        notice: "Group '#{group.name}' has been successfully restored."
+      else
+        redirect_to edit_group_path(group), alert: result[:message]
+      end
     end
 
     private

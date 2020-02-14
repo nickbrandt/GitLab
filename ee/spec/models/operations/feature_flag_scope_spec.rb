@@ -63,6 +63,7 @@ describe Operations::FeatureFlagScope do
       it 'validates multiple strategies' do
         feature_flag = create(:operations_feature_flag)
         scope = described_class.create(feature_flag: feature_flag,
+                                       environment_scope: 'production', active: true,
                                        strategies: [{ name: "default", parameters: {} },
                                                     { name: "invalid", parameters: {} }])
 
@@ -101,7 +102,9 @@ describe Operations::FeatureFlagScope do
         with_them do
           it 'must be one of "default", "gradualRolloutUserId", or "userWithId"' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: name, parameters: params }])
+            scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
+                                           strategies: [{ name: name, parameters: params }])
 
             expect(scope.errors[:strategies]).to eq(expected)
           end
@@ -113,6 +116,7 @@ describe Operations::FeatureFlagScope do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
             scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
                                            strategies: [{ name: 'gradualRolloutUserId' }])
 
             expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
@@ -126,6 +130,7 @@ describe Operations::FeatureFlagScope do
             it 'must have valid parameters for the strategy' do
               feature_flag = create(:operations_feature_flag)
               scope = described_class.create(feature_flag: feature_flag,
+                                             environment_scope: 'production', active: true,
                                              strategies: [{ name: 'gradualRolloutUserId',
                                                             parameters: invalid_parameters }])
 
@@ -136,6 +141,7 @@ describe Operations::FeatureFlagScope do
           it 'allows the parameters in any order' do
             feature_flag = create(:operations_feature_flag)
             scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
                                            strategies: [{ name: 'gradualRolloutUserId',
                                                           parameters: { percentage: '10', groupId: 'mygroup' } }])
 
@@ -152,6 +158,7 @@ describe Operations::FeatureFlagScope do
               it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: 'mygroup', percentage: invalid_value } }])
 
@@ -166,6 +173,7 @@ describe Operations::FeatureFlagScope do
               it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: 'mygroup', percentage: valid_value } }])
 
@@ -183,6 +191,7 @@ describe Operations::FeatureFlagScope do
               it 'must be a string value of up to 32 lowercase characters' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: invalid_value, percentage: '40' } }])
 
@@ -197,6 +206,7 @@ describe Operations::FeatureFlagScope do
               it 'must be a string value of up to 32 lowercase characters' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'gradualRolloutUserId',
                                                               parameters: { groupId: valid_value, percentage: '40' } }])
 
@@ -209,7 +219,9 @@ describe Operations::FeatureFlagScope do
         context 'when the strategy name is userWithId' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'userWithId' }])
+            scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
+                                           strategies: [{ name: 'userWithId' }])
 
             expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
           end
@@ -220,8 +232,9 @@ describe Operations::FeatureFlagScope do
           with_them do
             it 'must have valid parameters for the strategy' do
               feature_flag = create(:operations_feature_flag)
-              scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'userWithId',
-                                                                                        parameters: invalid_parameters }])
+              scope = described_class.create(feature_flag: feature_flag,
+                                             environment_scope: 'production', active: true,
+                                             strategies: [{ name: 'userWithId', parameters: invalid_parameters }])
 
               expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
             end
@@ -238,6 +251,7 @@ describe Operations::FeatureFlagScope do
               it 'is valid with a string of comma separated values' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'userWithId', parameters: { userIds: valid_value } }])
 
                 expect(scope.errors[:strategies]).to be_empty
@@ -253,6 +267,7 @@ describe Operations::FeatureFlagScope do
               it 'is invalid' do
                 feature_flag = create(:operations_feature_flag)
                 scope = described_class.create(feature_flag: feature_flag,
+                                               environment_scope: 'production', active: true,
                                                strategies: [{ name: 'userWithId', parameters: { userIds: invalid_value } }])
 
                 expect(scope.errors[:strategies]).to include(
@@ -266,7 +281,9 @@ describe Operations::FeatureFlagScope do
         context 'when the strategy name is default' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'default' }])
+            scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
+                                           strategies: [{ name: 'default' }])
 
             expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
           end
@@ -278,6 +295,7 @@ describe Operations::FeatureFlagScope do
             it 'must be empty' do
               feature_flag = create(:operations_feature_flag)
               scope = described_class.create(feature_flag: feature_flag,
+                                             environment_scope: 'production', active: true,
                                              strategies: [{ name: 'default',
                                                             parameters: invalid_value }])
 
@@ -288,6 +306,7 @@ describe Operations::FeatureFlagScope do
           it 'must be empty' do
             feature_flag = create(:operations_feature_flag)
             scope = described_class.create(feature_flag: feature_flag,
+                                           environment_scope: 'production', active: true,
                                            strategies: [{ name: 'default',
                                                           parameters: {} }])
 

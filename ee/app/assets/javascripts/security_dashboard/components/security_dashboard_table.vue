@@ -43,15 +43,12 @@ export default {
 </script>
 
 <template>
-  <div class="ci-table js-security-dashboard-table">
+  <div class="ci-table js-security-dashboard-table" data-qa-selector="security_report_content">
     <div
       class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
       role="row"
     >
       <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-section section-10 ml-md-2" role="rowheader">
-        {{ s__('Reports|Confidence') }}
-      </div>
       <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>

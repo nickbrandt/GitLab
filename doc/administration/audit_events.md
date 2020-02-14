@@ -18,7 +18,7 @@ permission level, who added a new user, or who removed a user.
 
 ## Use-cases
 
-- Check who was the person who changed the permission level of a particular
+- Check who the person was that changed the permission level of a particular
   user for a project in GitLab.
 - Use it to track which users have access to a certain group of projects
   in  GitLab, and who gave them that permission level.
@@ -105,9 +105,13 @@ recorded:
 - Ask for password reset
 - Grant OAuth access
 - Started/stopped user impersonation
+- Changed username ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/7797) in GitLab 12.8)
+- User was deleted ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
+- User was added ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
+- User was blocked via Admin Area ([introduced](https://gitlab.com/gitlab-org/gitlab/issues/251) in GitLab 12.8)
 
 It is possible to filter particular actions by choosing an audit data type from
-the filter drop-down. You can further filter by specific group, project or user
+the filter dropdown box. You can further filter by specific group, project or user
 (for authentication events).
 
 ![audit log](img/audit_log.png)
@@ -143,7 +147,7 @@ the steps bellow.
 
 1. Enter the Rails console:
 
-   ```sh
+   ```shell
    sudo gitlab-rails console
    ```
 

@@ -18,20 +18,6 @@ describe LinkedProjectIssueEntity do
   end
 
   describe 'issue_link_type' do
-    context 'when issue_link_types is enabled' do
-      before do
-        stub_feature_flags(issue_link_types: true)
-      end
-
-      it { expect(entity.as_json).to include(link_type: 'relates_to') }
-    end
-
-    context 'when issue_link_types is disabled' do
-      before do
-        stub_feature_flags(issue_link_types: false)
-      end
-
-      it { expect(entity.as_json).not_to include(:link_type) }
-    end
+    it { expect(entity.as_json).to include(link_type: 'relates_to') }
   end
 end

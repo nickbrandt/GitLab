@@ -2,6 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Toolbar from 'ee/design_management/components/toolbar/index.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
+import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
 import { GlButton } from '@gitlab/ui';
 
 const localVue = createLocalVue();
@@ -73,7 +74,7 @@ describe('Design management toolbar component', () => {
       const link = wrapper.find('a');
 
       expect(link.props('to')).toEqual({
-        name: 'designs',
+        name: DESIGNS_ROUTE_NAME,
         query: {
           version: undefined,
         },

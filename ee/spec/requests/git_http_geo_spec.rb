@@ -9,9 +9,9 @@ describe "Git HTTP requests (Geo)", :geo do
   include WorkhorseHelpers
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project, :repository, :private) }
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:project) { create(:project, :repository, :private) }
+  let_it_be(:primary) { create(:geo_node, :primary) }
+  let_it_be(:secondary) { create(:geo_node) }
 
   # Ensure the token always comes from the real time of the request
   let(:auth_token) { Gitlab::Geo::BaseRequest.new(scope: project.full_path).authorization }
@@ -83,7 +83,7 @@ describe "Git HTTP requests (Geo)", :geo do
   context 'when current node is a secondary' do
     let(:current_node) { secondary }
 
-    set(:project) { create(:project, :repository, :private) }
+    let_it_be(:project) { create(:project, :repository, :private) }
 
     describe 'GET info_refs' do
       context 'git pull' do
@@ -385,7 +385,7 @@ describe "Git HTTP requests (Geo)", :geo do
               it 'returns a 200' do
                 is_expected.to have_gitlab_http_status(:ok)
                 expect(json_response['GL_ID']).to match("user-#{user.id}")
-                expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository::PROJECT.identifier_for_subject(project))
+                expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository::PROJECT.identifier_for_container(project))
               end
             end
           end

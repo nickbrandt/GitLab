@@ -100,3 +100,71 @@ export const environment = {
   created_at: '2016-11-07T11:11:16.525Z',
   updated_at: '2016-11-10T15:55:58.778Z',
 };
+
+const sharedEnvironmentData = id => ({
+  environment_path: `/root/review-app/environments/${id}`,
+  external_url: null,
+  folderName: 'build',
+  has_stop_action: false,
+  id,
+  last_deployment: null,
+  project_path: '/root/review-app',
+  rollout_status: {},
+  state: 'available',
+  stop_path: `/root/review-app/environments/${id}/stop`,
+});
+
+export const environmentsList = [
+  {
+    name: 'DEV',
+    size: 1,
+    environment_type: null,
+    created_at: '2017-01-31T10:53:46.894Z',
+    updated_at: '2017-01-31T10:53:46.894Z',
+    ...sharedEnvironmentData(7),
+  },
+  {
+    name: 'build/update-README',
+    size: 5,
+    environment_type: 'build',
+    created_at: '2017-02-01T19:42:18.400Z',
+    updated_at: '2017-02-01T19:42:18.400Z',
+    ...sharedEnvironmentData(12),
+  },
+];
+
+export const serverDataList = [
+  {
+    name: 'DEV',
+    size: 1,
+    latest: {
+      name: 'DEV',
+      environment_type: null,
+      created_at: '2017-01-31T10:53:46.894Z',
+      updated_at: '2017-01-31T10:53:46.894Z',
+      ...sharedEnvironmentData(7),
+    },
+  },
+  {
+    name: 'build',
+    size: 5,
+    latest: {
+      name: 'build/update-README',
+      environment_type: 'build',
+      created_at: '2017-02-01T19:42:18.400Z',
+      updated_at: '2017-02-01T19:42:18.400Z',
+      ...sharedEnvironmentData(12),
+    },
+  },
+  {
+    name: 'build',
+    size: 1,
+    latest: {
+      name: 'build/update-README',
+      environment_type: 'build',
+      created_at: '2017-02-01T19:42:18.400Z',
+      updated_at: '2017-02-01T19:42:18.400Z',
+      ...sharedEnvironmentData(15),
+    },
+  },
+];

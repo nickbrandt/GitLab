@@ -50,4 +50,8 @@ module ApprovalRuleLike
   def any_approver?
     raise NotImplementedError
   end
+
+  def user_defined?
+    regular? || any_approver?
+  end
 end

@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MergeRequestTable component template matches the snapshot 1`] = `
+<table
+  aria-busy="false"
+  aria-colcount="7"
+  aria-describedby="__BVID__33__caption_"
+  class="table b-table gl-table my-3 b-table-stacked-sm"
+  id="__BVID__33"
+  role="table"
+>
+  <!---->
+  <!---->
+  <thead
+    class="thead-white border-bottom"
+    role="rowgroup"
+  >
+    <!---->
+    <tr
+      class=""
+      role="row"
+    >
+      <th
+        aria-colindex="1"
+        class="w-30p"
+        role="columnheader"
+        scope="col"
+      >
+        Merge Request
+      </th>
+      <th
+        aria-colindex="2"
+        class="text-right"
+        role="columnheader"
+        scope="col"
+      >
+        Review time
+      </th>
+      <th
+        aria-colindex="3"
+        class=""
+        role="columnheader"
+        scope="col"
+      >
+        Author
+      </th>
+      <th
+        aria-colindex="4"
+        class=""
+        role="columnheader"
+        scope="col"
+      >
+        Approvers
+      </th>
+      <th
+        aria-colindex="5"
+        class="text-right"
+        role="columnheader"
+        scope="col"
+      >
+        Comments
+      </th>
+      <th
+        aria-colindex="6"
+        class="text-right"
+        role="columnheader"
+        scope="col"
+      >
+        Commits
+      </th>
+      <th
+        aria-colindex="7"
+        class="text-right"
+        role="columnheader"
+        scope="col"
+      >
+        Line changes
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    role="rowgroup"
+  />
+  <!---->
+</table>
+`;

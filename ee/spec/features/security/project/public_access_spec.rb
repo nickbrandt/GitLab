@@ -5,7 +5,7 @@ require 'spec_helper'
 describe '[EE] Public Project Access' do
   include AccessMatchers
 
-  set(:project) { create(:project, :public, :repository) }
+  let_it_be(:project) { create(:project, :public, :repository) }
 
   describe 'GET /:project_path/insights' do
     before do
@@ -44,7 +44,7 @@ describe '[EE] Public Project Access' do
     it { is_expected.to be_allowed_for(:auditor) }
   end
 
-  describe "GET /:project_path/commit/:sha" do
+  describe "GET /:project_path/-/commit/:sha" do
     subject { project_commit_path(project, project.repository.commit) }
 
     it { is_expected.to be_allowed_for(:auditor) }

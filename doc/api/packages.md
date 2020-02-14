@@ -6,7 +6,7 @@ This is the API docs of [GitLab Packages](../administration/packages/index.md).
 
 ### Within a project
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9259) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9259) in GitLab 11.8.
 
 Get a list of project packages. Both Maven and NPM packages are included in results.
 When accessed without authentication, only packages of public projects are returned.
@@ -19,7 +19,7 @@ GET /projects/:id/packages
 | --------- | ---- | -------- | ----------- |
 | `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages
 ```
 
@@ -48,7 +48,7 @@ By default, the `GET` request will return 20 results, since the API is [paginate
 
 ### Within a group
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18871) in GitLab 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18871) in GitLab 12.5.
 
 Get a list of project packages at the group level.
 When accessed without authentication, only packages of public projects are returned.
@@ -62,7 +62,7 @@ GET /groups/:id/packages
 | `id`      | integer/string | yes | ID or [URL-encoded path of the group](README.md#namespaced-path-encoding). |
 | `exclude_subgroups` | boolean | false | If the param is included as true, packages from projects from subgroups are not listed. Default is `false`. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/packages?exclude_subgroups=true
 ```
 
@@ -81,7 +81,15 @@ Example response:
     },
     "created_at": "2019-11-27T03:37:38.711Z",
     "build_info": {
-      "pipeline_id": 123
+      "pipeline": {
+        "id": 123,
+        "status": "pending",
+        "ref": "new-pipeline",
+        "sha": "a91957a858320c0e17f3a0eca7cfacbff50ea29a",
+        "web_url": "https://example.com/foo/bar/pipelines/47",
+        "created_at": "2016-08-11T11:28:34.085Z",
+        "updated_at": "2016-08-11T11:32:35.169Z",
+      }
     }
   },
   {
@@ -95,7 +103,15 @@ Example response:
     },
     "created_at": "2019-11-27T03:37:38.711Z",
     "build_info": {
-      "pipeline_id": 123
+      "pipeline": {
+        "id": 123,
+        "status": "pending",
+        "ref": "new-pipeline",
+        "sha": "a91957a858320c0e17f3a0eca7cfacbff50ea29a",
+        "web_url": "https://example.com/foo/bar/pipelines/47",
+        "created_at": "2016-08-11T11:28:34.085Z",
+        "updated_at": "2016-08-11T11:32:35.169Z",
+      }
     }
   }
 ]
@@ -110,7 +126,7 @@ The `_links` object contains the following properties:
 
 ## Get a project package
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9667) in GitLab 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9667) in GitLab 11.9.
 
 Get a single project package.
 
@@ -123,7 +139,7 @@ GET /projects/:id/packages/:package_id
 | `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
 | `package_id`      | integer | yes | ID of a package. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages/:package_id
 ```
 
@@ -141,7 +157,15 @@ Example response:
   },
   "created_at": "2019-11-27T03:37:38.711Z",
   "build_info": {
-    "pipeline_id": 123
+    "pipeline": {
+      "id": 123,
+      "status": "pending",
+      "ref": "new-pipeline",
+      "sha": "a91957a858320c0e17f3a0eca7cfacbff50ea29a",
+      "web_url": "https://example.com/foo/bar/pipelines/47",
+      "created_at": "2016-08-11T11:28:34.085Z",
+      "updated_at": "2016-08-11T11:32:35.169Z",
+    }
   }
 }
 ```
@@ -153,7 +177,7 @@ The `_links` object contains the following properties:
 
 ## List package files
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9305) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9305) in GitLab 11.8.
 
 Get a list of package files of a single package.
 
@@ -166,7 +190,7 @@ GET /projects/:id/packages/:package_id/package_files
 | `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `package_id`      | integer | yes | ID of a package. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/packages/4/package_files
 ```
 
@@ -208,7 +232,7 @@ By default, the `GET` request will return 20 results, since the API is [paginate
 
 ## Delete a project package
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9623) in GitLab 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9623) in GitLab 11.9.
 
 Deletes a project package.
 
@@ -221,7 +245,7 @@ DELETE /projects/:id/packages/:package_id
 | `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `package_id`      | integer | yes | ID of a package. |
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages/:package_id
 ```
 

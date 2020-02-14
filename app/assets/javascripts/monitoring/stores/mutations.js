@@ -84,23 +84,26 @@ export default {
     state.emptyState = 'loading';
     state.showEmptyState = true;
   },
-  [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
-    state.dashboard.panel_groups = groupData.map((group, i) => {
-      const key = `${slugify(group.group || 'default')}-${i}`;
-      let { panels = [] } = group;
+  [types.RECEIVE_METRICS_DATA_SUCCESS](state, dashboard) {
+    state.dashboard = {
+      ...dashboard,
+      panel_groups: dashboard.panel_groups.map((group, i) => {
+        const key = `${slugify(group.group || 'default')}-${i}`;
+        let { panels = [] } = group;
 
-      // each panel has metric information that needs to be normalized
-      panels = panels.map(panel => ({
-        ...panel,
-        metrics: normalizePanelMetrics(panel.metrics, panel.y_label),
-      }));
+        // each panel has metric information that needs to be normalized
+        panels = panels.map(panel => ({
+          ...panel,
+          metrics: normalizePanelMetrics(panel.metrics, panel.y_label),
+        }));
 
-      return {
-        ...group,
-        panels,
-        key,
-      };
-    });
+        return {
+          ...group,
+          panels,
+          key,
+        };
+      }),
+    };
 
     if (!state.dashboard.panel_groups.length) {
       state.emptyState = 'noData';
@@ -120,10 +123,15 @@ export default {
   [types.RECEIVE_DEPLOYMENTS_DATA_FAILURE](state) {
     state.deploymentData = [];
   },
+  [types.REQUEST_ENVIRONMENTS_DATA](state) {
+    state.environmentsLoading = true;
+  },
   [types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS](state, environments) {
+    state.environmentsLoading = false;
     state.environments = environments;
   },
   [types.RECEIVE_ENVIRONMENTS_DATA_FAILURE](state) {
+    state.environmentsLoading = false;
     state.environments = [];
   },
 
@@ -169,11 +177,15 @@ export default {
 
   [types.SET_ENDPOINTS](state, endpoints) {
     state.metricsEndpoint = endpoints.metricsEndpoint;
-    state.environmentsEndpoint = endpoints.environmentsEndpoint;
     state.deploymentsEndpoint = endpoints.deploymentsEndpoint;
     state.dashboardEndpoint = endpoints.dashboardEndpoint;
+    state.dashboardsEndpoint = endpoints.dashboardsEndpoint;
     state.currentDashboard = endpoints.currentDashboard;
     state.projectPath = endpoints.projectPath;
+    state.logsPath = endpoints.logsPath || state.logsPath;
+  },
+  [types.SET_TIME_RANGE](state, timeRange) {
+    state.timeRange = timeRange;
   },
   [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
     state.emptyState = 'gettingStarted';
@@ -191,5 +203,8 @@ export default {
   [types.SET_PANEL_GROUP_METRICS](state, payload) {
     const panelGroup = state.dashboard.panel_groups.find(pg => payload.key === pg.key);
     panelGroup.panels = payload.panels;
+  },
+  [types.SET_ENVIRONMENTS_FILTER](state, searchTerm) {
+    state.environmentsSearchTerm = searchTerm;
   },
 };

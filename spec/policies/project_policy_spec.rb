@@ -17,7 +17,7 @@ describe ProjectPolicy do
     %i[
       read_project read_board read_list read_wiki read_issue
       read_project_for_iids read_issue_iid read_label
-      read_milestone read_project_snippet read_project_member read_note
+      read_milestone read_snippet read_project_member read_note
       create_project create_issue create_note upload_file create_merge_request_in
       award_emoji read_release
     ]
@@ -25,7 +25,7 @@ describe ProjectPolicy do
 
   let(:base_reporter_permissions) do
     %i[
-      download_code fork_project create_project_snippet update_issue
+      download_code fork_project create_snippet update_issue
       admin_issue admin_label admin_list read_commit_status read_build
       read_container_image read_pipeline read_environment read_deployment
       read_merge_request download_wiki_code read_sentry_issue
@@ -48,8 +48,8 @@ describe ProjectPolicy do
 
   let(:base_maintainer_permissions) do
     %i[
-      push_to_delete_protected_branch update_project_snippet
-      admin_project_snippet admin_project_member admin_note admin_wiki admin_project
+      push_to_delete_protected_branch update_snippet
+      admin_snippet admin_project_member admin_note admin_wiki admin_project
       admin_commit_status admin_build admin_container_image
       admin_pipeline admin_environment admin_deployment destroy_release add_cluster
       daily_statistics
@@ -508,6 +508,34 @@ describe ProjectPolicy do
     end
   end
 
+  context 'forking a project' do
+    subject { described_class.new(current_user, project) }
+
+    context 'anonymous user' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:fork_project) }
+    end
+
+    context 'project member' do
+      let_it_be(:project) { create(:project, :private) }
+
+      context 'guest' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_disallowed(:fork_project) }
+      end
+
+      %w(reporter developer maintainer).each do |role|
+        context role do
+          let(:current_user) { send(role) }
+
+          it { is_expected.to be_allowed(:fork_project) }
+        end
+      end
+    end
+  end
+
   describe 'update_max_artifacts_size' do
     subject { described_class.new(current_user, project) }
 
@@ -529,6 +557,20 @@ describe ProjectPolicy do
 
         it { expect_disallowed(:update_max_artifacts_size) }
       end
+    end
+  end
+
+  context 'alert bot' do
+    let(:current_user) { User.alert_bot }
+
+    subject { described_class.new(current_user, project) }
+
+    it { is_expected.to be_allowed(:reporter_access) }
+
+    context 'within a private project' do
+      let(:project) { create(:project, :private) }
+
+      it { is_expected.to be_allowed(:admin_issue) }
     end
   end
 end

@@ -67,6 +67,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
   end
 
   describe 'parse_search_result' do
+    let(:project) { double(:project) }
     let(:blob) do
       {
         'blob' => {
@@ -78,11 +79,12 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     end
 
     it 'returns an unhighlighted blob when no highlight data is present' do
-      parsed = described_class.parse_search_result('_source' => blob)
+      parsed = described_class.parse_search_result({ '_source' => blob }, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         startline: 1,
+        project: project,
         data: "foo\n"
       )
     end
@@ -95,7 +97,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         }
       }
 
-      parsed = described_class.parse_search_result(result)
+      parsed = described_class.parse_search_result(result, project)
 
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
@@ -104,6 +106,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         basename: 'path/file',
         ref: 'sha',
         startline: 2,
+        project: project,
         data: "bar\n"
       )
     end
@@ -519,11 +522,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     end
 
     def search_for(term)
-      blobs = described_class.new(user, term, [project_1.id]).objects('blobs')
-
-      blobs.map do |blob|
-        blob['_source']['blob']['path']
-      end
+      described_class.new(user, term, [project_1.id]).objects('blobs').map(&:path)
     end
 
     it_behaves_like 'a paginated object', 'blobs'
@@ -532,7 +531,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       results = described_class.new(user, 'def', limit_project_ids)
       blobs = results.objects('blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include('def')
+      expect(blobs.first.data).to include('def')
       expect(results.blobs_count).to eq 7
     end
 
@@ -544,7 +543,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
       results = described_class.new(user, 'def', [project_1.id])
       expect(results.blobs_count).to eq 7
-      result_project_ids = results.objects('blobs').map { |r| r.dig('_source', 'project_id') }
+      result_project_ids = results.objects('blobs').map(&:project_id)
       expect(result_project_ids.uniq).to eq([project_1.id])
 
       results = described_class.new(user, 'def', [project_1.id, project_2.id])
@@ -656,7 +655,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
     it 'finds wiki blobs' do
       blobs = results.objects('wiki_blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include("term")
+      expect(blobs.first.data).to include('term')
       expect(results.wiki_blobs_count).to eq 1
     end
 
@@ -664,7 +663,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       project_1.add_guest(user)
       blobs = results.objects('wiki_blobs')
 
-      expect(blobs.first['_source']['blob']['content']).to include("term")
+      expect(blobs.first.data).to include('term')
       expect(results.wiki_blobs_count).to eq 1
     end
 
@@ -989,14 +988,14 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         results = described_class.new(user, 'term', limit_project_ids)
         blobs = results.objects('wiki_blobs')
 
-        expect(blobs.map { |blob| blob.join_field.parent }).to match_array [internal_project.es_id, private_project2.es_id, public_project.es_id]
+        expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
         expect(results.wiki_blobs_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'term', [])
         blobs = results.objects('wiki_blobs')
 
-        expect(blobs.first.join_field.parent).to eq public_project.es_id
+        expect(blobs.first.project).to eq public_project
         expect(results.wiki_blobs_count).to eq 1
       end
     end
@@ -1053,14 +1052,14 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
         results = described_class.new(user, 'tesla', limit_project_ids)
         blobs = results.objects('blobs')
 
-        expect(blobs.map { |blob| blob.join_field.parent }).to match_array [internal_project.es_id, private_project2.es_id, public_project.es_id]
+        expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
         expect(results.blobs_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'tesla', [])
         blobs = results.objects('blobs')
 
-        expect(blobs.first.join_field.parent).to eq public_project.es_id
+        expect(blobs.first.project).to eq public_project
         expect(results.blobs_count).to eq 1
       end
     end

@@ -20,7 +20,7 @@ describe Explore::OnboardingController do
       it 'renders index with 200 status code and sets the session variable if the user is authenticated' do
         get :index
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
         expect(session[:onboarding_project]).to eq({ project_full_path: project.web_url, project_name: project.name })
       end
@@ -34,7 +34,7 @@ describe Explore::OnboardingController do
       it 'returns 404' do
         get :index
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
         expect(session[:onboarding_project]).to be_nil
       end
     end

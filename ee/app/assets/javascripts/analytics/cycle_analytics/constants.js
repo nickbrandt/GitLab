@@ -33,6 +33,16 @@ export const EMPTY_STAGE_TEXT = {
 export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
 export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
 
+export const TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS = {
+  [TASKS_BY_TYPE_SUBJECT_ISSUE]: __('Issues'),
+  [TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST]: __('Merge Requests'),
+};
+
+export const TASKS_BY_TYPE_FILTERS = {
+  SUBJECT: 'SUBJECT',
+  LABELS: 'LABELS',
+};
+
 export const STAGE_ACTIONS = {
   SELECT: 'selectStage',
   EDIT: 'editStage',

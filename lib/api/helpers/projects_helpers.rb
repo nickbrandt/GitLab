@@ -27,7 +27,9 @@ module API
         optional :wiki_access_level, type: String, values: %w(disabled private enabled), desc: 'Wiki access level. One of `disabled`, `private` or `enabled`'
         optional :builds_access_level, type: String, values: %w(disabled private enabled), desc: 'Builds access level. One of `disabled`, `private` or `enabled`'
         optional :snippets_access_level, type: String, values: %w(disabled private enabled), desc: 'Snippets access level. One of `disabled`, `private` or `enabled`'
+        optional :pages_access_level, type: String, values: %w(disabled private enabled public), desc: 'Pages access level. One of `disabled`, `private`, `enabled` or `public`'
 
+        optional :emails_disabled, type: Boolean, desc: 'Disable email notifications'
         optional :shared_runners_enabled, type: Boolean, desc: 'Flag indication if shared runners are enabled for that project'
         optional :resolve_outdated_diff_discussions, type: Boolean, desc: 'Automatically resolve merge request diffs discussions on lines changed with a push'
         optional :remove_source_branch_after_merge, type: Boolean, desc: 'Remove the source branch by default after merge'
@@ -46,6 +48,7 @@ module API
         optional :avatar, type: File, desc: 'Avatar image for project' # rubocop:disable Scalability/FileUploads
         optional :printing_merge_request_link_enabled, type: Boolean, desc: 'Show link to create/view merge request when pushing from the command line'
         optional :merge_method, type: String, values: %w(ff rebase_merge merge), desc: 'The merge method used when merging merge requests'
+        optional :suggestion_commit_message, type: String, desc: 'The commit message used to apply merge request suggestions'
         optional :initialize_with_readme, type: Boolean, desc: "Initialize a project with a README.md"
         optional :ci_default_git_depth, type: Integer, desc: 'Default number of revisions for shallow cloning'
         optional :auto_devops_enabled, type: Boolean, desc: 'Flag indication if Auto DevOps is enabled'
@@ -85,6 +88,7 @@ module API
 
       def self.update_params_at_least_one_of
         [
+          :autoclose_referenced_issues,
           :auto_devops_enabled,
           :auto_devops_deploy_strategy,
           :auto_cancel_pending_pipelines,
@@ -98,7 +102,7 @@ module API
           :container_expiration_policy_attributes,
           :default_branch,
           :description,
-          :autoclose_referenced_issues,
+          :emails_disabled,
           :issues_access_level,
           :lfs_enabled,
           :merge_requests_access_level,
@@ -106,6 +110,7 @@ module API
           :name,
           :only_allow_merge_if_all_discussions_are_resolved,
           :only_allow_merge_if_pipeline_succeeds,
+          :pages_access_level,
           :path,
           :printing_merge_request_link_enabled,
           :public_builds,
@@ -119,6 +124,7 @@ module API
           :visibility,
           :wiki_access_level,
           :avatar,
+          :suggestion_commit_message,
 
           # TODO: remove in API v5, replaced by *_access_level
           :issues_enabled,

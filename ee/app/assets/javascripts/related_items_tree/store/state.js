@@ -23,6 +23,7 @@ export default () => ({
   pendingReferences: [],
   itemAutoCompleteSources: {},
   itemAddFailureType: null,
+  itemAddFailureMessage: '',
 
   // UI Flags
   itemsFetchInProgress: false,

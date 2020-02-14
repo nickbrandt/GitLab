@@ -20,7 +20,21 @@ module Elastic
         results
       end
 
+      # @return [Kaminari::PaginatableArray]
+      def elastic_search_as_found_blob(query, page: 1, per: 20, options: {})
+        # Highlight is required for parse_search_result to locate relevant line
+        options = options.merge(highlight: true)
+
+        elastic_search_and_wrap(query, type: es_type, page: page, per: per, options: options) do |result, project|
+          ::Gitlab::Elastic::SearchResults.parse_search_result(result, project)
+        end
+      end
+
       private
+
+      def extract_repository_ids(options)
+        [options[:repository_id]].flatten
+      end
 
       def search_commit(query, page: 1, per: 20, options: {})
         page ||= 1
@@ -49,10 +63,11 @@ module Elastic
           query_hash[:track_scores] = true
         end
 
-        if options[:repository_id]
+        repository_ids = extract_repository_ids(options)
+        if repository_ids.any?
           query_hash[:query][:bool][:filter] << {
             terms: {
-              'commit.rid' => [options[:repository_id]].flatten
+              'commit.rid' => repository_ids
             }
           }
         end
@@ -77,7 +92,7 @@ module Elastic
 
         query_hash[:sort] = [:_score]
 
-        res = search(query_hash)
+        res = search(query_hash, options)
         {
           results: res.results,
           total_count: res.size
@@ -114,10 +129,11 @@ module Elastic
 
         query_hash[:query][:bool][:filter] += query.elasticsearch_filters(:blob)
 
-        if options[:repository_id]
+        repository_ids = extract_repository_ids(options)
+        if repository_ids.any?
           query_hash[:query][:bool][:filter] << {
             terms: {
-              'blob.rid' => [options[:repository_id]].flatten
+              'blob.rid' => repository_ids
             }
           }
         end
@@ -150,12 +166,64 @@ module Elastic
           }
         end
 
-        res = search(query_hash)
+        options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type.to_sym == :wiki_blob && repository_ids.any?
+
+        res = search(query_hash, options)
 
         {
           results: res.results,
           total_count: res.size
         }
+      end
+
+      # Wrap returned results into GitLab model objects and paginate
+      #
+      # @return [Kaminari::PaginatableArray]
+      def elastic_search_and_wrap(query, type:, page: 1, per: 20, options: {}, &blk)
+        type = type.to_s
+
+        response = elastic_search(
+          query,
+          type: type,
+          page: page,
+          per: per,
+          options: options
+        )[type.pluralize.to_sym][:results]
+
+        items, total_count = yield_each_search_result(response, type, &blk)
+
+        # Before "map" we had a paginated array so we need to recover it
+        offset = per * ((page || 1) - 1)
+        Kaminari.paginate_array(items, total_count: total_count, limit: per, offset: offset)
+      end
+
+      def yield_each_search_result(response, type)
+        # Avoid one SELECT per result by loading all projects into a hash
+        project_ids = response.map { |result| project_id_for_commit_or_blob(result, type) }.uniq
+        projects = Project.with_route.id_in(project_ids).index_by(&:id)
+        total_count = response.total_count
+
+        items = response.map do |result|
+          project_id = project_id_for_commit_or_blob(result, type)
+          project = projects[project_id]
+
+          if project.nil? || project.pending_delete?
+            total_count -= 1
+            next
+          end
+
+          yield(result, project)
+        end
+
+        # Remove results for deleted projects
+        items.compact!
+
+        [items, total_count]
+      end
+
+      # Indexed commit does not include project_id
+      def project_id_for_commit_or_blob(result, type)
+        result.dig('_source', 'project_id') || result.dig('_source', type, 'rid').to_i
       end
     end
   end

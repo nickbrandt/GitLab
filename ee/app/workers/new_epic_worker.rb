@@ -6,6 +6,7 @@ class NewEpicWorker
 
   feature_category :epics
   worker_resource_boundary :cpu
+  weight 2
 
   def perform(epic_id, user_id)
     return unless objects_found?(epic_id, user_id)

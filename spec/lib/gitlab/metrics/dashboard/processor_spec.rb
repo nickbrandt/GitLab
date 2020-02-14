@@ -62,7 +62,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
           'metric_a1', # group priority 1, panel weight 1
           project_business_metric.id, # group priority 0, panel weight nil (0)
           project_response_metric.id, # group priority -5, panel weight nil (0)
-          project_system_metric.id, # group priority -10, panel weight nil (0)
+          project_system_metric.id # group priority -10, panel weight nil (0)
         ]
         actual_metrics_order = all_metrics.map { |m| m[:id] || m[:metric_id] }
 
@@ -84,6 +84,16 @@ describe Gitlab::Metrics::Dashboard::Processor do
 
           expect(metrics.length).to be(3)
           expect(metrics).to eq %w(metric_b metric_a2 metric_a1)
+        end
+      end
+
+      context 'when sample_metrics are requested' do
+        let(:process_params) { [project, dashboard_yml, sequence, { environment: environment, sample_metrics: true }] }
+
+        it 'includes a sample metrics path for the prometheus endpoint with each metric' do
+          expect(all_metrics).to satisfy_all do |metric|
+            metric[:prometheus_endpoint_path] == sample_metrics_path(metric[:id])
+          end
         end
       end
     end
@@ -145,6 +155,14 @@ describe Gitlab::Metrics::Dashboard::Processor do
       environment,
       proxy_path: :query_range,
       query: query
+    )
+  end
+
+  def sample_metrics_path(metric)
+    Gitlab::Routing.url_helpers.sample_metrics_project_environment_path(
+      project,
+      environment,
+      identifier: metric
     )
   end
 end

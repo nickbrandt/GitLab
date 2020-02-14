@@ -101,7 +101,7 @@ module API
         get 'packages/:conan_package_reference' do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanPackageSnapshot
         end
@@ -113,7 +113,7 @@ module API
         get do
           authorize!(:read_package, project)
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeSnapshot
         end
@@ -250,7 +250,7 @@ module API
           end
           route_setting :authentication, job_token_allowed: true
           put 'authorize' do
-            authorize_workhorse!(project)
+            authorize_workhorse!(subject: project)
           end
         end
 
@@ -273,7 +273,7 @@ module API
           end
           route_setting :authentication, job_token_allowed: true
           put 'authorize' do
-            authorize_workhorse!(project)
+            authorize_workhorse!(subject: project)
           end
 
           desc 'Upload package files' do
@@ -294,24 +294,22 @@ module API
       include Gitlab::Utils::StrongMemoize
       include ::API::Helpers::RelatedResourcesHelpers
 
-      def present_package_download_urls
+      def present_download_urls(entity)
         authorize!(:read_package, project)
 
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
+        presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
 
-        render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
+        render_api_error!("No recipe manifest found", 404) if yield(presenter).empty?
 
-        present presenter, with: EE::API::Entities::ConanPackage::ConanPackageManifest
+        present presenter, with: entity
+      end
+
+      def present_package_download_urls
+        present_download_urls(EE::API::Entities::ConanPackage::ConanPackageManifest, &:package_urls)
       end
 
       def present_recipe_download_urls
-        authorize!(:read_package, project)
-
-        presenter = ConanPackagePresenter.new(recipe, current_user, project)
-
-        render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
-
-        present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeManifest
+        present_download_urls(EE::API::Entities::ConanPackage::ConanRecipeManifest, &:recipe_urls)
       end
 
       def recipe_upload_urls(file_names)
@@ -391,15 +389,31 @@ module API
         present_carrierwave_file!(package_file.file)
       end
 
+      def find_or_create_package
+        package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+      end
+
+      def track_push_package_event
+        if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+          track_event('push_package')
+        end
+      end
+
+      def create_package_file_with_type(file_type, current_package)
+        unless params['file.size'] == 0
+          # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
+          ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_package_file, params.merge(conan_file_type: file_type)).execute
+        end
+      end
+
       def upload_package_file(file_type)
         authorize_upload!(project)
 
-        current_package = package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+        current_package = find_or_create_package
 
-        track_event('push_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
+        track_push_package_event
 
-        # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
-        ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_package_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0
+        create_package_file_with_type(file_type, current_package)
       rescue ObjectStorage::RemoteStoreError => e
         Gitlab::ErrorTracking.track_exception(e, file_name: params[:file_name], project_id: project.id)
 
@@ -416,9 +430,7 @@ module API
       def find_user_from_job_token
         return unless route_authentication_setting[:job_token_allowed]
 
-        job = find_job_from_token
-
-        raise ::Gitlab::Auth::UnauthorizedError unless job
+        job = find_job_from_token || raise(::Gitlab::Auth::UnauthorizedError)
 
         job.user
       end

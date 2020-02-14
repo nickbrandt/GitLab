@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CiMinutesUsageMailer < BaseMailer
+class CiMinutesUsageMailer < ApplicationMailer
   def notify(namespace_name, recipients)
     @namespace_name = namespace_name
 

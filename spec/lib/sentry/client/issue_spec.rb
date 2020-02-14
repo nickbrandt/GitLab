@@ -8,7 +8,7 @@ describe Sentry::Client::Issue do
   let(:token) { 'test-token' }
   let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0' }
   let(:client) { Sentry::Client.new(sentry_url, token) }
-  let(:issue_id) { 503504 }
+  let(:issue_id) { 11 }
 
   describe '#list_issues' do
     shared_examples 'issues have correct return type' do |klass|
@@ -30,7 +30,7 @@ describe Sentry::Client::Issue do
     let(:default_httparty_options) do
       {
         follow_redirects: false,
-        headers: { "Authorization" => "Bearer test-token" }
+        headers: { 'Content-Type' => 'application/json', 'Authorization' => "Bearer test-token" }
       }
     end
 
@@ -107,28 +107,6 @@ describe Sentry::Client::Issue do
       let(:sentry_api_url) { sentry_url + '/issues/?limit=20&query=is:unresolved' }
 
       it_behaves_like 'no Sentry redirects'
-    end
-
-    # Sentry API returns 404 if there are extra slashes in the URL!
-    context 'extra slashes in URL' do
-      let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects//sentry-org/sentry-project/' }
-
-      let(:sentry_request_url) do
-        'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project/' \
-          'issues/?limit=20&query=is:unresolved'
-      end
-
-      it 'removes extra slashes in api url' do
-        expect(client.url).to eq(sentry_url)
-        expect(Gitlab::HTTP).to receive(:get).with(
-          URI('https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project/issues/'),
-          anything
-        ).and_call_original
-
-        subject
-
-        expect(sentry_api_request).to have_been_requested
-      end
     end
 
     context 'requests with sort parameter in sentry api' do
@@ -232,14 +210,6 @@ describe Sentry::Client::Issue do
 
     subject { client.issue_details(issue_id: issue_id) }
 
-    it 'escapes issue ID' do
-      allow(CGI).to receive(:escape).and_call_original
-
-      subject
-
-      expect(CGI).to have_received(:escape).with(issue_id.to_s)
-    end
-
     context 'error object created from sentry response' do
       using RSpec::Parameterized::TableSyntax
 
@@ -273,7 +243,7 @@ describe Sentry::Client::Issue do
       end
 
       it 'has a correct external URL' do
-        expect(subject.external_url).to eq('https://sentrytest.gitlab.com/api/0/issues/503504')
+        expect(subject.external_url).to eq('https://sentrytest.gitlab.com/api/0/issues/11')
       end
 
       it 'issue has a correct external base url' do

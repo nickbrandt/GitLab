@@ -37,6 +37,23 @@ describe EE::Issuable do
 
       expect(relation.labels_hash[issue_id]).to include('Feature', 'Second Label')
     end
+
+    # This tests the workaround for the lack of a NOT NULL constraint in
+    # label_links.label_id:
+    # https://gitlab.com/gitlab-org/gitlab/issues/197307
+    context 'with a NULL label ID in the link' do
+      let(:issue) { create(:labeled_issue, labels: [feature_label, second_label]) }
+
+      before do
+        label_link = issue.label_links.find_by(label_id: second_label.id)
+        label_link.label_id = nil
+        label_link.save(validate: false)
+      end
+
+      it 'filters out bad labels' do
+        expect(Issue.where(id: issue.id).labels_hash[issue.id]).to match_array(['Feature'])
+      end
+    end
   end
 
   describe '#matches_cross_reference_regex?' do

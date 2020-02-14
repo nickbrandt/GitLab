@@ -14,9 +14,9 @@ const emptyDashboardStateSvgPath = '/svgs/empty-dash.svg';
 const projectAddEndpoint = '/projects/add';
 const projectListEndpoint = '/projects/list';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
-const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
+const vulnerableProjectsEndpoint = '/vulnerable_projects_endpoint';
 
 describe('Instance Security Dashboard component', () => {
   let store;
@@ -57,9 +57,9 @@ describe('Instance Security Dashboard component', () => {
         projectAddEndpoint,
         projectListEndpoint,
         vulnerabilitiesEndpoint,
-        vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       },
     });
   };
@@ -161,9 +161,9 @@ describe('Instance Security Dashboard component', () => {
 
       expectComponentWithProps(SecurityDashboard, {
         vulnerabilitiesEndpoint,
-        vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       });
     });
 

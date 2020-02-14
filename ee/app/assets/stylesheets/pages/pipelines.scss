@@ -163,6 +163,10 @@
       }
     }
 
+    &.child-pipeline {
+      height: 68px;
+    }
+
     .linked-pipeline-content {
       @include build-content(0);
       text-align: inherit;

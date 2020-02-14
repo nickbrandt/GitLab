@@ -8,7 +8,6 @@ export default () => ({
    * {
    *  resourceId: String,
    *  pageType: String,
-   *  userCanDelete: Boolean,
    *  emptyListIllustration: String,
    *  emptyListHelpUrl: String
    * }
@@ -33,4 +32,15 @@ export default () => ({
    * }
    */
   pagination: {},
+  /**
+   * Sorting object has the following structure:
+   * {
+   *  sort: String,
+   *  orderBy: String
+   * }
+   */
+  sorting: {
+    sort: 'desc',
+    orderBy: 'version',
+  },
 });

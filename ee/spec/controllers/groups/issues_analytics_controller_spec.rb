@@ -18,7 +18,7 @@ describe Groups::IssuesAnalyticsController do
       it 'renders 404' do
         get :show, params: { group_id: group.to_param }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -32,7 +32,7 @@ describe Groups::IssuesAnalyticsController do
       it 'renders 404' do
         get :show, params: { group_id: group.to_param }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 

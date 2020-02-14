@@ -13,7 +13,7 @@ describe Groups::GroupMembersController do
     it 'renders index with 200 status code' do
       get :index, params: { group_id: group }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(response).to render_template(:index)
     end
 
@@ -29,6 +29,12 @@ describe Groups::GroupMembersController do
         get :index, params: { group_id: group }
 
         expect(assigns(:invited_members).map(&:invite_email)).to match_array(invited.map(&:invite_email))
+      end
+
+      it 'assigns skip groups' do
+        get :index, params: { group_id: group }
+
+        expect(assigns(:skip_groups)).to match_array(group.related_group_ids)
       end
 
       it 'restricts search to one email' do
@@ -99,7 +105,7 @@ describe Groups::GroupMembersController do
                         access_level: Gitlab::Access::GUEST
                       }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
         expect(group.users).not_to include group_user
       end
     end
@@ -167,7 +173,7 @@ describe Groups::GroupMembersController do
       it 'returns 403' do
         delete :destroy, params: { group_id: group, id: 42 }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -180,7 +186,7 @@ describe Groups::GroupMembersController do
         it 'returns 403' do
           delete :destroy, params: { group_id: group, id: member }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
           expect(group.members).to include member
         end
       end
@@ -217,7 +223,7 @@ describe Groups::GroupMembersController do
       it 'returns 404' do
         delete :leave, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -238,7 +244,7 @@ describe Groups::GroupMembersController do
         it 'supports json request' do
           delete :leave, params: { group_id: group }, format: :json
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['notice']).to eq "You left the \"#{group.name}\" group."
         end
       end
@@ -251,7 +257,7 @@ describe Groups::GroupMembersController do
         it 'cannot removes himself from the group' do
           delete :leave, params: { group_id: group }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -298,7 +304,7 @@ describe Groups::GroupMembersController do
       it 'returns 403' do
         post :approve_access_request, params: { group_id: group, id: 42 }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -311,7 +317,7 @@ describe Groups::GroupMembersController do
         it 'returns 403' do
           post :approve_access_request, params: { group_id: group, id: member }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
           expect(group.members).not_to include member
         end
       end
@@ -342,7 +348,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         get :index, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -350,7 +356,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         post :create, params: { group_id: group, users: user, access_level: Gitlab::Access::GUEST }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -364,7 +370,7 @@ describe Groups::GroupMembersController do
             },
             format: :js
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -372,7 +378,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         delete :destroy, params: { group_id: group, id: membership }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -382,7 +388,7 @@ describe Groups::GroupMembersController do
 
         post :request_access, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -391,7 +397,7 @@ describe Groups::GroupMembersController do
         access_request = create(:group_member, :access_request, group: group)
         post :approve_access_request, params: { group_id: group, id: access_request }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -401,7 +407,7 @@ describe Groups::GroupMembersController do
 
         delete :leave, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -409,7 +415,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         post :resend_invite, params: { group_id: group, id: membership }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
   end

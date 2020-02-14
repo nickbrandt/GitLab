@@ -1,12 +1,13 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlModal } from '@gitlab/ui';
+import { GlButton, GlModal, GlSprintf, GlLink } from '@gitlab/ui';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import state from 'ee/vue_shared/dashboards/store/state';
 import component from 'ee/environments_dashboard/components/dashboard/dashboard.vue';
 import ProjectHeader from 'ee/environments_dashboard/components/dashboard/project_header.vue';
 import Environment from 'ee/environments_dashboard/components/dashboard/environment.vue';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
+import { trimText } from 'helpers/text_helper';
 
 import environment from './mock_environment.json';
 
@@ -35,6 +36,7 @@ describe('dashboard', () => {
       listPath: 'mock-listPath',
       emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
       emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
+      environmentsDashboardHelpPath: '/help/user/operations_dashboard/index.html',
     };
 
     wrapper = shallowMount(component, {
@@ -44,6 +46,7 @@ describe('dashboard', () => {
       methods: {
         ...actionSpies,
       },
+      stubs: { GlSprintf },
     });
   });
 
@@ -58,6 +61,28 @@ describe('dashboard', () => {
 
   it('renders the dashboard title', () => {
     expect(wrapper.find('.js-dashboard-title').text()).toBe('Environments Dashboard');
+  });
+
+  describe('page limits information message', () => {
+    let message;
+
+    beforeEach(() => {
+      message = wrapper.find('.js-page-limits-message');
+    });
+
+    it('renders the message', () => {
+      expect(trimText(message.text())).toBe(
+        'This dashboard displays a maximum of 7 projects and 3 environments per project. Read more.',
+      );
+    });
+
+    it('includes the correct documentation link in the message', () => {
+      const helpLink = message.find(GlLink);
+
+      expect(helpLink.text()).toBe('Read more.');
+      expect(helpLink.attributes('href')).toBe(propsData.environmentsDashboardHelpPath);
+      expect(helpLink.attributes('rel')).toBe('noopener noreferrer');
+    });
   });
 
   describe('add projects button', () => {

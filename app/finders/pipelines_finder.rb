@@ -17,7 +17,7 @@ class PipelinesFinder
       return Ci::Pipeline.none
     end
 
-    items = pipelines
+    items = pipelines.no_child
     items = by_scope(items)
     items = by_status(items)
     items = by_ref(items)
@@ -39,7 +39,7 @@ class PipelinesFinder
 
   # rubocop: disable CodeReuse/ActiveRecord
   def from_ids(ids)
-    pipelines.unscoped.where(id: ids)
+    pipelines.unscoped.where(project_id: project.id, id: ids)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

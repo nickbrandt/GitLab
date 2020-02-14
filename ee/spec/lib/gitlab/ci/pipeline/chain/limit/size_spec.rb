@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
-  set(:namespace) { create(:namespace) }
-  set(:project) { create(:project, :repository, namespace: namespace) }
-  set(:user) { create(:user) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:project, reload: true) { create(:project, :repository, namespace: namespace) }
+  let_it_be(:user) { create(:user) }
 
   let(:pipeline) { build(:ci_pipeline, project: project) }
 

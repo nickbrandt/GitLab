@@ -5,12 +5,11 @@ require 'spec_helper'
 describe API::V3::Github do
   let(:user) { create(:user) }
   let(:unauthorized_user) { create(:user) }
-  let!(:project) { create(:project, :repository, creator: user) }
-  let!(:project2) { create(:project, :repository, creator: user) }
+  let(:admin) { create(:user, :admin) }
+  let(:project) { create(:project, :repository, creator: user) }
 
   before do
     project.add_maintainer(user)
-    project2.add_maintainer(user)
     stub_licensed_features(jira_dev_panel_integration: true)
   end
 
@@ -198,6 +197,7 @@ describe API::V3::Github do
   end
 
   describe 'repo pulls' do
+    let(:project2) { create(:project, :repository, creator: user) }
     let(:assignee) { create(:user) }
     let(:assignee2) { create(:user) }
     let!(:merge_request) do
@@ -205,6 +205,10 @@ describe API::V3::Github do
     end
     let!(:merge_request_2) do
       create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
+    end
+
+    before do
+      project2.add_maintainer(user)
     end
 
     describe 'GET /-/jira/pulls' do
@@ -230,11 +234,32 @@ describe API::V3::Github do
     end
 
     describe 'GET /repos/:namespace/:project/pulls/:id' do
-      it 'returns the requested merge request in github format' do
-        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
+      context 'when user has access to the merge requests' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
+      end
+
+      context 'when user has no access to the merge request' do
+        it 'returns 404' do
+          project.add_guest(unauthorized_user)
+
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", unauthorized_user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when instance admin' do
+        it 'returns the requested merge request in github format' do
+          jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", admin)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+        end
       end
     end
   end
@@ -261,23 +286,20 @@ describe API::V3::Github do
       expect(json_response.size).to eq(projects.size)
     end
 
-    context 'when instance admin' do
-      let(:project) { create(:project, group: group) }
-
-      it 'returns an array of projects belonging to group with github format' do
-        expect_project_under_namespace([project], group, create(:user, :admin))
-      end
-    end
-
     context 'group namespace' do
       let(:project) { create(:project, group: group) }
+      let!(:project2) { create(:project, :public, group: group) }
 
-      before do
-        group.add_maintainer(user)
+      it 'returns an array of projects belonging to group excluding the ones user is not directly a member of, even when public' do
+        expect_project_under_namespace([project], group, user)
       end
 
-      it 'returns an array of projects belonging to group with github format' do
-        expect_project_under_namespace([project], group, user)
+      context 'when instance admin' do
+        let(:user) { create(:user, :admin) }
+
+        it 'returns an array of projects belonging to group' do
+          expect_project_under_namespace([project, project2], group, user)
+        end
       end
     end
 

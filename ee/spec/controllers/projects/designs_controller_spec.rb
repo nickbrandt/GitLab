@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Projects::DesignsController do
   include DesignManagementTestHelpers
 
-  set(:project) { create(:project, :public) }
-  set(:issue) { create(:issue, project: project) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:issue) { create(:issue, project: project) }
   let(:file) { fixture_file_upload('spec/fixtures/dk.png', '`/png') }
   let(:lfs_pointer) { Gitlab::Git::LfsPointerFile.new(file.read) }
   let(:design) { create(:design, :with_lfs_file, file: lfs_pointer.pointer, issue: issue) }
@@ -37,7 +37,7 @@ describe Projects::DesignsController do
 
         subject
 
-        expect(response.header['Content-Disposition']).to eq(%Q(attachment; filename*=UTF-8''#{filename}; filename=\"#{filename}\"))
+        expect(response.header['Content-Disposition']).to eq(%Q(attachment; filename=\"#{filename}\"; filename*=UTF-8''#{filename}))
       end
 
       context 'when the design is not an LFS file' do

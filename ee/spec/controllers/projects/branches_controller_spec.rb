@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::BranchesController do
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
   let(:user) { project.owner }
 
   before do

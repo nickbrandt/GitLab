@@ -41,16 +41,35 @@ module EE
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
+      scope :without_approvals, -> { left_outer_joins(:approvals).where(approvals: { id: nil }) }
+      scope :with_approvals, -> { joins(:approvals) }
+      scope :approved_by_users_with_ids, -> (*user_ids) do
+        with_approvals
+          .merge(Approval.with_user)
+          .where(users: { id: user_ids })
+          .group(:id)
+          .having("COUNT(users.id) = ?", user_ids.size)
+      end
+      scope :approved_by_users_with_usernames, -> (*usernames) do
+        with_approvals
+          .merge(Approval.with_user)
+          .where(users: { username: usernames })
+          .group(:id)
+          .having("COUNT(users.id) = ?", usernames.size)
+      end
+
       participant :participant_approvers
 
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
 
-      state_machine :state_id do
-        after_transition any => :merged do |merge_request|
-          merge_request.merge_train&.merged!
+      scope :order_review_time_desc, -> do
+        joins(:metrics).reorder(::Gitlab::Database.nulls_last_order('merge_request_metrics.first_comment_at'))
+      end
 
-          true
-        end
+      scope :with_code_review_api_entity_associations, -> do
+        preload(
+          :author, :approved_by_users, :metrics,
+          latest_merge_request_diff: :merge_request_diff_files, target_project: :namespace, milestone: :project)
       end
     end
 
@@ -62,6 +81,24 @@ module EE
       # This is an ActiveRecord scope in CE
       def with_api_entity_associations
         super.preload(:blocking_merge_requests)
+      end
+
+      def sort_by_attribute(method, *args)
+        if method.to_s == 'review_time_desc'
+          order_review_time_desc
+        else
+          super
+        end
+      end
+
+      # Includes table keys in group by clause when sorting
+      # preventing errors in postgres
+      #
+      # Returns an array of arel columns
+      def grouping_columns(sort)
+        grouping_columns = super
+        grouping_columns << ::MergeRequest::Metrics.arel_table[:first_comment_at] if sort.to_s == 'review_time_desc'
+        grouping_columns
       end
     end
 
@@ -140,7 +177,7 @@ module EE
         container_scanning: report_type_enabled?(:container_scanning),
         dast: report_type_enabled?(:dast),
         dependency_scanning: report_type_enabled?(:dependency_scanning),
-        license_management: report_type_enabled?(:license_management)
+        license_management: report_type_enabled?(:license_scanning)
       }
     end
 
@@ -155,7 +192,7 @@ module EE
     end
 
     def has_license_management_reports?
-      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports))
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_scanning_reports))
     end
 
     def has_container_scanning_reports?

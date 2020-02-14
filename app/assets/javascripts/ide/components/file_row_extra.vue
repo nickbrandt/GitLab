@@ -55,7 +55,7 @@ export default {
         return n__('%d staged change', '%d staged changes', this.folderStagedCount);
       }
 
-      return sprintf(__('%{unstaged} unstaged and %{staged} staged changes'), {
+      return sprintf(__('%{staged} staged and %{unstaged} unstaged changes'), {
         unstaged: this.folderUnstagedCount,
         staged: this.folderStagedCount,
       });

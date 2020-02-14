@@ -75,7 +75,7 @@ describe Packages::GroupPackagesFinder do
     end
 
     context 'when project is public' do
-      set(:other_user) { create(:user) }
+      let_it_be(:other_user) { create(:user) }
       let(:finder) { described_class.new(other_user, group) }
 
       before do

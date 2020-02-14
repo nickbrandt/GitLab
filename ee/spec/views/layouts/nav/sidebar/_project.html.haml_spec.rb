@@ -141,11 +141,11 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dependencies) { true }
 
       it 'top level navigation link is visible' do
-        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is visible' do
-        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
       end
 
       it 'security configuration link is visible' do
@@ -162,11 +162,11 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dependencies) { false }
 
       it 'top level navigation link is visible' do
-        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is visible' do
-        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
       end
 
       it 'security configuration link is visible' do
@@ -187,7 +187,7 @@ describe 'layouts/nav/sidebar/_project' do
       end
 
       it 'security dashboard link is not visible' do
-        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
       end
 
       it 'security configuration link is not visible' do
@@ -204,11 +204,11 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_dashboard) { false }
 
       it 'top level navigation link is visible' do
-        expect(rendered).not_to have_link('Security & Compliance', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security & Compliance', href: project_security_dashboard_index_path(project))
       end
 
       it 'security dashboard link is not visible' do
-        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+        expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_index_path(project))
       end
 
       it 'security configuration link is not visible' do

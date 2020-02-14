@@ -50,6 +50,7 @@ export default {
       'itemAddInProgress',
       'itemAddFailure',
       'itemAddFailureType',
+      'itemAddFailureMessage',
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
@@ -118,8 +119,8 @@ export default {
       this.addPendingReferences(this.getRawRefs(newValue));
       this.setItemInputValue('');
     },
-    handleAddItemFormSubmit(newValue) {
-      this.handleAddItemFormBlur(newValue);
+    handleAddItemFormSubmit(event) {
+      this.handleAddItemFormBlur(event.pendingReferences);
 
       if (this.pendingReferences.length > 0) {
         this.addItem();
@@ -194,6 +195,7 @@ export default {
           :path-id-separator="itemPathIdSeparator"
           :has-error="itemAddFailure"
           :item-add-failure-type="itemAddFailureType"
+          :item-add-failure-message="itemAddFailureMessage"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"

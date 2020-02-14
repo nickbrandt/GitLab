@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'Group Packages' do
   include SortingHelper
 
-  set(:user) { create(:user) }
-  set(:group) { create(:group) }
-  set(:project) { create(:project, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
 
   before do
     sign_in(user)
@@ -28,7 +28,7 @@ describe 'Group Packages' do
       it 'gives 404' do
         visit_group_packages
 
-        expect(page).to have_gitlab_http_status(404)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -40,7 +40,7 @@ describe 'Group Packages' do
       it 'gives 404' do
         visit_group_packages
 
-        expect(page).to have_gitlab_http_status(404)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
 

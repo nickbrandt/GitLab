@@ -11,7 +11,7 @@ module EE
 
         relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
         relation.pluck(:id, 'labels.title').each do |issue_id, label|
-          issue_labels[issue_id] << label
+          issue_labels[issue_id] << label if label.present?
         end
 
         issue_labels
@@ -20,6 +20,10 @@ module EE
 
     def supports_epic?
       is_a?(Issue) && project.group
+    end
+
+    def supports_health_status?
+      false
     end
   end
 end

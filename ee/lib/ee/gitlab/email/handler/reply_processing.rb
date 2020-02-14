@@ -17,12 +17,22 @@ module EE
             command_definitions = ::QuickActions::InterpretService.command_definitions
             extractor = ::Gitlab::QuickActions::Extractor.new(command_definitions)
 
-            extractor.extract_commands(content)[0]
+            extractor.redact_commands(content)
           end
 
           override :process_message
           def process_message(**kwargs)
             strip_quick_actions(super(kwargs))
+          end
+
+          override :upload_params
+          def upload_params
+            return super unless try(:noteable)&.is_a?(Epic)
+
+            {
+              upload_parent: noteable.group,
+              uploader_class: NamespaceFileUploader
+            }
           end
         end
       end

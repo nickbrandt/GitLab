@@ -15,21 +15,25 @@ class Projects::SnippetsController < Projects::ApplicationController
   before_action :check_snippets_available!
   before_action :snippet, only: [:show, :edit, :destroy, :update, :raw, :toggle_award_emoji, :mark_as_spam]
 
-  # Allow read any snippet
-  before_action :authorize_read_project_snippet!, except: [:new, :create, :index]
+  # Allow create snippet
+  before_action :authorize_create_snippet!, only: [:new, :create]
 
-  # Allow write(create) snippet
-  before_action :authorize_create_project_snippet!, only: [:new, :create]
+  # Allow read any snippet
+  before_action :authorize_read_snippet!, except: [:new, :create, :index]
 
   # Allow modify snippet
-  before_action :authorize_update_project_snippet!, only: [:edit, :update]
+  before_action :authorize_update_snippet!, only: [:edit, :update]
 
   # Allow destroy snippet
-  before_action :authorize_admin_project_snippet!, only: [:destroy]
+  before_action :authorize_admin_snippet!, only: [:destroy]
 
   respond_to :html
 
   def index
+    @snippet_counts = Snippets::CountService
+      .new(current_user, project: @project)
+      .execute
+
     @snippets = SnippetsFinder.new(current_user, project: @project, scope: params[:scope])
       .execute
       .page(params[:page])
@@ -46,8 +50,8 @@ class Projects::SnippetsController < Projects::ApplicationController
 
   def create
     create_params = snippet_params.merge(spammable_params)
-
-    @snippet = CreateSnippetService.new(@project, current_user, create_params).execute
+    service_response = Snippets::CreateService.new(project, current_user, create_params).execute
+    @snippet = service_response.payload[:snippet]
 
     recaptcha_check_with_fallback { render :new }
   end
@@ -55,7 +59,8 @@ class Projects::SnippetsController < Projects::ApplicationController
   def update
     update_params = snippet_params.merge(spammable_params)
 
-    UpdateSnippetService.new(project, current_user, @snippet, update_params).execute
+    service_response = Snippets::UpdateService.new(project, current_user, update_params).execute(@snippet)
+    @snippet = service_response.payload[:snippet]
 
     recaptcha_check_with_fallback { render :edit }
   end
@@ -89,11 +94,17 @@ class Projects::SnippetsController < Projects::ApplicationController
   end
 
   def destroy
-    return access_denied! unless can?(current_user, :admin_project_snippet, @snippet)
+    service_response = Snippets::DestroyService.new(current_user, @snippet).execute
 
-    @snippet.destroy
-
-    redirect_to project_snippets_path(@project), status: :found
+    if service_response.success?
+      redirect_to project_snippets_path(project), status: :found
+    elsif service_response.http_status == 403
+      access_denied!
+    else
+      redirect_to project_snippet_path(project, @snippet),
+                  status: :found,
+                  alert: service_response.message
+    end
   end
 
   protected
@@ -108,16 +119,16 @@ class Projects::SnippetsController < Projects::ApplicationController
     project_snippet_path(@project, @snippet)
   end
 
-  def authorize_read_project_snippet!
-    return render_404 unless can?(current_user, :read_project_snippet, @snippet)
+  def authorize_read_snippet!
+    return render_404 unless can?(current_user, :read_snippet, @snippet)
   end
 
-  def authorize_update_project_snippet!
-    return render_404 unless can?(current_user, :update_project_snippet, @snippet)
+  def authorize_update_snippet!
+    return render_404 unless can?(current_user, :update_snippet, @snippet)
   end
 
-  def authorize_admin_project_snippet!
-    return render_404 unless can?(current_user, :admin_project_snippet, @snippet)
+  def authorize_admin_snippet!
+    return render_404 unless can?(current_user, :admin_snippet, @snippet)
   end
 
   def snippet_params

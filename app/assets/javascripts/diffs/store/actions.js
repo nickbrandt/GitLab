@@ -64,6 +64,11 @@ export const fetchDiffFiles = ({ state, commit }) => {
   const urlParams = {
     w: state.showWhitespace ? '0' : '1',
   };
+  let returnData;
+
+  if (state.useSingleDiffStyle) {
+    urlParams.view = state.diffViewType;
+  }
 
   commit(types.SET_LOADING, true);
 
@@ -83,25 +88,45 @@ export const fetchDiffFiles = ({ state, commit }) => {
 
       worker.postMessage(state.diffFiles);
 
+      returnData = res.data;
       return Vue.nextTick();
     })
-    .then(handleLocationHash)
+    .then(() => {
+      handleLocationHash();
+      return returnData;
+    })
     .catch(() => worker.terminate());
 };
 
 export const fetchDiffFilesBatch = ({ commit, state }) => {
+  const urlParams = {
+    per_page: DIFFS_PER_PAGE,
+    w: state.showWhitespace ? '0' : '1',
+  };
+
+  if (state.useSingleDiffStyle) {
+    urlParams.view = state.diffViewType;
+  }
+
   commit(types.SET_BATCH_LOADING, true);
   commit(types.SET_RETRIEVING_BATCHES, true);
 
-  const getBatch = page =>
+  const getBatch = (page = 1) =>
     axios
       .get(state.endpointBatch, {
-        params: { page, per_page: DIFFS_PER_PAGE, w: state.showWhitespace ? '0' : '1' },
+        params: {
+          ...urlParams,
+          page,
+        },
       })
       .then(({ data: { pagination, diff_files } }) => {
         commit(types.SET_DIFF_DATA_BATCH, { diff_files });
         commit(types.SET_BATCH_LOADING, false);
-        if (!pagination.next_page) commit(types.SET_RETRIEVING_BATCHES, false);
+
+        if (!pagination.next_page) {
+          commit(types.SET_RETRIEVING_BATCHES, false);
+        }
+
         return pagination.next_page;
       })
       .then(nextPage => nextPage && getBatch(nextPage))
@@ -114,6 +139,11 @@ export const fetchDiffFilesBatch = ({ commit, state }) => {
 
 export const fetchDiffFilesMeta = ({ commit, state }) => {
   const worker = new TreeWorker();
+  const urlParams = {};
+
+  if (state.useSingleDiffStyle) {
+    urlParams.view = state.diffViewType;
+  }
 
   commit(types.SET_LOADING, true);
 
@@ -124,16 +154,18 @@ export const fetchDiffFilesMeta = ({ commit, state }) => {
   });
 
   return axios
-    .get(state.endpointMetadata)
+    .get(mergeUrlParams(urlParams, state.endpointMetadata))
     .then(({ data }) => {
       const strippedData = { ...data };
+
       delete strippedData.diff_files;
       commit(types.SET_LOADING, false);
       commit(types.SET_MERGE_REQUEST_DIFFS, data.merge_request_diffs || []);
       commit(types.SET_DIFF_DATA, strippedData);
 
-      prepareDiffData(data);
-      worker.postMessage(data.diff_files);
+      worker.postMessage(prepareDiffData(data, state.diffFiles));
+
+      return data;
     })
     .catch(() => worker.terminate());
 };
@@ -150,7 +182,10 @@ export const assignDiscussionsToDiff = (
   { commit, state, rootState },
   discussions = rootState.notes.discussions,
 ) => {
-  const diffPositionByLineCode = getDiffPositionByLineCode(state.diffFiles);
+  const diffPositionByLineCode = getDiffPositionByLineCode(
+    state.diffFiles,
+    state.useSingleDiffStyle,
+  );
   const hash = getLocationHash();
 
   discussions
@@ -204,7 +239,7 @@ export const startRenderDiffsQueue = ({ state, commit }) => {
       const nextFile = state.diffFiles.find(
         file =>
           !file.renderIt &&
-          (file.viewer && (!file.viewer.collapsed || !file.viewer.name === diffViewerModes.text)),
+          (file.viewer && (!file.viewer.collapsed || file.viewer.name !== diffViewerModes.text)),
       );
 
       if (nextFile) {
@@ -339,24 +374,23 @@ export const toggleFileDiscussions = ({ getters, dispatch }, diff) => {
 
 export const toggleFileDiscussionWrappers = ({ commit }, diff) => {
   const discussionWrappersExpanded = allDiscussionWrappersExpanded(diff);
-  let linesWithDiscussions;
-  if (diff.highlighted_diff_lines) {
-    linesWithDiscussions = diff.highlighted_diff_lines.filter(line => line.discussions.length);
-  }
-  if (diff.parallel_diff_lines) {
-    linesWithDiscussions = diff.parallel_diff_lines.filter(
-      line =>
-        (line.left && line.left.discussions.length) ||
-        (line.right && line.right.discussions.length),
-    );
-  }
+  const lineCodesWithDiscussions = new Set();
+  const { parallel_diff_lines: parallelLines, highlighted_diff_lines: inlineLines } = diff;
+  const allLines = inlineLines.concat(
+    parallelLines.map(line => line.left),
+    parallelLines.map(line => line.right),
+  );
+  const lineHasDiscussion = line => Boolean(line?.discussions.length);
+  const registerDiscussionLine = line => lineCodesWithDiscussions.add(line.line_code);
 
-  if (linesWithDiscussions.length) {
-    linesWithDiscussions.forEach(line => {
+  allLines.filter(lineHasDiscussion).forEach(registerDiscussionLine);
+
+  if (lineCodesWithDiscussions.size) {
+    Array.from(lineCodesWithDiscussions).forEach(lineCode => {
       commit(types.TOGGLE_LINE_DISCUSSIONS, {
         fileHash: diff.file_hash,
-        lineCode: line.line_code,
         expanded: !discussionWrappersExpanded,
+        lineCode,
       });
     });
   }

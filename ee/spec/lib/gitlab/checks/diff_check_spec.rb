@@ -9,7 +9,7 @@ describe Gitlab::Checks::DiffCheck do
 
   describe '#validate!' do
     context 'no push rules active' do
-      set(:push_rule) { create(:push_rule) }
+      let_it_be(:push_rule) { create(:push_rule) }
 
       it "does not attempt to check commits" do
         expect(subject).not_to receive(:process_commits)

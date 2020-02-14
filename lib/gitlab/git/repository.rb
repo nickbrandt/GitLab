@@ -636,10 +636,9 @@ module Gitlab
       end
 
       # Delete the specified branch from the repository
+      # Note: No Git hooks are executed for this action
       def delete_branch(branch_name)
-        wrapped_gitaly_errors do
-          gitaly_ref_client.delete_branch(branch_name)
-        end
+        write_ref(branch_name, Gitlab::Git::BLANK_SHA)
       rescue CommandError => e
         raise DeleteBranchError, e
       end
@@ -651,14 +650,13 @@ module Gitlab
       end
 
       # Create a new branch named **ref+ based on **stat_point+, HEAD by default
+      # Note: No Git hooks are executed for this action
       #
       # Examples:
       #   create_branch("feature")
       #   create_branch("other-feature", "master")
       def create_branch(ref, start_point = "HEAD")
-        wrapped_gitaly_errors do
-          gitaly_ref_client.create_branch(ref, start_point)
-        end
+        write_ref(ref, start_point)
       end
 
       # If `mirror_refmap` is present the remote is set as mirror with that mapping
@@ -746,29 +744,9 @@ module Gitlab
       end
 
       def compare_source_branch(target_branch_name, source_repository, source_branch_name, straight:)
-        reachable_ref =
-          if source_repository == self
-            source_branch_name
-          else
-            # If a tmp ref was created before for a separate repo comparison (forks),
-            # we're able to short-circuit the tmp ref re-creation:
-            # 1. Take the SHA from the source repo
-            # 2. Read that in the current "target" repo
-            # 3. If that SHA is still known (readable), it means GC hasn't
-            # cleaned it up yet, so we can use it instead re-writing the tmp ref.
-            source_commit_id = source_repository.commit(source_branch_name)&.sha
-            commit(source_commit_id)&.sha if source_commit_id
-          end
-
-        return compare(target_branch_name, reachable_ref, straight: straight) if reachable_ref
-
-        tmp_ref = "refs/tmp/#{SecureRandom.hex}"
-
-        return unless fetch_source_branch!(source_repository, source_branch_name, tmp_ref)
-
-        compare(target_branch_name, tmp_ref, straight: straight)
-      ensure
-        delete_refs(tmp_ref) if tmp_ref
+        CrossRepoComparer
+          .new(source_repository, self)
+          .compare(source_branch_name, target_branch_name, straight: straight)
       end
 
       def write_ref(ref_path, ref, old_ref: nil)
@@ -842,18 +820,7 @@ module Gitlab
         gitaly_repository_client.create_from_snapshot(url, auth)
       end
 
-      # DEPRECATED: https://gitlab.com/gitlab-org/gitaly/issues/1628
-      def rebase_deprecated(user, rebase_id, branch:, branch_sha:, remote_repository:, remote_branch:)
-        wrapped_gitaly_errors do
-          gitaly_operation_client.user_rebase(user, rebase_id,
-                                            branch: branch,
-                                            branch_sha: branch_sha,
-                                            remote_repository: remote_repository,
-                                            remote_branch: remote_branch)
-        end
-      end
-
-      def rebase(user, rebase_id, branch:, branch_sha:, remote_repository:, remote_branch:, &block)
+      def rebase(user, rebase_id, branch:, branch_sha:, remote_repository:, remote_branch:, push_options: [], &block)
         wrapped_gitaly_errors do
           gitaly_operation_client.rebase(
             user,
@@ -862,6 +829,7 @@ module Gitlab
             branch_sha: branch_sha,
             remote_repository: remote_repository,
             remote_branch: remote_branch,
+            push_options: push_options,
             &block
           )
         end
@@ -1044,13 +1012,6 @@ module Gitlab
       end
 
       private
-
-      def compare(base_ref, head_ref, straight:)
-        Gitlab::Git::Compare.new(self,
-                                 base_ref,
-                                 head_ref,
-                                 straight: straight)
-      end
 
       def empty_diff_stats
         Gitlab::Git::DiffStatsCollection.new([])

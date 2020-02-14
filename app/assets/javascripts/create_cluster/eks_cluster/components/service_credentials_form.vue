@@ -82,8 +82,8 @@ export default {
 };
 </script>
 <template>
-  <form name="service-credentials-form" @submit.prevent="createRole({ roleArn, externalId })">
-    <h2>{{ s__('ClusterIntegration|Authenticate with Amazon Web Services') }}</h2>
+  <form name="service-credentials-form">
+    <h4>{{ s__('ClusterIntegration|Authenticate with Amazon Web Services') }}</h4>
     <p>
       {{
         s__(
@@ -136,6 +136,7 @@ export default {
       :disabled="submitButtonDisabled"
       :loading="isCreatingRole"
       :label="submitButtonLabel"
+      @click.prevent="createRole({ roleArn, externalId })"
     />
   </form>
 </template>

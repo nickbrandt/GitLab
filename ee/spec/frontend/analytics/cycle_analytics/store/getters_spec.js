@@ -3,7 +3,9 @@ import {
   startDate,
   endDate,
   transformedDurationData,
+  transformedDurationMedianData,
   durationChartPlottableData,
+  durationChartPlottableMedianData,
 } from '../mock_data';
 
 let state = null;
@@ -93,6 +95,30 @@ describe('Cycle analytics getters', () => {
       };
 
       expect(getters.durationChartPlottableData(stateWithDurationData)).toBeNull();
+    });
+  });
+
+  describe('durationChartPlottableMedianData', () => {
+    it('returns plottable median data for selected stages', () => {
+      const stateWithDurationMedianData = {
+        startDate,
+        endDate,
+        durationMedianData: transformedDurationMedianData,
+      };
+
+      expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual(
+        durationChartPlottableMedianData,
+      );
+    });
+
+    it('returns an empty array if there is no plottable median data for the selected stages', () => {
+      const stateWithDurationMedianData = {
+        startDate,
+        endDate,
+        durationMedianData: [],
+      };
+
+      expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual([]);
     });
   });
 });

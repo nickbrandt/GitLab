@@ -27,8 +27,12 @@ module EE
               attrs = attrs.except(:default_project_deletion_protection)
             end
 
-            unless License.feature_available?(:marking_project_for_deletion)
+            unless License.feature_available?(:adjourned_deletion_for_projects_and_groups)
               attrs = attrs.except(:deletion_adjourned_period)
+            end
+
+            unless License.feature_available?(:disable_name_update_for_users)
+              attrs = attrs.except(:updating_name_disabled_for_users)
             end
 
             attrs

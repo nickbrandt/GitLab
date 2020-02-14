@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty, findKey } from 'lodash';
 import Vue from 'vue';
 import {
   GlLink,
@@ -15,6 +15,7 @@ import {
 import { __, s__ } from '~/locale';
 import Translate from '~/vue_shared/translate';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Icon from '~/vue_shared/components/icon.vue';
 import { alertsValidator, queriesValidator } from '../validators';
 
@@ -54,6 +55,7 @@ export default {
     GlTooltip: GlTooltipDirective,
     TrackEvent: TrackEventDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     disabled: {
       type: Boolean,
@@ -104,7 +106,7 @@ export default {
       return this.disabled || !(this.prometheusMetricId || this.isValidQuery);
     },
     supportsComputedAlerts() {
-      return gon.features && gon.features.prometheusComputedAlerts;
+      return this.glFeatures.prometheusComputedAlerts;
     },
     queryDropdownLabel() {
       return this.currentQuery.label || s__('PrometheusAlerts|Select query');
@@ -118,7 +120,7 @@ export default {
       );
     },
     submitAction() {
-      if (_.isEmpty(this.selectedAlert)) return 'create';
+      if (isEmpty(this.selectedAlert)) return 'create';
       if (this.haveValuesChanged) return 'update';
       return 'delete';
     },
@@ -147,7 +149,7 @@ export default {
   },
   methods: {
     selectQuery(queryId) {
-      const existingAlertPath = _.findKey(this.alertsToManage, alert => alert.metricId === queryId);
+      const existingAlertPath = findKey(this.alertsToManage, alert => alert.metricId === queryId);
       const existingAlert = this.alertsToManage[existingAlertPath];
 
       if (existingAlert) {
@@ -237,11 +239,12 @@ export default {
         <gl-dropdown
           id="alert-query-dropdown"
           :text="queryDropdownLabel"
-          toggle-class="dropdown-menu-toggle"
+          toggle-class="dropdown-menu-toggle qa-alert-query-dropdown"
         >
           <gl-dropdown-item
             v-for="query in relevantQueries"
             :key="query.metricId"
+            data-qa-selector="alert_query_option"
             @click="selectQuery(query.metricId)"
           >
             {{ query.label }}
@@ -280,6 +283,7 @@ export default {
           v-model.number="threshold"
           :disabled="formDisabled"
           type="number"
+          data-qa-selector="alert_threshold_field"
         />
       </gl-form-group>
     </div>

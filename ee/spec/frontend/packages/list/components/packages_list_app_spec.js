@@ -1,40 +1,49 @@
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('packages_list_app', () => {
   let wrapper;
+  let store;
+
+  const PackageList = {
+    name: 'package-list',
+    template: '<div><slot name="empty-state"></slot></div>',
+  };
+  const GlLoadingIcon = { name: 'gl-loading-icon', template: '<div>loading</div>' };
 
   const emptyListHelpUrl = 'helpUrl';
-  const findListComponent = () => wrapper.find({ name: 'package-list' });
-  const findLoadingComponent = () => wrapper.find({ name: 'gl-loading-icon' });
+  const findListComponent = () => wrapper.find(PackageList);
+  const findLoadingComponent = () => wrapper.find(GlLoadingIcon);
 
-  const componentConfig = {
-    stubs: {
-      GlEmptyState,
-      'package-list': {
-        name: 'package-list',
-        template: '<div><slot name="empty-state"></slot></div>',
+  const mountComponent = () => {
+    wrapper = shallowMount(PackageListApp, {
+      localVue,
+      store,
+      stubs: {
+        GlEmptyState,
+        GlLoadingIcon,
+        PackageList,
       },
-      'gl-loading-icon': { name: 'gl-loading-icon', template: '<div>loading</div>' },
-    },
-    computed: {
-      isLoading: () => false,
-      emptyListIllustration: () => 'helpSvg',
-      emptyListHelpUrl: () => emptyListHelpUrl,
-      resourceId: () => 'project_id',
-    },
-    methods: {
-      requestPackagesList: jest.fn(),
-      requestDeletePackage: jest.fn(),
-      setProjectId: jest.fn(),
-      setGroupId: jest.fn(),
-      setUserCanDelete: jest.fn(),
-    },
+    });
   };
 
   beforeEach(() => {
-    wrapper = shallowMount(PackageListApp, componentConfig);
+    store = new Vuex.Store({
+      state: {
+        isLoading: false,
+        config: {
+          resourceId: 'project_id',
+          emptyListIllustration: 'helpSvg',
+          emptyListHelpUrl: 'helpUrl',
+        },
+      },
+    });
+    store.dispatch = jest.fn();
   });
 
   afterEach(() => {
@@ -42,45 +51,52 @@ describe('packages_list_app', () => {
   });
 
   it('renders', () => {
+    mountComponent();
     expect(wrapper.element).toMatchSnapshot();
   });
 
   describe('when isLoading is true', () => {
     beforeEach(() => {
-      wrapper = shallowMount(PackageListApp, {
-        ...componentConfig,
-        computed: {
-          isLoading: () => true,
-        },
-      });
+      store.state.isLoading = true;
+      mountComponent();
     });
+
     it('shows the loading component', () => {
       const loader = findLoadingComponent();
       expect(loader.exists()).toBe(true);
     });
   });
 
-  it('generate the correct empty list link', () => {
-    const emptyState = findListComponent();
-    const link = emptyState.find('a');
+  describe('when isLoading is false', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
 
-    expect(link.html()).toMatchInlineSnapshot(
-      `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
-    );
-  });
+    it('generate the correct empty list link', () => {
+      const emptyState = findListComponent();
+      const link = emptyState.find('a');
 
-  it('call requestPackagesList on page:changed', () => {
-    const list = findListComponent();
-    list.vm.$emit('page:changed', 1);
-    expect(componentConfig.methods.requestPackagesList).toHaveBeenCalledWith({ page: 1 });
-  });
+      expect(link.html()).toMatchInlineSnapshot(
+        `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
+      );
+    });
 
-  it('call requestDeletePackage on package:delete', () => {
-    const list = findListComponent();
-    list.vm.$emit('package:delete', 1);
-    expect(componentConfig.methods.requestDeletePackage).toHaveBeenCalledWith({
-      projectId: 'project_id',
-      packageId: 1,
+    it('call requestPackagesList on page:changed', () => {
+      const list = findListComponent();
+      list.vm.$emit('page:changed', 1);
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList', { page: 1 });
+    });
+
+    it('call requestDeletePackage on package:delete', () => {
+      const list = findListComponent();
+      list.vm.$emit('package:delete', 'foo');
+      expect(store.dispatch).toHaveBeenCalledWith('requestDeletePackage', 'foo');
+    });
+
+    it('calls requestPackagesList on sort:changed', () => {
+      const list = findListComponent();
+      list.vm.$emit('sort:changed');
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
     });
   });
 });

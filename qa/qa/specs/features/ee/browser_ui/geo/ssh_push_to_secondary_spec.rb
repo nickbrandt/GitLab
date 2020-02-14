@@ -39,6 +39,8 @@ module QA
             project.visit!
           end
 
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
@@ -52,7 +54,7 @@ module QA
             end
 
             expect(page).to have_content(key_title)
-            expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)
@@ -127,6 +129,8 @@ module QA
             end
           end
 
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
@@ -140,7 +144,7 @@ module QA
             end
 
             expect(page).to have_content(key_title)
-            expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key.md5_fingerprint)
 
             # Ensure project has replicated
             Page::Main::Menu.perform(&:go_to_projects)

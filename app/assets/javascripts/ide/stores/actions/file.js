@@ -71,6 +71,7 @@ export const getFileData = (
   const url = joinPaths(
     gon.relative_url_root || '/',
     state.currentProjectId,
+    '-',
     file.type,
     getters.lastCommit && getters.lastCommit.id,
     escapeFileUrl(file.prevPath || file.path),
@@ -89,7 +90,7 @@ export const getFileData = (
     .catch(() => {
       commit(types.TOGGLE_LOADING, { entry: file });
       dispatch('setErrorMessage', {
-        text: __('An error occurred whilst loading the file.'),
+        text: __('An error occurred while loading the file.'),
         action: payload =>
           dispatch('getFileData', payload).then(() => dispatch('setErrorMessage', null)),
         actionText: __('Please try again'),
@@ -136,7 +137,7 @@ export const getRawFileData = ({ state, commit, dispatch, getters }, { path }) =
       })
       .catch(() => {
         dispatch('setErrorMessage', {
-          text: __('An error occurred whilst loading the file content.'),
+          text: __('An error occurred while loading the file content.'),
           action: payload =>
             dispatch('getRawFileData', payload).then(() => dispatch('setErrorMessage', null)),
           actionText: __('Please try again'),
@@ -147,7 +148,7 @@ export const getRawFileData = ({ state, commit, dispatch, getters }, { path }) =
   });
 };
 
-export const changeFileContent = ({ commit, dispatch, state }, { path, content }) => {
+export const changeFileContent = ({ commit, state, getters }, { path, content }) => {
   const file = state.entries[path];
   commit(types.UPDATE_FILE_CONTENT, {
     path,
@@ -157,12 +158,10 @@ export const changeFileContent = ({ commit, dispatch, state }, { path, content }
   const indexOfChangedFile = state.changedFiles.findIndex(f => f.path === path);
 
   if (file.changed && indexOfChangedFile === -1) {
-    commit(types.ADD_FILE_TO_CHANGED, path);
+    commit(types.STAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
   } else if (!file.changed && !file.tempFile && indexOfChangedFile !== -1) {
     commit(types.REMOVE_FILE_FROM_CHANGED, path);
   }
-
-  dispatch('burstUnusedSeal', {}, { root: true });
 };
 
 export const setFileLanguage = ({ getters, commit }, { fileLanguage }) => {
@@ -191,38 +190,47 @@ export const setFileViewMode = ({ commit }, { file, viewMode }) => {
   commit(types.SET_FILE_VIEWMODE, { file, viewMode });
 };
 
-export const discardFileChanges = ({ dispatch, state, commit, getters }, path) => {
+export const restoreOriginalFile = ({ dispatch, state, commit }, path) => {
   const file = state.entries[path];
+  const isDestructiveDiscard = file.tempFile || file.prevPath;
 
   if (file.deleted && file.parentPath) {
     dispatch('restoreTree', file.parentPath);
   }
 
-  if (file.tempFile || file.prevPath) {
+  if (isDestructiveDiscard) {
     dispatch('closeFile', file);
+  }
 
-    if (file.tempFile) {
-      dispatch('deleteEntry', file.path);
-    } else {
-      commit(types.DISCARD_FILE_CHANGES, file.path);
-      dispatch('renameEntry', {
-        path: file.path,
-        name: file.prevName,
-        parentPath: file.prevParentPath,
-      });
-    }
+  if (file.tempFile) {
+    dispatch('deleteEntry', file.path);
   } else {
-    commit(types.DISCARD_FILE_CHANGES, path);
+    commit(types.DISCARD_FILE_CHANGES, file.path);
+  }
 
-    if (getters.activeFile && file.path === getters.activeFile.path) {
-      dispatch('updateDelayViewerUpdated', true)
-        .then(() => {
-          router.push(`/project${file.url}`);
-        })
-        .catch(e => {
-          throw e;
-        });
-    }
+  if (file.prevPath) {
+    dispatch('renameEntry', {
+      path: file.path,
+      name: file.prevName,
+      parentPath: file.prevParentPath,
+    });
+  }
+};
+
+export const discardFileChanges = ({ dispatch, state, commit, getters }, path) => {
+  const file = state.entries[path];
+  const isDestructiveDiscard = file.tempFile || file.prevPath;
+
+  dispatch('restoreOriginalFile', path);
+
+  if (!isDestructiveDiscard && file.path === getters.activeFile?.path) {
+    dispatch('updateDelayViewerUpdated', true)
+      .then(() => {
+        router.push(`/project${file.url}`);
+      })
+      .catch(e => {
+        throw e;
+      });
   }
 
   commit(types.REMOVE_FILE_FROM_CHANGED, path);

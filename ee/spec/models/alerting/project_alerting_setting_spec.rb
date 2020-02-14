@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Alerting::ProjectAlertingSetting do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   subject { create(:project_alerting_setting, project: project) }
 

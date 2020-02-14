@@ -19,7 +19,7 @@ for a good example):
 
 - `desc` for the method summary. You should pass it a block for additional
   details such as:
-  - The GitLab version when the endpoint was added
+  - The GitLab version when the endpoint was added. If it is behind a feature flag, mention that instead: _This feature is gated by the :feature\_flag\_symbol feature flag._
   - If the endpoint is deprecated, and if so, when will it be removed
 
 - `params` for the method params. This acts as description,
@@ -91,6 +91,12 @@ For instance:
 # good
 Model.create(foo: params[:foo])
 ```
+
+## Using HTTP status helpers
+
+For non-200 HTTP responses, use the provided helpers in `lib/api/helpers.rb` to ensure correct behaviour (`not_found!`, `no_content!` etc.). These will `throw` inside Grape and abort the execution of your endpoint.
+
+For `DELETE` requests, you should also generally use the `destroy_conditionally!` helper which by default returns a `204 No Content` response on success, or a `412 Precondition Failed` response if the given `If-Unmodified-Since` header is out of range. This helper calls `#destroy` on the passed resource, but you can also implement a custom deletion method by passing a block.
 
 ## Using API path helpers in GitLab Rails codebase
 

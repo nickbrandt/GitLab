@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { GlLink, GlBadge } from '@gitlab/ui';
 import component from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -24,8 +24,7 @@ describe('Environment Header', () => {
 
   describe('renders name and link to app', () => {
     beforeEach(() => {
-      wrapper = shallowMount(component, {
-        attachToDocument: true,
+      wrapper = mount(component, {
         propsData,
       });
     });
@@ -43,7 +42,7 @@ describe('Environment Header', () => {
     });
 
     it('renders a link to the external app', () => {
-      expect(wrapper.find(ReviewAppLink).attributes('link')).toBe(
+      expect(wrapper.find(ReviewAppLink).attributes('href')).toBe(
         propsData.environment.external_url,
       );
     });
@@ -60,7 +59,6 @@ describe('Environment Header', () => {
       propsData.environment.name = 'review/testing';
 
       wrapper = shallowMount(component, {
-        attachToDocument: true,
         propsData,
       });
     });
@@ -85,7 +83,6 @@ describe('Environment Header', () => {
       propsData.hasErrors = true;
 
       wrapper = shallowMount(component, {
-        attachToDocument: true,
         propsData,
       });
     });
@@ -100,7 +97,6 @@ describe('Environment Header', () => {
       propsData.hasPipelineFailed = true;
 
       wrapper = shallowMount(component, {
-        attachToDocument: true,
         propsData,
       });
     });

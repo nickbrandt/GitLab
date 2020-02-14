@@ -10,17 +10,14 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     const blobPath = data.blob_path || {};
     this.headBlobPath = blobPath.head_path || '';
     this.baseBlobPath = blobPath.base_path || '';
-    this.sast = data.sast || {};
-    this.sastContainer = data.sast_container || {};
-    this.dast = data.dast || {};
-    this.dependencyScanning = data.dependency_scanning || {};
     this.sastHelp = data.sast_help_path;
-    this.sastContainerHelp = data.sast_container_help_path;
+    this.containerScanningHelp = data.container_scanning_help_path;
     this.dastHelp = data.dast_help_path;
     this.dependencyScanningHelp = data.dependency_scanning_help_path;
     this.vulnerabilityFeedbackPath = data.vulnerability_feedback_path;
     this.vulnerabilityFeedbackHelpPath = data.vulnerability_feedback_help_path;
     this.approvalsHelpPath = data.approvals_help_path;
+    this.codequalityHelpPath = data.codequality_help_path;
     this.securityReportsPipelineId = data.pipeline_id;
     this.createVulnerabilityFeedbackIssuePath = data.create_vulnerability_feedback_issue_path;
     this.createVulnerabilityFeedbackMergeRequestPath =
@@ -39,7 +36,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.licenseManagement = data.license_management;
     this.metricsReportsPath = data.metrics_reports_path;
 
-    this.enabledSecurityReports = convertObjectPropsToCamelCase(data.enabled_reports);
+    this.enabledReports = convertObjectPropsToCamelCase(data.enabled_reports);
 
     this.blockingMergeRequests = data.blocking_merge_requests;
 

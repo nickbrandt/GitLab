@@ -3,11 +3,12 @@
 require 'spec_helper'
 
 describe Issues::ExportCsvService do
-  let(:user) { create(:user) }
-  let(:project) { create(:project, :public) }
-  let!(:issue)  { create(:issue, project: project, author: user) }
+  let_it_be(:user) { create(:user) }
+  let(:group) { create(:group) }
+  let(:project) { create(:project, :public, group: group) }
+  let!(:issue) { create(:issue, project: project, author: user) }
   let!(:bad_issue) { create(:issue, project: project, author: user) }
-  let(:subject) { described_class.new(Issue.all) }
+  let(:subject) { described_class.new(Issue.all, project) }
 
   it 'renders csv to string' do
     expect(subject.csv_data).to be_a String
@@ -15,13 +16,13 @@ describe Issues::ExportCsvService do
 
   describe '#email' do
     it 'emails csv' do
-      expect { subject.email(user, project) }.to change(ActionMailer::Base.deliveries, :count)
+      expect { subject.email(user) }.to change(ActionMailer::Base.deliveries, :count)
     end
 
     it 'renders with a target filesize' do
       expect(subject.csv_builder).to receive(:render).with(described_class::TARGET_FILESIZE)
 
-      subject.email(user, project)
+      subject.email(user)
     end
   end
 
@@ -142,12 +143,42 @@ describe Issues::ExportCsvService do
       expect(csv[1]['Time Spent']).to eq '0'
     end
 
+    context 'handling epics' do
+      let(:epic) { create(:epic, group: group) }
+
+      before do
+        create(:epic_issue, issue: issue, epic: epic)
+      end
+
+      context 'with epics disabled' do
+        it 'does not include epics information' do
+          expect(csv[0]).not_to have_key('Epic ID')
+        end
+      end
+
+      context 'with epics enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        specify 'epic ID' do
+          expect(csv[0]['Epic ID']).to eq(epic.id.to_s)
+          expect(csv[1]['Epic ID']).to be_nil
+        end
+
+        specify 'epic Title' do
+          expect(csv[0]['Epic Title']).to eq(epic.title)
+          expect(csv[1]['Epic Title']).to be_nil
+        end
+      end
+    end
+
     context 'with issues filtered by labels and project' do
       let(:subject) do
         described_class.new(
           IssuesFinder.new(user,
                            project_id: project.id,
-                           label_name: %w(Idea Feature)).execute)
+                           label_name: %w(Idea Feature)).execute, project)
       end
 
       it 'returns only filtered objects' do

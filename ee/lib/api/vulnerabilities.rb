@@ -16,10 +16,6 @@ module API
         Vulnerability.with_findings.find(params[:id])
       end
 
-      def authorize_vulnerability!(vulnerability, action)
-        authorize! action, vulnerability.project
-      end
-
       def render_vulnerability(vulnerability)
         if vulnerability.valid?
           present vulnerability, with: EE::API::Entities::Vulnerability
@@ -58,7 +54,7 @@ module API
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        break not_modified! if vulnerability.closed?
+        break not_modified! if vulnerability.dismissed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)

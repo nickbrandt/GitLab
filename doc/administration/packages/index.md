@@ -8,13 +8,14 @@ The Packages feature allows GitLab to act as a repository for the following:
 
 | Software repository | Description | Available in GitLab version |
 | ------------------- | ----------- | --------------------------- |
+| [NuGet Repository](../../user/packages/nuget_repository/index.md) | The GitLab NuGet Repository enables every project in GitLab to have its own space to store [NuGet](https://www.nuget.org/) packages. | 12.8+ |
 | [Conan Repository](../../user/packages/conan_repository/index.md) | The GitLab Conan Repository enables every project in GitLab to have its own space to store [Conan](https://conan.io/) packages. | 12.4+ |
 | [Maven Repository](../../user/packages/maven_repository/index.md) | The GitLab Maven Repository enables every project in GitLab to have its own space to store [Maven](https://maven.apache.org/) packages. | 11.3+ |
 | [NPM Registry](../../user/packages/npm_registry/index.md)   | The GitLab NPM Registry enables every project in GitLab to have its own space to store [NPM](https://www.npmjs.com/) packages. | 11.7+ |
 
 Don't you see your package management system supported yet?
 Please consider contributing
-to GitLab. This [development documentation](../../development/packages.md) will guide you through the process, it includes a list of [suggested contributions](../../development/packages.md#suggested-contributions).
+to GitLab. This [development documentation](../../development/packages.md) will guide you through the process.
 
 ## Enabling the Packages feature
 
@@ -165,12 +166,12 @@ The processing will be done in a background worker and requires **no downtime**.
 
 For Omnibus GitLab:
 
-```sh
+```shell
 sudo gitlab-rake "gitlab:packages:migrate"
 ```
 
 For installations from source:
 
-```bash
+```shell
 RAILS_ENV=production sudo -u git -H bundle exec rake gitlab:packages:migrate
 ```

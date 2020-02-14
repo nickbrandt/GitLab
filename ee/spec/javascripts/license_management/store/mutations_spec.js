@@ -3,11 +3,7 @@ import * as types from 'ee/vue_shared/license_management/store/mutation_types';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 import { TEST_HOST } from 'spec/test_constants';
-import {
-  approvedLicense,
-  licenseBaseIssues,
-  licenseHeadIssues,
-} from 'ee_spec/license_management/mock_data';
+import { approvedLicense } from 'ee_spec/license_management/mock_data';
 
 describe('License store mutations', () => {
   let store;
@@ -129,7 +125,7 @@ describe('License store mutations', () => {
     });
   });
 
-  describe('RECEIVE_LOAD_MANAGED_LICENSES', () => {
+  describe('RECEIVE_MANAGED_LICENSES_SUCCESS', () => {
     it('sets isLoadingManagedLicenses and loadManagedLicensesError to false and saves managed licenses', () => {
       store.replaceState({
         ...store.state,
@@ -138,7 +134,7 @@ describe('License store mutations', () => {
         loadManagedLicensesError: true,
       });
 
-      store.commit(types.RECEIVE_LOAD_MANAGED_LICENSES, [
+      store.commit(types.RECEIVE_MANAGED_LICENSES_SUCCESS, [
         { name: 'Foo', approval_status: LICENSE_APPROVAL_STATUS.approved },
       ]);
 
@@ -151,7 +147,7 @@ describe('License store mutations', () => {
     });
   });
 
-  describe('RECEIVE_LOAD_MANAGED_LICENSES_ERROR', () => {
+  describe('RECEIVE_MANAGED_LICENSES_ERROR', () => {
     it('sets isLoadingManagedLicenses to true and saves the error', () => {
       const error = new Error('test');
       store.replaceState({
@@ -160,84 +156,34 @@ describe('License store mutations', () => {
         loadManagedLicensesError: false,
       });
 
-      store.commit(types.RECEIVE_LOAD_MANAGED_LICENSES_ERROR, error);
+      store.commit(types.RECEIVE_MANAGED_LICENSES_ERROR, error);
 
       expect(store.state.isLoadingManagedLicenses).toBe(false);
       expect(store.state.loadManagedLicensesError).toBe(error);
     });
   });
 
-  describe('REQUEST_LOAD_MANAGED_LICENSES', () => {
+  describe('REQUEST_MANAGED_LICENSES', () => {
     it('sets isLoadingManagedLicenses to true', () => {
       store.replaceState({
         ...store.state,
         isLoadingManagedLicenses: true,
       });
 
-      store.commit(types.REQUEST_LOAD_MANAGED_LICENSES);
+      store.commit(types.REQUEST_MANAGED_LICENSES);
 
       expect(store.state.isLoadingManagedLicenses).toBe(true);
     });
   });
 
-  describe('RECEIVE_LOAD_LICENSE_REPORT', () => {
-    it('sets isLoadingLicenseReport and loadLicenseReportError to false and saves report', () => {
-      store.replaceState({
-        ...store.state,
-        headReport: false,
-        baseReport: false,
-        isLoadingLicenseReport: true,
-        loadLicenseReportError: true,
-      });
-
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-
-      store.commit(types.RECEIVE_LOAD_LICENSE_REPORT, payload);
-
-      expect(store.state.headReport).toEqual(licenseHeadIssues);
-      expect(store.state.baseReport).toEqual(licenseBaseIssues);
-      expect(store.state.isLoadingLicenseReport).toBe(false);
-      expect(store.state.loadLicenseReportError).toBe(false);
-    });
-  });
-
-  describe('RECEIVE_LOAD_LICENSE_REPORT_ERROR', () => {
-    it('sets isLoadingLicenseReport to true and saves the error', () => {
-      const error = new Error('test');
-      store.replaceState({
-        ...store.state,
-        isLoadingLicenseReport: true,
-        loadLicenseReportError: false,
-      });
-
-      store.commit(types.RECEIVE_LOAD_LICENSE_REPORT_ERROR, error);
-
-      expect(store.state.isLoadingLicenseReport).toBe(false);
-      expect(store.state.loadLicenseReportError).toBe(error);
-    });
-  });
-
-  describe('REQUEST_LOAD_LICENSE_REPORT', () => {
-    it('sets isLoadingLicenseReport to true', () => {
-      store.replaceState({
-        ...store.state,
-        isLoadingLicenseReport: true,
-      });
-
-      store.commit(types.REQUEST_LOAD_LICENSE_REPORT);
-
-      expect(store.state.isLoadingLicenseReport).toBe(true);
-    });
-  });
-
-  describe('RECEIVE_LOAD_PARSED_LICENSE_REPORT', () => {
+  describe('RECEIVE_PARSED_LICENSE_REPORT_SUCCESS', () => {
     const newLicenses = [];
     const existingLicenses = [];
 
     beforeEach(() => {
       store.state.isLoadingLicenseReport = true;
       store.state.loadLicenseReportError = new Error('test');
-      store.commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT, { newLicenses, existingLicenses });
+      store.commit(types.RECEIVE_PARSED_LICENSE_REPORT_SUCCESS, { newLicenses, existingLicenses });
     });
 
     it('should set the new and existing reports', () => {
@@ -251,12 +197,12 @@ describe('License store mutations', () => {
     });
   });
 
-  describe('RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR', () => {
+  describe('RECEIVE_PARSED_LICENSE_REPORT_ERROR', () => {
     const error = new Error('test');
     beforeEach(() => {
       store.state.isLoadingLicenseReport = true;
       store.state.loadLicenseReportError = false;
-      store.commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, error);
+      store.commit(types.RECEIVE_PARSED_LICENSE_REPORT_ERROR, error);
     });
 
     it('should set the error on the state', () => {
@@ -268,10 +214,10 @@ describe('License store mutations', () => {
     });
   });
 
-  describe('REQUEST_LOAD_PARSED_LICENSE_REPORT', () => {
+  describe('REQUEST_PARSED_LICENSE_REPORT', () => {
     beforeEach(() => {
       store.state.isLoadingLicenseReport = false;
-      store.commit(types.REQUEST_LOAD_PARSED_LICENSE_REPORT);
+      store.commit(types.REQUEST_PARSED_LICENSE_REPORT);
     });
 
     it('should initiate loading', () => {

@@ -5,6 +5,7 @@ require 'spec_helper'
 describe API::Members do
   let(:group) { create(:group) }
   let(:owner) { create(:user) }
+  let(:project) { create(:project, group: group) }
 
   before do
     group.add_owner(owner)
@@ -28,6 +29,13 @@ describe API::Members do
   end
 
   describe 'GET /groups/:id/members' do
+    it 'matches json schema' do
+      get api("/groups/#{group.to_param}/members", owner)
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to match_response_schema('public_api/v4/members')
+    end
+
     context 'when a group has SAML provider configured' do
       let(:maintainer) { create(:user) }
 
@@ -73,5 +81,74 @@ describe API::Members do
         end
       end
     end
+
+    context 'with is_using_seat' do
+      shared_examples 'seat information not included' do
+        it 'returns a list of users that does not contain the is_using_seat attribute' do
+          get api(api_url, owner)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response.size).to eq(1)
+          expect(json_response.first.keys).not_to include('is_using_seat')
+        end
+      end
+
+      context 'with show_seat_info set to true' do
+        it 'returns a list of users that contains the is_using_seat attribute' do
+          get api("/groups/#{group.to_param}/members?show_seat_info=true", owner)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response.size).to eq(1)
+          expect(json_response.first['is_using_seat']).to be_truthy
+        end
+      end
+
+      context 'with show_seat_info set to false' do
+        let(:api_url) { "/groups/#{group.to_param}/members?show_seat_info=false" }
+
+        it_behaves_like 'seat information not included'
+      end
+
+      context 'with no show_seat_info set' do
+        let(:api_url) { "/groups/#{group.to_param}/members" }
+
+        it_behaves_like 'seat information not included'
+      end
+    end
+  end
+
+  shared_examples 'POST /:source_type/:id/members' do |source_type|
+    let(:stranger) { create(:user) }
+    let(:url) { "/#{source_type.pluralize}/#{source.id}/members" }
+
+    context "with :source_type == #{source_type.pluralize}" do
+      it 'creates an audit event while creating a new member' do
+        params = { user_id: stranger.id, access_level: Member::DEVELOPER }
+
+        expect do
+          post api(url, owner), params: params
+
+          expect(response).to have_gitlab_http_status(201)
+        end.to change { AuditEvent.count }.by(1)
+      end
+
+      it 'does not create audit event if creating a new member fails' do
+        params = { user_id: 0, access_level: Member::DEVELOPER }
+
+        expect do
+          post api(url, owner), params: params
+
+          expect(response).to have_gitlab_http_status(404)
+        end.not_to change { AuditEvent.count }
+      end
+    end
+  end
+
+  it_behaves_like 'POST /:source_type/:id/members', 'project' do
+    let(:source) { project }
+  end
+
+  it_behaves_like 'POST /:source_type/:id/members', 'group' do
+    let(:source) { group }
   end
 end

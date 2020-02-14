@@ -21,6 +21,14 @@ class BasePolicy < DeclarativePolicy::Base
   with_options scope: :user, score: 0
   condition(:deactivated) { @user&.deactivated? }
 
+  desc "User email is unconfirmed or user account is locked"
+  with_options scope: :user, score: 0
+  condition(:inactive) do
+    Feature.enabled?(:inactive_policy_condition, default_enabled: true) &&
+      @user &&
+      !@user&.active_for_authentication?
+  end
+
   with_options scope: :user, score: 0
   condition(:external_user) { @user.nil? || @user.external? }
 
@@ -35,6 +43,9 @@ class BasePolicy < DeclarativePolicy::Base
   condition(:external_authorization_enabled, scope: :global, score: 0) do
     ::Gitlab::ExternalAuthorization.perform_check?
   end
+
+  with_options scope: :user, score: 0
+  condition(:alert_bot) { @user&.alert_bot? }
 
   rule { external_authorization_enabled & ~can?(:read_all_resources) }.policy do
     prevent :read_cross_project

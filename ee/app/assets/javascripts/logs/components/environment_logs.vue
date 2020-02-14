@@ -1,22 +1,24 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
+import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
+import { timeRangeFromUrl } from '~/monitoring/utils';
+
 export default {
   components: {
+    GlAlert,
     GlDropdown,
     GlDropdownItem,
     GlFormGroup,
     GlSearchBoxByClick,
+    DateTimePicker,
     LogControlButtons,
   },
   props: {
-    projectFullPath: {
-      type: String,
-      required: true,
-    },
     environmentName: {
       type: String,
       required: false,
@@ -32,20 +34,45 @@ export default {
       required: false,
       default: '',
     },
+    clusterApplicationsDocumentationPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       searchQuery: '',
+      timeRanges,
+      isElasticStackCalloutDismissed: false,
     };
   },
   computed: {
-    ...mapState('environmentLogs', ['environments', 'logs', 'pods']),
+    ...mapState('environmentLogs', ['environments', 'timeRange', 'logs', 'pods']),
     ...mapGetters('environmentLogs', ['trace']),
+
+    timeRangeModel: {
+      get() {
+        return this.timeRange.current;
+      },
+      set(val) {
+        this.setTimeRange(val);
+      },
+    },
+
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
     },
-    featureElasticEnabled() {
-      return gon.features && gon.features.enableClusterApplicationElasticStack;
+    advancedFeaturesEnabled() {
+      const environment = this.environments.options.find(
+        ({ name }) => name === this.environments.current,
+      );
+      return environment && environment.enable_advanced_logs_querying;
+    },
+    disableAdvancedControls() {
+      return this.environments.isLoading || !this.advancedFeaturesEnabled;
+    },
+    shouldShowElasticStackCallout() {
+      return !this.isElasticStackCalloutDismissed && this.disableAdvancedControls;
     },
   },
   watch: {
@@ -60,7 +87,7 @@ export default {
   },
   mounted() {
     this.setInitData({
-      projectPath: this.projectFullPath,
+      timeRange: timeRangeFromUrl() || defaultTimeRange,
       environmentName: this.environmentName,
       podName: this.currentPodName,
     });
@@ -71,6 +98,7 @@ export default {
     ...mapActions('environmentLogs', [
       'setInitData',
       'setSearch',
+      'setTimeRange',
       'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
@@ -80,20 +108,36 @@ export default {
 </script>
 <template>
   <div class="build-page-pod-logs mt-3">
+    <gl-alert
+      v-if="shouldShowElasticStackCallout"
+      class="mb-3 js-elasticsearch-alert"
+      @dismiss="isElasticStackCalloutDismissed = true"
+    >
+      {{
+        s__(
+          'Environments|Install Elastic Stack on your cluster to enable advanced querying capabilities such as full text search.',
+        )
+      }}
+      <a :href="clusterApplicationsDocumentationPath">
+        <strong>
+          {{ s__('View Documentation') }}
+        </strong>
+      </a>
+    </gl-alert>
     <div class="top-bar js-top-bar d-flex">
-      <div class="row">
+      <div class="row mx-n1">
         <gl-form-group
           id="environments-dropdown-fg"
           :label="s__('Environments|Environment')"
           label-size="sm"
           label-for="environments-dropdown"
-          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
+          class="col-3 px-1"
         >
           <gl-dropdown
             id="environments-dropdown"
             :text="environments.current"
             :disabled="environments.isLoading"
-            class="d-flex js-environments-dropdown"
+            class="d-flex gl-h-32 js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
           >
             <gl-dropdown-item
@@ -110,13 +154,13 @@ export default {
           :label="s__('Environments|Pod logs from')"
           label-size="sm"
           label-for="pods-dropdown"
-          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
+          class="col-3 px-1"
         >
           <gl-dropdown
             id="pods-dropdown"
             :text="pods.current || s__('Environments|No pods to display')"
-            :disabled="logs.isLoading"
-            class="d-flex js-pods-dropdown"
+            :disabled="environments.isLoading"
+            class="d-flex gl-h-32 js-pods-dropdown"
             toggle-class="dropdown-menu-toggle"
           >
             <gl-dropdown-item
@@ -129,16 +173,30 @@ export default {
           </gl-dropdown>
         </gl-form-group>
         <gl-form-group
-          v-if="featureElasticEnabled"
+          id="dates-fg"
+          :label="s__('Environments|Show last')"
+          label-size="sm"
+          label-for="time-window-dropdown"
+          class="col-3 px-1"
+        >
+          <date-time-picker
+            ref="dateTimePicker"
+            v-model="timeRangeModel"
+            class="w-100 gl-h-32"
+            :disabled="disableAdvancedControls"
+            :options="timeRanges"
+          />
+        </gl-form-group>
+        <gl-form-group
           id="search-fg"
           :label="s__('Environments|Search')"
           label-size="sm"
           label-for="search"
-          class="col-4"
+          class="col-3 px-1"
         >
           <gl-search-box-by-click
             v-model.trim="searchQuery"
-            :disabled="environments.isLoading"
+            :disabled="disableAdvancedControls"
             :placeholder="s__('Environments|Search')"
             class="js-logs-search"
             type="search"
@@ -150,7 +208,7 @@ export default {
 
       <log-control-buttons
         ref="scrollButtons"
-        class="controllers align-self-end"
+        class="controllers align-self-end mb-1"
         @refresh="showPodLogs(pods.current)"
       />
     </div>

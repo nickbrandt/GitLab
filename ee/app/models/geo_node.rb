@@ -63,14 +63,14 @@ class GeoNode < ApplicationRecord
   class << self
     # Set in gitlab.rb as external_url
     def current_node_url
-      RequestStore.fetch('geo_node:current_node_url') do
+      Gitlab::SafeRequestStore.fetch('geo_node:current_node_url') do
         Gitlab.config.gitlab.url
       end
     end
 
     # Set in gitlab.rb as geo_node_name
     def current_node_name
-      RequestStore.fetch('geo_node:current_node_name') do
+      Gitlab::SafeRequestStore.fetch('geo_node:current_node_name') do
         Gitlab.config.geo.node_name
       end
     end
@@ -233,7 +233,20 @@ class GeoNode < ApplicationRecord
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
-    LfsObject.project_id_in(projects)
+    query = LfsObjectsProject.project_id_in(projects).select(:lfs_object_id)
+    cte = Gitlab::SQL::CTE.new(:restricted_lfs_objects, query)
+    lfs_object_table = LfsObject.arel_table
+
+    inner_join_restricted_lfs_objects =
+      cte.table
+        .join(lfs_object_table, Arel::Nodes::InnerJoin)
+        .on(cte.table[:lfs_object_id].eq(lfs_object_table[:id]))
+        .join_sources
+
+    LfsObject
+      .with(cte.to_arel)
+      .from(cte.table)
+      .joins(inner_join_restricted_lfs_objects)
   end
 
   def projects

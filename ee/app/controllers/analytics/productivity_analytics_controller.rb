@@ -15,6 +15,7 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
   before_action -> {
     authorize_view_by_action!(:view_productivity_analytics)
   }
+
   before_action -> {
     push_frontend_feature_flag(:productivity_analytics_scatterplot_enabled, default_enabled: true)
   }

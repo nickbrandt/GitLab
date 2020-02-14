@@ -1,4 +1,4 @@
-export const contributionsPath = '/foo/analytics.json';
+export const contributionsPath = '/foo/contribution_analytics.json';
 
 export const rawMembers = [
   {

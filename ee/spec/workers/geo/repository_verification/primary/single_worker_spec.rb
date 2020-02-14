@@ -6,8 +6,7 @@ describe Geo::RepositoryVerification::Primary::SingleWorker, :clean_gitlab_redis
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  set(:project) { create(:project) }
-
+  let_it_be(:project) { create(:project) }
   let!(:primary) { create(:geo_node, :primary) }
 
   before do

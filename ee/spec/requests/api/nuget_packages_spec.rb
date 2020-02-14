@@ -71,22 +71,10 @@ describe API::NugetPackages do
         it_behaves_like 'rejects nuget access with invalid project id'
       end
 
-      context 'with feature flag disabled' do
-        before do
-          stub_feature_flags(nuget_package_registry: { enabled: false, thing: project })
-        end
-
-        it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
-      end
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
     end
 
-    context 'with packages features disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects nuget packages access', :anonymous, :forbidden
-    end
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/nuget/authorize' do
@@ -153,37 +141,25 @@ describe API::NugetPackages do
         it_behaves_like 'rejects nuget access with invalid project id'
       end
 
-      context 'with feature flag disabled' do
-        before do
-          stub_feature_flags(nuget_package_registry: { enabled: false, thing: project })
-        end
-
-        it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
-      end
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
     end
 
-    context 'with packages features disabled' do
-      before do
-        stub_licensed_features(packages: false)
-      end
-
-      it_behaves_like 'rejects nuget packages access', :anonymous, :forbidden
-    end
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/nuget' do
-    let_it_be(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
-    let_it_be(:workhorse_header) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
+    let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
+    let(:workhorse_header) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }
     let_it_be(:file_name) { 'package.nupkg' }
     let(:url) { "/projects/#{project.id}/packages/nuget" }
     let(:headers) { {} }
-    let(:params) { { file: temp_file(file_name) } }
+    let(:params) { { package: temp_file(file_name) } }
 
     subject do
       workhorse_finalize(
         api(url),
         method: :put,
-        file_key: :file,
+        file_key: :package,
         params: params,
         headers: headers
       )
@@ -245,21 +221,288 @@ describe API::NugetPackages do
         it_behaves_like 'rejects nuget access with invalid project id'
       end
 
-      context 'with feature flag disabled' do
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
+    end
+
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
+  end
+
+  describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/index' do
+    let_it_be(:package_name) { 'Dummy.Package' }
+    let_it_be(:packages) { create_list(:nuget_package, 5, name: package_name, project: project) }
+    let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/index.json" }
+
+    subject { get api(url) }
+
+    context 'with packages features enabled' do
+      before do
+        stub_licensed_features(packages: true)
+      end
+
+      context 'with feature flag enabled' do
         before do
-          stub_feature_flags(nuget_package_registry: { enabled: false, thing: project })
+          stub_feature_flags(nuget_package_registry: { enabled: true, thing: project })
         end
 
-        it_behaves_like 'rejects nuget packages access', :anonymous, :not_found
+        context 'with valid project' do
+          using RSpec::Parameterized::TableSyntax
+
+          where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
+            'PUBLIC'  | :developer  | true  | true  | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :guest      | true  | true  | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :developer  | true  | false | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :guest      | true  | false | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :developer  | false | true  | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :guest      | false | true  | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :developer  | false | false | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :guest      | false | false | 'process nuget metadata request at package name level' | :success
+            'PUBLIC'  | :anonymous  | false | true  | 'process nuget metadata request at package name level' | :success
+            'PRIVATE' | :developer  | true  | true  | 'process nuget metadata request at package name level' | :success
+            'PRIVATE' | :guest      | true  | true  | 'rejects nuget packages access'                        | :forbidden
+            'PRIVATE' | :developer  | true  | false | 'rejects nuget packages access'                        | :unauthorized
+            'PRIVATE' | :guest      | true  | false | 'rejects nuget packages access'                        | :unauthorized
+            'PRIVATE' | :developer  | false | true  | 'rejects nuget packages access'                        | :not_found
+            'PRIVATE' | :guest      | false | true  | 'rejects nuget packages access'                        | :not_found
+            'PRIVATE' | :developer  | false | false | 'rejects nuget packages access'                        | :unauthorized
+            'PRIVATE' | :guest      | false | false | 'rejects nuget packages access'                        | :unauthorized
+            'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access'                        | :unauthorized
+          end
+
+          with_them do
+            let(:token) { user_token ? personal_access_token.token : 'wrong' }
+            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
+
+            subject { get api(url), headers: headers }
+
+            before do
+              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            end
+
+            after do
+              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            end
+
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+          end
+        end
       end
+
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
     end
 
-    context 'with packages features disabled' do
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
+  end
+
+  describe 'GET /api/v4/projects/:id/packages/nuget/metadata/*package_name/*package_version' do
+    let_it_be(:package_name) { 'Dummy.Package' }
+    let_it_be(:package) { create(:nuget_package, name: 'Dummy.Package', project: project) }
+    let(:url) { "/projects/#{project.id}/packages/nuget/metadata/#{package_name}/#{package.version}.json" }
+
+    subject { get api(url) }
+
+    context 'with packages features enabled' do
       before do
-        stub_licensed_features(packages: false)
+        stub_licensed_features(packages: true)
       end
 
-      it_behaves_like 'rejects nuget packages access', :anonymous, :forbidden
+      context 'with feature flag enabled' do
+        before do
+          stub_feature_flags(nuget_package_registry: { enabled: true, thing: project })
+        end
+
+        context 'with valid project' do
+          using RSpec::Parameterized::TableSyntax
+
+          where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
+            'PUBLIC'  | :developer  | true  | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :guest      | true  | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :developer  | true  | false | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :guest      | true  | false | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :developer  | false | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :guest      | false | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :developer  | false | false | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :guest      | false | false | 'process nuget metadata request at package name and package version level' | :success
+            'PUBLIC'  | :anonymous  | false | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PRIVATE' | :developer  | true  | true  | 'process nuget metadata request at package name and package version level' | :success
+            'PRIVATE' | :guest      | true  | true  | 'rejects nuget packages access'                                            | :forbidden
+            'PRIVATE' | :developer  | true  | false | 'rejects nuget packages access'                                            | :unauthorized
+            'PRIVATE' | :guest      | true  | false | 'rejects nuget packages access'                                            | :unauthorized
+            'PRIVATE' | :developer  | false | true  | 'rejects nuget packages access'                                            | :not_found
+            'PRIVATE' | :guest      | false | true  | 'rejects nuget packages access'                                            | :not_found
+            'PRIVATE' | :developer  | false | false | 'rejects nuget packages access'                                            | :unauthorized
+            'PRIVATE' | :guest      | false | false | 'rejects nuget packages access'                                            | :unauthorized
+            'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access'                                            | :unauthorized
+          end
+
+          with_them do
+            let(:token) { user_token ? personal_access_token.token : 'wrong' }
+            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
+
+            subject { get api(url), headers: headers }
+
+            before do
+              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            end
+
+            after do
+              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            end
+
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+          end
+        end
+
+        context 'with invalid package name' do
+          let_it_be(:package_name) { 'Unkown' }
+
+          it_behaves_like 'rejects nuget packages access', :developer, :not_found
+        end
+      end
+
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
     end
+
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
+  end
+
+  describe 'GET /api/v4/projects/:id/packages/nuget/download/*package_name/index' do
+    let_it_be(:package_name) { 'Dummy.Package' }
+    let_it_be(:packages) { create_list(:nuget_package, 5, name: package_name, project: project) }
+    let(:url) { "/projects/#{project.id}/packages/nuget/download/#{package_name}/index.json" }
+
+    subject { get api(url) }
+
+    context 'with packages features enabled' do
+      before do
+        stub_licensed_features(packages: true)
+      end
+
+      context 'with feature flag enabled' do
+        before do
+          stub_feature_flags(nuget_package_registry: { enabled: true, thing: project })
+        end
+
+        context 'with valid project' do
+          using RSpec::Parameterized::TableSyntax
+
+          where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
+            'PUBLIC'  | :developer  | true  | true  | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :guest      | true  | true  | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :developer  | true  | false | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :guest      | true  | false | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :developer  | false | true  | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :guest      | false | true  | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :developer  | false | false | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :guest      | false | false | 'process nuget download versions request'   | :success
+            'PUBLIC'  | :anonymous  | false | true  | 'process nuget download versions request'   | :success
+            'PRIVATE' | :developer  | true  | true  | 'process nuget download versions request'   | :success
+            'PRIVATE' | :guest      | true  | true  | 'rejects nuget packages access'             | :forbidden
+            'PRIVATE' | :developer  | true  | false | 'rejects nuget packages access'             | :unauthorized
+            'PRIVATE' | :guest      | true  | false | 'rejects nuget packages access'             | :unauthorized
+            'PRIVATE' | :developer  | false | true  | 'rejects nuget packages access'             | :not_found
+            'PRIVATE' | :guest      | false | true  | 'rejects nuget packages access'             | :not_found
+            'PRIVATE' | :developer  | false | false | 'rejects nuget packages access'             | :unauthorized
+            'PRIVATE' | :guest      | false | false | 'rejects nuget packages access'             | :unauthorized
+            'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access'             | :unauthorized
+          end
+
+          with_them do
+            let(:token) { user_token ? personal_access_token.token : 'wrong' }
+            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
+
+            subject { get api(url), headers: headers }
+
+            before do
+              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            end
+
+            after do
+              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            end
+
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+          end
+        end
+
+        it_behaves_like 'rejects nuget access with unknown project id'
+
+        it_behaves_like 'rejects nuget access with invalid project id'
+      end
+
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
+    end
+
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
+  end
+
+  describe 'GET /api/v4/projects/:id/packages/nuget/download/*package_name/*package_version/*package_filename' do
+    let_it_be(:package_name) { 'Dummy.Package' }
+    let_it_be(:package) { create(:nuget_package, project: project, name: package_name) }
+
+    let(:url) { "/projects/#{project.id}/packages/nuget/download/#{package.name}/#{package.version}/#{package.name}.#{package.version}.nupkg" }
+
+    subject { get api(url) }
+
+    context 'with packages features enabled' do
+      before do
+        stub_licensed_features(packages: true)
+      end
+
+      context 'with feature flag enabled' do
+        before do
+          stub_feature_flags(nuget_package_registry: { enabled: true, thing: project })
+        end
+
+        context 'with valid project' do
+          using RSpec::Parameterized::TableSyntax
+
+          where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
+            'PUBLIC'  | :developer  | true  | true  | 'process nuget download content request'   | :success
+            'PUBLIC'  | :guest      | true  | true  | 'process nuget download content request'   | :success
+            'PUBLIC'  | :developer  | true  | false | 'process nuget download content request'   | :success
+            'PUBLIC'  | :guest      | true  | false | 'process nuget download content request'   | :success
+            'PUBLIC'  | :developer  | false | true  | 'process nuget download content request'   | :success
+            'PUBLIC'  | :guest      | false | true  | 'process nuget download content request'   | :success
+            'PUBLIC'  | :developer  | false | false | 'process nuget download content request'   | :success
+            'PUBLIC'  | :guest      | false | false | 'process nuget download content request'   | :success
+            'PUBLIC'  | :anonymous  | false | true  | 'process nuget download content request'   | :success
+            'PRIVATE' | :developer  | true  | true  | 'process nuget download content request'   | :success
+            'PRIVATE' | :guest      | true  | true  | 'rejects nuget packages access'            | :forbidden
+            'PRIVATE' | :developer  | true  | false | 'rejects nuget packages access'            | :unauthorized
+            'PRIVATE' | :guest      | true  | false | 'rejects nuget packages access'            | :unauthorized
+            'PRIVATE' | :developer  | false | true  | 'rejects nuget packages access'            | :not_found
+            'PRIVATE' | :guest      | false | true  | 'rejects nuget packages access'            | :not_found
+            'PRIVATE' | :developer  | false | false | 'rejects nuget packages access'            | :unauthorized
+            'PRIVATE' | :guest      | false | false | 'rejects nuget packages access'            | :unauthorized
+            'PRIVATE' | :anonymous  | false | true  | 'rejects nuget packages access'            | :unauthorized
+          end
+
+          with_them do
+            let(:token) { user_token ? personal_access_token.token : 'wrong' }
+            let(:headers) { user_role == :anonymous ? {} : build_basic_auth_header(user.username, token) }
+
+            subject { get api(url), headers: headers }
+
+            before do
+              project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
+            end
+
+            after do
+              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            end
+
+            it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+          end
+        end
+
+        it_behaves_like 'rejects nuget access with unknown project id'
+
+        it_behaves_like 'rejects nuget access with invalid project id'
+      end
+
+      it_behaves_like 'rejects nuget packages access with feature flag disabled'
+    end
+
+    it_behaves_like 'rejects nuget packages access with packages features disabled'
   end
 end

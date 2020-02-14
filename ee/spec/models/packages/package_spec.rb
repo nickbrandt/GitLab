@@ -47,7 +47,23 @@ RSpec.describe Packages::Package, type: :model do
       end
     end
 
-    Packages::Package.package_types.keys.each do |pt|
+    context "recipe uniqueness for conan packages" do
+      let!(:package) { create('conan_package') }
+
+      it "will allow a conan package with same project, name, version and package_type" do
+        new_package = build('conan_package', project: package.project, name: package.name, version: package.version)
+        new_package.conan_metadatum.package_channel = 'beta'
+        expect(new_package).to be_valid
+      end
+
+      it "will not allow a conan package with same recipe (name, version, metadatum.package_channel, metadatum.package_username, and package_type)" do
+        new_package = build('conan_package', project: package.project, name: package.name, version: package.version)
+        expect(new_package).not_to be_valid
+        expect(new_package.errors.to_a).to include("Package recipe already exists")
+      end
+    end
+
+    Packages::Package.package_types.keys.without('conan').each do |pt|
       context "project id, name, version and package type uniqueness for package type #{pt}" do
         let(:package) { create("#{pt}_package") }
 
@@ -118,11 +134,25 @@ RSpec.describe Packages::Package, type: :model do
         is_expected.to match_array([package2, package3])
       end
     end
+  end
+
+  context 'conan scopes' do
+    let!(:package) { create(:conan_package) }
 
     describe '.with_conan_channel' do
-      let!(:package) { create(:conan_package) }
-
       subject { described_class.with_conan_channel('stable') }
+
+      it 'includes only packages with specified version' do
+        is_expected.to include(package)
+      end
+    end
+
+    describe '.with_conan_username' do
+      subject do
+        described_class.with_conan_username(
+          Packages::ConanMetadatum.package_username_from(full_path: package.project.full_path)
+        )
+      end
 
       it 'includes only packages with specified version' do
         is_expected.to match_array([package])
@@ -130,13 +160,75 @@ RSpec.describe Packages::Package, type: :model do
     end
   end
 
-  describe '.with_conan_channel' do
-    let!(:package) { create(:conan_package) }
+  describe '.processed' do
+    let!(:package1) { create(:nuget_package) }
+    let!(:package2) { create(:npm_package) }
+    let!(:package3) { create(:nuget_package) }
 
-    subject { described_class.with_conan_channel('stable') }
+    subject { described_class.processed }
 
-    it 'includes only packages with specified version' do
-      is_expected.to eq([package])
+    it { is_expected.to eq([package1, package2, package3]) }
+
+    context 'with temporary packages' do
+      let!(:package1) { create(:nuget_package, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+      it { is_expected.to eq([package2, package3]) }
+    end
+  end
+
+  describe '.limit_recent' do
+    let!(:package1) { create(:nuget_package) }
+    let!(:package2) { create(:nuget_package) }
+    let!(:package3) { create(:nuget_package) }
+
+    subject { described_class.limit_recent(2) }
+
+    it { is_expected.to match_array([package3, package2]) }
+  end
+
+  context 'with several packages' do
+    let_it_be(:package1) { create(:nuget_package, name: 'FooBarish') }
+    let_it_be(:package2) { create(:npm_package) }
+    let_it_be(:package3) { create(:npm_package) }
+
+    describe '.pluck_names' do
+      subject { described_class.pluck_names.sort }
+
+      it { is_expected.to match_array([package1, package2, package3].map(&:name).sort) }
+    end
+
+    describe '.pluck_versions' do
+      subject { described_class.pluck_versions.sort }
+
+      it { is_expected.to match_array([package1, package2, package3].map(&:version).sort) }
+    end
+
+    describe '.with_name_like' do
+      subject { described_class.with_name_like(package_name) }
+
+      context 'with downcase name' do
+        let(:package_name) { 'foobarish' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with prefix wildcard' do
+        let(:package_name) { '%arish' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with suffix wildcard' do
+        let(:package_name) { 'foo%' }
+
+        it { is_expected.to match_array([package1]) }
+      end
+
+      context 'with surrounding wildcards' do
+        let(:package_name) { '%ooba%' }
+
+        it { is_expected.to match_array([package1]) }
+      end
     end
   end
 end

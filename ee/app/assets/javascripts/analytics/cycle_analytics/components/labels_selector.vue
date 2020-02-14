@@ -41,7 +41,7 @@ export default {
           class="d-inline-block dropdown-label-box"
         >
         </span>
-        {{ selectedLabel.name }}
+        {{ selectedLabel.title }}
       </span>
       <span v-else>{{ __('Select a label') }}</span>
     </template>
@@ -56,7 +56,7 @@ export default {
     >
       <span :style="{ backgroundColor: label.color }" class="d-inline-block dropdown-label-box">
       </span>
-      {{ label.name }}
+      {{ label.title }}
     </gl-dropdown-item>
   </gl-dropdown>
 </template>

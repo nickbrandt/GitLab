@@ -40,7 +40,7 @@ repositories are also processed with CommonMark. As of 11.8, the [Redcarpet Ruby
 has been removed and all issues and comments, including those from pre-11.1, are now processed
 using the [CommonMark Ruby Library](https://github.com/gjtorikian/commonmarker).
 
-The documentation website had its [Markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/108)
+The documentation website had its [Markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/108)
 in October 2018.
 
 You may have older issues, merge requests, or Markdown documents in your
@@ -97,6 +97,7 @@ not found in standard Markdown:
 - [Math equations and symbols written in LaTeX](#math)
 - [Special GitLab references](#special-gitlab-references)
 - [Task Lists](#task-lists)
+- [Table of Contents](#table-of-contents)
 - [Wiki specific Markdown](#wiki-specific-markdown)
 
 It also has [extended Markdown features](#standard-markdown-and-extensions-in-gitlab), without
@@ -157,7 +158,7 @@ It is possible to generate diagrams and flowcharts from text in GitLab using [Me
 
 #### Mermaid
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15107) in
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15107) in
 GitLab 10.3.
 
 Visit the [official page](https://mermaidjs.github.io/) for more details. If you are new to using Mermaid or need help identifying issues in your Mermaid code, the [Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/) is a helpful tool for creating and resolving issues within Mermaid diagrams.
@@ -261,7 +262,7 @@ this font installed by default.
 
 ### Front matter
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/23331) in GitLab 11.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/23331) in GitLab 11.6.
 
 Front matter is metadata included at the beginning of a Markdown document, preceding
 its content. This data can be used by static site generators such as [Jekyll](https://jekyllrb.com/docs/front-matter/),
@@ -407,6 +408,7 @@ GFM will recognize the following:
 | merge request                   | `!123`                     | `namespace/project!123`                 | `project!123`                  |
 | snippet                         | `$123`                     | `namespace/project$123`                 | `project$123`                  |
 | epic **(ULTIMATE)**             | `&123`                     | `group1/subgroup&123`                   |                                |
+| design **(PREMIUM)**            | `#123[file.jpg]` or `#123["file.png"]` | `group1/subgroup#123[file.png]`         | `project#123[file.png]`         |
 | label by ID                     | `~123`                     | `namespace/project~123`                 | `project~123`                  |
 | one-word label by name          | `~bug`                     | `namespace/project~bug`                 | `project~bug`                  |
 | multi-word label by name        | `~"feature request"`       | `namespace/project~"feature request"`   | `project~"feature request"`    |
@@ -454,6 +456,17 @@ unordered or ordered lists:
 1. [ ] Incomplete task
    1. [ ] Sub-task 1
    1. [x] Sub-task 2
+
+### Table of Contents
+
+A table of contents can be added to a Markdown file, issue or merge request
+description, or a wiki page, by adding the tag `[[_TOC_]]` on its own line.
+It will be replaced with an unordered list that links to the various
+headers.
+
+```markdown
+[[_TOC_]]
+```
 
 ### Wiki-specific Markdown
 
@@ -773,17 +786,33 @@ do*this*and*do*that*and*another thing
 
 ### Footnotes
 
-Footnotes add a link to a note rendered at the end of a Markdown file:
+Footnotes add a link to a note that will be rendered at the end of a Markdown file.
+
+To make a footnote, you need both a reference tag and a separate line (anywhere in the file) with the note content.
+
+Regardless of the tag names, the relative order of the reference tags determines the rendered numbering.
 
 ```markdown
-You can add footnotes to your text as follows.[^1]
+A footnote reference tag looks like this:[^1]
 
-[^1]: This is my awesome footnote (later in file).
+[^1]: This is the contents of a footnote.
+
+Reference tags can use letters and other characters.[^footnote-note]
+
+[^footnote-note]: Avoid using lowercase `w` or an underscore (`_`)
+in your footnote tag name until an
+[upstream bug](https://gitlab.com/gitlab-org/gitlab/issues/24423) is resolved.
 ```
 
-You can add footnotes to your text as follows.[^1]
+A footnote reference tag looks like this:[^1]
 
-[^1]: This is my awesome footnote (later in file).
+[^1]: This is the contents of a footnote.
+
+Reference tags can use letters and other characters.[^footnote-note]
+
+[^footnote-note]: Avoid using lowercase `w` or an underscore (`_`)
+in your footnote tag name until an
+[upstream bug](https://gitlab.com/gitlab-org/gitlab/issues/24423) is resolved.
 
 ### Headers
 
@@ -879,6 +908,11 @@ Reference-style (hover to see title text):
 [logo]: img/markdown_logo.png "Title Text"
 ```
 
+<!--
+DO NOT change the name of markdown_logo.png. This is used for a test
+in spec/controllers/help_controller_spec.rb.
+-->
+
 Inline-style (hover to see title text):
 
 ![alt text](img/markdown_logo.png "Title Text")
@@ -930,7 +964,7 @@ Here's a sample audio clip:
 You can also use raw HTML in your Markdown, and it'll usually work pretty well.
 
 See the documentation for HTML::Pipeline's [SanitizationFilter](https://www.rubydoc.info/gems/html-pipeline/1.11.0/HTML/Pipeline/SanitizationFilter#WHITELIST-constant)
-class for the list of allowed HTML tags and attributes.  In addition to the default
+class for the list of allowed HTML tags and attributes. In addition to the default
 `SanitizationFilter` whitelist, GitLab allows `span`, `abbr`, `details` and `summary` elements.
 
 ```html
@@ -1357,6 +1391,22 @@ to the sides of the "dash" lines in the second row. This will affect every cell 
 | :---         | :---:    | ---:          | :----------- | :------: | ------------: |
 | Cell 1       | Cell 2   | Cell 3        | Cell 4       | Cell 5   | Cell 6        |
 | Cell 7       | Cell 8   | Cell 9        | Cell 10      | Cell 11  | Cell 12       |
+
+#### Copy from spreadsheet and paste in Markdown
+
+[Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27205) in GitLab 12.7.
+
+If you're working in spreadsheet software (e.g. Microsoft Excel, Google
+Sheets, Apple Numbers), you can copy from a spreadsheet, and GitLab will
+paste it as a Markdown table. For example, suppose you have the
+following spreadsheet:
+
+![Copy from spreadsheet](img/markdown_copy_from_spreadsheet_v12_7.png)
+
+Select the cells and copy them to your clipboard. Open a GitLab Markdown
+entry and paste the spreadsheet:
+
+![Paste to Markdown table](img/markdown_paste_table_v12_7.png)
 
 ## References
 

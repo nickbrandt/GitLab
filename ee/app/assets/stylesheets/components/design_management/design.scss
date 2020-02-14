@@ -1,5 +1,16 @@
-.design-image {
-  object-fit: contain;
+.design-presentation-wrapper {
+  top: 0;
+  left: 0;
+}
+
+.design-scaler {
+  z-index: 1;
+}
+
+.design-scaler-wrapper {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .design-list-item .design-event {

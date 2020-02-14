@@ -7,7 +7,8 @@ class ProjectWiki
   MARKUPS = {
     'Markdown' => :markdown,
     'RDoc'     => :rdoc,
-    'AsciiDoc' => :asciidoc
+    'AsciiDoc' => :asciidoc,
+    'Org'      => :org
   }.freeze unless defined?(MARKUPS)
 
   CouldNotCreateWikiError = Class.new(StandardError)
@@ -64,7 +65,7 @@ class ProjectWiki
   # Returns the Gitlab::Git::Wiki object.
   def wiki
     @wiki ||= begin
-      gl_repository = Gitlab::GlRepository::WIKI.identifier_for_subject(project)
+      gl_repository = Gitlab::GlRepository::WIKI.identifier_for_container(project)
       raw_repository = Gitlab::Git::Repository.new(project.repository_storage, disk_path + '.git', gl_repository, full_path)
 
       create_repo!(raw_repository) unless raw_repository.exists?

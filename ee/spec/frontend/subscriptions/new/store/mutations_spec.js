@@ -7,6 +7,10 @@ const state = () => ({
   isSetupForCompany: true,
   numberOfUsers: 1,
   organizationName: 'name',
+  countryOptions: [],
+  stateOptions: [],
+  isLoadingPaymentMethod: false,
+  isConfirmingOrder: false,
 });
 
 let stateCopy;
@@ -15,42 +19,34 @@ beforeEach(() => {
   stateCopy = state();
 });
 
-describe('UPDATE_CURRENT_STEP', () => {
-  it('should set the currentStep to the given step', () => {
-    mutations[types.UPDATE_CURRENT_STEP](stateCopy, 'secondStep');
+describe('ee/subscriptions/new/store/mutation', () => {
+  describe.each`
+    mutation                                  | value                                 | stateProp
+    ${types.UPDATE_CURRENT_STEP}              | ${'secondStep'}                       | ${'currentStep'}
+    ${types.UPDATE_SELECTED_PLAN}             | ${'secondPlan'}                       | ${'selectedPlan'}
+    ${types.UPDATE_IS_SETUP_FOR_COMPANY}      | ${false}                              | ${'isSetupForCompany'}
+    ${types.UPDATE_NUMBER_OF_USERS}           | ${2}                                  | ${'numberOfUsers'}
+    ${types.UPDATE_ORGANIZATION_NAME}         | ${'new name'}                         | ${'organizationName'}
+    ${types.UPDATE_COUNTRY_OPTIONS}           | ${[{ text: 'country', value: 'id' }]} | ${'countryOptions'}
+    ${types.UPDATE_STATE_OPTIONS}             | ${[{ text: 'state', value: 'id' }]}   | ${'stateOptions'}
+    ${types.UPDATE_COUNTRY}                   | ${'NL'}                               | ${'country'}
+    ${types.UPDATE_STREET_ADDRESS_LINE_ONE}   | ${'streetAddressLine1'}               | ${'streetAddressLine1'}
+    ${types.UPDATE_STREET_ADDRESS_LINE_TWO}   | ${'streetAddressLine2'}               | ${'streetAddressLine2'}
+    ${types.UPDATE_CITY}                      | ${'city'}                             | ${'city'}
+    ${types.UPDATE_COUNTRY_STATE}             | ${'countryState'}                     | ${'countryState'}
+    ${types.UPDATE_ZIP_CODE}                  | ${'zipCode'}                          | ${'zipCode'}
+    ${types.UPDATE_PAYMENT_FORM_PARAMS}       | ${{ token: 'x' }}                     | ${'paymentFormParams'}
+    ${types.UPDATE_PAYMENT_METHOD_ID}         | ${'paymentMethodId'}                  | ${'paymentMethodId'}
+    ${types.UPDATE_CREDIT_CARD_DETAILS}       | ${{ type: 'x' }}                      | ${'creditCardDetails'}
+    ${types.UPDATE_IS_LOADING_PAYMENT_METHOD} | ${true}                               | ${'isLoadingPaymentMethod'}
+    ${types.UPDATE_IS_CONFIRMING_ORDER}       | ${true}                               | ${'isConfirmingOrder'}
+  `('$mutation', ({ mutation, value, stateProp }) => {
+    it(`should set the ${stateProp} to the given value`, () => {
+      expect(stateCopy[stateProp]).not.toEqual(value);
 
-    expect(stateCopy.currentStep).toEqual('secondStep');
-  });
-});
+      mutations[mutation](stateCopy, value);
 
-describe('UPDATE_SELECTED_PLAN', () => {
-  it('should set the selectedPlan to the given plan', () => {
-    mutations[types.UPDATE_SELECTED_PLAN](stateCopy, 'secondPlan');
-
-    expect(stateCopy.selectedPlan).toEqual('secondPlan');
-  });
-});
-
-describe('UPDATE_IS_SETUP_FOR_COMPANY', () => {
-  it('should set the isSetupForCompany to the given boolean', () => {
-    mutations[types.UPDATE_IS_SETUP_FOR_COMPANY](stateCopy, false);
-
-    expect(stateCopy.isSetupForCompany).toEqual(false);
-  });
-});
-
-describe('UPDATE_NUMBER_OF_USERS', () => {
-  it('should set the numberOfUsers to the given number', () => {
-    mutations[types.UPDATE_NUMBER_OF_USERS](stateCopy, 2);
-
-    expect(stateCopy.numberOfUsers).toEqual(2);
-  });
-});
-
-describe('UPDATE_ORGANIZATION_NAME', () => {
-  it('should set the organizationName to the given name', () => {
-    mutations[types.UPDATE_ORGANIZATION_NAME](stateCopy, 'new name');
-
-    expect(stateCopy.organizationName).toEqual('new name');
+      expect(stateCopy[stateProp]).toEqual(value);
+    });
   });
 });

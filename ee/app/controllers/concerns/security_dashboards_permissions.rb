@@ -19,6 +19,6 @@ module SecurityDashboardsPermissions
   end
 
   def read_security_dashboard
-    "read_#{vulnerable.class.name.downcase}_security_dashboard".to_sym
+    "read_#{vulnerable.class.name.underscore}_security_dashboard".to_sym
   end
 end

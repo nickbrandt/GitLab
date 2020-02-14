@@ -5,16 +5,30 @@ require 'spec_helper'
 describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_store_caching do
   include MetricsDashboardHelpers
 
-  set(:user) { create(:user) }
-  set(:cluster_project) { create(:cluster_project) }
-  set(:cluster) { cluster_project.cluster }
-  set(:project) { cluster_project.project }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:cluster_project) { create(:cluster_project) }
+  let_it_be(:cluster) { cluster_project.cluster }
+  let_it_be(:project) { cluster_project.project }
 
   before do
     project.add_maintainer(user)
   end
 
-  describe 'get_dashboard' do
+  describe '.valid_params?' do
+    let(:params) { { cluster: cluster } }
+
+    subject { described_class.valid_params?(params) }
+
+    it { is_expected.to be_truthy }
+
+    context 'missing cluster' do
+      let(:params) { {} }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#get_dashboard' do
     let(:service_params) { [project, user, { cluster: cluster, cluster_type: :project }] }
     let(:service_call) { described_class.new(*service_params).get_dashboard }
 

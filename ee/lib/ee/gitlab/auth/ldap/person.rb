@@ -91,7 +91,7 @@ module EE
           def cn_from_memberof(memberof)
             # Only get the first CN value of the string, that's the one that contains
             # the group name
-            memberof.match(/(?:cn=([\w\s]+))/i)&.captures&.first
+            memberof.match(/(?:cn=([\w\s-]+))/i)&.captures&.first
           end
         end
       end

@@ -29,11 +29,6 @@ describe('Edit feature flag form', () => {
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
       },
-      provide: {
-        glFeatures: {
-          featureFlagIID: true,
-        },
-      },
       store,
     });
   };

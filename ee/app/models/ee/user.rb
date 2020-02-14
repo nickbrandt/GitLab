@@ -70,9 +70,6 @@ module EE
         joins(:identities).where(identities: { provider: provider })
       end
 
-      scope :bots, -> { where.not(bot_type: nil) }
-      scope :humans, -> { where(bot_type: nil) }
-
       scope :with_invalid_expires_at_tokens, ->(expiration_date) do
         where(id: ::PersonalAccessToken.with_invalid_expires_at(expiration_date).select(:user_id))
       end
@@ -85,12 +82,6 @@ module EE
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
-
-      enum bot_type: {
-        support_bot: 1,
-        alert_bot: 2,
-        visual_review_bot: 3
-      }
     end
 
     class_methods do
@@ -105,15 +96,6 @@ module EE
         end
       end
 
-      def alert_bot
-        email_pattern = "alert%s@#{Settings.gitlab.host}"
-
-        unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
-          u.bio = 'The GitLab alert bot'
-          u.name = 'GitLab Alert Bot'
-        end
-      end
-
       def visual_review_bot
         email_pattern = "visual_review%s@#{Settings.gitlab.host}"
 
@@ -121,16 +103,6 @@ module EE
           u.bio = 'The Gitlab Visual Review feedback bot'
           u.name = 'Gitlab Visual Review Bot'
         end
-      end
-
-      override :internal
-      def internal
-        super.or(where.not(bot_type: nil))
-      end
-
-      override :non_internal
-      def non_internal
-        super.where(bot_type: nil)
       end
 
       def non_ldap
@@ -275,11 +247,25 @@ module EE
 
     def using_license_seat?
       return false unless active?
+      return false if internal?
+      return false unless License.current
 
-      if License.current&.exclude_guests_from_active_count?
+      if License.current.exclude_guests_from_active_count?
         highest_role > ::Gitlab::Access::GUEST
       else
-        highest_role > ::Gitlab::Access::NO_ACCESS
+        true
+      end
+    end
+
+    def using_gitlab_com_seat?(namespace)
+      return false unless ::Gitlab.com?
+      return false unless namespace.present?
+      return false if namespace.free_plan?
+
+      if namespace.gold_plan?
+        highest_role > ::Gitlab::Access::GUEST
+      else
+        true
       end
     end
 
@@ -320,24 +306,27 @@ module EE
       super
     end
 
-    override :internal?
-    def internal?
-      super || bot?
-    end
+    def ab_feature_enabled?(feature, percentage: nil)
+      return false unless ::Gitlab.com?
+      return false if ::Gitlab::Geo.secondary?
 
-    def bot?
-      return bot_type.present? if has_attribute?(:bot_type)
+      raise "Currently only discover_security feature is supported" unless feature == :discover_security
 
-      # Some older *migration* specs utilize this removed column
-      read_attribute(:support_bot)
-    end
+      return false unless ::Feature.enabled?(feature)
 
-    def security_dashboard_project_ids
-      if self.can?(:read_all_resources)
-        security_dashboard_projects.ids
-      else
-        security_dashboard_projects.visible_to_user(self).ids
+      filter = user_preference.feature_filter_type.presence || 0
+
+      # We use a 2nd feature flag for control as enabled and percentage_of_time for chatops
+      flipper_feature = ::Feature.get((feature.to_s + '_control').to_sym)
+      percentage ||= flipper_feature.gate_values[:percentage_of_time] || 0 if flipper_feature
+      return false if percentage <= 0
+
+      if filter == UserPreference::FEATURE_FILTER_UNKNOWN
+        filter = SecureRandom.rand * 100 <= percentage ? UserPreference::FEATURE_FILTER_EXPERIMENT : UserPreference::FEATURE_FILTER_CONTROL
+        user_preference.update_column :feature_filter_type, filter
       end
+
+      filter == UserPreference::FEATURE_FILTER_EXPERIMENT
     end
 
     protected

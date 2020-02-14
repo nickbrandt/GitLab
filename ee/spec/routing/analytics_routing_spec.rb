@@ -13,6 +13,8 @@ describe 'Analytics' do
     let(:user) { create(:user) }
 
     before do
+      stub_feature_flags(group_level_productivity_analytics: false)
+
       login_as(user)
     end
 
@@ -29,7 +31,7 @@ describe 'Analytics' do
       it 'succeeds' do
         expect(Gitlab::Analytics).to receive(:cycle_analytics_enabled?).and_call_original
 
-        expect(get('/-/analytics/cycle_analytics')).to route_to('analytics/cycle_analytics#show')
+        expect(get('/-/analytics/value_stream_analytics')).to route_to('analytics/cycle_analytics#show')
       end
     end
 

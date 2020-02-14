@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TasksByTypeChart no data available should render the no data available message 1`] = `
+"<div class=\\"row\\">
+  <div class=\\"col-12\\">
+    <h3>Type of work</h3>
+    <div class=\\"bs-callout bs-callout-info\\">
+      <p>There is no data available. Please change your selection.</p>
+    </div>
+  </div>
+</div>"
+`;
+
+exports[`TasksByTypeChart with data available filters labels has label filters 1`] = `
+"<div class=\\"js-tasks-by-type-chart-filters-labels mb-3 mx-3\\">
+  <p class=\\"font-weight-bold text-left my-2\\">
+    Select labels
+  </p>
+  <div class=\\"dropdown-input px-0\\"><input type=\\"search\\" class=\\"dropdown-input-field\\"> <svg aria-hidden=\\"true\\" class=\\"dropdown-input-search s16 ic-search\\" data-hidden=\\"true\\">
+      <use xlink:href=\\"#search\\"></use>
+    </svg></div>
+  <div class=\\"dropdown-content px-0\\"></div>
+</div>"
+`;
+
+exports[`TasksByTypeChart with data available filters labels with label dropdown open renders the group labels as dropdown items 1`] = `
+"<div class=\\"dropdown-content px-0\\">
+  <ul>
+    <li>
+      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+        <span style=\\"background-color: #BADA55;\\" class=\\"d-inline-block dropdown-label-box\\">
+              </span>
+        Foo Label
+      </a>
+    </li>
+
+    <li>
+      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+        <span style=\\"background-color: #0033CC;\\" class=\\"d-inline-block dropdown-label-box\\">
+              </span>
+        Foo::Bar
+      </a>
+    </li>
+  </ul>
+</div>"
+`;
+
+exports[`TasksByTypeChart with data available filters subject has subject filters 1`] = `
+"<div class=\\"js-tasks-by-type-chart-filters-subject mb-3 mx-3\\">
+  <p class=\\"font-weight-bold text-left mb-2\\">Show</p>
+  <div role=\\"radiogroup\\" tabindex=\\"-1\\" class=\\"gl-segmented-control btn-group-toggle btn-group\\" id=\\"__BVID__74\\"><label class=\\"btn btn-gl-segmented-button active\\"><input id=\\"__BVID__74__BV_option_0_\\" type=\\"radio\\" name=\\"__BVID__74\\" autocomplete=\\"off\\" class=\\"\\" value=\\"Issue\\"><span>Issues</span></label><label class=\\"btn btn-gl-segmented-button\\"><input id=\\"__BVID__74__BV_option_1_\\" type=\\"radio\\" name=\\"__BVID__74\\" autocomplete=\\"off\\" class=\\"\\" value=\\"MergeRequest\\"><span>Merge Requests</span></label></div>
+</div>"
+`;
+
+exports[`TasksByTypeChart with data available should render the loading chart 1`] = `
+"<div class=\\"row\\">
+  <div class=\\"col-12\\">
+    <h3>Type of work</h3>
+    <div>
+      <p>Showing data for group 'Gitlab Org' from Dec 11, 2019 to Jan 10, 2020</p>
+      <tasks-by-type-filters-stub labels=\\"[object Object],[object Object]\\" selectedlabelids=\\"1,2,3\\" subjectfilter=\\"Issue\\"></tasks-by-type-filters-stub>
+      <gl-stacked-column-chart-stub data=\\"0,1,2,5,2,3,2,4,1\\" option=\\"[object Object]\\" presentation=\\"stacked\\" groupby=\\"Group 1,Group 2,Group 3\\" xaxistype=\\"category\\" xaxistitle=\\"Date\\" yaxistitle=\\"Number of tasks\\" seriesnames=\\"Cool label,Normal label\\" legendaveragetext=\\"Avg\\" legendmaxtext=\\"Max\\" y-axis-type=\\"value\\"></gl-stacked-column-chart-stub>
+    </div>
+  </div>
+</div>"
+`;

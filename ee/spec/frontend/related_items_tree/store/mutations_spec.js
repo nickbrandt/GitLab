@@ -479,10 +479,14 @@ describe('RelatedItemsTree', () => {
 
       describe(types.RECEIVE_ADD_ITEM_FAILURE, () => {
         it('should set `itemAddInProgress` to false, `itemAddFailure` to true and `itemAddFailureType` value within state', () => {
-          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType: 'bar' });
+          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, {
+            itemAddFailureMessage: 'foo',
+            itemAddFailureType: 'bar',
+          });
 
           expect(state.itemAddInProgress).toBe(false);
           expect(state.itemAddFailure).toBe(true);
+          expect(state.itemAddFailureMessage).toEqual('foo');
           expect(state.itemAddFailureType).toEqual('bar');
         });
       });

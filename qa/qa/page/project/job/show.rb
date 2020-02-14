@@ -13,18 +13,22 @@ module QA::Page
         element :pipeline_path
       end
 
+      view 'app/assets/javascripts/jobs/components/sidebar.vue' do
+        element :retry_button
+      end
+
       def successful?(timeout: 60)
         raise "Timed out waiting for the build trace to load" unless loaded?
         raise "Timed out waiting for the status to be a valid completed state" unless completed?(timeout: timeout)
 
-        status_badge == PASSED_STATUS
+        passed?
       end
 
       # Reminder: You may wish to wait for a particular job status before checking output
       def output(wait: 5)
         result = ''
 
-        wait(reload: false, max: wait, interval: 1) do
+        wait_until(reload: false, max_duration: wait, sleep_interval: 1) do
           result = find_element(:job_log_content).text
 
           result.include?('Job')
@@ -33,10 +37,14 @@ module QA::Page
         result
       end
 
+      def retry!
+        click_element :retry_button
+      end
+
       private
 
       def loaded?(wait: 60)
-        wait(reload: true, max: wait, interval: 1) do
+        wait_until(reload: true, max_duration: wait, sleep_interval: 1) do
           has_element?(:job_log_content, wait: 1)
         end
       end

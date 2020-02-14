@@ -41,14 +41,14 @@ describe RoutableActions do
         it 'redirects to group sign in page' do
           get :show, params: request_params(routable)
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(response.location).to match(/groups\/.*\/-\/saml\/sso\?redirect=.+&token=/)
         end
 
         it 'does not redirect on POST requests' do
           post :create, params: request_params(routable)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 

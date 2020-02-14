@@ -137,9 +137,7 @@ describe('IDE store merge request actions', () => {
         store
           .dispatch('getMergeRequestData', { projectId: TEST_PROJECT, mergeRequestId: 1 })
           .then(() => {
-            expect(service.getProjectMergeRequestData).toHaveBeenCalledWith(TEST_PROJECT, 1, {
-              render_html: true,
-            });
+            expect(service.getProjectMergeRequestData).toHaveBeenCalledWith(TEST_PROJECT, 1);
 
             done();
           })
@@ -180,7 +178,7 @@ describe('IDE store merge request actions', () => {
           .then(done.fail)
           .catch(() => {
             expect(dispatch).toHaveBeenCalledWith('setErrorMessage', {
-              text: 'An error occurred whilst loading the merge request.',
+              text: 'An error occurred while loading the merge request.',
               action: jasmine.any(Function),
               actionText: 'Please try again',
               actionPayload: {
@@ -253,7 +251,7 @@ describe('IDE store merge request actions', () => {
           .then(done.fail)
           .catch(() => {
             expect(dispatch).toHaveBeenCalledWith('setErrorMessage', {
-              text: 'An error occurred whilst loading the merge request changes.',
+              text: 'An error occurred while loading the merge request changes.',
               action: jasmine.any(Function),
               actionText: 'Please try again',
               actionPayload: {
@@ -323,7 +321,7 @@ describe('IDE store merge request actions', () => {
           .then(done.fail)
           .catch(() => {
             expect(dispatch).toHaveBeenCalledWith('setErrorMessage', {
-              text: 'An error occurred whilst loading the merge request version data.',
+              text: 'An error occurred while loading the merge request version data.',
               action: jasmine.any(Function),
               actionText: 'Please try again',
               actionPayload: {

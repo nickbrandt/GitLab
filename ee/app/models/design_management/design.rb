@@ -17,7 +17,7 @@ module DesignManagement
     # This is a polymorphic association, so we can't count on FK's to delete the
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
-    has_many :user_mentions, class_name: "DesignUserMention"
+    has_many :user_mentions, class_name: "DesignUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
     validates :project, :filename, presence: true
     validates :issue, presence: true, unless: :importing?
@@ -25,6 +25,10 @@ module DesignManagement
     validate :validate_file_is_image
 
     alias_attribute :title, :filename
+
+    # Pre-fetching scope to include the data necessary to construct a
+    # reference using `to_reference`.
+    scope :for_reference, -> { includes(issue: [{ project: [:route, :namespace] }]) }
 
     # Find designs visible at the given version
     #
@@ -52,6 +56,7 @@ module DesignManagement
     end
 
     scope :with_filename, -> (filenames) { where(filename: filenames) }
+    scope :on_issue, ->(issue) { where(issue_id: issue) }
 
     # Scope called by our REST API to avoid N+1 problems
     scope :with_api_entity_associations, -> { preload(:issue) }
@@ -73,6 +78,19 @@ module DesignManagement
       most_recent_action&.deletion?
     end
 
+    # A design is visible_in? a version if:
+    #   * it was created before that version
+    #   * the most recent action before the version was not a deletion
+    def visible_in?(version)
+      map = strong_memoize(:visible_in) do
+        Hash.new do |h, k|
+          h[k] = self.class.visible_at_version(k).where(id: id).exists?
+        end
+      end
+
+      map[version]
+    end
+
     def most_recent_action
       strong_memoize(:most_recent_action) { actions.ordered.last }
     end
@@ -84,10 +102,74 @@ module DesignManagement
     #   #123[homescreen.png]
     #   other-project#72[sidebar.jpg]
     #   #38/designs[transition.gif]
+    #   #12["filename with [] in it.jpg"]
     def to_reference(from = nil, full: false)
       infix = full ? '/designs' : ''
+      totally_simple = %r{ \A #{self.class.simple_file_name} \z }x
+      safe_name = if totally_simple.match?(filename)
+                    filename
+                  elsif filename =~ /[<>]/
+                    %Q{base64:#{Base64.strict_encode64(filename)}}
+                  else
+                    escaped = filename.gsub(%r{[\\"]}) { |x| "\\#{x}" }
+                    %Q{"#{escaped}"}
+                  end
 
-      "%s%s[%s]" % [issue.to_reference(from, full: full), infix, filename]
+      "#{issue.to_reference(from, full: full)}#{infix}[#{safe_name}]"
+    end
+
+    def self.reference_pattern
+      @reference_pattern ||= begin
+        # Filenames can be escaped with double quotes to name filenames
+        # that include square brackets, or other special characters
+        %r{
+          #{Issue.reference_pattern}
+          (\/designs)?
+          \[
+            (?<design> #{simple_file_name} | #{quoted_file_name} | #{base_64_encoded_name})
+          \]
+        }x
+      end
+    end
+
+    def self.simple_file_name
+      %r{
+          (?<simple_file_name>
+           ( \w | [_:,'-] | \. | \s )+
+           \.
+           \w+
+          )
+      }x
+    end
+
+    def self.base_64_encoded_name
+      %r{
+          base64:
+          (?<base_64_encoded_name>
+           [A-Za-z0-9+\n]+
+           =?
+          )
+      }x
+    end
+
+    def self.quoted_file_name
+      %r{
+          "
+          (?<escaped_filename>
+            (\\ \\ | \\ " | [^"\\])+
+          )
+          "
+      }x
+    end
+
+    def self.link_reference_pattern
+      @link_reference_pattern ||= begin
+        exts = SAFE_IMAGE_EXT + DANGEROUS_IMAGE_EXT
+        path_segment = %r{issues/(?<issue>\d+)/designs}
+        filename_pattern = %r{(?<simple_file_name>[a-z0-9_=-]+\.(#{exts.join('|')}))}i
+
+        super(path_segment, filename_pattern)
+      end
     end
 
     def to_ability_name
@@ -112,7 +194,7 @@ module DesignManagement
 
     def clear_version_cache
       [versions, actions].each(&:reset)
-      [:new_design, :diff_refs, :head_sha, :most_recent_action].each do |key|
+      %i[new_design diff_refs head_sha visible_in most_recent_action].each do |key|
         clear_memoization(key)
       end
     end

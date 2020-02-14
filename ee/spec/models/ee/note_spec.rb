@@ -59,8 +59,8 @@ describe Note do
     end
 
     context 'when running in a Geo primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
+      let_it_be(:primary) { create(:geo_node, :primary) }
+      let_it_be(:secondary) { create(:geo_node) }
 
       before do
         stub_current_geo_node(primary)

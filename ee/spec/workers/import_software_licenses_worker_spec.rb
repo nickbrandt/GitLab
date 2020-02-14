@@ -39,5 +39,15 @@ describe ImportSoftwareLicensesWorker do
         expect { subject.perform }.not_to change(SoftwareLicense, :count)
       end
     end
+
+    context 'when a license has an invalid SPDX identifier' do
+      before do
+        apache.update_column(:spdx_identifier, 'invalid')
+        subject.perform
+      end
+
+      it { expect(apache.reload.spdx_identifier).to eql(spdx_apache_license.id) }
+      it { expect(SoftwareLicense.pluck(:spdx_identifier)).to contain_exactly(spdx_apache_license.id, spdx_mit_license.id, spdx_bsd_license.id) }
+    end
   end
 end

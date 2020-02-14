@@ -5,7 +5,7 @@ import * as types from '~/monitoring/stores/mutation_types';
 import state from '~/monitoring/stores/state';
 import { metricStates } from '~/monitoring/constants';
 import {
-  metricsGroupsAPIResponse,
+  metricsDashboardPayload,
   deploymentData,
   metricsDashboardResponse,
   dashboardGitResponse,
@@ -23,14 +23,14 @@ describe('Monitoring mutations', () => {
 
     beforeEach(() => {
       stateCopy.dashboard.panel_groups = [];
-      payload = metricsGroupsAPIResponse;
+      payload = metricsDashboardPayload;
     });
     it('adds a key to the group', () => {
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
       const groups = getGroups();
 
-      expect(groups[0].key).toBe('response-metrics-nginx-ingress-vts--0');
-      expect(groups[1].key).toBe('system-metrics-kubernetes--1');
+      expect(groups[0].key).toBe('response-metrics-nginx-ingress-vts-0');
+      expect(groups[1].key).toBe('system-metrics-kubernetes-1');
     });
     it('normalizes values', () => {
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, payload);
@@ -81,16 +81,24 @@ describe('Monitoring mutations', () => {
     it('should set all the endpoints', () => {
       mutations[types.SET_ENDPOINTS](stateCopy, {
         metricsEndpoint: 'additional_metrics.json',
-        environmentsEndpoint: 'environments.json',
         deploymentsEndpoint: 'deployments.json',
         dashboardEndpoint: 'dashboard.json',
         projectPath: '/gitlab-org/gitlab-foss',
       });
       expect(stateCopy.metricsEndpoint).toEqual('additional_metrics.json');
-      expect(stateCopy.environmentsEndpoint).toEqual('environments.json');
       expect(stateCopy.deploymentsEndpoint).toEqual('deployments.json');
       expect(stateCopy.dashboardEndpoint).toEqual('dashboard.json');
       expect(stateCopy.projectPath).toEqual('/gitlab-org/gitlab-foss');
+    });
+
+    it('should not remove default value of logsPath', () => {
+      const defaultLogsPath = stateCopy.logsPath;
+
+      mutations[types.SET_ENDPOINTS](stateCopy, {
+        dashboardEndpoint: 'dashboard.json',
+      });
+
+      expect(stateCopy.logsPath).toBe(defaultLogsPath);
     });
   });
   describe('Individual panel/metric results', () => {
@@ -100,12 +108,12 @@ describe('Monitoring mutations', () => {
         values: [[0, 1], [1, 1], [1, 3]],
       },
     ];
-    const dashboardGroups = metricsDashboardResponse.dashboard.panel_groups;
+    const { dashboard } = metricsDashboardResponse;
     const getMetric = () => stateCopy.dashboard.panel_groups[0].panels[0].metrics[0];
 
     describe('REQUEST_METRIC_RESULT', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboardGroups);
+        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
       });
       it('stores a loading state on a metric', () => {
         expect(stateCopy.showEmptyState).toBe(true);
@@ -128,7 +136,7 @@ describe('Monitoring mutations', () => {
 
     describe('RECEIVE_METRIC_RESULT_SUCCESS', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboardGroups);
+        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
       });
       it('clears empty state', () => {
         expect(stateCopy.showEmptyState).toBe(true);
@@ -161,7 +169,7 @@ describe('Monitoring mutations', () => {
 
     describe('RECEIVE_METRIC_RESULT_FAILURE', () => {
       beforeEach(() => {
-        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboardGroups);
+        mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboard);
       });
       it('maintains the loading state when a metric fails', () => {
         expect(stateCopy.showEmptyState).toBe(true);

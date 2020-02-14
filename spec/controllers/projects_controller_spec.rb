@@ -27,7 +27,7 @@ describe ProjectsController do
 
             get :new, params: { namespace_id: group.id }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response).to render_template('new')
           end
         end
@@ -36,7 +36,7 @@ describe ProjectsController do
           it 'responds with status 404' do
             get :new, params: { namespace_id: group.id }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(response).not_to render_template('new')
           end
         end
@@ -60,6 +60,46 @@ describe ProjectsController do
         get :index
 
         expect(response).to redirect_to(explore_root_path)
+      end
+    end
+  end
+
+  describe "GET #activity as JSON" do
+    render_views
+
+    let(:project) { create(:project, :public, issues_access_level: ProjectFeature::PRIVATE) }
+
+    before do
+      create(:event, :created, project: project, target: create(:issue))
+
+      sign_in(user)
+
+      request.cookies[:event_filter] = 'all'
+    end
+
+    context 'when user has permission to see the event' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'returns count' do
+        get :activity, params: { namespace_id: project.namespace, id: project, format: :json }
+
+        expect(json_response['count']).to eq(1)
+      end
+    end
+
+    context 'when user has no permission to see the event' do
+      it 'filters out invisible event' do
+        get :activity, params: { namespace_id: project.namespace, id: project, format: :json }
+
+        expect(json_response['html']).to eq("\n")
+      end
+
+      it 'filters out invisible event when calculating the count' do
+        get :activity, params: { namespace_id: project.namespace, id: project, format: :json }
+
+        expect(json_response['count']).to eq(0)
       end
     end
   end
@@ -159,7 +199,7 @@ describe ProjectsController do
       it 'renders a 503' do
         get :show, params: { namespace_id: project.namespace, id: project }
 
-        expect(response).to have_gitlab_http_status(503)
+        expect(response).to have_gitlab_http_status(:service_unavailable)
       end
     end
 
@@ -264,7 +304,7 @@ describe ProjectsController do
 
         get :show, params: { namespace_id: project.namespace, id: project }, format: :git
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(namespace_project_path)
       end
     end
@@ -331,7 +371,7 @@ describe ProjectsController do
             id: project.path
           }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'sets the badge API endpoint' do
@@ -371,7 +411,7 @@ describe ProjectsController do
       end
 
       it 'redirects to projects path' do
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(project_path(project))
       end
     end
@@ -391,7 +431,7 @@ describe ProjectsController do
       end
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -419,7 +459,7 @@ describe ProjectsController do
       end
 
       it 'redirects to projects path' do
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(project_path(project))
       end
     end
@@ -439,7 +479,7 @@ describe ProjectsController do
       end
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -466,7 +506,7 @@ describe ProjectsController do
                id: project.path
              }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -486,7 +526,7 @@ describe ProjectsController do
                id: project.path
              }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
   end
@@ -521,7 +561,7 @@ describe ProjectsController do
             expect(assign_repository_path).to include(project.path)
           end
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
 
@@ -537,7 +577,7 @@ describe ProjectsController do
             .not_to change { project.reload.path }
 
           expect(controller).to set_flash.now[:alert].to(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -555,7 +595,7 @@ describe ProjectsController do
               project: params
             }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         params.each do |param, value|
           expect(project.public_send(param)).to eq(value)
         end
@@ -653,7 +693,7 @@ describe ProjectsController do
       project.reload
 
       expect(project.namespace).to eq(new_namespace)
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     context 'when new namespace is empty' do
@@ -674,7 +714,7 @@ describe ProjectsController do
         project.reload
 
         expect(project.namespace).to eq(old_namespace)
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(flash[:alert]).to eq s_('TransferProject|Please select a new namespace for your project.')
       end
     end
@@ -691,7 +731,7 @@ describe ProjectsController do
       delete :destroy, params: { namespace_id: project.namespace, id: project }
 
       expect { Project.find(orig_id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(response).to have_gitlab_http_status(302)
+      expect(response).to have_gitlab_http_status(:found)
       expect(response).to redirect_to(dashboard_projects_path)
     end
 
@@ -733,7 +773,7 @@ describe ProjectsController do
     end
 
     it 'has http status 200' do
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'changes the user incoming email token' do
@@ -763,7 +803,7 @@ describe ProjectsController do
     end
 
     it 'has http status 200' do
-      expect(response).to have_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'changes the user incoming email token' do
@@ -856,7 +896,7 @@ describe ProjectsController do
             id: project
           },
           format: :js)
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
   end
 
@@ -905,7 +945,7 @@ describe ProjectsController do
           sign_in(user)
           get :refs, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -928,7 +968,7 @@ describe ProjectsController do
       it 'returns 404' do
         post :preview_markdown, params: { namespace_id: private_project.namespace, id: private_project, text: '*Markdown* text' }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -973,7 +1013,7 @@ describe ProjectsController do
       end
 
       it 'renders JSON body with image links expanded' do
-        expanded_path = "/#{project_with_repo.full_path}/raw/master/files/images/logo-white.png"
+        expanded_path = "/#{project_with_repo.full_path}/-/raw/master/files/images/logo-white.png"
 
         post :preview_markdown, params: preview_markdown_params
 
@@ -994,7 +1034,7 @@ describe ProjectsController do
             get :show, params: { namespace_id: public_project.namespace, id: public_project }
 
             expect(assigns(:project)).to eq(public_project)
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
 
@@ -1033,13 +1073,13 @@ describe ProjectsController do
         it 'does not 404' do
           post :toggle_star, params: { namespace_id: public_project.namespace, id: public_project.path.upcase }
 
-          expect(response).not_to have_gitlab_http_status(404)
+          expect(response).not_to have_gitlab_http_status(:not_found)
         end
 
         it 'does not redirect to the correct casing' do
           post :toggle_star, params: { namespace_id: public_project.namespace, id: public_project.path.upcase }
 
-          expect(response).not_to have_gitlab_http_status(301)
+          expect(response).not_to have_gitlab_http_status(:moved_permanently)
         end
       end
 
@@ -1049,7 +1089,7 @@ describe ProjectsController do
         it 'returns not found' do
           post :toggle_star, params: { namespace_id: 'foo', id: 'bar' }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -1063,13 +1103,13 @@ describe ProjectsController do
         it 'does not 404' do
           delete :destroy, params: { namespace_id: project.namespace, id: project.path.upcase }
 
-          expect(response).not_to have_gitlab_http_status(404)
+          expect(response).not_to have_gitlab_http_status(:not_found)
         end
 
         it 'does not redirect to the correct casing' do
           delete :destroy, params: { namespace_id: project.namespace, id: project.path.upcase }
 
-          expect(response).not_to have_gitlab_http_status(301)
+          expect(response).not_to have_gitlab_http_status(:moved_permanently)
         end
       end
 
@@ -1079,7 +1119,7 @@ describe ProjectsController do
         it 'returns not found' do
           delete :destroy, params: { namespace_id: 'foo', id: 'bar' }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -1103,7 +1143,7 @@ describe ProjectsController do
         get action, params: { namespace_id: project.namespace, id: project }
 
         expect(flash[:alert]).to eq('This endpoint has been requested too many times. Try again later.')
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
 
@@ -1114,7 +1154,7 @@ describe ProjectsController do
         it 'returns 302' do
           get action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
 
@@ -1126,7 +1166,7 @@ describe ProjectsController do
         it 'returns 404' do
           get action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -1143,7 +1183,7 @@ describe ProjectsController do
           it 'returns 302' do
             get action, params: { namespace_id: project.namespace, id: project }
 
-            expect(response).to have_gitlab_http_status(302)
+            expect(response).to have_gitlab_http_status(:found)
           end
         end
 
@@ -1155,7 +1195,7 @@ describe ProjectsController do
           it 'returns 404' do
             get action, params: { namespace_id: project.namespace, id: project }
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
 
@@ -1172,7 +1212,7 @@ describe ProjectsController do
         it 'returns 302' do
           post action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
 
@@ -1184,7 +1224,7 @@ describe ProjectsController do
         it 'returns 404' do
           post action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -1196,7 +1236,7 @@ describe ProjectsController do
         it 'returns 302' do
           post action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
         end
       end
 
@@ -1208,7 +1248,7 @@ describe ProjectsController do
         it 'returns 404' do
           post action, params: { namespace_id: project.namespace, id: project }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -1245,7 +1285,7 @@ describe ProjectsController do
       it 'redirects to the project page' do
         get :resolve, params: { id: project.id }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(response).to redirect_to(project_path(project))
       end
     end
@@ -1267,14 +1307,14 @@ describe ProjectsController do
         it 'gives 404 for existing project' do
           get :resolve, params: { id: project.id }
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
       it 'gives 404 for non-existing project' do
         get :resolve, params: { id: '0' }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -1288,7 +1328,7 @@ describe ProjectsController do
       it 'gives 404 for private project' do
         get :resolve, params: { id: project.id }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

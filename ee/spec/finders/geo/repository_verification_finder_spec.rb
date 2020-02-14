@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Geo::RepositoryVerificationFinder do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   describe '#find_failed_repositories' do
     it 'returns projects where next retry attempt is in the past' do

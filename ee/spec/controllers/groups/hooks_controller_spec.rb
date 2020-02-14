@@ -20,7 +20,7 @@ describe Groups::HooksController do
       it 'is successfull' do
         get :index, params: { group_id: group.to_param }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -43,7 +43,7 @@ describe Groups::HooksController do
 
         post :create, params: { group_id: group.to_param, hook: hook_params }
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
         expect(group.hooks.size).to eq(1)
         expect(group.hooks.first).to have_attributes(hook_params)
       end
@@ -55,7 +55,7 @@ describe Groups::HooksController do
       it 'is successfull' do
         get :edit, params: { group_id: group.to_param, id: hook }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:edit)
         expect(group.hooks.size).to eq(1)
       end
@@ -85,7 +85,7 @@ describe Groups::HooksController do
         it 'is successfull' do
           patch :update, params: { group_id: group.to_param, id: hook, hook: hook_params }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(response).to redirect_to(group_hooks_path(group))
           expect(group.hooks.size).to eq(1)
           expect(group.hooks.first).to have_attributes(hook_params)
@@ -102,7 +102,7 @@ describe Groups::HooksController do
         it 'renders "edit" template' do
           patch :update, params: { group_id: group.to_param, id: hook, hook: hook_params }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:edit)
           expect(group.hooks.size).to eq(1)
           expect(group.hooks.first).not_to have_attributes(hook_params)
@@ -119,7 +119,7 @@ describe Groups::HooksController do
 
           post :test, params: { group_id: group.to_param, id: hook }
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(flash[:alert]).to eq('Hook execution failed. Ensure the group has a project with commits.')
         end
       end
@@ -135,7 +135,7 @@ describe Groups::HooksController do
 
             post :test, params: { group_id: group.to_param, id: hook }
 
-            expect(response).to have_gitlab_http_status(302)
+            expect(response).to have_gitlab_http_status(:found)
             expect(flash[:notice]).to eq('Hook executed successfully: HTTP 200')
           end
         end
@@ -150,7 +150,7 @@ describe Groups::HooksController do
 
             post :test, params: { group_id: group.to_param, id: hook, trigger: trigger }
 
-            expect(response).to have_gitlab_http_status(302)
+            expect(response).to have_gitlab_http_status(:found)
             expect(flash[:notice]).to eq('Hook executed successfully: HTTP 200')
           end
         end
@@ -167,7 +167,7 @@ describe Groups::HooksController do
       it 'renders a 404' do
         get :index, params: { group_id: group.to_param }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

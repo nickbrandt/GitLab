@@ -37,6 +37,10 @@ class SamlProvider < ApplicationRecord
     super && enforced_sso? && Feature.enabled?(:group_managed_accounts, group)
   end
 
+  def prohibited_outer_forks?
+    enforced_group_managed_accounts? && super
+  end
+
   class DefaultOptions
     include Gitlab::Routing
 

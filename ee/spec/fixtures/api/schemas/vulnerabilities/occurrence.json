@@ -57,7 +57,7 @@
     ]},
     "state" : {
       "type": "string",
-      "enum": ["opened", "confirmed", "resolved", "dismissed"]
+      "enum": ["detected", "confirmed", "resolved", "dismissed"]
     },
     "description": { "type": ["string", "null"] },
     "solution": { "type": ["string", "null"] },

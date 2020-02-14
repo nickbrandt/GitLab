@@ -37,9 +37,9 @@ module Gitlab
         when 'notes'
           eager_load(notes, page, eager: { project: [:route, :namespace] })
         when 'blobs'
-          blobs.page(page).per(per_page)
+          blobs(page: page, per_page: per_page)
         when 'wiki_blobs'
-          wiki_blobs.page(page).per(per_page)
+          wiki_blobs(page: page, per_page: per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
         when 'users'
@@ -112,7 +112,7 @@ module Gitlab
         false
       end
 
-      def self.parse_search_result(result)
+      def self.parse_search_result(result, project)
         ref = result["_source"]["blob"]["commit_sha"]
         path = result["_source"]["blob"]["path"]
         extname = File.extname(path)
@@ -156,6 +156,7 @@ module Gitlab
           ref: ref,
           startline: from + 1,
           data: data.join,
+          project: project,
           project_id: project_id
         )
       end
@@ -211,7 +212,10 @@ module Gitlab
 
       def merge_requests
         strong_memoize(:merge_requests) do
-          options = base_options.merge(project_ids: non_guest_project_ids)
+          options = base_options.merge(
+            project_ids: filter_project_ids_by_feature(:merge_requests, limit_project_ids)
+          )
+
           MergeRequest.elastic_search(query, options: options)
         end
       end
@@ -222,35 +226,37 @@ module Gitlab
         end
       end
 
-      def blobs
+      def blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:blobs) do
-          opt = {
-            additional_filter: repository_filter
-          }
+          options = base_options.merge(
+            additional_filter: repository_filter(limit_project_ids)
+          )
 
-          Repository.elastic_search(
+          Repository.__elasticsearch__.elastic_search_as_found_blob(
             query,
-            type: :blob,
-            options: opt.merge({ highlight: true })
-          )[:blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page,
+            options: options
+          )
         end
       end
 
-      def wiki_blobs
+      def wiki_blobs(page: 1, per_page: 20)
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:wiki_blobs) do
-          opt = {
-            additional_filter: wiki_filter
-          }
+          options = base_options.merge(
+            additional_filter: wiki_filter(limit_project_ids)
+          )
 
-          ProjectWiki.elastic_search(
+          ProjectWiki.__elasticsearch__.elastic_search_as_wiki_page(
             query,
-            type: :wiki_blob,
-            options: opt.merge({ highlight: true })
-          )[:wiki_blobs][:results].response
+            page: (page || 1).to_i,
+            per: per_page,
+            options: options
+          )
         end
       end
 
@@ -264,9 +270,9 @@ module Gitlab
         return Kaminari.paginate_array([]) if query.blank?
 
         strong_memoize(:commits) do
-          options = {
-            additional_filter: repository_filter
-          }
+          options = base_options.merge(
+            additional_filter: repository_filter(limit_project_ids)
+          )
 
           Repository.find_commits_by_message_with_elastic(
             query,
@@ -277,27 +283,32 @@ module Gitlab
         end
       end
 
-      def wiki_filter
-        blob_filter(:wiki, visible_for_guests: true)
+      def wiki_filter(project_ids)
+        blob_filter(:wiki, project_ids)
       end
 
-      def repository_filter
-        blob_filter(:repository)
+      def repository_filter(project_ids)
+        blob_filter(:repository, project_ids)
       end
 
-      def blob_filter(feature, visible_for_guests: false)
-        project_ids = visible_for_guests ? limit_project_ids : non_guest_project_ids
+      def filter_project_ids_by_feature(feature, project_ids)
+        return project_ids if project_ids == :any
+
+        Project
+          .id_in(project_ids)
+          .filter_by_feature_visibility(feature, current_user)
+          .pluck_primary_key
+      end
+
+      def blob_filter(feature, project_ids)
         key_name = "#{feature}_access_level"
+
+        project_ids = filter_project_ids_by_feature(feature, project_ids)
 
         conditions =
           if project_ids == :any
             [{ exists: { field: "id" } }]
           else
-            project_ids = Project
-              .id_in(project_ids)
-              .filter_by_feature_visibility(feature, current_user)
-              .pluck_primary_key
-
             [{ terms: { id: project_ids } }]
           end
 

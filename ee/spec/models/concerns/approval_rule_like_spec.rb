@@ -91,7 +91,7 @@ describe ApprovalRuleLike do
     it_behaves_like 'approval rule like'
   end
 
-  context '.group_users' do
+  describe '.group_users' do
     subject { create(:approval_project_rule) }
 
     it 'returns distinct users' do

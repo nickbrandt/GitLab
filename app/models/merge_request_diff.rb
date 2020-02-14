@@ -138,7 +138,7 @@ class MergeRequestDiff < ApplicationRecord
   # All diff information is collected from repository after object is created.
   # It allows you to override variables like head_commit_sha before getting diff.
   after_create :save_git_content, unless: :importing?
-  after_create_commit :set_as_latest_diff
+  after_create_commit :set_as_latest_diff, unless: :importing?
 
   after_save :update_external_diff_store, if: -> { !importing? && saved_change_to_external_diff? }
 
@@ -559,6 +559,10 @@ class MergeRequestDiff < ApplicationRecord
     # present. This reduces file open/close overhead.
     opening_external_diff do
       collection = merge_request_diff_files
+
+      if options[:include_context_commits]
+        collection += merge_request.merge_request_context_commit_diff_files
+      end
 
       if paths = options[:paths]
         collection = collection.where('old_path IN (?) OR new_path IN (?)', paths, paths)

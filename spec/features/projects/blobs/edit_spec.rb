@@ -12,10 +12,8 @@ describe 'Editing file blob', :js do
   let(:readme_file_path) { 'README.md' }
 
   before do
-    stub_feature_flags(web_ide_default: false, single_mr_diff_view: false)
+    stub_feature_flags(web_ide_default: false)
   end
-
-  it_behaves_like 'rendering a single diff version'
 
   context 'as a developer' do
     let(:user) { create(:user) }
@@ -71,6 +69,8 @@ describe 'Editing file blob', :js do
 
     context 'from blob file path' do
       before do
+        stub_feature_flags(code_navigation: false)
+
         visit project_blob_path(project, tree_join(branch, file_path))
       end
 

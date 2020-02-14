@@ -15,7 +15,6 @@ module API
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
 
     PACKAGE_FILENAME = 'package.nupkg'
-    PACKAGE_FILETYPE = 'application/octet-stream'
 
     default_format :json
 
@@ -56,6 +55,30 @@ module API
         header(AUTHENTICATE_REALM_HEADER, AUTHENTICATE_REALM_NAME)
         unauthorized!
       end
+
+      def find_packages
+        packages = package_finder.execute
+
+        not_found!('Packages') unless packages.exists?
+
+        packages
+      end
+
+      def find_package
+        package = package_finder(package_version: params[:package_version]).execute
+                                                                           .first
+
+        not_found!('Package') unless package
+
+        package
+      end
+
+      def package_finder(finder_params = {})
+        ::Packages::Nuget::PackageFinder.new(
+          authorized_user_project,
+          finder_params.merge(package_name: params[:package_name])
+        )
+      end
     end
 
     before do
@@ -84,7 +107,7 @@ module API
         end
 
         # https://docs.microsoft.com/en-us/nuget/api/package-publish-resource
-        desc 'The NuGet Package Content endpoint' do
+        desc 'The NuGet Package Publish endpoint' do
           detail 'This feature was introduced in GitLab 12.6'
         end
         params do
@@ -93,17 +116,20 @@ module API
         put do
           authorize_upload!(authorized_user_project)
 
-          package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user).execute
-
           file_params = params.merge(
-            file: uploaded_package_file,
-            file_name: PACKAGE_FILENAME,
-            file_type: PACKAGE_FILETYPE
+            file: uploaded_package_file(:package),
+            file_name: PACKAGE_FILENAME
           )
+
+          package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user)
+                                                           .execute
+
+          package_file = ::Packages::CreatePackageFileService.new(package, file_params)
+                                                             .execute
 
           track_event('push_package')
 
-          ::Packages::CreatePackageFileService.new(package, file_params).execute
+          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id)
 
           created!
         rescue ObjectStorage::RemoteStoreError => e
@@ -112,7 +138,72 @@ module API
           forbidden!
         end
         put 'authorize' do
-          authorize_workhorse!(authorized_user_project)
+          authorize_workhorse!(subject: authorized_user_project, has_length: false)
+        end
+
+        params do
+          requires :package_name, type: String, desc: 'The NuGet package name', regexp: API::NO_SLASH_URL_PART_REGEX
+        end
+        namespace '/metadata/*package_name' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          # https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource
+          desc 'The NuGet Metadata Service - Package name level' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get 'index', format: :json do
+            present ::Packages::Nuget::PackagesMetadataPresenter.new(find_packages),
+                    with: EE::API::Entities::Nuget::PackagesMetadata
+          end
+
+          desc 'The NuGet Metadata Service - Package name and version level' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          params do
+            requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
+          end
+          get '*package_version', format: :json do
+            present ::Packages::Nuget::PackageMetadataPresenter.new(find_package),
+                    with: EE::API::Entities::Nuget::PackageMetadata
+          end
+        end
+
+        # https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
+        params do
+          requires :package_name, type: String, desc: 'The NuGet package name', regexp: API::NO_SLASH_URL_PART_REGEX
+        end
+        namespace '/download/*package_name' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          desc 'The NuGet Content Service - index request' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get 'index', format: :json do
+            present ::Packages::Nuget::PackagesVersionsPresenter.new(find_packages),
+                    with: EE::API::Entities::Nuget::PackagesVersions
+          end
+
+          desc 'The NuGet Content Service - content request' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          params do
+            requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
+            requires :package_filename, type: String, desc: 'The NuGet package filename', regexp: API::NO_SLASH_URL_PART_REGEX
+          end
+          get '*package_version/*package_filename', format: :nupkg do
+            filename = "#{params[:package_filename]}.#{params[:format]}"
+            package_file = ::Packages::PackageFileFinder.new(find_package, filename, with_file_name_like: true)
+                                                        .execute
+
+            not_found!('Package') unless package_file
+
+            # nuget and dotnet don't support 302 Moved status codes, supports_direct_download has to be set to false
+            present_carrierwave_file!(package_file.file, supports_direct_download: false)
+          end
         end
       end
     end

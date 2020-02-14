@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe CommitStatus do
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
 
-  set(:pipeline) do
+  let_it_be(:pipeline) do
     create(:ci_pipeline, project: project, sha: project.commit.id)
   end
 
@@ -59,6 +59,42 @@ describe CommitStatus do
         commit_status.run!
 
         expect(commit_status.started_at).to be_present
+      end
+    end
+  end
+
+  describe '#processed' do
+    subject { commit_status.processed }
+
+    context 'when ci_atomic_processing is disabled' do
+      before do
+        stub_feature_flags(ci_atomic_processing: false)
+
+        commit_status.save!
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when ci_atomic_processing is enabled' do
+      before do
+        stub_feature_flags(ci_atomic_processing: true)
+      end
+
+      context 'status is latest' do
+        before do
+          commit_status.update!(retried: false, status: :pending)
+        end
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'status is retried' do
+        before do
+          commit_status.update!(retried: true, status: :pending)
+        end
+
+        it { is_expected.to be_truthy }
       end
     end
   end

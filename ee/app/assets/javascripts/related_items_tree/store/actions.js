@@ -75,10 +75,7 @@ export const receiveItemsFailure = ({ commit }, data) => {
   flash(s__('Epics|Something went wrong while fetching child epics.'));
   commit(types.RECEIVE_ITEMS_FAILURE, data);
 };
-export const fetchItems = (
-  { dispatch },
-  { parentItem, isSubItem = false, fetchPolicy = 'cache-first' },
-) => {
+export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
   const { iid, fullPath } = parentItem;
 
   dispatch('requestItems', {
@@ -90,7 +87,6 @@ export const fetchItems = (
     .query({
       query: epicChildren,
       variables: { iid, fullPath },
-      fetchPolicy,
     })
     .then(({ data }) => {
       const children = processQueryResponse(data.group);
@@ -311,8 +307,11 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', { toggleState: false });
 };
-export const receiveAddItemFailure = ({ commit }, { itemAddFailureType } = {}) => {
-  commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType });
+export const receiveAddItemFailure = (
+  { commit },
+  { itemAddFailureType, itemAddFailureMessage = '' } = {},
+) => {
+  commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType, itemAddFailureMessage });
 };
 export const addItem = ({ state, dispatch, getters }) => {
   dispatch('requestAddItem');
@@ -329,20 +328,22 @@ export const addItem = ({ state, dispatch, getters }) => {
     })
     .catch(data => {
       const { response } = data;
-      if (response.status === 404) {
+      if (response.status === httpStatusCodes.NOT_FOUND) {
         dispatch('receiveAddItemFailure', { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND });
       }
       // Ignore 409 conflict when the issue or epic is already attached to epic
       /* eslint-disable @gitlab/i18n/no-non-i18n-strings */
       else if (
-        response.status === 409 &&
+        response.status === httpStatusCodes.CONFLICT &&
         response.data.message === 'Epic hierarchy level too deep'
       ) {
         dispatch('receiveAddItemFailure', {
           itemAddFailureType: itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS,
         });
       } else {
-        dispatch('receiveAddItemFailure');
+        dispatch('receiveAddItemFailure', {
+          itemAddFailureMessage: response.data.message,
+        });
       }
     });
 };
@@ -458,7 +459,6 @@ export const createNewIssue = ({ state, dispatch }, { issuesEndpoint, title }) =
     .then(() =>
       dispatch('fetchItems', {
         parentItem,
-        fetchPolicy: 'network-only',
       }),
     )
     .catch(e => {

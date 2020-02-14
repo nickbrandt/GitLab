@@ -16,7 +16,7 @@ export default () => ({
   canCreateIssuePermission: false,
   canCreateFeedbackPermission: false,
 
-  sastContainer: {
+  containerScanning: {
     paths: {
       head: null,
       base: null,
@@ -28,6 +28,8 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
+    baseReportOutofDate: false,
+    hasBaseReport: false,
   },
   dast: {
     paths: {
@@ -41,6 +43,8 @@ export default () => ({
 
     newIssues: [],
     resolvedIssues: [],
+    baseReportOutofDate: false,
+    hasBaseReport: false,
   },
 
   dependencyScanning: {
@@ -56,6 +60,8 @@ export default () => ({
     newIssues: [],
     resolvedIssues: [],
     allIssues: [],
+    baseReportOutofDate: false,
+    hasBaseReport: false,
   },
 
   modal: {
@@ -88,11 +94,6 @@ export default () => ({
       severity: {
         value: null,
         text: s__('ciReport|Severity'),
-        isLink: false,
-      },
-      confidence: {
-        value: null,
-        text: s__('ciReport|Confidence'),
         isLink: false,
       },
       className: {

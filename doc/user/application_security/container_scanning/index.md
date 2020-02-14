@@ -4,7 +4,7 @@ type: reference, howto
 
 # Container Scanning **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/3672)
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3672)
 in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
 
 ## Overview
@@ -46,17 +46,31 @@ To enable Container Scanning in your pipeline, you need:
 - Docker `18.09.03` or higher installed on the machine where the Runners are
   running. If you're using the shared Runners on GitLab.com, this is already
   the case.
-- To [build and push](../../../ci/docker/using_docker_build.md#container-registry-examples)
-  your Docker image to your project's [Container Registry](../../packages/container_registry/index.md).
-  The name of the Docker image should match the following scheme:
+- To [build and push](../../packages/container_registry/index.md#container-registry-examples-with-gitlab-cicd)
+  your Docker image to your project's Container Registry.
+  The name of the Docker image should use the following
+  [predefined environment variables](../../../ci/variables/predefined_variables.md)
+  as defined below:
 
   ```text
   $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
   ```
 
-  The variables above can be found in the
-  [predefined environment variables](../../../ci/variables/predefined_variables.md)
-  document.
+  These can be used directly in your `.gitlab-ci.yml` file:
+
+  ```yaml
+  build:
+    image: docker:19.03.1
+    stage: build
+    services:
+      - docker:19.03.1-dind
+    variables:
+      IMAGE_TAG: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_REF_SHA
+    script:
+      - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+      - docker build -t $IMAGE_TAG .
+      - docker push $IMAGE_TAG
+  ```
 
 ## Configuration
 
@@ -71,7 +85,7 @@ Add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
-  template: Container-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 ```
 
 The included template will:
@@ -156,7 +170,7 @@ using environment variables.
 | `DOCKER_PASSWORD`              | Password for accessing a Docker registry requiring authentication.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `$CI_REGISTRY_PASSWORD`                  |
 | `CLAIR_OUTPUT`                 | Severity level threshold. Vulnerabilities with severity level higher than or equal to this threshold will be outputted. Supported levels are `Unknown`, `Negligible`, `Low`, `Medium`, `High`, `Critical` and `Defcon1`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `Unknown`                                |
 | `REGISTRY_INSECURE`            | Allow [Klar](https://github.com/optiopay/klar) to access insecure registries (HTTP only). Should only be set to `true` when testing the image locally.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `"false"`                                |
-| `CLAIR_VULNERABILITIES_DB_URL` | This variable is explicitly set in the [services section](https://gitlab.com/gitlab-org/gitlab/blob/30522ca8b901223ac8c32b633d8d67f340b159c1/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L17-19) of the `Container-Scanning.gitlab-ci.yml` file and defaults to `clair-vulnerabilities-db`.  This value represents the address that the [postgres server hosting the vulnerabilities definitions](https://hub.docker.com/r/arminc/clair-db) is running on and **shouldn't be changed** unless you're running the image locally as described in the [Running the scanning tool](https://gitlab.com/gitlab-org/security-products/analyzers/klar/#running-the-scanning-tool) section of the [GitLab klar analyzer readme](https://gitlab.com/gitlab-org/security-products/analyzers/klar). | `clair-vulnerabilities-db`               |
+| `CLAIR_VULNERABILITIES_DB_URL` | This variable is explicitly set in the [services section](https://gitlab.com/gitlab-org/gitlab/blob/30522ca8b901223ac8c32b633d8d67f340b159c1/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L17-19) of the `Container-Scanning.gitlab-ci.yml` file and defaults to `clair-vulnerabilities-db`. This value represents the address that the [postgres server hosting the vulnerabilities definitions](https://hub.docker.com/r/arminc/clair-db) is running on and **shouldn't be changed** unless you're running the image locally as described in the [Running the scanning tool](https://gitlab.com/gitlab-org/security-products/analyzers/klar/#running-the-scanning-tool) section of the [GitLab klar analyzer readme](https://gitlab.com/gitlab-org/security-products/analyzers/klar). | `clair-vulnerabilities-db`               |
 | `CI_APPLICATION_REPOSITORY`    | Docker repository URL for the image to be scanned.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG` |
 | `CI_APPLICATION_TAG`           | Docker respository tag for the image to be scanned.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `$CI_COMMIT_SHA`                         |
 | `CLAIR_DB_IMAGE`               | The Docker image name and tag for the [postgres server hosting the vulnerabilities definitions](https://hub.docker.com/r/arminc/clair-db). It can be useful to override this value with a specific version, for example, to provide a consistent set of vulnerabilities for integration testing purposes, or to refer to a locally hosted vulnerabilities database for an on-premise air-gapped installation.                                                                                                                                                                                                                                                                                                                                                                                                 | `arminc/clair-db:latest`                 |
@@ -197,7 +211,7 @@ Container Scanning can be executed on an offline air-gapped GitLab Ultimate inst
        CLAIR_DB_IMAGE: $CI_REGISTRY/namespace/clair-vulnerabilities-db
    ```
 
-It may be worthwhile to set up a [scheduled pipeline](../../project/pipelines/schedules.md) to automatically build a new version of the vulnerabilities database on a preset schedule.  You can use the following `.gitlab-yml.ci` as a template:
+It may be worthwhile to set up a [scheduled pipeline](../../project/pipelines/schedules.md) to automatically build a new version of the vulnerabilities database on a preset schedule. You can use the following `.gitlab-yml.ci` as a template:
 
 ```yaml
 image: docker:stable
@@ -269,6 +283,15 @@ it highlighted:
     }
   ],
   "remediations": [
+    {
+      "fixes": [
+        {
+          "cve": "debian:9:apt:CVE-2019-3462"
+        }
+      ],
+      "summary": "Upgrade apt from 1.4.8 to 1.4.9",
+      "diff": "YXB0LWdldCB1cGRhdGUgJiYgYXB0LWdldCB1cGdyYWRlIC15IGFwdA=="
+    }
   ]
 }
 ```
@@ -296,7 +319,7 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].location.dependency.package.name` | Name of the package where the vulnerability is located.                                                                                                                                                                                                                                                                                                                                    |
 | `vulnerabilities[].location.dependency.version`      | Version of the vulnerable package. Optional.                                                                                                                                                                                                                                                                                                                                               |
 | `vulnerabilities[].location.operating_system`        | The operating system that contains the vulnerable package.                                                                                                                                                                                                                                                                                                                                 |
-| `vulnerabilities[].location.image`                   | The Docker image that was analyzed. Optional.                                                                                                                                                                                                                                                                                                                                              |
+| `vulnerabilities[].location.image`                   | The Docker image that was analyzed.                                                                                                                                                                                                                                                                                                                                                        |
 | `vulnerabilities[].identifiers`                      | An ordered array of references that identify a vulnerability on internal or external DBs.                                                                                                                                                                                                                                                                                                  |
 | `vulnerabilities[].identifiers[].type`               | Type of the identifier. Possible values: common identifier types (among `cve`, `cwe`, `osvdb`, and `usn`).                                                                                                                                                                                                                                                                                 |
 | `vulnerabilities[].identifiers[].name`               | Name of the identifier for display purpose.                                                                                                                                                                                                                                                                                                                                                |
@@ -305,7 +328,11 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].links`                            | An array of references to external documentation pieces or articles that describe the vulnerability further. Optional.                                                                                                                                                                                                                                                                     |
 | `vulnerabilities[].links[].name`                     | Name of the vulnerability details link. Optional.                                                                                                                                                                                                                                                                                                                                          |
 | `vulnerabilities[].links[].url`                      | URL of the vulnerability details document. Optional.                                                                                                                                                                                                                                                                                                                                       |
-| `remediations`                                       | Not supported yet.                                                                                                                                                                                                                                                                                                                                                                         |
+| `remediations`                                       | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. Empty if no remediations provided by an underlying analyzer.                                                                                                                                                                                                                          |
+| `remediations[].fixes`                               | An array of strings that represent references to vulnerabilities fixed by this particular remediation.                                                                                                                                                                                                                                                                                     |
+| `remediations[].fixes[].cve`                         | A string value that describes a fixed vulnerability occurrence in the same format as `vulnerabilities[].cve`.                                                                                                                                                                                                                                                                              |
+| `remediations[].summary`                             | Overview of how the vulnerabilities have been fixed.                                                                                                                                                                                                                                                                                                                                       |
+| `remediations[].diff`                                | base64-encoded remediation code diff, compatible with [`git apply`](https://git-scm.com/docs/git-format-patch#_discussion).                                                                                                                                                                                                                                                                |
 
 ## Troubleshooting
 

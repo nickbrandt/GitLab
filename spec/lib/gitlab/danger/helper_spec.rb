@@ -313,6 +313,19 @@ describe Gitlab::Danger::Helper do
     end
   end
 
+  describe '#sanitize_mr_title' do
+    where(:mr_title, :expected_mr_title) do
+      'My MR title'      | 'My MR title'
+      'WIP: My MR title' | 'My MR title'
+    end
+
+    with_them do
+      subject { helper.sanitize_mr_title(mr_title) }
+
+      it { is_expected.to eq(expected_mr_title) }
+    end
+  end
+
   describe '#security_mr?' do
     it 'returns false when `gitlab_helper` is unavailable' do
       expect(helper).to receive(:gitlab_helper).and_return(nil)
@@ -322,14 +335,14 @@ describe Gitlab::Danger::Helper do
 
     it 'returns false when on a normal merge request' do
       expect(fake_gitlab).to receive(:mr_json)
-        .and_return('web_url' => 'https://gitlab.com/gitlab-org/gitlab/merge_requests/1')
+        .and_return('web_url' => 'https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1')
 
       expect(helper).not_to be_security_mr
     end
 
     it 'returns true when on a security merge request' do
       expect(fake_gitlab).to receive(:mr_json)
-        .and_return('web_url' => 'https://gitlab.com/gitlab-org/security/gitlab/merge_requests/1')
+        .and_return('web_url' => 'https://gitlab.com/gitlab-org/security/gitlab/-/merge_requests/1')
 
       expect(helper).to be_security_mr
     end

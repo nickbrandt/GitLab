@@ -2,7 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/vulnerabilities/sta
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
-import mockData from './data/mock_data_vulnerabilities.json';
+import mockData from './data/mock_data_vulnerabilities';
 
 describe('vulnerabilities module mutations', () => {
   let state;
@@ -18,6 +18,16 @@ describe('vulnerabilities module mutations', () => {
       mutations[types.SET_PIPELINE_ID](state, pipelineId);
 
       expect(state.pipelineId).toBe(pipelineId);
+    });
+  });
+
+  describe('SET_SOURCE_BRANCH', () => {
+    const sourceBranch = 'feature-branch-1';
+
+    it(`should set the sourceBranch to ${sourceBranch}`, () => {
+      mutations[types.SET_SOURCE_BRANCH](state, sourceBranch);
+
+      expect(state.sourceBranch).toBe(sourceBranch);
     });
   });
 
@@ -43,6 +53,7 @@ describe('vulnerabilities module mutations', () => {
   describe('REQUEST_VULNERABILITIES', () => {
     beforeEach(() => {
       state.errorLoadingVulnerabilities = true;
+      state.loadingVulnerabilitiesErrorCode = 403;
       mutations[types.REQUEST_VULNERABILITIES](state);
     });
 
@@ -52,6 +63,10 @@ describe('vulnerabilities module mutations', () => {
 
     it('should set `errorLoadingVulnerabilities` to `false`', () => {
       expect(state.errorLoadingVulnerabilities).toBeFalsy();
+    });
+
+    it('should reset `loadingVulnerabilitiesErrorCode`', () => {
+      expect(state.loadingVulnerabilitiesErrorCode).toBe(null);
     });
   });
 
@@ -80,10 +95,18 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('RECEIVE_VULNERABILITIES_ERROR', () => {
-    it('should set `isLoadingVulnerabilities` to `false`', () => {
-      mutations[types.RECEIVE_VULNERABILITIES_ERROR](state);
+    const errorCode = 403;
 
+    beforeEach(() => {
+      mutations[types.RECEIVE_VULNERABILITIES_ERROR](state, errorCode);
+    });
+
+    it('should set `isLoadingVulnerabilities` to `false`', () => {
       expect(state.isLoadingVulnerabilities).toBeFalsy();
+    });
+
+    it('should set `loadingVulnerabilitiesErrorCode`', () => {
+      expect(state.loadingVulnerabilitiesErrorCode).toBe(errorCode);
     });
   });
 
@@ -254,10 +277,6 @@ describe('vulnerabilities module mutations', () => {
 
       it('should set the modal severity', () => {
         expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
-      });
-
-      it('should set the modal confidence', () => {
-        expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
       });
 
       it('should set the modal class', () => {

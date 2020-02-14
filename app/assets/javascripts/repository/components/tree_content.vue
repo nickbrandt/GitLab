@@ -5,6 +5,7 @@ import FileTable from './table/index.vue';
 import getRefMixin from '../mixins/get_ref';
 import getFiles from '../queries/getFiles.query.graphql';
 import getProjectPath from '../queries/getProjectPath.query.graphql';
+import getVueFileListLfsBadge from '../queries/getVueFileListLfsBadge.query.graphql';
 import FilePreview from './preview/index.vue';
 import { readmeFile } from '../utils/readme';
 
@@ -20,12 +21,20 @@ export default {
     projectPath: {
       query: getProjectPath,
     },
+    vueFileListLfsBadge: {
+      query: getVueFileListLfsBadge,
+    },
   },
   props: {
     path: {
       type: String,
       required: false,
       default: '/',
+    },
+    loadingPath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {
@@ -38,6 +47,7 @@ export default {
         blobs: [],
       },
       isLoadingFiles: false,
+      vueFileListLfsBadge: false,
     };
   },
   computed: {
@@ -72,10 +82,12 @@ export default {
             path: this.path || '/',
             nextPageCursor: this.nextPageCursor,
             pageSize: PAGE_SIZE,
+            vueLfsEnabled: this.vueFileListLfsBadge,
           },
         })
         .then(({ data }) => {
-          if (!data) return;
+          if (data.errors) throw data.errors;
+          if (!data?.project?.repository) return;
 
           const pageInfo = this.hasNextPage(data.project.repository.tree);
 
@@ -88,12 +100,15 @@ export default {
             {},
           );
 
-          if (pageInfo && pageInfo.hasNextPage) {
+          if (pageInfo?.hasNextPage) {
             this.nextPageCursor = pageInfo.endCursor;
             this.fetchFiles();
           }
         })
-        .catch(() => createFlash(__('An error occurred while fetching folder content.')));
+        .catch(error => {
+          createFlash(__('An error occurred while fetching folder content.'));
+          throw error;
+        });
     },
     normalizeData(key, data) {
       return this.entries[key].concat(data.map(({ node }) => node));
@@ -109,7 +124,12 @@ export default {
 
 <template>
   <div>
-    <file-table :path="path" :entries="entries" :is-loading="isLoadingFiles" />
+    <file-table
+      :path="path"
+      :entries="entries"
+      :is-loading="isLoadingFiles"
+      :loading-path="loadingPath"
+    />
     <file-preview v-if="readme" :blob="readme" />
   </div>
 </template>

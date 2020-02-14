@@ -15,17 +15,17 @@ module EE
           end
         end
 
-        def add_parent_to_finder_params(finder_params, noteable_type, parent_id)
+        def add_parent_to_finder_params(finder_params, noteable_type)
           if noteable_type.name.underscore == 'epic'
-            finder_params[:group_id] = parent_id
+            finder_params[:group_id] = user_group.id
           else
             super
           end
         end
 
         # Used only for anonymous Visual Review Tools feedback
-        def find_merge_request_without_permissions_check(parent_id, noteable_id)
-          params = finder_params_by_noteable_type_and_id(::MergeRequest, noteable_id, parent_id)
+        def find_merge_request_without_permissions_check(noteable_id)
+          params = finder_params_by_noteable_type_and_id(::MergeRequest, noteable_id)
 
           ::NotesFinder.new(current_user, params).target || not_found!(noteable_type)
         end

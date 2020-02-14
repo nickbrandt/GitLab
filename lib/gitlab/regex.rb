@@ -5,7 +5,10 @@ module Gitlab
     extend self
 
     def project_name_regex
-      @project_name_regex ||= /\A[\p{Alnum}\u{00A9}-\u{1f9c0}_][\p{Alnum}\p{Pd}\u{00A9}-\u{1f9c0}_\. ]*\z/.freeze
+      # The character range \p{Alnum} overlaps with \u{00A9}-\u{1f9ff}
+      # hence the Ruby warning.
+      # https://gitlab.com/gitlab-org/gitlab/merge_requests/23165#not-easy-fixable
+      @project_name_regex ||= /\A[\p{Alnum}\u{00A9}-\u{1f9ff}_][\p{Alnum}\p{Pd}\u{00A9}-\u{1f9ff}_\. ]*\z/.freeze
     end
 
     def project_name_regex_message

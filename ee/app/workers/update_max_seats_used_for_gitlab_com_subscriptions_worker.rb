@@ -2,7 +2,7 @@
 
 class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
   include ApplicationWorker
-  include CronjobQueue
+  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
   feature_category :license_compliance
   worker_resource_boundary :cpu

@@ -83,8 +83,11 @@ export const showBranchNotFoundError = ({ dispatch }, branchId) => {
   });
 };
 
-export const showEmptyState = ({ commit, state }, { projectId, branchId }) => {
+export const showEmptyState = ({ commit, state, dispatch }, { projectId, branchId }) => {
   const treePath = `${projectId}/${branchId}`;
+
+  dispatch('setCurrentBranchId', branchId);
+
   commit(types.CREATE_TREE, { treePath });
   commit(types.TOGGLE_LOADING, {
     entry: state.trees[treePath],
@@ -130,9 +133,9 @@ export const loadBranch = ({ dispatch, getters }, { projectId, branchId }) =>
         ref: branch.commit.id,
       });
     })
-    .catch(() => {
+    .catch(err => {
       dispatch('showBranchNotFoundError', branchId);
-      return Promise.reject();
+      throw err;
     });
 
 export const openBranch = ({ dispatch, state, getters }, { projectId, branchId, basePath }) => {
@@ -149,7 +152,7 @@ export const openBranch = ({ dispatch, state, getters }, { projectId, branchId, 
         () =>
           new Error(
             sprintf(
-              __('An error occurred whilst getting files for - %{branchId}'),
+              __('An error occurred while getting files for - %{branchId}'),
               {
                 branchId: `<strong>${_.escape(projectId)}/${_.escape(branchId)}</strong>`,
               },

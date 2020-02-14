@@ -74,39 +74,6 @@ module QA
           expect(merge_request).to have_dast_vulnerability_count
         end
       end
-
-      it 'can dismiss a vulnerability with a reason' do
-        dismiss_reason = "Vulnerability not applicable"
-
-        Page::MergeRequest::Show.perform do |merge_request|
-          expect(merge_request).to have_vulnerability_report
-          merge_request.dismiss_vulnerability_with_reason(vuln_name, dismiss_reason)
-          merge_request.click_vulnerability(vuln_name)
-
-          expect(merge_request).to have_opened_dismissed_vulnerability(dismiss_reason)
-        end
-      end
-
-      it 'can create an issue from a vulnerability' do
-        Page::MergeRequest::Show.perform do |merge_request|
-          expect(merge_request).to have_vulnerability_report
-          merge_request.create_vulnerability_issue(vuln_name)
-        end
-
-        Page::Project::Issue::Show.perform do |issue|
-          expect(issue).to have_title("Investigate vulnerability: #{vuln_name}")
-        end
-      end
-
-      it 'can create an auto-remediation MR' do
-        Page::MergeRequest::Show.perform do |merge_request|
-          expect(merge_request).to have_vulnerability_report
-          merge_request.resolve_vulnerability_with_mr remediable_vuln_name
-
-          # Context changes as resolve method creates new MR
-          expect(merge_request).to have_title remediable_vuln_name
-        end
-      end
     end
   end
 end

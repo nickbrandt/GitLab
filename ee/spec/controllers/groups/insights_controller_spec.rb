@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Groups::InsightsController do
-  set(:parent_group) { create(:group, :private) }
-  set(:nested_group) { create(:group, :private, parent: parent_group) }
-  set(:project) { create(:project, :private) }
-  set(:insight) { create(:insight, group: parent_group, project: project) }
-  set(:user) { create(:user) }
+  let_it_be(:parent_group) { create(:group, :private) }
+  let_it_be(:nested_group) { create(:group, :private, parent: parent_group) }
+  let_it_be(:project) { create(:project, :private) }
+  let_it_be(:insight) { create(:insight, group: parent_group, project: project) }
+  let_it_be(:user) { create(:user) }
   let(:query_params) { { type: 'bar', query: { issuable_type: 'issue', collection_labels: ['bug'] }, projects: projects_params } }
   let(:projects_params) { { only: [project.id, project.full_path] } }
   let(:params) { { trailing_slash: true } }
@@ -23,7 +23,7 @@ describe Groups::InsightsController do
     it 'returns 404 status' do
       subject
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -31,7 +31,7 @@ describe Groups::InsightsController do
     it 'returns 200 status' do
       subject
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -79,7 +79,7 @@ describe Groups::InsightsController do
         it 'does return the default config' do
           subject
 
-          expect(response.parsed_body).to eq(parent_group.default_insights_config.to_json)
+          expect(response.parsed_body).to eq(parent_group.default_insights_config.as_json)
         end
       end
 

@@ -36,6 +36,8 @@ module QA
       end
 
       it 'proxies wiki commit to primary node and ultmately replicates to secondary node' do
+        QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
         QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
@@ -47,7 +49,7 @@ module QA
 
           Page::Profile::SSHKeys.perform do |ssh|
             expect(ssh.keys_list).to have_content(key_title)
-            expect(ssh.keys_list).to have_content(key.fingerprint)
+            expect(ssh.keys_list).to have_content(key.md5_fingerprint)
           end
 
           Page::Main::Menu.perform(&:go_to_projects)

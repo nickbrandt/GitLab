@@ -3,6 +3,8 @@
 module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
+      include MetricsDashboard
+
       respond_to :json
 
       protect_from_forgery except: [:notify]
@@ -133,6 +135,13 @@ module Projects
 
       def prometheus_alerts
         project.prometheus_alerts.for_environment(params[:environment_id])
+      end
+
+      def metrics_dashboard_params
+        {
+          embedded: true,
+          prometheus_alert_id: params[:id].to_i
+        }
       end
     end
   end

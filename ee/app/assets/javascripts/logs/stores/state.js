@@ -1,13 +1,18 @@
-export default () => ({
-  /**
-   * Current project path
-   */
-  projectPath: '',
+import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
 
+export default () => ({
   /**
    * Full text search
    */
   search: '',
+
+  /**
+   * Time range (Show last)
+   */
+  timeRange: {
+    options: timeRanges,
+    current: defaultTimeRange,
+  },
 
   /**
    * Environments list information

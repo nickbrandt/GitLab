@@ -48,6 +48,14 @@ module EE
                 presence: true,
                 numericality: { only_integer: true, greater_than: 0 }
 
+      validates :elasticsearch_max_bulk_size_mb,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
+      validates :elasticsearch_max_bulk_concurrency,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
       validates :elasticsearch_url,
                 presence: { message: "can't be blank when indexing is enabled" },
                 if: ->(setting) { setting.elasticsearch_indexing? }
@@ -55,6 +63,10 @@ module EE
       validates :elasticsearch_aws_region,
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
                 if: ->(setting) { setting.elasticsearch_indexing? && setting.elasticsearch_aws? }
+
+      validates :elasticsearch_indexed_field_length_limit,
+                presence: true,
+                numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
       validates :email_additional_text,
                 allow_blank: true,
@@ -85,6 +97,9 @@ module EE
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
+          elasticsearch_indexed_field_length_limit: 0,
+          elasticsearch_max_bulk_size_bytes: 10.megabytes,
+          elasticsearch_max_bulk_concurrency: 10,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
           lock_memberships_to_ldap: false,
@@ -204,7 +219,9 @@ module EE
         aws:                   elasticsearch_aws,
         aws_access_key:        elasticsearch_aws_access_key,
         aws_secret_access_key: elasticsearch_aws_secret_access_key,
-        aws_region:            elasticsearch_aws_region
+        aws_region:            elasticsearch_aws_region,
+        max_bulk_size_bytes:   elasticsearch_max_bulk_size_mb.megabytes,
+        max_bulk_concurrency:  elasticsearch_max_bulk_concurrency
       }
     end
 

@@ -9,8 +9,6 @@ import {
   mockIssue1,
 } from '../../../javascripts/related_items_tree/mock_data';
 
-jest.mock('~/lib/graphql', () => jest.fn());
-
 describe('RelatedItemsTree', () => {
   describe('epicUtils', () => {
     describe('sortChildren', () => {

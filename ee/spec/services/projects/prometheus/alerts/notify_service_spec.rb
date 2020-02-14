@@ -32,7 +32,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
   shared_examples 'processes incident issues' do |amount|
     let(:create_incident_service) { spy }
 
-    it 'processes issues', :sidekiq do
+    it 'processes issues' do
       expect(IncidentManagement::ProcessPrometheusAlertWorker)
         .to receive(:perform_async)
         .with(project.id, kind_of(Hash))

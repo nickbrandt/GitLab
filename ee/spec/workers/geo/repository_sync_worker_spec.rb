@@ -11,6 +11,7 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
   let!(:project_in_synced_group) { create(:project, group: synced_group) }
   let!(:unsynced_project) { create(:project) }
   let(:healthy_shard_name) { project_in_synced_group.repository.storage }
+  let(:design_worker) { Geo::DesignRepositoryShardSyncWorker }
 
   before do
     stub_current_geo_node(secondary)
@@ -32,6 +33,7 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
         end
 
         expect(worker).not_to receive(:perform_async).with('broken')
+        expect(design_worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end
@@ -44,7 +46,9 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
           .and_return([result(true, healthy_shard_name), result(true, 'broken')])
 
         expect(worker).to receive(:perform_async).with('default')
+        expect(design_worker).to receive(:perform_async).with('default')
         expect(worker).not_to receive(:perform_async).with('broken')
+        expect(design_worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end
@@ -61,7 +65,9 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
         stub_storage_settings({})
 
         expect(worker).to receive(:perform_async).with(project_in_synced_group.repository.storage)
+        expect(design_worker).to receive(:perform_async).with(project_in_synced_group.repository.storage)
         expect(worker).not_to receive(:perform_async).with('unknown')
+        expect(design_worker).not_to receive(:perform_async).with('unknown')
 
         subject.perform
       end
@@ -77,7 +83,9 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
           .and_return([result(true, healthy_shard_name), result(false, 'broken')])
 
         expect(worker).to receive(:perform_async).with(healthy_shard_name)
+        expect(design_worker).to receive(:perform_async).with(healthy_shard_name)
         expect(worker).not_to receive(:perform_async).with('broken')
+        expect(design_worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end

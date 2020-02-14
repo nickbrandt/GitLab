@@ -1,14 +1,14 @@
 import * as types from './mutation_types';
 
 export default {
-  /** Project data */
-  [types.SET_PROJECT_PATH](state, projectPath) {
-    state.projectPath = projectPath;
-  },
-
   /** Search data */
   [types.SET_SEARCH](state, searchQuery) {
     state.search = searchQuery;
+  },
+
+  /** Time Range data */
+  [types.SET_TIME_RANGE](state, timeRange) {
+    state.timeRange.current = timeRange;
   },
 
   /** Environments data */

@@ -4,7 +4,7 @@ require 'spec_helper'
 describe Packages::CreateDependencyService do
   describe '#execute' do
     let_it_be(:namespace) {create(:namespace)}
-    let_it_be(:version) { '1.0.1'.freeze }
+    let_it_be(:version) { '1.0.1' }
     let_it_be(:package_name) { "@#{namespace.path}/my-app".freeze }
 
     context 'when packages are published' do
@@ -15,7 +15,7 @@ describe Packages::CreateDependencyService do
                 .gsub('1.0.1', version))
                 .with_indifferent_access
       end
-      let(:package_version) { params[:versions].keys.first }
+      let(:package_version) { params[:versions].each_key.first }
       let(:dependencies) { params[:versions][package_version] }
       let(:package) { create(:npm_package) }
       let(:dependency_names) { package.dependency_links.flat_map(&:dependency).map(&:name).sort }
@@ -42,14 +42,14 @@ describe Packages::CreateDependencyService do
         it 'creates dependencies and links' do
           expect(Packages::Dependency)
             .to receive(:ids_for_package_names_and_version_patterns)
-            .exactly(5).times
+            .exactly(4).times
             .and_call_original
 
           expect { subject }
             .to change { Packages::Dependency.count }.by(4)
-            .and change { Packages::DependencyLink.count }.by(7)
-          expect(dependency_names).to match_array(%w(d3 d3 d3 dagre-d3 dagre-d3 express express))
-          expect(dependency_link_types).to match_array(%w(bundleDependencies dependencies dependencies deprecated devDependencies devDependencies peerDependencies))
+            .and change { Packages::DependencyLink.count }.by(6)
+          expect(dependency_names).to match_array(%w(d3 d3 d3 dagre-d3 dagre-d3 express))
+          expect(dependency_link_types).to match_array(%w(bundleDependencies dependencies dependencies devDependencies devDependencies peerDependencies))
         end
       end
 
@@ -87,6 +87,25 @@ describe Packages::CreateDependencyService do
           expect { subject }
             .to not_change { Packages::Dependency.count }
             .and change { Packages::DependencyLink.count }.by(1)
+        end
+      end
+
+      context 'with a dependency not described with a hash' do
+        let(:invalid_dependencies) { dependencies.tap { |d| d['bundleDependencies'] = false } }
+
+        subject { described_class.new(package, invalid_dependencies).execute }
+
+        it 'creates dependencies and links' do
+          expect(Packages::Dependency)
+              .to receive(:ids_for_package_names_and_version_patterns)
+              .once
+              .and_call_original
+
+          expect { subject }
+            .to change { Packages::Dependency.count }.by(1)
+            .and change { Packages::DependencyLink.count }.by(1)
+          expect(dependency_names).to match_array(%w(express))
+          expect(dependency_link_types).to match_array(%w(dependencies))
         end
       end
     end

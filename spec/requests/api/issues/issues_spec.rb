@@ -778,6 +778,32 @@ describe API::Issues do
           expect(json_response["error"]).to include("mutually exclusive")
         end
       end
+
+      context 'filtering by non_archived' do
+        let_it_be(:group1) { create(:group) }
+        let_it_be(:archived_project) { create(:project, :archived, namespace: group1) }
+        let_it_be(:active_project) { create(:project, namespace: group1) }
+        let_it_be(:issue1) { create(:issue, project: active_project) }
+        let_it_be(:issue2) { create(:issue, project: active_project) }
+        let_it_be(:issue3) { create(:issue, project: archived_project) }
+
+        before do
+          archived_project.add_developer(user)
+          active_project.add_developer(user)
+        end
+
+        it 'returns issues from non archived projects only by default' do
+          get api("/groups/#{group1.id}/issues", user), params: { scope: 'all' }
+
+          expect_paginated_array_response([issue2.id, issue1.id])
+        end
+
+        it 'returns issues from archived and non archived projects when non_archived is false' do
+          get api("/groups/#{group1.id}/issues", user), params: { non_archived: false, scope: 'all' }
+
+          expect_paginated_array_response([issue3.id, issue2.id, issue1.id])
+        end
+      end
     end
 
     context "when returns issue merge_requests_count for different access levels" do

@@ -25,14 +25,11 @@ describe 'User comments on a diff', :js do
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(single_mr_diff_view: false)
     project.add_maintainer(user)
     sign_in(user)
 
     visit(diffs_project_merge_request_path(project, merge_request))
   end
-
-  it_behaves_like 'rendering a single diff version'
 
   context 'single suggestion note' do
     it 'hides suggestion popover' do
@@ -115,7 +112,7 @@ describe 'User comments on a diff', :js do
       changes = sample_compare(expanded_changes).changes.last(expanded_changes.size)
 
       page.within("[id='#{hash}']") do
-        find("button[data-original-title='Show full file']").click
+        find("button[title='Show full file']").click
         wait_for_requests
 
         click_diff_line(find("[id='#{changes.first[:line_code]}']"))

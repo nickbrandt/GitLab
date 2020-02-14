@@ -13,6 +13,7 @@ import {
   GlDropdownDivider,
   GlTooltipDirective,
   GlPagination,
+  GlButtonGroup,
 } from '@gitlab/ui';
 import AccessorUtils from '~/lib/utils/accessor';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -20,32 +21,45 @@ import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import { __ } from '~/locale';
 import _ from 'underscore';
 
+export const tableDataClass = 'table-col d-flex d-sm-table-cell align-items-center';
+
 export default {
   FIRST_PAGE: 1,
   PREV_PAGE: 1,
   NEXT_PAGE: 2,
+  statusButtons: [
+    { status: 'ignored', icon: 'eye-slash', title: __('Ignore') },
+    { status: 'resolved', icon: 'check-circle', title: __('Resolve') },
+  ],
   fields: [
     {
       key: 'error',
       label: __('Error'),
-      thClass: 'w-70p',
-      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+      thClass: 'w-60p',
+      tdClass: `${tableDataClass} px-3`,
     },
     {
       key: 'events',
       label: __('Events'),
-      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+      thClass: 'text-right',
+      tdClass: `${tableDataClass}`,
     },
     {
       key: 'users',
       label: __('Users'),
-      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+      thClass: 'text-right',
+      tdClass: `${tableDataClass}`,
     },
     {
       key: 'lastSeen',
       label: __('Last seen'),
       thClass: 'w-15p',
-      tdClass: 'table-col d-flex align-items-center d-sm-table-cell',
+      tdClass: `${tableDataClass}`,
+    },
+    {
+      key: 'status',
+      label: '',
+      tdClass: `${tableDataClass} text-right`,
     },
     {
       key: 'details',
@@ -72,6 +86,7 @@ export default {
     Icon,
     GlPagination,
     TimeAgo,
+    GlButtonGroup,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -95,6 +110,14 @@ export default {
     },
     userCanEnableErrorTracking: {
       type: Boolean,
+      required: true,
+    },
+    projectPath: {
+      type: String,
+      required: true,
+    },
+    listPath: {
+      type: String,
       required: true,
     },
   },
@@ -144,6 +167,8 @@ export default {
       'loadRecentSearches',
       'setIndexPath',
       'fetchPaginatedResults',
+      'updateStatus',
+      'removeIgnoredResolvedErrors',
     ]),
     setSearchText(text) {
       this.errorSearchQuery = text;
@@ -166,6 +191,16 @@ export default {
     isCurrentSortField(field) {
       return field === this.sortField;
     },
+    getIssueUpdatePath(errorId) {
+      return `/${this.projectPath}/-/error_tracking/${errorId}.json`;
+    },
+    updateIssueStatus(errorId, status) {
+      this.updateStatus({
+        endpoint: this.getIssueUpdatePath(errorId),
+        status,
+      });
+      this.removeIgnoredResolvedErrors(errorId);
+    },
   },
 };
 </script>
@@ -173,9 +208,7 @@ export default {
 <template>
   <div class="error-list">
     <div v-if="errorTrackingEnabled">
-      <div
-        class="row flex-column flex-sm-row align-items-sm-center row-top m-0 mt-sm-2 mx-sm-1 p-0 p-sm-3"
-      >
+      <div class="row flex-column flex-sm-row align-items-sm-center row-top m-0 mt-sm-2 p-0 p-sm-3">
         <div class="search-box flex-fill mr-sm-2 my-3 m-sm-0 p-3 p-sm-0">
           <div class="filtered-search-box mb-0">
             <gl-dropdown
@@ -203,7 +236,6 @@ export default {
             </gl-dropdown>
             <div class="filtered-search-input-container flex-fill">
               <gl-form-input
-                v-model="errorSearchQuery"
                 class="pl-2 filtered-search"
                 :disabled="loading"
                 :placeholder="__('Search or filter results…')"
@@ -266,17 +298,17 @@ export default {
           stacked="sm"
           tbody-tr-class="table-row mb-4"
         >
-          <template v-slot:head(error)>
+          <template #head(error)>
             <div class="d-none d-sm-block">{{ __('Open errors') }}</div>
           </template>
-          <template v-slot:head(events)="data">
+          <template #head(events)="data">
             <div class="text-sm-right">{{ data.label }}</div>
           </template>
-          <template v-slot:head(users)="data">
+          <template #head(users)="data">
             <div class="text-sm-right">{{ data.label }}</div>
           </template>
 
-          <template v-slot:error="errors">
+          <template #cell(error)="errors">
             <div class="d-flex flex-column">
               <gl-link class="d-flex mw-100 text-dark" :href="getDetailsLink(errors.item.id)">
                 <strong class="text-truncate">{{ errors.item.title.trim() }}</strong>
@@ -286,20 +318,34 @@ export default {
               </span>
             </div>
           </template>
-          <template v-slot:events="errors">
+          <template #cell(events)="errors">
             <div class="text-right">{{ errors.item.count }}</div>
           </template>
 
-          <template v-slot:users="errors">
+          <template #cell(users)="errors">
             <div class="text-right">{{ errors.item.userCount }}</div>
           </template>
 
-          <template v-slot:lastSeen="errors">
+          <template #cell(lastSeen)="errors">
             <div class="text-md-left text-right">
               <time-ago :time="errors.item.lastSeen" class="text-secondary" />
             </div>
           </template>
-          <template v-slot:details="errors">
+          <template #cell(status)="errors">
+            <gl-button-group>
+              <gl-button
+                v-for="button in $options.statusButtons"
+                :key="button.status"
+                :ref="button.title.toLowerCase() + 'Error'"
+                v-gl-tooltip.hover
+                :title="button.title"
+                @click="updateIssueStatus(errors.item.id, button.status)"
+              >
+                <gl-icon :name="button.icon" :size="12" />
+              </gl-button>
+            </gl-button-group>
+          </template>
+          <template #cell(details)="errors">
             <gl-button
               :href="getDetailsLink(errors.item.id)"
               variant="outline-info"
@@ -308,7 +354,7 @@ export default {
               {{ __('More details') }}
             </gl-button>
           </template>
-          <template v-slot:empty>
+          <template #empty>
             {{ __('No errors to display.') }}
             <gl-link class="js-try-again" @click="restartPolling">
               {{ __('Check again') }}

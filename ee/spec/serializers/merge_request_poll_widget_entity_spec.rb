@@ -5,12 +5,13 @@ require 'spec_helper'
 describe MergeRequestPollWidgetEntity do
   include ProjectForksHelper
 
-  set(:user) { create(:user) }
-  set(:project) { create :project, :repository }
-  set(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create :project, :repository }
+  let_it_be(:merge_request, reload: true) { create(:merge_request, source_project: project, target_project: project) }
   let(:request) { double('request', current_user: user) }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_developer(user)
   end
 
@@ -33,7 +34,7 @@ describe MergeRequestPollWidgetEntity do
 
     context 'when the merge train feature is disabled' do
       before do
-        stub_feature_flags(merge_trains_enabled: false)
+        stub_feature_flags(disable_merge_trains: true)
       end
 
       it 'does not have merge trains count' do

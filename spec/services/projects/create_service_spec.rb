@@ -43,6 +43,12 @@ describe Projects::CreateService, '#execute' do
 
       create_project(user, opts)
     end
+
+    it 'creates associated project settings' do
+      project = create_project(user, opts)
+
+      expect(project.project_setting).to be_persisted
+    end
   end
 
   context "admin creates project with other user's namespace_id" do
@@ -247,7 +253,9 @@ describe Projects::CreateService, '#execute' do
 
   context 'repository creation' do
     it 'synchronously creates the repository' do
-      expect_any_instance_of(Project).to receive(:create_repository)
+      expect_next_instance_of(Project) do |instance|
+        expect(instance).to receive(:create_repository)
+      end
 
       project = create_project(user, opts)
       expect(project).to be_valid

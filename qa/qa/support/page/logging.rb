@@ -16,13 +16,6 @@ module QA
           super
         end
 
-        def wait(max: 60, interval: 0.1, reload: true)
-          log("next wait uses reload: #{reload}")
-          # Logging of wait start/end/duration is handled by QA::Support::Waiter
-
-          super
-        end
-
         def scroll_to(selector, text: nil)
           msg = "scrolling to :#{selector}"
           msg += " with text: #{text}" if text
@@ -119,10 +112,10 @@ module QA
           found
         end
 
-        def has_no_text?(text)
+        def has_no_text?(text, **kwargs)
           found = super
 
-          log(%Q{has_no_text?('#{text}') returned #{found}})
+          log(%Q{has_no_text?('#{text}', wait: #{kwargs[:wait] || Capybara.default_max_wait_time}) returned #{found}})
 
           found
         end

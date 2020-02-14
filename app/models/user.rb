@@ -20,6 +20,7 @@ class User < ApplicationRecord
   include WithUploads
   include OptionallySearch
   include FromUnion
+  include BatchDestroyDependentAssociations
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -57,6 +58,8 @@ class User < ApplicationRecord
                     "administrator if you think this is an error."
 
   MINIMUM_INACTIVE_DAYS = 180
+
+  enum bot_type: ::UserBotTypeEnums.bots
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -100,6 +103,7 @@ class User < ApplicationRecord
 
   # Groups
   has_many :members
+  has_one  :max_access_level_membership, -> { select(:id, :user_id, :access_level).order(access_level: :desc).readonly }, class_name: 'Member'
   has_many :group_members, -> { where(requested_at: nil) }, source: 'GroupMember'
   has_many :groups, through: :group_members
   has_many :owned_groups, -> { where(members: { access_level: Gitlab::Access::OWNER }) }, through: :group_members, source: :group
@@ -163,9 +167,9 @@ class User < ApplicationRecord
   # Validations
   #
   # Note: devise :validatable above adds validations for :email and :password
-  validates :name, presence: true, length: { maximum: 128 }
-  validates :first_name, length: { maximum: 255 }
-  validates :last_name, length: { maximum: 255 }
+  validates :name, presence: true, length: { maximum: 255 }
+  validates :first_name, length: { maximum: 127 }
+  validates :last_name, length: { maximum: 127 }
   validates :email, confirmation: true
   validates :notification_email, presence: true
   validates :notification_email, devise_email: true, if: ->(user) { user.notification_email != user.email }
@@ -185,6 +189,12 @@ class User < ApplicationRecord
   validate :owns_public_email, if: :public_email_changed?
   validate :owns_commit_email, if: :commit_email_changed?
   validate :signup_domain_valid?, on: :create, if: ->(user) { !user.created_by_id }
+
+  validates :theme_id, allow_nil: true, inclusion: { in: Gitlab::Themes.valid_ids,
+    message: _("%{placeholder} is not a valid theme") % { placeholder: '%{value}' } }
+
+  validates :color_scheme_id, allow_nil: true, inclusion: { in: Gitlab::ColorSchemes.valid_ids,
+    message: _("%{placeholder} is not a valid color scheme") % { placeholder: '%{value}' } }
 
   before_validation :sanitize_attrs
   before_validation :set_notification_email, if: :new_record?
@@ -222,19 +232,19 @@ class User < ApplicationRecord
   after_initialize :set_projects_limit
 
   # User's Layout preference
-  enum layout: [:fixed, :fluid]
+  enum layout: { fixed: 0, fluid: 1 }
 
   # User's Dashboard preference
   # Note: When adding an option, it MUST go on the end of the array.
-  enum dashboard: [:projects, :stars, :project_activity, :starred_project_activity, :groups, :todos, :issues, :merge_requests, :operations]
+  enum dashboard: { projects: 0, stars: 1, project_activity: 2, starred_project_activity: 3, groups: 4, todos: 5, issues: 6, merge_requests: 7, operations: 8 }
 
   # User's Project preference
   # Note: When adding an option, it MUST go on the end of the array.
-  enum project_view: [:readme, :activity, :files]
+  enum project_view: { readme: 0, activity: 1, files: 2 }
 
   # User's role
   # Note: When adding an option, it MUST go on the end of the array.
-  enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other], _suffix: true
+  enum role: { software_developer: 0, development_team_lead: 1, devops_engineer: 2, systems_administrator: 3, security_analyst: 4, data_analyst: 5, product_manager: 6, product_designer: 7, other: 8 }, _suffix: true
 
   delegate :path, to: :namespace, allow_nil: true, prefix: true
   delegate :notes_filter_for, to: :user_preference
@@ -244,6 +254,7 @@ class User < ApplicationRecord
   delegate :time_display_relative, :time_display_relative=, to: :user_preference
   delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
   delegate :show_whitespace_in_diffs, :show_whitespace_in_diffs=, to: :user_preference
+  delegate :tab_width, :tab_width=, to: :user_preference
   delegate :sourcegraph_enabled, :sourcegraph_enabled=, to: :user_preference
   delegate :setup_for_company, :setup_for_company=, to: :user_preference
   delegate :render_whitespace_in_code, :render_whitespace_in_code=, to: :user_preference
@@ -286,6 +297,10 @@ class User < ApplicationRecord
       end
     end
 
+    before_transition do
+      !Gitlab::Database.read_only?
+    end
+
     # rubocop: disable CodeReuse/ServiceClass
     # Ideally we should not call a service object here but user.block
     # is also bcalled by Users::MigrateToGhostUserService which references
@@ -302,6 +317,8 @@ class User < ApplicationRecord
   scope :blocked, -> { with_states(:blocked, :ldap_blocked) }
   scope :external, -> { where(external: true) }
   scope :active, -> { with_state(:active).non_internal }
+  scope :active_without_ghosts, -> { with_state(:active).without_ghosts }
+  scope :without_ghosts, -> { where('ghost IS NOT TRUE') }
   scope :deactivated, -> { with_state(:deactivated).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
@@ -314,6 +331,8 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
+  scope :bots, -> { where.not(bot_type: nil) }
+  scope :humans, -> { where(bot_type: nil) }
 
   scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
     where('EXISTS (?)',
@@ -385,6 +404,11 @@ class User < ApplicationRecord
     # Devise method overridden to allow support for dynamic password lengths
     def password_length
       Gitlab::CurrentSettings.minimum_password_length..Devise.password_length.max
+    end
+
+    # Generate a random password that conforms to the current password length settings
+    def random_password
+      Devise.friendly_token(password_length.max)
     end
 
     # Devise method overridden to allow sign in with email or username
@@ -465,7 +489,7 @@ class User < ApplicationRecord
       when 'deactivated'
         deactivated
       else
-        active
+        active_without_ghosts
       end
     end
 
@@ -585,6 +609,15 @@ class User < ApplicationRecord
       end
     end
 
+    def alert_bot
+      email_pattern = "alert%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+        u.bio = 'The GitLab alert bot'
+        u.name = 'GitLab Alert Bot'
+      end
+    end
+
     # Return true if there is only single non-internal user in the deployment,
     # ghost user is ignored.
     def single_user?
@@ -600,16 +633,20 @@ class User < ApplicationRecord
     username
   end
 
+  def bot?
+    bot_type.present?
+  end
+
   def internal?
-    ghost?
+    ghost? || bot?
   end
 
   def self.internal
-    where(ghost: true)
+    where(ghost: true).or(bots)
   end
 
   def self.non_internal
-    where('ghost IS NOT TRUE')
+    without_ghosts.humans
   end
 
   #
@@ -1015,7 +1052,7 @@ class User < ApplicationRecord
   end
 
   def highest_role
-    members.maximum(:access_level) || Gitlab::Access::NO_ACCESS
+    max_access_level_membership&.access_level || Gitlab::Access::NO_ACCESS
   end
 
   def accessible_deploy_keys
@@ -1514,6 +1551,13 @@ class User < ApplicationRecord
   end
 
   def read_only_attribute?(attribute)
+    if Feature.enabled?(:ldap_readonly_attributes, default_enabled: true)
+      enabled = Gitlab::Auth::LDAP::Config.enabled?
+      read_only = attribute.to_sym.in?(UserSyncedAttributesMetadata::SYNCABLE_ATTRIBUTES)
+
+      return true if enabled && read_only
+    end
+
     user_synced_attributes_metadata&.read_only?(attribute)
   end
 
@@ -1606,6 +1650,13 @@ class User < ApplicationRecord
   end
   # End of signup_flow experiment methods
 
+  def dismissed_callout?(feature_name:, ignore_dismissal_earlier_than: nil)
+    callouts = self.callouts.with_feature_name(feature_name)
+    callouts = callouts.with_dismissed_after(ignore_dismissal_earlier_than) if ignore_dismissal_earlier_than
+
+    callouts.any?
+  end
+
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
 
@@ -1614,13 +1665,6 @@ class User < ApplicationRecord
   # override, from Devise::Validatable
   def password_required?
     return false if internal?
-
-    super
-  end
-
-  # override from Devise::Confirmable
-  def confirmation_period_valid?
-    return false if Feature.disabled?(:soft_email_confirmation)
 
     super
   end

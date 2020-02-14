@@ -42,12 +42,9 @@ export default {
       'active',
     ]),
     title() {
-      return this.hasFeatureFlagsIID
+      return this.iid
         ? `^${this.iid} ${this.name}`
         : sprintf(s__('Edit %{name}'), { name: this.name });
-    },
-    hasFeatureFlagsIID() {
-      return this.glFeatures.featureFlagIID && this.iid;
     },
   },
   created() {

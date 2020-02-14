@@ -178,4 +178,40 @@ describe SamlProvider do
       end
     end
   end
+
+  describe '#prohibited_outer_forks?' do
+    context 'without enforced GMA' do
+      it 'is false when prohibited_outer_forks flag value is true' do
+        subject.prohibited_outer_forks = true
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
+      end
+
+      it 'is false when prohibited_outer_forks flag value is false' do
+        subject.prohibited_outer_forks = false
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
+      end
+    end
+
+    context 'when enforced GMA is enabled' do
+      before do
+        subject.enabled = true
+        subject.enforced_sso = true
+        subject.enforced_group_managed_accounts = true
+      end
+
+      it 'is true when prohibited_outer_forks flag value is true' do
+        subject.prohibited_outer_forks = true
+
+        expect(subject.prohibited_outer_forks?).to be_truthy
+      end
+
+      it 'is false when prohibited_outer_forks flag value is false' do
+        subject.prohibited_outer_forks = false
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
+      end
+    end
+  end
 end

@@ -6,6 +6,8 @@ module QA
       module Project
         module Settings
           module MergeRequest
+            include Page::Component::SecureReport
+
             def self.prepended(page)
               page.module_eval do
                 view 'ee/app/views/projects/_merge_pipelines_settings.html.haml' do

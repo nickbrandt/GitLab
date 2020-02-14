@@ -6,8 +6,8 @@ describe MergeTrains::RefreshMergeRequestsService do
   include ExclusiveLeaseHelpers
 
   let(:project) { create(:project) }
-  set(:maintainer_1) { create(:user) }
-  set(:maintainer_2) { create(:user) }
+  let_it_be(:maintainer_1) { create(:user) }
+  let_it_be(:maintainer_2) { create(:user) }
   let(:service) { described_class.new(project, maintainer_1) }
 
   before do
@@ -115,7 +115,7 @@ describe MergeTrains::RefreshMergeRequestsService do
       context 'when merge request 1 was on a merge train' do
         before do
           allow(merge_request_1.merge_train).to receive(:cleanup_ref)
-          merge_request_1.merge_train.merged!
+          merge_request_1.merge_train.update_column(:status, MergeTrain.state_machines[:status].states[:merged].value)
         end
 
         it 'does not refresh' do
@@ -146,26 +146,6 @@ describe MergeTrains::RefreshMergeRequestsService do
           subject
         end
       end
-
-      context 'when merge_trains_efficient_refresh is disabled' do
-        before do
-          stub_feature_flags(merge_trains_efficient_refresh: false)
-        end
-
-        context 'when the exclusive lock has already been taken' do
-          let(:lease_key) do
-            "merge_train:#{merge_request_1.target_project_id}-#{merge_request_1.target_branch}"
-          end
-
-          before do
-            stub_exclusive_lease_taken(lease_key)
-          end
-
-          it 'raises FailedToObtainLockError' do
-            expect { subject }.to raise_error(Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError)
-          end
-        end
-      end
     end
 
     context 'when merge request 2 is passed' do
@@ -194,7 +174,7 @@ describe MergeTrains::RefreshMergeRequestsService do
         context 'when merge request 1 has already been merged' do
           before do
             allow(merge_request_1.merge_train).to receive(:cleanup_ref)
-            merge_request_1.merge_train.merged!
+            merge_request_1.merge_train.update_column(:status, MergeTrain.state_machines[:status].states[:merged].value)
           end
 
           it 'does not refresh the merge request 1' do

@@ -2,7 +2,10 @@
 
 module Geo
   class ContainerRepositorySyncDispatchWorker < Geo::Scheduler::Secondary::SchedulerWorker
+    # rubocop:disable Scalability/CronWorkerContext
+    # This worker does not perform work scoped to a context
     include CronjobQueue
+    # rubocop:enable Scalability/CronWorkerContext
 
     def perform
       unless Gitlab.config.geo.registry_replication.enabled

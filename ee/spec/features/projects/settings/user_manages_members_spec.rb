@@ -3,9 +3,9 @@
 require "spec_helper"
 
 describe "User manages members" do
-  set(:group) { create(:group) }
-  set(:project) { create(:project, namespace: group) }
-  set(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, namespace: group) }
+  let_it_be(:user) { create(:user) }
 
   before do
     sign_in(user)
@@ -28,7 +28,7 @@ describe "User manages members" do
       visit(project_project_members_path(project))
     end
 
-    it { expect(page).to have_no_button("Add members").and have_no_link("Import members") }
+    it { expect(page).to have_no_selector(".invite-users-form") }
   end
 
   context "as project maintainer" do

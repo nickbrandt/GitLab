@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'Insights page' do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   context 'as a permitted user' do
     before(:context) do
@@ -20,7 +20,7 @@ RSpec.shared_examples 'Insights page' do
       it 'has correct title' do
         visit route
 
-        expect(page).to have_gitlab_http_status(200)
+        expect(page).to have_gitlab_http_status(:ok)
         expect(page).to have_content('Insights')
       end
 
@@ -52,7 +52,7 @@ RSpec.shared_examples 'Insights page' do
         it 'returns 404' do
           visit route
 
-          expect(page).to have_gitlab_http_status(404)
+          expect(page).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -66,7 +66,7 @@ RSpec.shared_examples 'Insights page' do
       it 'returns 404' do
         visit route
 
-        expect(page).to have_gitlab_http_status(404)
+        expect(page).to have_gitlab_http_status(:not_found)
       end
     end
   end

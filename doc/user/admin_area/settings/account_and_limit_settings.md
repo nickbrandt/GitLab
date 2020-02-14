@@ -17,7 +17,7 @@ details.
 
 ## Repository size limit **(STARTER)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/blog/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/blog/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
 > Available in [GitLab Starter](https://about.gitlab.com/pricing/).
 
 Repositories within your GitLab instance can grow quickly, especially if you are
@@ -81,7 +81,7 @@ If you wanted to increase the max attachment size to 200m in a GitLab
 [Omnibus](https://docs.gitlab.com/omnibus/) install, for example, you might need to
 add the line below to `/etc/gitlab/gitlab.rb` before increasing the max attachment size:
 
-```
+```ruby
 nginx['client_max_body_size'] = "200m"
 ```
 
@@ -116,3 +116,17 @@ Once a lifetime for personal access tokens is set, GitLab will:
 - After three hours, revoke old tokens with no expiration date or with a lifetime longer than the
   allowed lifetime. Three hours is given to allow administrators to change the allowed lifetime,
   or remove it, before revocation takes place.
+
+## Disabling user profile name changes **(PREMIUM ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/24605) in GitLab 12.7.
+
+To maintain integrity of user details in [Audit Events](../../../administration/audit_events.md), GitLab administrators can choose to disable a user's ability to change their profile name.
+
+To do this:
+
+1. Navigate to **Admin Area > Settings > General**, then expand **Account and Limit**.
+1. Check the **Prevent users from changing their profile name** checkbox.
+
+NOTE: **Note:**
+When this ability is disabled, GitLab administrators will still be able to update the name of any user in their instance via the [Admin UI](../index.md#administering-users) or the [API](../../../api/users.md#user-modification)

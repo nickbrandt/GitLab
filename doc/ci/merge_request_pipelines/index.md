@@ -24,7 +24,7 @@ Pipelines for merge requests have the following requirements and limitations:
 
 - As of GitLab 11.10, pipelines for merge requests require GitLab Runner 11.9
   or higher due to the
-  [recent refspecs changes](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25504).
+  [recent refspecs changes](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25504).
 - Pipelines for merge requests are incompatible with
   [CI/CD for external repositories](../ci_cd_for_external_repos/index.md).
 
@@ -161,7 +161,7 @@ test:
   only: [merge_requests]
   except:
     variables:
-      $CI_COMMIT_REF_NAME =~ /^docs-/
+      - $CI_COMMIT_REF_NAME =~ /^docs-/
 ```
 
 ## Important notes about merge requests from forked projects

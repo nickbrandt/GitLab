@@ -44,7 +44,7 @@ To enable or disable GitLab CI/CD Pipelines in your project:
 
 - **Private**: Only project members can access pipelines.
 - **Internal** or **Public**: Pipelines can be set to either **Only Project Members**
-  or **Everyone With Access** via the drop-down box.
+  or **Everyone With Access** via the dropdown box.
 
 Press **Save changes** for the settings to take effect.
 
@@ -75,7 +75,7 @@ default_projects_features:
 
 Save the file and restart GitLab:
 
-```sh
+```shell
 sudo service gitlab restart
 ```
 
@@ -87,7 +87,7 @@ gitlab_rails['gitlab_default_projects_features_builds'] = false
 
 Save the file and reconfigure GitLab:
 
-```sh
+```shell
 sudo gitlab-ctl reconfigure
 ```
 

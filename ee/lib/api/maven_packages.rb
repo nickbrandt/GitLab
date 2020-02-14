@@ -27,7 +27,7 @@ module API
         if %w(md5 sha1).include?(format)
           [name, format]
         else
-          [file_name, nil]
+          [file_name, format]
         end
       end
 
@@ -45,6 +45,10 @@ module API
       def find_project_by_path(path)
         project_path = path.rpartition('/').first
         Project.find_by_full_path(project_path)
+      end
+
+      def jar_file?(format)
+        format == 'jar'
       end
     end
 
@@ -66,7 +70,7 @@ module API
 
       authorize_read_package!(project)
 
-      package = ::Packages::MavenPackageFinder
+      package = ::Packages::Maven::PackageFinder
         .new(params[:path], current_user, project: project).execute!
 
       authorize_packages_feature!(package.project)
@@ -79,7 +83,9 @@ module API
         package_file.file_md5
       when 'sha1'
         package_file.file_sha1
-      when nil
+      else
+        track_event('pull_package') if jar_file?(format)
+
         present_carrierwave_file!(package_file.file)
       end
     end
@@ -103,7 +109,7 @@ module API
 
         not_found!('Group') unless can?(current_user, :read_group, group)
 
-        package = ::Packages::MavenPackageFinder
+        package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, group: group).execute!
 
         authorize_packages_feature!(package.project)
@@ -117,7 +123,9 @@ module API
           package_file.file_md5
         when 'sha1'
           package_file.file_sha1
-        when nil
+        else
+          track_event('pull_package') if jar_file?(format)
+
           present_carrierwave_file!(package_file.file)
         end
       end
@@ -144,7 +152,7 @@ module API
 
         file_name, format = extract_format(params[:file_name])
 
-        package = ::Packages::MavenPackageFinder
+        package = ::Packages::Maven::PackageFinder
           .new(params[:path], current_user, project: user_project).execute!
 
         package_file = ::Packages::PackageFileFinder
@@ -155,12 +163,14 @@ module API
           package_file.file_md5
         when 'sha1'
           package_file.file_sha1
-        when nil
+        else
+          track_event('pull_package') if jar_file?(format)
+
           present_carrierwave_file!(package_file.file)
         end
       end
 
-      desc 'Upload the maven package file' do
+      desc 'Workhorse authorize the maven package file upload' do
         detail 'This feature was introduced in GitLab 11.3'
       end
       params do
@@ -169,10 +179,7 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/maven/*path/:file_name/authorize', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
-        authorize_create_package!(user_project)
-
-        require_gitlab_workhorse!
-        Gitlab::Workhorse.verify_api_request!(headers)
+        authorize_upload!
 
         status 200
         content_type Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE
@@ -195,15 +202,14 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
-        authorize_create_package!(user_project)
-        require_gitlab_workhorse!
+        authorize_upload!
 
         file_name, format = extract_format(params[:file_name])
 
         uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
         bad_request!('Missing package file!') unless uploaded_file
 
-        package = ::Packages::FindOrCreateMavenPackageService
+        package = ::Packages::Maven::FindOrCreatePackageService
           .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
 
         case format
@@ -215,7 +221,11 @@ module API
             .new(package, file_name).execute!
 
           verify_package_file(package_file, uploaded_file)
-        when nil
+        when 'md5'
+          nil
+        else
+          track_event('push_package') if jar_file?(format)
+
           file_params = {
             file:      uploaded_file,
             size:      params['file.size'],

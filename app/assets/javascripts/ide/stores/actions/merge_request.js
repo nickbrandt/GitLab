@@ -44,9 +44,7 @@ export const getMergeRequestData = (
   new Promise((resolve, reject) => {
     if (!state.projects[projectId].mergeRequests[mergeRequestId] || force) {
       service
-        .getProjectMergeRequestData(targetProjectId || projectId, mergeRequestId, {
-          render_html: true,
-        })
+        .getProjectMergeRequestData(targetProjectId || projectId, mergeRequestId)
         .then(({ data }) => {
           commit(types.SET_MERGE_REQUEST, {
             projectPath: projectId,
@@ -58,7 +56,7 @@ export const getMergeRequestData = (
         })
         .catch(() => {
           dispatch('setErrorMessage', {
-            text: __('An error occurred whilst loading the merge request.'),
+            text: __('An error occurred while loading the merge request.'),
             action: payload =>
               dispatch('getMergeRequestData', payload).then(() =>
                 dispatch('setErrorMessage', null),
@@ -91,7 +89,7 @@ export const getMergeRequestChanges = (
         })
         .catch(() => {
           dispatch('setErrorMessage', {
-            text: __('An error occurred whilst loading the merge request changes.'),
+            text: __('An error occurred while loading the merge request changes.'),
             action: payload =>
               dispatch('getMergeRequestChanges', payload).then(() =>
                 dispatch('setErrorMessage', null),
@@ -125,7 +123,7 @@ export const getMergeRequestVersions = (
         })
         .catch(() => {
           dispatch('setErrorMessage', {
-            text: __('An error occurred whilst loading the merge request version data.'),
+            text: __('An error occurred while loading the merge request version data.'),
             action: payload =>
               dispatch('getMergeRequestVersions', payload).then(() =>
                 dispatch('setErrorMessage', null),

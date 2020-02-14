@@ -8,6 +8,7 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   let(:group) { create(:group) }
+  let(:user) { create(:user) }
 
   describe 'contribution analytics tab' do
     it 'is not visible when there is no valid license and we dont show promotions' do
@@ -70,20 +71,96 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   describe 'security dashboard tab' do
+    let(:group) { create(:group, plan: :gold_plan) }
+
     before do
-      stub_licensed_features(security_dashboard: true)
       enable_namespace_license_check!
 
       create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
     end
 
     context 'when security dashboard feature is enabled' do
-      let(:group) { create(:group, plan: :gold_plan) }
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
 
       it 'is visible' do
         render
 
+        expect(rendered).to have_link 'Security & Compliance'
         expect(rendered).to have_link 'Security'
+      end
+    end
+
+    context 'when compliance dashboard feature is enabled' do
+      before do
+        stub_licensed_features(group_level_compliance_dashboard: true)
+      end
+
+      context 'when the user does not have access to Compliance dashboard' do
+        it 'is not visible' do
+          render
+
+          expect(rendered).not_to have_link 'Security & Compliance'
+          expect(rendered).not_to have_link 'Compliance'
+        end
+      end
+
+      context 'when the user has access to Compliance dashboard' do
+        before do
+          group.add_owner(user)
+          allow(view).to receive(:current_user).and_return(user)
+        end
+
+        it 'is visible' do
+          render
+
+          expect(rendered).to have_link 'Security & Compliance'
+          expect(rendered).to have_link 'Compliance'
+        end
+      end
+    end
+
+    context 'when credentials inventory feature is enabled' do
+      shared_examples_for 'Credentials tab is not visible' do
+        it 'does not show the `Credentials` tab' do
+          render
+
+          expect(rendered).not_to have_link 'Security & Compliance'
+          expect(rendered).not_to have_link 'Credentials'
+        end
+      end
+
+      before do
+        stub_licensed_features(credentials_inventory: true)
+      end
+
+      context 'when the group does not enforce managed accounts' do
+        it_behaves_like 'Credentials tab is not visible'
+      end
+
+      context 'when the group enforces managed accounts' do
+        before do
+          allow(group).to receive(:enforced_group_managed_accounts?).and_return(true)
+        end
+
+        context 'when the user has privileges to view Credentials' do
+          before do
+            group.add_owner(user)
+            allow(view).to receive(:current_user).and_return(user)
+          end
+
+          it 'is visible' do
+            render
+
+            expect(rendered).to have_link 'Security & Compliance'
+            expect(rendered).to have_link 'Credentials'
+          end
+        end
+
+        context 'when the user does not have privileges to view Credentials' do
+          it_behaves_like 'Credentials tab is not visible'
+        end
       end
     end
 
@@ -93,7 +170,7 @@ describe 'layouts/nav/sidebar/_group' do
       it 'is not visible' do
         render
 
-        expect(rendered).not_to have_link 'Security'
+        expect(rendered).not_to have_link 'Security & Compliance'
       end
     end
   end

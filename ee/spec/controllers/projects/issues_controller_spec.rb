@@ -81,15 +81,16 @@ describe Projects::IssuesController do
     end
   end
 
-  describe 'issue weights' do
-    let(:project) { create(:project) }
+  describe 'licensed features' do
+    let(:project) { create(:project, group: namespace) }
     let(:user) { create(:user) }
+    let(:epic) { create(:epic, group: namespace) }
     let(:issue) { create(:issue, project: project, weight: 5) }
     let(:issue2) { create(:issue, project: project, weight: 1) }
     let(:new_issue) { build(:issue, project: project, weight: 5) }
 
     before do
-      project.add_developer(user)
+      namespace.add_developer(user)
       sign_in(user)
     end
 
@@ -99,7 +100,7 @@ describe Projects::IssuesController do
 
     context 'licensed' do
       before do
-        stub_licensed_features(issue_weights: true)
+        stub_licensed_features(issue_weights: true, epics: true)
       end
 
       describe '#index' do
@@ -108,7 +109,7 @@ describe Projects::IssuesController do
 
           perform :get, :index, sort: 'weight'
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(assigns(:issues)).to eq(expected)
         end
 
@@ -118,36 +119,38 @@ describe Projects::IssuesController do
 
           perform :get, :index, weight: 1
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(assigns(:issues)).to eq([issue2])
         end
       end
 
       describe '#update' do
-        it 'sets issue weight' do
-          perform :put, :update, id: issue.to_param, issue: { weight: 6 }, format: :json
+        it 'sets issue weight and epic' do
+          perform :put, :update, id: issue.to_param, issue: { weight: 6, epic_id: epic.id }, format: :json
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(issue.reload.weight).to eq(6)
+          expect(issue.epic).to eq(epic)
         end
       end
 
       describe '#create' do
-        it 'sets issue weight' do
-          perform :post, :create, issue: new_issue.attributes
+        it 'sets issue weight and epic' do
+          perform :post, :create, issue: new_issue.attributes.merge(epic_id: epic.id)
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(Issue.count).to eq(1)
 
           issue = Issue.first
           expect(issue.weight).to eq(new_issue.weight)
+          expect(issue.epic).to eq(epic)
         end
       end
     end
 
     context 'unlicensed' do
       before do
-        stub_licensed_features(issue_weights: false)
+        stub_licensed_features(issue_weights: false, epics: false)
       end
 
       describe '#index' do
@@ -156,7 +159,7 @@ describe Projects::IssuesController do
 
           perform :get, :index, weight: 1
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(assigns(:issues)).to match_array(expected)
         end
       end
@@ -165,21 +168,22 @@ describe Projects::IssuesController do
         it 'does not set issue weight' do
           perform :put, :update, id: issue.to_param, issue: { weight: 6 }, format: :json
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(issue.reload.weight).to be_nil
           expect(issue.reload.read_attribute(:weight)).to eq(5) # pre-existing data is not overwritten
         end
       end
 
       describe '#create' do
-        it 'does not set issue weight' do
+        it 'does not set issue weight ane epic' do
           perform :post, :create, issue: new_issue.attributes
 
-          expect(response).to have_gitlab_http_status(302)
+          expect(response).to have_gitlab_http_status(:found)
           expect(Issue.count).to eq(1)
 
           issue = Issue.first
-          expect(issue.read_attribute(:weight)).to be_nil
+          expect(issue.weight).to be_nil
+          expect(issue.epic).to be_nil
         end
       end
     end
@@ -234,7 +238,7 @@ describe Projects::IssuesController do
       it 'returns a 404' do
         get_service_desk
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -261,7 +265,7 @@ describe Projects::IssuesController do
             }
 
         expect(response).to redirect_to(designs_project_issue_path(new_project, issue))
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
   end

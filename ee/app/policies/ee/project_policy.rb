@@ -316,7 +316,6 @@ module EE
     override :lookup_access_level!
     def lookup_access_level!
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
-      return ::Gitlab::Access::REPORTER if alert_bot?
       return ::Gitlab::Access::REPORTER if support_bot? && service_desk_enabled?
       return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 

@@ -1,47 +1,70 @@
-import { mount } from '@vue/test-utils';
-import { GlModal } from '@gitlab/ui';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
+import { GlEmptyState, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
+import PackageTitle from 'ee/packages/details/components/package_title.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
-import { mavenPackage, mavenFiles, npmPackage, npmFiles, conanPackage } from '../../mock_data';
+import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
+import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
+import {
+  conanPackage,
+  mavenPackage,
+  mavenFiles,
+  npmPackage,
+  npmFiles,
+  nugetPackage,
+} from '../../mock_data';
+import stubChildren from 'helpers/stub_children';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('PackagesApp', () => {
   let wrapper;
+  let store;
 
-  const defaultProps = {
-    packageEntity: mavenPackage,
-    files: mavenFiles,
-    canDelete: true,
-    destroyPath: 'destroy-package-path',
-    emptySvgPath: 'empty-illustration',
-    npmPath: 'foo',
-    npmHelpPath: 'foo',
-    mavenPath: 'foo',
-    mavenHelpPath: 'foo',
-  };
-
-  function createComponent(props = {}) {
-    const propsData = {
-      ...defaultProps,
-      ...props,
-    };
+  function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
+    store = new Vuex.Store({
+      state: {
+        isLoading: false,
+        packageEntity,
+        packageFiles,
+        pipelineInfo: {},
+        pipelineError: null,
+        canDelete: true,
+        destroyPath: 'destroy-package-path',
+        emptySvgPath: 'empty-illustration',
+        npmPath: 'foo',
+        npmHelpPath: 'foo',
+      },
+    });
 
     wrapper = mount(PackagesApp, {
-      propsData,
-      attachToDocument: true,
+      localVue,
+      store,
+      stubs: {
+        ...stubChildren(PackagesApp),
+        GlButton: false,
+        GlLink: false,
+        GlModal: false,
+        GlTable: false,
+      },
     });
   }
 
-  const versionTitle = () => wrapper.find('.js-version-title');
-  const emptyState = () => wrapper.find('.js-package-empty-state');
+  const packageTitle = () => wrapper.find(PackageTitle);
+  const emptyState = () => wrapper.find(GlEmptyState);
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
   const npmInstallation = () => wrapper.find(NpmInstallation);
   const mavenInstallation = () => wrapper.find(MavenInstallation);
+  const conanInstallation = () => wrapper.find(ConanInstallation);
+  const nugetInstallation = () => wrapper.find(NugetInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -52,11 +75,10 @@ describe('PackagesApp', () => {
     wrapper.destroy();
   });
 
-  it('renders the app and displays the package version as the title', () => {
+  it('renders the app and displays the package title', () => {
     createComponent();
 
-    expect(versionTitle()).toExist();
-    expect(versionTitle().text()).toBe(mavenPackage.version);
+    expect(packageTitle()).toExist();
   });
 
   it('renders an empty state component when no an invalid package is passed as a prop', () => {
@@ -81,20 +103,14 @@ describe('PackagesApp', () => {
   });
 
   it('does not render package metadata for npm as npm packages do not contain metadata', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(packageInformation(0)).toExist();
     expect(allPackageInformation().length).toBe(1);
   });
 
   it('renders package installation instructions for npm packages', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(npmInstallation()).toExist();
   });
@@ -106,10 +122,7 @@ describe('PackagesApp', () => {
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {
-    createComponent({
-      packageEntity: npmPackage,
-      files: npmFiles,
-    });
+    createComponent(npmPackage, npmFiles);
 
     expect(allFileRows()).toExist();
     expect(allFileRows().length).toBe(1);
@@ -151,13 +164,13 @@ describe('PackagesApp', () => {
     });
 
     it('tracking category calls packageTypeToTrackCategory', () => {
-      createComponent({ packageEntity: conanPackage });
+      createComponent(conanPackage);
       expect(wrapper.vm.tracking.category).toBe(category);
       expect(utilSpy).toHaveBeenCalledWith('conan');
     });
 
     it(`delete button on delete modal call event with ${TrackingActions.DELETE_PACKAGE}`, () => {
-      createComponent({ packageEntity: conanPackage, canDelete: true, destroyPath: 'foo' });
+      createComponent(conanPackage);
       deleteButton().trigger('click');
       return wrapper.vm.$nextTick().then(() => {
         modalDeleteButton().trigger('click');
@@ -170,7 +183,7 @@ describe('PackagesApp', () => {
     });
 
     it(`file download link call event with ${TrackingActions.PULL_PACKAGE}`, () => {
-      createComponent({ packageEntity: conanPackage });
+      createComponent(conanPackage);
       firstFileDownloadLink().trigger('click');
       expect(eventSpy).toHaveBeenCalledWith(
         category,
@@ -178,5 +191,21 @@ describe('PackagesApp', () => {
         expect.any(Object),
       );
     });
+  });
+
+  it('renders package installation instructions for conan packages', () => {
+    createComponent({
+      packageEntity: conanPackage,
+    });
+
+    expect(conanInstallation()).toExist();
+  });
+
+  it('renders package installation instructions for nuget packages', () => {
+    createComponent({
+      packageEntity: nugetPackage,
+    });
+
+    expect(nugetInstallation()).toExist();
   });
 });

@@ -1,0 +1,5 @@
+---
+title: Raise exception if any namespaces runner minutes were not reset
+merge_request: 22636
+author:
+type: added

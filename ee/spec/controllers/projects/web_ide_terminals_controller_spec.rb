@@ -30,7 +30,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { admin }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -38,7 +38,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { owner }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -46,7 +46,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { maintainer }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -54,7 +54,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { developer }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -62,7 +62,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { reporter }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -70,7 +70,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { guest }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -78,7 +78,7 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { create(:user) }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -89,7 +89,7 @@ describe Projects::WebIdeTerminalsController do
       let(:pipeline) { create(:ci_pipeline, project: project, source: :chat, user: user) }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -124,7 +124,7 @@ describe Projects::WebIdeTerminalsController do
       let(:result) { { status: :error } }
 
       it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
       end
     end
   end
@@ -161,7 +161,7 @@ describe Projects::WebIdeTerminalsController do
       it 'returns 400' do
         subject
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
 
@@ -174,7 +174,7 @@ describe Projects::WebIdeTerminalsController do
 
         subject
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
   end
@@ -197,7 +197,7 @@ describe Projects::WebIdeTerminalsController do
       let!(:job) { create(:ci_build, :failed, pipeline: pipeline, user: user) }
 
       it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
       end
     end
   end
@@ -220,7 +220,7 @@ describe Projects::WebIdeTerminalsController do
       let!(:job) { create(:ci_build, :running, pipeline: pipeline, user: user) }
 
       it 'returns 422' do
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
       end
     end
   end

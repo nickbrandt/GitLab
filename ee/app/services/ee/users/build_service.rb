@@ -60,18 +60,6 @@ module EE
         end
       end
 
-      override :build_user_params
-      def build_user_params(skip_authorization:)
-        user_params = super
-        fallback_name = "#{user_params[:first_name]} #{user_params[:last_name]}"
-
-        if user_params[:name].blank? && fallback_name.present?
-          user_params.merge(name: fallback_name)
-        else
-          user_params
-        end
-      end
-
       def saml_provider_id
         strong_memoize(:saml_provider_id) do
           group = GroupFinder.new(current_user).execute(id: group_id_for_saml)

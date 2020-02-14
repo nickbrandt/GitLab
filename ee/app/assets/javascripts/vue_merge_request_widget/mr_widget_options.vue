@@ -44,11 +44,10 @@ export default {
     },
     shouldRenderCodeQuality() {
       const { codeclimate } = this.mr || {};
-      return codeclimate && codeclimate.head_path && codeclimate.base_path;
+      return codeclimate && codeclimate.head_path;
     },
     shouldRenderLicenseReport() {
-      const { licenseManagement } = this.mr;
-      return licenseManagement && licenseManagement.head_path;
+      return this.mr.enabledReports?.licenseManagement;
     },
     hasCodequalityIssues() {
       return (
@@ -71,11 +70,10 @@ export default {
       return performance && performance.head_path && performance.base_path;
     },
     shouldRenderSecurityReport() {
+      const { enabledReports } = this.mr;
       return (
-        (this.mr.sast && this.mr.sast.head_path) ||
-        (this.mr.sastContainer && this.mr.sastContainer.head_path) ||
-        (this.mr.dast && this.mr.dast.head_path) ||
-        (this.mr.dependencyScanning && this.mr.dependencyScanning.head_path)
+        enabledReports &&
+        this.$options.securityReportTypes.some(reportType => enabledReports[reportType])
       );
     },
     codequalityText() {
@@ -101,6 +99,23 @@ export default {
       }
 
       return text.join('');
+    },
+    codequalityPopover() {
+      const { codeclimate } = this.mr || {};
+      if (codeclimate && !codeclimate.base_path) {
+        return {
+          title: s__('ciReport|Base pipeline codequality artifact not found'),
+          content: sprintf(
+            s__('ciReport|%{linkStartTag}Learn more about codequality reports %{linkEndTag}'),
+            {
+              linkStartTag: `<a href="${this.mr.codequalityHelpPath}" target="_blank" rel="noopener noreferrer">`,
+              linkEndTag: '<i class="fa fa-external-link" aria-hidden="true"></i></a>',
+            },
+            false,
+          ),
+        };
+      }
+      return {};
     },
 
     performanceText() {
@@ -174,11 +189,20 @@ export default {
       };
     },
     fetchCodeQuality() {
-      const { head_path, base_path } = this.mr.codeclimate;
+      const { codeclimate } = this.mr || {};
+
+      if (!codeclimate.base_path) {
+        this.isLoadingCodequality = false;
+        this.loadingCodequalityFailed = true;
+        return;
+      }
 
       this.isLoadingCodequality = true;
 
-      Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
+      Promise.all([
+        this.service.fetchReport(codeclimate.head_path),
+        this.service.fetchReport(codeclimate.base_path),
+      ])
         .then(values =>
           this.mr.compareCodeclimateMetrics(
             values[0],
@@ -223,6 +247,7 @@ export default {
       };
     },
   },
+  securityReportTypes: ['dast', 'sast', 'dependencyScanning', 'containerScanning'],
 };
 </script>
 <template>
@@ -251,6 +276,7 @@ export default {
         :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
         :has-issues="hasCodequalityIssues"
         :component="$options.componentNames.CodequalityIssueBody"
+        :popover-options="codequalityPopover"
         class="js-codequality-widget mr-widget-border-top mr-report"
       />
       <report-section
@@ -274,19 +300,12 @@ export default {
         v-if="shouldRenderSecurityReport"
         :head-blob-path="mr.headBlobPath"
         :source-branch="mr.sourceBranch"
+        :target-branch="mr.targetBranch"
         :base-blob-path="mr.baseBlobPath"
-        :enabled-reports="mr.enabledSecurityReports"
-        :sast-head-path="mr.sast.head_path"
-        :sast-base-path="mr.sast.base_path"
+        :enabled-reports="mr.enabledReports"
         :sast-help-path="mr.sastHelp"
-        :dast-head-path="mr.dast.head_path"
-        :dast-base-path="mr.dast.base_path"
         :dast-help-path="mr.dastHelp"
-        :sast-container-head-path="mr.sastContainer.head_path"
-        :sast-container-base-path="mr.sastContainer.base_path"
-        :sast-container-help-path="mr.sastContainerHelp"
-        :dependency-scanning-head-path="mr.dependencyScanning.head_path"
-        :dependency-scanning-base-path="mr.dependencyScanning.base_path"
+        :container-scanning-help-path="mr.containerScanningHelp"
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
@@ -300,6 +319,9 @@ export default {
         :can-create-issue="mr.canCreateIssue"
         :can-create-merge-request="mr.canCreateMergeRequest"
         :can-dismiss-vulnerability="mr.canDismissVulnerability"
+        :diverged-commits-count="mr.divergedCommitsCount"
+        :mr-state="mr.state"
+        class="js-security-widget"
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
@@ -309,8 +331,6 @@ export default {
         :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
         :full-report-path="mr.licenseManagement.license_management_full_report_path"
         :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
-        :base-path="mr.licenseManagement.base_path"
-        :head-path="mr.licenseManagement.head_path"
         :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />

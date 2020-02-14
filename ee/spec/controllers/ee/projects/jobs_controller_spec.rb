@@ -39,7 +39,7 @@ describe Projects::JobsController do
       let(:user) { admin }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -47,7 +47,7 @@ describe Projects::JobsController do
       let(:user) { owner }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -55,7 +55,7 @@ describe Projects::JobsController do
       let(:user) { maintainer }
 
       it 'returns 200' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -63,7 +63,7 @@ describe Projects::JobsController do
       let(:user) { developer }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -71,7 +71,7 @@ describe Projects::JobsController do
       let(:user) { reporter }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -79,7 +79,7 @@ describe Projects::JobsController do
       let(:user) { guest }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -87,7 +87,7 @@ describe Projects::JobsController do
       let(:user) { create(:user) }
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -103,7 +103,7 @@ describe Projects::JobsController do
       end
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -118,7 +118,7 @@ describe Projects::JobsController do
         it 'returns the proxy data for the service running in the job' do
           make_request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers["Content-Type"]).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
           expect(response.body).to eq(expected_data)
         end
@@ -130,7 +130,7 @@ describe Projects::JobsController do
         it 'returns 404' do
           make_request
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -153,7 +153,7 @@ describe Projects::JobsController do
 
       make_request
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 

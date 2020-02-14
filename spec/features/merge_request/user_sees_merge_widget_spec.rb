@@ -19,7 +19,7 @@ describe 'Merge request > User sees merge widget', :js do
     sign_in(user)
   end
 
-  context 'new merge request' do
+  context 'new merge request', :sidekiq_might_not_need_inline do
     before do
       visit project_new_merge_request_path(
         project,
@@ -604,7 +604,7 @@ describe 'Merge request > User sees merge widget', :js do
                 click_button 'addTest'
 
                 expect(page).to have_content('6.66')
-                expect(page).to have_content(sample_java_failed_message.gsub!(/\s+/, ' ').strip)
+                expect(page).to have_content(sample_java_failed_message.gsub(/\s+/, ' ').strip)
               end
             end
           end
@@ -649,7 +649,7 @@ describe 'Merge request > User sees merge widget', :js do
                 click_button 'Test#sum when a is 1 and b is 3 returns summary'
 
                 expect(page).to have_content('2.22')
-                expect(page).to have_content(sample_rspec_failed_message.gsub!(/\s+/, ' ').strip)
+                expect(page).to have_content(sample_rspec_failed_message.gsub(/\s+/, ' ').strip)
               end
             end
           end

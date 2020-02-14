@@ -6,7 +6,7 @@ FactoryBot.define do
       failure_reason { Ci::Build.failure_reasons[:protected_environment_failure] }
     end
 
-    %i[sast codequality dependency_scanning container_scanning dast performance license_management].each do |report_type|
+    %i[codequality container_scanning dast dependency_scanning license_management license_scanning performance sast].each do |report_type|
       trait "legacy_#{report_type}".to_sym do
         success
         artifacts

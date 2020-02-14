@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }
@@ -15,7 +15,6 @@ module QA
         Flow::Login.sign_in
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'Issue to test scoped labels'
           issue.labels = [initial_label, initial_label_multi_colon]
         end
 

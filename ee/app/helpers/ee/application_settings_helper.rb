@@ -26,7 +26,10 @@ module EE
         :elasticsearch_aws_region,
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_indexing,
+        :elasticsearch_max_bulk_concurrency,
+        :elasticsearch_max_bulk_size_mb,
         :elasticsearch_replicas,
+        :elasticsearch_indexed_field_length_limit,
         :elasticsearch_search,
         :elasticsearch_shards,
         :elasticsearch_url,
@@ -89,6 +92,7 @@ module EE
         file_template_project_id
         default_project_deletion_protection
         deletion_adjourned_period
+        updating_name_disabled_for_users
       ]
     end
   end

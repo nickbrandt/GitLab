@@ -3,17 +3,17 @@
 require 'spec_helper'
 
 describe ApprovalRulePresenter do
-  set(:user) { create(:user) }
-  set(:public_group) { create(:group) }
-  set(:private_group) { create(:group, :private) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:public_group) { create(:group) }
+  let_it_be(:private_group) { create(:group, :private) }
   let(:groups) { [public_group, private_group] }
 
   subject(:presenter) { described_class.new(rule, current_user: user) }
 
   describe '#approvers' do
-    set(:private_member) { create(:group_member, group: private_group) }
-    set(:public_member) { create(:group_member, group: public_group) }
-    set(:rule) { create(:approval_merge_request_rule, groups: [public_group, private_group]) }
+    let_it_be(:private_member) { create(:group_member, group: private_group) }
+    let_it_be(:public_member) { create(:group_member, group: public_group) }
+    let_it_be(:rule) { create(:approval_merge_request_rule, groups: [public_group, private_group]) }
 
     subject { presenter.approvers }
 

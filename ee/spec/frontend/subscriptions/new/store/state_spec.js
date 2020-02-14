@@ -2,6 +2,7 @@ import createState from 'ee/subscriptions/new/store/state';
 import * as constants from 'ee/subscriptions/new/constants';
 
 constants.STEPS = ['firstStep', 'secondStep'];
+constants.TAX_RATE = 0;
 
 describe('projectsSelector default state', () => {
   const planData = [
@@ -15,6 +16,10 @@ describe('projectsSelector default state', () => {
     setupForCompany: 'true',
     fullName: 'Full Name',
   };
+
+  const currentDate = new Date('2020-01-07T12:44:08.135Z');
+
+  jest.spyOn(global.Date, 'now').mockImplementationOnce(() => currentDate.valueOf());
 
   const state = createState(initialData);
 
@@ -91,5 +96,65 @@ describe('projectsSelector default state', () => {
 
       expect(modifiedState.numberOfUsers).toEqual(1);
     });
+  });
+
+  it('sets the country to null', () => {
+    expect(state.country).toBeNull();
+  });
+
+  it('sets the streetAddressLine1 to null', () => {
+    expect(state.streetAddressLine1).toBeNull();
+  });
+
+  it('sets the streetAddressLine2 to null', () => {
+    expect(state.streetAddressLine2).toBeNull();
+  });
+
+  it('sets the city to null', () => {
+    expect(state.city).toBeNull();
+  });
+
+  it('sets the countryState to null', () => {
+    expect(state.countryState).toBeNull();
+  });
+
+  it('sets the zipCode to null', () => {
+    expect(state.zipCode).toBeNull();
+  });
+
+  it('sets the countryOptions to an empty array', () => {
+    expect(state.countryOptions).toEqual([]);
+  });
+
+  it('sets the stateOptions to an empty array', () => {
+    expect(state.stateOptions).toEqual([]);
+  });
+
+  it('sets the taxRate to the TAX_RATE constant', () => {
+    expect(state.taxRate).toEqual(0);
+  });
+
+  it('sets the startDate to the current date', () => {
+    expect(state.startDate).toEqual(currentDate);
+  });
+
+  it('sets the paymentFormParams to an empty object', () => {
+    expect(state.paymentFormParams).toEqual({});
+  });
+
+  it('sets the paymentMethodId to null', () => {
+    expect(state.paymentMethodId).toBeNull();
+  });
+
+  it('sets the creditCardDetails to an empty object', () => {
+    expect(state.creditCardDetails).toEqual({});
+  });
+
+  it('sets isLoadingPaymentMethod to false', () => {
+    expect(state.isLoadingPaymentMethod).toEqual(false);
+  });
+
+  it('sets isConfirmingOrder to false', () => {
+    expect(state.isConfirmingOrder).toBe(false);
   });
 });

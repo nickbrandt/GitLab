@@ -32,6 +32,7 @@ module EE
         def features_usage_data_ee
           {
             elasticsearch_enabled: ::Gitlab::CurrentSettings.elasticsearch_search?,
+            license_trial_ends_on: License.trial_ends_on,
             geo_enabled: ::Gitlab::Geo.enabled?
           }
         end
@@ -89,10 +90,17 @@ module EE
             dast: :dast_jobs,
             dependency_scanning: :dependency_scanning_jobs,
             license_management: :license_management_jobs,
+            license_scanning: :license_scanning_jobs,
             sast: :sast_jobs
           }
 
           results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1))
+
+          license_scan_count = results.delete("license_scanning")
+          if license_scan_count && results["license_management"]
+            results["license_management"] += license_scan_count
+          end
+
           results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
         end
         # rubocop: enable CodeReuse/ActiveRecord
@@ -225,6 +233,7 @@ module EE
         # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
         def usage_activity_by_stage_manage
           {
+            events: ::Event.distinct_count_by(:author_id),
             groups: ::GroupMember.distinct_count_by(:user_id),
             ldap_keys: ::LDAPKey.distinct_count_by(:user_id),
             ldap_users: ::GroupMember.of_ldap_type.distinct_count_by(:user_id)

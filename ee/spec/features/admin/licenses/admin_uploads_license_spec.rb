@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe "Admin uploads license" do
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
 
   before do
     stub_feature_flags(licenses_app: false)
@@ -11,7 +11,7 @@ describe "Admin uploads license" do
   end
 
   context "when license key is provided in the query string" do
-    set(:license) { build(:license, data: build(:gitlab_license, restrictions: { active_user_count: 2000 }).export) }
+    let_it_be(:license) { build(:license, data: build(:gitlab_license, restrictions: { active_user_count: 2000 }).export) }
 
     before do
       License.destroy_all # rubocop: disable DestroyAll
@@ -51,20 +51,20 @@ describe "Admin uploads license" do
     end
 
     context "when license is valid" do
-      set(:license) { build(:gitlab_license) }
-      set(:path) { Rails.root.join("tmp/valid_license.gitlab-license") }
+      let_it_be(:license) { build(:gitlab_license) }
+      let_it_be(:path) { Rails.root.join("tmp/valid_license.gitlab-license") }
 
       it "uploads license" do
         attach_and_upload(path)
 
         expect(page).to have_content("The license was successfully uploaded and is now active.")
-                   .and have_content(license.licensee.values.first)
+                   .and have_content(license.licensee.each_value.first)
       end
     end
 
     context "when license is invalid" do
-      set(:license) { build(:gitlab_license, expires_at: Date.yesterday) }
-      set(:path) { Rails.root.join("tmp/invalid_license.gitlab-license") }
+      let_it_be(:license) { build(:gitlab_license, expires_at: Date.yesterday) }
+      let_it_be(:path) { Rails.root.join("tmp/invalid_license.gitlab-license") }
 
       it "doesn't upload license" do
         attach_and_upload(path)

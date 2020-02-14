@@ -7,7 +7,7 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
   include ExclusiveLeaseHelpers
 
   let(:primary)   { create(:geo_node, :primary, host: 'primary-geo-node') }
-  let(:secondary) { create(:geo_node) }
+  let(:secondary) { create(:geo_node, :local_storage_only) }
 
   before do
     stub_current_geo_node(secondary)
@@ -16,6 +16,14 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
 
   it 'does not run when node is disabled' do
     secondary.update_column(:enabled, false)
+
+    expect(subject).not_to receive(:try_obtain_lease)
+
+    subject.perform
+  end
+
+  it 'does not run when sync_object_storage is enabled' do
+    secondary.update_column(:sync_object_storage, true)
 
     expect(subject).not_to receive(:try_obtain_lease)
 

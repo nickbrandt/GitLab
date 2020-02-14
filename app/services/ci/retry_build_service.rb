@@ -5,13 +5,13 @@ module Ci
     CLONE_ACCESSORS = %i[pipeline project ref tag options name
                          allow_failure stage stage_id stage_idx trigger_request
                          yaml_variables when environment coverage_regex
-                         description tag_list protected needs resource_group].freeze
+                         description tag_list protected needs resource_group scheduling_type].freeze
 
     def execute(build)
       reprocess!(build).tap do |new_build|
         build.pipeline.mark_as_processable_after_stage(build.stage_idx)
 
-        new_build.enqueue!
+        Gitlab::OptimisticLocking.retry_lock(new_build, &:enqueue)
 
         MergeRequests::AddTodoWhenBuildFailsService
           .new(project, current_user)
@@ -27,19 +27,22 @@ module Ci
 
       attributes = CLONE_ACCESSORS.map do |attribute|
         [attribute, build.public_send(attribute)] # rubocop:disable GitlabSecurity/PublicSend
-      end
+      end.to_h
 
-      attributes.push([:user, current_user])
-
-      build.retried = true
+      attributes[:user] = current_user
+      attributes[:scheduling_type] ||= build.find_legacy_scheduling_type
 
       Ci::Build.transaction do
         # mark all other builds of that name as retried
         build.pipeline.builds.latest
           .where(name: build.name)
-          .update_all(retried: true)
+          .update_all(retried: true, processed: true)
 
-        create_build!(attributes)
+        create_build!(attributes).tap do
+          # mark existing object as retried/processed without a reload
+          build.retried = true
+          build.processed = true
+        end
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -47,8 +50,9 @@ module Ci
     private
 
     def create_build!(attributes)
-      build = project.builds.new(Hash[attributes])
+      build = project.builds.new(attributes)
       build.deployment = ::Gitlab::Ci::Pipeline::Seed::Deployment.new(build).to_resource
+      build.retried = false
       build.save!
       build
     end

@@ -84,7 +84,7 @@ module API
         if child_epic.valid?
           present child_epic, with: EE::API::Entities::LinkedEpic, user: current_user
         else
-          render_validation_error!(epic)
+          render_validation_error!(child_epic)
         end
       end
 

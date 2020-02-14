@@ -43,7 +43,7 @@ As an example, imagine a pipeline consisting of four stages, executed in the fol
 
 ## Visualizing pipelines
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5742) in GitLab 8.11.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5742) in GitLab 8.11.
 
 Pipelines can be complex structures with many sequential and parallel jobs.
 
@@ -87,7 +87,7 @@ Stages in pipeline mini graphs are collapsible. Hover your mouse over them and c
 
 Job ordering depends on the type of pipeline graph. For [regular pipeline graphs](#regular-pipeline-graphs), jobs are sorted by name.
 
-For [pipeline mini graphs](#pipeline-mini-graphs) ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/9760)
+For [pipeline mini graphs](#pipeline-mini-graphs) ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/9760)
 in GitLab 9.0), jobs are sorted by severity and then by name.
 
 The order of severity is:
@@ -144,6 +144,13 @@ The union of A, B, and C is (1, 4) and (6, 7). Therefore, the total running time
 (4 - 1) + (7 - 6) => 4
 ```
 
+### How pipeline quotas are used
+
+Each user has a personal pipeline quota that tracks the usage of shared runners in all personal projects.
+Each group has a [usage quota](../subscriptions/index.md#ci-pipeline-minutes) that tracks the usage of shared runners for all projects created within the group.
+
+When a pipeline is triggered, regardless of who triggered it, the pipeline quota for the project owner's [namespace](../user/group/index.md#namespaces) is used. In this case, the namespace can be the user or group that owns the project.
+
 ### Expanding and collapsing job log sections
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/14664) in GitLab
@@ -180,7 +187,7 @@ through the GitLab UI:
 
 ### Grouping jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/6242) in GitLab 8.12.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6242) in GitLab 8.12.
 
 If you have many similar jobs, your [pipeline graph](#visualizing-pipelines) becomes long and hard
 to read.
@@ -245,6 +252,13 @@ For information on adding pipeline badges to projects, see [Pipeline badges](../
 Pipelines for different projects can be combined and visualized together.
 
 For more information, see [Multi-project pipelines](multi_project_pipelines.md).
+
+## Parent-child pipelines
+
+Complex pipelines can be broken down into one parent pipeline that can trigger
+multiple child sub-pipelines, which all run in the same project and with the same SHA.
+
+For more information, see [Parent-Child pipelines](parent_child_pipelines.md).
 
 ## Working with pipelines
 
@@ -326,7 +340,7 @@ Clicking on an individual job will show you its job log, and allow you to:
 
 ### Seeing the failure reason for jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17782) in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17782) in GitLab 10.7.
 
 When a pipeline fails or is allowed to fail, there are several places where you
 can quickly check the reason it failed:
@@ -339,12 +353,12 @@ In each place, if you hover over the failed job you can see the reason it failed
 
 ![Pipeline detail](img/job_failure_reason.png)
 
-From [GitLab 10.8](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17814),
+From [GitLab 10.8](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17814),
 you can also see the reason it failed on the Job detail page.
 
 ### Manual actions from pipeline graphs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/7931) in GitLab 8.15.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7931) in GitLab 8.15.
 
 Manual actions, configured using the [`when:manual`](yaml/README.md#whenmanual) parameter,
 allow you to require manual interaction before moving forward in the pipeline.
@@ -360,7 +374,7 @@ stage has a job with a manual action.
 
 ### Specifying variables when running manual jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30485) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/30485) in GitLab 12.2.
 
 When running manual jobs you can supply additional job specific variables.
 
@@ -374,7 +388,7 @@ environment variables.
 
 ### Delay a job in a pipeline graph
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/21767) in GitLab 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/21767) in GitLab 11.4.
 
 When you do not want to run a job immediately, you can use the [`when:delayed`](yaml/README.md#whendelayed) parameter to
 delay a job's execution for a certain period.
@@ -401,7 +415,7 @@ GitLab provides API endpoints to:
 
 ### Start multiple manual actions in a stage
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/27188) in GitLab 11.11.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/27188) in GitLab 11.11.
 
 Multiple manual actions in a single stage can be started at the same time using the "Play all manual" button.
 Once the user clicks this button, each individual manual action will be triggered and refreshed
@@ -459,7 +473,7 @@ runners will not use regular runners, they must be tagged accordingly.
 
 ## Persistent pipeline refs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/17043) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/17043) in GitLab 12.4.
 
 Previously, you'd have encountered unexpected pipeline failures when you force-pushed
 a branch to its remote repository. To illustrate the problem, suppose you've had the current workflow:

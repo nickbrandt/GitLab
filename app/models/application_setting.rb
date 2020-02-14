@@ -10,7 +10,10 @@ class ApplicationSetting < ApplicationRecord
   add_authentication_token_field :health_check_access_token
   add_authentication_token_field :static_objects_external_storage_auth_token
 
-  belongs_to :instance_administration_project, class_name: "Project"
+  belongs_to :self_monitoring_project, class_name: "Project", foreign_key: 'instance_administration_project_id'
+  alias_attribute :self_monitoring_project_id, :instance_administration_project_id
+
+  belongs_to :instance_administrators_group, class_name: "Group"
 
   # Include here so it can override methods from
   # `add_authentication_token_field`
@@ -141,7 +144,7 @@ class ApplicationSetting < ApplicationRecord
             if: :auto_devops_enabled?
 
   validates :enabled_git_access_protocol,
-            inclusion: { in: %w(ssh http), allow_blank: true, allow_nil: true }
+            inclusion: { in: %w(ssh http), allow_blank: true }
 
   validates :domain_blacklist,
             presence: { message: 'Domain blacklist cannot be empty if Blacklist is enabled.' },
@@ -169,7 +172,11 @@ class ApplicationSetting < ApplicationRecord
 
   validates :gitaly_timeout_default,
             presence: true,
-            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+            numericality: {
+              only_integer: true,
+              greater_than_or_equal_to: 0,
+              less_than_or_equal_to: Settings.gitlab.max_request_duration_seconds
+            }
 
   validates :gitaly_timeout_medium,
             presence: true,

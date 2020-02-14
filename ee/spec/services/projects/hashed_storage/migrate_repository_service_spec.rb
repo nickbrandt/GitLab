@@ -8,7 +8,7 @@ describe Projects::HashedStorage::MigrateRepositoryService do
   let(:gitlab_shell) { Gitlab::Shell.new }
   let(:project) { create(:project, :empty_repo, :wiki_repo, :design_repo, :legacy_storage) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
-  let(:hashed_storage) { Storage::HashedProject.new(project) }
+  let(:hashed_storage) { Storage::Hashed.new(project) }
   let(:old_disk_path) { legacy_storage.disk_path }
   let(:new_disk_path) { hashed_storage.disk_path }
 

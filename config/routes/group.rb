@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop: disable Cop/PutGroupRoutesUnderScope
-resources :groups, only: [:index, :new, :create] do
-  post :preview_markdown
-end
-# rubocop: enable Cop/PutGroupRoutesUnderScope
-
 constraints(::Constraints::GroupUrlConstrainer.new) do
   scope(path: 'groups/*id',
         controller: :groups,
@@ -68,7 +62,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :uploads, only: [:create] do
       collection do
-        get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
+        get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }, format: false, defaults: { format: nil }
         post :authorize
       end
     end
@@ -82,7 +76,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :container_registries, only: [:index], controller: 'registry/repositories'
+    resources :container_registries, only: [:index, :show], controller: 'registry/repositories'
   end
 
   scope(path: '*id',

@@ -38,12 +38,16 @@ module EE
           attrs << :default_project_deletion_protection
         end
 
-        if License.feature_available?(:marking_project_for_deletion)
+        if License.feature_available?(:adjourned_deletion_for_projects_and_groups)
           attrs << :deletion_adjourned_period
         end
 
         if License.feature_available?(:required_ci_templates)
           attrs << :required_instance_ci_template
+        end
+
+        if License.feature_available?(:disable_name_update_for_users)
+          attrs << :updating_name_disabled_for_users
         end
 
         attrs

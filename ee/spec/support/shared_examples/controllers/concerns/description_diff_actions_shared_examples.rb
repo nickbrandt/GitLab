@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
-shared_examples DescriptionDiffActions do
+RSpec.shared_examples DescriptionDiffActions do
   let(:base_params) { { namespace_id: project.namespace, project_id: project, id: issuable } }
 
-  describe 'GET description_diff' do
+  describe do
     let_it_be(:version_1) { create(:description_version, issuable.class.name.underscore => issuable) }
     let_it_be(:version_2) { create(:description_version, issuable.class.name.underscore => issuable) }
     let_it_be(:version_3) { create(:description_version, issuable.class.name.underscore => issuable) }
@@ -14,44 +12,119 @@ shared_examples DescriptionDiffActions do
       get :description_diff, params: base_params.merge(extra_params)
     end
 
+    def delete_description_version(extra_params = {})
+      delete :delete_description_version, params: base_params.merge(extra_params)
+    end
+
     context 'when license is available' do
       before do
         stub_licensed_features(epics: true, description_diffs: true)
       end
 
-      it 'returns the diff with the previous version' do
-        expect(Gitlab::Diff::CharDiff).to receive(:new).with(version_2.description, version_3.description).and_call_original
+      context 'GET description_diff' do
+        it 'returns the diff with the previous version' do
+          expect(Gitlab::Diff::CharDiff).to receive(:new).with(version_2.description, version_3.description).and_call_original
 
-        get_description_diff(version_id: version_3)
+          get_description_diff(version_id: version_3)
 
-        expect(response.status).to eq(200)
-      end
+          expect(response.status).to eq(200)
+        end
 
-      it 'returns the diff with the previous version of the specified start_version_id' do
-        expect(Gitlab::Diff::CharDiff).to receive(:new).with(version_1.description, version_3.description).and_call_original
+        it 'returns the diff with the previous version of the specified start_version_id' do
+          expect(Gitlab::Diff::CharDiff).to receive(:new).with(version_1.description, version_3.description).and_call_original
 
-        get_description_diff(version_id: version_3, start_version_id: version_2)
+          get_description_diff(version_id: version_3, start_version_id: version_2)
 
-        expect(response.status).to eq(200)
-      end
+          expect(response.status).to eq(200)
+        end
 
-      context 'when description version is from another issuable' do
-        it 'returns 404' do
-          other_version = create(:description_version)
+        context 'when description version is from another issuable' do
+          it 'returns 404' do
+            other_version = create(:description_version)
 
-          get_description_diff(version_id: other_version)
+            get_description_diff(version_id: other_version)
 
-          expect(response.status).to eq(404)
+            expect(response.status).to eq(404)
+          end
+        end
+
+        context 'when start_version_id is from another issuable' do
+          it 'returns 404' do
+            other_version = create(:description_version)
+
+            get_description_diff(version_id: version_3, start_version_id: other_version)
+
+            expect(response.status).to eq(404)
+          end
+        end
+
+        context 'when start_version_id is deleted' do
+          it 'returns 404' do
+            version_2.delete!
+
+            get_description_diff(version_id: version_3, start_version_id: version_2)
+
+            expect(response.status).to eq(404)
+          end
+        end
+
+        context 'when description version is deleted' do
+          it 'returns 404' do
+            version_3.delete!
+
+            delete_description_version(version_id: version_3)
+
+            expect(response.status).to eq(404)
+          end
         end
       end
 
-      context 'when start_version_id is from another issuable' do
-        it 'returns 404' do
-          other_version = create(:description_version)
+      context 'DELETE description_diff' do
+        before do
+          developer_user = create(:user)
+          issuable.resource_parent.add_developer(developer_user)
+          sign_in(developer_user)
+        end
 
-          get_description_diff(version_id: version_3, start_version_id: other_version)
+        it 'returns 200' do
+          delete_description_version(version_id: version_3)
 
-          expect(response.status).to eq(404)
+          expect(response.status).to eq(200)
+          expect(version_3.reload.deleted_at).to be_present
+        end
+
+        context 'when start_version_id is present' do
+          it 'returns 200' do
+            delete_description_version(version_id: version_3, start_version_id: version_1)
+
+            expect(response.status).to eq(200)
+            expect(version_1.reload.deleted_at).to be_present
+            expect(version_2.reload.deleted_at).to be_present
+            expect(version_3.reload.deleted_at).to be_present
+          end
+        end
+
+        context 'when version is already deleted' do
+          it 'returns 404' do
+            version_3.delete!
+
+            delete_description_version(version_id: version_3)
+
+            expect(response.status).to eq(404)
+          end
+        end
+
+        context 'when user cannot admin issuable' do
+          it 'returns 404' do
+            guest_user = create(:user)
+            issuable.resource_parent.add_guest(guest_user)
+            sign_in(guest_user)
+
+            delete_description_version(version_id: version_3)
+
+            expect(response.status).to eq(404)
+            expect(version_3.reload.deleted_at).to be_nil
+          end
         end
       end
     end
@@ -61,10 +134,20 @@ shared_examples DescriptionDiffActions do
         stub_licensed_features(epics: true, description_diffs: false)
       end
 
-      it 'returns 404' do
-        get_description_diff(version_id: version_3)
+      context 'GET description_diff' do
+        it 'returns 404' do
+          get_description_diff(version_id: version_3)
 
-        expect(response.status).to eq(404)
+          expect(response.status).to eq(404)
+        end
+      end
+
+      context 'DELETE description_diff' do
+        it 'returns 404' do
+          delete_description_version(version_id: version_3)
+
+          expect(response.status).to eq(404)
+        end
       end
     end
   end

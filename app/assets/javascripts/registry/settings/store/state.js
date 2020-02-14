@@ -8,6 +8,10 @@ export default () => ({
    */
   isLoading: false,
   /*
+   * Boolean to determine if the user is allowed to interact with the form
+   */
+  isDisabled: false,
+  /*
    * This contains the data shown and manipulated in the UI
    * Has the following structure:
    * {
@@ -23,4 +27,8 @@ export default () => ({
    * Same structure as settings, above but Frozen object and used only in case the user clicks 'cancel'
    */
   original: {},
+  /*
+   * Contains the options used to populate the form selects
+   */
+  formOptions: {},
 });

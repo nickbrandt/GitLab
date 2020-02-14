@@ -13,7 +13,7 @@ module QA
             license_page.add_new_license(license) unless license_page.license?
           end
 
-          QA::Page::Main::Menu.perform(&:sign_out)
+          QA::Page::Main::Menu.perform(&:sign_out_if_signed_in)
         end
       end
     end

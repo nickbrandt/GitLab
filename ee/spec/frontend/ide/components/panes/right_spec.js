@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import EERightPane from 'ee/ide/components/panes/right.vue';
 import RightPane from '~/ide/components/panes/right.vue';
@@ -29,6 +29,7 @@ describe('IDE EERightPane', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   it('adds terminal tab', () => {

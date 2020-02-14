@@ -6,8 +6,8 @@ module LicenseHelper
 
   delegate :new_admin_license_path, to: 'Gitlab::Routing.url_helpers'
 
-  def active_user_count
-    User.active.count
+  def current_active_user_count
+    License.current&.current_active_users_count || active_user_count
   end
 
   def guest_user_count
@@ -48,6 +48,13 @@ module LicenseHelper
       message << 'service.'
     end
 
+    unless is_trial
+      renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
+      renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
+      link_end = '</a>'.html_safe
+      message << _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
+    end
+
     message.join(' ').html_safe
   end
 
@@ -79,6 +86,10 @@ module LicenseHelper
     return @current_license if defined?(@current_license)
 
     @current_license = License.current
+  end
+
+  def current_license_title
+    @current_license_title ||= License.current ? License.current.plan.titleize : 'Core'
   end
 
   def new_trial_url
@@ -131,4 +142,10 @@ module LicenseHelper
   end
 
   extend self
+
+  private
+
+  def active_user_count
+    User.active.count
+  end
 end

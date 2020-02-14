@@ -104,299 +104,130 @@ describe SystemNoteService do
   end
 
   describe '.change_epic_date_note' do
-    let(:timestamp) { Time.now }
+    let(:date_type) { double }
+    let(:date) { double }
 
-    context 'when start date was changed' do
-      let(:noteable) { create(:epic) }
-
-      subject { described_class.change_epic_date_note(noteable, author, 'start date', timestamp) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_date_changed' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:change_epic_date_note).with(date_type, date)
       end
 
-      it 'sets the note text' do
-        expect(subject.note).to eq "changed start date to #{timestamp.strftime('%b %-d, %Y')}"
-      end
-    end
-
-    context 'when start date was removed' do
-      let(:noteable) { create(:epic, start_date: timestamp) }
-
-      subject { described_class.change_epic_date_note(noteable, author, 'start date', nil) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_date_changed' }
-      end
-
-      it 'sets the note text' do
-        expect(subject.note).to eq 'removed the start date'
-      end
-    end
-
-    context '.issue_promoted' do
-      context 'note on the epic' do
-        subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
-
-        it_behaves_like 'a system note', exclude_project: true do
-          let(:action) { 'moved' }
-          let(:expected_noteable) { epic }
-        end
-
-        it 'sets the note text' do
-          expect(subject.note).to eq("promoted from issue #{issue.to_reference(group)}")
-        end
-      end
-
-      context 'note on the issue' do
-        subject { described_class.issue_promoted(issue, epic, author, direction: :to) }
-
-        it_behaves_like 'a system note' do
-          let(:action) { 'moved' }
-        end
-
-        it 'sets the note text' do
-          expect(subject.note).to eq("promoted to epic #{epic.to_reference(project)}")
-        end
-      end
+      described_class.change_epic_date_note(noteable, author, date_type, date)
     end
   end
 
   describe '.epic_issue' do
-    let(:noteable) { epic }
+    let(:type) { double }
 
-    context 'issue added to an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :added) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_issue_added' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:epic_issue).with(noteable, type)
       end
 
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("added issue #{issue.to_reference(epic.group)}")
-      end
-    end
-
-    context 'issue removed from an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :removed) }
-
-      it_behaves_like 'a system note', exclude_project: true do
-        let(:action) { 'epic_issue_removed' }
-      end
-
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("removed issue #{issue.to_reference(epic.group)}")
-      end
-    end
-
-    context 'invalid type' do
-      it 'raises an error' do
-        expect { described_class.issue_on_epic(issue, epic, author, :invalid) }
-          .not_to change { Note.count }
-      end
+      described_class.epic_issue(epic, noteable, author, type)
     end
   end
 
   describe '.issue_on_epic' do
-    context 'issue added to an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :added) }
+    let(:type) { double }
 
-      it_behaves_like 'a system note' do
-        let(:action) { 'issue_added_to_epic' }
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:issue_on_epic).with(noteable, type)
       end
 
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("added to epic #{epic.to_reference(issue.project)}")
-      end
-    end
-
-    context 'issue removed from an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :removed) }
-
-      it_behaves_like 'a system note' do
-        let(:action) { 'issue_removed_from_epic' }
-      end
-
-      it 'creates the note text correctly' do
-        expect(subject.note).to eq("removed from epic #{epic.to_reference(issue.project)}")
-      end
-    end
-
-    context 'invalid type' do
-      it 'does not create a new note' do
-        expect { described_class.issue_on_epic(issue, epic, author, :invalid) }
-          .not_to change { Note.count }
-      end
+      described_class.issue_on_epic(noteable, epic, author, type)
     end
   end
 
-  describe '.relate_epic' do
-    let(:child_epic) { create(:epic, parent: epic, group: group) }
-    let(:noteable) { child_epic }
+  describe '.change_epics_relation' do
+    let(:child_epic) { double }
+    let(:type) { double }
 
-    subject { described_class.change_epics_relation(epic, child_epic, author, 'relate_epic') }
-
-    it_behaves_like 'a system note', exclude_project: true do
-      let(:action) { 'relate_epic' }
-    end
-
-    context 'when epic is added as child to a parent epic' do
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("added epic &#{child_epic.iid} as child epic")
-        expect(Note.last.note).to eq("added epic &#{epic.iid} as parent epic")
-      end
-    end
-
-    context 'when added epic is from a subgroup' do
-      let(:subgroup) {create(:group, parent: group)}
-
-      before do
-        child_epic.update!({ group: subgroup })
+    it 'calls EpicsService' do
+      expect_next_instance_of(EE::SystemNotes::EpicsService) do |service|
+        expect(service).to receive(:change_epics_relation).with(child_epic, type)
       end
 
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("added epic #{group.path}/#{subgroup.path}&#{child_epic.iid} as child epic")
-        expect(Note.last.note).to eq("added epic #{group.path}&#{epic.iid} as parent epic")
-      end
-    end
-  end
-
-  describe '.unrelate_epic' do
-    let(:child_epic) { create(:epic, parent: epic, group: group) }
-    let(:noteable) { child_epic }
-
-    subject { described_class.change_epics_relation(epic, child_epic, author, 'unrelate_epic') }
-
-    it_behaves_like 'a system note', exclude_project: true do
-      let(:action) { 'unrelate_epic' }
-    end
-
-    context 'when child epic is removed from a parent epic' do
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("removed child epic &#{child_epic.iid}")
-        expect(Note.last.note).to eq("removed parent epic &#{epic.iid}")
-      end
-    end
-
-    context 'when removed epic is from a subgroup' do
-      let(:subgroup) {create(:group, parent: group)}
-
-      before do
-        child_epic.update!({ group: subgroup })
-      end
-
-      it 'sets the note text' do
-        expect { subject }.to change { Note.system.count }.from(0).to(2)
-        expect(Note.first.note).to eq("removed child epic #{group.path}/#{subgroup.path}&#{child_epic.iid}")
-        expect(Note.last.note).to eq("removed parent epic #{group.path}&#{epic.iid}")
-      end
+      described_class.change_epics_relation(epic, child_epic, author, type)
     end
   end
 
   describe '.merge_train' do
-    subject { described_class.merge_train(noteable, project, author, noteable.merge_train) }
+    let(:merge_train) { double }
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('started a merge train')
-    end
-
-    context 'when index of the merge request is not zero' do
-      before do
-        allow(noteable.merge_train).to receive(:index) { 1 }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:enqueue).with(merge_train)
       end
 
-      it "posts the 'merge train' system note" do
-        expect(subject.note).to eq('added this merge request to the merge train at position 2')
-      end
+      described_class.merge_train(noteable, project, author, merge_train)
     end
   end
 
   describe '.cancel_merge_train' do
-    subject { described_class.cancel_merge_train(noteable, project, author) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:cancel)
+      end
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-    let(:reason) { }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('removed this merge request from the merge train')
+      described_class.cancel_merge_train(noteable, project, author)
     end
   end
 
   describe '.abort_merge_train' do
-    subject { described_class.abort_merge_train(noteable, project, author, 'source branch was updated') }
+    let(:message) { double }
 
-    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
-    let(:reason) { }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:abort).with(message)
+      end
 
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'merge train' system note" do
-      expect(subject.note).to eq('removed this merge request from the merge train because source branch was updated')
+      described_class.abort_merge_train(noteable, project, author, message)
     end
   end
 
   describe '.add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, pipeline.sha) }
+    let(:sha) { double }
 
-    let(:pipeline) { build(:ci_pipeline) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:add_when_pipeline_succeeds).with(sha)
+      end
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
-    end
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to match(%r{enabled automatic add to merge train when the pipeline for (\w+/\w+@)?\h{40} succeeds})
+      described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, sha)
     end
   end
 
   describe '.cancel_add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author) }
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:cancel_add_when_pipeline_succeeds)
+      end
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
-    end
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
-
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to eq 'cancelled automatic add to merge train'
+      described_class.cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author)
     end
   end
 
   describe '.abort_add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, 'target branch was changed') }
+    let(:message) { double }
 
-    let(:noteable) do
-      create(:merge_request, source_project: project, target_project: project)
+    it 'calls MergeTrainService' do
+      expect_next_instance_of(EE::SystemNotes::MergeTrainService) do |service|
+        expect(service).to receive(:abort_add_when_pipeline_succeeds).with(message)
+      end
+
+      described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, message)
     end
+  end
 
-    it_behaves_like 'a system note' do
-      let(:action) { 'merge' }
-    end
+  describe '.auto_resolve_prometheus_alert' do
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:auto_resolve_prometheus_alert)
+      end
 
-    it "posts the 'add to merge train when pipeline succeeds' system note" do
-      expect(subject.note).to eq 'aborted automatic add to merge train because target branch was changed'
+      described_class.auto_resolve_prometheus_alert(noteable, project, author)
     end
   end
 end

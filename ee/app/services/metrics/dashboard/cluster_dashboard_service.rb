@@ -13,6 +13,17 @@ module Metrics
         STAGES::ClusterEndpointInserter,
         STAGES::Sorter
       ].freeze
+
+      class << self
+        def valid_params?(params)
+          params[:cluster].present?
+        end
+      end
+
+      # Permissions are handled at the controller level
+      def allowed?
+        true
+      end
     end
   end
 end

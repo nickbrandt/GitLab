@@ -6,13 +6,6 @@ describe Users::UpdateService do
   let(:user) { create(:user) }
 
   describe '#execute' do
-    it 'updates the name' do
-      result = update_user(user, name: 'New Name')
-
-      expect(result).to eq(status: :success)
-      expect(user.name).to eq('New Name')
-    end
-
     it 'updates time preferences' do
       result = update_user(user, timezone: 'Europe/Warsaw', time_display_relative: true, time_format_in_24h: false)
 
@@ -60,6 +53,15 @@ describe Users::UpdateService do
 
       expect(result[:status]).to eq(:error)
       expect(result[:message]).to eq("Emoji is not included in the list")
+    end
+
+    it 'ignores read-only attributes' do
+      allow(user).to receive(:read_only_attribute?).with(:name).and_return(true)
+
+      expect do
+        update_user(user, name: 'changed' + user.name)
+        user.reload
+      end.not_to change { user.name }
     end
 
     def update_user(user, opts)

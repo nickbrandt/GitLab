@@ -1,5 +1,5 @@
 import { shallowMount, RouterLinkStub } from '@vue/test-utils';
-import { GlBadge, GlLink } from '@gitlab/ui';
+import { GlBadge, GlLink, GlLoadingIcon } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
 import TableRow from '~/repository/components/table/row.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -51,6 +51,20 @@ describe('Repository table row component', () => {
     });
   });
 
+  it('renders table row for path with special character', () => {
+    factory({
+      id: '1',
+      sha: '123',
+      path: 'test$/test',
+      type: 'file',
+      currentPath: 'test$',
+    });
+
+    return vm.vm.$nextTick().then(() => {
+      expect(vm.element).toMatchSnapshot();
+    });
+  });
+
   it.each`
     type        | component         | componentName
     ${'tree'}   | ${RouterLinkStub} | ${'RouterLink'}
@@ -88,10 +102,26 @@ describe('Repository table row component', () => {
       vm.trigger('click');
 
       if (pushes) {
-        expect($router.push).toHaveBeenCalledWith({ path: '/tree/master/test' });
+        expect($router.push).toHaveBeenCalledWith({ path: '/-/tree/master/test' });
       } else {
         expect($router.push).not.toHaveBeenCalled();
       }
+    });
+  });
+
+  it('pushes new route for directory with hash', () => {
+    factory({
+      id: '1',
+      sha: '123',
+      path: 'test#',
+      type: 'tree',
+      currentPath: '/',
+    });
+
+    return vm.vm.$nextTick().then(() => {
+      vm.trigger('click');
+
+      expect($router.push).toHaveBeenCalledWith({ path: '/-/tree/master/test%23' });
     });
   });
 
@@ -197,5 +227,18 @@ describe('Repository table row component', () => {
     return vm.vm.$nextTick().then(() => {
       expect(vm.find(Icon).exists()).toBe(true);
     });
+  });
+
+  it('renders loading icon when path is loading', () => {
+    factory({
+      id: '1',
+      sha: '1',
+      path: 'test',
+      type: 'tree',
+      currentPath: '/',
+      loadingPath: 'test',
+    });
+
+    expect(vm.find(GlLoadingIcon).exists()).toBe(true);
   });
 });

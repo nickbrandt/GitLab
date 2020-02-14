@@ -17,6 +17,7 @@ class Milestone < ApplicationRecord
   include StripAttribute
   include Milestoneish
   include FromUnion
+  include Importable
   include Gitlab::SQL::Pattern
 
   prepend_if_ee('::EE::Milestone') # rubocop: disable Cop/InjectEnterpriseEditionModule
@@ -30,16 +31,13 @@ class Milestone < ApplicationRecord
   has_many :milestone_releases
   has_many :releases, through: :milestone_releases
 
-  has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.milestones&.maximum(:iid) }
-  has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.milestones&.maximum(:iid) }
+  has_internal_id :iid, scope: :project, track_if: -> { !importing? }, init: ->(s) { s&.project&.milestones&.maximum(:iid) }
+  has_internal_id :iid, scope: :group, track_if: -> { !importing? }, init: ->(s) { s&.group&.milestones&.maximum(:iid) }
 
   has_many :issues
   has_many :labels, -> { distinct.reorder('labels.title') }, through: :issues
   has_many :merge_requests
   has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
-
-  has_many :issue_milestones
-  has_many :merge_request_milestones
 
   scope :of_projects, ->(ids) { where(project_id: ids) }
   scope :of_groups, ->(ids) { where(group_id: ids) }
@@ -56,6 +54,12 @@ class Milestone < ApplicationRecord
     groups = [] if groups.nil?
 
     where(project_id: projects).or(where(group_id: groups))
+  end
+
+  scope :within_timeframe, -> (start_date, end_date) do
+    where('start_date is not NULL or due_date is not NULL')
+      .where('start_date is NULL or start_date <= ?', end_date)
+      .where('due_date is NULL or due_date >= ?', start_date)
   end
 
   scope :order_by_name_asc, -> { order(Arel::Nodes::Ascending.new(arel_table[:title].lower)) }
@@ -227,7 +231,7 @@ class Milestone < ApplicationRecord
     reference = "#{self.class.reference_prefix}#{format_reference}"
 
     if project
-      "#{project.to_reference(from, full: full)}#{reference}"
+      "#{project.to_reference_base(from, full: full)}#{reference}"
     else
       reference
     end

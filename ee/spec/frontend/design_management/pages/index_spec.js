@@ -8,6 +8,7 @@ import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesi
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
 import UploadButton from 'ee/design_management/components/upload/button.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
+import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
 import createFlash from '~/flash';
 
 const localVue = createLocalVue();
@@ -15,7 +16,7 @@ localVue.use(VueRouter);
 const router = new VueRouter({
   routes: [
     {
-      name: 'designs',
+      name: DESIGNS_ROUTE_NAME,
       path: '/designs',
       component: Index,
     },
@@ -70,8 +71,9 @@ describe('Design management index page', () => {
     allVersions = [],
     createDesign = true,
     stubs = {},
+    mockMutate = jest.fn().mockResolvedValue(),
   } = {}) {
-    mutate = jest.fn(() => Promise.resolve());
+    mutate = mockMutate;
     const $apollo = {
       queries: {
         designs: {
@@ -216,6 +218,8 @@ describe('Design management index page', () => {
                 },
               },
             ],
+            skippedDesigns: [],
+            errors: [],
           },
         },
       };
@@ -252,7 +256,7 @@ describe('Design management index page', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.filesToBeSaved).toEqual([]);
         expect(wrapper.vm.isSaving).toBeFalsy();
-        expect(wrapper.vm.$router.currentRoute.path).toEqual('/designs');
+        expect(wrapper.vm.isLatestVersion).toBe(true);
       });
     });
 
@@ -301,9 +305,32 @@ describe('Design management index page', () => {
         expect(createFlash).toHaveBeenCalled();
       });
     });
+
+    it('flashes warning if designs are skipped', () => {
+      createComponent({
+        mockMutate: () =>
+          Promise.resolve({
+            data: { designManagementUpload: { skippedDesigns: [{ filename: 'test.jpg' }] } },
+          }),
+      });
+
+      const uploadDesign = wrapper.vm.onUploadDesign([
+        {
+          name: 'test',
+        },
+      ]);
+
+      return uploadDesign.then(() => {
+        expect(createFlash).toHaveBeenCalledTimes(1);
+        expect(createFlash).toHaveBeenCalledWith(
+          'Upload skipped. test.jpg did not change.',
+          'warning',
+        );
+      });
+    });
   });
 
-  describe('on latest version', () => {
+  describe('on latest version when has designs', () => {
     beforeEach(() => {
       createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
     });
@@ -312,13 +339,10 @@ describe('Design management index page', () => {
       expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
     });
 
-    it('renders Delete selected button', () => {
-      expect(findDeleteButton().exists()).toBe(true);
-    });
-
-    it('renders a button with Select all text', () => {
-      expect(findSelectAllButton().exists()).toBe(true);
-      expect(findSelectAllButton().text()).toBe('Select all');
+    it('renders toolbar buttons', () => {
+      expect(findToolbar().exists()).toBe(true);
+      expect(findToolbar().classes()).toContain('d-flex');
+      expect(findToolbar().classes()).not.toContain('d-none');
     });
 
     it('adds two designs to selected designs when their checkboxes are checked', () => {
@@ -375,12 +399,17 @@ describe('Design management index page', () => {
     });
   });
 
+  it('on latest version when has no designs does not render toolbar buttons', () => {
+    createComponent({ designs: [], allVersions: [mockVersion] });
+    expect(findToolbar().exists()).toBe(false);
+  });
+
   describe('on non-latest version', () => {
     beforeEach(() => {
       createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
 
       router.replace({
-        name: 'designs',
+        name: DESIGNS_ROUTE_NAME,
         query: {
           version: '2',
         },

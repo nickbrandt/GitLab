@@ -142,12 +142,14 @@ describe API::ProjectContainerRepositories do
         let(:worker_params) do
           { name_regex: 'v10.*',
             keep_n: 100,
-            older_than: '1 day' }
+            older_than: '1 day',
+            container_expiration_policy: false }
         end
 
         let(:lease_key) { "container_repository:cleanup_tags:#{root_repository.id}" }
 
         it 'schedules cleanup of tags repository' do
+          stub_last_activity_update
           stub_exclusive_lease(lease_key, timeout: 1.hour)
           expect(CleanupContainerRepositoryWorker).to receive(:perform_async)
             .with(maintainer.id, root_repository.id, worker_params)

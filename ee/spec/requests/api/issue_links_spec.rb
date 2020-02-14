@@ -53,7 +53,7 @@ describe API::IssueLinks do
           target_issue = create(:issue)
 
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: 999, target_issue_iid: target_issue.iid }
+               params: { target_project_id: -1, target_issue_iid: target_issue.iid }
 
           expect(response).to have_gitlab_http_status(404)
           expect(json_response['message']).to eq('404 Project Not Found')
@@ -126,22 +126,9 @@ describe API::IssueLinks do
           expect_link_response(link_type: 'blocks')
         end
 
-        context 'when `issue_link_types` is disabled' do
-          before do
-            stub_feature_flags(issue_link_types: false)
-          end
-
-          it 'ignores `link_type` parameter' do
-            post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-                 params: { target_project_id: project.id, target_issue_iid: target_issue.iid, link_type: 'blocks' }
-
-            expect_link_response
-          end
-        end
-
         it 'returns 201 when sending full path of target project' do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
-               params: { target_project_id: project.to_reference(full: true), target_issue_iid: target_issue.iid }
+               params: { target_project_id: project.full_path, target_issue_iid: target_issue.iid }
 
           expect_link_response
         end

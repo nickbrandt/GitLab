@@ -6,6 +6,47 @@ describe API::Users do
   let(:user)  { create(:user) }
   let(:admin) { create(:admin) }
 
+  context 'updating name' do
+    shared_examples_for 'admin can update the name of a user' do
+      it 'updates the user with new name' do
+        put api("/users/#{user.id}", admin), params: { name: 'New Name' }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['name']).to eq('New Name')
+      end
+    end
+
+    context 'when `disable_name_update_for_users` feature is available' do
+      before do
+        stub_licensed_features(disable_name_update_for_users: true)
+      end
+
+      context 'when the ability to update their name is disabled for users' do
+        before do
+          stub_application_setting(updating_name_disabled_for_users: true)
+        end
+
+        it_behaves_like 'admin can update the name of a user'
+      end
+
+      context 'when the ability to update their name is not disabled for users' do
+        before do
+          stub_application_setting(updating_name_disabled_for_users: false)
+        end
+
+        it_behaves_like 'admin can update the name of a user'
+      end
+    end
+
+    context 'when `disable_name_update_for_users` feature is not available' do
+      before do
+        stub_licensed_features(disable_name_update_for_users: false)
+      end
+
+      it_behaves_like 'admin can update the name of a user'
+    end
+  end
+
   context 'extended audit events' do
     describe "PUT /users/:id" do
       it "creates audit event when updating user with new password" do

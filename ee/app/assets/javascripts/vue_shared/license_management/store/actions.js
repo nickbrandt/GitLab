@@ -20,7 +20,7 @@ export const requestDeleteLicense = ({ commit }) => {
 };
 export const receiveDeleteLicense = ({ commit, dispatch }) => {
   commit(types.RECEIVE_DELETE_LICENSE);
-  dispatch('loadManagedLicenses');
+  dispatch('fetchManagedLicenses');
 };
 export const receiveDeleteLicenseError = ({ commit }, error) => {
   commit(types.RECEIVE_DELETE_LICENSE_ERROR, error);
@@ -39,102 +39,67 @@ export const deleteLicense = ({ dispatch, state }) => {
     });
 };
 
-export const requestLoadManagedLicenses = ({ commit }) => {
-  commit(types.REQUEST_LOAD_MANAGED_LICENSES);
+export const requestManagedLicenses = ({ commit }) => {
+  commit(types.REQUEST_MANAGED_LICENSES);
 };
-export const receiveLoadManagedLicenses = ({ commit }, licenses) => {
-  commit(types.RECEIVE_LOAD_MANAGED_LICENSES, licenses);
+export const receiveManagedLicensesSuccess = ({ commit }, licenses) => {
+  commit(types.RECEIVE_MANAGED_LICENSES_SUCCESS, licenses);
 };
-export const receiveLoadManagedLicensesError = ({ commit }, error) => {
-  commit(types.RECEIVE_LOAD_MANAGED_LICENSES_ERROR, error);
+export const receiveManagedLicensesError = ({ commit }, error) => {
+  commit(types.RECEIVE_MANAGED_LICENSES_ERROR, error);
 };
-export const loadManagedLicenses = ({ dispatch, state }) => {
-  dispatch('requestLoadManagedLicenses');
+export const fetchManagedLicenses = ({ dispatch, state }) => {
+  dispatch('requestManagedLicenses');
 
   const { apiUrlManageLicenses } = state;
 
   return axios
     .get(apiUrlManageLicenses, { params: { per_page: 100 } })
     .then(({ data }) => {
-      dispatch('receiveLoadManagedLicenses', data);
+      dispatch('receiveManagedLicensesSuccess', data);
     })
     .catch(error => {
-      dispatch('receiveLoadManagedLicensesError', error);
+      dispatch('receiveManagedLicensesError', error);
     });
 };
 
-export const requestLoadParsedLicenseReport = ({ commit }) => {
-  commit(types.REQUEST_LOAD_PARSED_LICENSE_REPORT);
+export const requestParsedLicenseReport = ({ commit }) => {
+  commit(types.REQUEST_PARSED_LICENSE_REPORT);
 };
-export const receiveLoadParsedLicenseReport = ({ commit }, reports) => {
-  commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT, reports);
+export const receiveParsedLicenseReportSuccess = ({ commit }, reports) => {
+  commit(types.RECEIVE_PARSED_LICENSE_REPORT_SUCCESS, reports);
 };
-export const receiveLoadParsedLicenseReportError = ({ commit }, error) => {
-  commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, error);
+export const receiveParsedLicenseReportError = ({ commit }, error) => {
+  commit(types.RECEIVE_PARSED_LICENSE_REPORT_ERROR, error);
 };
-export const loadParsedLicenseReport = ({ dispatch, state }) => {
-  dispatch('requestLoadParsedLicenseReport');
+export const fetchParsedLicenseReport = ({ dispatch, state }) => {
+  dispatch('requestParsedLicenseReport');
 
   pollUntilComplete(state.licensesApiPath)
     .then(({ data }) => {
       const newLicenses = (data.new_licenses || data).map(convertToOldReportFormat);
       const existingLicenses = (data.existing_licenses || []).map(convertToOldReportFormat);
-      dispatch('receiveLoadParsedLicenseReport', { newLicenses, existingLicenses });
-    })
-    .catch(() => {
-      dispatch('receiveLoadLicenseReportError');
-    });
-};
-
-export const requestLoadLicenseReport = ({ commit }) => {
-  commit(types.REQUEST_LOAD_LICENSE_REPORT);
-};
-export const receiveLoadLicenseReport = ({ commit }, reports) => {
-  commit(types.RECEIVE_LOAD_LICENSE_REPORT, reports);
-};
-export const receiveLoadLicenseReportError = ({ commit }, error) => {
-  commit(types.RECEIVE_LOAD_LICENSE_REPORT_ERROR, error);
-};
-export const loadLicenseReport = ({ dispatch, state }) => {
-  dispatch('requestLoadLicenseReport');
-
-  const { headPath, basePath } = state;
-
-  const promises = [axios.get(headPath).then(({ data }) => data)];
-
-  if (basePath) {
-    promises.push(
-      axios
-        .get(basePath)
-        .then(({ data }) => data)
-        .catch(e => {
-          if (e.response.status === 404) {
-            return {};
-          }
-
-          throw e;
-        }),
-    );
-  }
-
-  return Promise.all(promises)
-    .then(([headReport, baseReport = {}]) => {
-      dispatch('receiveLoadLicenseReport', { headReport, baseReport });
+      dispatch('receiveParsedLicenseReportSuccess', { newLicenses, existingLicenses });
     })
     .catch(error => {
-      dispatch('receiveLoadLicenseReportError', error);
+      dispatch('receiveParsedLicenseReportError', error);
     });
 };
 
 export const requestSetLicenseApproval = ({ commit }) => {
   commit(types.REQUEST_SET_LICENSE_APPROVAL);
 };
-export const receiveSetLicenseApproval = ({ commit, dispatch }) => {
+export const receiveSetLicenseApproval = ({ commit, dispatch, state }) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL);
-  if (gon.features && gon.features.parsedLicenseReport) {
-    dispatch('loadParsedLicenseReport');
+  // If we have the licenses API endpoint, fetch from there. This corresponds
+  // to the cases that we're viewing the merge request or pipeline pages.
+  // Otherwise, fetch from the managed licenses endpoint, which corresponds to
+  // the project settings page.
+  // https://gitlab.com/gitlab-org/gitlab/issues/201867
+  if (state.licensesApiPath) {
+    dispatch('fetchParsedLicenseReport');
   } else {
-    dispatch('loadManagedLicenses');
+    dispatch('fetchManagedLicenses');
   }
 };
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {

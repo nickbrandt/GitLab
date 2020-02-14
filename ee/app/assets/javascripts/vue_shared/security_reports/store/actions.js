@@ -48,37 +48,26 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
 
 /**
- * SAST CONTAINER
+ * CONTAINER SCANNING
  */
-export const setSastContainerHeadPath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_HEAD_PATH, path);
 
-export const setSastContainerBasePath = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_BASE_PATH, path);
+export const setContainerScanningDiffEndpoint = ({ commit }, path) =>
+  commit(types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT, path);
 
-export const setSastContainerDiffEndpoint = ({ commit }, path) =>
-  commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
+export const requestContainerScanningDiff = ({ commit }) =>
+  commit(types.REQUEST_CONTAINER_SCANNING_DIFF);
 
-export const requestSastContainerReports = ({ commit }) =>
-  commit(types.REQUEST_SAST_CONTAINER_REPORTS);
+export const receiveContainerScanningDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS, response);
 
-export const receiveSastContainerReports = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_CONTAINER_REPORTS, response);
+export const receiveContainerScanningDiffError = ({ commit }) =>
+  commit(types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR);
 
-export const receiveSastContainerError = ({ commit }, error) =>
-  commit(types.RECEIVE_SAST_CONTAINER_ERROR, error);
-
-export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
-
-export const receiveSastContainerDiffError = ({ commit }) =>
-  commit(types.RECEIVE_SAST_CONTAINER_DIFF_ERROR);
-
-export const fetchSastContainerDiff = ({ state, dispatch }) => {
-  dispatch('requestSastContainerReports');
+export const fetchContainerScanningDiff = ({ state, dispatch }) => {
+  dispatch('requestContainerScanningDiff');
 
   return Promise.all([
-    pollUntilComplete(state.sastContainer.paths.diffEndpoint),
+    pollUntilComplete(state.containerScanning.paths.diffEndpoint),
     axios.get(state.vulnerabilityFeedbackPath, {
       params: {
         category: 'container_scanning',
@@ -86,39 +75,13 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
     }),
   ])
     .then(values => {
-      dispatch('receiveSastContainerDiffSuccess', {
+      dispatch('receiveContainerScanningDiffSuccess', {
         diff: values[0].data,
         enrichData: values[1].data,
       });
     })
     .catch(() => {
-      dispatch('receiveSastContainerDiffError');
-    });
-};
-
-export const fetchSastContainerReports = ({ state, dispatch }) => {
-  const { base, head } = state.sastContainer.paths;
-
-  dispatch('requestSastContainerReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'container_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveSastContainerReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveSastContainerError');
+      dispatch('receiveContainerScanningDiffError');
     });
 };
 
@@ -128,44 +91,9 @@ export const updateContainerScanningIssue = ({ commit }, issue) =>
 /**
  * DAST
  */
-export const setDastHeadPath = ({ commit }, path) => commit(types.SET_DAST_HEAD_PATH, path);
-
-export const setDastBasePath = ({ commit }, path) => commit(types.SET_DAST_BASE_PATH, path);
-
 export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
 
-export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
-
-export const receiveDastReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DAST_REPORTS, response);
-
-export const receiveDastError = ({ commit }, error) => commit(types.RECEIVE_DAST_ERROR, error);
-
-export const fetchDastReports = ({ state, dispatch }) => {
-  const { base, head } = state.dast.paths;
-
-  dispatch('requestDastReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dast',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDastReports', {
-        head: values && values[0] ? values[0].data : null,
-        base: values && values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDastError');
-    });
-};
+export const requestDastDiff = ({ commit }) => commit(types.REQUEST_DAST_DIFF);
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
@@ -175,7 +103,7 @@ export const receiveDastDiffSuccess = ({ commit }, response) =>
 export const receiveDastDiffError = ({ commit }) => commit(types.RECEIVE_DAST_DIFF_ERROR);
 
 export const fetchDastDiff = ({ state, dispatch }) => {
-  dispatch('requestDastReports');
+  dispatch('requestDastDiff');
 
   return Promise.all([
     pollUntilComplete(state.dast.paths.diffEndpoint),
@@ -199,23 +127,12 @@ export const fetchDastDiff = ({ state, dispatch }) => {
 /**
  * DEPENDENCY SCANNING
  */
-export const setDependencyScanningHeadPath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_HEAD_PATH, path);
-
-export const setDependencyScanningBasePath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
 
 export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
 
-export const requestDependencyScanningReports = ({ commit }) =>
-  commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
-
-export const receiveDependencyScanningReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_REPORTS, response);
-
-export const receiveDependencyScanningError = ({ commit }, error) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_ERROR, error);
+export const requestDependencyScanningDiff = ({ commit }) =>
+  commit(types.REQUEST_DEPENDENCY_SCANNING_DIFF);
 
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
@@ -224,7 +141,7 @@ export const receiveDependencyScanningDiffError = ({ commit }) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR);
 
 export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
-  dispatch('requestDependencyScanningReports');
+  dispatch('requestDependencyScanningDiff');
 
   return Promise.all([
     pollUntilComplete(state.dependencyScanning.paths.diffEndpoint),
@@ -242,32 +159,6 @@ export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('receiveDependencyScanningDiffError');
-    });
-};
-
-export const fetchDependencyScanningReports = ({ state, dispatch }) => {
-  const { base, head } = state.dependencyScanning.paths;
-
-  dispatch('requestDependencyScanningReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dependency_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDependencyScanningReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDependencyScanningError');
     });
 };
 
@@ -511,11 +402,11 @@ export const createMergeRequest = ({ state, dispatch }) => {
 };
 
 export const downloadPatch = ({ state }) => {
-  /* 
+  /*
     This action doesn't actually mutate the Vuex state and is a dirty
-    workaround to modifying the dom. We do this because gl-split-button 
-    relies on a old version of vue-bootstrap and it doesn't allow us to 
-    set a href for a file download. 
+    workaround to modifying the dom. We do this because gl-split-button
+    relies on a old version of vue-bootstrap and it doesn't allow us to
+    set a href for a file download.
 
     https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
   */

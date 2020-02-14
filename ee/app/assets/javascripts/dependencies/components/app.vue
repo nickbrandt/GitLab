@@ -159,7 +159,7 @@ export default {
         </template>
         <paginated-dependencies-table :namespace="listType.namespace" />
       </gl-tab>
-      <template #tabs>
+      <template #tabs-end>
         <li class="d-flex align-items-center ml-sm-auto">
           <dependencies-actions :namespace="currentList" class="my-2 my-sm-0" />
         </li>

@@ -122,10 +122,12 @@ describe('RelatedItemsTreeApp', () => {
 
     describe('handleAddItemFormSubmit', () => {
       it('calls `addItem` action when `pendingReferences` prop in state is not empty', () => {
-        const newValue = '&1 &2';
+        const emitObj = {
+          pendingReferences: '&1 &2',
+        };
         jest.spyOn(wrapper.vm, 'addItem').mockImplementation();
 
-        wrapper.vm.handleAddItemFormSubmit(newValue);
+        wrapper.vm.handleAddItemFormSubmit(emitObj);
 
         expect(wrapper.vm.addItem).toHaveBeenCalled();
       });

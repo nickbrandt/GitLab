@@ -152,5 +152,25 @@ describe TrialsController do
         end
       end
     end
+
+    it "calls the ApplyTrialService with correct parameters" do
+      gl_com_params = { gitlab_com_trial: true, sync_to_gl: true }
+      post_params = {
+        namespace_id: namespace.id.to_s,
+        trial_entity: 'company',
+        glm_source: 'source',
+        glm_content: 'content'
+      }
+      apply_trial_params = {
+        uid: user.id,
+        trial_user:  ActionController::Parameters.new(post_params).permit(:namespace_id, :trial_entity, :glm_source, :glm_content).merge(gl_com_params)
+      }
+
+      expect_next_instance_of(GitlabSubscriptions::ApplyTrialService) do |service|
+        expect(service).to receive(:execute).with(apply_trial_params).and_return({ success: true })
+      end
+
+      post :apply, params: post_params
+    end
   end
 end

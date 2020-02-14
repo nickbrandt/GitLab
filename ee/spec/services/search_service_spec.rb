@@ -4,6 +4,77 @@ require 'spec_helper'
 
 describe SearchService do
   describe '#search_objects' do
+    context 'redacting search results (repository)', :elastic, :sidekiq_inline do
+      let(:project) { create(:project, :repository) }
+      let(:user) { project.creator }
+
+      subject(:search_service) { described_class.new(user, search: '*', scope: scope, page: 1) }
+
+      shared_examples 'it redacts incorrect results' do
+        before do
+          stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+          Gitlab::Elastic::Indexer.new(project).run
+          Gitlab::Elastic::Helper.refresh_index
+
+          # disable permission to test redaction
+          allow(Ability).to receive(:allowed?).and_call_original
+          allow(Ability).to receive(:allowed?).with(user, ability, a_kind_of(model_class)).and_return(allowed)
+        end
+
+        context 'when allowed' do
+          let(:allowed) { true }
+
+          it 'does nothing' do
+            results = subject.search_objects
+
+            expect(results).not_to be_empty
+            expect(results).to all(be_an(model_class))
+          end
+        end
+
+        context 'when disallowed' do
+          let(:allowed) { false }
+
+          it 'redacts results' do
+            results = subject.search_objects
+
+            expect(results).to be_empty
+          end
+        end
+      end
+
+      context 'commits' do
+        let(:scope) { 'commits' }
+        let(:model_class) { Commit }
+        let(:ability) { :read_commit }
+
+        it_behaves_like 'it redacts incorrect results'
+      end
+
+      context 'blobs' do
+        let(:scope) { 'blobs' }
+        let(:model_class) { Gitlab::Search::FoundBlob }
+        let(:ability) { :read_blob }
+
+        it_behaves_like 'it redacts incorrect results'
+      end
+
+      context 'wiki blobs' do
+        let(:project) { create(:project, :wiki_repo) }
+        let(:scope) { 'wiki_blobs' }
+        let(:model_class) { Gitlab::Search::FoundWikiPage }
+        let(:ability) { :read_wiki_page }
+
+        it_behaves_like 'it redacts incorrect results' do
+          before do
+            create(:wiki_page, wiki: project.wiki)
+            Gitlab::Elastic::Indexer.new(project, wiki: true).run
+            Gitlab::Elastic::Helper.refresh_index
+          end
+        end
+      end
+    end
+
     context 'redacting search results' do
       let(:user) { create(:user) }
 
@@ -21,8 +92,6 @@ describe SearchService do
       let(:note_on_unauthorized_issue) { create(:note, project: unauthorized_project, noteable: issue1_in_unauthorized_project) }
       let(:merge_request_in_unauthorized_project) { create(:merge_request_with_diffs, target_project: unauthorized_project, source_project: unauthorized_project) }
       let(:milestone_in_unauthorized_project) { create(:milestone, project: unauthorized_project) }
-      let(:wiki_page) { WikiPages::CreateService.new(unauthorized_project, user, { title: "foo", content: "wiki_blobs" }).execute }
-      let(:commit) { unauthorized_project.repository.commit(SeedRepo::FirstCommit::ID) }
 
       let(:search_service) { described_class.new(user, search: 'some-search-string', page: 1) }
       let(:mock_global_service) { instance_double(Search::GlobalService, scope: 'some-scope') }
@@ -146,55 +215,6 @@ describe SearchService do
 
         expect(subject).to be_kind_of(Kaminari::PaginatableArray)
         expect(subject).to contain_exactly(note_on_issue_in_project)
-      end
-
-      it 'redacts commits the user does not have access to' do
-        allow(mock_results).to receive(:objects)
-          .and_return(
-            Kaminari.paginate_array(
-              [
-                commit
-              ],
-              total_count: 1,
-              limit: 1,
-              offset: 0
-            )
-          )
-
-        expect(subject).to be_kind_of(Kaminari::PaginatableArray)
-        expect(subject).to be_empty
-      end
-
-      it 'redacts blobs the user does not have access to' do
-        blob = unauthorized_project.repository.blob_at(SeedRepo::FirstCommit::ID, 'README.md')
-        response = Elasticsearch::Model::Response::Response.new Blob, double(:search)
-
-        allow(response).to receive_messages(
-          results: [blob],
-          total_count: 1,
-          limit_value: 10,
-          offset_value: 0
-        )
-        allow(mock_results).to receive(:objects).and_return(response)
-
-        expect(subject).to be_kind_of(Kaminari::PaginatableArray)
-        expect(subject).to be_empty
-      end
-
-      it 'redacts wikis the user does not have access to' do
-        wiki_page = create(:wiki_page, wiki: unauthorized_project.wiki)
-        response = Elasticsearch::Model::Response::Response.new WikiPage, double(:search)
-
-        allow(response).to receive_messages(
-          results: [wiki_page],
-          total_count: 1,
-          limit_value: 10,
-          offset_value: 0
-        )
-        allow(mock_results).to receive(:objects).and_return(response)
-
-        expect(subject).to be_kind_of(Kaminari::PaginatableArray)
-        expect(subject).to be_empty
       end
     end
   end

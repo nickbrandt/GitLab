@@ -55,7 +55,7 @@ describe Projects::DeployKeysController do
       it 'returns 404' do
         put :enable, params: { id: 0, namespace_id: project.namespace, project_id: project }
 
-        expect(response).to have_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

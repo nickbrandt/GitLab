@@ -6,7 +6,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
   include StubGitlabCalls
   include RedisHelpers
 
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
 
   describe '/api/v4/jobs' do
     let(:runner) { create(:ci_runner, :project, projects: [project]) }

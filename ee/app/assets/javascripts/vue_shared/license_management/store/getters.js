@@ -1,19 +1,13 @@
 import { n__, s__, sprintf } from '~/locale';
-import { parseLicenseReportMetrics } from './utils';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 
 export const isLoading = state => state.isLoadingManagedLicenses || state.isLoadingLicenseReport;
 
-export const licenseReport = state =>
-  gon.features && gon.features.parsedLicenseReport
-    ? state.newLicenses
-    : parseLicenseReportMetrics(state.headReport, state.baseReport, state.managedLicenses);
+export const licenseReport = state => state.newLicenses;
 
 export const licenseSummaryText = (state, getters) => {
   const hasReportItems = getters.licenseReport && getters.licenseReport.length;
-  const baseReportHasLicenses =
-    state.existingLicenses.length ||
-    (state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length);
+  const baseReportHasLicenses = state.existingLicenses.length;
 
   if (getters.isLoading) {
     return sprintf(s__('ciReport|Loading %{reportName} report'), {

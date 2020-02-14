@@ -19,7 +19,7 @@ class TrialsController < ApplicationController
     @result = GitlabSubscriptions::CreateLeadService.new.execute({ trial_user: company_params })
 
     if @result[:success]
-      redirect_to select_trials_url
+      redirect_to select_trials_url(glm_source: params[:glm_source], glm_content: params[:glm_content])
     else
       render :new
     end
@@ -66,7 +66,7 @@ class TrialsController < ApplicationController
     gl_com_params = { gitlab_com_trial: true, sync_to_gl: true }
 
     {
-      trial_user: params.permit(:namespace_id).merge(gl_com_params),
+      trial_user: params.permit(:namespace_id, :trial_entity, :glm_source, :glm_content).merge(gl_com_params),
       uid: current_user.id
     }
   end

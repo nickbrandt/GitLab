@@ -160,6 +160,7 @@ module Gitlab
 
     def self.execute(storage, service, rpc, request, remote_storage:, timeout:)
       enforce_gitaly_request_limits(:call)
+      Gitlab::RequestContext.instance.ensure_deadline_not_exceeded!
 
       kwargs = request_kwargs(storage, timeout: timeout.to_f, remote_storage: remote_storage)
       kwargs = yield(kwargs) if block_given?
@@ -234,11 +235,27 @@ module Gitlab
       metadata['gitaly-session-id'] = session_id
       metadata.merge!(Feature::Gitaly.server_feature_flags)
 
-      result = { metadata: metadata }
+      deadline_info = request_deadline(timeout)
+      metadata.merge!(deadline_info.slice(:deadline_type))
 
-      result[:deadline] = real_time + timeout if timeout > 0
-      result
+      { metadata: metadata, deadline: deadline_info[:deadline] }
     end
+
+    def self.request_deadline(timeout)
+      # timeout being 0 means the request is allowed to run indefinitely.
+      # We can't allow that inside a request, but this won't count towards Gitaly
+      # error budgets
+      regular_deadline = real_time.to_i + timeout if timeout > 0
+
+      return { deadline: regular_deadline } if Sidekiq.server?
+      return { deadline: regular_deadline } unless Gitlab::RequestContext.instance.request_deadline
+
+      limited_deadline = [regular_deadline, Gitlab::RequestContext.instance.request_deadline].compact.min
+      limited = limited_deadline < regular_deadline
+
+      { deadline: limited_deadline, deadline_type: limited ? "limited" : "regular" }
+    end
+    private_class_method :request_deadline
 
     def self.session_id
       Gitlab::SafeRequestStore[:gitaly_session_id] ||= SecureRandom.uuid
@@ -415,10 +432,7 @@ module Gitlab
     end
 
     def self.filesystem_id(storage)
-      response = Gitlab::GitalyClient::ServerService.new(storage).info
-      storage_status = response.storage_statuses.find { |status| status.storage_name == storage }
-
-      storage_status&.filesystem_id
+      Gitlab::GitalyClient::ServerService.new(storage).storage_info&.filesystem_id
     end
 
     def self.filesystem_id_from_disk(storage)
@@ -427,6 +441,14 @@ module Gitlab
       metadata_hash['gitaly_filesystem_id']
     rescue Errno::ENOENT, Errno::EACCES, JSON::ParserError
       nil
+    end
+
+    def self.filesystem_disk_available(storage)
+      Gitlab::GitalyClient::ServerService.new(storage).storage_disk_statistics&.available
+    end
+
+    def self.filesystem_disk_used(storage)
+      Gitlab::GitalyClient::ServerService.new(storage).storage_disk_statistics&.used
     end
 
     def self.timeout(timeout_name)

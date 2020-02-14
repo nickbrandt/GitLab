@@ -6,7 +6,7 @@ describe Projects::FeatureFlagsController do
   include Gitlab::Routing
   include FeatureFlagHelpers
 
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:user) { developer }
   let(:developer) { create(:user) }
   let(:reporter) { create(:user) }
@@ -26,36 +26,24 @@ describe Projects::FeatureFlagsController do
     subject { get(:index, params: view_params) }
 
     context 'when there is no feature flags' do
-      before do
-        subject
-      end
-
-      it 'renders page' do
-        expect(response).to be_ok
+      it 'responds with success' do
+        is_expected.to have_gitlab_http_status(:ok)
       end
     end
 
     context 'for a list of feature flags' do
       let!(:feature_flags) { create_list(:operations_feature_flag, 50, project: project) }
 
-      before do
-        subject
-      end
-
-      it 'renders page' do
-        expect(response).to have_gitlab_http_status(:ok)
+      it 'responds with success' do
+        is_expected.to have_gitlab_http_status(:ok)
       end
     end
 
     context 'when feature is not available' do
       let(:feature_enabled) { false }
 
-      before do
-        subject
-      end
-
-      it 'shows not found' do
-        expect(subject).to have_gitlab_http_status(404)
+      it 'responds with not found' do
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -102,9 +90,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      subject
-
-      expect(response).to match_response_schema('feature_flags', dir: 'ee')
+      is_expected.to match_response_schema('feature_flags', dir: 'ee')
     end
 
     it 'returns false for active when the feature flag is inactive even if it has an active scope' do
@@ -119,6 +105,14 @@ describe Projects::FeatureFlagsController do
       feature_flag_json = json_response['feature_flags'].second
 
       expect(feature_flag_json['active']).to eq(false)
+    end
+
+    it 'returns the feature flag iid' do
+      subject
+
+      feature_flag_json = json_response['feature_flags'].first
+
+      expect(feature_flag_json['iid']).to eq(feature_flag_active.iid)
     end
 
     context 'when scope is specified' do
@@ -220,9 +214,7 @@ describe Projects::FeatureFlagsController do
     subject { get(:new, params: view_params) }
 
     it 'renders the form' do
-      subject
-
-      expect(response).to be_ok
+      is_expected.to have_gitlab_http_status(:ok)
     end
   end
 
@@ -249,9 +241,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      subject
-
-      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag', dir: 'ee')
     end
 
     context 'when feature flag is not found' do
@@ -266,9 +256,7 @@ describe Projects::FeatureFlagsController do
       end
 
       it 'returns 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -276,9 +264,7 @@ describe Projects::FeatureFlagsController do
       let(:user) { reporter }
 
       it 'returns 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -338,9 +324,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'returns 200' do
-      subject
-
-      expect(response).to have_gitlab_http_status(200)
+      is_expected.to have_gitlab_http_status(:ok)
     end
 
     it 'creates a new feature flag' do
@@ -359,9 +343,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      subject
-
-      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag', dir: 'ee')
     end
 
     context 'when the same named feature flag has already existed' do
@@ -370,9 +352,7 @@ describe Projects::FeatureFlagsController do
       end
 
       it 'returns 400' do
-        subject
-
-        expect(response).to have_gitlab_http_status(400)
+        is_expected.to have_gitlab_http_status(:bad_request)
       end
 
       it 'returns an error message' do
@@ -407,9 +387,7 @@ describe Projects::FeatureFlagsController do
       let(:user) { reporter }
 
       it 'returns 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -428,7 +406,7 @@ describe Projects::FeatureFlagsController do
       it 'creates feature flag scopes successfully' do
         expect { subject }.to change { Operations::FeatureFlagScope.count }.by(2)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'creates feature flag scopes in a correct order' do
@@ -453,7 +431,7 @@ describe Projects::FeatureFlagsController do
         it 'returns 400' do
           subject
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message'])
             .to include('Default scope has to be the first element')
         end
@@ -541,9 +519,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'returns 200' do
-      subject
-
-      expect(response).to have_gitlab_http_status(200)
+      is_expected.to have_gitlab_http_status(:ok)
     end
 
     it 'deletes one feature flag' do
@@ -555,18 +531,14 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      subject
-
-      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag', dir: 'ee')
     end
 
     context 'when user is reporter' do
       let(:user) { reporter }
 
       it 'returns 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -601,9 +573,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'returns 200' do
-      subject
-
-      expect(response).to have_gitlab_http_status(200)
+      is_expected.to have_gitlab_http_status(:ok)
     end
 
     it 'updates the name of the feature flag name' do
@@ -613,9 +583,7 @@ describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      subject
-
-      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag', dir: 'ee')
     end
 
     context 'when updates active' do
@@ -664,9 +632,7 @@ describe Projects::FeatureFlagsController do
       let(:user) { reporter }
 
       it 'returns 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
+        is_expected.to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -703,9 +669,7 @@ describe Projects::FeatureFlagsController do
       end
 
       it 'returns 400' do
-        subject
-
-        expect(response).to have_gitlab_http_status(400)
+        is_expected.to have_gitlab_http_status(:bad_request)
       end
     end
 
@@ -753,9 +717,7 @@ describe Projects::FeatureFlagsController do
       end
 
       it 'returns 400' do
-        subject
-
-        expect(response).to have_gitlab_http_status(400)
+        is_expected.to have_gitlab_http_status(:bad_request)
       end
     end
 

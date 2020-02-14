@@ -12,7 +12,9 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
 
   let(:email_raw) { email_fixture('emails/service_desk.eml', dir: 'ee') }
   let_it_be(:namespace) { create(:namespace, name: "email") }
-  let(:expected_description) { "Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)" }
+  let(:expected_description) do
+    "Service desk stuff!\n\n```\na = b\n```\n\n`/label ~label1`\n`/assign @user1`\n`/close`\n![image](uploads/image.png)"
+  end
 
   context 'service desk is enabled for the project' do
     let_it_be(:project) { create(:project, :repository, :public, namespace: namespace, path: 'test', service_desk_enabled: true) }
@@ -100,16 +102,16 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
               expect(issue.milestone).to eq(milestone)
             end
 
-            it 'does not apply quick actions present on user email body' do
+            it 'redacts quick actions present on user email body' do
               set_template_file('service_desk1', 'text from template')
 
               receiver.execute
 
               issue = Issue.last
               expect(issue).to be_opened
-              expect(issue.description).not_to include('/label ~label1')
-              expect(issue.description).not_to include('/assign @user1')
-              expect(issue.description).not_to include('/close')
+              expect(issue.description).to include('`/label ~label1`')
+              expect(issue.description).to include('`/assign @user1`')
+              expect(issue.description).to include('`/close`')
               expect(issue.assignees).to be_empty
               expect(issue.milestone).to be_nil
             end

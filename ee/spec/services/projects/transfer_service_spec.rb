@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Projects::TransferService do
   include EE::GeoHelpers
 
-  let(:user) { create(:user) }
-  let(:group) { create(:group) }
-  let(:project) { create(:project, :repository, namespace: user.namespace) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let(:project) { create(:project, :repository, :legacy_storage, namespace: user.namespace) }
 
   subject { described_class.new(project, user) }
 
@@ -79,6 +79,84 @@ describe Projects::TransferService do
       it 'does allow the transfer' do
         expect(subject.execute(other_group)).to be true
         expect(project.errors[:new_namespace]).to be_empty
+      end
+    end
+  end
+
+  describe 'transferring a design repository' do
+    def design_repository
+      project.design_repository
+    end
+
+    it 'does not create a design repository' do
+      expect(subject.execute(group)).to be true
+
+      project.clear_memoization(:design_repository)
+
+      expect(design_repository.exists?).to be false
+    end
+
+    describe 'when the project has a design repository' do
+      let(:project_repo_path) { "#{project.path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}" }
+      let(:old_full_path) { "#{user.namespace.full_path}/#{project_repo_path}" }
+      let(:new_full_path) { "#{group.full_path}/#{project_repo_path}" }
+
+      context 'with legacy storage' do
+        let(:project) { create(:project, :repository, :legacy_storage, :design_repo, namespace: user.namespace) }
+
+        it 'moves the repository' do
+          expect(subject.execute(group)).to be true
+
+          project.clear_memoization(:design_repository)
+
+          expect(design_repository).to have_attributes(
+            disk_path: new_full_path,
+            full_path: new_full_path
+          )
+        end
+
+        it 'does not move the repository when an error occurs', :aggregate_failures do
+          allow(subject).to receive(:execute_system_hooks).and_raise('foo')
+          expect { subject.execute(group) }.to raise_error('foo')
+
+          project.clear_memoization(:design_repository)
+
+          expect(design_repository).to have_attributes(
+            disk_path: old_full_path,
+            full_path: old_full_path
+          )
+        end
+      end
+
+      context 'with hashed storage' do
+        let(:project) { create(:project, :repository, namespace: user.namespace) }
+
+        it 'does not move the repository' do
+          old_disk_path = design_repository.disk_path
+
+          expect(subject.execute(group)).to be true
+
+          project.clear_memoization(:design_repository)
+
+          expect(design_repository).to have_attributes(
+            disk_path: old_disk_path,
+            full_path: new_full_path
+          )
+        end
+
+        it 'does not move the repository when an error occurs' do
+          old_disk_path = design_repository.disk_path
+
+          allow(subject).to receive(:execute_system_hooks).and_raise('foo')
+          expect { subject.execute(group) }.to raise_error('foo')
+
+          project.clear_memoization(:design_repository)
+
+          expect(design_repository).to have_attributes(
+            disk_path: old_disk_path,
+            full_path: old_full_path
+          )
+        end
       end
     end
   end

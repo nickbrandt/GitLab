@@ -24,7 +24,8 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
       commits_anchor_data,
       branches_anchor_data,
       tags_anchor_data,
-      files_anchor_data
+      files_anchor_data,
+      releases_anchor_data
     ].compact.select(&:is_link)
   end
 
@@ -153,6 +154,22 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
                    empty_repo? ? nil : project_tree_path(project))
   end
 
+  def releases_anchor_data
+    return unless can?(current_user, :read_release, project)
+
+    releases_count = project.releases.count
+    return if releases_count < 1
+
+    AnchorData.new(true,
+                   statistic_icon('rocket') +
+                   n_('%{strong_start}%{release_count}%{strong_end} Release', '%{strong_start}%{release_count}%{strong_end} Releases', releases_count).html_safe % {
+                     release_count: number_with_delimiter(releases_count),
+                     strong_start: '<strong class="project-stat-value">'.html_safe,
+                     strong_end: '</strong>'.html_safe
+                   },
+                  project_releases_path(project))
+  end
+
   def commits_anchor_data
     AnchorData.new(true,
                    statistic_icon('commit') +
@@ -191,7 +208,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
       AnchorData.new(false,
                      statistic_icon + _('New file'),
                      project_new_blob_path(project, default_branch || 'master'),
-                     'success')
+                     'missing')
     end
   end
 
@@ -285,7 +302,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
         cluster_link = clusters.count == 1 ? project_cluster_path(project, clusters.first) : project_clusters_path(project)
 
         AnchorData.new(false,
-                       _('Kubernetes configured'),
+                       _('Kubernetes'),
                        cluster_link,
                       'default')
       end

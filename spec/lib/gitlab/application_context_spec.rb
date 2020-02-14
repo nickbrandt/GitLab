@@ -28,7 +28,7 @@ describe Gitlab::ApplicationContext do
   describe '.push' do
     it 'passes the expected context on to labkit' do
       fake_proc = duck_type(:call)
-      expected_context = hash_including(user: fake_proc, project: fake_proc, root_namespace: fake_proc)
+      expected_context = { user: fake_proc }
 
       expect(Labkit::Context).to receive(:push).with(expected_context)
 
@@ -43,11 +43,11 @@ describe Gitlab::ApplicationContext do
   describe '#to_lazy_hash' do
     let(:user) { build(:user) }
     let(:project) { build(:project) }
-    let(:namespace) { build(:group) }
-    let(:subgroup) { build(:group, parent: namespace) }
+    let(:namespace) { create(:group) }
+    let(:subgroup) { create(:group, parent: namespace) }
 
     def result(context)
-      context.to_lazy_hash.transform_values { |v| v.call }
+      context.to_lazy_hash.transform_values { |v| v.respond_to?(:call) ? v.call : v }
     end
 
     it 'does not call the attributes until needed' do
@@ -77,6 +77,20 @@ describe Gitlab::ApplicationContext do
 
       expect(result(context))
         .to include(project: project.full_path, root_namespace: project.full_path_components.first)
+    end
+  end
+
+  describe '#use' do
+    let(:context) { described_class.new(user: build(:user)) }
+
+    it 'yields control' do
+      expect { |b| context.use(&b) }.to yield_control
+    end
+
+    it 'passes the expected context on to labkit' do
+      expect(Labkit::Context).to receive(:with_context).with(a_hash_including(user: duck_type(:call)))
+
+      context.use {}
     end
   end
 end

@@ -6,9 +6,13 @@ module EE
 
     override :sidebar_projects_paths
     def sidebar_projects_paths
-      super + %w[
-        projects/insights#show
-      ]
+      if ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, @project)
+        super
+      else
+        super + %w[
+          projects/insights#show
+        ]
+      end
     end
 
     override :sidebar_settings_paths
@@ -59,7 +63,7 @@ module EE
         nav_tabs << :packages
       end
 
-      if ::Feature.enabled?(:code_review_analytics, project)
+      if can?(current_user, :read_code_review_analytics, project)
         nav_tabs << :code_review
       end
 
@@ -122,7 +126,7 @@ module EE
 
     override :remove_project_message
     def remove_project_message(project)
-      return super unless project.feature_available?(:marking_project_for_deletion)
+      return super unless project.feature_available?(:adjourned_deletion_for_projects_and_groups)
 
       date = permanent_deletion_date(Time.now.utc)
       _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?") %
@@ -163,9 +167,10 @@ module EE
     def sidebar_security_paths
       %w[
         projects/security/configuration#show
-        projects/security/dashboard#show
-        projects/dependencies#show
-        projects/licenses#show
+        projects/security/dashboard#index
+        projects/security/vulnerabilities#index
+        projects/dependencies#index
+        projects/licenses#index
         projects/threat_monitoring#show
       ]
     end
@@ -251,6 +256,17 @@ module EE
 
     def any_project_nav_tab?(tabs)
       tabs.any? { |tab| project_nav_tab?(tab) }
+    end
+
+    def show_discover_project_security?(project)
+      security_feature_available_at = DateTime.new(2020, 1, 20)
+
+      !!current_user &&
+        ::Gitlab.com? &&
+        current_user.created_at > security_feature_available_at &&
+        !project.feature_available?(:security_dashboard) &&
+        can?(current_user, :admin_namespace, project.root_ancestor) &&
+        current_user.ab_feature_enabled?(:discover_security)
     end
 
     def settings_operations_available?

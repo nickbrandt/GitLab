@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Vulnerabilities::History do
   describe '#findings_counter', :use_clean_rails_memory_store_caching do
     shared_examples 'the history cache when given an expected Vulnerable' do
-      let(:filters) { project_ids }
+      let(:filters) { ActionController::Parameters.new }
       let(:today) { Date.parse('20191031') }
 
       before do
@@ -18,7 +18,7 @@ describe Gitlab::Vulnerabilities::History do
       subject(:counter) { described_class.new(vulnerable, params: filters).findings_counter }
 
       context 'when filters are passed' do
-        let(:filters) { project_ids.merge(report_type: :sast) }
+        let(:filters) { ActionController::Parameters.new({ 'report_type' => ['sast'] }) }
 
         it 'does not call Gitlab::Vulnerabilities::HistoryCache' do
           expect(Gitlab::Vulnerabilities::HistoryCache).not_to receive(:new)
@@ -57,6 +57,20 @@ describe Gitlab::Vulnerabilities::History do
         end
       end
 
+      context 'when a project_id filter is passed' do
+        let(:filters) { ActionController::Parameters.new({ 'project_id' => [project1] }) }
+
+        it 'only fetches history for the filtered by projects' do
+          expect(Gitlab::Vulnerabilities::HistoryCache).to receive(:new).once.and_call_original
+
+          Timecop.freeze(today) do
+            expect(counter[:total]).to eq({ today => 1 })
+            expect(counter[:high]).to eq({})
+            expect(counter[:medium]).to eq({ today => 1 })
+          end
+        end
+      end
+
       def create_vulnerabilities(count, project, options = {})
         report_type = options[:report_type] || :sast
         severity = options[:severity] || :high
@@ -71,29 +85,23 @@ describe Gitlab::Vulnerabilities::History do
         let(:group) { create(:group) }
         let(:project1) { create(:project, :public, namespace: group) }
         let(:project2) { create(:project, :public, namespace: group) }
-        let(:project_ids) { {} }
         let(:vulnerable) { group }
       end
     end
 
-    context 'when given an ApplicationInstance' do
-      let(:vulnerable) { ApplicationInstance.new }
+    context 'when given an InstanceSecurityDashboard' do
+      it_behaves_like 'the history cache when given an expected Vulnerable' do
+        let(:group) { create(:group) }
+        let(:project1) { create(:project, :public, namespace: group) }
+        let(:project2) { create(:project, :public, namespace: group) }
+        let(:user) { create(:user) }
+        let(:vulnerable) { InstanceSecurityDashboard.new(user) }
 
-      context 'and a project_id filter' do
-        it_behaves_like 'the history cache when given an expected Vulnerable' do
-          let(:group) { create(:group) }
-          let(:project1) { create(:project, :public, namespace: group) }
-          let(:project2) { create(:project, :public, namespace: group) }
-          let(:project_ids) { ActionController::Parameters.new({ 'project_id' => [project1, project2] }) }
-        end
-      end
+        before do
+          project1.add_developer(user)
+          project2.add_developer(user)
 
-      context 'and no project_id filter' do
-        it 'throws an error saying that the filter must be given' do
-          expect { described_class.new(vulnerable, params: {}).findings_counter }.to raise_error(
-            Gitlab::Vulnerabilities::History::NoProjectIDsError,
-            "A project_id filter must be given with this #{vulnerable.model_name.human.downcase}"
-          )
+          user.security_dashboard_projects << [project1, project2]
         end
       end
     end

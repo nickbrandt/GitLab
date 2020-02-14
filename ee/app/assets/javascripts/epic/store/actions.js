@@ -7,13 +7,42 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import epicUtils from '../utils/epic_utils';
 import { statusType, statusEvent, dateTypes } from '../constants';
 
+import epicDetailsQuery from '../queries/epicDetails.query.graphql';
 import updateEpic from '../queries/updateEpic.mutation.graphql';
+import epicSetSubscription from '../queries/epicSetSubscription.mutation.graphql';
 
 import * as types from './mutation_types';
 
 export const setEpicMeta = ({ commit }, meta) => commit(types.SET_EPIC_META, meta);
 
 export const setEpicData = ({ commit }, data) => commit(types.SET_EPIC_DATA, data);
+
+export const fetchEpicDetails = ({ state, dispatch }) => {
+  const variables = {
+    fullPath: state.fullPath,
+    iid: state.epicIid,
+  };
+
+  epicUtils.gqClient
+    .query({
+      query: epicDetailsQuery,
+      variables,
+    })
+    .then(({ data }) => {
+      const participants = data.group.epic.participants.edges.map(participant => ({
+        name: participant.node.name,
+        avatar_url: participant.node.avatarUrl,
+        web_url: participant.node.webUrl,
+      }));
+
+      dispatch('setEpicData', { participants });
+    })
+    .catch(() => dispatch('requestEpicParticipantsFailure'));
+};
+
+export const requestEpicParticipantsFailure = () => {
+  flash(__('There was an error getting the epic participants.'));
+};
 
 export const requestEpicStatusChange = ({ commit }) => commit(types.REQUEST_EPIC_STATUS_CHANGE);
 
@@ -128,8 +157,8 @@ export const requestEpicDateSaveFailure = ({ commit }, data) => {
 };
 export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDate }) => {
   const updateEpicInput = {
-    iid: `${state.epicId}`,
-    groupPath: state.groupPath,
+    iid: `${state.epicIid}`,
+    groupPath: state.fullPath,
     [dateType === dateTypes.start ? 'startDateIsFixed' : 'dueDateIsFixed']: dateTypeIsFixed,
   };
 
@@ -182,12 +211,26 @@ export const requestEpicSubscriptionToggleFailure = ({ commit, state }) => {
 };
 export const toggleEpicSubscription = ({ state, dispatch }) => {
   dispatch('requestEpicSubscriptionToggle');
-  axios
-    .post(state.toggleSubscriptionPath)
-    .then(() => {
-      dispatch('requestEpicSubscriptionToggleSuccess', {
-        subscribed: !state.subscribed,
-      });
+  epicUtils.gqClient
+    .mutate({
+      mutation: epicSetSubscription,
+      variables: {
+        epicSetSubscriptionInput: {
+          iid: `${state.epicIid}`,
+          groupPath: state.fullPath,
+          subscribedState: !state.subscribed,
+        },
+      },
+    })
+    .then(({ data }) => {
+      if (!data?.epicSetSubscription?.errors.length) {
+        dispatch('requestEpicSubscriptionToggleSuccess', {
+          subscribed: !state.subscribed,
+        });
+      } else {
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        throw new Error('An error occurred while toggling to notifications.');
+      }
     })
     .catch(() => {
       dispatch('requestEpicSubscriptionToggleFailure');

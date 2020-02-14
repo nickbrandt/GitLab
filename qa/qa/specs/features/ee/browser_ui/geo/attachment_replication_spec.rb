@@ -24,6 +24,8 @@ module QA
           end
         end
 
+        QA::Runtime::Logger.debug('Visiting the secondary geo node')
+
         QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
@@ -51,7 +53,7 @@ module QA
 
           Page::Project::Issue::Show.perform do |show|
             # Wait for attachment replication
-            found = show.wait(reload: false) do
+            found = show.wait_until(reload: false) do
               show.asset_exists?(image_url)
             end
 

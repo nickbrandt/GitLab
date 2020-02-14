@@ -11,17 +11,25 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  podLogsPath: '/:project_full_path/-/logs/k8s.json',
+  k8sPodLogsPath: ':project_path/-/logs/k8s.json',
+  elasticsearchPodLogsPath: ':project_path/-/logs/elasticsearch.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
-  cycleAnalyticsSummaryDataPath: '/-/analytics/cycle_analytics/summary',
-  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
-  cycleAnalyticsStageEventsPath: '/-/analytics/cycle_analytics/stages/:stage_id/records',
-  cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
-  cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
-  cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
+  cycleAnalyticsSummaryDataPath: '/-/analytics/value_stream_analytics/summary',
+  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/value_stream_analytics/stages',
+  cycleAnalyticsStageEventsPath: '/-/analytics/value_stream_analytics/stages/:stage_id/records',
+  cycleAnalyticsStageMedianPath: '/-/analytics/value_stream_analytics/stages/:stage_id/median',
+  cycleAnalyticsStagePath: '/-/analytics/value_stream_analytics/stages/:stage_id',
+  cycleAnalyticsDurationChartPath:
+    '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
+  codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
+  countriesPath: '/-/countries',
+  countryStatesPath: '/-/country_states',
+  paymentFormPath: '/-/subscriptions/payment_form',
+  paymentMethodPath: '/-/subscriptions/payment_method',
+  confirmOrderPath: '/-/subscriptions',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -87,17 +95,24 @@ export default {
    * Returns pods logs for an environment with an optional pod and container
    *
    * @param {Object} params
-   * @param {string} param.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
-   * @param {number} param.environmentId - Id of the environment
+   * @param {Object} param.environment - Environment object
    * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
    * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
+   * @param {string=} params.start - Starting date to query the logs in ISO format
+   * @param {string=} params.end - Ending date to query the logs in ISO format
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
-  getPodLogs({ projectPath, environmentName, podName, containerName, search }) {
-    const url = this.buildUrl(this.podLogsPath).replace(':project_full_path', projectPath);
+  getPodLogs({ environment, podName, containerName, search, start, end }) {
+    let baseUrl;
+    if (environment.enable_advanced_logs_querying) {
+      baseUrl = this.elasticsearchPodLogsPath;
+    } else {
+      baseUrl = this.k8sPodLogsPath;
+    }
+    const url = this.buildUrl(baseUrl.replace(':project_path', environment.project_path));
 
     const params = {
-      environment_name: environmentName,
+      environment_name: environment.name,
     };
 
     if (podName) {
@@ -108,6 +123,12 @@ export default {
     }
     if (search) {
       params.search = search;
+    }
+    if (start) {
+      params.start = start;
+    }
+    if (end) {
+      params.end = end;
     }
 
     return axios.get(url, { params });
@@ -203,6 +224,11 @@ export default {
     });
   },
 
+  codeReviewAnalytics(params = {}) {
+    const url = Api.buildUrl(this.codeReviewAnalyticsPath);
+    return axios.get(url, { params });
+  },
+
   getGeoDesigns(params = {}) {
     const url = Api.buildUrl(this.geoDesignsPath);
     return axios.get(url, { params });
@@ -216,5 +242,30 @@ export default {
   initiateGeoDesignSync({ projectId, action }) {
     const url = Api.buildUrl(this.geoDesignsPath);
     return axios.put(`${url}/${projectId}/${action}`, {});
+  },
+
+  fetchCountries() {
+    const url = Api.buildUrl(this.countriesPath);
+    return axios.get(url);
+  },
+
+  fetchStates(country) {
+    const url = Api.buildUrl(this.countryStatesPath);
+    return axios.get(url, { params: { country } });
+  },
+
+  fetchPaymentFormParams(id) {
+    const url = Api.buildUrl(this.paymentFormPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  fetchPaymentMethodDetails(id) {
+    const url = Api.buildUrl(this.paymentMethodPath);
+    return axios.get(url, { params: { id } });
+  },
+
+  confirmOrder(params = {}) {
+    const url = Api.buildUrl(this.confirmOrderPath);
+    return axios.post(url, params);
   },
 };

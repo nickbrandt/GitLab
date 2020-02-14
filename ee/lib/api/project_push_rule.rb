@@ -78,7 +78,8 @@ module API
         not_found!('Push Rule') unless push_rule
 
         push_rule.destroy
-        status 204
+
+        no_content!
       end
     end
   end

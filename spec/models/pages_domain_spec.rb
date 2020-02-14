@@ -180,8 +180,12 @@ describe PagesDomain do
       expect(subject.wildcard).to eq(false)
     end
 
-    it 'defaults domain_type to project' do
-      expect(subject.domain_type).to eq('project')
+    it 'defaults scope to project' do
+      expect(subject.scope).to eq('project')
+    end
+
+    it 'defaults usage to pages' do
+      expect(subject.usage).to eq('pages')
     end
   end
 
@@ -315,11 +319,11 @@ describe PagesDomain do
   end
 
   describe '#update_daemon' do
-    context 'when domain_type is instance' do
-      it 'does nothing' do
+    context 'when usage is serverless' do
+      it 'does not call the UpdatePagesConfigurationService' do
         expect(Projects::UpdatePagesConfigurationService).not_to receive(:new)
 
-        create(:pages_domain, domain_type: :instance)
+        create(:pages_domain, usage: :serverless)
       end
     end
 
@@ -348,9 +352,9 @@ describe PagesDomain do
     end
 
     context 'configuration updates when attributes change' do
-      set(:project1) { create(:project) }
-      set(:project2) { create(:project) }
-      set(:domain) { create(:pages_domain) }
+      let_it_be(:project1) { create(:project) }
+      let_it_be(:project2) { create(:project) }
+      let_it_be(:domain) { create(:pages_domain) }
 
       where(:attribute, :old_value, :new_value, :update_expected) do
         now = Time.now
@@ -398,8 +402,8 @@ describe PagesDomain do
       end
 
       context 'TLS configuration' do
-        set(:domain_without_tls) { create(:pages_domain, :without_certificate, :without_key) }
-        set(:domain) { create(:pages_domain) }
+        let_it_be(:domain_without_tls) { create(:pages_domain, :without_certificate, :without_key) }
+        let_it_be(:domain) { create(:pages_domain) }
 
         let(:cert1) { domain.certificate }
         let(:cert2) { cert1 + ' ' }

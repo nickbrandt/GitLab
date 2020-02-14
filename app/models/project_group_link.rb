@@ -21,12 +21,18 @@ class ProjectGroupLink < ApplicationRecord
 
   after_commit :refresh_group_members_authorized_projects
 
+  alias_method :shared_with_group, :group
+
   def self.access_options
     Gitlab::Access.options
   end
 
   def self.default_access
     DEVELOPER
+  end
+
+  def self.search(query)
+    joins(:group).merge(Group.search(query))
   end
 
   def human_access

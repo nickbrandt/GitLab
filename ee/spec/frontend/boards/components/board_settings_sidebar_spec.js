@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlDrawer, GlLabel, GlButton, GlFormInput } from '@gitlab/ui';
+import { GlDrawer, GlLabel, GlFormInput, GlAvatarLink, GlAvatarLabeled } from '@gitlab/ui';
 import BoardSettingsSidebar from 'ee/boards/components/board_settings_sidebar.vue';
 import boardsStore from 'ee_else_ce/boards/stores/boards_store_ee';
 import getters from 'ee_else_ce/boards/stores/getters';
@@ -25,8 +25,9 @@ describe('BoardSettingsSideBar', () => {
   const labelTitle = 'test';
   const labelColor = '#FFFF';
   const listId = 1;
+  const currentWipLimit = 1; // Needs to be other than null to trigger requests.
 
-  const createComponent = (state = {}, actions = {}, localState = {}) => {
+  const createComponent = (state = { activeListId: 0 }, actions = {}, localState = {}) => {
     storeActions = actions;
 
     const store = new Vuex.Store({
@@ -81,23 +82,19 @@ describe('BoardSettingsSideBar', () => {
     });
 
     describe('on close', () => {
-      it('calls closeSidebar', done => {
+      it('calls closeSidebar', () => {
         const spy = jest.fn();
-        createComponent({}, { setActiveListId: spy });
+        createComponent({ activeListId: 0 }, { setActiveListId: spy });
 
         wrapper.find(GlDrawer).vm.$emit('close');
 
-        return wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(storeActions.setActiveListId).toHaveBeenCalledWith(
-              expect.anything(),
-              0,
-              undefined,
-            );
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(storeActions.setActiveListId).toHaveBeenCalledWith(
+            expect.anything(),
+            0,
+            undefined,
+          );
+        });
       });
     });
 
@@ -110,6 +107,20 @@ describe('BoardSettingsSideBar', () => {
     });
 
     describe('when activeListId is greater than zero', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          list_type: 'label',
+        });
+      });
+
+      afterEach(() => {
+        boardsStore.store.removeList(listId);
+      });
+
       it('renders GlDrawer with open false', () => {
         createComponent({ activeListId: 1 });
 
@@ -156,12 +167,8 @@ describe('BoardSettingsSideBar', () => {
         mock.restore();
       });
 
-      it('renders label title', () => {
-        expect(wrapper.find(GlLabel).props('title')).toEqual('');
-      });
-
-      it('renders label background color', () => {
-        expect(wrapper.find(GlLabel).props('backgroundColor')).toEqual('');
+      it('does not render GlLabel', () => {
+        expect(wrapper.find(GlLabel).exists()).toBe(false);
       });
     });
   });
@@ -193,6 +200,74 @@ describe('BoardSettingsSideBar', () => {
     });
 
     describe('when activeListWipLimit is greater than 0', () => {
+      describe('when list type is "milestone"', () => {
+        beforeEach(() => {
+          boardsStore.store.addList({
+            id: 1,
+            milestone: {
+              webUrl: 'https://gitlab.com/h5bp/html5-boilerplate/-/milestones/1',
+              title: 'Backlog',
+            },
+            max_issue_count: 1,
+            list_type: 'milestone',
+          });
+        });
+
+        afterEach(() => {
+          boardsStore.store.removeList(1, 'milestone');
+          wrapper.destroy();
+        });
+
+        it('renders the correct milestone text', () => {
+          createComponent({ activeListId: 1 });
+
+          expect(wrapper.find('.js-milestone').text()).toMatchSnapshot();
+        });
+
+        it('renders the correct list type text', () => {
+          createComponent({ activeListId: 1 });
+
+          expect(wrapper.find('.js-list-label').text()).toMatchSnapshot();
+        });
+      });
+
+      describe('when list type is "assignee"', () => {
+        beforeEach(() => {
+          boardsStore.store.addList({
+            id: 1,
+            user: { username: 'root', avatar: '', name: 'Test', webUrl: 'https://gitlab.com/root' },
+            max_issue_count: 1,
+            list_type: 'assignee',
+          });
+        });
+
+        afterEach(() => {
+          boardsStore.store.removeList(1, 'assignee');
+          wrapper.destroy();
+        });
+
+        it('renders gl-avatar-link with correct href', () => {
+          createComponent({ activeListId: 1 });
+
+          expect(wrapper.find(GlAvatarLink).exists()).toBe(true);
+          expect(wrapper.find(GlAvatarLink).attributes('href')).toEqual('https://gitlab.com/root');
+        });
+
+        it('renders gl-avatar-labeled with "root" as username and name as "Test"', () => {
+          createComponent({ activeListId: 1 });
+
+          expect(wrapper.find(GlAvatarLabeled).exists()).toBe(true);
+          expect(wrapper.find(GlAvatarLabeled).attributes('label')).toEqual('Test');
+          expect(wrapper.find(GlAvatarLabeled).attributes('sublabel')).toEqual('@root');
+        });
+
+        it('renders the correct list type text', () => {
+          createComponent({ activeListId: 1 });
+
+          expect(wrapper.find('.js-list-label').text()).toMatchSnapshot();
+        });
+      });
+
       it.each`
         num
         ${1}
@@ -222,45 +297,80 @@ describe('BoardSettingsSideBar', () => {
         list_type: 'label',
       });
 
-      createComponent({ activeListId: listId });
+      createComponent({ activeListId: listId }, { updateListWipLimit: () => {} });
     });
 
-    it('renders an input', done => {
-      wrapper.find(GlButton).vm.$emit('click');
+    it('renders an input', () => {
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.find(GlFormInput).exists()).toBe(true);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(GlFormInput).exists()).toBe(true);
+      });
     });
 
-    it('does not render current wipLimit text', done => {
-      wrapper.find(GlButton).vm.$emit('click');
+    it('does not render current wipLimit text', () => {
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.find('.js-wip-limit').exists()).toBe(false);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find('.js-wip-limit').exists()).toBe(false);
+      });
     });
 
-    it('sets wipLimit to be the value of list.maxIssueCount', done => {
-      expect(wrapper.vm.currentWipLimit).toEqual(0);
+    it('sets wipLimit to be the value of list.maxIssueCount', () => {
+      expect(wrapper.vm.currentWipLimit).toEqual(null);
 
-      wrapper.find(GlButton).vm.$emit('click');
+      wrapper.find('.js-edit-button').vm.$emit('click');
 
-      return wrapper.vm
-        .$nextTick()
-        .then(() => {
-          expect(wrapper.vm.currentWipLimit).toBe(4);
-        })
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.vm.currentWipLimit).toBe(4);
+      });
+    });
+  });
+
+  describe('remove limit', () => {
+    describe('when wipLimit is set', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          max_issue_count: 4,
+          list_type: 'label',
+        });
+        const spy = jest.fn().mockResolvedValue({
+          config: { data: JSON.stringify({ list: { max_issue_count: 0 } }) },
+        });
+
+        createComponent({ activeListId: listId }, { updateListWipLimit: spy });
+      });
+
+      it('resets wipLimit to 0', () => {
+        expect(wrapper.vm.activeList.maxIssueCount).toEqual(4);
+
+        wrapper.find('.js-remove-limit').vm.$emit('click');
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.vm.activeList.maxIssueCount).toEqual(0);
+        });
+      });
+    });
+
+    describe('when wipLimit is not set', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        boardsStore.store.addList({
+          id: listId,
+          label: { title: labelTitle, color: labelColor },
+          max_issue_count: 0,
+          list_type: 'label',
+        });
+
+        createComponent({ activeListId: listId }, { updateListWipLimit: () => {} });
+      });
+
+      it('does not render the remove limit button', () => {
+        expect(wrapper.find('.js-remove-limit').exists()).toBe(false);
+      });
     });
   });
 
@@ -289,9 +399,13 @@ describe('BoardSettingsSideBar', () => {
       describe(`when blur is triggered by ${blurMethod}`, () => {
         it('calls updateListWipLimit', () => {
           const spy = jest.fn().mockResolvedValue({
-            config: { data: JSON.stringify({ list: { max_issue_count: 'hello' } }) },
+            config: { data: JSON.stringify({ list: { max_issue_count: '4' } }) },
           });
-          createComponent({ activeListId: 1 }, { updateListWipLimit: spy }, { edit: true });
+          createComponent(
+            { activeListId: 1 },
+            { updateListWipLimit: spy },
+            { edit: true, currentWipLimit },
+          );
 
           triggerBlur(blurMethod);
 
@@ -302,11 +416,7 @@ describe('BoardSettingsSideBar', () => {
 
         describe('when component wipLimit and List.maxIssueCount are equal', () => {
           it('doesnt call updateListWipLimit', () => {
-            const spy = jest.fn(() =>
-              Promise.resolve({
-                config: { data: JSON.stringify({ list: { max_issue_count: 0 } }) },
-              }),
-            );
+            const spy = jest.fn().mockResolvedValue({});
             createComponent(
               { activeListId: 1 },
               { updateListWipLimit: spy },
@@ -321,16 +431,33 @@ describe('BoardSettingsSideBar', () => {
           });
         });
 
+        describe('when currentWipLimit is null', () => {
+          it('doesnt call updateListWipLimit', () => {
+            const spy = jest.fn().mockResolvedValue({});
+            createComponent(
+              { activeListId: 1 },
+              { updateListWipLimit: spy },
+              { edit: true, currentWipLimit: null },
+            );
+
+            triggerBlur(blurMethod);
+
+            return wrapper.vm.$nextTick().then(() => {
+              expect(spy).toHaveBeenCalledTimes(0);
+            });
+          });
+        });
+
         describe('when response is successful', () => {
           const maxIssueCount = 11;
 
           beforeEach(() => {
-            const spy = jest.fn(() =>
-              Promise.resolve({
-                config: { data: JSON.stringify({ list: { max_issue_count: maxIssueCount } }) },
-              }),
+            const spy = jest.fn().mockResolvedValue({});
+            createComponent(
+              { activeListId: 1 },
+              { updateListWipLimit: spy },
+              { edit: true, currentWipLimit: maxIssueCount },
             );
-            createComponent({ activeListId: 1 }, { updateListWipLimit: spy }, { edit: true });
 
             triggerBlur(blurMethod);
 
@@ -360,7 +487,7 @@ describe('BoardSettingsSideBar', () => {
             createComponent(
               { activeListId: 1 },
               { updateListWipLimit: spy, setActiveListId: () => {} },
-              { edit: true },
+              { edit: true, currentWipLimit },
             );
 
             triggerBlur(blurMethod);

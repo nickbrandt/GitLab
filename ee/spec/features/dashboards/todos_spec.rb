@@ -3,18 +3,18 @@
 require 'spec_helper'
 
 describe 'Dashboard todos' do
-  set(:user) { create(:user) }
-  set(:author)  { create(:user) }
-  set(:project) { create(:project, :public) }
-  set(:issue) { create(:issue, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:author)  { create(:user) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:issue) { create(:issue, project: project) }
   let(:page_path) { dashboard_todos_path }
 
   it_behaves_like 'dashboard gold trial callout'
 
   context 'User has a todo regarding a design' do
-    set(:target) { create(:design, issue: issue) }
-    set(:note) { create(:note, project: project, note: "I am note, hear me roar") }
-    set(:todo) do
+    let_it_be(:target) { create(:design, issue: issue) }
+    let_it_be(:note) { create(:note, project: project, note: "I am note, hear me roar") }
+    let_it_be(:todo) do
       create(:todo, :mentioned,
              user: user,
              project: project,

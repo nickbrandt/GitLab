@@ -160,6 +160,16 @@ describe API::Issues do
           expect(json_response['iid']).not_to eq 9001
         end
       end
+
+      context 'when an issue with the same IID exists on database' do
+        it 'returns 409' do
+          post api("/projects/#{project.id}/issues", admin),
+            params: { title: 'new issue', iid: issue.iid }
+
+          expect(response).to have_gitlab_http_status(409)
+          expect(json_response['message']).to eq 'Duplicated issue'
+        end
+      end
     end
 
     it 'creates a new project issue' do
@@ -379,10 +389,10 @@ describe API::Issues do
     end
 
     before do
-      expect_next_instance_of(SpamService) do |spam_service|
+      expect_next_instance_of(Spam::SpamCheckService) do |spam_service|
         expect(spam_service).to receive_messages(check_for_spam?: true)
       end
-      expect_next_instance_of(AkismetService) do |akismet_service|
+      expect_next_instance_of(Spam::AkismetService) do |akismet_service|
         expect(akismet_service).to receive_messages(spam?: true)
       end
     end

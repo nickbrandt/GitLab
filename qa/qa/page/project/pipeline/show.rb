@@ -30,9 +30,9 @@ module QA::Page
         element :pipeline_badges
       end
 
-      def running?
+      def running?(wait: 0)
         within('.ci-header-container') do
-          page.has_content?('running')
+          page.has_content?('running', wait: wait)
         end
       end
 
@@ -67,13 +67,7 @@ module QA::Page
       end
 
       def click_on_first_job
-        css = '.js-pipeline-graph-job-link'
-
-        wait(reload: false) do
-          has_css?(css)
-        end
-
-        first(css).click
+        first('.js-pipeline-graph-job-link', wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME).click
       end
     end
   end

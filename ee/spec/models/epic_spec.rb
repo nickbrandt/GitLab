@@ -128,8 +128,7 @@ describe Epic do
         epic3 = create(:epic, group: group, parent: epic2)
         epic4 = create(:epic, group: group, parent: epic3)
         epic5 = create(:epic, group: group, parent: epic4)
-        epic6 = create(:epic, group: group, parent: epic5)
-        epic.parent = epic6
+        epic.parent = epic5
 
         expect(epic.valid_parent?).to be_falsey
       end
@@ -149,8 +148,7 @@ describe Epic do
       it 'returns false when total depth after adding would exceed limit' do
         child_epic2 = create(:epic, group: group, parent: child_epic1)
         child_epic3 = create(:epic, group: group, parent: child_epic2)
-        child_epic4 = create(:epic, group: group, parent: child_epic3)
-        create(:epic, group: group, parent: child_epic4)
+        create(:epic, group: group, parent: child_epic3)
 
         epic.parent = parent_epic
 
@@ -284,6 +282,15 @@ describe Epic do
         expect(subject.start_date).to eq(date)
       end
     end
+  end
+
+  it_behaves_like 'within_timeframe scope' do
+    let_it_be(:now) { Time.now }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:resource_1) { create(:epic, group: group, start_date: now - 1.day, end_date: now + 1.day) }
+    let_it_be(:resource_2) { create(:epic, group: group, start_date: now + 2.days, end_date: now + 3.days) }
+    let_it_be(:resource_3) { create(:epic, group: group, end_date: now) }
+    let_it_be(:resource_4) { create(:epic, group: group, start_date: now) }
   end
 
   describe '#start_date_from_milestones' do
@@ -558,4 +565,6 @@ describe Epic do
   end
 
   it_behaves_like 'versioned description'
+
+  it_behaves_like 'having health status'
 end

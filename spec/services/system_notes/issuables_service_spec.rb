@@ -265,7 +265,9 @@ describe ::SystemNotes::IssuablesService do
 
     context 'when cross-reference disallowed' do
       before do
-        expect_any_instance_of(described_class).to receive(:cross_reference_disallowed?).and_return(true)
+        expect_next_instance_of(described_class) do |instance|
+          expect(instance).to receive(:cross_reference_disallowed?).and_return(true)
+        end
       end
 
       it 'returns nil' do
@@ -279,7 +281,9 @@ describe ::SystemNotes::IssuablesService do
 
     context 'when cross-reference allowed' do
       before do
-        expect_any_instance_of(described_class).to receive(:cross_reference_disallowed?).and_return(false)
+        expect_next_instance_of(described_class) do |instance|
+          expect(instance).to receive(:cross_reference_disallowed?).and_return(false)
+        end
       end
 
       it_behaves_like 'a system note' do
@@ -624,6 +628,19 @@ describe ::SystemNotes::IssuablesService do
         expect(service.cross_reference_disallowed?(mentioner))
           .to be_truthy
       end
+    end
+  end
+
+  describe '#close_after_error_tracking_resolve' do
+    subject { service.close_after_error_tracking_resolve }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'closed' }
+    end
+
+    it 'creates the expected system note' do
+      expect(subject.note)
+          .to eq('resolved the corresponding error and closed the issue.')
     end
   end
 end

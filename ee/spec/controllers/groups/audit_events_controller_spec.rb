@@ -8,8 +8,10 @@ describe Groups::AuditEventsController do
   let(:group) { create(:group, :private) }
 
   describe 'GET #index' do
+    let(:sort) { nil }
+
     let(:request) do
-      get :index, params: { group_id: group.to_param }
+      get :index, params: { group_id: group.to_param, sort: sort }
     end
 
     context 'authorized' do
@@ -19,7 +21,7 @@ describe Groups::AuditEventsController do
       end
 
       context 'when audit_events feature is available' do
-        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Group.name, entity_id: group.id).permit! }
+        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Group.name, entity_id: group.id, sort: '').permit! }
 
         before do
           stub_licensed_features(audit_events: true)
@@ -30,32 +32,48 @@ describe Groups::AuditEventsController do
 
           request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:index)
         end
 
         context 'ordering' do
+          shared_examples 'orders by id descending' do
+            it 'orders by id descending' do
+              request
+
+              expect(assigns(:events)).to eq(group.audit_events.order(id: :desc))
+            end
+          end
+
           before do
             create_list(:group_audit_event, 5, entity_id: group.id)
           end
 
-          it 'orders by id descending' do
-            request
-
-            expect(assigns(:events)).to eq(group.audit_events.order(id: :desc))
+          context 'when no sort order is specified' do
+            it_behaves_like 'orders by id descending'
           end
-        end
-      end
 
-      context 'when audit_events feature is not available' do
-        before do
-          stub_licensed_features(audit_events: false)
-        end
+          context 'when sorting by latest events first' do
+            let(:sort) { 'created_desc' }
 
-        it 'renders 404' do
-          request
+            it_behaves_like 'orders by id descending'
+          end
 
-          expect(response).to have_gitlab_http_status(404)
+          context 'when sorting by oldest events first' do
+            let(:sort) { 'created_asc' }
+
+            it 'orders by id ascending' do
+              request
+
+              expect(assigns(:events)).to eq(group.audit_events.order(id: :asc))
+            end
+          end
+
+          context 'when sorting by an unsupported sort order' do
+            let(:sort) { 'FOO' }
+
+            it_behaves_like 'orders by id descending'
+          end
         end
       end
     end
@@ -69,7 +87,7 @@ describe Groups::AuditEventsController do
       it 'renders 404' do
         request
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

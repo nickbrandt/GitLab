@@ -58,13 +58,13 @@ The following languages and dependency managers are supported.
 | Java ([Gradle](https://gradle.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Java ([Maven](https://maven.apache.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | JavaScript ([npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/en/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [Retire.js](https://retirejs.github.io/retire.js/)         |
-| Go ([Golang](https://golang.org/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7132 "Dependency Scanning for Go")) | not available |
 | PHP ([Composer](https://getcomposer.org/))  | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Python ([pip](https://pip.pypa.io/en/stable/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Python ([Pipfile](https://pipenv.kennethreitz.org/en/latest/basics/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/11756 "Pipfile.lock support for Dependency Scanning"))| not available |
 | Python ([poetry](https://poetry.eustace.io/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7006 "Support Poetry in Dependency Scanning")) | not available |
 | Ruby ([gem](https://rubygems.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [bundler-audit](https://github.com/rubysec/bundler-audit) |
 | Scala ([sbt](https://www.scala-sbt.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
+| Go ([Go Modules](https://github.com/golang/go/wiki/Modules)) | yes ([alpha](https://gitlab.com/gitlab-org/gitlab/issues/7132)) | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 
 ## Configuration
 
@@ -79,7 +79,7 @@ Add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
-  template: Dependency-Scanning.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
 ```
 
 The included template will create a `dependency_scanning` job in your CI/CD
@@ -99,7 +99,7 @@ For example:
 
 ```yaml
 include:
-  template: Dependency-Scanning.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
 
 variables:
   DS_PYTHON_VERSION: 2
@@ -116,7 +116,7 @@ after the template inclusion and specify any additional keys under it. For examp
 
 ```yaml
 include:
-  template: Dependency-Scanning.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
 
 dependency_scanning:
   variables:
@@ -134,7 +134,7 @@ using environment variables.
 | `DS_ANALYZER_IMAGE_PREFIX`              | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
 | `DS_ANALYZER_IMAGE_TAG`                 | Override the Docker tag of the official default images. Read more about [customizing analyzers](analyzers.md). |
 | `DS_PYTHON_VERSION`                     | Version of Python. If set to 2, dependencies are installed using Python 2.7 instead of Python 3.6. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12296) in GitLab 12.1)|
-| `DS_PIP_VERSION`                        | Force the install of a specific pip version (example: `"19.3"`), otherwise the pip installed in the docker image is used. |
+| `DS_PIP_VERSION`                        | Force the install of a specific pip version (example: `"19.3"`), otherwise the pip installed in the Docker image is used. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12811) in GitLab 12.7) |
 | `DS_PIP_DEPENDENCY_PATH`                | Path to load Python pip dependencies from. ([Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12412) in GitLab 12.2) |
 | `GEMNASIUM_DB_LOCAL_PATH`               | Path to local gemnasium database (default `/gemnasium-db`).
 | `GEMNASIUM_DB_REMOTE_URL`               | Repository URL for fetching the gemnasium database (default `https://gitlab.com/gitlab-org/security-products/gemnasium-db.git`).
@@ -151,6 +151,8 @@ using environment variables.
 | `PIP_REQUIREMENTS_FILE`                 | Pip requirements file to be scanned. |
 | `MAVEN_CLI_OPTS`                        | List of command line arguments that will be passed to `maven` by the analyzer. The default is `"-DskipTests --batch-mode"`. See an example for [using private repos](#using-private-maven-repos). |
 | `BUNDLER_AUDIT_UPDATE_DISABLED`         | Disable automatic updates for the `bundler-audit` analyzer (default: `"false"`). Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
+| `BUNDLER_AUDIT_ADVISORY_DB_URL`         | URL of the advisory database used by bundler-audit (default: `https://github.com/rubysec/ruby-advisory-db`). |
+| `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME`    | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL` (default: `master`). |
 
 ### Using private Maven repos
 
@@ -187,7 +189,7 @@ This does not require running the executor in privileged mode. For example:
 
 ```yaml
 include:
-  template: Dependency-Scanning.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
 
 variables:
   DS_DISABLE_DIND: "true"

@@ -25,7 +25,7 @@ export default {
         ),
       };
     },
-    sastContainerPopover() {
+    containerScanningPopover() {
       return {
         title: s__(
           'ciReport|Container scanning detects known vulnerabilities in your docker images.',
@@ -33,7 +33,7 @@ export default {
         content: sprintf(
           s__('ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}'),
           {
-            linkStartTag: getLinkStartTag(this.sastContainerHelpPath),
+            linkStartTag: getLinkStartTag(this.containerScanningHelpPath),
             linkEndTag,
           },
           false,

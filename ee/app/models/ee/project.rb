@@ -44,12 +44,10 @@ module EE
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
-      has_one :alerts_service
 
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
-      has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
 
       has_many :reviews, inverse_of: :project
@@ -83,7 +81,6 @@ module EE
 
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
 
-      has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
       has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
@@ -144,6 +141,8 @@ module EE
       scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
       scope :with_repos_templates, -> { where(namespace_id: ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id) }
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
+      scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
+      scope :with_deleting_user, -> { includes(:deleting_user) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -159,7 +158,7 @@ module EE
 
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled?, to: :ci_cd_settings
-      delegate :actual_limits, to: :namespace, allow_nil: true
+      delegate :actual_limits, :actual_plan_name, to: :namespace, allow_nil: true
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
@@ -181,7 +180,6 @@ module EE
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :alerting_setting, update_only: true
-      accepts_nested_attributes_for :incident_management_setting, update_only: true
 
       alias_attribute :fallback_approvals_required, :approvals_before_merge
     end
@@ -196,17 +194,10 @@ module EE
           .where('services.id IS NULL')
       end
 
-      def inner_join_design_management
-        join_statement =
-          arel_table
-            .join(DesignManagement::Design.arel_table, Arel::Nodes::InnerJoin)
-            .on(arel_table[:id].eq(DesignManagement::Design.arel_table[:project_id]))
-
-        joins(join_statement.join_sources)
-      end
-
-      def count_designs
-        inner_join_design_management.distinct.count
+      def find_by_service_desk_project_key(key)
+        # project_key is not indexed for now
+        # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
+        joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
       end
     end
 
@@ -323,6 +314,10 @@ module EE
       feature_available?(:code_owner_approval_required)
     end
 
+    def scoped_approval_rules_enabled?
+      ::Feature.enabled?(:scoped_approval_rules, self, default_enabled: true)
+    end
+
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end
@@ -361,7 +356,7 @@ module EE
     def has_group_hooks?(hooks_scope = :push_hooks)
       return unless group && feature_available?(:group_webhooks)
 
-      group.hooks.hooks_for(hooks_scope).any?
+      group_hooks.hooks_for(hooks_scope).any?
     end
 
     def execute_hooks(data, hooks_scope = :push_hooks)
@@ -369,7 +364,7 @@ module EE
 
       if group && feature_available?(:group_webhooks)
         run_after_commit_or_now do
-          group.hooks.hooks_for(hooks_scope).each do |hook|
+          group_hooks.hooks_for(hooks_scope).each do |hook|
             hook.async_execute(data, hooks_scope.to_s)
           end
         end
@@ -408,14 +403,11 @@ module EE
       end
     end
 
-    def visible_user_defined_rules
-      strong_memoize(:visible_user_defined_rules) do
-        rules = approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
+    def visible_user_defined_rules(branch: nil)
+      return user_defined_rules.take(1) unless multiple_approval_rules_available?
+      return user_defined_rules unless branch
 
-        next rules.take(1) unless multiple_approval_rules_available?
-
-        rules
-      end
+      user_defined_rules.applicable_to_branch(branch)
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
@@ -695,6 +687,7 @@ module EE
       feature_available?(:incident_management)
     end
 
+    override :alerts_service_activated?
     def alerts_service_activated?
       alerts_service_available? && alerts_service&.active?
     end
@@ -708,14 +701,20 @@ module EE
     end
 
     def adjourned_deletion?
-      feature_available?(:marking_project_for_deletion) &&
+      feature_available?(:adjourned_deletion_for_projects_and_groups) &&
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
     end
 
     def marked_for_deletion?
-      return false unless feature_available?(:marking_project_for_deletion)
+      marked_for_deletion_at.present? &&
+        feature_available?(:adjourned_deletion_for_projects_and_groups)
+    end
 
-      marked_for_deletion_at.present?
+    def ancestor_marked_for_deletion
+      return unless feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      ancestors(hierarchy_order: :asc)
+        .joins(:deletion_schedule).first
     end
 
     def has_packages?(package_type)
@@ -728,7 +727,20 @@ module EE
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
     end
 
+    override :template_source?
+    def template_source?
+      return true if namespace_id == ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id
+
+      ::Project.with_groups_level_repos_templates.exists?(id)
+    end
+
     private
+
+    def group_hooks
+      return group.hooks unless ::Feature.enabled?(:sub_group_webhooks, self)
+
+      GroupHook.where(group_id: group.self_and_ancestors)
+    end
 
     def set_override_pull_mirror_available
       self.pull_mirror_available_overridden = read_attribute(:mirror)
@@ -769,6 +781,12 @@ module EE
 
       unless ::Gitlab::GitRefValidator.validate("#{pull_mirror_branch_prefix}master")
         errors.add(:pull_mirror_branch_prefix, _('Invalid Git ref'))
+      end
+    end
+
+    def user_defined_rules
+      strong_memoize(:user_defined_rules) do
+        approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
       end
     end
   end

@@ -3,16 +3,12 @@
 module QA
   context 'Plan', :smoke do
     describe 'Issue creation' do
-      let(:issue_title) { 'issue title' }
-
       before do
         Flow::Login.sign_in
       end
 
-      it 'user creates an issue' do
-        issue = Resource::Issue.fabricate_via_browser_ui! do |issue|
-          issue.title = issue_title
-        end
+      it 'creates an issue', :reliable do
+        issue = Resource::Issue.fabricate_via_browser_ui!
 
         Page::Project::Menu.perform(&:click_issues)
 
@@ -28,14 +24,10 @@ module QA
         end
 
         before do
-          issue = Resource::Issue.fabricate_via_api! do |issue|
-            issue.title = issue_title
-          end
-
-          issue.visit!
+          Resource::Issue.fabricate_via_api!.visit!
         end
 
-        it 'user comments on an issue with an attachment' do
+        it 'comments on an issue with an attachment' do
           Page::Project::Issue::Show.perform do |show|
             show.comment('See attached banana for scale', attachment: file_to_attach)
 

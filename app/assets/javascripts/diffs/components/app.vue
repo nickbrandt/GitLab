@@ -6,6 +6,7 @@ import { __ } from '~/locale';
 import createFlash from '~/flash';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { isSingleViewStyle } from '~/helpers/diffs_helper';
 import eventHub from '../../notes/event_hub';
 import CompareVersions from './compare_versions.vue';
 import DiffFile from './diff_file.vue';
@@ -94,6 +95,7 @@ export default {
 
     return {
       treeWidth,
+      diffFilesLength: 0,
     };
   },
   computed: {
@@ -145,6 +147,9 @@ export default {
   },
   watch: {
     diffViewType() {
+      if (this.needsReload() || this.needsFirstLoad()) {
+        this.refetchDiffData();
+      }
       this.adjustView();
     },
     shouldShow() {
@@ -158,9 +163,6 @@ export default {
     },
     isLoading: 'adjustView',
     showTreeList: 'adjustView',
-    retrievingBatches(newVal) {
-      if (!newVal) this.unwatchDiscussions();
-    },
   },
   mounted() {
     this.setBaseConfig({
@@ -193,6 +195,16 @@ export default {
       () => `${this.diffFiles.length}:${this.$store.state.notes.discussions.length}`,
       () => this.setDiscussions(),
     );
+
+    this.unwatchRetrievingBatches = this.$watch(
+      () => `${this.retrievingBatches}:${this.$store.state.notes.discussions.length}`,
+      () => {
+        if (!this.retrievingBatches && this.$store.state.notes.discussions.length) {
+          this.unwatchDiscussions();
+          this.unwatchRetrievingBatches();
+        }
+      },
+    );
   },
   beforeDestroy() {
     eventHub.$off('fetchDiffData', this.fetchData);
@@ -224,10 +236,21 @@ export default {
         { timeout: 1000 },
       );
     },
+    needsReload() {
+      return (
+        this.glFeatures.singleMrDiffView &&
+        this.diffFiles.length &&
+        isSingleViewStyle(this.diffFiles[0])
+      );
+    },
+    needsFirstLoad() {
+      return this.glFeatures.singleMrDiffView && !this.diffFiles.length;
+    },
     fetchData(toggleTree = true) {
       if (this.glFeatures.diffsBatchLoad) {
         this.fetchDiffFilesMeta()
-          .then(() => {
+          .then(({ real_size }) => {
+            this.diffFilesLength = parseInt(real_size, 10);
             if (toggleTree) this.hideTreeListIfJustOneFile();
 
             this.startDiffRendering();
@@ -237,19 +260,28 @@ export default {
           });
 
         this.fetchDiffFilesBatch()
+          .then(() => {
+            // Guarantee the discussions are assigned after the batch finishes.
+            // Just watching the length of the discussions or the diff files
+            // isn't enough, because with split diff loading, neither will
+            // change when loading the other half of the diff files.
+            this.setDiscussions();
+          })
           .then(() => this.startDiffRendering())
           .catch(() => {
             createFlash(__('Something went wrong on our end. Please try again!'));
           });
       } else {
         this.fetchDiffFiles()
-          .then(() => {
+          .then(({ real_size }) => {
+            this.diffFilesLength = parseInt(real_size, 10);
             if (toggleTree) {
               this.hideTreeListIfJustOneFile();
             }
 
             requestIdleCallback(
               () => {
+                this.setDiscussions();
                 this.startRenderDiffsQueue();
               },
               { timeout: 1000 },
@@ -322,13 +354,14 @@ export default {
 
 <template>
   <div v-show="shouldShow">
-    <div v-if="isLoading" class="loading"><gl-loading-icon /></div>
+    <div v-if="isLoading" class="loading"><gl-loading-icon size="lg" /></div>
     <div v-else id="diffs" :class="{ active: shouldShow }" class="diffs tab-pane">
       <compare-versions
         :merge-request-diffs="mergeRequestDiffs"
         :merge-request-diff="mergeRequestDiff"
         :target-branch="targetBranch"
         :is-limited-container="isLimitedContainer"
+        :diff-files-length="diffFilesLength"
       />
 
       <hidden-files-warning
@@ -341,7 +374,7 @@ export default {
 
       <div
         :data-can-create-note="getNoteableData.current_user.can_create_note"
-        class="files d-flex prepend-top-default"
+        class="files d-flex"
       >
         <div
           v-show="showTreeList"

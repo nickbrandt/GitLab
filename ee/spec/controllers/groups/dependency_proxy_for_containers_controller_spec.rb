@@ -40,7 +40,7 @@ describe Groups::DependencyProxyForContainersController do
         it 'proxies status from the remote token request' do
           get_manifest
 
-          expect(response).to have_gitlab_http_status(503)
+          expect(response).to have_gitlab_http_status(:service_unavailable)
           expect(response.body).to eq('Service Unavailable')
         end
       end
@@ -57,7 +57,7 @@ describe Groups::DependencyProxyForContainersController do
         it 'proxies status from the remote manifest request' do
           get_manifest
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(response.body).to be_empty
         end
       end
@@ -65,7 +65,7 @@ describe Groups::DependencyProxyForContainersController do
       it 'returns 200 with manifest file' do
         get_manifest
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.body).to eq(manifest)
       end
     end
@@ -73,7 +73,7 @@ describe Groups::DependencyProxyForContainersController do
     it 'returns 404 when feature is disabled' do
       get_manifest
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     def get_manifest
@@ -108,7 +108,7 @@ describe Groups::DependencyProxyForContainersController do
         it 'proxies status from the remote blob request' do
           get_blob
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(response.body).to be_empty
         end
       end
@@ -130,7 +130,7 @@ describe Groups::DependencyProxyForContainersController do
     it 'returns 404 when feature is disabled' do
       get_blob
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     def get_blob

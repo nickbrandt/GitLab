@@ -61,9 +61,11 @@ export default {
   },
   mounted() {
     this.toggleSidebarFlag(epicUtils.getCollapsedGutter());
+    this.fetchEpicDetails();
   },
   methods: {
     ...mapActions([
+      'fetchEpicDetails',
       'toggleSidebar',
       'toggleSidebarFlag',
       'toggleStartDateType',

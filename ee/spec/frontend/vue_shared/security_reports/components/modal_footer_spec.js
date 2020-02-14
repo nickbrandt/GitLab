@@ -9,10 +9,7 @@ describe('Security Reports modal footer', () => {
   let wrapper;
 
   const mountComponent = options => {
-    wrapper = mount(component, {
-      attachToDocument: true,
-      ...options,
-    });
+    wrapper = mount(component, options);
   };
 
   describe('can only create issue', () => {

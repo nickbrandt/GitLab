@@ -5,18 +5,12 @@ import createState from 'ee/vue_shared/license_management/store/state';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { TEST_HOST } from 'spec/test_constants';
 import testAction from 'spec/helpers/vuex_action_helper';
-import {
-  approvedLicense,
-  blacklistedLicense,
-  licenseHeadIssues,
-  licenseBaseIssues,
-} from 'ee_spec/license_management/mock_data';
+import { approvedLicense, blacklistedLicense } from 'ee_spec/license_management/mock_data';
 import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
-  const headPath = `${TEST_HOST}/licenses/head`;
-  const basePath = `${TEST_HOST}/licenses/base`;
+  const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
 
   let axiosMock;
   let licenseId;
@@ -27,8 +21,6 @@ describe('License store actions', () => {
     state = {
       ...createState(),
       apiUrlManageLicenses,
-      headPath,
-      basePath,
       currentLicenseInModal: approvedLicense,
     };
     licenseId = approvedLicense.id;
@@ -40,7 +32,7 @@ describe('License store actions', () => {
 
   describe('setAPISettings', () => {
     it('commits SET_API_SETTINGS', done => {
-      const payload = { headPath, apiUrlManageLicenses };
+      const payload = { apiUrlManageLicenses };
       testAction(
         actions.setAPISettings,
         payload,
@@ -96,13 +88,13 @@ describe('License store actions', () => {
   });
 
   describe('receiveDeleteLicense', () => {
-    it('commits RECEIVE_DELETE_LICENSE and dispatches loadManagedLicenses', done => {
+    it('commits RECEIVE_DELETE_LICENSE and dispatches fetchManagedLicenses', done => {
       testAction(
         actions.receiveDeleteLicense,
         null,
         state,
         [{ type: mutationTypes.RECEIVE_DELETE_LICENSE }],
-        [{ type: 'loadManagedLicenses' }],
+        [{ type: 'fetchManagedLicenses' }],
       )
         .then(done)
         .catch(done.fail);
@@ -186,43 +178,28 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    gon.features = gon.features || {};
-    const { parsedLicenseReport } = gon.features;
-
-    afterEach(() => {
-      gon.features.parsedLicenseReport = parsedLicenseReport;
-    });
-
-    describe('with the parsedLicenseReport feature flag enabled', () => {
-      beforeEach(() => {
-        gon.features.parsedLicenseReport = true;
-      });
-
-      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+    describe('given the licensesApiPath is provided', () => {
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches fetchParsedLicenseReport', done => {
         testAction(
           actions.receiveSetLicenseApproval,
           null,
-          state,
+          { ...state, licensesApiPath },
           [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-          [{ type: 'loadParsedLicenseReport' }],
+          [{ type: 'fetchParsedLicenseReport' }],
         )
           .then(done)
           .catch(done.fail);
       });
     });
 
-    describe('with the parsedLicenseReport feature flag disabled', () => {
-      beforeEach(() => {
-        gon.features.parsedLicenseReport = false;
-      });
-
-      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
+    describe('given the licensesApiPath is not provided', () => {
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches fetchManagedLicenses', done => {
         testAction(
           actions.receiveSetLicenseApproval,
           null,
           state,
           [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-          [{ type: 'loadManagedLicenses' }],
+          [{ type: 'fetchManagedLicenses' }],
         )
           .then(done)
           .catch(done.fail);
@@ -427,13 +404,13 @@ describe('License store actions', () => {
     });
   });
 
-  describe('requestLoadManagedLicenses', () => {
-    it('commits REQUEST_LOAD_MANAGED_LICENSES', done => {
+  describe('requestManagedLicenses', () => {
+    it('commits REQUEST_MANAGED_LICENSES', done => {
       testAction(
-        actions.requestLoadManagedLicenses,
+        actions.requestManagedLicenses,
         null,
         state,
-        [{ type: mutationTypes.REQUEST_LOAD_MANAGED_LICENSES }],
+        [{ type: mutationTypes.REQUEST_MANAGED_LICENSES }],
         [],
       )
         .then(done)
@@ -441,14 +418,14 @@ describe('License store actions', () => {
     });
   });
 
-  describe('receiveLoadManagedLicenses', () => {
-    it('commits RECEIVE_LOAD_MANAGED_LICENSES', done => {
+  describe('receiveManagedLicensesSuccess', () => {
+    it('commits RECEIVE_MANAGED_LICENSES_SUCCESS', done => {
       const payload = [approvedLicense];
       testAction(
-        actions.receiveLoadManagedLicenses,
+        actions.receiveManagedLicensesSuccess,
         payload,
         state,
-        [{ type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES, payload }],
+        [{ type: mutationTypes.RECEIVE_MANAGED_LICENSES_SUCCESS, payload }],
         [],
       )
         .then(done)
@@ -456,14 +433,14 @@ describe('License store actions', () => {
     });
   });
 
-  describe('receiveLoadManagedLicensesError', () => {
-    it('commits RECEIVE_LOAD_MANAGED_LICENSES_ERROR', done => {
+  describe('receiveManagedLicensesError', () => {
+    it('commits RECEIVE_MANAGED_LICENSES_ERROR', done => {
       const error = new Error('Test');
       testAction(
-        actions.receiveLoadManagedLicensesError,
+        actions.receiveManagedLicensesError,
         error,
         state,
-        [{ type: mutationTypes.RECEIVE_LOAD_MANAGED_LICENSES_ERROR, payload: error }],
+        [{ type: mutationTypes.RECEIVE_MANAGED_LICENSES_ERROR, payload: error }],
         [],
       )
         .then(done)
@@ -471,39 +448,39 @@ describe('License store actions', () => {
     });
   });
 
-  describe('loadManagedLicenses', () => {
+  describe('fetchManagedLicenses', () => {
     let endpointMock;
 
     beforeEach(() => {
       endpointMock = axiosMock.onGet(apiUrlManageLicenses, { params: { per_page: 100 } });
     });
 
-    it('dispatches requestLoadManagedLicenses and receiveLoadManagedLicenses for successful response', done => {
+    it('dispatches requestManagedLicenses and receiveManagedLicensesSuccess for successful response', done => {
       const payload = [{ name: 'foo', approval_status: LICENSE_APPROVAL_STATUS.BLACKLISTED }];
       endpointMock.replyOnce(() => [200, payload]);
 
       testAction(
-        actions.loadManagedLicenses,
+        actions.fetchManagedLicenses,
         null,
         state,
         [],
-        [{ type: 'requestLoadManagedLicenses' }, { type: 'receiveLoadManagedLicenses', payload }],
+        [{ type: 'requestManagedLicenses' }, { type: 'receiveManagedLicensesSuccess', payload }],
       )
         .then(done)
         .catch(done.fail);
     });
 
-    it('dispatches requestLoadManagedLicenses and receiveLoadManagedLicensesError for error response', done => {
+    it('dispatches requestManagedLicenses and receiveManagedLicensesError for error response', done => {
       endpointMock.replyOnce(() => [500, '']);
 
       testAction(
-        actions.loadManagedLicenses,
+        actions.fetchManagedLicenses,
         null,
         state,
         [],
         [
-          { type: 'requestLoadManagedLicenses' },
-          { type: 'receiveLoadManagedLicensesError', payload: jasmine.any(Error) },
+          { type: 'requestManagedLicenses' },
+          { type: 'receiveManagedLicensesError', payload: jasmine.any(Error) },
         ],
       )
         .then(done)
@@ -511,13 +488,13 @@ describe('License store actions', () => {
     });
   });
 
-  describe('requestLoadLicenseReport', () => {
-    it('commits REQUEST_LOAD_LICENSE_REPORT', done => {
+  describe('requestParsedLicenseReport', () => {
+    it(`should commit ${mutationTypes.REQUEST_PARSED_LICENSE_REPORT}`, done => {
       testAction(
-        actions.requestLoadLicenseReport,
+        actions.requestParsedLicenseReport,
         null,
         state,
-        [{ type: mutationTypes.REQUEST_LOAD_LICENSE_REPORT }],
+        [{ type: mutationTypes.REQUEST_PARSED_LICENSE_REPORT }],
         [],
       )
         .then(done)
@@ -525,137 +502,15 @@ describe('License store actions', () => {
     });
   });
 
-  describe('receiveLoadLicenseReport', () => {
-    it('commits RECEIVE_LOAD_LICENSE_REPORT', done => {
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-      testAction(
-        actions.receiveLoadLicenseReport,
-        payload,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT, payload }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadLicenseReportError', () => {
-    it('commits RECEIVE_LOAD_LICENSE_REPORT_ERROR', done => {
-      const error = new Error('Test');
-      testAction(
-        actions.receiveLoadLicenseReportError,
-        error,
-        state,
-        [{ type: mutationTypes.RECEIVE_LOAD_LICENSE_REPORT_ERROR, payload: error }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('loadLicenseReport', () => {
-    let headMock;
-    let baseMock;
-
-    beforeEach(() => {
-      headMock = axiosMock.onGet(headPath);
-      baseMock = axiosMock.onGet(basePath);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReport for successful response', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [200, licenseBaseIssues]);
-
-      const payload = { headReport: licenseHeadIssues, baseReport: licenseBaseIssues };
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReport for 404 on basePath', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [404, null]);
-
-      const payload = { headReport: licenseHeadIssues, baseReport: {} };
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [{ type: 'requestLoadLicenseReport' }, { type: 'receiveLoadLicenseReport', payload }],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReportError for error response on head Path', done => {
-      headMock.replyOnce(() => [500, '']);
-      baseMock.replyOnce(() => [200, licenseBaseIssues]);
-
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
-        ],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('dispatches requestLoadLicenseReport and receiveLoadLicenseReportError for error response on base Path', done => {
-      headMock.replyOnce(() => [200, licenseHeadIssues]);
-      baseMock.replyOnce(() => [500, '']);
-
-      testAction(
-        actions.loadLicenseReport,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestLoadLicenseReport' },
-          { type: 'receiveLoadLicenseReportError', payload: jasmine.any(Error) },
-        ],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('requestLoadParsedLicenseReport', () => {
-    it(`should commit ${mutationTypes.REQUEST_LOAD_PARSED_LICENSE_REPORT}`, done => {
-      testAction(
-        actions.requestLoadParsedLicenseReport,
-        null,
-        state,
-        [{ type: mutationTypes.REQUEST_LOAD_PARSED_LICENSE_REPORT }],
-        [],
-      )
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('receiveLoadParsedLicenseReport', () => {
-    it(`should commit ${mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT} with the correct payload`, done => {
+  describe('receiveParsedLicenseReportSuccess', () => {
+    it(`should commit ${mutationTypes.RECEIVE_PARSED_LICENSE_REPORT_SUCCESS} with the correct payload`, done => {
       const payload = { newLicenses: [{ name: 'foo' }] };
 
       testAction(
-        actions.receiveLoadParsedLicenseReport,
+        actions.receiveParsedLicenseReportSuccess,
         payload,
         state,
-        [{ type: mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT, payload }],
+        [{ type: mutationTypes.RECEIVE_PARSED_LICENSE_REPORT_SUCCESS, payload }],
         [],
       )
         .then(done)
@@ -663,15 +518,15 @@ describe('License store actions', () => {
     });
   });
 
-  describe('receiveLoadParsedLicenseReportError', () => {
-    it(`should commit ${mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR}`, done => {
+  describe('receiveParsedLicenseReportError', () => {
+    it(`should commit ${mutationTypes.RECEIVE_PARSED_LICENSE_REPORT_ERROR}`, done => {
       const payload = new Error('Test');
 
       testAction(
-        actions.receiveLoadParsedLicenseReportError,
+        actions.receiveParsedLicenseReportError,
         payload,
         state,
-        [{ type: mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, payload }],
+        [{ type: mutationTypes.RECEIVE_PARSED_LICENSE_REPORT_ERROR, payload }],
         [],
       )
         .then(done)
@@ -679,8 +534,7 @@ describe('License store actions', () => {
     });
   });
 
-  describe('loadParsedLicenseReport', () => {
-    const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
+  describe('fetchParsedLicenseReport', () => {
     let licensesApiMock;
     let rawLicenseReport;
 
@@ -722,13 +576,13 @@ describe('License store actions', () => {
         };
 
         testAction(
-          actions.loadParsedLicenseReport,
+          actions.fetchParsedLicenseReport,
           null,
           state,
           [],
           [
-            { type: 'requestLoadParsedLicenseReport' },
-            { type: 'receiveLoadParsedLicenseReport', payload: parsedLicenses },
+            { type: 'requestParsedLicenseReport' },
+            { type: 'receiveParsedLicenseReportSuccess', payload: parsedLicenses },
           ],
         )
           .then(done)
@@ -739,11 +593,14 @@ describe('License store actions', () => {
         licensesApiMock.replyOnce(400);
 
         testAction(
-          actions.loadParsedLicenseReport,
+          actions.fetchParsedLicenseReport,
           null,
           state,
           [],
-          [{ type: 'requestLoadParsedLicenseReport' }, { type: 'receiveLoadLicenseReportError' }],
+          [
+            { type: 'requestParsedLicenseReport' },
+            { type: 'receiveParsedLicenseReportError', payload: jasmine.any(Error) },
+          ],
         )
           .then(done)
           .catch(done.fail);
@@ -814,13 +671,13 @@ describe('License store actions', () => {
         };
 
         testAction(
-          actions.loadParsedLicenseReport,
+          actions.fetchParsedLicenseReport,
           null,
           state,
           [],
           [
-            { type: 'requestLoadParsedLicenseReport' },
-            { type: 'receiveLoadParsedLicenseReport', payload: parsedLicenses },
+            { type: 'requestParsedLicenseReport' },
+            { type: 'receiveParsedLicenseReportSuccess', payload: parsedLicenses },
           ],
         )
           .then(done)

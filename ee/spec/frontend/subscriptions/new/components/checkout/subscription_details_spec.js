@@ -2,13 +2,14 @@ import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
 import createStore from 'ee/subscriptions/new/store';
 import * as types from 'ee/subscriptions/new/store/mutation_types';
-import Step from 'ee/subscriptions/new/components/checkout/components/step.vue';
+import Step from 'ee/subscriptions/new/components/checkout/step.vue';
 import Component from 'ee/subscriptions/new/components/checkout/subscription_details.vue';
 
 describe('Subscription Details', () => {
   const localVue = createLocalVue();
   localVue.use(Vuex);
 
+  let store;
   let wrapper;
 
   const planData = [
@@ -23,25 +24,23 @@ describe('Subscription Details', () => {
     fullName: 'Full Name',
   };
 
-  const store = createStore(initialData);
+  const isStepValid = () => wrapper.find(Step).props('isValid');
 
-  const createComponent = (opts = {}) => {
+  const createComponent = () => {
     wrapper = mount(Component, {
       localVue,
       store,
-      ...opts,
     });
   };
 
   beforeEach(() => {
+    store = createStore(initialData);
     createComponent();
   });
 
   afterEach(() => {
     wrapper.destroy();
   });
-
-  const isStepValid = () => wrapper.find(Step).props('isValid');
 
   describe('Setting up for personal use', () => {
     beforeEach(() => {

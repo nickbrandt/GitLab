@@ -12,7 +12,7 @@ module EE
           override :find_groups
           # rubocop: disable CodeReuse/ActiveRecord
           def find_groups(params, parent_id = nil)
-            super.preload(:ldap_group_links)
+            super.preload(:ldap_group_links, :deletion_schedule)
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
@@ -53,6 +53,21 @@ module EE
           def audit_log_finder_params(group)
             audit_log_finder_params = params.slice(:created_after, :created_before)
             audit_log_finder_params.merge(entity_type: group.class.name, entity_id: group.id)
+          end
+
+          override :delete_group
+          def delete_group(group)
+            return super unless group.adjourned_deletion?
+
+            result = destroy_conditionally!(group) do |group|
+              ::Groups::MarkForDeletionService.new(group, current_user).execute
+            end
+
+            if result[:status] == :success
+              accepted!
+            else
+              render_api_error!(result[:message], 400)
+            end
           end
         end
 
@@ -102,6 +117,20 @@ module EE
               not_found!('Audit Event') unless audit_event
 
               present audit_event, with: EE::API::Entities::AuditEvent
+            end
+          end
+
+          desc 'Restore a group.'
+          post ':id/restore' do
+            authorize! :admin_group, user_group
+            break not_found! unless user_group.feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+            result = ::Groups::RestoreService.new(user_group, current_user).execute
+
+            if result[:status] == :success
+              present user_group, with: ::API::Entities::GroupDetail, current_user: current_user
+            else
+              render_api_error!(result[:message], 400)
             end
           end
         end

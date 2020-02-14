@@ -35,6 +35,12 @@ module Gitlab
                 message: 'key may not be used with `rules`'
               },
               if: :has_rules?
+            validates :config,
+              disallowed_keys: {
+                in: %i[release],
+                message: 'release features are not enabled'
+              },
+              unless: -> { Feature.enabled?(:ci_release_generation, default_enabled: false) }
 
             with_options allow_nil: true do
               validates :allow_failure, boolean: true
@@ -55,11 +61,12 @@ module Gitlab
             validates :start_in, duration: { limit: '1 week' }, if: :delayed?
             validates :start_in, absence: true, if: -> { has_rules? || !delayed? }
 
-            validate do
+            validate on: :composed do
               next unless dependencies.present?
-              next unless needs.present?
+              next unless needs_value.present?
 
-              missing_needs = dependencies - needs
+              missing_needs = dependencies - needs_value[:job].pluck(:name) # rubocop:disable CodeReuse/ActiveRecord (Array#pluck)
+
               if missing_needs.any?
                 errors.add(:dependencies, "the #{missing_needs.join(", ")} should be part of needs")
               end
@@ -251,7 +258,8 @@ module Gitlab
               after_script: after_script_value,
               ignore: ignored?,
               needs: needs_defined? ? needs_value : nil,
-              resource_group: resource_group }
+              resource_group: resource_group,
+              scheduling_type: needs_defined? ? :dag : :stage }
           end
         end
       end

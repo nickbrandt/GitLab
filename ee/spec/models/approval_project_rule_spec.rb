@@ -141,10 +141,41 @@ describe ApprovalProjectRule do
     let(:project) { create(:project) }
     let(:rule) { build(:approval_project_rule, project: project, rule_type: :any_approver) }
 
-    it 'creating more than one any_approver rule raises an error' do
+    it 'creating only one any_approver rule is allowed' do
       create(:approval_project_rule, project: project, rule_type: :any_approver)
 
-      expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      expect(rule).not_to be_valid
+      expect(rule.errors.messages).to eq(rule_type: ['any-approver for the project already exists'])
+      expect { rule.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
+
+  describe '.applicable_to_branch' do
+    let!(:rule) { create(:approval_project_rule) }
+    let(:branch) { 'stable' }
+
+    subject { described_class.applicable_to_branch(branch) }
+
+    context 'when there are no associated protected branches' do
+      it { is_expected.to eq([rule]) }
+    end
+
+    context 'when there are associated protected branches' do
+      before do
+        rule.update!(protected_branches: protected_branches)
+      end
+
+      context 'and branch matches' do
+        let(:protected_branches) { [create(:protected_branch, name: branch)] }
+
+        it { is_expected.to eq([rule]) }
+      end
+
+      context 'but branch does not match anything' do
+        let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
+
+        it { is_expected.to be_empty }
+      end
     end
   end
 end

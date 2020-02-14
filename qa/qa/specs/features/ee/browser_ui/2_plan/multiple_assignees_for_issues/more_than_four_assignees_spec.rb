@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Multiple assignees per issue' do
       let(:project) do
-        Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'project-to-test-issue-with-multiple-assignees'
+        Resource::Project.fabricate_via_api! do |project|
+          project.name = 'project-to-test-issue-with-multiple-assignees'
         end
       end
 
@@ -27,7 +27,6 @@ module QA
         project.add_member(user_6)
 
         @issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = issue.title = 'issue-to-test-multiple-assignees'
           issue.project = project
           issue.assignee_ids = [
             user_1.id,

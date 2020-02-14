@@ -1,7 +1,16 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import dateFormat from 'dateformat';
-import { GlFormInput, GlLink, GlLoadingIcon, GlBadge } from '@gitlab/ui';
+import createFlash from '~/flash';
+import {
+  GlButton,
+  GlFormInput,
+  GlLink,
+  GlLoadingIcon,
+  GlBadge,
+  GlAlert,
+  GlSprintf,
+} from '@gitlab/ui';
 import { __, sprintf, n__ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -10,10 +19,14 @@ import Stacktrace from './stacktrace.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { trackClickErrorLinkToSentryOptions } from '../utils';
+import { severityLevel, severityLevelVariant, errorStatus } from './constants';
+
+import query from '../queries/details.query.graphql';
 
 export default {
   components: {
     LoadingButton,
+    GlButton,
     GlFormInput,
     GlLink,
     GlLoadingIcon,
@@ -21,13 +34,23 @@ export default {
     Icon,
     Stacktrace,
     GlBadge,
+    GlAlert,
+    GlSprintf,
   },
   directives: {
     TrackEvent: TrackEventDirective,
   },
   mixins: [timeagoMixin],
   props: {
-    issueDetailsPath: {
+    issueUpdatePath: {
+      type: String,
+      required: true,
+    },
+    issueId: {
+      type: String,
+      required: true,
+    },
+    projectPath: {
       type: String,
       required: true,
     },
@@ -44,13 +67,42 @@ export default {
       required: true,
     },
   },
+  apollo: {
+    error: {
+      query,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+          errorId: `gid://gitlab/Gitlab::ErrorTracking::DetailedError/${this.issueId}`,
+        };
+      },
+      pollInterval: 2000,
+      update: data => data.project.sentryErrors.detailedError,
+      error: () => createFlash(__('Failed to load error details from Sentry.')),
+      result(res) {
+        if (res.data.project?.sentryErrors?.detailedError) {
+          this.$apollo.queries.error.stopPolling();
+          this.setStatus(this.error.status);
+        }
+      },
+    },
+  },
   data() {
     return {
+      error: null,
       issueCreationInProgress: false,
+      isAlertVisible: false,
+      closedIssueId: null,
     };
   },
   computed: {
-    ...mapState('details', ['error', 'loading', 'loadingStacktrace', 'stacktraceData']),
+    ...mapState('details', [
+      'loadingStacktrace',
+      'stacktraceData',
+      'updatingResolveStatus',
+      'updatingIgnoreStatus',
+      'errorStatus',
+    ]),
     ...mapGetters('details', ['stacktrace']),
     reported() {
       return sprintf(
@@ -63,16 +115,13 @@ export default {
       );
     },
     firstReleaseLink() {
-      return `${this.error.external_base_url}/releases/${this.error.first_release_short_version}`;
+      return `${this.error.externalBaseUrl}/releases/${this.error.firstReleaseShortVersion}`;
     },
     lastReleaseLink() {
-      return `${this.error.external_base_url}releases/${this.error.last_release_short_version}`;
-    },
-    showDetails() {
-      return Boolean(!this.loading && this.error && this.error.id);
+      return `${this.error.externalBaseUrl}/releases/${this.error.lastReleaseShortVersion}`;
     },
     showStacktrace() {
-      return Boolean(!this.loadingStacktrace && this.stacktrace && this.stacktrace.length);
+      return Boolean(this.stacktrace?.length);
     },
     issueTitle() {
       return this.error.title;
@@ -84,13 +133,13 @@ export default {
         ),
         {
           description: '# Error Details:\n',
-          errorUrl: `${this.error.external_url}\n`,
-          firstSeen: `\n${this.error.first_seen}\n`,
-          lastSeen: `${this.error.last_seen}\n`,
+          errorUrl: `${this.error.externalUrl}\n`,
+          firstSeen: `\n${this.error.firstSeen}\n`,
+          lastSeen: `${this.error.lastSeen}\n`,
           countLabel: n__('- Event', '- Events', this.error.count),
           count: `${this.error.count}\n`,
-          userCountLabel: n__('- User', '- Users', this.error.user_count),
-          userCount: `${this.error.user_count}\n`,
+          userCountLabel: n__('- User', '- Users', this.error.userCount),
+          userCount: `${this.error.userCount}\n`,
         },
         false,
       );
@@ -98,17 +147,50 @@ export default {
     errorLevel() {
       return sprintf(__('level: %{level}'), { level: this.error.tags.level });
     },
+    errorSeverityVariant() {
+      return (
+        severityLevelVariant[this.error.tags.level] || severityLevelVariant[severityLevel.ERROR]
+      );
+    },
+    ignoreBtnLabel() {
+      return this.errorStatus !== errorStatus.IGNORED ? __('Ignore') : __('Undo ignore');
+    },
+    resolveBtnLabel() {
+      return this.errorStatus !== errorStatus.RESOLVED ? __('Resolve') : __('Unresolve');
+    },
   },
   mounted() {
-    this.startPollingDetails(this.issueDetailsPath);
     this.startPollingStacktrace(this.issueStackTracePath);
   },
   methods: {
-    ...mapActions('details', ['startPollingDetails', 'startPollingStacktrace']),
+    ...mapActions('details', [
+      'startPollingStacktrace',
+      'updateStatus',
+      'setStatus',
+      'updateResolveStatus',
+      'updateIgnoreStatus',
+    ]),
     trackClickErrorLinkToSentryOptions,
     createIssue() {
       this.issueCreationInProgress = true;
       this.$refs.sentryIssueForm.submit();
+    },
+    onIgnoreStatusUpdate() {
+      const status =
+        this.errorStatus === errorStatus.IGNORED ? errorStatus.UNRESOLVED : errorStatus.IGNORED;
+      this.updateIgnoreStatus({ endpoint: this.issueUpdatePath, status });
+    },
+    onResolveStatusUpdate() {
+      const status =
+        this.errorStatus === errorStatus.RESOLVED ? errorStatus.UNRESOLVED : errorStatus.RESOLVED;
+
+      // eslint-disable-next-line promise/catch-or-return
+      this.updateResolveStatus({ endpoint: this.issueUpdatePath, status }).then(res => {
+        this.closedIssueId = res.closed_issue_iid;
+        if (this.closedIssueId) {
+          this.isAlertVisible = true;
+        }
+      });
     },
     formatDate(date) {
       return `${this.timeFormatted(date)} (${dateFormat(date, 'UTC:yyyy-mm-dd h:MM:ssTT Z')})`;
@@ -119,84 +201,134 @@ export default {
 
 <template>
   <div>
-    <div v-if="loading" class="py-3">
+    <div v-if="$apollo.queries.error.loading" class="py-3">
       <gl-loading-icon :size="3" />
     </div>
-    <div v-else-if="showDetails" class="error-details">
+    <div v-else-if="error" class="error-details">
+      <gl-alert v-if="isAlertVisible" @dismiss="isAlertVisible = false">
+        <gl-sprintf
+          :message="
+            __('The associated issue #%{issueId} has been closed as the error is now resolved.')
+          "
+        >
+          <template #issueId>
+            <span>{{ closedIssueId }}</span>
+          </template>
+        </gl-sprintf>
+      </gl-alert>
+
       <div class="top-area align-items-center justify-content-between py-3">
         <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
-        <form ref="sentryIssueForm" :action="projectIssuesPath" method="POST">
-          <gl-form-input class="hidden" name="issue[title]" :value="issueTitle" />
-          <input name="issue[description]" :value="issueDescription" type="hidden" />
-          <gl-form-input
-            :value="error.id"
-            class="hidden"
-            name="issue[sentry_issue_attributes][sentry_issue_identifier]"
-          />
-          <gl-form-input :value="csrfToken" class="hidden" name="authenticity_token" />
+        <div class="d-inline-flex ml-lg-auto">
           <loading-button
-            v-if="!error.gitlab_issue"
-            class="btn-success"
-            :label="__('Create issue')"
-            :loading="issueCreationInProgress"
-            data-qa-selector="create_issue_button"
-            @click="createIssue"
+            :label="ignoreBtnLabel"
+            :loading="updatingIgnoreStatus"
+            data-qa-selector="update_ignore_status_button"
+            @click="onIgnoreStatusUpdate"
           />
-        </form>
+          <loading-button
+            class="btn-outline-info ml-2"
+            :label="resolveBtnLabel"
+            :loading="updatingResolveStatus"
+            data-qa-selector="update_resolve_status_button"
+            @click="onResolveStatusUpdate"
+          />
+          <gl-button
+            v-if="error.gitlabIssuePath"
+            class="ml-2"
+            data-qa-selector="view_issue_button"
+            :href="error.gitlabIssuePath"
+            variant="success"
+          >
+            {{ __('View issue') }}
+          </gl-button>
+          <form
+            ref="sentryIssueForm"
+            :action="projectIssuesPath"
+            method="POST"
+            class="d-inline-block ml-2"
+          >
+            <gl-form-input class="hidden" name="issue[title]" :value="issueTitle" />
+            <input name="issue[description]" :value="issueDescription" type="hidden" />
+            <gl-form-input
+              :value="error.sentryId"
+              class="hidden"
+              name="issue[sentry_issue_attributes][sentry_issue_identifier]"
+            />
+            <gl-form-input :value="csrfToken" class="hidden" name="authenticity_token" />
+            <loading-button
+              v-if="!error.gitlabIssuePath"
+              class="btn-success"
+              :label="__('Create issue')"
+              :loading="issueCreationInProgress"
+              data-qa-selector="create_issue_button"
+              @click="createIssue"
+            />
+          </form>
+        </div>
       </div>
       <div>
         <tooltip-on-truncate :title="error.title" truncate-target="child" placement="top">
           <h2 class="text-truncate">{{ error.title }}</h2>
         </tooltip-on-truncate>
         <template v-if="error.tags">
-          <gl-badge v-if="error.tags.level" variant="danger" class="rounded-pill mr-2">{{
-            errorLevel
-          }}</gl-badge>
-          <gl-badge v-if="error.tags.logger" variant="light" class="rounded-pill">{{
-            error.tags.logger
-          }}</gl-badge>
+          <gl-badge
+            v-if="error.tags.level"
+            :variant="errorSeverityVariant"
+            class="rounded-pill mr-2"
+          >
+            {{ errorLevel }}
+          </gl-badge>
+          <gl-badge v-if="error.tags.logger" variant="light" class="rounded-pill"
+            >{{ error.tags.logger }}
+          </gl-badge>
         </template>
-
-        <h3>{{ __('Error details') }}</h3>
         <ul>
-          <li v-if="error.gitlab_issue">
-            <span class="bold">{{ __('GitLab Issue') }}:</span>
-            <gl-link :href="error.gitlab_issue">
-              <span>{{ error.gitlab_issue }}</span>
+          <li v-if="error.gitlabCommit">
+            <strong class="bold">{{ __('GitLab commit') }}:</strong>
+            <gl-link :href="error.gitlabCommitPath">
+              <span>{{ error.gitlabCommit.substr(0, 10) }}</span>
+            </gl-link>
+          </li>
+          <li v-if="error.gitlabIssuePath">
+            <strong class="bold">{{ __('GitLab Issue') }}:</strong>
+            <gl-link :href="error.gitlabIssuePath">
+              <span>{{ error.gitlabIssuePath }}</span>
             </gl-link>
           </li>
           <li>
-            <span class="bold">{{ __('Sentry event') }}:</span>
+            <strong class="bold">{{ __('Sentry event') }}:</strong>
             <gl-link
-              v-track-event="trackClickErrorLinkToSentryOptions(error.external_url)"
-              :href="error.external_url"
+              v-track-event="trackClickErrorLinkToSentryOptions(error.externalUrl)"
+              class="d-inline-flex align-items-center"
+              :href="error.externalUrl"
               target="_blank"
             >
-              <span class="text-truncate">{{ error.external_url }}</span>
+              <span class="text-truncate">{{ error.externalUrl }}</span>
               <icon name="external-link" class="ml-1 flex-shrink-0" />
             </gl-link>
           </li>
-          <li v-if="error.first_release_short_version">
-            <span class="bold">{{ __('First seen') }}:</span>
-            {{ formatDate(error.first_seen) }}
+          <li v-if="error.firstReleaseShortVersion">
+            <strong class="bold">{{ __('First seen') }}:</strong>
+            {{ formatDate(error.firstSeen) }}
             <gl-link :href="firstReleaseLink" target="_blank">
-              <span>{{ __('Release') }}: {{ error.first_release_short_version }}</span>
+              <span>{{ __('Release') }}: {{ error.firstReleaseShortVersion.substr(0, 10) }}</span>
             </gl-link>
           </li>
-          <li v-if="error.last_release_short_version">
-            <span class="bold">{{ __('Last seen') }}:</span>
-            {{ formatDate(error.last_seen) }}
+          <li v-if="error.lastReleaseShortVersion">
+            <strong class="bold">{{ __('Last seen') }}:</strong>
+            {{ formatDate(error.lastSeen) }}
             <gl-link :href="lastReleaseLink" target="_blank">
-              <span>{{ __('Release') }}: {{ error.last_release_short_version }}</span>
+              <span>{{ __('Release') }}: {{ error.lastReleaseShortVersion.substr(0, 10) }}</span>
             </gl-link>
           </li>
           <li>
-            <span class="bold">{{ __('Events') }}:</span>
+            <strong class="bold">{{ __('Events') }}:</strong>
             <span>{{ error.count }}</span>
           </li>
           <li>
-            <span class="bold">{{ __('Users') }}:</span>
-            <span>{{ error.user_count }}</span>
+            <strong class="bold">{{ __('Users') }}:</strong>
+            <span>{{ error.userCount }}</span>
           </li>
         </ul>
 
@@ -204,7 +336,7 @@ export default {
           <gl-loading-icon :size="3" />
         </div>
 
-        <template v-if="showStacktrace">
+        <template v-else-if="showStacktrace">
           <h3 class="my-4">{{ __('Stack trace') }}</h3>
           <stacktrace :entries="stacktrace" />
         </template>

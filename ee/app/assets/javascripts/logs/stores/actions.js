@@ -4,7 +4,17 @@ import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { s__ } from '~/locale';
+import { convertToFixedRange } from '~/lib/utils/datetime_range';
+
 import * as types from './mutation_types';
+
+const flashTimeRangeWarning = () => {
+  flash(s__('Metrics|Invalid time range, please verify.'), 'warning');
+};
+
+const flashLogsError = () => {
+  flash(s__('Metrics|There was an error fetching the logs, please try again'));
+};
 
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
@@ -21,11 +31,12 @@ const requestLogsUntilData = params =>
       });
   });
 
-export const setInitData = ({ dispatch, commit }, { projectPath, environmentName, podName }) => {
-  commit(types.SET_PROJECT_PATH, projectPath);
+export const setInitData = ({ commit }, { timeRange, environmentName, podName }) => {
+  if (timeRange) {
+    commit(types.SET_TIME_RANGE, timeRange);
+  }
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
   commit(types.SET_CURRENT_POD_NAME, podName);
-  dispatch('fetchLogs');
 };
 
 export const showPodLogs = ({ dispatch, commit }, podName) => {
@@ -38,19 +49,25 @@ export const setSearch = ({ dispatch, commit }, searchQuery) => {
   dispatch('fetchLogs');
 };
 
+export const setTimeRange = ({ dispatch, commit }, timeRange) => {
+  commit(types.SET_TIME_RANGE, timeRange);
+  dispatch('fetchLogs');
+};
+
 export const showEnvironment = ({ dispatch, commit }, environmentName) => {
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
   commit(types.SET_CURRENT_POD_NAME, null);
   dispatch('fetchLogs');
 };
 
-export const fetchEnvironments = ({ commit }, environmentsPath) => {
+export const fetchEnvironments = ({ commit, dispatch }, environmentsPath) => {
   commit(types.REQUEST_ENVIRONMENTS_DATA);
 
   axios
     .get(environmentsPath)
     .then(({ data }) => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, data.environments);
+      dispatch('fetchLogs');
     })
     .catch(() => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_ERROR);
@@ -60,11 +77,20 @@ export const fetchEnvironments = ({ commit }, environmentsPath) => {
 
 export const fetchLogs = ({ commit, state }) => {
   const params = {
-    projectPath: state.projectPath,
-    environmentName: state.environments.current,
+    environment: state.environments.options.find(({ name }) => name === state.environments.current),
     podName: state.pods.current,
     search: state.search,
   };
+
+  if (state.timeRange.current) {
+    try {
+      const { start, end } = convertToFixedRange(state.timeRange.current);
+      params.start = start;
+      params.end = end;
+    } catch {
+      flashTimeRangeWarning();
+    }
+  }
 
   commit(types.REQUEST_PODS_DATA);
   commit(types.REQUEST_LOGS_DATA);
@@ -80,7 +106,7 @@ export const fetchLogs = ({ commit, state }) => {
     .catch(() => {
       commit(types.RECEIVE_PODS_DATA_ERROR);
       commit(types.RECEIVE_LOGS_DATA_ERROR);
-      flash(s__('Metrics|There was an error fetching the logs, please try again'));
+      flashLogsError();
     });
 };
 

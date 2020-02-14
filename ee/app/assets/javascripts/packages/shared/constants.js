@@ -1,11 +1,14 @@
 export const PackageType = {
+  CONAN: 'conan',
   MAVEN: 'maven',
   NPM: 'npm',
-  CONAN: 'conan',
+  NUGET: 'nuget',
 };
 
 export const TrackingActions = {
   DELETE_PACKAGE: 'delete_package',
+  REQUEST_DELETE_PACKAGE: 'request_delete_package',
+  CANCEL_DELETE_PACKAGE: 'cancel_delete_package',
   PULL_PACKAGE: 'pull_package',
 };
 

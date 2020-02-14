@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { GlButton, GlTooltipDirective, GlModalDirective, GlModal, GlToggle } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -14,7 +14,6 @@ export default {
     GlToggle,
   },
   directives: {
-    GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
   mixins: [glFeatureFlagMixin()],
@@ -37,9 +36,6 @@ export default {
   computed: {
     permissions() {
       return this.glFeatures.featureFlagPermissions;
-    },
-    hasIIDs() {
-      return this.glFeatures.featureFlagIID;
     },
     modalTitle() {
       return sprintf(
@@ -84,12 +80,17 @@ export default {
 
       return `${displayName}${displayPercentage}`;
     },
+    featureFlagIidText(featureFlag) {
+      return featureFlag.iid ? `^${featureFlag.iid}` : '';
+    },
     canDeleteFlag(flag) {
       return !this.permissions || (flag.scopes || []).every(scope => scope.can_update);
     },
     setDeleteModalData(featureFlag) {
       this.deleteFeatureFlagUrl = featureFlag.destroy_path;
       this.deleteFeatureFlagName = featureFlag.name;
+
+      this.$refs[this.modalId].show();
     },
     onSubmit() {
       this.$refs.form.submit();
@@ -106,7 +107,7 @@ export default {
 <template>
   <div class="table-holder js-feature-flag-table">
     <div class="gl-responsive-table-row table-row-header" role="row">
-      <div v-if="hasIIDs" class="table-section section-10">
+      <div class="table-section section-10">
         {{ s__('FeatureFlags|ID') }}
       </div>
       <div class="table-section section-10" role="columnheader">
@@ -122,9 +123,11 @@ export default {
 
     <template v-for="featureFlag in featureFlags">
       <div :key="featureFlag.id" class="gl-responsive-table-row" role="row">
-        <div v-if="hasIIDs" class="table-section section-10" role="gridcell">
+        <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|ID') }}</div>
-          <div class="table-mobile-content js-feature-flag-id">^{{ featureFlag.iid }}</div>
+          <div class="table-mobile-content js-feature-flag-id">
+            {{ featureFlagIidText(featureFlag) }}
+          </div>
         </div>
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
@@ -189,7 +192,6 @@ export default {
             <template v-if="featureFlag.destroy_path">
               <gl-button
                 v-gl-tooltip.hover.bottom="__('Delete')"
-                v-gl-modal-directive="modalId"
                 class="js-feature-flag-delete-button"
                 variant="danger"
                 :disabled="!canDeleteFlag(featureFlag)"
@@ -204,6 +206,7 @@ export default {
     </template>
 
     <gl-modal
+      :ref="modalId"
       :title="modalTitle"
       :ok-title="s__('FeatureFlags|Delete feature flag')"
       :modal-id="modalId"

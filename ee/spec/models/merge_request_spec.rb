@@ -121,19 +121,20 @@ describe MergeRequest do
   describe '#enabled_reports' do
     let(:project) { create(:project, :repository) }
 
-    where(:report_type, :with_reports) do
-      :sast | :with_sast_reports
-      :container_scanning | :with_container_scanning_reports
-      :dast | :with_dast_reports
-      :dependency_scanning | :with_dependency_scanning_reports
-      :license_management | :with_license_management_reports
+    where(:report_type, :with_reports, :feature) do
+      :sast                | :with_sast_reports                | :sast
+      :container_scanning  | :with_container_scanning_reports  | :container_scanning
+      :dast                | :with_dast_reports                | :dast
+      :dependency_scanning | :with_dependency_scanning_reports | :dependency_scanning
+      :license_management  | :with_license_management_reports  | :license_management
+      :license_management  | :with_license_scanning_reports    | :license_management
     end
 
     with_them do
       subject { merge_request.enabled_reports[report_type] }
 
       before do
-        stub_licensed_features({ report_type => true })
+        stub_licensed_features({ feature => true })
       end
 
       context "when head pipeline has reports" do
@@ -523,7 +524,7 @@ describe MergeRequest do
             expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
-            expect(subject[:key]).to include(*[license_1.id, license_1.classification, license_2.id, license_2.classification])
+            expect(subject[:key].last).to include("software_license_policies/query-")
           end
         end
 
@@ -747,7 +748,9 @@ describe MergeRequest do
 
     context 'when the merge request was on a merge train' do
       let(:merge_request) do
-        create(:merge_request, :on_train, status: 'merged', source_project: project, target_project: project)
+        create(:merge_request, :on_train,
+          status: MergeTrain.state_machines[:status].states[:merged].value,
+          source_project: project, target_project: project)
       end
 
       it { is_expected.to be_falsy }
@@ -762,31 +765,14 @@ describe MergeRequest do
     end
   end
 
-  describe 'state machine' do
-    context 'when the merge request is on a merge train' do
-      let(:merge_request) do
-        create(:merge_request, :on_train, source_project: project, target_project: project)
-      end
+  describe 'review time sorting' do
+    it 'orders by first_comment_at' do
+      merge_request_1 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 1.day.ago })
+      merge_request_2 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 3.days.ago })
+      merge_request_3 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: nil })
 
-      context 'when the merge request is merged' do
-        it 'ensures to finish merge train' do
-          expect(merge_request.merge_train).to receive(:merged!)
-
-          merge_request.mark_as_merged!
-        end
-      end
-    end
-
-    context 'when the merge request is not on a merge train' do
-      let(:merge_request) do
-        create(:merge_request, source_project: project, target_project: project)
-      end
-
-      context 'when the merge request is merged' do
-        it 'does not raise error' do
-          expect { merge_request.mark_as_merged! }.not_to raise_error
-        end
-      end
+      expect(described_class.order_review_time_desc).to match([merge_request_2, merge_request_1, merge_request_3])
+      expect(described_class.sort_by_attribute('review_time_desc')).to match([merge_request_2, merge_request_1, merge_request_3])
     end
   end
 end

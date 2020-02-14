@@ -23,7 +23,7 @@ module Elastic
 
         query_hash[:highlight] = highlight_options(options[:in])
 
-        search(query_hash)
+        search(query_hash, options)
       end
 
       private

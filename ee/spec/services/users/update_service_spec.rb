@@ -5,6 +5,94 @@ describe Users::UpdateService do
   let(:user) { create(:user) }
 
   describe '#execute' do
+    context 'updating name' do
+      let(:admin) { create(:admin) }
+
+      shared_examples_for 'a user can update the name' do
+        it 'updates the name' do
+          result = described_class.new(current_user, { user: user, name: 'New Name' }).execute!
+
+          expect(result).to be_truthy
+          expect(user.name).to eq('New Name')
+        end
+      end
+
+      context 'when `disable_name_update_for_users` feature is available' do
+        before do
+          stub_licensed_features(disable_name_update_for_users: true)
+        end
+
+        context 'when the ability to update their name is not disabled for users' do
+          before do
+            stub_application_setting(updating_name_disabled_for_users: false)
+          end
+
+          it_behaves_like 'a user can update the name' do
+            let(:current_user) { user }
+          end
+
+          it_behaves_like 'a user can update the name' do
+            let(:current_user) { admin }
+          end
+        end
+
+        context 'when the ability to update their name is disabled for users' do
+          before do
+            stub_application_setting(updating_name_disabled_for_users: true)
+          end
+
+          context 'as a regular user' do
+            it 'does not update the name' do
+              result = update_user(user, name: 'New Name')
+
+              expect(result).to be_truthy
+              expect(user.name).not_to eq('New Name')
+            end
+          end
+
+          it_behaves_like 'a user can update the name' do
+            let(:current_user) { admin }
+          end
+        end
+      end
+
+      context 'when `disable_name_update_for_users` feature is not available' do
+        before do
+          stub_licensed_features(disable_name_update_for_users: false)
+        end
+
+        it_behaves_like 'a user can update the name' do
+          let(:current_user) { user }
+        end
+
+        it_behaves_like 'a user can update the name' do
+          let(:current_user) { admin }
+        end
+      end
+    end
+
+    context 'audit events' do
+      context 'licensed' do
+        before do
+          stub_licensed_features(admin_audit_log: true)
+        end
+
+        context 'updating username' do
+          it 'logs audit event' do
+            previous_username = user.username
+            new_username = 'my_new_username'
+            expected_message = "Changed username from #{previous_username} to #{new_username}"
+
+            expect do
+              update_user(user, username: new_username)
+            end.to change { AuditEvent.count }.by(1)
+
+            expect(AuditEvent.last.present.action).to eq(expected_message)
+          end
+        end
+      end
+    end
+
     it 'does not update email if an user has group managed account' do
       allow(user).to receive(:group_managed_account?).and_return(true)
 

@@ -8,10 +8,10 @@ describe API::Commits do
 
   let(:user) { create(:user) }
   let(:guest) { create(:user).tap { |u| project.add_guest(u) } }
+  let(:developer) { create(:user).tap { |u| project.add_developer(u) } }
   let(:project) { create(:project, :repository, creator: user, path: 'my.project') }
   let(:branch_with_dot) { project.repository.find_branch('ends-with.json') }
   let(:branch_with_slash) { project.repository.find_branch('improve/awesome') }
-
   let(:project_id) { project.id }
   let(:current_user) { nil }
 
@@ -237,6 +237,40 @@ describe API::Commits do
             expect(json_response.size).to eq(per_page)
             expect(json_response.first['id']).to eq(commit.id)
             expect(response.headers['X-Page']).to eq('3')
+          end
+        end
+      end
+
+      context 'with order parameter' do
+        let(:route) { "/projects/#{project_id}/repository/commits?ref_name=0031876&per_page=6&order=#{order}" }
+
+        context 'set to topo' do
+          let(:order) { 'topo' }
+
+          # git log --graph -n 6 --pretty=format:"%h" --topo-order 0031876
+          # *   0031876
+          # |\
+          # | * 48ca272
+          # | * 335bc94
+          # * | bf6e164
+          # * | 9d526f8
+          # |/
+          # * 1039376
+          it 'returns project commits ordered by topo order' do
+            commits = project.repository.commits("0031876", limit: 6, order: 'topo')
+
+            get api(route, current_user)
+
+            expect(json_response.size).to eq(6)
+            expect(json_response.map { |entry| entry["id"] }).to eq(commits.map(&:id))
+          end
+        end
+
+        context 'set to blank' do
+          let(:order) { '' }
+
+          it_behaves_like '400 response' do
+            let(:request) { get api(route, current_user) }
           end
         end
       end
@@ -964,6 +998,56 @@ describe API::Commits do
       end
     end
 
+    shared_examples_for 'ref with pipeline' do
+      let!(:pipeline) do
+        project
+          .ci_pipelines
+          .create!(source: :push, ref: 'master', sha: commit.sha, protected: false)
+      end
+
+      it 'includes status as "created" and a last_pipeline object' do
+        get api(route, current_user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/commit/detail')
+        expect(json_response['status']).to eq('created')
+        expect(json_response['last_pipeline']['id']).to eq(pipeline.id)
+        expect(json_response['last_pipeline']['ref']).to eq(pipeline.ref)
+        expect(json_response['last_pipeline']['sha']).to eq(pipeline.sha)
+        expect(json_response['last_pipeline']['status']).to eq(pipeline.status)
+      end
+
+      context 'when pipeline succeeds' do
+        before do
+          pipeline.update!(status: 'success')
+        end
+
+        it 'includes a "success" status' do
+          get api(route, current_user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('public_api/v4/commit/detail')
+          expect(json_response['status']).to eq('success')
+        end
+      end
+    end
+
+    shared_examples_for 'ref with unaccessible pipeline' do
+      let!(:pipeline) do
+        project
+          .ci_pipelines
+          .create!(source: :push, ref: 'master', sha: commit.sha, protected: false)
+      end
+
+      it 'does not include last_pipeline' do
+        get api(route, current_user)
+
+        expect(response).to match_response_schema('public_api/v4/commit/detail')
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['last_pipeline']).to be_nil
+      end
+    end
+
     context 'when stat param' do
       let(:route) { "/projects/#{project_id}/repository/commits/#{commit_id}" }
 
@@ -993,6 +1077,15 @@ describe API::Commits do
       let(:project) { create(:project, :public, :repository) }
 
       it_behaves_like 'ref commit'
+      it_behaves_like 'ref with pipeline'
+
+      context 'with private builds' do
+        before do
+          project.project_feature.update!(builds_access_level: ProjectFeature::PRIVATE)
+        end
+
+        it_behaves_like 'ref with unaccessible pipeline'
+      end
     end
 
     context 'when unauthenticated', 'and project is private' do
@@ -1006,6 +1099,17 @@ describe API::Commits do
       let(:current_user) { user }
 
       it_behaves_like 'ref commit'
+      it_behaves_like 'ref with pipeline'
+
+      context 'when builds are disabled' do
+        before do
+          project
+            .project_feature
+            .update!(builds_access_level: ProjectFeature::DISABLED)
+        end
+
+        it_behaves_like 'ref with unaccessible pipeline'
+      end
 
       context 'when branch contains a dot' do
         let(:commit) { project.repository.commit(branch_with_dot.name) }
@@ -1041,35 +1145,53 @@ describe API::Commits do
           it_behaves_like 'ref commit'
         end
       end
+    end
 
-      context 'when the ref has a pipeline' do
-        let!(:pipeline) { project.ci_pipelines.create(source: :push, ref: 'master', sha: commit.sha, protected: false) }
+    context 'when authenticated', 'as a developer' do
+      let(:current_user) { developer }
 
-        it 'includes a "created" status' do
-          get api(route, current_user)
+      it_behaves_like 'ref commit'
+      it_behaves_like 'ref with pipeline'
 
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to match_response_schema('public_api/v4/commit/detail')
-          expect(json_response['status']).to eq('created')
-          expect(json_response['last_pipeline']['id']).to eq(pipeline.id)
-          expect(json_response['last_pipeline']['ref']).to eq(pipeline.ref)
-          expect(json_response['last_pipeline']['sha']).to eq(pipeline.sha)
-          expect(json_response['last_pipeline']['status']).to eq(pipeline.status)
+      context 'with private builds' do
+        before do
+          project.project_feature.update!(builds_access_level: ProjectFeature::PRIVATE)
         end
 
-        context 'when pipeline succeeds' do
-          before do
-            pipeline.update(status: 'success')
-          end
+        it_behaves_like 'ref with pipeline'
+      end
+    end
 
-          it 'includes a "success" status' do
-            get api(route, current_user)
+    context 'when authenticated', 'as a guest' do
+      let(:current_user) { guest }
 
-            expect(response).to have_gitlab_http_status(200)
-            expect(response).to match_response_schema('public_api/v4/commit/detail')
-            expect(json_response['status']).to eq('success')
-          end
+      it_behaves_like '403 response' do
+        let(:request) { get api(route, guest) }
+        let(:message) { '403 Forbidden' }
+      end
+    end
+
+    context 'when authenticated', 'as a non member' do
+      let(:current_user) { create(:user) }
+
+      it_behaves_like '403 response' do
+        let(:request) { get api(route, guest) }
+        let(:message) { '403 Forbidden' }
+      end
+    end
+
+    context 'when authenticated', 'as non_member and project is public' do
+      let(:current_user) { create(:user) }
+      let(:project) { create(:project, :public, :repository) }
+
+      it_behaves_like 'ref with pipeline'
+
+      context 'with private builds' do
+        before do
+          project.project_feature.update!(builds_access_level: ProjectFeature::PRIVATE)
         end
+
+        it_behaves_like 'ref with unaccessible pipeline'
       end
     end
   end

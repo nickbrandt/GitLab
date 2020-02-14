@@ -31,6 +31,8 @@ describe('ErrorTrackingList', () => {
       store,
       propsData: {
         indexPath: '/path',
+        listPath: '/error_tracking',
+        projectPath: 'project/test',
         enableErrorTrackingLink: '/link',
         userCanEnableErrorTracking,
         errorTrackingEnabled,
@@ -59,6 +61,8 @@ describe('ErrorTrackingList', () => {
       searchByQuery: jest.fn(),
       sortByField: jest.fn(),
       fetchPaginatedResults: jest.fn(),
+      updateStatus: jest.fn(),
+      removeIgnoredResolvedErrors: jest.fn(),
     };
 
     const state = {
@@ -139,6 +143,18 @@ describe('ErrorTrackingList', () => {
       });
     });
 
+    it('each error in the list should have an ignore button', () => {
+      findErrorListRows().wrappers.forEach(row => {
+        expect(row.contains('glicon-stub[name="eye-slash"]')).toBe(true);
+      });
+    });
+
+    it('each error in the list should have a resolve button', () => {
+      findErrorListRows().wrappers.forEach(row => {
+        expect(row.contains('glicon-stub[name="check-circle"]')).toBe(true);
+      });
+    });
+
     describe('filtering', () => {
       const findSearchBox = () => wrapper.find(GlFormInput);
 
@@ -202,6 +218,82 @@ describe('ErrorTrackingList', () => {
       expect(findLoadingIcon().exists()).toBe(false);
       expect(findErrorListTable().exists()).toBe(false);
       expect(findSortDropdown().exists()).toBe(false);
+    });
+  });
+
+  describe('When the ignore button on an error is clicked', () => {
+    const ignoreErrorButton = () => wrapper.find({ ref: 'ignoreError' });
+
+    beforeEach(() => {
+      store.state.list.loading = false;
+      store.state.list.errors = errorsList;
+
+      mountComponent({
+        stubs: {
+          GlTable: false,
+          GlLink: false,
+          GlButton: false,
+        },
+      });
+    });
+
+    it('sends the "ignored" status and error ID', () => {
+      ignoreErrorButton().trigger('click');
+      expect(actions.updateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          endpoint: `/project/test/-/error_tracking/${errorsList[0].id}.json`,
+          status: 'ignored',
+        },
+        undefined,
+      );
+    });
+
+    it('calls an action to remove the item from the list', () => {
+      ignoreErrorButton().trigger('click');
+      expect(actions.removeIgnoredResolvedErrors).toHaveBeenCalledWith(
+        expect.anything(),
+        '1',
+        undefined,
+      );
+    });
+  });
+
+  describe('When the resolve button on an error is clicked', () => {
+    const resolveErrorButton = () => wrapper.find({ ref: 'resolveError' });
+
+    beforeEach(() => {
+      store.state.list.loading = false;
+      store.state.list.errors = errorsList;
+
+      mountComponent({
+        stubs: {
+          GlTable: false,
+          GlLink: false,
+          GlButton: false,
+        },
+      });
+    });
+
+    it('sends "resolved" status and error ID', () => {
+      resolveErrorButton().trigger('click');
+      expect(actions.updateStatus).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          endpoint: `/project/test/-/error_tracking/${errorsList[0].id}.json`,
+          status: 'resolved',
+        },
+        undefined,
+      );
+    });
+
+    it('calls an action to remove the item from the list', () => {
+      resolveErrorButton().trigger('click');
+      expect(actions.removeIgnoredResolvedErrors).toHaveBeenCalledWith(
+        expect.anything(),
+        '1',
+        undefined,
+      );
     });
   });
 

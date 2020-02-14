@@ -1,5 +1,0 @@
----
-title: Fix N+1 SQL queries with protected environments
-merge_request: 22101
-author:
-type: performance

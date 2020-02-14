@@ -30,9 +30,6 @@ export default {
       default: false,
     },
   },
-  tooltips: {
-    information: s__('EnviornmentDashboard|You are looking at the last updated environment'),
-  },
   computed: {
     headerClasses() {
       return {
@@ -41,6 +38,13 @@ export default {
         'bg-light': !this.hasErrors && !this.hasPipelineFailed,
       };
     },
+  },
+  reviewButtonText: {
+    text: s__('Review App|View app'),
+    tooltip: '',
+  },
+  tooltips: {
+    information: s__('EnvironmentDashboard|You are looking at the last updated environment'),
   },
 };
 </script>
@@ -70,7 +74,7 @@ export default {
     <review-app-link
       v-else-if="environment.external_url"
       :link="environment.external_url"
-      :is-current="true"
+      :display="$options.reviewButtonText"
       css-class="btn btn-default btn-sm"
     />
   </div>

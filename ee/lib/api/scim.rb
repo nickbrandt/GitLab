@@ -157,9 +157,7 @@ module API
           updated = update_scim_user(identity)
 
           if updated
-            status 204
-
-            {}
+            no_content!
           else
             scim_error!(message: "Error updating #{identity.user.name} with #{params.inspect}")
           end
@@ -180,9 +178,7 @@ module API
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless destroyed
 
-          status 204
-
-          {}
+          no_content!
         end
       end
     end

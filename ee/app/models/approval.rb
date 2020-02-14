@@ -6,4 +6,6 @@ class Approval < ApplicationRecord
 
   validates :merge_request_id, presence: true
   validates :user_id, presence: true, uniqueness: { scope: [:merge_request_id] }
+
+  scope :with_user, -> { joins(:user) }
 end

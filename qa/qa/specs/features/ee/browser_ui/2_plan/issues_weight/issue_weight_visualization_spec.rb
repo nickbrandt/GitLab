@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Issues weight visualization' do
       before do
         Flow::Login.sign_in
       end
 
       let(:milestone) do
-        QA::EE::Resource::ProjectMilestone.fabricate_via_api! do |m|
-          m.title = 'the-fellowship-of-the-ring'
-        end
+        QA::EE::Resource::ProjectMilestone.fabricate_via_api!
       end
 
       let(:weight) { 1000 }

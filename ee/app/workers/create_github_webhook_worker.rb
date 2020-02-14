@@ -7,6 +7,7 @@ class CreateGithubWebhookWorker
   feature_category :integrations
   worker_resource_boundary :cpu
   worker_has_external_dependencies!
+  weight 2
 
   attr_reader :project
 

@@ -14,8 +14,12 @@ module SCA
       end
     end
 
-    def detected_policies
-      policies.reject { |policy| policy.dependencies.count.zero? }
+    def find_policies(detected_only: false, classification: [])
+      classifications = Array(classification || [])
+      policies.reject do |policy|
+        (detected_only && policy.dependencies.none?) ||
+          (classifications.present? && !policy.classification.in?(classifications))
+      end
     end
 
     def latest_build_for_default_branch
@@ -52,7 +56,7 @@ module SCA
 
     def pipeline
       strong_memoize(:pipeline) do
-        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_management_reports)
+        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_scanning_reports)
       end
     end
 

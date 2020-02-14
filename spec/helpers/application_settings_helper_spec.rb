@@ -76,9 +76,23 @@ describe ApplicationSettingsHelper do
         )
       end
 
+      it 'returns delete_self_monitoring_project_path' do
+        expect(helper.self_monitoring_project_data).to include(
+          'delete_self_monitoring_project_path' =>
+            delete_self_monitoring_project_admin_application_settings_path
+        )
+      end
+
+      it 'returns status_delete_self_monitoring_project_path' do
+        expect(helper.self_monitoring_project_data).to include(
+          'status_delete_self_monitoring_project_path' =>
+            status_delete_self_monitoring_project_admin_application_settings_path
+        )
+      end
+
       it 'returns self_monitoring_project_exists false' do
         expect(helper.self_monitoring_project_data).to include(
-          'self_monitoring_project_exists' => false
+          'self_monitoring_project_exists' => "false"
         )
       end
 
@@ -93,12 +107,12 @@ describe ApplicationSettingsHelper do
       let(:project) { build(:project) }
 
       before do
-        stub_application_setting(instance_administration_project: project)
+        stub_application_setting(self_monitoring_project: project)
       end
 
       it 'returns self_monitoring_project_exists true' do
         expect(helper.self_monitoring_project_data).to include(
-          'self_monitoring_project_exists' => true
+          'self_monitoring_project_exists' => "true"
         )
       end
 

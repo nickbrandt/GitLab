@@ -13,51 +13,84 @@ export default {
       required: false,
       default: '',
     },
+    scale: {
+      type: Number,
+      required: false,
+      default: 1,
+    },
+  },
+  data() {
+    return {
+      baseImageSize: null,
+      imageStyle: null,
+    };
+  },
+  watch: {
+    scale(val) {
+      this.zoom(val);
+    },
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeThrottled, false);
   },
   mounted() {
     this.onImgLoad();
-    this.resizeThrottled = _.throttle(this.onImgLoad, 400);
+
+    this.resizeThrottled = _.throttle(() => {
+      this.onWindowResize();
+    }, 400);
     window.addEventListener('resize', this.resizeThrottled, false);
   },
   methods: {
     onImgLoad() {
-      requestIdleCallback(this.calculateImgSize, { timeout: 1000 });
+      requestIdleCallback(this.setBaseImageSize, { timeout: 1000 });
     },
-    calculateImgSize() {
+    onWindowResize() {
       const { contentImg } = this.$refs;
-
       if (!contentImg) return;
 
-      this.$nextTick(() => {
-        const naturalRatio = contentImg.naturalWidth / contentImg.naturalHeight;
-        const visibleRatio = contentImg.width / contentImg.height;
-
-        const position = {
-          // Handling the case where img element takes more width than visible image thanks to object-fit: contain
-          width:
-            naturalRatio < visibleRatio
-              ? contentImg.clientHeight * naturalRatio
-              : contentImg.clientWidth,
-          height: contentImg.clientHeight,
-        };
-
-        this.$emit('setOverlayDimensions', position);
+      this.onResize({
+        width: contentImg.offsetWidth,
+        height: contentImg.offsetHeight,
       });
+    },
+    setBaseImageSize() {
+      const { contentImg } = this.$refs;
+      if (!contentImg || contentImg.offsetHeight === 0 || contentImg.offsetWidth === 0) return;
+
+      this.baseImageSize = {
+        height: contentImg.offsetHeight,
+        width: contentImg.offsetWidth,
+      };
+      this.onResize({ width: this.baseImageSize.width, height: this.baseImageSize.height });
+    },
+    onResize({ width, height }) {
+      this.$emit('resize', { width, height });
+    },
+    zoom(amount) {
+      const width = this.baseImageSize.width * amount;
+      const height = this.baseImageSize.height * amount;
+
+      this.imageStyle = {
+        width: `${width}px`,
+        height: `${height}px`,
+      };
+
+      this.onResize({ width, height });
     },
   },
 };
 </script>
 
 <template>
-  <div class="d-flex align-items-center h-100 w-100 p-3 overflow-hidden js-design-image">
+  <div class="m-auto js-design-image" :class="{ 'h-100 w-100 d-flex-center': !imageStyle }">
     <img
       ref="contentImg"
+      class="mh-100"
       :src="image"
       :alt="name"
-      class="ml-auto mr-auto img-fluid mh-100 design-image"
+      :style="imageStyle"
+      :class="{ 'img-fluid': !imageStyle }"
       @load="onImgLoad"
     />
   </div>

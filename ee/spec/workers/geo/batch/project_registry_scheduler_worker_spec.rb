@@ -6,7 +6,7 @@ RSpec.describe Geo::Batch::ProjectRegistrySchedulerWorker do
   include ExclusiveLeaseHelpers
   include ::EE::GeoHelpers
 
-  set(:secondary) { create(:geo_node) }
+  let_it_be(:secondary) { create(:geo_node) }
   let(:lease_key) { subject.lease_key }
   let(:lease_timeout) { 2.minutes }
 

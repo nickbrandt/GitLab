@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Configurable issue board' do
       let(:label_board_list) do
         EE::Resource::Board::BoardList::Project::LabelBoardList.fabricate_via_api!
@@ -18,7 +18,6 @@ module QA
 
         EE::Page::Component::IssueBoard::Show.perform do |show|
           show.click_boards_config_button
-
           show.set_name(new_board_name)
 
           expect(show.boards_dropdown).to have_content(new_board_name)

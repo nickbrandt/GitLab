@@ -115,11 +115,14 @@ With this configuration, we:
 - Lastly we deploy to the staging server.
 
 NOTE: **Note:**
-The `environment` keyword is just a hint for GitLab that this job actually
-deploys to the `name` environment. It can also have a `url` that is
-exposed in various places within GitLab. Each time a job that
-has an environment specified succeeds, a deployment is recorded, storing
-the Git SHA and environment name.
+The `environment` keyword defines where the app is deployed.
+The environment `name` and `url` is exposed in various places
+within GitLab. Each time a job that has an environment specified
+succeeds, a deployment is recorded, along with the Git SHA and environment name.
+
+CAUTION: **Caution**:
+Some characters are not allowed in environment names. Use only letters,
+numbers, spaces, and `-`, `_`, `/`, `{`, `}`, or `.`. Also, it must not start nor end with `/`.
 
 In summary, with the above `.gitlab-ci.yml` we have achieved the following:
 
@@ -220,7 +223,7 @@ deployment will be recorded as a new environment named `production`.
 
 NOTE: **Note:**
 If your environment's name is `production` (all lowercase),
-it will get recorded in [Cycle Analytics](../user/project/cycle_analytics.md).
+it will get recorded in [Value Stream Analytics](../user/project/cycle_analytics.md).
 
 ### Configuring dynamic environments
 
@@ -231,6 +234,11 @@ can be used. Dynamic environments make it possible to create environments on the
 declaring their names dynamically in `.gitlab-ci.yml`.
 
 Dynamic environments are a fundamental part of [Review apps](review_apps/index.md).
+
+### Configuring incremental rollouts
+
+Learn how to release production changes to only a portion of your Kubernetes pods with
+[incremental rollouts](environments/incremental_rollouts.md).
 
 #### Allowed variables
 
@@ -618,7 +626,7 @@ You can read more in the [`.gitlab-ci.yml` reference](yaml/README.md#environment
 
 ### Grouping similar environments
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/7015) in GitLab 8.14.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/7015) in GitLab 8.14.
 
 As documented in [Configuring dynamic environments](#configuring-dynamic-environments), you can
 prepend environment name with a word, followed by a `/`, and finally the branch
@@ -732,8 +740,8 @@ fetch = +refs/environments/*:refs/remotes/origin/environments/*
 
 ### Scoping environments with specs
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/2112) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
-> - [Scoping for environment variables was moved to Core](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30779) to Core in GitLab 12.2.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2112) in [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
+> - [Scoping for environment variables was moved to Core](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/30779) to Core in GitLab 12.2.
 
 You can limit the environment scope of a variable by
 defining which environments it can be available for.

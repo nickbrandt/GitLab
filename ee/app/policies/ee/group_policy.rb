@@ -57,7 +57,6 @@ module EE
         enable :admin_list
         enable :admin_board
         enable :read_prometheus
-        enable :view_code_analytics
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
         enable :read_group_timelogs
@@ -133,6 +132,11 @@ module EE
       end
 
       rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard
+
+      rule { admin | owner }.policy do
+        enable :read_group_compliance_dashboard
+        enable :read_group_credentials_inventory
+      end
 
       rule { needs_new_sso_session }.policy do
         prevent :read_group

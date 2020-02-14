@@ -192,6 +192,7 @@ Settings.gitlab['username_changing_enabled'] = true if Settings.gitlab['username
 Settings.gitlab['issue_closing_pattern'] = '\b((?:[Cc]los(?:e[sd]?|ing)|\b[Ff]ix(?:e[sd]|ing)?|\b[Rr]esolv(?:e[sd]?|ing)|\b[Ii]mplement(?:s|ed|ing)?)(:?) +(?:(?:issues? +)?%{issue_ref}(?:(?: *,? +and +| *,? *)?)|([A-Z][A-Z0-9_]+-\d+))+)' if Settings.gitlab['issue_closing_pattern'].nil?
 Settings.gitlab['default_projects_features'] ||= {}
 Settings.gitlab['webhook_timeout'] ||= 10
+Settings.gitlab['graphql_timeout'] ||= 30
 Settings.gitlab['max_attachment_size'] ||= 10
 Settings.gitlab['session_expire_delay'] ||= 10080
 Settings.gitlab['unauthenticated_session_expire_delay'] ||= 2.hours.to_i
@@ -209,6 +210,7 @@ Settings.gitlab['content_security_policy'] ||= Gitlab::ContentSecurityPolicy::Co
 Settings.gitlab['no_todos_messages'] ||= YAML.load_file(Rails.root.join('config', 'no_todos_messages.yml'))
 Settings.gitlab['impersonation_enabled'] ||= true if Settings.gitlab['impersonation_enabled'].nil?
 Settings.gitlab['usage_ping_enabled'] = true if Settings.gitlab['usage_ping_enabled'].nil?
+Settings.gitlab['max_request_duration_seconds'] ||= 57
 
 Gitlab.ee do
   Settings.gitlab['mirror_max_delay'] ||= 300
@@ -401,6 +403,9 @@ Settings.cron_jobs['pipeline_schedule_worker']['job_class'] = 'PipelineScheduleW
 Settings.cron_jobs['expire_build_artifacts_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['expire_build_artifacts_worker']['cron'] ||= '50 * * * *'
 Settings.cron_jobs['expire_build_artifacts_worker']['job_class'] = 'ExpireBuildArtifactsWorker'
+Settings.cron_jobs['environments_auto_stop_cron_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['environments_auto_stop_cron_worker']['cron'] ||= '24 * * * *'
+Settings.cron_jobs['environments_auto_stop_cron_worker']['job_class'] = 'Environments::AutoStopCronWorker'
 Settings.cron_jobs['repository_check_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['repository_check_worker']['cron'] ||= '20 * * * *'
 Settings.cron_jobs['repository_check_worker']['job_class'] = 'RepositoryCheck::DispatchWorker'
@@ -496,6 +501,9 @@ Gitlab.ee do
   Settings.cron_jobs['geo_repository_sync_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['geo_repository_sync_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['geo_repository_sync_worker']['job_class'] ||= 'Geo::RepositorySyncWorker'
+  Settings.cron_jobs['geo_secondary_registry_consistency_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['geo_secondary_registry_consistency_worker']['cron'] ||= '* * * * *'
+  Settings.cron_jobs['geo_secondary_registry_consistency_worker']['job_class'] ||= 'Geo::Secondary::RegistryConsistencyWorker'
   Settings.cron_jobs['geo_repository_verification_primary_batch_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['geo_repository_verification_primary_batch_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['geo_repository_verification_primary_batch_worker']['job_class'] ||= 'Geo::RepositoryVerification::Primary::BatchWorker'

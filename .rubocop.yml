@@ -155,11 +155,10 @@ Rails/ApplicationRecord:
     # as they need to be as decoupled from application code as possible
     - db/**/*.rb
     - lib/gitlab/background_migration/**/*.rb
+    - ee/lib/ee/gitlab/background_migration/**/*.rb
     - lib/gitlab/database/**/*.rb
     - spec/**/*.rb
     - ee/db/**/*.rb
-    - ee/lib/gitlab/background_migration/**/*.rb
-    - ee/lib/ee/gitlab/background_migration/**/*.rb
     - ee/spec/**/*.rb
 
 # GitLab ###################################################################
@@ -233,13 +232,8 @@ RSpec/FactoriesInMigrationSpecs:
     - 'spec/migrations/**/*.rb'
     - 'ee/spec/migrations/**/*.rb'
     - 'spec/lib/gitlab/background_migration/**/*.rb'
-    - 'ee/spec/lib/gitlab/background_migration/**/*.rb'
-
-Cop/IncludeActionViewContext:
-  Enabled: true
-  Exclude:
-    - 'spec/**/*'
-    - 'ee/spec/**/*'
+    - 'spec/lib/ee/gitlab/background_migration/**/*.rb'
+    - 'ee/spec/lib/ee/gitlab/background_migration/**/*.rb'
 
 Cop/IncludeSidekiqWorker:
   Enabled: true
@@ -301,30 +295,6 @@ RSpec/AnyInstanceOf:
   Enabled: false
 
 # Cops for upgrade to gitlab-styles 3.1.0
-Rails/SafeNavigationWithBlank:
-  Enabled: false
-
-Rails/ApplicationController:
-  Enabled: false
-
-Rails/ApplicationMailer:
-  Enabled: false
-
-Rails/RakeEnvironment:
-  Enabled: false
-
-Rails/HelperInstanceVariable:
-  Enabled: false
-
-Rails/EnumHash:
-  Enabled: false
-
-RSpec/ReceiveCounts:
-  Enabled: false
-
-RSpec/ContextMethod:
-  Enabled: false
-
 RSpec/ImplicitSubject:
   Enabled: false
 
@@ -360,6 +330,21 @@ RSpec/MissingExampleGroupArgument:
 
 RSpec/UnspecifiedException:
   Enabled: false
+
+# Work in progress. See https://gitlab.com/gitlab-org/gitlab/issues/196163
+RSpec/HaveGitlabHttpStatus:
+  Enabled: true
+  Exclude:
+    - 'spec/support/matchers/have_gitlab_http_status.rb'
+  Include:
+    - 'spec/support/**/*'
+    - 'ee/spec/support/**/*'
+    - 'spec/features/**/*'
+    - 'ee/spec/features/**/*'
+    - 'spec/controllers/**/*'
+    - 'ee/spec/controllers/**/*'
+    - 'spec/requests/*.rb'
+    - 'ee/spec/requests/*.rb'
 
 Style/MultilineWhenThen:
   Enabled: false

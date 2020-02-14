@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-scope "/-/push_from_secondary/:geo_node_id" do
-  draw :git_http
-end
-
 constraints(::Constraints::ProjectUrlConstrainer.new) do
   scope(path: '*namespace_id',
         as: :namespace,
@@ -60,13 +56,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :subscriptions, only: [:create, :destroy]
 
-        resources :licenses, only: [:index, :create, :update]
-
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring
 
         resources :logs, only: [:index] do
           collection do
             get :k8s
+            get :elasticsearch
           end
         end
 
@@ -78,11 +73,34 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :audit_events, only: [:index]
 
-        namespace :analytics do
-          constraints(::Constraints::FeatureConstrainer.new(:code_review_analytics)) do
-            resources :code_reviews, only: [:index]
+        namespace :security do
+          resources :waf_anomalies, only: [] do
+            get :summary, on: :collection
           end
+
+          resources :dashboard, only: [:show, :index], controller: :dashboard
+          resource :configuration, only: [:show], controller: :configuration
+          resource :discover, only: [:show], controller: :discover
+
+          resources :vulnerability_findings, only: [:index] do
+            collection do
+              get :summary
+            end
+          end
+
+          resources :vulnerabilities, only: [:index]
         end
+
+        namespace :analytics do
+          resources :code_reviews, only: [:index]
+        end
+
+        resources :approvers, only: :destroy
+        resources :approver_groups, only: :destroy
+        resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
+        resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+        resources :dependencies, only: [:index]
+        resources :licenses, only: [:index, :create, :update]
       end
       # End of the /-/ scope.
 
@@ -99,14 +117,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       namespace :prometheus do
         resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
           post :notify, on: :collection
+          member do
+            get :metrics_dashboard
+          end
         end
 
         resources :metrics, constraints: { id: %r{[^\/]+} }, only: [] do
           post :validate_query, on: :collection
         end
       end
-
-      post 'alerts/notify', to: 'alerting/notifications#create'
 
       resource :tracing, only: [:show]
 
@@ -121,39 +140,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :issues, only: [], constraints: { id: /\d+/ } do
-        member do
-          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
-          get '/designs(/*vueroute)', to: 'issues#designs', as: :designs, format: false
-        end
-
-        collection do
-          post :export_csv
-          get :service_desk
-        end
-
-        resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
-      end
-
       get '/service_desk' => 'service_desk#show', as: :service_desk
       put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
 
-      # Unscoped route. It will be replaced with redirect to /-/merge_requests/
-      # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
-      draw :merge_requests_ee
-
-      # To ensure an old unscoped routing is used for the UI we need to
-      # add prefix 'as' to the scope routing and place it below original MR routing.
-      # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
-      scope '-', as: 'scoped' do
-        draw :merge_requests_ee
-      end
-
       post '/restore' => '/projects#restore', as: :restore
-
-      resources :approvers, only: :destroy
-      resources :approver_groups, only: :destroy
-      resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
 
       resources :pipelines, only: [] do
         member do
@@ -167,21 +157,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :query
         end
       end
-
-      namespace :security do
-        resource :dashboard, only: [:show], controller: :dashboard
-        resource :configuration, only: [:show], controller: :configuration
-
-        resources :vulnerability_findings, only: [:index] do
-          collection do
-            get :summary
-          end
-        end
-      end
-
-      resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
-
-      resources :dependencies, only: [:index]
       # All new routes should go under /-/ scope.
       # Look for scope '-' at the top of the file.
       # rubocop: enable Cop/PutProjectRoutesUnderScope
@@ -215,7 +190,7 @@ scope path: '(/-/jira)', constraints: ::Constraints::JiraEncodedUrlConstrainer.n
         project: params[:project_id]
       )
 
-      "/#{project_full_path}/tree/#{params[:id]}"
+      "/#{project_full_path}/-/tree/#{params[:id]}"
     }
   end
 end

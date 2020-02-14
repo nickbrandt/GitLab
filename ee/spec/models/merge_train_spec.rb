@@ -5,7 +5,7 @@ require "spec_helper"
 describe MergeTrain do
   include ProjectForksHelper
 
-  set(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
 
   it { is_expected.to belong_to(:merge_request) }
   it { is_expected.to belong_to(:user) }
@@ -16,10 +16,11 @@ describe MergeTrain do
   end
 
   shared_context 'various merge trains' do
-    let_it_be(:merge_train_created) { create(:merge_train, :created) }
+    let_it_be(:merge_train_idle) { create(:merge_train, :idle) }
     let_it_be(:merge_train_stale) { create(:merge_train, :stale) }
     let_it_be(:merge_train_fresh) { create(:merge_train, :fresh) }
     let_it_be(:merge_train_merged) { create(:merge_train, :merged) }
+    let_it_be(:merge_train_merging) { create(:merge_train, :merging) }
   end
 
   describe '.active' do
@@ -28,17 +29,17 @@ describe MergeTrain do
     include_context 'various merge trains'
 
     it 'returns only active merge trains' do
-      is_expected.to contain_exactly(merge_train_created, merge_train_stale, merge_train_fresh)
+      is_expected.to contain_exactly(merge_train_idle, merge_train_stale, merge_train_fresh)
     end
   end
 
-  describe '.merged' do
-    subject { described_class.merged }
+  describe '.complete' do
+    subject { described_class.complete }
 
     include_context 'various merge trains'
 
     it 'returns only merged merge trains' do
-      is_expected.to contain_exactly(merge_train_merged)
+      is_expected.to contain_exactly(merge_train_merged, merge_train_merging)
     end
   end
 
@@ -98,9 +99,7 @@ describe MergeTrain do
     end
 
     context 'when the merge request has already been merged' do
-      before do
-        merge_request.merge_train.merged!
-      end
+      let!(:merge_request) { create_merge_request_on_train(status: :merged) }
 
       it { is_expected.to be_empty }
     end
@@ -134,9 +133,7 @@ describe MergeTrain do
     end
 
     context 'when the merge request has already been merged' do
-      before do
-        merge_request.merge_train.merged!
-      end
+      let!(:merge_request) { create_merge_request_on_train(status: :merged) }
 
       it { is_expected.to be_nil }
     end
@@ -164,9 +161,7 @@ describe MergeTrain do
     end
 
     context 'when first_on_master has already been merged' do
-      before do
-        first_on_master.merge_train.merged!
-      end
+      let!(:first_on_master) { create_merge_request_on_train(target_branch: 'master', source_branch: 'feature-1', status: :merged) }
 
       it 'returns second on master as active MR' do
         is_expected.to contain_exactly(second_on_master, first_on_stable)
@@ -195,9 +190,7 @@ describe MergeTrain do
       end
 
       context 'when the first merge request has already been merged' do
-        before do
-          merge_request_1.merge_train.merged!
-        end
+        let!(:merge_request_1) { create_merge_request_on_train(status: :merged) }
 
         it 'returns the first active merge request on the merge train from the given ids' do
           is_expected.to eq(merge_request_2)
@@ -214,8 +207,8 @@ describe MergeTrain do
     end
   end
 
-  describe '.last_merged_mr_in_train' do
-    subject { described_class.last_merged_mr_in_train(target_project_id, target_branch) }
+  describe '.last_complete_mr_in_train' do
+    subject { described_class.last_complete_mr_in_train(target_project_id, target_branch) }
 
     let(:target_project_id) { project.id }
     let(:target_branch) { 'master' }
@@ -224,20 +217,14 @@ describe MergeTrain do
       let!(:merge_request_1) { create_merge_request_on_train }
 
       context 'when the merge request has already been merged' do
-        before do
-          merge_request_1.merge_train.merged!
-        end
+        let!(:merge_request_1) { create_merge_request_on_train(status: :merged) }
 
         it 'returns the merge request' do
           is_expected.to eq(merge_request_1)
         end
 
         context 'when there is another merge request on train and it has been merged' do
-          let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
-
-          before do
-            merge_request_2.merge_train.merged!
-          end
+          let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome', status: :merged) }
 
           it 'returns the last merge request' do
             is_expected.to eq(merge_request_2)
@@ -272,9 +259,20 @@ describe MergeTrain do
       let(:merge_commit_sha_1) { Digest::SHA1.hexdigest 'test-1' }
       let(:target_sha) { merge_commit_sha_1 }
 
-      context 'when the merge request has already been merged' do
+      context 'when the merge request has already been merging' do
+        let!(:merge_request_1) { create_merge_request_on_train(status: :merging) }
+
         before do
-          merge_request_1.merge_train.merged!
+          merge_request_1.update_column(:in_progress_merge_commit_sha, merge_commit_sha_1)
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when the merge request has already been merged' do
+        let!(:merge_request_1) { create_merge_request_on_train(status: :merged) }
+
+        before do
           merge_request_1.update_column(:merge_commit_sha, merge_commit_sha_1)
         end
 
@@ -282,12 +280,11 @@ describe MergeTrain do
       end
 
       context 'when there is another merge request on train and it has been merged' do
-        let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+        let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome', status: :merged) }
         let(:merge_commit_sha_2) { Digest::SHA1.hexdigest 'test-2' }
         let(:target_sha) { merge_commit_sha_2 }
 
         before do
-          merge_request_2.merge_train.merged!
           merge_request_2.update_column(:merge_commit_sha, merge_commit_sha_2)
         end
 
@@ -329,9 +326,7 @@ describe MergeTrain do
     end
 
     context 'when the merge request has already been merged' do
-      before do
-        merge_request.merge_train.merged!
-      end
+      let!(:merge_request) { create_merge_request_on_train(status: :merged) }
 
       it 'returns zero' do
         is_expected.to be(0)
@@ -387,9 +382,7 @@ describe MergeTrain do
       end
 
       context 'when the previous merge request has already been merged' do
-        before do
-          merge_request.merge_train.merged!
-        end
+        let!(:merge_request) { create_merge_request_on_train(status: :merged) }
 
         it 'returns empty array' do
           is_expected.to be_empty
@@ -490,22 +483,31 @@ describe MergeTrain do
   end
 
   describe 'status transition' do
-    context 'when status is created' do
+    context 'when status is idle' do
       let(:merge_train) { create(:merge_train) }
 
-      context 'and transits to merged' do
-        it 'cleanup ref' do
-          expect(merge_train).to receive(:cleanup_ref).once
+      context 'and transits to fresh' do
+        let!(:pipeline) { create(:ci_pipeline) }
 
-          merge_train.merged!
+        it 'refreshes the state and set a pipeline' do
+          merge_train.refresh_pipeline!(pipeline.id)
+
+          expect(merge_train).to be_fresh
+          expect(merge_train.pipeline).to eq(pipeline)
+        end
+      end
+
+      context 'and transits to merged' do
+        it 'does not allow the transition' do
+          expect { merge_train.finish_merge! }
+            .to raise_error(StateMachines::InvalidTransition)
         end
       end
 
       context 'and transits to stale' do
-        it 'refreshes asynchronously' do
-          expect(merge_train).to receive(:refresh_async).once
-
-          merge_train.stale!
+        it 'does not allow the transition' do
+          expect { merge_train.outdate_pipeline! }
+            .to raise_error(StateMachines::InvalidTransition)
         end
       end
     end
@@ -514,18 +516,43 @@ describe MergeTrain do
       let(:merge_train) { create(:merge_train, :fresh) }
 
       context 'and transits to merged' do
-        it 'cleanup ref' do
-          expect(merge_train).to receive(:cleanup_ref).once
-
-          merge_train.merged!
+        it 'does not allow the transition' do
+          expect { merge_train.finish_merge! }
+            .to raise_error(StateMachines::InvalidTransition)
         end
       end
 
       context 'and transits to stale' do
         it 'refreshes asynchronously' do
-          expect(merge_train).to receive(:refresh_async).once
+          expect(AutoMergeProcessWorker)
+            .to receive(:perform_async).with(merge_train.merge_request_id).once
 
-          merge_train.stale!
+          merge_train.outdate_pipeline!
+        end
+      end
+    end
+
+    context 'when status is merging' do
+      let!(:merge_train) { create(:merge_train, :merging) }
+
+      context 'and transits to merged' do
+        it 'persists duration and merged_at' do
+          expect(merge_train.duration).to be_nil
+          expect(merge_train.merged_at).to be_nil
+
+          Timecop.freeze(1.hour.from_now) do
+            merge_train.finish_merge!
+
+            merge_train.reload
+            expect(merge_train.merged_at.to_i).to eq(Time.zone.now.to_i)
+            expect(merge_train.duration).to eq(1.hour.to_i)
+          end
+        end
+
+        it 'cleans up train ref' do
+          expect(merge_train).to receive(:cleanup_ref)
+
+          merge_train.finish_merge!
         end
       end
     end
@@ -534,10 +561,9 @@ describe MergeTrain do
       let(:merge_train) { create(:merge_train, :merged) }
 
       context 'and transits to merged' do
-        it 'does not cleanup ref' do
-          expect(merge_train).not_to receive(:cleanup_ref)
-
-          merge_train.merged!
+        it 'does not allow the transition' do
+          expect { merge_train.finish_merge! }
+            .to raise_error(StateMachines::InvalidTransition)
         end
       end
     end
@@ -572,8 +598,8 @@ describe MergeTrain do
   describe '#active?' do
     subject { merge_train.active? }
 
-    context 'when status is created' do
-      let(:merge_train) { create(:merge_train, :created) }
+    context 'when status is idle' do
+      let(:merge_train) { create(:merge_train, :idle) }
 
       it { is_expected.to eq(true) }
     end
@@ -585,12 +611,13 @@ describe MergeTrain do
     end
   end
 
-  def create_merge_request_on_train(target_project: project, target_branch: 'master', source_project: project, source_branch: 'feature')
+  def create_merge_request_on_train(target_project: project, target_branch: 'master', source_project: project, source_branch: 'feature', status: :idle)
     create(:merge_request,
       :on_train,
       target_branch: target_branch,
       target_project: target_project,
       source_branch: source_branch,
-      source_project: source_project)
+      source_project: source_project,
+      status: MergeTrain.state_machines[:status].states[status].value)
   end
 end

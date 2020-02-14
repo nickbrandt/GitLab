@@ -1,6 +1,6 @@
 import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import { STEPS } from '../constants';
+import { STEPS, TAX_RATE } from '../constants';
 
 const parsePlanData = planData =>
   JSON.parse(planData).map(plan => ({
@@ -16,16 +16,32 @@ const determineSelectedPlan = (planId, plans) => {
   return plans[0] && plans[0].value;
 };
 
-export default ({ planData = '[]', planId, setupForCompany, fullName }) => {
-  const plans = parsePlanData(planData);
+export default ({ planData = '[]', planId, setupForCompany, fullName, newUser }) => {
+  const availablePlans = parsePlanData(planData);
 
   return {
     currentStep: STEPS[0],
-    availablePlans: plans,
-    selectedPlan: determineSelectedPlan(planId, plans),
     isSetupForCompany: parseBoolean(setupForCompany),
+    availablePlans,
+    selectedPlan: determineSelectedPlan(planId, availablePlans),
+    newUser: parseBoolean(newUser),
     fullName,
     organizationName: null,
     numberOfUsers: parseBoolean(setupForCompany) ? 0 : 1,
+    country: null,
+    streetAddressLine1: null,
+    streetAddressLine2: null,
+    city: null,
+    countryState: null,
+    zipCode: null,
+    countryOptions: [],
+    stateOptions: [],
+    paymentFormParams: {},
+    paymentMethodId: null,
+    creditCardDetails: {},
+    isLoadingPaymentMethod: false,
+    isConfirmingOrder: false,
+    taxRate: TAX_RATE,
+    startDate: new Date(Date.now()),
   };
 };

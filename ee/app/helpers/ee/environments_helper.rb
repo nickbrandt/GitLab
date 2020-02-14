@@ -34,8 +34,8 @@ module EE
       {
         "environment-name": environment.name,
         "environments-path": project_environments_path(project, format: :json),
-        "project-full-path": project.full_path,
-        "environment-id": environment.id
+        "environment-id": environment.id,
+        "cluster-applications-documentation-path" => help_page_path('user/clusters/applications.md', anchor: 'elastic-stack')
       }
     end
 
@@ -45,7 +45,8 @@ module EE
         "validate-query-path" => validate_query_project_prometheus_metrics_path(project),
         "custom-metrics-available" => "#{custom_metrics_available?(project)}",
         "alerts-endpoint" => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
-        "prometheus-alerts-available" => "#{can?(current_user, :read_prometheus_alerts, project)}"
+        "prometheus-alerts-available" => "#{can?(current_user, :read_prometheus_alerts, project)}",
+        "logs-path" => project_logs_path(project, environment_name: environment.name)
       }
 
       super.merge(ee_metrics_data)

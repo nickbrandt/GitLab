@@ -26,7 +26,7 @@ describe Projects::LicensesController do
         it 'responds to an HTML request' do
           get :index, params: params
 
-          expect(response).to have_http_status(:ok)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'counts usage of the feature' do
@@ -43,7 +43,7 @@ describe Projects::LicensesController do
           end
 
           it 'returns success code' do
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           it 'returns a hash with licenses' do
@@ -84,10 +84,14 @@ describe Projects::LicensesController do
 
           context "when loading all policies" do
             before do
-              get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                detected: false
+              }, format: :json
             end
 
-            it { expect(response).to have_http_status(:ok) }
+            it { expect(response).to have_gitlab_http_status(:ok) }
             it { expect(json_response["licenses"].count).to be(4) }
 
             it 'includes a policy for an unclassified and known license that was detected in the scan report' do
@@ -140,7 +144,7 @@ describe Projects::LicensesController do
               }, format: :json
             end
 
-            it { expect(response).to have_http_status(:ok) }
+            it { expect(response).to have_gitlab_http_status(:ok) }
 
             it 'only includes policies for licenses detected in the most recent scan report' do
               expect(json_response["licenses"].count).to be(3)
@@ -172,6 +176,56 @@ describe Projects::LicensesController do
               })
             end
           end
+
+          context "when loading `allowed` software policies only" do
+            before do
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                classification: ['allowed']
+              }, format: :json
+            end
+
+            it { expect(response).to have_gitlab_http_status(:ok) }
+            it { expect(json_response["licenses"].count).to be(1) }
+
+            it 'includes only `allowed` policies' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => other_license_policy.id,
+                "spdx_identifier" => "Other-Id",
+                "classification" => "allowed"
+              })
+            end
+          end
+
+          context "when loading `allowed` and `denied` software policies" do
+            before do
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                classification: %w[allowed denied]
+              }, format: :json
+            end
+
+            it { expect(response).to have_gitlab_http_status(:ok) }
+            it { expect(json_response["licenses"].count).to be(2) }
+
+            it 'includes `denied` policies' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => mit_policy.id,
+                "spdx_identifier" => mit.spdx_identifier,
+                "classification" => mit_policy.classification
+              })
+            end
+
+            it 'includes `allowed` policies' do
+              expect(json_response.dig("licenses", 1)).to include({
+                "id" => other_license_policy.id,
+                "spdx_identifier" => other_license_policy.spdx_identifier,
+                "classification" => other_license_policy.classification
+              })
+            end
+          end
         end
 
         context 'without existing report' do
@@ -193,7 +247,7 @@ describe Projects::LicensesController do
         end
 
         it 'returns 404' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -206,7 +260,7 @@ describe Projects::LicensesController do
       end
 
       it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -238,7 +292,7 @@ describe Projects::LicensesController do
           post :create, xhr: true, params: default_params
         end
 
-        it { expect(response).to have_http_status(:not_found) }
+        it { expect(response).to have_gitlab_http_status(:not_found) }
       end
 
       context "when the current user is a member of the project but not authorized to create policies" do
@@ -248,7 +302,7 @@ describe Projects::LicensesController do
           post :create, xhr: true, params: default_params
         end
 
-        it { expect(response).to have_http_status(:not_found) }
+        it { expect(response).to have_gitlab_http_status(:not_found) }
       end
 
       context "when authorized as a maintainer" do
@@ -268,7 +322,7 @@ describe Projects::LicensesController do
             })
           end
 
-          it { expect(response).to have_http_status(:created) }
+          it { expect(response).to have_gitlab_http_status(:created) }
 
           it 'creates a new policy' do
             expect(project.reload.software_license_policies.denied.count).to be(1)
@@ -295,7 +349,7 @@ describe Projects::LicensesController do
             })
           end
 
-          it { expect(response).to have_http_status(:created) }
+          it { expect(response).to have_gitlab_http_status(:created) }
 
           it 'creates a new policy' do
             expect(project.reload.software_license_policies.allowed.count).to be(1)
@@ -322,7 +376,7 @@ describe Projects::LicensesController do
             })
           end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(response).to have_gitlab_http_status(:unprocessable_entity) }
           it { expect(json).to eq({ 'errors' => { "software_license" => ["can't be blank"] } }) }
         end
       end
@@ -356,7 +410,7 @@ describe Projects::LicensesController do
           patch :update, xhr: true, params: default_params
         end
 
-        it { expect(response).to have_http_status(:not_found) }
+        it { expect(response).to have_gitlab_http_status(:not_found) }
       end
 
       context "when the current user is a member of the project but not authorized to update policies" do
@@ -366,7 +420,7 @@ describe Projects::LicensesController do
           patch :update, xhr: true, params: default_params
         end
 
-        it { expect(response).to have_http_status(:not_found) }
+        it { expect(response).to have_gitlab_http_status(:not_found) }
       end
 
       context "when authorized as a maintainer" do
@@ -385,7 +439,7 @@ describe Projects::LicensesController do
             })
           end
 
-          it { expect(response).to have_http_status(:ok) }
+          it { expect(response).to have_gitlab_http_status(:ok) }
           it { expect(software_license_policy.reload).to be_denied }
 
           it "generates the proper JSON response" do
@@ -405,7 +459,7 @@ describe Projects::LicensesController do
             })
           end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(response).to have_gitlab_http_status(:unprocessable_entity) }
           it { expect(json).to eq({ "errors" => { "classification" => ["is invalid"] } }) }
         end
       end

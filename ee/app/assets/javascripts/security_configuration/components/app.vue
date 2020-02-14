@@ -94,7 +94,10 @@ export default {
       v-html="calloutContent"
     ></section>
     <section ref="featuresTable" class="mt-0">
-      <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
+      <div
+        class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2 gl-text-gray-900"
+        role="row"
+      >
         <div class="table-section section-80">
           {{ s__('SecurityConfiguration|Secure features') }}
         </div>
@@ -113,7 +116,7 @@ export default {
             </div>
             <div class="table-mobile-content">
               <div class="d-flex align-items-center justify-content-end justify-content-md-start">
-                <div class="text-2">
+                <div class="text-2 gl-text-gray-900">
                   {{ feature.name }}
                 </div>
                 <gl-link

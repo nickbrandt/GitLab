@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, plan: :bronze_plan) }
+  let_it_be(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -16,6 +16,28 @@ describe Ci::Build do
   let(:job) { create(:ci_build, pipeline: pipeline) }
   let(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
 
+  describe '.license_scan' do
+    subject(:build) { described_class.license_scan.first }
+
+    let(:artifact) { build.job_artifacts.first }
+
+    context 'with old license_management artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_management' }
+    end
+
+    context 'with new license_scanning artifact' do
+      let!(:license_artifact) { create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project) }
+
+      it { expect(artifact.file_type).to eq 'license_scanning' }
+    end
+  end
+
+  describe 'associations' do
+    it { is_expected.to have_many(:security_scans) }
+  end
+
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 
@@ -24,7 +46,7 @@ describe Ci::Build do
         job.runner = create(:ci_runner, :instance)
       end
 
-      it do
+      specify do
         expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
           .and_return(true)
 
@@ -247,7 +269,7 @@ describe Ci::Build do
 
       it 'parses blobs and add the results to the report' do
         subject
-        blob_path = "/#{project.full_path}/blob/#{job.sha}/yarn/yarn.lock"
+        blob_path = "/#{project.full_path}/-/blob/#{job.sha}/yarn/yarn.lock"
         mini_portile2 = dependency_list_report.dependencies[0]
         yarn = dependency_list_report.dependencies[20]
 

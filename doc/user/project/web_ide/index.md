@@ -15,7 +15,7 @@ and from merge requests.
 
 ## File finder
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18323) in [GitLab Core][ce] 10.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18323) in [GitLab Core][ce] 10.8.
 
 The file finder allows you to quickly open files in the current branch by
 searching. The file finder is launched using the keyboard shortcut `Command-p`,
@@ -46,12 +46,16 @@ Single file editing is based on the [Ace Editor](https://ace.c9.io).
 ## Stage and commit changes
 
 After making your changes, click the **Commit** button in the bottom left to
-review the list of changed files. Click on each file to review the changes and
-click the tick icon to stage the file.
+review the list of changed files. If you're using GitLab 12.6 or older versions,
+click on each file to review the changes and tick the item to stage a file.
 
-![Review changes](img/review_changes_v12_3.png)
+From [GitLab 12.7 onward](https://gitlab.com/gitlab-org/gitlab/issues/33441),
+all your files will be automatically staged. You still have the option to unstage
+changes in case you want to submit them in multiple smaller commits. To unstage
+a change, simply click the **Unstage** button when a staged file is open, or click
+the undo icon next to **Staged changes** to unstage all changes.
 
-Once you have staged some changes, you can add a commit message, commit the
+Once you have finalized your changes, you can add a commit message, commit the
 staged changes and directly create a merge request. In case you don't have write
 access to the selected branch, you will see a warning, but still be able to create
 a new branch and start a merge request.
@@ -69,7 +73,7 @@ shows you a preview of the merge request diff if you commit your changes.
 
 ## View CI job logs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19279) in [GitLab Core][ce] 11.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19279) in [GitLab Core][ce] 11.0.
 
 You can use the Web IDE to quickly fix failing tests by opening
 the branch or merge request in the Web IDE and opening the logs of the failed
@@ -82,7 +86,7 @@ left.
 
 ## Switching merge requests
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19318) in [GitLab Core][ce] 11.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19318) in [GitLab Core][ce] 11.0.
 
 To switch between your authored and assigned merge requests, click the
 dropdown in the top of the sidebar to open a list of merge requests. You will
@@ -91,7 +95,7 @@ request.
 
 ## Switching branches
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/20850) in [GitLab Core][ce] 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20850) in [GitLab Core][ce] 11.2.
 
 To switch between branches of the current project repository, click the dropdown
 in the top of the sidebar to open a list of branches.
@@ -100,7 +104,7 @@ different branch.
 
 ## Client Side Evaluation
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/19764) in [GitLab Core][ce] 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/19764) in [GitLab Core][ce] 11.2.
 
 You can use the Web IDE to preview JavaScript projects right in the browser.
 This feature uses CodeSandbox to compile and bundle the JavaScript used to

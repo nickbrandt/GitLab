@@ -1,25 +1,31 @@
 # frozen_string_literal: true
 
 class Admin::CredentialsController < Admin::ApplicationController
-  include Admin::CredentialsHelper
+  extend ::Gitlab::Utils::Override
+  include CredentialsInventoryActions
 
-  before_action :check_license_credentials_inventory_available!
+  helper_method :credentials_inventory_path, :user_detail_path
 
-  def index
-    @credentials = filter_credentials.page(params[:page]).preload_users.without_count
-  end
+  before_action :check_license_credentials_inventory_available!, only: [:index]
 
   private
 
-  def filter_credentials
-    if show_personal_access_tokens?
-      ::PersonalAccessTokensFinder.new({ user: nil, impersonation: false, state: 'active', sort: 'id_desc' }).execute
-    elsif show_ssh_keys?
-      ::KeysFinder.new(current_user, { user: nil, key_type: 'ssh' }).execute
-    end
-  end
-
   def check_license_credentials_inventory_available!
     render_404 unless credentials_inventory_feature_available?
+  end
+
+  override :credentials_inventory_path
+  def credentials_inventory_path(args)
+    admin_credentials_path(args)
+  end
+
+  override :user_detail_path
+  def user_detail_path(user)
+    admin_user_path(user)
+  end
+
+  override :users
+  def users
+    nil
   end
 end

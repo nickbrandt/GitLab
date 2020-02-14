@@ -556,6 +556,12 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         expect(json_response['status']).to eq job.status
         expect(json_response['lines']).to eq [{ 'content' => [{ 'text' => 'BUILD TRACE' }], 'offset' => 0 }]
       end
+
+      it 'sets being-watched flag for the job' do
+        expect(response).to have_gitlab_http_status(:ok)
+
+        expect(job.trace.being_watched?).to be(true)
+      end
     end
 
     context 'when job has no traces' do
@@ -1177,7 +1183,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
           get_terminal_websocket(id: job.id)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers["Content-Type"]).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
           expect(response.body).to eq('{"workhorse":"response"}')
         end
@@ -1187,7 +1193,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         it 'returns 404' do
           get_terminal_websocket(id: 1234)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end

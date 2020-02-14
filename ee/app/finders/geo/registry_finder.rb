@@ -14,9 +14,19 @@ module Geo
 
     private
 
-    def current_node
-      strong_memoize(:current_node) do
+    def current_node(fdw: true)
+      fdw ? current_node_fdw : current_node_non_fdw
+    end
+
+    def current_node_fdw
+      strong_memoize(:current_node_fdw) do
         Geo::Fdw::GeoNode.find(current_node_id) if current_node_id
+      end
+    end
+
+    def current_node_non_fdw
+      strong_memoize(:current_node_non_fdw) do
+        GeoNode.find(current_node_id) if current_node_id
       end
     end
   end

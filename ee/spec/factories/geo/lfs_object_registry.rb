@@ -10,6 +10,11 @@ FactoryBot.define do
       retry_count { 1 }
     end
 
+    trait :never_synced do
+      success { false }
+      retry_count { nil }
+    end
+
     trait :with_lfs_object do
       after(:build, :stub) do |registry, _|
         lfs_object = create(:lfs_object)

@@ -4,6 +4,7 @@ class ApprovalProjectRule < ApplicationRecord
   include ApprovalRuleLike
 
   belongs_to :project
+  has_and_belongs_to_many :protected_branches
 
   enum rule_type: {
     regular: 0,
@@ -16,6 +17,17 @@ class ApprovalProjectRule < ApplicationRecord
   validate :validate_default_license_report_name, on: :update, if: :report_approver?
 
   validates :name, uniqueness: { scope: :project_id }
+  validates :rule_type, uniqueness: { scope: :project_id, message: proc { _('any-approver for the project already exists') } }, if: :any_approver?
+
+  def self.applicable_to_branch(branch)
+    includes(:protected_branches).select { |rule| rule.applies_to_branch?(branch) }
+  end
+
+  def applies_to_branch?(branch)
+    return true if protected_branches.empty?
+
+    protected_branches.matching(branch).any?
+  end
 
   def source_rule
     nil

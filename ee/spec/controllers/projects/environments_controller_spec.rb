@@ -5,10 +5,10 @@ require 'spec_helper'
 describe Projects::EnvironmentsController do
   include KubernetesHelpers
 
-  set(:user) { create(:user) }
-  set(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
 
-  set(:environment) do
+  let_it_be(:environment) do
     create(:environment, name: 'production', project: project)
   end
 
@@ -93,7 +93,7 @@ describe Projects::EnvironmentsController do
         end
 
         it 'responds with access denied' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -105,7 +105,7 @@ describe Projects::EnvironmentsController do
         end
 
         it 'is successful' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -114,7 +114,7 @@ describe Projects::EnvironmentsController do
       it 'is successful' do
         get :terminal, params: environment_params
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
   end

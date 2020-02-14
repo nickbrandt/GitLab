@@ -20,7 +20,7 @@ describe('Deploy Board Instance', () => {
 
     it('should render a div with the correct css status and tooltip data', () => {
       wrapper = createComponent({
-        projectPath: folder.project_path,
+        logsPath: folder.logs_path,
         tooltipText: 'This is a pod',
       });
 
@@ -43,8 +43,7 @@ describe('Deploy Board Instance', () => {
 
     it('should have a log path computed with a pod name as a parameter', () => {
       wrapper = createComponent({
-        projectPath: folder.project_path,
-        environmentName: 'foo',
+        logsPath: folder.logs_path,
         podName: 'tanuki-1',
       });
 
@@ -76,10 +75,10 @@ describe('Deploy Board Instance', () => {
       wrapper.destroy();
     });
 
-    it('should not be a link without a projectPath prop', done => {
+    it('should not be a link without a logsPath prop', done => {
       wrapper = createComponent({
         stable: false,
-        projectPath: '',
+        logsPath: '',
       });
 
       wrapper.vm.$nextTick(() => {

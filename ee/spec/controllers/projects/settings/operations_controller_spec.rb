@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::Settings::OperationsController do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   before do
     sign_in(user)
@@ -34,7 +34,7 @@ describe Projects::Settings::OperationsController do
       it 'renders ok' do
         get :show, params: project_params(project)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:show)
       end
     end

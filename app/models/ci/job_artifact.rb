@@ -16,6 +16,8 @@ module Ci
       archive: nil,
       metadata: nil,
       trace: nil,
+      metrics_referee: nil,
+      network_referee: nil,
       junit: 'junit.xml',
       codequality: 'gl-code-quality-report.json',
       sast: 'gl-sast-report.json',
@@ -25,7 +27,8 @@ module Ci
       license_management: 'gl-license-management-report.json',
       license_scanning: 'gl-license-scanning-report.json',
       performance: 'performance.json',
-      metrics: 'metrics.txt'
+      metrics: 'metrics.txt',
+      lsif: 'lsif.json'
     }.freeze
 
     INTERNAL_TYPES = {
@@ -37,6 +40,8 @@ module Ci
     REPORT_TYPES = {
       junit: :gzip,
       metrics: :gzip,
+      metrics_referee: :gzip,
+      network_referee: :gzip,
 
       # All these file formats use `raw` as we need to store them uncompressed
       # for Frontend to fetch the files and do analysis
@@ -48,7 +53,8 @@ module Ci
       dast: :raw,
       license_management: :raw,
       license_scanning: :raw,
-      performance: :raw
+      performance: :raw,
+      lsif: :raw
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
@@ -68,6 +74,7 @@ module Ci
 
     scope :with_files_stored_locally, -> { where(file_store: [nil, ::JobArtifactUploader::Store::LOCAL]) }
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
+    scope :for_sha, ->(sha) { joins(job: :pipeline).where(ci_pipelines: { sha: sha }) }
 
     scope :with_file_types, -> (file_types) do
       types = self.file_types.select { |file_type| file_types.include?(file_type) }.values
@@ -108,7 +115,10 @@ module Ci
       license_management: 10, ## EE-specific
       license_scanning: 101, ## EE-specific till 13.0
       performance: 11, ## EE-specific
-      metrics: 12 ## EE-specific
+      metrics: 12, ## EE-specific
+      metrics_referee: 13, ## runner referees
+      network_referee: 14, ## runner referees
+      lsif: 15 # LSIF data for code navigation
     }
 
     enum file_format: {

@@ -23,7 +23,7 @@ module EE
       else
         flash.now[:alert] = result[:message]
 
-        render 'edit'
+        render_edit
       end
     end
 
@@ -41,7 +41,7 @@ module EE
       else
         flash.now[:alert] = result[:message]
 
-        render 'edit'
+        render_edit
       end
     end
 
@@ -136,6 +136,12 @@ module EE
 
     def log_unarchive_audit_event
       log_audit_event(message: 'Project unarchived')
+    end
+
+    override :render_edit
+    def render_edit
+      push_frontend_feature_flag(:scoped_approval_rules, project, default_enabled: true)
+      super
     end
   end
 end

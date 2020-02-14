@@ -8,8 +8,9 @@ export default () => ({
 
   isLoading: false,
   isLoadingStage: false,
-  isLoadingChartData: false,
+  isLoadingTasksByTypeChart: false,
   isLoadingDurationChart: false,
+  isLoadingDurationChartMedianData: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -37,4 +38,5 @@ export default () => ({
   },
 
   durationData: [],
+  durationMedianData: [],
 });

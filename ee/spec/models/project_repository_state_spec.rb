@@ -5,8 +5,8 @@ require 'spec_helper'
 describe ProjectRepositoryState do
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project) }
-  set(:repository_state) { create(:repository_state, project_id: project.id) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:repository_state) { create(:repository_state, project_id: project.id) }
 
   subject { repository_state }
 

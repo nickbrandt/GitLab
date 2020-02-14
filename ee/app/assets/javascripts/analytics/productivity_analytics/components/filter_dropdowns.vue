@@ -21,6 +21,10 @@ export default {
       required: false,
       default: null,
     },
+    hideGroupDropDown: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -68,6 +72,7 @@ export default {
     per_page: projectsPerPage,
     with_shared: false, // exclude forks
     order_by: LAST_ACTIVITY_AT,
+    include_subgroups: true,
   },
 };
 </script>
@@ -75,6 +80,7 @@ export default {
 <template>
   <div class="dropdown-container d-flex flex-column flex-lg-row">
     <groups-dropdown-filter
+      v-if="!hideGroupDropDown"
       class="group-select"
       :query-params="$options.groupsQueryParams"
       :default-group="group"

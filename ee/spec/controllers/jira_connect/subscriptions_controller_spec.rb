@@ -12,7 +12,7 @@ describe JiraConnect::SubscriptionsController do
       it 'returns 404' do
         get :index
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -20,7 +20,7 @@ describe JiraConnect::SubscriptionsController do
       it '#create returns 404' do
         post :create
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -30,7 +30,7 @@ describe JiraConnect::SubscriptionsController do
       it '#destroy returns 404' do
         delete :destroy, params: { id: subscription.id }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -51,7 +51,7 @@ describe JiraConnect::SubscriptionsController do
         let(:jwt) { nil }
 
         it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -60,7 +60,7 @@ describe JiraConnect::SubscriptionsController do
         let(:jwt) { Atlassian::Jwt.encode({ iss: installation.client_key, qsh: qsh }, installation.shared_secret) }
 
         it 'returns 200' do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'removes X-Frame-Options to allow rendering in iframe' do
@@ -88,7 +88,7 @@ describe JiraConnect::SubscriptionsController do
 
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -112,7 +112,7 @@ describe JiraConnect::SubscriptionsController do
             it 'returns 200' do
               subject
 
-              expect(response).to have_gitlab_http_status(200)
+              expect(response).to have_gitlab_http_status(:ok)
             end
           end
 
@@ -124,7 +124,7 @@ describe JiraConnect::SubscriptionsController do
             it 'returns 422' do
               subject
 
-              expect(response).to have_gitlab_http_status(422)
+              expect(response).to have_gitlab_http_status(:unprocessable_entity)
             end
           end
         end
@@ -133,7 +133,7 @@ describe JiraConnect::SubscriptionsController do
           it 'returns 401' do
             subject
 
-            expect(response).to have_gitlab_http_status(401)
+            expect(response).to have_gitlab_http_status(:unauthorized)
           end
         end
       end
@@ -150,7 +150,7 @@ describe JiraConnect::SubscriptionsController do
         let(:jwt) { nil }
 
         it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -159,7 +159,7 @@ describe JiraConnect::SubscriptionsController do
 
         it 'deletes the subscription' do
           expect { subscription.reload }.to raise_error ActiveRecord::RecordNotFound
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end

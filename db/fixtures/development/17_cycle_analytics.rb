@@ -109,7 +109,7 @@ class Gitlab::Seeder::CycleAnalytics
   def create_issues
     Array.new(@issue_count) do
       issue_params = {
-        title: "Cycle Analytics: #{FFaker::Lorem.sentence(6)}",
+        title: "Value Stream Analytics: #{FFaker::Lorem.sentence(6)}",
         description: FFaker::Lorem.sentence,
         state: 'opened',
         assignees: [@project.team.users.sample]
@@ -166,7 +166,7 @@ class Gitlab::Seeder::CycleAnalytics
       Timecop.travel 12.hours.from_now
 
       opts = {
-        title: 'Cycle Analytics merge_request',
+        title: 'Value Stream Analytics merge_request',
         description: "Fixes #{issue.to_reference}",
         source_branch: branch,
         target_branch: 'master'
@@ -187,7 +187,7 @@ class Gitlab::Seeder::CycleAnalytics
 
       pipeline.builds.each(&:enqueue) # make sure all pipelines in pending state
       pipeline.builds.each(&:run!)
-      pipeline.update_status
+      pipeline.update_legacy_status
     end
   end
 
@@ -208,7 +208,7 @@ class Gitlab::Seeder::CycleAnalytics
       job = merge_request.head_pipeline.builds.where.not(environment: nil).last
 
       job.success!
-      pipeline.update_status
+      job.pipeline.update_legacy_status
     end
   end
 end

@@ -13,9 +13,10 @@ class ServiceDeskService {
     return axios.put(this.endpoint, { service_desk_enabled: enable });
   }
 
-  updateTemplate(template, isEnabled) {
+  updateTemplate({ selectedTemplate, outgoingName }, isEnabled) {
     const body = {
-      issue_template_key: template,
+      issue_template_key: selectedTemplate,
+      outgoing_name: outgoingName,
       service_desk_enabled: isEnabled,
     };
     return axios.put(this.endpoint, body);

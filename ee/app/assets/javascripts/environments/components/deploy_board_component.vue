@@ -42,13 +42,10 @@ export default {
       type: Boolean,
       required: true,
     },
-    environmentName: {
+    logsPath: {
       type: String,
-      required: true,
-    },
-    projectPath: {
-      type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     hasLegacyAppLabel: {
       type: Boolean,
@@ -116,7 +113,7 @@ export default {
     <template v-else>
       <div v-if="hasLegacyAppLabel" class="bs-callout bs-callout-warning mb-0 mt-0">
         <span v-html="legacyLabelWarningMessage"></span>
-        <gl-link target="blank" :href="deployBoardsHelpPath">
+        <gl-link target="_blank" :href="deployBoardsHelpPath">
           <strong>{{ __('More Information') }}</strong>
         </gl-link>
       </div>
@@ -143,9 +140,8 @@ export default {
                   :key="i"
                   :status="instance.status"
                   :tooltip-text="instance.tooltip"
-                  :environment-name="environmentName"
                   :pod-name="instance.pod_name"
-                  :project-path="projectPath"
+                  :logs-path="logsPath"
                   :stable="instance.stable"
                 />
               </template>

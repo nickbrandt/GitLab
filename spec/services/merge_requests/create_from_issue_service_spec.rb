@@ -11,10 +11,8 @@ describe MergeRequests::CreateFromIssueService do
   let(:milestone_id) { create(:milestone, project: project).id }
   let(:issue) { create(:issue, project: project, milestone_id: milestone_id) }
   let(:custom_source_branch) { 'custom-source-branch' }
-
-  subject(:service) { described_class.new(project, user, service_params) }
-
-  subject(:service_with_custom_source_branch) { described_class.new(project, user, branch_name: custom_source_branch, **service_params) }
+  let(:service) { described_class.new(project, user, service_params) }
+  let(:service_with_custom_source_branch) { described_class.new(project, user, branch_name: custom_source_branch, **service_params) }
 
   before do
     project.add_developer(user)
@@ -55,7 +53,9 @@ describe MergeRequests::CreateFromIssueService do
       end
 
       it 'creates the new_issue_branch system note when the branch could be created but the merge_request cannot be created', :sidekiq_might_not_need_inline do
-        expect_any_instance_of(MergeRequest).to receive(:valid?).at_least(:once).and_return(false)
+        expect_next_instance_of(MergeRequest) do |instance|
+          expect(instance).to receive(:valid?).at_least(:once).and_return(false)
+        end
 
         expect(SystemNoteService).to receive(:new_issue_branch).with(issue, project, user, issue.to_branch_name, branch_project: target_project)
 

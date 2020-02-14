@@ -53,10 +53,10 @@ module QA
           sign_in
           @group.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
-          Page::Group::Settings::General.perform(&:set_request_access_enabled)
+          Page::Group::Settings::General.perform(&:toggle_request_access)
 
           Page::Group::Menu.perform(&:click_group_general_settings_item)
-          Page::Group::Settings::General.perform(&:set_request_access_disabled)
+          Page::Group::Settings::General.perform(&:toggle_request_access)
         end
 
         it_behaves_like 'group audit event logs', ["Change request access enabled from true to false", "Change request access enabled from false to true"]

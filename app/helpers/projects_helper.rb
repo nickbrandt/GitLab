@@ -368,8 +368,8 @@ module ProjectsHelper
     @project.grafana_integration&.grafana_url
   end
 
-  def grafana_integration_token
-    @project.grafana_integration&.token
+  def grafana_integration_masked_token
+    @project.grafana_integration&.masked_token
   end
 
   def grafana_integration_enabled?
@@ -403,6 +403,10 @@ module ProjectsHelper
       nav_tabs << :operations
     end
 
+    if can?(current_user, :read_cycle_analytics, project)
+      nav_tabs << :cycle_analytics
+    end
+
     tab_ability_map.each do |tab, ability|
       if can?(current_user, ability, project)
         nav_tabs << tab
@@ -425,7 +429,7 @@ module ProjectsHelper
     {
       environments:     :read_environment,
       milestones:       :read_milestone,
-      snippets:         :read_project_snippet,
+      snippets:         :read_snippet,
       settings:         :admin_project,
       builds:           :read_build,
       clusters:         :read_cluster,
@@ -443,7 +447,7 @@ module ProjectsHelper
       blobs:          :download_code,
       commits:        :download_code,
       merge_requests: :read_merge_request,
-      notes:          [:read_merge_request, :download_code, :read_issue, :read_project_snippet],
+      notes:          [:read_merge_request, :download_code, :read_issue, :read_snippet],
       members:        :read_project_member
     )
   end
@@ -563,6 +567,7 @@ module ProjectsHelper
       requestAccessEnabled: !!project.request_access_enabled,
       issuesAccessLevel: feature.issues_access_level,
       repositoryAccessLevel: feature.repository_access_level,
+      forkingAccessLevel: feature.forking_access_level,
       mergeRequestsAccessLevel: feature.merge_requests_access_level,
       buildsAccessLevel: feature.builds_access_level,
       wikiAccessLevel: feature.wiki_access_level,
@@ -587,6 +592,7 @@ module ProjectsHelper
       lfsHelpPath: help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs'),
       pagesAvailable: Gitlab.config.pages.enabled,
       pagesAccessControlEnabled: Gitlab.config.pages.access_control,
+      pagesAccessControlForced: ::Gitlab::Pages.access_control_is_forced?,
       pagesHelpPath: help_page_path('user/project/pages/introduction', anchor: 'gitlab-pages-access-control-core')
     }
   end
@@ -641,7 +647,6 @@ module ProjectsHelper
       projects#show
       projects#activity
       releases#index
-      cycle_analytics#show
     ]
   end
 
@@ -698,10 +703,20 @@ module ProjectsHelper
   end
 
   def vue_file_list_enabled?
-    Feature.enabled?(:vue_file_list, @project)
+    Feature.enabled?(:vue_file_list, @project, default_enabled: true)
+  end
+
+  def native_code_navigation_enabled?(project)
+    Feature.enabled?(:code_navigation, project)
   end
 
   def show_visibility_confirm_modal?(project)
     project.unlink_forks_upon_visibility_decrease_enabled? && project.visibility_level > Gitlab::VisibilityLevel::PRIVATE && project.forks_count > 0
+  end
+
+  def settings_container_registry_expiration_policy_available?(project)
+    Feature.enabled?(:registry_retention_policies_settings, project) &&
+      Gitlab.config.registry.enabled &&
+      can?(current_user, :destroy_container_image, project)
   end
 end

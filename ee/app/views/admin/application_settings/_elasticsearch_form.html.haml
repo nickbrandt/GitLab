@@ -57,6 +57,26 @@
               = _('How many replicas each Elasticsearch shard has.')
               = recreate_index_text
 
+          .form-group
+            = f.label :elasticsearch_indexed_field_length_limit, _('Maximum field length'), class: 'label-bold'
+            = f.number_field :elasticsearch_indexed_field_length_limit, value: @application_setting.elasticsearch_indexed_field_length_limit, class: 'form-control'
+            .form-text.text-muted
+              = _('If any indexed field exceeds this limit it will be truncated to this number of characters and the rest will not be indexed or searchable. This does not apply to repository and wiki indexing. Setting this to 0 means it is unlimited.')
+
+          .form-group
+            = f.label :elasticsearch_max_bulk_size_mb, _('Maximum bulk request size (MiB)'), class: 'label-bold'
+            = f.number_field :elasticsearch_max_bulk_size_mb, value: @application_setting.elasticsearch_max_bulk_size_mb, class: 'form-control'
+            .form-text.text-muted
+              = _('Maximum size of Elasticsearch bulk indexing requests.')
+              = _('This only applies to repository indexing operations.')
+
+          .form-group
+            = f.label :elasticsearch_max_bulk_concurrency, _('Bulk request concurrency'), class: 'label-bold'
+            = f.number_field :elasticsearch_max_bulk_concurrency, value: @application_setting.elasticsearch_max_bulk_concurrency, class: 'form-control'
+            .form-text.text-muted
+              = _('Maximum concurrency of Elasticsearch bulk requests per indexing operation.')
+              = _('This only applies to repository indexing operations.')
+
         .sub-section
           %h4= _('Elasticsearch indexing restrictions')
           .form-group

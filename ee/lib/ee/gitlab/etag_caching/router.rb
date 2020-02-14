@@ -12,6 +12,10 @@ module EE
           ::Gitlab::EtagCaching::Router::Route.new(
             %r(#{::Gitlab::EtagCaching::Router::RESERVED_WORDS_PREFIX}/logs/k8s\.json(\?.*)?\z),
             'k8s_pod_logs'
+          ),
+          ::Gitlab::EtagCaching::Router::Route.new(
+            %r(#{::Gitlab::EtagCaching::Router::RESERVED_WORDS_PREFIX}/logs/elasticsearch\.json(\?.*)?\z),
+            'elasticsearch_pod_logs'
           )
         ].freeze
 

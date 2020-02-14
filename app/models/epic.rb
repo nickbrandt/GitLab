@@ -5,8 +5,6 @@
 class Epic < ApplicationRecord
   include IgnorableColumns
 
-  ignore_column :milestone_id, remove_after: '2019-12-15', remove_with: '12.7'
-
   def self.link_reference_pattern
     nil
   end

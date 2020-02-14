@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require 'spec_helper'
 
-shared_examples_for 'member validations' do
+RSpec.shared_examples 'member validations' do
   describe 'validations' do
     context 'validates SSO enforcement' do
       let(:user) { create(:user) }

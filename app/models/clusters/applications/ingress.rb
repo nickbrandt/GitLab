@@ -3,7 +3,8 @@
 module Clusters
   module Applications
     class Ingress < ApplicationRecord
-      VERSION = '1.22.1'
+      VERSION = '1.29.3'
+      MODSECURITY_LOG_CONTAINER_NAME = 'modsecurity-log'
 
       self.table_name = 'clusters_applications_ingress'
 
@@ -42,7 +43,7 @@ module Clusters
       end
 
       def allowed_to_uninstall?
-        external_ip_or_hostname? && application_jupyter_nil_or_installable? && application_elastic_stack_nil_or_installable?
+        external_ip_or_hostname? && application_jupyter_nil_or_installable?
       end
 
       def install_command
@@ -85,7 +86,7 @@ module Clusters
             },
             "extraContainers" => [
               {
-                "name" => "modsecurity-log",
+                "name" => MODSECURITY_LOG_CONTAINER_NAME,
                 "image" => "busybox",
                 "args" => [
                   "/bin/sh",
@@ -154,10 +155,6 @@ module Clusters
 
       def application_jupyter_nil_or_installable?
         cluster.application_jupyter.nil? || cluster.application_jupyter&.installable?
-      end
-
-      def application_elastic_stack_nil_or_installable?
-        cluster.application_elastic_stack.nil? || cluster.application_elastic_stack&.installable?
       end
     end
   end

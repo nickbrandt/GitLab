@@ -26,7 +26,8 @@ describe EnvironmentsHelper do
         'validate-query-path' => validate_query_project_prometheus_metrics_path(project),
         'custom-metrics-available' => 'false',
         'alerts-endpoint' => project_prometheus_alerts_path(project, environment_id: environment.id, format: :json),
-        'prometheus-alerts-available' => 'true'
+        'prometheus-alerts-available' => 'true',
+        'logs-path' => project_logs_path(project, environment_name: environment.name)
       )
     end
   end
@@ -43,7 +44,6 @@ describe EnvironmentsHelper do
 
     it 'returns parameters for forming the pod logs API URL' do
       expect(subject).to include(
-        "project-full-path": project.full_path,
         "environment-id": environment.id
       )
     end

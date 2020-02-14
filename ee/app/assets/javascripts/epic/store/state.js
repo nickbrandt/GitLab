@@ -3,12 +3,12 @@ export default () => ({
   endpoint: '',
   updateEndpoint: '',
 
+  fullPath: '',
   groupPath: '',
   markdownPreviewPath: '',
   labelsPath: '',
   todoPath: '',
   todoDeletePath: '',
-  toggleSubscriptionPath: '',
 
   // URLs to use with links
   epicsWebUrl: '',

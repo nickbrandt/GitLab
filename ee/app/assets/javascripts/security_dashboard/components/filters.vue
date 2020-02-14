@@ -17,7 +17,7 @@ export default {
 </script>
 
 <template>
-  <div class="dashboard-filters border-bottom bg-light">
+  <div class="dashboard-filters border-bottom bg-gray-light">
     <div class="row mx-0 p-2">
       <dashboard-filter
         v-for="filter in filters"

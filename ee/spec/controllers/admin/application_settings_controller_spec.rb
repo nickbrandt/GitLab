@@ -42,7 +42,7 @@ describe Admin::ApplicationSettingsController do
 
       put :update, params: { application_setting: settings }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       settings.except(:elasticsearch_url, :repository_size_limit).each do |setting, value|
         expect(ApplicationSetting.current.public_send(setting)).to eq(value)
       end
@@ -104,9 +104,16 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'updating name disabled for users setting' do
+      let(:settings) { { updating_name_disabled_for_users: true } }
+      let(:feature) { :disable_name_update_for_users }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'project deletion adjourned period' do
       let(:settings) { { deletion_adjourned_period: 6 } }
-      let(:feature) { :marking_project_for_deletion }
+      let(:feature) { :adjourned_deletion_for_projects_and_groups }
 
       it_behaves_like 'settings for licensed features'
     end
@@ -129,7 +136,7 @@ describe Admin::ApplicationSettingsController do
     it 'updates repository_size_limit' do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 
-      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to redirect_to(general_admin_application_settings_path)
       expect(response).to set_flash[:notice].to('Application settings saved successfully')
     end
 

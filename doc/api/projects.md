@@ -55,8 +55,8 @@ GET /projects
 | `with_issues_enabled`         | boolean | no | Limit by enabled issues feature |
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `with_programming_language`   | string  | no | Limit by projects which use the given programming language |
-| `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
-| `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
 | `min_access_level`            | integer | no | Limit by current user minimal [access level](members.md) |
 | `id_after`                    | integer | no | Limit results to projects with IDs greater than the specified ID |
 | `id_before`                   | integer | no | Limit results to projects with IDs less than the specified ID |
@@ -129,6 +129,7 @@ When the user is authenticated and `simple` is not set this returns something li
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -157,6 +158,7 @@ When the user is authenticated and `simple` is not set this returns something li
     "request_access_enabled": false,
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -204,6 +206,7 @@ When the user is authenticated and `simple` is not set this returns something li
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -256,6 +259,7 @@ When the user is authenticated and `simple` is not set this returns something li
     "service_desk_enabled": false,
     "service_desk_address": null,
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 12,
       "storage_size": 2066080,
@@ -297,6 +301,15 @@ You can filter by [custom attributes](custom_attributes.md) with:
 ```
 GET /projects?custom_attributes[key]=value&custom_attributes[other_key]=other_value
 ```
+
+### Pagination limits
+
+From GitLab 12.10, [offset-based pagination](README.md#offset-based-pagination) will be
+[limited to 10,000 records](https://gitlab.com/gitlab-org/gitlab/issues/34565).
+[Keyset pagination](README.md#keyset-based-pagination) will be required to retrieve projects
+beyond this limit.
+
+Note that keyset pagination only supports `order_by=id`. Other sorting options are not available.
 
 ## List user projects
 
@@ -360,6 +373,7 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -388,6 +402,7 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "request_access_enabled": false,
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -435,6 +450,7 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -487,6 +503,7 @@ This endpoint supports [keyset pagination](README.md#keyset-based-pagination) fo
     "service_desk_enabled": false,
     "service_desk_address": null,
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 12,
       "storage_size": 2066080,
@@ -535,7 +552,7 @@ GET /users/:user_id/starred_projects
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature. |
 | `min_access_level` | integer | no | Limit by current user minimal [access level](members.md). |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/users/5/starred_projects"
 ```
 
@@ -571,6 +588,7 @@ Example response:
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -598,6 +616,7 @@ Example response:
     "request_access_enabled": false,
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -643,6 +662,7 @@ Example response:
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -694,6 +714,7 @@ Example response:
     "service_desk_enabled": false,
     "service_desk_address": null,
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "statistics": {
       "commit_count": 12,
       "storage_size": 2066080,
@@ -759,6 +780,7 @@ GET /projects/:id
   "jobs_enabled": true,
   "wiki_enabled": true,
   "snippets_enabled": false,
+  "can_create_merge_request_in": true,
   "resolve_outdated_diff_discussions": false,
   "container_registry_enabled": false,
   "container_expiration_policy": {
@@ -844,6 +866,7 @@ GET /projects/:id
   "service_desk_enabled": false,
   "service_desk_address": null,
   "autoclose_referenced_issues": true,
+  "suggestion_commit_message": null,
   "statistics": {
     "commit_count": 37,
     "storage_size": 1038090,
@@ -992,6 +1015,8 @@ POST /projects
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
+| `emails_disabled` | boolean | no | Disable email notifications |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `container_expiration_policy_attributes` | hash | no | Update the container expiration policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `enabled` (boolean) |
@@ -1058,6 +1083,8 @@ POST /projects/user/:user_id
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
+| `emails_disabled` | boolean | no | Disable email notifications |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `shared_runners_enabled` | boolean | no | Enable shared runners for this project |
@@ -1068,6 +1095,7 @@ POST /projects/user/:user_id
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `merge_method` | string | no | Set the [merge method](#project-merge-method) used |
 | `autoclose_referenced_issues` | boolean | no | Set whether auto-closing referenced issues on default branch |
+| `suggestion_commit_message` | string | no | The commit message used to apply merge request suggestions |
 | `remove_source_branch_after_merge` | boolean | no | Enable `Delete source branch` option by default for all new merge requests |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
@@ -1122,6 +1150,8 @@ PUT /projects/:id
 | `builds_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `wiki_access_level` | string | no | One of `disabled`, `private` or `enabled` |
 | `snippets_access_level` | string | no | One of `disabled`, `private` or `enabled` |
+| `pages_access_level` | string | no | One of `disabled`, `private`, `enabled` or `public` |
+| `emails_disabled` | boolean | no | Disable email notifications |
 | `resolve_outdated_diff_discussions` | boolean | no | Automatically resolve merge request diffs discussions on lines changed with a push |
 | `container_registry_enabled` | boolean | no | Enable container registry for this project |
 | `container_expiration_policy_attributes` | hash | no | Update the container expiration policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `enabled` (boolean) |
@@ -1133,6 +1163,7 @@ PUT /projects/:id
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `merge_method` | string | no | Set the [merge method](#project-merge-method) used |
 | `autoclose_referenced_issues` | boolean | no | Set whether auto-closing referenced issues on default branch |
+| `suggestion_commit_message` | string | no | The commit message used to apply merge request suggestions |
 | `remove_source_branch_after_merge` | boolean | no | Enable `Delete source branch` option by default for all new merge requests |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
@@ -1208,7 +1239,7 @@ GET /projects/:id/forks
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `min_access_level` | integer | no | Limit by current user minimal [access level](members.md) |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/forks"
 ```
 
@@ -1239,6 +1270,7 @@ Example responses:
     "jobs_enabled": true,
     "wiki_enabled": true,
     "snippets_enabled": false,
+    "can_create_merge_request_in": true,
     "resolve_outdated_diff_discussions": false,
     "container_registry_enabled": false,
     "created_at": "2013-09-30T13:46:02Z",
@@ -1265,6 +1297,7 @@ Example responses:
     "request_access_enabled": false,
     "merge_method": "merge",
     "autoclose_referenced_issues": true,
+    "suggestion_commit_message": null,
     "_links": {
       "self": "http://example.com/api/v4/projects",
       "issues": "http://example.com/api/v4/projects/1/issues",
@@ -1290,7 +1323,7 @@ POST /projects/:id/star
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/star"
 ```
 
@@ -1320,6 +1353,7 @@ Example response:
   "jobs_enabled": true,
   "wiki_enabled": true,
   "snippets_enabled": false,
+  "can_create_merge_request_in": true,
   "resolve_outdated_diff_discussions": false,
   "container_registry_enabled": false,
   "created_at": "2013-09-30T13:46:02Z",
@@ -1354,6 +1388,7 @@ Example response:
   "request_access_enabled": false,
   "merge_method": "merge",
   "autoclose_referenced_issues": true,
+  "suggestion_commit_message": null,
   "_links": {
     "self": "http://example.com/api/v4/projects",
     "issues": "http://example.com/api/v4/projects/1/issues",
@@ -1378,7 +1413,7 @@ POST /projects/:id/unstar
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/unstar"
 ```
 
@@ -1408,6 +1443,7 @@ Example response:
   "jobs_enabled": true,
   "wiki_enabled": true,
   "snippets_enabled": false,
+  "can_create_merge_request_in": true,
   "resolve_outdated_diff_discussions": false,
   "container_registry_enabled": false,
   "created_at": "2013-09-30T13:46:02Z",
@@ -1442,6 +1478,7 @@ Example response:
   "request_access_enabled": false,
   "merge_method": "merge",
   "autoclose_referenced_issues": true,
+  "suggestion_commit_message": null,
   "_links": {
     "self": "http://example.com/api/v4/projects",
     "issues": "http://example.com/api/v4/projects/1/issues",
@@ -1466,7 +1503,7 @@ GET /projects/:id/starrers
 | --------- | ---- | -------- | ----------- |
 | `search` | string | no | Search for specific users. |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/starrers"
 ```
 
@@ -1507,7 +1544,7 @@ Get languages used in a project with percentage value.
 GET /projects/:id/languages
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/languages"
 ```
 
@@ -1535,7 +1572,7 @@ POST /projects/:id/archive
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/archive"
 ```
 
@@ -1570,6 +1607,7 @@ Example response:
   "jobs_enabled": true,
   "wiki_enabled": true,
   "snippets_enabled": false,
+  "can_create_merge_request_in": true,
   "resolve_outdated_diff_discussions": false,
   "container_registry_enabled": false,
   "created_at": "2013-09-30T13:46:02Z",
@@ -1617,6 +1655,7 @@ Example response:
   "request_access_enabled": false,
   "merge_method": "merge",
   "autoclose_referenced_issues": true,
+  "suggestion_commit_message": null,
   "_links": {
     "self": "http://example.com/api/v4/projects",
     "issues": "http://example.com/api/v4/projects/1/issues",
@@ -1642,7 +1681,7 @@ POST /projects/:id/unarchive
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/unarchive"
 ```
 
@@ -1677,6 +1716,7 @@ Example response:
   "jobs_enabled": true,
   "wiki_enabled": true,
   "snippets_enabled": false,
+  "can_create_merge_request_in": true,
   "resolve_outdated_diff_discussions": false,
   "container_registry_enabled": false,
   "created_at": "2013-09-30T13:46:02Z",
@@ -1724,6 +1764,7 @@ Example response:
   "request_access_enabled": false,
   "merge_method": "merge",
   "autoclose_referenced_issues": true,
+  "suggestion_commit_message": null,
   "_links": {
     "self": "http://example.com/api/v4/projects",
     "issues": "http://example.com/api/v4/projects/1/issues",
@@ -1741,9 +1782,9 @@ Example response:
 This endpoint either:
 
 - Removes a project including all associated resources (issues, merge requests etc).
-- From GitLab 12.6 on Premium or higher tiers, marks a project for deletion. Actual
+- From [GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/32935) on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a project for deletion. Actual
   deletion happens after number of days specified in
-  [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#project-deletion-adjourned-period-premium-only).
+  [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
 
 ```
 DELETE /projects/:id
@@ -1754,6 +1795,8 @@ DELETE /projects/:id
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ## Restore project marked for deletion **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/32935) in GitLab 12.6.
 
 Restores project marked for deletion.
 
@@ -1783,7 +1826,7 @@ cURL to post data using the header `Content-Type: multipart/form-data`.
 The `file=` parameter must point to a file on your filesystem and be preceded
 by `@`. For example:
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" https://gitlab.example.com/api/v4/projects/5/uploads
 ```
 
@@ -1829,7 +1872,7 @@ DELETE /projects/:id/share/:group_id
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `group_id` | integer | yes | The ID of the group |
 
-```bash
+```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/share/17
 ```
 
@@ -1957,11 +2000,6 @@ Allows modification of the forked relationship between existing projects. Availa
 
 ### Create a forked from/to relation between existing projects
 
-CAUTION: **Warning:**
-This will destroy the LFS objects stored in the fork.
-So to retain the LFS objects, make sure you've pulled them **before** creating the fork relation,
-and push them again **after** creating the fork relation.
-
 ```
 POST /projects/:id/fork/:forked_from_id
 ```
@@ -1997,7 +2035,7 @@ GET /projects
 | `order_by` | string | no | Return requests ordered by `id`, `name`, `created_at` or `last_activity_at` fields |
 | `sort` | string | no | Return requests sorted in `asc` or `desc` order |
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects?search=test
 ```
 
@@ -2077,7 +2115,7 @@ POST /projects/:id/push_rule
 | `commit_message_negative_regex` **(STARTER)** | string         | no       | No commit message is allowed to match this, e.g. `ssh\:\/\/` |
 | `branch_name_regex` **(STARTER)**             | string         | no       | All branch names must match this, e.g. `(feature|hotfix)\/*` |
 | `author_email_regex` **(STARTER)**            | string         | no       | All commit author emails must match this, e.g. `@my-company.com$` |
-| `file_name_regex` **(STARTER)**               | string         | no       | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `file_name_regex` **(STARTER)**               | string         | no       | All committed filenames must **not** match this, e.g. `(jar|exe)$` |
 | `max_file_size` **(STARTER)**                 | integer        | no       | Maximum file size (MB) |
 | `commit_committer_check` **(PREMIUM)**        | boolean        | no       | Users can only push commits to this repository that were committed with one of their own verified emails. |
 | `reject_unsigned_commits` **(PREMIUM)**        | boolean        | no       | Reject commit when it is not signed through GPG. |
@@ -2100,7 +2138,7 @@ PUT /projects/:id/push_rule
 | `commit_message_negative_regex` **(STARTER)** | string         | no       | No commit message is allowed to match this, e.g. `ssh\:\/\/` |
 | `branch_name_regex` **(STARTER)**             | string         | no       | All branch names must match this, e.g. `(feature|hotfix)\/*` |
 | `author_email_regex` **(STARTER)**            | string         | no       | All commit author emails must match this, e.g. `@my-company.com$` |
-| `file_name_regex` **(STARTER)**               | string         | no       | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `file_name_regex` **(STARTER)**               | string         | no       | All committed filenames must **not** match this, e.g. `(jar|exe)$` |
 | `max_file_size` **(STARTER)**                 | integer        | no       | Maximum file size (MB) |
 | `commit_committer_check` **(PREMIUM)**        | boolean        | no       | Users can only push commits to this repository that were committed with one of their own verified emails. |
 | `reject_unsigned_commits` **(PREMIUM)**        | boolean        | no       | Reject commits when they are not GPG signed. |
@@ -2156,7 +2194,7 @@ POST /projects/:id/mirror/pull
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
-```bash
+```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/mirror/pull
 ```
 
@@ -2190,4 +2228,4 @@ GET /projects/:id/snapshot
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `wiki`    | boolean | no | Whether to download the wiki, rather than project, repository |
 
-[ce-27427]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/27427
+[ce-27427]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/27427

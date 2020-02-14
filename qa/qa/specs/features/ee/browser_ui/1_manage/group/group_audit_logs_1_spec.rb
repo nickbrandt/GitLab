@@ -9,7 +9,7 @@ module QA
 
     shared_examples 'group audit event logs' do |expected_events|
       it 'logs audit events' do
-        wait_for_audit_events(expected_events)
+        wait_for_audit_events(expected_events, group)
 
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
         expected_events.each do |expected_event|
@@ -32,7 +32,7 @@ module QA
       end
 
       before do
-        @event_count = get_audit_event_count
+        @event_count = get_audit_event_count(@group)
       end
 
       let(:project) do
@@ -42,15 +42,27 @@ module QA
       end
 
       let(:user) { Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1) }
+      let(:group) { @group }
 
       context 'Add group' do
+        let(:group_name) { 'new group' }
+
         before do
+          @event_count = 0
           sign_in
-          Resource::Group.fabricate_via_browser_ui!.visit!
+          Resource::Group.fabricate_via_browser_ui! do |group|
+            group.name = group_name
+          end.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
         end
 
-        it_behaves_like 'group audit event logs', ["Add group"]
+        it_behaves_like 'group audit event logs', ['Add group'] do
+          let(:group) do
+            Resource::Group.fabricate_via_api! do |group|
+              group.name = group_name
+            end
+          end
+        end
       end
 
       context 'Change repository size limit', :requires_admin do
@@ -63,7 +75,7 @@ module QA
             settings.click_save_name_visibility_settings_button
           end
         end
-        it_behaves_like 'group audit event logs', ["Change repository size limit"]
+        it_behaves_like 'group audit event logs', ['Change repository size limit']
       end
 
       context 'Update group name' do
@@ -78,7 +90,7 @@ module QA
           end
         end
 
-        it_behaves_like 'group audit event logs', ["Change name"]
+        it_behaves_like 'group audit event logs', ['Change name']
       end
 
       context 'Add user, change access level, remove user' do
@@ -93,7 +105,7 @@ module QA
           end
         end
 
-        it_behaves_like 'group audit event logs', ["Add user access as guest", "Change access level", "Remove user access"]
+        it_behaves_like 'group audit event logs', ['Add user access as guest', 'Change access level', 'Remove user access']
       end
 
       context 'Add and remove project access' do
@@ -114,7 +126,7 @@ module QA
           @group.visit!
         end
 
-        it_behaves_like 'group audit event logs', ["Add project access", "Remove project access"]
+        it_behaves_like 'group audit event logs', ['Add project access', 'Remove project access']
       end
     end
 
@@ -127,16 +139,16 @@ module QA
       end
     end
 
-    def get_audit_event_count
-      response = get Runtime::API::Request.new(api_client, "/groups/#{@group.id}/audit_events").url
+    def get_audit_event_count(group)
+      response = get Runtime::API::Request.new(api_client, "/groups/#{group.id}/audit_events").url
       parse_body(response).length
     end
 
-    def wait_for_audit_events(expected_events)
+    def wait_for_audit_events(expected_events, group)
       new_event_count = @event_count + expected_events.length
 
-      Support::Retrier.retry_until(sleep_interval: 1) do
-        get_audit_event_count == new_event_count
+      Support::Retrier.retry_until(max_duration: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME, sleep_interval: 1) do
+        get_audit_event_count(group) == new_event_count
       end
     end
   end

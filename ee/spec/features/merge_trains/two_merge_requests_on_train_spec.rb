@@ -6,8 +6,8 @@ describe 'Two merge requests on a merge train' do
   include RepoHelpers
 
   let(:project) { create(:project, :repository) }
-  set(:maintainer_1) { create(:user) }
-  set(:maintainer_2) { create(:user) }
+  let_it_be(:maintainer_1) { create(:user) }
+  let_it_be(:maintainer_2) { create(:user) }
 
   let(:merge_request_1) do
     create(:merge_request,
@@ -28,6 +28,7 @@ describe 'Two merge requests on a merge train' do
   end
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_maintainer(maintainer_1)
     project.add_maintainer(maintainer_2)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
@@ -238,7 +239,7 @@ describe 'Two merge requests on a merge train' do
     end
 
     it 'does not recreate pipeline when merge request 1 refreshed again' do
-      expect { merge_request_1.merge_train.send(:refresh_async) }
+      expect { AutoMergeProcessWorker.perform_async(merge_request_1.id) }
         .not_to change { merge_request_1.all_pipelines.count }
     end
 

@@ -5,11 +5,11 @@ require 'spec_helper'
 describe API::Groups do
   include GroupAPIHelpers
 
-  set(:group) { create(:group) }
-  set(:private_group) { create(:group, :private) }
-  set(:project) { create(:project, group: group) }
-  set(:user) { create(:user) }
-  set(:another_user) { create(:user) }
+  let_it_be(:group, reload: true) { create(:group) }
+  let_it_be(:private_group) { create(:group, :private) }
+  let_it_be(:project) { create(:project, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:another_user) { create(:user) }
   let(:admin) { create(:admin) }
 
   before do
@@ -44,38 +44,66 @@ describe API::Groups do
   end
 
   describe 'GET /groups/:id' do
-    before do
-      create(:ip_restriction, group: private_group)
-      private_group.add_maintainer(user)
+    context 'group_ip_restriction' do
+      before do
+        create(:ip_restriction, group: private_group)
+        private_group.add_maintainer(user)
+      end
+
+      context 'when the group_ip_restriction feature is not available' do
+        before do
+          stub_licensed_features(group_ip_restriction: false)
+        end
+
+        it 'returns 200' do
+          get api("/groups/#{private_group.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'when the group_ip_restriction feature is available' do
+        before do
+          stub_licensed_features(group_ip_restriction: true)
+        end
+
+        it 'returns 404 for request from ip not in the range' do
+          get api("/groups/#{private_group.id}", user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+
+        it 'returns 200 for request from ip in the range' do
+          get api("/groups/#{private_group.id}", user), headers: { 'REMOTE_ADDR' => '192.168.0.0' }
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
     end
 
-    context 'when the group_ip_restriction feature is not available' do
-      before do
-        stub_licensed_features(group_ip_restriction: false)
+    context 'marked_for_deletion_on attribute' do
+      context 'when feature is available' do
+        before do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+        end
+
+        it 'is exposed' do
+          get api("/groups/#{group.id}", user)
+
+          expect(json_response).to have_key 'marked_for_deletion_on'
+        end
       end
 
-      it 'returns 200' do
-        get api("/groups/#{private_group.id}", user)
+      context 'when feature is not available' do
+        before do
+          stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+        end
 
-        expect(response).to have_gitlab_http_status(200)
-      end
-    end
+        it 'is not exposed' do
+          get api("/groups/#{group.id}", user)
 
-    context 'when the group_ip_restriction feature is available' do
-      before do
-        stub_licensed_features(group_ip_restriction: true)
-      end
-
-      it 'returns 404 for request from ip not in the range' do
-        get api("/groups/#{private_group.id}", user)
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-
-      it 'returns 200 for request from ip in the range' do
-        get api("/groups/#{private_group.id}", user), headers: { 'REMOTE_ADDR' => '192.168.0.0' }
-
-        expect(response).to have_gitlab_http_status(200)
+          expect(json_response).not_to have_key 'marked_for_deletion_on'
+        end
       end
     end
   end
@@ -456,6 +484,138 @@ describe API::Groups do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "DELETE /groups/:id" do
+    subject { delete api("/groups/#{group.id}", user) }
+
+    shared_examples_for 'immediately enqueues the job to delete the group' do
+      it do
+        Sidekiq::Testing.fake! do
+          expect { subject }.to change(GroupDestroyWorker.jobs, :size).by(1)
+        end
+
+        expect(response).to have_gitlab_http_status(202)
+      end
+    end
+
+    context 'feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'period for adjourned deletion is greater than 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 1)
+        end
+
+        context 'success' do
+          it 'marks the group for adjourned deletion' do
+            subject
+            group.reload
+
+            expect(response).to have_gitlab_http_status(202)
+            expect(group.marked_for_deletion_on).to eq(Date.today)
+            expect(group.deleting_user).to eq(user)
+          end
+
+          it 'does not immediately enqueue the job to delete the group' do
+            expect { subject }.not_to change(GroupDestroyWorker.jobs, :size)
+          end
+        end
+
+        context 'failure' do
+          before do
+            allow(::Groups::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: 'error' })
+          end
+
+          it 'returns error' do
+            subject
+
+            expect(response).to have_gitlab_http_status(400)
+            expect(json_response['message']).to eq('error')
+          end
+        end
+      end
+
+      context 'period of adjourned deletion is set to 0' do
+        before do
+          stub_application_setting(deletion_adjourned_period: 0)
+        end
+
+        it_behaves_like 'immediately enqueues the job to delete the group'
+      end
+    end
+
+    context 'feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      end
+
+      it_behaves_like 'immediately enqueues the job to delete the group'
+    end
+  end
+
+  describe "POST /groups/:id/restore" do
+    let(:group) do
+      create(:group_with_deletion_schedule,
+      marked_for_deletion_on: 1.day.ago,
+      deleting_user: user)
+    end
+
+    subject { post api("/groups/#{group.id}/restore", user) }
+
+    context 'feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'authenticated as owner' do
+        context 'restoring is successful' do
+          it 'restores the group to original state' do
+            subject
+
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response['marked_for_deletion_on']).to be_falsey
+          end
+        end
+
+        context 'restoring fails' do
+          before do
+            allow(::Groups::RestoreService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: 'error' })
+          end
+
+          it 'returns error' do
+            subject
+
+            expect(response).to have_gitlab_http_status(400)
+            expect(json_response['message']).to eq('error')
+          end
+        end
+      end
+
+      context 'authenticated as user without access to the group' do
+        subject { post api("/groups/#{group.id}/restore", another_user) }
+
+        it 'returns 403' do
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+
+    context 'feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      end
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end

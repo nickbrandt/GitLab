@@ -8,6 +8,7 @@ import SecurityDashboardTable from 'ee/security_dashboard/components/security_da
 import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_chart.vue';
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
+import LoadingError from 'ee/security_dashboard/components/loading_error.vue';
 
 import createStore from 'ee/security_dashboard/store';
 import { getParameterValues } from '~/lib/utils/url_utility';
@@ -156,12 +157,7 @@ describe('Security Dashboard app', () => {
 
   describe('dismissed vulnerabilities', () => {
     beforeEach(() => {
-      getParameterValues.mockImplementation(() => [true]);
       setup();
-    });
-
-    afterEach(() => {
-      getParameterValues.mockRestore();
     });
 
     it.each`
@@ -173,6 +169,27 @@ describe('Security Dashboard app', () => {
       getParameterValues.mockImplementation(() => getParameterValuesReturnValue);
       createComponent();
       expect(wrapper.vm.$store.state.filters.hideDismissed).toBe(expected);
+    });
+  });
+
+  describe('on error', () => {
+    beforeEach(() => {
+      setup();
+      createComponent();
+    });
+
+    it.each([401, 403])('displays an error on error %s', errorCode => {
+      store.dispatch('vulnerabilities/receiveVulnerabilitiesError', errorCode);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(LoadingError).exists()).toBe(true);
+      });
+    });
+
+    it.each([404, 500])('does not display an error on error %s', errorCode => {
+      store.dispatch('vulnerabilities/receiveVulnerabilitiesError', errorCode);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find(LoadingError).exists()).toBe(false);
+      });
     });
   });
 });

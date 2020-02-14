@@ -50,9 +50,7 @@ describe Groups::CycleAnalyticsController do
         get(:show,
             params: {
               group_id: group.name,
-              cycle_analytics: {
-                project_ids: [project.id]
-              }
+              project_ids: [project.id]
             },
             format: :json)
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Epics Management' do
       before do
         Flow::Login.sign_in
@@ -81,7 +81,6 @@ module QA
 
           Resource::Issue.fabricate_via_api! do |issue|
             issue.project = project
-            issue.title = 'Issue created via API'
           end
         end
 

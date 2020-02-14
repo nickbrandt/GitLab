@@ -14,3 +14,16 @@
     }
   }
 }
+
+.daterange-indicator {
+  @include media-breakpoint-down(md) {
+    .number-of-days {
+      padding-left: 0.25rem !important;
+      margin-top: 0.25rem;
+    }
+
+    svg {
+      margin-top: 0.45rem;
+    }
+  }
+}

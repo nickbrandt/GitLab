@@ -103,7 +103,7 @@ describe MarkupHelper do
         let(:requested_path) { 'files/images/README.md' }
 
         it 'returns the correct HTML for the image' do
-          expanded_path = "/#{project.full_path}/raw/master/files/images/#{image_file}"
+          expanded_path = "/#{project.full_path}/-/raw/master/files/images/#{image_file}"
 
           expect(subject.css('a')[0].attr('href')).to eq(expanded_path)
           expect(subject.css('img')[0].attr('data-src')).to eq(expanded_path)
@@ -138,8 +138,18 @@ describe MarkupHelper do
     describe 'without redacted attribute' do
       it 'renders the markdown value' do
         expect(Banzai).to receive(:render_field).with(commit, attribute, {}).and_call_original
+        expect(Banzai).to receive(:post_process)
 
         helper.markdown_field(commit, attribute)
+      end
+    end
+
+    context 'when post_process is false' do
+      it 'does not run Markdown post processing' do
+        expect(Banzai).to receive(:render_field).with(commit, attribute, {}).and_call_original
+        expect(Banzai).not_to receive(:post_process)
+
+        helper.markdown_field(commit, attribute, post_process: false)
       end
     end
   end
@@ -273,16 +283,19 @@ describe MarkupHelper do
 
   describe '#render_wiki_content' do
     let(:wiki) { double('WikiPage', path: "file.#{extension}") }
+    let(:wiki_repository) { double('Repository') }
     let(:context) do
       {
         pipeline: :wiki, project: project, project_wiki: wiki,
-        page_slug: 'nested/page', issuable_state_filter_enabled: true
+        page_slug: 'nested/page', issuable_state_filter_enabled: true,
+        repository: wiki_repository
       }
     end
 
     before do
       expect(wiki).to receive(:content).and_return('wiki content')
       expect(wiki).to receive(:slug).and_return('nested/page')
+      expect(wiki).to receive(:repository).and_return(wiki_repository)
       helper.instance_variable_set(:@project_wiki, wiki)
     end
 
@@ -354,10 +367,10 @@ describe MarkupHelper do
   describe '#markup_unsafe' do
     subject { helper.markup_unsafe(file_name, text, context) }
 
+    let_it_be(:project_base) { create(:project, :repository) }
+    let_it_be(:context) { { project: project_base } }
     let(:file_name) { 'foo.bar' }
     let(:text) { 'Noël' }
-    let(:project_base) { build(:project, :repository) }
-    let(:context) { { project: project_base } }
 
     context 'when text is missing' do
       let(:text) { nil }
@@ -380,11 +393,20 @@ describe MarkupHelper do
 
       context 'when renderer returns an error' do
         before do
-          allow(Banzai).to receive(:render).and_raise("An error")
+          allow(Banzai).to receive(:render).and_raise(StandardError, "An error")
         end
 
         it 'returns html (rendered by ActionView:TextHelper)' do
           is_expected.to eq('<p>Noël</p>')
+        end
+
+        it 'logs the error' do
+          expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
+            instance_of(StandardError),
+            project_id: project.id, file_name: 'foo.md'
+          )
+
+          subject
         end
       end
     end
@@ -410,7 +432,7 @@ describe MarkupHelper do
     end
 
     context 'when file has an unknown type' do
-      let(:file_name) { 'foo' }
+      let(:file_name) { 'foo.tex' }
 
       it 'returns html (rendered by Gitlab::OtherMarkup)' do
         expected_html = 'Noël'
@@ -552,6 +574,14 @@ describe MarkupHelper do
         expect(doc.css('gl-emoji')[1].attr('data-name')).to eq 'grinning'
 
         expect(doc.content).to eq "foo 😉\nbar 😀"
+      end
+
+      it 'does not post-process truncated text', :request_store do
+        object = create_object("hello \n\n [Test](README.md)")
+
+        expect do
+          first_line_in_markdown(object, attribute, nil, project: project)
+        end.not_to change { Gitlab::GitalyClient.get_request_count }
       end
     end
 

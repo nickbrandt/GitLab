@@ -51,7 +51,7 @@ class ProjectsController < Projects::ApplicationController
 
   def edit
     @badge_api_endpoint = expose_url(api_v4_projects_badges_path(id: @project.id))
-    render 'edit'
+    render_edit
   end
 
   def create
@@ -85,7 +85,7 @@ class ProjectsController < Projects::ApplicationController
       else
         flash.now[:alert] = result[:message]
 
-        format.html { render 'edit' }
+        format.html { render_edit }
       end
 
       format.js
@@ -118,7 +118,7 @@ class ProjectsController < Projects::ApplicationController
       format.html
       format.json do
         load_events
-        pager_json('events/_events', @events.count)
+        pager_json('events/_events', @events.count { |event| event.visible_to_user?(current_user) })
       end
     end
   end
@@ -296,7 +296,7 @@ class ProjectsController < Projects::ApplicationController
   private
 
   def show_blob_ids?
-    repo_exists? && project_view_files? && Feature.disabled?(:vue_file_list, @project)
+    repo_exists? && project_view_files? && Feature.disabled?(:vue_file_list, @project, default_enabled: true)
   end
 
   # Render project landing depending of which features are available
@@ -343,6 +343,7 @@ class ProjectsController < Projects::ApplicationController
     @events = EventCollection
       .new(projects, offset: params[:offset].to_i, filter: event_filter)
       .to_a
+      .map(&:present)
 
     Events::RenderService.new(current_user).execute(@events, atom_request: request.format.atom?)
   end
@@ -387,10 +388,12 @@ class ProjectsController < Projects::ApplicationController
       :merge_method,
       :initialize_with_readme,
       :autoclose_referenced_issues,
+      :suggestion_commit_message,
 
       project_feature_attributes: %i[
         builds_access_level
         issues_access_level
+        forking_access_level
         merge_requests_access_level
         repository_access_level
         snippets_access_level
@@ -486,6 +489,10 @@ class ProjectsController < Projects::ApplicationController
 
   def rate_limiter
     ::Gitlab::ApplicationRateLimiter
+  end
+
+  def render_edit
+    render 'edit'
   end
 end
 

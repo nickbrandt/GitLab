@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe JiraConnect::SyncBranchWorker do
   describe '#perform' do
-    set(:project) { create(:project, :repository) }
+    let_it_be(:project) { create(:project, :repository) }
     let(:project_id) { project.id }
     let(:branch_name) { 'master' }
     let(:commit_shas) { %w(b83d6e3 5a62481) }

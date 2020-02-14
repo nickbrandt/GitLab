@@ -96,7 +96,7 @@ request that have been performed and how much time it took. This task is
 more useful for GitLab contributors and developers. Use part of this log
 file when you are going to report bug. For example:
 
-```
+```plaintext
 Started GET "/gitlabhq/yaml_db/tree/master" for 168.111.56.1 at 2015-02-12 19:34:53 +0200
 Processing by Projects::TreeController#show as HTML
   Parameters: {"project_id"=>"gitlabhq/yaml_db", "id"=>"master"}
@@ -121,7 +121,9 @@ In this example we can see that server processed an HTTP request with URL
 
 ## `api_json.log`
 
-Introduced in GitLab 10.0, this file lives in
+> Introduced in GitLab 10.0.
+
+This file lives in
 `/var/log/gitlab/gitlab-rails/api_json.log` for Omnibus GitLab packages or in
 `/home/git/gitlab/log/api_json.log` for installations from source.
 
@@ -151,12 +153,27 @@ installations from source.
 It helps you discover events happening in your instance such as user creation,
 project removing and so on. For example:
 
-```
+```plaintext
 October 06, 2014 11:56: User "Administrator" (admin@example.com) was created
 October 06, 2014 11:56: Documentcloud created a new project "Documentcloud / Underscore"
 October 06, 2014 11:56: Gitlab Org created a new project "Gitlab Org / Gitlab Ce"
 October 07, 2014 11:25: User "Claudie Hodkiewicz" (nasir_stehr@olson.co.uk)  was removed
 October 07, 2014 11:25: Project "project133" was removed
+```
+
+## `application_json.log`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/22812) in GitLab 12.7.
+
+This file lives in `/var/log/gitlab/gitlab-rails/application_json.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/application_json.log` for
+installations from source.
+
+It contains the JSON version of the logs in `application.log` like the example below:
+
+``` json
+{"severity":"INFO","time":"2020-01-14T13:35:15.466Z","correlation_id":"3823a1550b64417f9c9ed8ee0f48087e","message":"User \"Administrator\" (admin@example.com) was created"}
+{"severity":"INFO","time":"2020-01-14T13:35:15.466Z","correlation_id":"78e3df10c9a18745243d524540bd5be4","message":"Project \"project133\" was removed"}
 ```
 
 ## `integrations_json.log`
@@ -167,14 +184,16 @@ installations from source.
 
 It contains information about [integrations](../user/project/integrations/project_services.md) activities such as Jira, Asana and Irker services. It uses JSON format like the example below:
 
-``` json
+```json
 {"severity":"ERROR","time":"2018-09-06T14:56:20.439Z","service_class":"JiraService","project_id":8,"project_path":"h5bp/html5-boilerplate","message":"Error sending message","client_url":"http://jira.gitlap.com:8080","error":"execution expired"}
 {"severity":"INFO","time":"2018-09-06T17:15:16.365Z","service_class":"JiraService","project_id":3,"project_path":"namespace2/project2","message":"Successfully posted","client_url":"http://jira.example.com"}
 ```
 
 ## `kubernetes.log`
 
-Introduced in GitLab 11.6. This file lives in
+> Introduced in GitLab 11.6.
+
+This file lives in
 `/var/log/gitlab/gitlab-rails/kubernetes.log` for Omnibus GitLab
 packages or in `/home/git/gitlab/log/kubernetes.log` for
 installations from source.
@@ -269,14 +288,17 @@ For source installations, edit the `gitlab.yml` and set the Sidekiq
 
 ## `gitlab-shell.log`
 
-This file lives in `/var/log/gitlab/gitlab-shell/gitlab-shell.log` for
-Omnibus GitLab packages or in `/home/git/gitlab-shell/gitlab-shell.log` for
+This file lives in `/var/log/gitlab/gitaly/gitlab-shell.log` for
+Omnibus GitLab packages or in `/home/git/gitaly/gitlab-shell.log` for
 installations from source.
+
+NOTE: **Note**
+For GitLab 12.5 and earlier the file lives in `/var/log/gitlab/gitlab-shell/gitlab-shell.log`.
 
 GitLab Shell is used by GitLab for executing Git commands and provide
 SSH access to Git repositories. For example:
 
-```
+```plaintext
 I, [2015-02-13T06:17:00.671315 #9291]  INFO -- : Adding project root/example.git at </var/opt/gitlab/git-data/repositories/root/dcdcdcdcd.git>.
 I, [2015-02-13T06:17:00.679433 #9291]  INFO -- : Moving existing hooks directory and symlinking global hooks directory for /var/opt/gitlab/git-data/repositories/root/example.git.
 ```
@@ -294,7 +316,7 @@ serving the GitLab application. You can look at this log if, for
 example, your application does not respond. This log contains all
 information about the state of Unicorn processes at any given time.
 
-```
+```plaintext
 I, [2015-02-13T06:14:46.680381 #9047]  INFO -- : Refreshing Gem list
 I, [2015-02-13T06:14:56.931002 #9047]  INFO -- : listening on addr=127.0.0.1:8080 fd=12
 I, [2015-02-13T06:14:56.931381 #9047]  INFO -- : listening on addr=/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket fd=13
@@ -320,13 +342,17 @@ It logs information whenever a [repository check is run][repocheck] on a project
 
 ## `importer.log`
 
-Introduced in GitLab 11.3. This file lives in `/var/log/gitlab/gitlab-rails/importer.log` for
+> Introduced in GitLab 11.3.
+
+This file lives in `/var/log/gitlab/gitlab-rails/importer.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/importer.log` for
 installations from source.
 
 ## `auth.log`
 
-Introduced in GitLab 12.0. This file lives in `/var/log/gitlab/gitlab-rails/auth.log` for
+> Introduced in GitLab 12.0.
+
+This file lives in `/var/log/gitlab/gitlab-rails/auth.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/auth.log` for
 installations from source.
 
@@ -356,13 +382,15 @@ GraphQL queries are recorded in that file. For example:
 
 ## `migrations.log`
 
-Introduced in GitLab 12.3. This file lives in `/var/log/gitlab/gitlab-rails/migrations.log` for
+> Introduced in GitLab 12.3.
+
+This file lives in `/var/log/gitlab/gitlab-rails/migrations.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/migrations.log` for
 installations from source.
 
 ## `mail_room_json.log` (default)
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/19186) in GitLab 12.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/19186) in GitLab 12.6.
 
 This file lives in `/var/log/gitlab/mail_room/mail_room_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/mail_room_json.log` for
@@ -396,7 +424,7 @@ installations from source.
 
 ## `database_load_balancing.log` **(PREMIUM ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/15442) in GitLab 12.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/15442) in GitLab 12.3.
 
 Contains details of GitLab's [Database Load Balancing](database_load_balancing.md).
 It is stored at:
@@ -406,7 +434,9 @@ It is stored at:
 
 ## `elasticsearch.log`
 
-Introduced in GitLab 12.6. This file lives in
+> Introduced in GitLab 12.6.
+
+This file lives in
 `/var/log/gitlab/gitlab-rails/elasticsearch.log` for Omnibus GitLab
 packages or in `/home/git/gitlab/log/elasticsearch.log` for installations
 from source.
@@ -423,7 +453,7 @@ etc. For example:
 
 ## `exceptions_json.log`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/17819) in GitLab 12.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/17819) in GitLab 12.6.
 
 This file lives in
 `/var/log/gitlab/gitlab-rails/exceptions_json.log` for Omnibus GitLab

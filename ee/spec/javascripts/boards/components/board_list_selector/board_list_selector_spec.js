@@ -58,7 +58,7 @@ describe('BoardListSelector', () => {
       });
 
       it('does not call axios.get when store.state.assignees is not empty', done => {
-        spyOn(axios, 'get');
+        spyOn(axios, 'get').and.returnValue(Promise.resolve());
         boardsStore.state.assignees = mockAssigneesList;
 
         vm.loadList()

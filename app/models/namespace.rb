@@ -131,6 +131,11 @@ class Namespace < ApplicationRecord
       name = host.delete_suffix(gitlab_host)
       Namespace.find_by_full_path(name)
     end
+
+    # overridden in ee
+    def reset_ci_minutes!(namespace_id)
+      false
+    end
   end
 
   def visibility_level_field
@@ -186,7 +191,11 @@ class Namespace < ApplicationRecord
   # any ancestor can disable emails for all descendants
   def emails_disabled?
     strong_memoize(:emails_disabled) do
-      self_and_ancestors.where(emails_disabled: true).exists?
+      if parent_id
+        self_and_ancestors.where(emails_disabled: true).exists?
+      else
+        !!emails_disabled
+      end
     end
   end
 

@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::AlertsController do
-  set(:user) { create(:user) }
-  set(:project) { create(:project) }
-  set(:environment) { create(:environment, project: project) }
-  set(:metric) { create(:prometheus_metric, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:environment) { create(:environment, project: project) }
+  let_it_be(:metric) { create(:prometheus_metric, project: project) }
 
   before do
     stub_licensed_features(prometheus_alerts: true)
@@ -353,6 +353,30 @@ describe Projects::Prometheus::AlertsController do
     it_behaves_like 'unlicensed'
     it_behaves_like 'project non-specific environment', :not_found
     it_behaves_like 'project non-specific metric', :not_found
+  end
+
+  describe 'GET #metrics_dashboard' do
+    let!(:alert) do
+      create(:prometheus_alert,
+             project: project,
+             environment: environment,
+             prometheus_metric: metric)
+    end
+
+    it 'returns a json object with the correct keys' do
+      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response.keys).to contain_exactly('dashboard', 'status')
+    end
+
+    it 'is the correct embed' do
+      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+
+      title = json_response['dashboard']['panel_groups'][0]['panels'][0]['title']
+
+      expect(title).to eq(metric.title)
+    end
   end
 
   def project_params(opts = {})

@@ -27,7 +27,7 @@ describe Projects::PipelinesController do
         end
 
         it do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template :show
         end
       end
@@ -89,7 +89,7 @@ describe Projects::PipelinesController do
         end
 
         it do
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template :show
         end
       end
@@ -133,7 +133,7 @@ describe Projects::PipelinesController do
         end
 
         it 'will not return report' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -157,7 +157,7 @@ describe Projects::PipelinesController do
         end
 
         it 'will return 404'  do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -177,7 +177,7 @@ describe Projects::PipelinesController do
         end
 
         it 'will return 404' do
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end

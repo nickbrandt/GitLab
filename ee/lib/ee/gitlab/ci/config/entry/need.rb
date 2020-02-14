@@ -9,10 +9,13 @@ module EE
             extend ActiveSupport::Concern
 
             prepended do
+              # When defining a bridge that subscribes to an upstream pipeline:
+              # needs:pipeline: other/project
               strategy :BridgeHash,
                 class: EE::Gitlab::Ci::Config::Entry::Need::BridgeHash,
                 if: -> (config) { config.is_a?(Hash) && !config.key?(:job) && !config.key?(:project) }
 
+              # When defining DAG dependency across project/ref
               strategy :CrossDependency,
                 class: EE::Gitlab::Ci::Config::Entry::Need::CrossDependency,
                 if: -> (config) { config.is_a?(Hash) && (config.key?(:project) || config.key?(:ref)) }

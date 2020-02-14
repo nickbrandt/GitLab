@@ -4,7 +4,10 @@ module Geo
   module Scheduler
     class PerShardSchedulerWorker
       include ApplicationWorker
+      # rubocop:disable Scalability/CronWorkerContext
+      # This worker does not perform work scoped to a context
       include CronjobQueue
+      # rubocop:enable Scalability/CronWorkerContext
       include ::Gitlab::Geo::LogHelpers
       include ::EachShardWorker
 

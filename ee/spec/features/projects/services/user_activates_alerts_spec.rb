@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe 'User activates Alerts' do
-  set(:project) { create(:project) }
-  set(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
 
   let(:service_name) { 'alerts' }
   let(:service_title) { 'Alerts endpoint' }

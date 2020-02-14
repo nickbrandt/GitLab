@@ -22,14 +22,14 @@
           %span.board-title-main-text.block-truncated{ "v-if": "list.type !== \"label\"",
             ":title" => '((list.label && list.label.description) || list.title || "")',
             data: { container: "body" },
-            ":class": "{ 'has-tooltip': !['backlog', 'closed'].includes(list.type) }" }
+            ":class": "{ 'has-tooltip': !['backlog', 'closed'].includes(list.type), 'd-block': list.type === 'milestone' }" }
             {{ list.title }}
 
           %span.board-title-sub-text.prepend-left-5.has-tooltip{ "v-if": "list.type === \"assignee\"",
             ":title" => '(list.assignee && list.assignee.username || "")' }
             @{{ list.assignee.username }}
 
-          %span.has-tooltip.badge.color-label.title{ "v-if": "list.type === \"label\"",
+          %span.has-tooltip.badge.color-label.title.d-inline-block.mw-100.text-truncate.align-middle{ "v-if": "list.type === \"label\"",
             ":title" => '(list.label ? list.label.description : "")',
             data: { container: "body", placement: "bottom" },
             ":style" => "{ backgroundColor: (list.label && list.label.color ? list.label.color : null), color: (list.label && list.label.textColor ? list.label.textColor : \"#2e2e2e\") }" }
@@ -42,9 +42,10 @@
             %button.board-delete.no-drag.p-0.border-0.has-tooltip.float-right{ type: "button", title: _("Delete list"), ":class": "{ 'd-none': !list.isExpanded }", "aria-label" => _("Delete list"), data: { placement: "bottom" }, "@click.stop" => "deleteBoard" }
               = icon("trash")
 
-        .issue-count-badge.pr-0.no-drag.text-secondary{ "v-if" => "showBoardListAndBoardInfo", ":title": "counterTooltip", "v-tooltip": true, data: { placement: "top" } }
+        .issue-count-badge.pr-0.no-drag.text-secondary{ "v-if" => "showBoardListAndBoardInfo" }
           %span.d-inline-flex
-            %span.issue-count-badge-count
+            %gl-tooltip{ ":target" => "() => $refs.issueCount", ":title" => "issuesTooltip" }
+            %span.issue-count-badge-count{ "ref" => "issueCount" }
               %icon.mr-1{ name: "issues" }
               %issue-count{ ":maxIssueCount" => "list.maxIssueCount",
                 ":issuesSize" => "list.issuesSize" }

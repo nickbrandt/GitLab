@@ -70,7 +70,7 @@ describe Search::GroupService, :elastic do
   context 'visibility', :sidekiq_inline do
     include_context 'ProjectPolicyTable context'
 
-    set(:group) { create(:group) }
+    let_it_be(:group) { create(:group) }
     let!(:project) { create(:project, project_level, namespace: group) }
     let!(:project2) { create(:project, project_level) }
     let(:user) { create_user_from_membership(project, membership) }
@@ -80,12 +80,6 @@ describe Search::GroupService, :elastic do
       let!(:merge_request2) { create :merge_request, target_project: project2, source_project: project2, title: merge_request.title }
       let!(:note) { create :note, project: project, noteable: merge_request }
       let!(:note2) { create :note, project: project2, noteable: merge_request2, note: note.note }
-      let(:pendings) do
-        [
-          { project_level: :public, feature_access_level: :enabled, membership: :guest, expected_count: 1 },
-          { project_level: :internal, feature_access_level: :enabled, membership: :guest, expected_count: 1 }
-        ]
-      end
 
       where(:project_level, :feature_access_level, :membership, :expected_count) do
         permission_table_for_reporter_feature_access
@@ -98,7 +92,7 @@ describe Search::GroupService, :elastic do
           end
           Gitlab::Elastic::Helper.refresh_index
 
-          expect_search_results(user, 'merge_requests', expected_count: expected_count, pending: pending?) do |user|
+          expect_search_results(user, 'merge_requests', expected_count: expected_count) do |user|
             described_class.new(user, group, search: merge_request.title).execute
           end
 
@@ -112,14 +106,6 @@ describe Search::GroupService, :elastic do
     context 'code' do
       let!(:project) { create(:project, project_level, :repository, namespace: group ) }
       let!(:note) { create :note_on_commit, project: project }
-      let(:pendings) do
-        [
-          { project_level: :public, feature_access_level: :enabled, membership: :guest, expected_count: 1 },
-          { project_level: :public, feature_access_level: :private, membership: :guest, expected_count: 1 },
-          { project_level: :internal, feature_access_level: :enabled, membership: :guest, expected_count: 1 },
-          { project_level: :internal, feature_access_level: :private, membership: :guest, expected_count: 1 }
-        ]
-      end
 
       where(:project_level, :feature_access_level, :membership, :expected_count) do
         permission_table_for_guest_feature_access_and_non_private_project_only
@@ -134,15 +120,15 @@ describe Search::GroupService, :elastic do
           ElasticCommitIndexerWorker.new.perform(project.id)
           Gitlab::Elastic::Helper.refresh_index
 
-          expect_search_results(user, 'commits', expected_count: expected_count, pending: pending?) do |user|
+          expect_search_results(user, 'commits', expected_count: expected_count) do |user|
             described_class.new(user, group, search: 'initial').execute
           end
 
-          expect_search_results(user, 'blobs', expected_count: expected_count, pending: pending?) do |user|
+          expect_search_results(user, 'blobs', expected_count: expected_count) do |user|
             described_class.new(user, group, search: '.gitmodules').execute
           end
 
-          expect_search_results(user, 'notes', expected_count: expected_count, pending: pending?) do |user|
+          expect_search_results(user, 'notes', expected_count: expected_count) do |user|
             described_class.new(user, group, search: note.note).execute
           end
         end

@@ -3,13 +3,76 @@
 In order to interact with Geo node endpoints, you need to authenticate yourself
 as an admin.
 
+## Create a new Geo node
+
+Creates a new Geo node.
+
+```
+POST /geo_nodes
+```
+
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes \
+     --request POST \
+     -d "name=himynameissomething" \
+     -d "url=https://another-node.example.com/"
+```
+
+| Attribute                   | Type    | Required | Description                                                      |
+| ----------------------------| ------- | -------- | -----------------------------------------------------------------|
+| `primary`                   | boolean | no       | Specifying whether this node will be primary. Defaults to false. |
+| `enabled`                   | boolean | no       | Flag indicating if the Geo node is enabled. Defaults to true.    |
+| `name`                      | string  | yes      | The unique identifier for the Geo node. Must match `geo_node_name` if it is set in `gitlab.rb`, otherwise it must match `external_url` |
+| `url`                       | string  | yes      | The user-facing URL for the Geo node. |
+| `internal_url`              | string  | no       | The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set. |
+| `files_max_capacity`        | integer | no       | Control the maximum concurrency of LFS/attachment backfill for this secondary node. Defaults to 10. |
+| `repos_max_capacity`        | integer | no       | Control the maximum concurrency of repository backfill for this secondary node. Defaults to 25. |
+| `verification_max_capacity` | integer | no       | Control the maximum concurrency of repository verification for this node. Defaults to 100. |
+| `container_repositories_max_capacity` | integer  | no | Control the maximum concurrency of container repository sync for this node. Defaults to 10. |
+| `sync_object_storage`       | boolean | no       | Flag indicating if the secondary Geo node will replicate blobs in Object Storage. Defaults to false. |
+| `selective_sync_type`       | string  | no       | Limit syncing to only specific groups or shards. Valid values: `"namespaces"`, `"shards"`, or `null`. |
+| `selective_sync_shards`     | array   | no       | The repository storage for the projects synced if `selective_sync_type` == `shards`. |
+| `selective_sync_namespace_ids` | array | no      | The IDs of groups that should be synced, if `selective_sync_type` == `namespaces`. |
+| `minimum_reverification_interval` | integer | no | The interval (in days) in which the repository verification is valid. Once expired, it will be reverified. This has no effect when set on a secondary node. |
+
+Example response:
+
+```json
+{
+  "id": 3,
+  "name": "Test Node 1",
+  "url": "https://secondary.example.com/",
+  "internal_url": "https://secondary.example.com/",
+  "primary": false,
+  "enabled": true,
+  "current": false,
+  "files_max_capacity": 10,
+  "repos_max_capacity": 25,
+  "verification_max_capacity": 100,
+  "selective_sync_type": "namespaces",
+  "selective_sync_shards": [],
+  "selective_sync_namespace_ids": [1, 25],
+  "minimum_reverification_interval": 7,
+  "container_repositories_max_capacity": 10,
+  "sync_object_storage": false,
+  "clone_protocol": "http",
+  "web_edit_url": "https://primary.example.com/admin/geo/nodes/3/edit",
+  "web_geo_projects_url": "http://secondary.example.com/admin/geo/projects",
+  "_links": {
+     "self": "https://primary.example.com/api/v4/geo_nodes/3",
+     "status": "https://primary.example.com/api/v4/geo_nodes/3/status",
+     "repair": "https://primary.example.com/api/v4/geo_nodes/3/repair"
+  }
+}
+```
+
 ## Retrieve configuration about all Geo nodes
 
 ```
 GET /geo_nodes
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes
 ```
 
@@ -29,6 +92,10 @@ Example response:
     "repos_max_capacity": 25,
     "container_repositories_max_capacity": 10,
     "verification_max_capacity": 100,
+    "selective_sync_type": "namespaces",
+    "selective_sync_shards": [],
+    "selective_sync_namespace_ids": [1, 25],
+    "minimum_reverification_interval": 7,
     "clone_protocol": "http",
     "web_edit_url": "https://primary.example.com/admin/geo/nodes/1/edit",
     "_links": {
@@ -49,6 +116,10 @@ Example response:
     "repos_max_capacity": 25,
     "container_repositories_max_capacity": 10,
     "verification_max_capacity": 100,
+    "selective_sync_type": "namespaces",
+    "selective_sync_shards": [],
+    "selective_sync_namespace_ids": [1, 25],
+    "minimum_reverification_interval": 7,
     "sync_object_storage": true,
     "clone_protocol": "http",
     "web_edit_url": "https://primary.example.com/admin/geo/nodes/2/edit",
@@ -68,7 +139,7 @@ Example response:
 GET /geo_nodes/:id
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes/1
 ```
 
@@ -87,6 +158,10 @@ Example response:
   "repos_max_capacity": 25,
   "container_repositories_max_capacity": 10,
   "verification_max_capacity": 100,
+  "selective_sync_type": "namespaces",
+  "selective_sync_shards": [],
+  "selective_sync_namespace_ids": [1, 25],
+  "minimum_reverification_interval": 7,
   "clone_protocol": "http",
   "web_edit_url": "https://primary.example.com/admin/geo/nodes/1/edit",
   "_links": {
@@ -119,6 +194,10 @@ PUT /geo_nodes/:id
 | `verification_max_capacity` | integer | no        | Control the maximum concurrency of verification for this node. |
 | `container_repositories_max_capacity` | integer | no | Control the maximum concurrency of container repository sync for this node. |
 | `sync_object_storage`       | boolean | no        | Flag indicating if the secondary Geo node will replicate blobs in Object Storage. |
+| `selective_sync_type`       | string  | no        | Limit syncing to only specific groups or shards. Valid values: `"namespaces"`, `"shards"`, or `null`. |
+| `selective_sync_shards`     | array   | no        | The repository storage for the projects synced if `selective_sync_type` == `shards`. |
+| `selective_sync_namespace_ids` | array | no       | The IDs of groups that should be synced, if `selective_sync_type` == `namespaces`. |
+| `minimum_reverification_interval` | integer | no | The interval (in days) in which the repository verification is valid. Once expired, it will be reverified. This has no effect when set on a secondary node. |
 
 Example response:
 
@@ -135,6 +214,10 @@ Example response:
   "repos_max_capacity": 25,
   "container_repositories_max_capacity": 10,
   "verification_max_capacity": 100,
+  "selective_sync_type": "namespaces",
+  "selective_sync_shards": [],
+  "selective_sync_namespace_ids": [1, 25],
+  "minimum_reverification_interval": 7,
   "sync_object_storage": true,
   "clone_protocol": "http",
   "web_edit_url": "https://primary.example.com/admin/geo/nodes/2/edit",
@@ -203,7 +286,7 @@ Example response:
 GET /geo_nodes/status
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes/status
 ```
 
@@ -362,7 +445,7 @@ In GitLab 12.0, deprecated fields `wikis_count` and `repositories_count` were re
 GET /geo_nodes/:id/status
 ```
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes/2/status
 ```
 
@@ -440,7 +523,7 @@ GET /geo_nodes/current/failures
 
 This endpoint uses [Pagination](README.md#pagination).
 
-```bash
+```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://primary.example.com/api/v4/geo_nodes/current/failures
 ```
 

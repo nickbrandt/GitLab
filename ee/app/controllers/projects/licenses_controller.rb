@@ -65,12 +65,20 @@ module Projects
       render json: { errors: result[:message].as_json }, status: result.fetch(:http_status, :unprocessable_entity)
     end
 
+    def matching_policies_params
+      params.permit(:detected, classification: [])
+    end
+
     def matching_policies_from(license_compliance)
-      if params[:detected]
-        license_compliance.detected_policies
-      else
-        license_compliance.policies
-      end
+      filters = matching_policies_params
+      license_compliance.find_policies(
+        detected_only: truthy?(filters[:detected]),
+        classification: filters[:classification]
+      )
+    end
+
+    def truthy?(value)
+      value.in?(%w[true 1])
     end
   end
 end

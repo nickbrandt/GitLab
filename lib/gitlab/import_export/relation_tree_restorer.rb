@@ -4,19 +4,20 @@ module Gitlab
   module ImportExport
     class RelationTreeRestorer
       # Relations which cannot be saved at project level (and have a group assigned)
-      GROUP_MODELS = [GroupLabel, Milestone].freeze
+      GROUP_MODELS = [GroupLabel, Milestone, Epic].freeze
 
       attr_reader :user
       attr_reader :shared
       attr_reader :importable
       attr_reader :tree_hash
 
-      def initialize(user:, shared:, importable:, tree_hash:, members_mapper:, relation_factory:, reader:)
+      def initialize(user:, shared:, importable:, tree_hash:, members_mapper:, object_builder:, relation_factory:, reader:)
         @user = user
         @shared = shared
         @importable = importable
         @tree_hash = tree_hash
         @members_mapper = members_mapper
+        @object_builder = object_builder
         @relation_factory = relation_factory
         @reader = reader
       end
@@ -71,25 +72,22 @@ module Gitlab
         return if importable_class == Project && group_model?(relation_object)
 
         relation_object.assign_attributes(importable_class_sym => @importable)
-        relation_object.save!
+
+        import_failure_service.with_retry(action: 'relation_object.save!', relation_key: relation_key, relation_index: relation_index) do
+          relation_object.save!
+        end
 
         save_id_mapping(relation_key, data_hash, relation_object)
       rescue => e
-        log_import_failure(relation_key, relation_index, e)
-      end
-
-      def log_import_failure(relation_key, relation_index, exception)
-        Gitlab::ErrorTracking.track_exception(exception,
-          project_id: @importable.id, relation_key: relation_key, relation_index: relation_index)
-
-        ImportFailure.create(
-          project: @importable,
+        import_failure_service.log_import_failure(
+          source: 'process_relation_item!',
           relation_key: relation_key,
           relation_index: relation_index,
-          exception_class: exception.class.to_s,
-          exception_message: exception.message.truncate(255),
-          correlation_id_value: Labkit::Correlation::CorrelationId.current_or_new_id
-        )
+          exception: e)
+      end
+
+      def import_failure_service
+        @import_failure_service ||= ImportFailureService.new(@importable)
       end
 
       # Older, serialized CI pipeline exports may only have a
@@ -161,7 +159,7 @@ module Gitlab
       def build_relation(relation_key, relation_definition, data_hash)
         # TODO: This is hack to not create relation for the author
         # Rather make `RelationFactory#set_note_author` to take care of that
-        return data_hash if relation_key == 'author'
+        return data_hash if relation_key == 'author' || already_restored?(data_hash)
 
         # create relation objects recursively for all sub-objects
         relation_definition.each do |sub_relation_key, sub_relation_definition|
@@ -169,6 +167,13 @@ module Gitlab
         end
 
         @relation_factory.create(relation_factory_params(relation_key, data_hash))
+      end
+
+      # Since we update the data hash in place as we restore relation items,
+      # and since we also de-duplicate items, we might encounter items that
+      # have already been restored in a previous iteration.
+      def already_restored?(relation_item)
+        !relation_item.is_a?(Hash)
       end
 
       def transform_sub_relations!(data_hash, sub_relation_key, sub_relation_definition)
@@ -221,15 +226,16 @@ module Gitlab
 
       def relation_factory_params(relation_key, data_hash)
         base_params = {
-          relation_sym:   relation_key.to_sym,
-          relation_hash:  data_hash,
+          relation_sym: relation_key.to_sym,
+          relation_hash: data_hash,
+          importable: @importable,
           members_mapper: @members_mapper,
-          user:           @user,
-          excluded_keys:  excluded_keys_for_relation(relation_key)
+          object_builder: @object_builder,
+          user: @user,
+          excluded_keys: excluded_keys_for_relation(relation_key)
         }
 
         base_params[:merge_requests_mapping] = merge_requests_mapping if importable_class == Project
-        base_params[importable_class_sym] = @importable
         base_params
       end
     end

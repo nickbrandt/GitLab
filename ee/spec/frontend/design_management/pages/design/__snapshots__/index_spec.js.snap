@@ -5,7 +5,7 @@ exports[`Design management design index page renders design index 1`] = `
   class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <div
-    class="d-flex overflow-hidden flex-lg-grow-1 flex-column"
+    class="d-flex overflow-hidden flex-grow-1 flex-column position-relative"
   >
     <design-destroyer-stub
       filenames="test.jpg"
@@ -13,24 +13,19 @@ exports[`Design management design index page renders design index 1`] = `
       projectpath=""
     />
      
+    <!---->
+     
+    <design-presentation-stub
+      discussions="[object Object]"
+      image="test.jpg"
+      imagename="test.jpg"
+      scale="1"
+    />
+     
     <div
-      class="d-flex flex-column h-100 mh-100 position-relative"
+      class="design-scaler-wrapper position-absolute mb-4 d-flex-center"
     >
-      <div
-        class="p-3"
-      >
-        <!---->
-      </div>
-       
-      <design-image-stub
-        image="test.jpg"
-        name="test.jpg"
-      />
-       
-      <design-overlay-stub
-        notes="[object Object]"
-        position="[object Object]"
-      />
+      <design-scaler-stub />
     </div>
   </div>
    
@@ -87,7 +82,7 @@ exports[`Design management design index page with error GlAlert is rendered in c
   class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <div
-    class="d-flex overflow-hidden flex-lg-grow-1 flex-column"
+    class="d-flex overflow-hidden flex-grow-1 flex-column position-relative"
   >
     <design-destroyer-stub
       filenames="test.jpg"
@@ -96,36 +91,35 @@ exports[`Design management design index page with error GlAlert is rendered in c
     />
      
     <div
-      class="d-flex flex-column h-100 mh-100 position-relative"
+      class="p-3"
     >
-      <div
-        class="p-3"
+      <gl-alert-stub
+        dismissible="true"
+        dismisslabel="Dismiss"
+        primarybuttonlink=""
+        primarybuttontext=""
+        secondarybuttonlink=""
+        secondarybuttontext=""
+        title=""
+        variant="danger"
       >
-        <gl-alert-stub
-          dismissible="true"
-          dismisslabel="Dismiss"
-          primarybuttonlink=""
-          primarybuttontext=""
-          secondarybuttonlink=""
-          secondarybuttontext=""
-          title=""
-          variant="danger"
-        >
-          
-            woops
-          
-        </gl-alert-stub>
-      </div>
-       
-      <design-image-stub
-        image="test.jpg"
-        name="test.jpg"
-      />
-       
-      <design-overlay-stub
-        notes=""
-        position="[object Object]"
-      />
+        
+          woops
+        
+      </gl-alert-stub>
+    </div>
+     
+    <design-presentation-stub
+      discussions=""
+      image="test.jpg"
+      imagename="test.jpg"
+      scale="1"
+    />
+     
+    <div
+      class="design-scaler-wrapper position-absolute mb-4 d-flex-center"
+    >
+      <design-scaler-stub />
     </div>
   </div>
    

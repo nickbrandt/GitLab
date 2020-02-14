@@ -11,7 +11,8 @@ describe 'Trial Sign In' do
     end
 
     it 'logs the user in' do
-      visit(new_trial_registration_path)
+      url_params = { glm_source: 'any-source', glm_content: 'any-content' }
+      visit(new_trial_registration_path(url_params))
 
       within('div#login-pane') do
         fill_in 'user_login', with: user.email
@@ -20,7 +21,7 @@ describe 'Trial Sign In' do
         click_button 'Continue'
       end
 
-      expect(current_path).to eq(new_trial_path)
+      expect(current_url).to eq(new_trial_url(url_params))
     end
   end
 

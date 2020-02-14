@@ -4,11 +4,12 @@ require 'spec_helper'
 
 describe MergeTrains::CreatePipelineService do
   let(:project) { create(:project, :repository, :auto_devops) }
-  set(:maintainer) { create(:user) }
+  let_it_be(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer) }
   let(:previous_ref) { 'refs/heads/master' }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_maintainer(maintainer)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.update!(merge_pipelines_enabled: true)
@@ -35,7 +36,7 @@ describe MergeTrains::CreatePipelineService do
 
     context 'when merge trains option is disabled' do
       before do
-        stub_feature_flags(merge_trains_enabled: false)
+        stub_feature_flags(disable_merge_trains: true)
       end
 
       it_behaves_like 'returns an error' do

@@ -17,6 +17,12 @@ module Analytics
       }
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
+    def first_comment_at
+      merge_request.related_notes.by_humans.where.not(author_id: merge_request.author_id).fresh.first&.created_at
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
     private
 
     attr_reader :merge_request
@@ -25,10 +31,6 @@ module Analytics
 
     def diff_size
       merge_request_diff.lines_count
-    end
-
-    def first_comment_at
-      merge_request.notes.by_humans.fresh.first&.created_at
     end
 
     def first_commit_at

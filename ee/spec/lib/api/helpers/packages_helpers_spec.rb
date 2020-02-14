@@ -89,7 +89,7 @@ describe API::Helpers::PackagesHelpers do
   describe '#authorize_workhorse!' do
     let_it_be(:headers) { {} }
 
-    subject { helper.authorize_workhorse!(project) }
+    subject { helper.authorize_workhorse!(subject: project) }
 
     before do
       allow(helper).to receive(:headers).and_return(headers)
@@ -103,6 +103,20 @@ describe API::Helpers::PackagesHelpers do
       expect(::Packages::PackageFileUploader).to receive(:workhorse_authorize).with(has_length: true)
 
       expect(subject).to eq nil
+    end
+
+    context 'without length' do
+      subject { helper.authorize_workhorse!(subject: project, has_length: false) }
+
+      it 'authorizes workhorse' do
+        expect(helper).to receive(:authorize_upload!).with(project)
+        expect(helper).to receive(:status).with(200)
+        expect(helper).to receive(:content_type).with(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+        expect(Gitlab::Workhorse).to receive(:verify_api_request!).with(headers)
+        expect(::Packages::PackageFileUploader).to receive(:workhorse_authorize).with(has_length: false, maximum_size: ::API::Helpers::PackagesHelpers::MAX_PACKAGE_FILE_SIZE)
+
+        expect(subject).to eq nil
+      end
     end
   end
 

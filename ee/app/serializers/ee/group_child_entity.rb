@@ -5,9 +5,10 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      # Project only attributes
-      expose :marked_for_deletion_at,
-        if: lambda { |_instance, _options| project? }
+      # For both group and project
+      expose :marked_for_deletion do |instance|
+        instance.marked_for_deletion?
+      end
     end
   end
 end

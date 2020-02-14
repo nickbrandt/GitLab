@@ -53,6 +53,10 @@ FactoryBot.define do
     trait :design_repository_updated_event do
       repository_updated_event factory: :geo_design_repository_updated_event
     end
+
+    trait :event do
+      event factory: :geo_event
+    end
   end
 
   factory :geo_repository_created_event, class: 'Geo::RepositoryCreatedEvent' do
@@ -119,7 +123,7 @@ FactoryBot.define do
     project { create(:project, :repository) }
 
     old_attachments_path { Storage::LegacyProject.new(project).disk_path }
-    new_attachments_path { Storage::HashedProject.new(project).disk_path }
+    new_attachments_path { Storage::Hashed.new(project).disk_path }
   end
 
   factory :geo_lfs_object_deleted_event, class: 'Geo::LfsObjectDeletedEvent' do

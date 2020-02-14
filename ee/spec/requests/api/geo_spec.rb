@@ -7,10 +7,10 @@ describe API::Geo do
   include ApiHelpers
   include ::EE::GeoHelpers
 
-  set(:admin) { create(:admin) }
-  set(:user) { create(:user) }
-  set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
+  let_it_be(:admin) { create(:admin) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:primary_node) { create(:geo_node, :primary) }
+  let_it_be(:secondary_node) { create(:geo_node) }
   let(:geo_token_header) do
     { 'X-Gitlab-Token' => secondary_node.system_hook.token }
   end
@@ -137,6 +137,18 @@ describe API::Geo do
           get api("/geo/transfers/avatar/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'avatar has mount_point nil' do
+        it 'responds with 200 with X-Sendfile' do
+          upload.update(mount_point: nil)
+
+          get api("/geo/transfers/avatar/#{upload.id}"), headers: req_header
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response.headers['Content-Type']).to eq('application/octet-stream')
+          expect(response.headers['X-Sendfile']).to eq(user.avatar.path)
         end
       end
     end

@@ -194,7 +194,7 @@ describe ProjectsHelper do
       expect(helper.project_list_cache_key(project).last).to start_with('v')
     end
 
-    it 'includes wether or not the user can read cross project' do
+    it 'includes whether or not the user can read cross project' do
       expect(helper.project_list_cache_key(project)).to include('cross-project:true')
     end
 
@@ -935,14 +935,14 @@ describe ProjectsHelper do
       helper.instance_variable_set(:@project, project)
     end
 
-    subject { helper.grafana_integration_token }
+    subject { helper.grafana_integration_masked_token }
 
     it { is_expected.to eq(nil) }
 
     context 'grafana integration exists' do
       let!(:grafana_integration) { create(:grafana_integration, project: project) }
 
-      it { is_expected.to eq(grafana_integration.token) }
+      it { is_expected.to eq(grafana_integration.masked_token) }
     end
   end
 

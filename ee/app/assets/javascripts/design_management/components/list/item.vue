@@ -3,6 +3,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 import { n__, __ } from '~/locale';
+import { DESIGN_ROUTE_NAME } from '../../router/constants';
 
 export default {
   components: {
@@ -69,13 +70,14 @@ export default {
       return n__('%d comment', '%d comments', this.notesCount);
     },
   },
+  DESIGN_ROUTE_NAME,
 };
 </script>
 
 <template>
   <router-link
     :to="{
-      name: 'design',
+      name: $options.DESIGN_ROUTE_NAME,
       params: { id: filename },
       query: $route.query,
     }"

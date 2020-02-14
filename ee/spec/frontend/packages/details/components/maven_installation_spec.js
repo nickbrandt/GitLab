@@ -1,27 +1,32 @@
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import { TrackingActions, TrackingLabels } from 'ee/packages/details/constants';
-import {
-  generateMavenCommand,
-  generateXmlCodeBlock,
-  generateMavenSetupXml,
-  mavenMetadata,
-  registryUrl,
-} from '../mock_data';
+import { registryUrl as mavenPath } from '../mock_data';
+import { mavenPackage as packageEntity } from '../../mock_data';
 import Tracking from '~/tracking';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('MavenInstallation', () => {
   let wrapper;
 
-  const defaultProps = {
-    mavenMetadata,
-    registryUrl,
-    helpUrl: 'foo',
-  };
+  const xmlCodeBlock = 'foo/xml';
+  const mavenCommandStr = 'foo/command';
+  const mavenSetupXml = 'foo/setup';
 
-  const mavenCommandStr = generateMavenCommand(mavenMetadata);
-  const xmlCodeBlock = generateXmlCodeBlock(mavenMetadata);
-  const mavenSetupXml = generateMavenSetupXml();
+  const store = new Vuex.Store({
+    state: {
+      packageEntity,
+      mavenPath,
+    },
+    getters: {
+      mavenInstallationXml: () => xmlCodeBlock,
+      mavenInstallationCommand: () => mavenCommandStr,
+      mavenSetupXml: () => mavenSetupXml,
+    },
+  });
 
   const installationTab = () => wrapper.find('.js-installation-tab > a');
   const setupTab = () => wrapper.find('.js-setup-tab > a');
@@ -29,14 +34,10 @@ describe('MavenInstallation', () => {
   const mavenCommand = () => wrapper.find('.js-maven-command > input');
   const xmlSetup = () => wrapper.find('.js-maven-setup-xml > pre');
 
-  function createComponent(props = {}) {
-    const propsData = {
-      ...defaultProps,
-      ...props,
-    };
-
+  function createComponent() {
     wrapper = mount(MavenInstallation, {
-      propsData,
+      localVue,
+      store,
     });
   }
 
@@ -46,26 +47,6 @@ describe('MavenInstallation', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
-  });
-
-  describe('with empty maven metadata', () => {
-    beforeEach(() => {
-      createComponent({
-        mavenMetadata: {},
-      });
-    });
-
-    it('renders empty strings in the xml block', () => {
-      const emptyXmlBlock = generateXmlCodeBlock({});
-
-      expect(xmlCode().text()).toBe(emptyXmlBlock);
-    });
-
-    it('renders empty strings in the command block', () => {
-      const emptyMavenCommand = generateMavenCommand({});
-
-      expect(mavenCommand().element.value).toBe(emptyMavenCommand);
-    });
   });
 
   describe('installation commands', () => {

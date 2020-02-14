@@ -7,6 +7,7 @@ describe 'admin Geo Nodes', :js, :geo do
 
   before do
     allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+    stub_feature_flags(enable_geo_node_form_js: false)
     sign_in(create(:admin))
   end
 
@@ -152,12 +153,7 @@ describe 'admin Geo Nodes', :js, :geo do
     it 'updates an existing Geo Node' do
       geo_node.update(primary: true)
 
-      visit admin_geo_nodes_path
-      wait_for_requests
-
-      page.within(find('.geo-node-actions', match: :first)) do
-        page.click_link('Edit')
-      end
+      visit edit_admin_geo_node_path(geo_node)
 
       fill_in 'URL', with: 'http://newsite.com'
       fill_in 'Internal URL', with: 'http://internal-url.com'
@@ -214,6 +210,48 @@ describe 'admin Geo Nodes', :js, :geo do
     it 'shows Discover GitLab Geo' do
       page.within(find('h4')) do
         expect(page).to have_content('Discover GitLab Geo')
+      end
+    end
+  end
+
+  describe 'Feature(:enable_geo_node_form_js)' do
+    describe 'when true' do
+      before do
+        stub_feature_flags(enable_geo_node_form_js: true)
+      end
+
+      it '`/new` uses the Vue form instead of the HAML partial' do
+        visit new_admin_geo_node_path
+
+        expect(page).to have_css(".geo-node-form-container")
+        expect(page).not_to have_css(".js-geo-node-form")
+      end
+
+      it '`/edit` uses the Vue form instead of the HAML partial' do
+        visit edit_admin_geo_node_path(geo_node)
+
+        expect(page).to have_css(".geo-node-form-container")
+        expect(page).not_to have_css(".js-geo-node-form")
+      end
+    end
+
+    describe 'when false' do
+      before do
+        stub_feature_flags(enable_geo_node_form_js: false)
+      end
+
+      it '`/new` uses the HAML partial instead of the Vue form' do
+        visit new_admin_geo_node_path
+
+        expect(page).not_to have_css(".geo-node-form-container")
+        expect(page).to have_css(".js-geo-node-form")
+      end
+
+      it '`/edit` uses the HAML partial instead of the Vue form' do
+        visit edit_admin_geo_node_path(geo_node)
+
+        expect(page).not_to have_css(".geo-node-form-container")
+        expect(page).to have_css(".js-geo-node-form")
       end
     end
   end

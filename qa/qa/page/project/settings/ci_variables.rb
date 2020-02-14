@@ -52,10 +52,18 @@ module QA
             end
           end
 
+          def remove_variable(location: :first)
+            within('.ci-variable-row-body', match: location) do
+              find('button.ci-variable-row-remove-button').click
+            end
+
+            save_variables
+          end
+
           private
 
           def toggle_masked(masked_node, masked)
-            wait(reload: false) do
+            wait_until(reload: false) do
               masked_node.click
 
               masked ? masked_enabled?(masked_node) : masked_disabled?(masked_node)

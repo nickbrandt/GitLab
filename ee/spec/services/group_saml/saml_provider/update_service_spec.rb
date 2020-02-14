@@ -3,12 +3,14 @@
 require 'spec_helper'
 
 describe GroupSaml::SamlProvider::UpdateService do
-  subject(:service) { described_class.new(nil, saml_provider, params: params) }
+  let(:current_user) { create(:user) }
+  subject(:service) { described_class.new(current_user, saml_provider, params: params) }
 
   let(:saml_provider) do
-    create :saml_provider, enabled: false, enforced_sso: false, enforced_group_managed_accounts: enforced_group_managed_accounts
+    create :saml_provider, enabled: false, enforced_sso: false
   end
   let(:group) { saml_provider.group }
 
   include_examples 'base SamlProvider service'
+  include_examples 'SamlProvider service toggles Group Managed Accounts'
 end

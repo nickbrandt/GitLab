@@ -39,10 +39,10 @@ module API
       authorize_read_package!(project_by_package_name)
       authorize_packages_feature!(project_by_package_name)
 
-      packages = ::Packages::NpmPackagesFinder.new(project_by_package_name, package_name)
+      packages = ::Packages::Npm::PackageFinder.new(project_by_package_name, package_name)
                                               .execute
 
-      present NpmPackagePresenter.new(package_name, packages),
+      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
               with: EE::API::Entities::NpmPackageTag
     end
 
@@ -65,7 +65,7 @@ module API
 
         authorize_create_package!(project_by_package_name)
 
-        package = ::Packages::NpmPackagesFinder
+        package = ::Packages::Npm::PackageFinder
           .new(project_by_package_name, package_name)
           .find_by_version(version)
         not_found!('Package') unless package
@@ -112,10 +112,10 @@ module API
       authorize_read_package!(project_by_package_name)
       authorize_packages_feature!(project_by_package_name)
 
-      packages = ::Packages::NpmPackagesFinder
+      packages = ::Packages::Npm::PackageFinder
         .new(project_by_package_name, package_name).execute
 
-      present NpmPackagePresenter.new(package_name, packages),
+      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
         with: EE::API::Entities::NpmPackage
     end
 
@@ -144,6 +144,8 @@ module API
         package_file = ::Packages::PackageFileFinder
           .new(package, params[:file_name]).execute!
 
+        track_event('pull_package')
+
         present_carrierwave_file!(package_file.file)
       end
 
@@ -157,6 +159,8 @@ module API
       route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!(user_project)
+
+        track_event('push_package')
 
         created_package = ::Packages::Npm::CreatePackageService
           .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute

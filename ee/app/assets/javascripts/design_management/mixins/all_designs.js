@@ -4,6 +4,7 @@ import { s__ } from '~/locale';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import { extractNodes } from '../utils/design_management_utils';
 import allVersionsMixin from './all_versions';
+import { DESIGNS_ROUTE_NAME } from '../router/constants';
 
 export default {
   mixins: [allVersionsMixin],
@@ -34,7 +35,7 @@ export default {
               'DesignManagement|Requested design version does not exist. Showing latest version instead',
             ),
           );
-          this.$router.replace({ name: 'designs', query: { version: undefined } });
+          this.$router.replace({ name: DESIGNS_ROUTE_NAME, query: { version: undefined } });
         }
       },
     },

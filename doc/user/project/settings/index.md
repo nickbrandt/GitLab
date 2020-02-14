@@ -1,8 +1,8 @@
 # Project settings
 
 NOTE: **Note:**
-Only project Maintainers and Admin users have the [permissions] to access a project
-settings.
+Only project Maintainers and Admin users have the [permissions](../../permissions.md#project-members-permissions)
+to access a project settings.
 
 You can adjust your [project](../index.md) settings by navigating
 to your project's homepage and clicking **Settings**.
@@ -43,6 +43,7 @@ Use the switches to enable or disable the following features:
 | **Issues**                        | ✓                         | Activates the GitLab issues tracker                                                                                                                                                            |
 | **Repository**                    | ✓                         | Enables [repository](../repository/) functionality                                                                                                                                             |
 | **Merge Requests**                | ✓                         | Enables [merge request](../merge_requests/) functionality; also see [Merge request settings](#merge-request-settings)                                                                          |
+| **Forks**                         | ✓                         | Enables [forking](../index.md#fork-a-project) functionality                                                                                                                                    |
 | **Pipelines**                     | ✓                         | Enables [CI/CD](../../../ci/README.md) functionality                                                                                                                                           |
 | **Container Registry**            |                           | Activates a [registry](../../packages/container_registry/) for your docker images                                                                                                              |
 | **Git Large File Storage**        |                           | Enables the use of [large files](../../../administration/lfs/manage_large_binaries_with_git_lfs.md#git-lfs)                                                                                    |
@@ -85,12 +86,13 @@ related to the project by selecting the **Disable email notifications** checkbox
 
 Set up your project's merge request settings:
 
-- Set up the merge request method (merge commit, [fast-forward merge](../merge_requests/fast_forward_merge.html)).
+- Set up the merge request method (merge commit, [fast-forward merge](../merge_requests/fast_forward_merge.md)).
 - Add merge request [description templates](../description_templates.md#description-templates).
 - Enable [merge request approvals](../merge_requests/merge_request_approvals.md). **(STARTER)**
 - Enable [merge only if pipeline succeeds](../merge_requests/merge_when_pipeline_succeeds.md).
 - Enable [merge only when all threads are resolved](../../discussions/index.md#only-allow-merge-requests-to-be-merged-if-all-threads-are-resolved).
 - Enable [`delete source branch after merge` option by default](../merge_requests/getting_started.md#deleting-the-source-branch)
+- Configure [suggested changes commit messages](../../discussions/index.md#configure-the-commit-message-for-applied-suggestions)
 
 ![project's merge request settings](img/merge_requests_settings.png)
 
@@ -104,12 +106,13 @@ Learn how to [export a project](import_export.md#importing-the-project) in GitLa
 
 ### Advanced settings
 
-Here you can run housekeeping, archive, rename, transfer, or remove a project.
+Here you can run housekeeping, archive, rename, transfer, [remove a fork relationship](#removing-a-fork-relationship), or remove a project.
 
 #### Archiving a project
 
 NOTE: **Note:**
-Only project Owners and Admin users have the [permissions] to archive a project.
+Only project Owners and Admin users have the [permissions](../../permissions.md#project-members-permissions)
+to archive a project.
 
 Archiving a project makes it read-only for all users and indicates that it is
 no longer actively maintained. Projects that have been archived can also be
@@ -128,7 +131,7 @@ To archive a project:
 #### Renaming a repository
 
 NOTE: **Note:**
-Only project Maintainers and Admin users have the [permissions] to rename a
+Only project Maintainers and Admin users have the [permissions](../../permissions.md#project-members-permissions) to rename a
 repository. Not to be confused with a project's name where it can also be
 changed from the [general project settings](#general-project-settings).
 
@@ -148,11 +151,12 @@ old URL will not be able to push or pull. Read more about what happens with the
 #### Transferring an existing project into another namespace
 
 NOTE: **Note:**
-Only project Owners and Admin users have the [permissions] to transfer a project.
+Only project Owners and Admin users have the [permissions](../../permissions.md#project-members-permissions)
+to transfer a project.
 
 You can transfer an existing project into a [group](../../group/index.md) if:
 
-1. You have at least **Maintainer** [permissions] to that group.
+1. You have at least **Maintainer** [permissions](../../permissions.md#project-members-permissions) to that group.
 1. The project is in a subgroup you own.
 1. You are at least a **Maintainer** of the project under your personal namespace.
    Similarly, if you are an owner of a group, you can transfer any of its projects
@@ -173,7 +177,48 @@ NOTE: **Note:**
 GitLab administrators can use the admin interface to move any project to any
 namespace if needed.
 
-[permissions]: ../../permissions.md#project-members-permissions
+#### Remove a project
+
+NOTE: **Note:**
+Only project owners and admins have [permissions]((../../permissions.md#project-members-permissions) to remove a project.
+
+To remove a project:
+
+1. Navigate to your project, and select **{settings}** **Settings > General > Advanced**.
+1. In the Remove project section, click the **Remove project** button.
+1. Confirm the action when asked to.
+
+This action either:
+
+- Removes a project including all associated resources (issues, merge requests etc).
+- Since [GitLab 12.6](https://gitlab.com/gitlab-org/gitlab/issues/32935), on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a project for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../../admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+
+### Restore a project **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/32935) in GitLab 12.6.
+
+To restore a project that is marked for deletion:
+
+1. Navigate to your project, and select **{settings}** **Settings > General > Advanced**.
+1. In the Restore project section, click the **Restore project** button.
+
+#### Removing a fork relationship
+
+Forking is a great way to [contribute to a project](../repository/forking_workflow.md)
+of which you are not a member.
+If you want to use the fork for yourself and do not need to send
+[merge requests](../merge_requests.md) to the upstream project,
+you can safely remove the fork relationship.
+
+To do so:
+
+1. Navigate to your project's **Settings > General > Advanced**.
+1. Under **Remove fork relationship**, click the likewise-labeled button.
+1. Confirm the action by typing the project's path as instructed.
+
+NOTE: **Note:**
+Only project maintainers have the [permissions](../../permissions.md#project-members-permissions)
+to remove a fork relationship.
 
 ## Operations settings
 

@@ -9,6 +9,8 @@ export default () => {
   if (data.pathLocksAvailable) {
     const toggleBtn = document.querySelector('.js-path-lock');
 
+    if (!toggleBtn) return;
+
     toggleBtn.addEventListener('click', e => {
       e.preventDefault();
 
@@ -16,7 +18,7 @@ export default () => {
 
       axios
         .post(data.pathLocksToggle, {
-          path: router.currentRoute.params.pathMatch.replace(/^\//, ''),
+          path: router.currentRoute.params.path.replace(/^\//, ''),
         })
         .then(() => window.location.reload())
         .catch(() => {

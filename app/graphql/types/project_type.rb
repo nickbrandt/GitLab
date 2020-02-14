@@ -104,6 +104,8 @@ module Types
           description: 'Indicates if `Delete source branch` option should be enabled by default for all new merge requests of the project'
     field :autoclose_referenced_issues, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if issues referenced by merge requests and commits within the default branch are closed automatically'
+    field :suggestion_commit_message, GraphQL::STRING_TYPE, null: true,
+          description: 'The commit message used to apply merge request suggestions'
 
     field :namespace, Types::NamespaceType, null: true,
           description: 'Namespace of the project'
@@ -136,6 +138,12 @@ module Types
           description: 'Issues of the project',
           resolver: Resolvers::IssuesResolver
 
+    field :environments,
+          Types::EnvironmentType.connection_type,
+          null: true,
+          description: 'Environments of the project',
+          resolver: Resolvers::EnvironmentsResolver
+
     field :issue,
           Types::IssueType,
           null: true,
@@ -165,6 +173,12 @@ module Types
           null: true,
           description: 'Snippets of the project',
           resolver: Resolvers::Projects::SnippetsResolver
+
+    field :sentry_errors,
+          Types::ErrorTracking::SentryErrorCollectionType,
+          null: true,
+          description: 'Paginated collection of Sentry errors on the project',
+          resolver: Resolvers::ErrorTracking::SentryErrorCollectionResolver
   end
 end
 

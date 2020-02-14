@@ -35,6 +35,8 @@ import initPerformanceBar from './performance_bar';
 import initSearchAutocomplete from './search_autocomplete';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
+import initBroadcastNotifications from './broadcast_notification';
+import PersistentUserCallout from './persistent_user_callout';
 import { initUserTracking } from './tracking';
 import { __ } from './locale';
 
@@ -105,6 +107,10 @@ function deferredInitialisation() {
   initUsagePingConsent();
   initUserPopovers();
   initUserTracking();
+  initBroadcastNotifications();
+
+  const recoverySettingsCallout = document.querySelector('.js-recovery-settings-callout');
+  PersistentUserCallout.factory(recoverySettingsCallout);
 
   if (document.querySelector('.search')) initSearchAutocomplete();
 
@@ -222,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Disable form buttons while a form is submitting
   $body.on('ajax:complete, ajax:beforeSend, submit', 'form', function ajaxCompleteCallback(e) {
-    const $buttons = $('[type="submit"], .js-disable-on-submit', this);
+    const $buttons = $('[type="submit"], .js-disable-on-submit', this).not('.js-no-auto-disable');
     switch (e.type) {
       case 'ajax:beforeSend':
       case 'submit':

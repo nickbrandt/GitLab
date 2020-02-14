@@ -366,7 +366,7 @@ describe Projects::MergeRequestsController do
     end
 
     def expect_rebase_worker_for(user)
-      expect(RebaseWorker).to receive(:perform_async).with(merge_request.id, user.id)
+      expect(RebaseWorker).to receive(:perform_async).with(merge_request.id, user.id, false)
     end
 
     context 'approvals pending' do
@@ -473,7 +473,7 @@ describe Projects::MergeRequestsController do
       it 'restricts unauthorized access' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -556,7 +556,7 @@ describe Projects::MergeRequestsController do
       it 'restricts unauthorized access' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -639,7 +639,7 @@ describe Projects::MergeRequestsController do
       it 'restricts unauthorized access' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -720,7 +720,7 @@ describe Projects::MergeRequestsController do
 
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'restricts access to other users' do
@@ -728,7 +728,7 @@ describe Projects::MergeRequestsController do
 
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

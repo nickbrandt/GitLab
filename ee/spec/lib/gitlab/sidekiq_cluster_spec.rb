@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
+require 'rspec-parameterized'
 
 describe Gitlab::SidekiqCluster do
   describe '.trap_signals' do
@@ -59,12 +60,18 @@ describe Gitlab::SidekiqCluster do
 
   describe '.start' do
     it 'starts Sidekiq with the given queues, environment and options' do
-      expected_options = { env: :production, directory: 'foo/bar', max_concurrency: 20, dryrun: true }
+      expected_options = {
+        env: :production,
+        directory: 'foo/bar',
+        max_concurrency: 20,
+        min_concurrency: 10,
+        dryrun: true
+      }
 
       expect(described_class).to receive(:start_sidekiq).ordered.with(%w(foo), expected_options.merge(worker_id: 0))
       expect(described_class).to receive(:start_sidekiq).ordered.with(%w(bar baz), expected_options.merge(worker_id: 1))
 
-      described_class.start([%w(foo), %w(bar baz)], env: :production, directory: 'foo/bar', max_concurrency: 20, dryrun: true)
+      described_class.start([%w(foo), %w(bar baz)], env: :production, directory: 'foo/bar', max_concurrency: 20, min_concurrency: 10, dryrun: true)
     end
 
     it 'starts Sidekiq with the given queues and sensible default options' do
@@ -72,6 +79,7 @@ describe Gitlab::SidekiqCluster do
         env: :development,
         directory: an_instance_of(String),
         max_concurrency: 50,
+        min_concurrency: 0,
         worker_id: an_instance_of(Integer),
         dryrun: false
       }
@@ -86,7 +94,7 @@ describe Gitlab::SidekiqCluster do
   describe '.start_sidekiq' do
     let(:first_worker_id) { 0 }
     let(:options) do
-      { env: :production, directory: 'foo/bar', max_concurrency: 20, worker_id: first_worker_id, dryrun: false }
+      { env: :production, directory: 'foo/bar', max_concurrency: 20, min_concurrency: 0, worker_id: first_worker_id, dryrun: false }
     end
     let(:env) { { "ENABLE_SIDEKIQ_CLUSTER" => "1", "SIDEKIQ_WORKER_ID" => first_worker_id.to_s } }
     let(:args) { ['bundle', 'exec', 'sidekiq', anything, '-eproduction', *([anything] * 5)] }
@@ -116,6 +124,27 @@ describe Gitlab::SidekiqCluster do
 
       allow(described_class).to receive(:wait_async)
       expect(described_class.start_sidekiq(%w(foo bar baz), options)).to eq(1)
+    end
+  end
+
+  describe '.concurrency' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:queue_count, :min, :max, :expected) do
+      2 | 0 | 0 | 3 # No min or max specified
+      2 | 0 | 9 | 3 # No min specified, value < max
+      2 | 1 | 4 | 3 # Value between min and max
+      2 | 4 | 5 | 4 # Value below range
+      5 | 2 | 3 | 3 # Value above range
+      2 | 1 | 1 | 1 # Value above explicit setting (min == max)
+      0 | 3 | 3 | 3 # Value below explicit setting (min == max)
+      1 | 4 | 3 | 3 # Min greater than max
+    end
+
+    with_them do
+      let(:queues) { Array.new(queue_count) }
+
+      it { expect(described_class.concurrency(queues, min, max)).to eq(expected) }
     end
   end
 

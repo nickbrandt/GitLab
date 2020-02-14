@@ -5,9 +5,18 @@ module Gitlab
   class ApplicationContext
     include Gitlab::Utils::LazyAttributes
 
+    Attribute = Struct.new(:name, :type, :evaluation)
+
+    APPLICATION_ATTRIBUTES = [
+      Attribute.new(:project, Project),
+      Attribute.new(:namespace, Namespace),
+      Attribute.new(:user, User),
+      Attribute.new(:caller_id, String)
+    ].freeze
+
     def self.with_context(args, &block)
       application_context = new(**args)
-      Labkit::Context.with_context(application_context.to_lazy_hash, &block)
+      application_context.use(&block)
     end
 
     def self.push(args)
@@ -15,21 +24,41 @@ module Gitlab
       Labkit::Context.push(application_context.to_lazy_hash)
     end
 
-    def initialize(user: nil, project: nil, namespace: nil)
-      @user, @project, @namespace = user, project, namespace
+    def initialize(**args)
+      unknown_attributes = args.keys - APPLICATION_ATTRIBUTES.map(&:name)
+      raise ArgumentError, "#{unknown_attributes} are not known keys" if unknown_attributes.any?
+
+      @set_values = args.keys
+
+      assign_attributes(args)
     end
 
     def to_lazy_hash
-      { user: -> { username },
-        project: -> { project_path },
-        root_namespace: -> { root_namespace_path } }
+      {}.tap do |hash|
+        hash[:user] = -> { username } if set_values.include?(:user)
+        hash[:project] = -> { project_path } if set_values.include?(:project)
+        hash[:root_namespace] = -> { root_namespace_path } if include_namespace?
+        hash[:caller_id] = caller_id if set_values.include?(:caller_id)
+      end
+    end
+
+    def use
+      Labkit::Context.with_context(to_lazy_hash) { yield }
     end
 
     private
 
-    lazy_attr_reader :user, type: User
-    lazy_attr_reader :project, type: Project
-    lazy_attr_reader :namespace, type: Namespace
+    attr_reader :set_values
+
+    APPLICATION_ATTRIBUTES.each do |attr|
+      lazy_attr_reader attr.name, type: attr.type
+    end
+
+    def assign_attributes(values)
+      values.slice(*APPLICATION_ATTRIBUTES.map(&:name)).each do |name, value|
+        instance_variable_set("@#{name}", value)
+      end
+    end
 
     def project_path
       project&.full_path
@@ -46,5 +75,11 @@ module Gitlab
         project&.full_path_components&.first
       end
     end
+
+    def include_namespace?
+      set_values.include?(:namespace) || set_values.include?(:project)
+    end
   end
 end
+
+Gitlab::ApplicationContext.prepend_if_ee('EE::Gitlab::ApplicationContext')

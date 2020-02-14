@@ -5,7 +5,7 @@ import { toLicenseObject } from 'ee/project_licenses/utils/mappers';
 import { LICENSE_LIST } from 'ee/project_licenses/store/constants';
 import PaginatedLicensesTable from 'ee/project_licenses/components/paginated_licenses_table.vue';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
-import mockLicensesResponse from '../store/modules/list/data/mock_licenses';
+import mockLicensesResponse from '../store/modules/list/data/mock_licenses.json';
 
 jest.mock('underscore', () => ({
   uniqueId: () => 'fakeUniqueId',

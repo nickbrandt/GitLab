@@ -23,15 +23,6 @@ export default {
   },
   mixins: [reportsMixin],
   props: {
-    headPath: {
-      type: String,
-      required: true,
-    },
-    basePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
     fullReportPath: {
       type: String,
       required: false,
@@ -96,30 +87,18 @@ export default {
     },
   },
   mounted() {
-    const { headPath, basePath, apiUrl, canManageLicenses, licensesApiPath } = this;
+    const { apiUrl, canManageLicenses, licensesApiPath } = this;
 
     this.setAPISettings({
       apiUrlManageLicenses: apiUrl,
-      headPath,
-      basePath,
       canManageLicenses,
       licensesApiPath,
     });
 
-    if (gon.features && gon.features.parsedLicenseReport) {
-      this.loadParsedLicenseReport();
-    } else {
-      this.loadLicenseReport();
-      this.loadManagedLicenses();
-    }
+    this.fetchParsedLicenseReport();
   },
   methods: {
-    ...mapActions([
-      'setAPISettings',
-      'loadManagedLicenses',
-      'loadLicenseReport',
-      'loadParsedLicenseReport',
-    ]),
+    ...mapActions(['setAPISettings', 'fetchParsedLicenseReport']),
   },
 };
 </script>

@@ -64,9 +64,7 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/36815 bug_in_code
-      # BUG_IN_CODE
-      context 'instance level', :quarantine, :requires_admin do
+      context 'instance level', :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/36815', type: :bug } do
         before do
           Flow::Login.sign_in_as_admin
 
@@ -108,7 +106,7 @@ module QA
         end
       end
 
-      context 'group level' do
+      context 'group level', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/198690', type: :flaky } do
         before do
           Flow::Login.sign_in
 

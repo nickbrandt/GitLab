@@ -57,7 +57,7 @@ class Gitlab::Seeder::Pipelines
       BUILDS.each { |opts| build_create!(pipeline, opts) }
       EXTERNAL_JOBS.each { |opts| commit_status_create!(pipeline, opts) }
       pipeline.update_duration
-      pipeline.update_status
+      pipeline.update_legacy_status
     end
   end
 
@@ -165,9 +165,10 @@ class Gitlab::Seeder::Pipelines
   end
 
   def job_attributes(pipeline, opts)
-    { name: 'test build', stage: 'test', stage_idx: stage_index(opts[:stage]),
+    {
+      name: 'test build', stage: 'test', stage_idx: stage_index(opts[:stage]),
       ref: pipeline.ref, tag: false, user: build_user, project: @project, pipeline: pipeline,
-      created_at: Time.now, updated_at: Time.now
+      scheduling_type: :stage, created_at: Time.now, updated_at: Time.now
     }.merge(opts)
   end
 

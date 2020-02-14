@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Vulnerabilities::FeedbackEntity do
-  set(:user) { create(:user) }
-  set(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
   let(:request) { double('request') }
   let(:entity) { described_class.represent(feedback, request: request) }
 

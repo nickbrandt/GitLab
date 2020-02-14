@@ -5,7 +5,7 @@ require 'spec_helper'
 describe API::Unleash do
   include FeatureFlagHelpers
 
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:project_id) { project.id }
   let(:feature_enabled) { true }
   let(:params) { }

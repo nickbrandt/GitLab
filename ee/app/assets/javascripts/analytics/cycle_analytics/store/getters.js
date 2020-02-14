@@ -1,7 +1,7 @@
 import dateFormat from 'dateformat';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
-import { getDurationChartData } from '../utils';
+import { getDurationChartData, getDurationChartMedianData, getTasksByTypeData } from '../utils';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
@@ -24,4 +24,27 @@ export const durationChartPlottableData = state => {
   const plottableData = getDurationChartData(selectedStagesDurationData, startDate, endDate);
 
   return plottableData.length ? plottableData : null;
+};
+
+export const durationChartMedianData = state => {
+  const { durationMedianData, startDate, endDate } = state;
+  const selectedStagesDurationMedianData = durationMedianData.filter(stage => stage.selected);
+  const plottableData = getDurationChartMedianData(
+    selectedStagesDurationMedianData,
+    startDate,
+    endDate,
+  );
+
+  return plottableData.length ? plottableData : [];
+};
+
+export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
+  if (tasksByType && tasksByType.data.length) {
+    return getTasksByTypeData({
+      data: tasksByType.data,
+      startDate,
+      endDate,
+    });
+  }
+  return { groupBy: [], data: [], seriesNames: [] };
 };

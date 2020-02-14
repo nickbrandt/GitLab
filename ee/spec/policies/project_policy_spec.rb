@@ -5,12 +5,12 @@ require 'spec_helper'
 describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
 
-  set(:owner) { create(:user) }
-  set(:admin) { create(:admin) }
-  set(:maintainer) { create(:user) }
-  set(:developer) { create(:user) }
-  set(:reporter) { create(:user) }
-  set(:guest) { create(:user) }
+  let_it_be(:owner) { create(:user) }
+  let_it_be(:admin) { create(:admin) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
+  let_it_be(:guest) { create(:user) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
   subject { described_class.new(current_user, project) }
@@ -45,7 +45,7 @@ describe ProjectPolicy do
         download_code download_wiki_code read_project read_board read_list
         read_project_for_iids read_issue_iid read_merge_request_iid read_wiki
         read_issue read_label read_issue_link read_milestone
-        read_project_snippet read_project_member read_note read_cycle_analytics
+        read_snippet read_project_member read_note read_cycle_analytics
         read_pipeline read_build read_commit_status read_container_image
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
@@ -1018,18 +1018,6 @@ describe ProjectPolicy do
       let(:current_user) { admin }
 
       it { is_expected.to be_disallowed(:read_prometheus_alerts) }
-    end
-  end
-
-  context 'alert bot' do
-    let(:current_user) { User.alert_bot }
-
-    it { is_expected.to be_allowed(:reporter_access) }
-
-    context 'within a private project' do
-      let(:project) { create(:project, :private) }
-
-      it { is_expected.to be_allowed(:admin_issue) }
     end
   end
 

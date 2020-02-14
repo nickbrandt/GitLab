@@ -63,6 +63,16 @@ describe SystemNoteService do
     end
   end
 
+  describe '.close_after_error_tracking_resolve' do
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:close_after_error_tracking_resolve)
+      end
+
+      described_class.close_after_error_tracking_resolve(noteable, project, author)
+    end
+  end
+
   describe '.change_milestone' do
     let(:milestone) { double }
 
@@ -76,28 +86,14 @@ describe SystemNoteService do
   end
 
   describe '.change_due_date' do
-    subject { described_class.change_due_date(noteable, project, author, due_date) }
+    let(:due_date) { double }
 
-    let(:due_date) { Date.today }
-
-    it_behaves_like 'a note with overridable created_at'
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'due_date' }
-    end
-
-    context 'when due date added' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "changed due date to #{Date.today.to_s(:long)}"
+    it 'calls TimeTrackingService' do
+      expect_next_instance_of(::SystemNotes::TimeTrackingService) do |service|
+        expect(service).to receive(:change_due_date).with(due_date)
       end
-    end
 
-    context 'when due date removed' do
-      let(:due_date) { nil }
-
-      it 'sets the note text' do
-        expect(subject.note).to eq 'removed due date'
-      end
+      described_class.change_due_date(noteable, project, author, due_date)
     end
   end
 
@@ -326,9 +322,9 @@ describe SystemNoteService do
       links = []
       if link_exists
         url = if type == 'commit'
-                "#{Settings.gitlab.base_url}/#{project.namespace.path}/#{project.path}/commit/#{commit.id}"
+                "#{Settings.gitlab.base_url}/#{project.namespace.path}/#{project.path}/-/commit/#{commit.id}"
               else
-                "#{Settings.gitlab.base_url}/#{project.namespace.path}/#{project.path}/merge_requests/#{merge_request.iid}"
+                "#{Settings.gitlab.base_url}/#{project.namespace.path}/#{project.path}/-/merge_requests/#{merge_request.iid}"
               end
 
         link = double(object: { 'url' => url })
@@ -466,7 +462,7 @@ describe SystemNoteService do
     describe "existing reference" do
       before do
         allow(JIRA::Resource::Remotelink).to receive(:all).and_return([])
-        message = "[#{author.name}|http://localhost/#{author.username}] mentioned this issue in [a commit of #{project.full_path}|http://localhost/#{project.full_path}/commit/#{commit.id}]:\n'#{commit.title.chomp}'"
+        message = "[#{author.name}|http://localhost/#{author.username}] mentioned this issue in [a commit of #{project.full_path}|http://localhost/#{project.full_path}/-/commit/#{commit.id}]:\n'#{commit.title.chomp}'"
         allow_next_instance_of(JIRA::Resource::Issue) do |instance|
           allow(instance).to receive(:comments).and_return([OpenStruct.new(body: message)])
         end
@@ -488,36 +484,12 @@ describe SystemNoteService do
   end
 
   describe '.change_time_estimate' do
-    subject { described_class.change_time_estimate(noteable, project, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'time_tracking' }
-    end
-
-    context 'with a time estimate' do
-      it 'sets the note text' do
-        noteable.update_attribute(:time_estimate, 277200)
-
-        expect(subject.note).to eq "changed time estimate to 1w 4d 5h"
+    it 'calls TimeTrackingService' do
+      expect_next_instance_of(::SystemNotes::TimeTrackingService) do |service|
+        expect(service).to receive(:change_time_estimate)
       end
 
-      context 'when time_tracking_limit_to_hours setting is true' do
-        before do
-          stub_application_setting(time_tracking_limit_to_hours: true)
-        end
-
-        it 'sets the note text' do
-          noteable.update_attribute(:time_estimate, 277200)
-
-          expect(subject.note).to eq "changed time estimate to 77h"
-        end
-      end
-    end
-
-    context 'without a time estimate' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "removed time estimate"
-      end
+      described_class.change_time_estimate(noteable, project, author)
     end
   end
 
@@ -548,61 +520,12 @@ describe SystemNoteService do
   end
 
   describe '.change_time_spent' do
-    # We need a custom noteable in order to the shared examples to be green.
-    let(:noteable) do
-      mr = create(:merge_request, source_project: project)
-      mr.spend_time(duration: 360000, user_id: author.id)
-      mr.save!
-      mr
-    end
+    it 'calls TimeTrackingService' do
+      expect_next_instance_of(::SystemNotes::TimeTrackingService) do |service|
+        expect(service).to receive(:change_time_spent)
+      end
 
-    subject do
       described_class.change_time_spent(noteable, project, author)
-    end
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'time_tracking' }
-    end
-
-    context 'when time was added' do
-      it 'sets the note text' do
-        spend_time!(277200)
-
-        expect(subject.note).to eq "added 1w 4d 5h of time spent"
-      end
-    end
-
-    context 'when time was subtracted' do
-      it 'sets the note text' do
-        spend_time!(-277200)
-
-        expect(subject.note).to eq "subtracted 1w 4d 5h of time spent"
-      end
-    end
-
-    context 'when time was removed' do
-      it 'sets the note text' do
-        spend_time!(:reset)
-
-        expect(subject.note).to eq "removed time spent"
-      end
-    end
-
-    context 'when time_tracking_limit_to_hours setting is true' do
-      before do
-        stub_application_setting(time_tracking_limit_to_hours: true)
-      end
-
-      it 'sets the note text' do
-        spend_time!(277200)
-
-        expect(subject.note).to eq "added 77h of time spent"
-      end
-    end
-
-    def spend_time!(seconds)
-      noteable.spend_time(duration: seconds, user_id: author.id)
-      noteable.save!
     end
   end
 

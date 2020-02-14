@@ -1,4 +1,4 @@
-# Uploads Migrate Rake Task
+# Uploads Migrate Rake Tasks
 
 ## Migrate to Object Storage
 
@@ -17,13 +17,13 @@ described in the next section.
 
 **Omnibus Installation**
 
-```bash
+```shell
 gitlab-rake "gitlab:uploads:migrate:all"
 ```
 
 **Source Installation**
 
-```bash
+```shell
 sudo RAILS_ENV=production -u git -H bundle exec rake gitlab:uploads:migrate:all
 ```
 
@@ -52,7 +52,7 @@ Variable | Type | Description
 
 **Omnibus Installation**
 
-```bash
+```shell
 # gitlab-rake gitlab:uploads:migrate[uploader_class, model_class, mount_point]
 
 # Avatars
@@ -80,7 +80,7 @@ gitlab-rake "gitlab:uploads:migrate[FileUploader, MergeRequest]"
 >**Note:**
 Use `RAILS_ENV=production` for every task.
 
-```bash
+```shell
 # sudo -u git -H bundle exec rake gitlab:uploads:migrate
 
 # Avatars
@@ -110,6 +110,14 @@ sudo -u git -H bundle exec rake "gitlab:uploads:migrate[FileUploader, MergeReque
 
 To migrate all uploads created by legacy uploaders, run:
 
+**Omnibus Installation**
+
+```shell
+gitlab-rake gitlab:uploads:legacy:migrate
+```
+
+**Source Installation**
+
 ```shell
 bundle exec rake gitlab:uploads:legacy:migrate
 ```
@@ -137,13 +145,13 @@ keeping in mind the task name in this case is `gitlab:uploads:migrate_to_local`.
 
 **Omnibus Installation**
 
-```bash
+```shell
 gitlab-rake "gitlab:uploads:migrate_to_local:all"
 ```
 
 **Source Installation**
 
-```bash
+```shell
 sudo RAILS_ENV=production -u git -H bundle exec rake gitlab:uploads:migrate_to_local:all
 ```
 

@@ -208,7 +208,7 @@ Git operations in GitLab will result in an API error.
 
    On `gitaly1.internal`:
 
-   ```
+   ```ruby
    git_data_dirs({
      'default' => {
        'path' => '/var/opt/gitlab/git-data'
@@ -221,7 +221,7 @@ Git operations in GitLab will result in an API error.
 
    On `gitaly2.internal`:
 
-   ```
+   ```ruby
    git_data_dirs({
      'storage2' => {
        'path' => '/srv/gitlab/git-data'
@@ -309,7 +309,7 @@ can read and write to `/mnt/gitlab/storage2`.
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Tail the logs to see the requests:
 
-   ```sh
+   ```shell
    sudo gitlab-ctl tail gitaly
    ```
 
@@ -343,7 +343,7 @@ can read and write to `/mnt/gitlab/storage2`.
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 1. Tail the logs to see the requests:
 
-   ```sh
+   ```shell
    tail -f /home/git/gitlab/log/gitaly.log
    ```
 
@@ -352,9 +352,9 @@ coming in. One sure way to trigger a Gitaly request is to clone a repository
 from your GitLab server over HTTP.
 
 DANGER: **Danger:**
-If you have [custom server-side Git hooks](../custom_hooks.md) configured,
+If you have [Server hooks](../server_hooks.md) configured,
 either per repository or globally, you must move these to the Gitaly node.
-If you have multiple Gitaly nodes, copy your custom hook(s) to all nodes.
+If you have multiple Gitaly nodes, copy your server hook(s) to all nodes.
 
 ### Disabling the Gitaly service in a cluster environment
 
@@ -390,7 +390,7 @@ To disable Gitaly on a client node:
 
 ## TLS support
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22602) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22602) in GitLab 11.8.
 
 Gitaly supports TLS encryption. To be able to communicate
 with a Gitaly instance that listens for secure connections you will need to use `tls://` URL
@@ -435,7 +435,7 @@ To configure Gitaly with TLS:
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
 1. On the Gitaly server, create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
-   ```sh
+   ```shell
    sudo mkdir -p /etc/gitlab/ssl
    sudo chmod 755 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
@@ -491,7 +491,7 @@ To configure Gitaly with TLS:
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on client node(s).
 1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
-   ```sh
+   ```shell
    sudo mkdir -p /etc/gitlab/ssl
    sudo chmod 700 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
@@ -519,7 +519,7 @@ To configure Gitaly with TLS:
 To observe what type of connections are actually being used in a
 production environment you can use the following Prometheus query:
 
-```
+```prometheus
 sum(rate(gitaly_connections_total[5m])) by (type)
 ```
 
@@ -648,14 +648,14 @@ machine.
 Use Prometheus to see what the current authentication behavior of your
 GitLab installation is.
 
-```
+```prometheus
 sum(rate(gitaly_authentications_total[5m])) by (enforced, status)
 ```
 
 In a system where authentication is configured correctly, and where you
 have live traffic, you will see something like this:
 
-```
+```prometheus
 {enforced="true",status="ok"}  4424.985419441742
 ```
 
@@ -684,7 +684,7 @@ gitaly['auth_transitioning'] = true
 After you have applied this, your Prometheus query should return
 something like this:
 
-```
+```prometheus
 {enforced="false",status="would be ok"}  4424.985419441742
 ```
 
@@ -730,7 +730,7 @@ gitaly['auth_transitioning'] = false
 Refresh your Prometheus query. You should now see the same kind of
 result as you did in the beginning:
 
-```
+```prometheus
 {enforced="true",status="ok"}  4424.985419441742
 ```
 
@@ -856,7 +856,7 @@ your GitLab / Gitaly server already at `/opt/gitlab/embedded/bin/gitaly-debug`.
 If you're investigating an older GitLab version you can compile this
 tool offline and copy the executable to your server:
 
-```sh
+```shell
 git clone https://gitlab.com/gitlab-org/gitaly.git
 cd cmd/gitaly-debug
 GOOS=linux GOARCH=amd64 go build -o gitaly-debug
@@ -864,13 +864,13 @@ GOOS=linux GOARCH=amd64 go build -o gitaly-debug
 
 To see the help page of `gitaly-debug` for a list of supported sub-commands, run:
 
-```sh
+```shell
 gitaly-debug -h
 ```
 
 ### Commits, pushes, and clones return a 401
 
-```
+```plaintext
 remote: GitLab: 401 Unauthorized
 ```
 
@@ -884,6 +884,12 @@ client has its own log file which may contain useful information when
 you are seeing Gitaly errors. You can control the log level of the
 gRPC client with the `GRPC_LOG_LEVEL` environment variable. The
 default level is `WARN`.
+
+You can run a GRPC trace with:
+
+```shell
+GRPC_TRACE=all GRPC_VERBOSITY=DEBUG sudo gitlab-rake gitlab:gitaly:check
+```
 
 ### Observing `gitaly-ruby` traffic
 
@@ -902,7 +908,7 @@ Assuming your `grpc_client_handled_total` counter only observes Gitaly,
 the following query shows you RPCs are (most likely) internally
 implemented as calls to `gitaly-ruby`:
 
-```
+```prometheus
 sum(rate(grpc_client_handled_total[5m])) by (grpc_method) > 0
 ```
 
@@ -919,7 +925,7 @@ Confirm the following are all true:
 - When any user performs a `git push` to any repository on this Gitaly node, it
   fails with the following error (note the `401 Unauthorized`):
 
-  ```sh
+  ```shell
   remote: GitLab: 401 Unauthorized
   To <REMOTE_URL>
   ! [remote rejected] branch-name -> branch-name (pre-receive hook declined)
@@ -933,7 +939,7 @@ Confirm the following are all true:
 - When [tailing the logs](https://docs.gitlab.com/omnibus/settings/logs.html#tail-logs-in-a-console-on-the-server) on an app node and reproducing the error, you get `401` errors
   when reaching the `/api/v4/internal/allowed` endpoint:
 
-  ```sh
+  ```shell
   # api_json.log
   {
     "time": "2019-07-18T00:30:14.967Z",
@@ -1003,7 +1009,7 @@ If you are having trouble connecting to a Gitaly node with command line (CLI) to
 
 Verify that you can reach Gitaly via TCP:
 
-```bash
+```shell
 sudo gitlab-rake gitlab:tcp_check[GITALY_SERVER_IP,GITALY_LISTEN_PORT]
 ```
 
@@ -1013,7 +1019,7 @@ If you use proxy servers in your command line environment, such as Bash, these c
 
 If you use Bash or a compatible command line environment, run the following commands to determine whether you have proxy servers configured:
 
-```bash
+```shell
 echo $http_proxy
 echo $https_proxy
 ```
@@ -1022,7 +1028,7 @@ If either of these variables have a value, your Gitaly CLI connections may be ge
 
 To remove the proxy setting, run the following commands (depending on which variables had values):
 
-```bash
+```shell
 unset http_proxy
 unset https_proxy
 ```

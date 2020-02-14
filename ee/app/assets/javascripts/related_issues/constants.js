@@ -6,6 +6,18 @@ export const issuableTypesMap = {
   MERGE_REQUEST: 'merge_request',
 };
 
+export const linkedIssueTypesMap = {
+  BLOCKS: 'blocks',
+  IS_BLOCKED_BY: 'is_blocked_by',
+  RELATES_TO: 'relates_to',
+};
+
+export const linkedIssueTypesTextMap = {
+  [linkedIssueTypesMap.RELATES_TO]: __('Relates to'),
+  [linkedIssueTypesMap.BLOCKS]: __('Blocks'),
+  [linkedIssueTypesMap.IS_BLOCKED_BY]: __('Is blocked by'),
+};
+
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
@@ -67,7 +79,6 @@ export const issuableIconMap = {
  * them inside i18n functions.
  */
 export const issuableQaClassMap = {
-  [issuableTypesMap.ISSUE]: 'qa-add-issues-button',
   [issuableTypesMap.EPIC]: 'qa-add-epics-button',
 };
 

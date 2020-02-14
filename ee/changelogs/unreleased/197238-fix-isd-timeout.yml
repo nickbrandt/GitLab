@@ -1,0 +1,5 @@
+---
+title: Fix vulnerability finding list endpoint query timeout on instance security dashboard
+merge_request: 23232
+author:
+type: fixed

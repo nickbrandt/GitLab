@@ -44,6 +44,8 @@ const Api = {
   releasePath: '/api/:version/projects/:id/releases/:tag_name',
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
   adminStatisticsPath: '/api/:version/application/statistics',
+  pipelineSinglePath: '/api/:version/projects/:id/pipelines/:pipeline_id',
+  lsifPath: '/api/:version/projects/:id/commits/:commit_id/lsif/info',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -54,10 +56,15 @@ const Api = {
     });
   },
 
-  groupMembers(id) {
+  groupMembers(id, options) {
     const url = Api.buildUrl(this.groupMembersPath).replace(':id', encodeURIComponent(id));
 
-    return axios.get(url);
+    return axios.get(url, {
+      params: {
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
+    });
   },
 
   // Return groups list. Filtered by query
@@ -441,6 +448,22 @@ const Api = {
   adminStatistics() {
     const url = Api.buildUrl(this.adminStatisticsPath);
     return axios.get(url);
+  },
+
+  pipelineSingle(id, pipelineId) {
+    const url = Api.buildUrl(this.pipelineSinglePath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':pipeline_id', encodeURIComponent(pipelineId));
+
+    return axios.get(url);
+  },
+
+  lsifData(projectPath, commitId, path) {
+    const url = Api.buildUrl(this.lsifPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':commit_id', commitId);
+
+    return axios.get(url, { params: { path } });
   },
 
   buildUrl(url) {

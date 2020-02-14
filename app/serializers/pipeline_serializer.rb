@@ -41,6 +41,7 @@ class PipelineSerializer < BaseSerializer
   def preloaded_relations
     [
       :latest_statuses_ordered_by_stage,
+      :project,
       :stages,
       {
         failed_builds: %i(project metadata)
@@ -57,7 +58,8 @@ class PipelineSerializer < BaseSerializer
         pending_builds: :project,
         project: [:route, { namespace: :route }],
         artifacts: {
-          project: [:route, { namespace: :route }]
+          project: [:route, { namespace: :route }],
+          job_artifacts_archive: []
         }
       },
       { triggered_by_pipeline: [:project, :user] },

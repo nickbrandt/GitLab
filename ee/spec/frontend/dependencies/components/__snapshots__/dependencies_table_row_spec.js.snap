@@ -155,15 +155,16 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
       >
         <gl-button-stub
           class="bold text-warning-700 text-1 text-decoration-none js-vulnerabilities-toggle"
+          size="md"
           variant="link"
         >
           <icon-stub
             class="align-top text-secondary-700 d-none d-md-inline"
-            name="arrow-down"
+            name="chevron-down"
             size="16"
           />
           
-          7 vulnerabilities
+          8 vulnerabilities
         
         </gl-button-stub>
       </div>

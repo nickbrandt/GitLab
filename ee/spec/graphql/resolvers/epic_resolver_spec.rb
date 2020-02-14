@@ -5,8 +5,8 @@ require 'spec_helper'
 describe Resolvers::EpicResolver do
   include GraphqlHelpers
 
-  set(:current_user) { create(:user) }
-  set(:user2) { create(:user) }
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:user2) { create(:user) }
 
   context "with a group" do
     let(:group)   { create(:group) }
@@ -73,13 +73,13 @@ describe Resolvers::EpicResolver do
         end
 
         context 'when only start_date is present' do
-          it 'returns epics within timeframe' do
+          it 'raises error' do
             expect { resolve_epics(start_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
           end
         end
 
         context 'when only end_date is present' do
-          it 'returns epics within timeframe' do
+          it 'raises error' do
             expect { resolve_epics(end_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
           end
         end

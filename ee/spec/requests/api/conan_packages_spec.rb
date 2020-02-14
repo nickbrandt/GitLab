@@ -236,7 +236,7 @@ describe API::ConanPackages do
       end
 
       it 'returns not found' do
-        allow(ConanPackagePresenter).to receive(:new)
+        allow(::Packages::Conan::PackagePresenter).to receive(:new)
           .with(
             'aa/bb@%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) },
             user,
@@ -292,10 +292,10 @@ describe API::ConanPackages do
     let(:jwt) { build_jwt(personal_access_token) }
     let(:headers) { build_token_auth_header(jwt.encoded) }
     let(:conan_package_reference) { '123456789' }
-    let(:presenter) { double('ConanPackagePresenter') }
+    let(:presenter) { double('::Packages::Conan::PackagePresenter') }
 
     before do
-      allow(ConanPackagePresenter).to receive(:new)
+      allow(::Packages::Conan::PackagePresenter).to receive(:new)
         .with(package.conan_recipe, user, package.project)
         .and_return(presenter)
     end
@@ -482,7 +482,7 @@ describe API::ConanPackages do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -498,7 +498,7 @@ describe API::ConanPackages do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
     end
 
@@ -513,7 +513,7 @@ describe API::ConanPackages do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
+        expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download when not enough permissions' do
@@ -585,6 +585,8 @@ describe API::ConanPackages do
       context 'with object storage disabled' do
         context 'without a file from workhorse' do
           let(:params) { { file: nil } }
+
+          it_behaves_like 'package workhorse uploads'
 
           it 'rejects the request' do
             subject
@@ -686,7 +688,7 @@ describe API::ConanPackages do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+        expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
       end
 
       it 'rejects request without a valid token' do
@@ -710,7 +712,7 @@ describe API::ConanPackages do
 
         subject
 
-        expect(response).to have_gitlab_http_status(:error)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       context 'when using remote storage' do
@@ -723,7 +725,7 @@ describe API::ConanPackages do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+            expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
             expect(json_response).not_to have_key('TempPath')
             expect(json_response['RemoteObject']).to have_key('ID')
             expect(json_response['RemoteObject']).to have_key('GetURL')
@@ -742,7 +744,7 @@ describe API::ConanPackages do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+            expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
             expect(json_response['TempPath']).to eq(::Packages::PackageFileUploader.workhorse_local_upload_path)
             expect(json_response['RemoteObject']).to be_nil
           end

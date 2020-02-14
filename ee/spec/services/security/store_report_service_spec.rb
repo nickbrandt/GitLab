@@ -3,18 +3,24 @@
 require 'spec_helper'
 
 describe Security::StoreReportService, '#execute' do
+  let(:user) { create(:user) }
   let(:artifact) { create(:ee_ci_job_artifact, report_type) }
   let(:project) { artifact.project }
   let(:pipeline) { artifact.job.pipeline }
   let(:report) { pipeline.security_reports.get_report(report_type.to_s, artifact) }
 
   before do
-    stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true)
+    stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true, security_dashboard: true)
   end
 
   subject { described_class.new(pipeline, report).execute }
 
   context 'without existing data' do
+    before do
+      project.add_developer(user)
+      allow(pipeline).to receive(:user).and_return(user)
+    end
+
     using RSpec::Parameterized::TableSyntax
 
     where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
@@ -43,6 +49,10 @@ describe Security::StoreReportService, '#execute' do
       it 'inserts all occurrence pipelines (join model)' do
         expect { subject }.to change { Vulnerabilities::OccurrencePipeline.count }.by(occurrence_pipelines)
       end
+
+      it 'inserts all vulnerabilties' do
+        expect { subject }.to change { Vulnerability.count }.by(occurrences)
+      end
     end
   end
 
@@ -63,6 +73,11 @@ describe Security::StoreReportService, '#execute' do
         scanner: scanner,
         project: project,
         location_fingerprint: 'd869ba3f0b3347eb2749135a437dc07c8ae0f420')
+    end
+
+    before do
+      project.add_developer(user)
+      allow(new_pipeline).to receive(:user).and_return(user)
     end
 
     subject { described_class.new(new_pipeline, new_report).execute }

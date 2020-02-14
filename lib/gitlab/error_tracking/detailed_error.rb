@@ -16,6 +16,7 @@ module Gitlab
                     :first_seen,
                     :frequency,
                     :gitlab_commit,
+                    :gitlab_commit_path,
                     :gitlab_issue,
                     :gitlab_project,
                     :id,
@@ -34,7 +35,7 @@ module Gitlab
                     :user_count
 
       def self.declarative_policy_class
-        'ErrorTracking::DetailedErrorPolicy'
+        'ErrorTracking::BasePolicy'
       end
     end
   end

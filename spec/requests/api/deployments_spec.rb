@@ -40,6 +40,18 @@ describe API::Deployments do
         end
       end
 
+      context 'with the environment filter specifed' do
+        it 'returns deployments for the environment' do
+          get(
+            api("/projects/#{project.id}/deployments", user),
+            params: { environment: deployment_1.environment.name }
+          )
+
+          expect(json_response.size).to eq(1)
+          expect(json_response.first['iid']).to eq(deployment_1.iid)
+        end
+      end
+
       describe 'ordering' do
         let(:order_by) { 'iid' }
         let(:sort) { 'desc' }
@@ -110,7 +122,29 @@ describe API::Deployments do
 
   describe 'POST /projects/:id/deployments' do
     let!(:project) { create(:project, :repository) }
-    let(:sha) { 'b83d6e391c22777fca1ed3012fce84f633d7fed0' }
+    # *   ddd0f15ae83993f5cb66a927a28673882e99100b (HEAD -> master, origin/master, origin/HEAD) Merge branch 'po-fix-test-en
+    # |\
+    # | * 2d1db523e11e777e49377cfb22d368deec3f0793 Correct test_env.rb path for adding branch
+    # |/
+    # *   1e292f8fedd741b75372e19097c76d327140c312 Merge branch 'cherry-pick-ce369011' into 'master'
+
+    let_it_be(:sha) { 'ddd0f15ae83993f5cb66a927a28673882e99100b' }
+    let_it_be(:first_deployment_sha) { '1e292f8fedd741b75372e19097c76d327140c312' }
+
+    before do
+      # Creating the first deployment is an edge-case that is already covered by unit testing,
+      # here we want to see the behavior of a running system so we create a first deployment
+      post(
+        api("/projects/#{project.id}/deployments", user),
+        params: {
+          environment: 'production',
+          sha: first_deployment_sha,
+          ref: 'master',
+          tag: false,
+          status: 'success'
+        }
+      )
+    end
 
     context 'as a maintainer' do
       it 'creates a new deployment' do
@@ -151,6 +185,7 @@ describe API::Deployments do
         mr = create(
           :merge_request,
           :merged,
+          merge_commit_sha: sha,
           target_project: project,
           source_project: project,
           target_branch: 'master',
@@ -203,6 +238,7 @@ describe API::Deployments do
         mr = create(
           :merge_request,
           :merged,
+          merge_commit_sha: sha,
           target_project: project,
           source_project: project,
           target_branch: 'master',
@@ -222,6 +258,43 @@ describe API::Deployments do
 
         deploy = project.deployments.last
 
+        expect(deploy.merge_requests).to eq([mr])
+      end
+
+      it 'links any picked merge requests to the deployment', :sidekiq_inline do
+        mr = create(
+          :merge_request,
+          :merged,
+          merge_commit_sha: sha,
+          target_project: project,
+          source_project: project,
+          target_branch: 'master',
+          source_branch: 'foo'
+        )
+
+        # we branch from the previous deployment and cherry-pick mr into the new branch
+        branch = project.repository.add_branch(developer, 'stable', first_deployment_sha)
+        expect(branch).not_to be_nil
+
+        result = ::Commits::CherryPickService
+                   .new(project, developer, commit: mr.merge_commit, start_branch: 'stable', branch_name: 'stable')
+                   .execute
+        expect(result[:status]).to eq(:success), result[:message]
+
+        pick_sha = result[:result]
+
+        post(
+          api("/projects/#{project.id}/deployments", developer),
+          params: {
+            environment: 'production',
+            sha: pick_sha,
+            ref: 'stable',
+            tag: false,
+            status: 'success'
+          }
+        )
+
+        deploy = project.deployments.last
         expect(deploy.merge_requests).to eq([mr])
       end
     end
@@ -339,6 +412,48 @@ describe API::Deployments do
         )
 
         expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'GET /projects/:id/deployments/:deployment_id/merge_requests' do
+    let(:project) { create(:project, :repository) }
+    let!(:deployment) { create(:deployment, :success, project: project) }
+
+    subject { get api("/projects/#{project.id}/deployments/#{deployment.id}/merge_requests", user) }
+
+    context 'when a user is not a member of the deployment project' do
+      let(:user) { build(:user) }
+
+      it 'returns a 404 status code' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when a user member of the deployment project' do
+      let_it_be(:project2) { create(:project) }
+      let!(:merge_request1) { create(:merge_request, source_project: project, target_project: project) }
+      let!(:merge_request2) { create(:merge_request, source_project: project, target_project: project, state: 'closed') }
+      let!(:merge_request3) { create(:merge_request, source_project: project2, target_project: project2) }
+
+      it 'returns the relevant merge requests linked to a deployment for a project' do
+        deployment.merge_requests << [merge_request1, merge_request2]
+
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.map { |d| d['id'] }).to contain_exactly(merge_request1.id, merge_request2.id)
+      end
+
+      context 'when a deployment is not associated to any existing merge requests' do
+        it 'returns an empty array' do
+          subject
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to eq([])
+        end
       end
     end
   end

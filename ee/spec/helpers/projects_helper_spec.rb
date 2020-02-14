@@ -187,4 +187,34 @@ describe ProjectsHelper do
       end
     end
   end
+
+  describe '#show_discover_project_security?' do
+    using RSpec::Parameterized::TableSyntax
+    let(:user) { create(:user) }
+
+    where(
+      ab_feature_enabled?: [true, false],
+      gitlab_com?: [true, false],
+       user?: [true, false],
+      created_at: [Time.mktime(2010, 1, 20), Time.mktime(2030, 1, 20)],
+      security_dashboard_feature_available?: [true, false],
+      can_admin_namespace?: [true, false]
+    )
+
+    with_them do
+      it 'returns the expected value' do
+        allow(::Gitlab).to receive(:com?) { gitlab_com? }
+        allow(user).to receive(:ab_feature_enabled?) { ab_feature_enabled? }
+        allow(helper).to receive(:current_user) { user? ? user : nil }
+        allow(user).to receive(:created_at) { created_at }
+        allow(project).to receive(:feature_available?) { security_dashboard_feature_available? }
+        allow(helper).to receive(:can?) { can_admin_namespace? }
+
+        expected_value = user? && created_at > DateTime.new(2020, 1, 20) && gitlab_com? &&
+                         ab_feature_enabled? && !security_dashboard_feature_available? && can_admin_namespace?
+
+        expect(helper.show_discover_project_security?(project)).to eq(expected_value)
+      end
+    end
+  end
 end

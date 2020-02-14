@@ -4,6 +4,7 @@ module ErrorTracking
   class ProjectErrorTrackingSetting < ApplicationRecord
     include Gitlab::Utils::StrongMemoize
     include ReactiveCaching
+    include Gitlab::Routing
 
     SENTRY_API_ERROR_TYPE_BAD_REQUEST = 'bad_request_for_sentry_api'
     SENTRY_API_ERROR_TYPE_MISSING_KEYS = 'missing_keys_in_sentry_response'
@@ -72,7 +73,9 @@ module ErrorTracking
     end
 
     def sentry_client
-      Sentry::Client.new(api_url, token)
+      strong_memoize(:sentry_client) do
+        Sentry::Client.new(api_url, token)
+      end
     end
 
     def sentry_external_url
@@ -86,7 +89,9 @@ module ErrorTracking
     end
 
     def list_sentry_projects
-      { projects: sentry_client.projects }
+      handle_exceptions do
+        { projects: sentry_client.projects }
+      end
     end
 
     def issue_details(opts = {})
@@ -127,7 +132,7 @@ module ErrorTracking
     # ->
     # http://HOST/ORG/PROJECT
     def self.extract_sentry_external_url(url)
-      url.sub('api/0/projects/', '')
+      url&.sub('api/0/projects/', '')
     end
 
     def api_host
@@ -141,6 +146,7 @@ module ErrorTracking
 
     def add_gitlab_issue_details(issue)
       issue.gitlab_commit = match_gitlab_commit(issue.first_release_version)
+      issue.gitlab_commit_path = project_commit_path(project, issue.gitlab_commit) if issue.gitlab_commit
 
       issue
     end

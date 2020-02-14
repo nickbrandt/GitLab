@@ -5,7 +5,7 @@ require 'spec_helper'
 describe GroupClusterablePresenter do
   include Gitlab::Routing.url_helpers
 
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   let(:presenter) { described_class.new(group) }
   let(:cluster) { create(:cluster, :provided_by_gcp, :group) }

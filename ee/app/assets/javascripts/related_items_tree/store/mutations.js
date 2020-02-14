@@ -172,9 +172,10 @@ export default {
     state.itemAddInProgress = false;
     state.itemsFetchResultEmpty = false;
   },
-  [types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType }) {
+  [types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType, itemAddFailureMessage }) {
     state.itemAddInProgress = false;
     state.itemAddFailure = true;
+    state.itemAddFailureMessage = itemAddFailureMessage;
     if (itemAddFailureType) {
       state.itemAddFailureType = itemAddFailureType;
     }

@@ -117,7 +117,7 @@ export default {
 
     <ci-badge-link
       ref="status"
-      class="bg-white"
+      class="bg-white d-inline-block align-middle py-0"
       :status="lastPipeline.details.status"
       :show-text="true"
     />

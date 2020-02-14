@@ -3,9 +3,9 @@
 require "spec_helper"
 
 describe API::Services do
-  set(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
-  set(:project) do
+  let_it_be(:project) do
     create(:project, creator_id: user.id, namespace: user.namespace)
   end
 

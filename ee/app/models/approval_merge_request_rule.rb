@@ -24,6 +24,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
+  validates :rule_type, uniqueness: { scope: :merge_request_id, message: proc { _('any-approver for the merge request already exists') } }, if: :any_approver?
   validates :report_type, presence: true, if: :report_approver?
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
   # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
@@ -68,6 +69,14 @@ class ApprovalMergeRequestRule < ApplicationRecord
     end
   rescue ActiveRecord::RecordNotUnique
     retry
+  end
+
+  def self.applicable_to_branch(branch)
+    includes(approval_project_rule: :protected_branches).select do |rule|
+      next true unless rule.approval_project_rule.present?
+
+      rule.approval_project_rule.applies_to_branch?(branch)
+    end
   end
 
   def project

@@ -16,7 +16,7 @@ describe GroupsController do
           post :create, params: { group: { name: 'new_group', path: "new_group" } }
         end.to change { Group.count }.by(1)
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(:found)
       end
     end
   end

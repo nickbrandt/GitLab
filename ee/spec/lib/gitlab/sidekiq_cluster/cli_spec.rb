@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
 
 describe Gitlab::SidekiqCluster::CLI do
   let(:cli) { described_class.new('/dev/null') }
   let(:default_options) do
-    { env: 'test', directory: Dir.pwd, max_concurrency: 50, dryrun: false }
+    { env: 'test', directory: Dir.pwd, max_concurrency: 50, min_concurrency: 0, dryrun: false }
+  end
+
+  before do
+    stub_env('RAILS_ENV', 'test')
   end
 
   describe '#run' do
@@ -32,7 +36,7 @@ describe Gitlab::SidekiqCluster::CLI do
 
       context 'with --negate flag' do
         it 'starts Sidekiq workers for all queues in all_queues.yml except the ones in argv' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(['baz'])
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(['baz'])
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([['baz']], default_options)
                                               .and_return([])
@@ -43,7 +47,7 @@ describe Gitlab::SidekiqCluster::CLI do
 
       context 'with --max-concurrency flag' do
         it 'starts Sidekiq workers for specified queues with a max concurrency' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(%w(foo bar baz))
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(%w(foo bar baz))
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([%w(foo bar baz), %w(solo)], default_options.merge(max_concurrency: 2))
                                               .and_return([])
@@ -52,9 +56,20 @@ describe Gitlab::SidekiqCluster::CLI do
         end
       end
 
+      context 'with --min-concurrency flag' do
+        it 'starts Sidekiq workers for specified queues with a min concurrency' do
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(%w(foo bar baz))
+          expect(Gitlab::SidekiqCluster).to receive(:start)
+                                              .with([%w(foo bar baz), %w(solo)], default_options.merge(min_concurrency: 2))
+                                              .and_return([])
+
+          cli.run(%w(foo,bar,baz solo --min-concurrency 2))
+        end
+      end
+
       context 'queue namespace expansion' do
         it 'starts Sidekiq workers for all queues in all_queues.yml with a namespace in argv' do
-          expect(Gitlab::SidekiqConfig).to receive(:worker_queues).and_return(['cronjob:foo', 'cronjob:bar'])
+          expect(Gitlab::SidekiqConfig::CliMethods).to receive(:worker_queues).and_return(['cronjob:foo', 'cronjob:bar'])
           expect(Gitlab::SidekiqCluster).to receive(:start)
                                               .with([['cronjob', 'cronjob:foo', 'cronjob:bar']], default_options)
                                               .and_return([])

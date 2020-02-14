@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'admin/groups/_form' do
-  set(:admin) { create(:admin) }
+  let_it_be(:admin) { create(:admin) }
 
   before do
     assign(:group, group)

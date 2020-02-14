@@ -9,7 +9,7 @@ import getInitialState from 'ee/project_licenses/store/modules/list/state';
 import { FETCH_ERROR_MESSAGE } from 'ee/project_licenses/store/modules/list/constants';
 import createFlash from '~/flash';
 
-import mockLicensesResponse from './data/mock_licenses';
+import mockLicensesResponse from './data/mock_licenses.json';
 
 jest.mock('~/flash', () => jest.fn());
 

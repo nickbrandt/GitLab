@@ -16,16 +16,16 @@ describe ResourceEvents::MergeIntoNotesService do
     create(:resource_weight_event, event_params.merge(params))
   end
 
-  set(:project) { create(:project) }
-  set(:user) { create(:user) }
-  set(:resource) { create(:issue, project: project) }
-  set(:label) { create(:label, project: project) }
-  set(:label2) { create(:label, project: project) }
-  set(:scoped_label_group1_1) { create(:label, project: project, title: 'key::value') }
-  set(:scoped_label_group1_2) { create(:label, project: project, title: 'key::value2') }
-  set(:scoped_label_group2_1) { create(:label, project: project, title: 'key2::value') }
-  set(:scoped_label_group2_2) { create(:label, project: project, title: 'key2::value2') }
-  set(:scoped_label_group3_1) { create(:label, project: project, title: 'key3::value') }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:resource) { create(:issue, project: project) }
+  let_it_be(:label) { create(:label, project: project) }
+  let_it_be(:label2) { create(:label, project: project) }
+  let_it_be(:scoped_label_group1_1) { create(:label, project: project, title: 'key::value') }
+  let_it_be(:scoped_label_group1_2) { create(:label, project: project, title: 'key::value2') }
+  let_it_be(:scoped_label_group2_1) { create(:label, project: project, title: 'key2::value') }
+  let_it_be(:scoped_label_group2_2) { create(:label, project: project, title: 'key2::value2') }
+  let_it_be(:scoped_label_group3_1) { create(:label, project: project, title: 'key3::value') }
   let(:time) { Time.now }
 
   describe '#execute' do

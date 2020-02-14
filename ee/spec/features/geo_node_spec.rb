@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'GEO Nodes', :geo do
   include ::EE::GeoHelpers
 
-  set(:user) { create(:user) }
-  set(:geo_primary) { create(:geo_node, :primary) }
-  set(:geo_secondary) { create(:geo_node) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:geo_primary) { create(:geo_node, :primary) }
+  let_it_be(:geo_secondary) { create(:geo_node) }
 
   context 'Geo Secondary Node' do
     let(:project) { create(:project) }

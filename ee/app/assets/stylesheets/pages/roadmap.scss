@@ -161,7 +161,7 @@ html.group-epics-roadmap-html {
   position: sticky;
   position: -webkit-sticky;
   top: 0;
-  z-index: 3;
+  z-index: 20;
 
   .timeline-header-blank,
   .timeline-header-item {
@@ -224,25 +224,15 @@ html.group-epics-roadmap-html {
         line-height: 1.5;
         padding: 2px 0;
       }
+    }
 
-      .today-bar {
-        position: absolute;
-        top: 20px;
-        width: 2px;
-        background-color: $red-500;
-        pointer-events: none;
-      }
-
-      .today-bar::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -3px;
-        height: $grid-size;
-        width: $grid-size;
-        background-color: inherit;
-        border-radius: 50%;
-      }
+    .current-day-indicator-header {
+      bottom: 0;
+      height: $gl-vert-padding;
+      width: $gl-vert-padding;
+      background-color: $red-500;
+      border-radius: 50%;
+      transform: translateX(-2px);
     }
   }
 
@@ -275,7 +265,6 @@ html.group-epics-roadmap-html {
         .epic-details-cell,
         .epic-timeline-cell {
           background-color: $white-light;
-          border-bottom: 0;
         }
       }
 
@@ -308,7 +297,7 @@ html.group-epics-roadmap-html {
       padding: $gl-padding-8 $gl-padding;
       font-size: $code-font-size;
       background-color: $white-light;
-      z-index: 2;
+      z-index: 10;
 
       &::after {
         height: $item-height;
@@ -348,9 +337,18 @@ html.group-epics-roadmap-html {
     }
 
     .epic-timeline-cell {
+      position: relative;
       width: $timeline-cell-width;
       background-color: transparent;
       border-right: $border-style;
+
+      .current-day-indicator {
+        top: -1px;
+        width: 2px;
+        height: calc(100% + 1px);
+        background-color: $red-500;
+        pointer-events: none;
+      }
 
       .timeline-bar-wrapper {
         position: relative;
@@ -364,6 +362,7 @@ html.group-epics-roadmap-html {
         border-radius: $border-radius-default;
         opacity: 0.75;
         will-change: width, left;
+        z-index: 5;
 
         &:hover {
           opacity: 1;

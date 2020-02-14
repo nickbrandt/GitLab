@@ -10,21 +10,26 @@ export default {
   [types.SET_PIPELINE_ID](state, payload) {
     state.pipelineId = payload;
   },
+  [types.SET_SOURCE_BRANCH](state, payload) {
+    state.sourceBranch = payload;
+  },
   [types.SET_VULNERABILITIES_ENDPOINT](state, payload) {
     state.vulnerabilitiesEndpoint = payload;
   },
   [types.REQUEST_VULNERABILITIES](state) {
     state.isLoadingVulnerabilities = true;
     state.errorLoadingVulnerabilities = false;
+    state.loadingVulnerabilitiesErrorCode = null;
   },
   [types.RECEIVE_VULNERABILITIES_SUCCESS](state, payload) {
     state.isLoadingVulnerabilities = false;
     state.pageInfo = payload.pageInfo;
     state.vulnerabilities = payload.vulnerabilities;
   },
-  [types.RECEIVE_VULNERABILITIES_ERROR](state) {
+  [types.RECEIVE_VULNERABILITIES_ERROR](state, errorCode = null) {
     state.isLoadingVulnerabilities = false;
     state.errorLoadingVulnerabilities = true;
+    state.loadingVulnerabilitiesErrorCode = errorCode;
   },
   [types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, payload) {
     state.vulnerabilitiesCountEndpoint = payload;
@@ -121,7 +126,6 @@ export default {
 
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
     Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
-    Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(
       state.modal.vulnerability,

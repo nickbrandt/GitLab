@@ -5,10 +5,10 @@ require 'spec_helper'
 describe DesignManagement::DesignAtVersion do
   include DesignManagementTestHelpers
 
-  set(:issue) { create(:issue) }
-  set(:issue_b) { create(:issue) }
-  set(:design) { create(:design, issue: issue) }
-  set(:version) { create(:design_version, designs: [design]) }
+  let_it_be(:issue, reload: true) { create(:issue) }
+  let_it_be(:issue_b, reload: true) { create(:issue) }
+  let_it_be(:design, reload: true) { create(:design, issue: issue) }
+  let_it_be(:version) { create(:design_version, designs: [design]) }
 
   describe '#id' do
     subject { described_class.new(design: design, version: version) }

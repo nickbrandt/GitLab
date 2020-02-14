@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module QA
-  context 'Plan' do
+  context 'Plan', :reliable do
     describe 'Issues list' do
       let(:project) do
         Resource::Project.fabricate_via_api! do |project|
@@ -17,7 +17,6 @@ module QA
         2.times do
           Resource::Issue.fabricate_via_api! do |issue|
             issue.project = project
-            issue.title = "Issue-#{SecureRandom.hex(4)}"
           end
         end
 

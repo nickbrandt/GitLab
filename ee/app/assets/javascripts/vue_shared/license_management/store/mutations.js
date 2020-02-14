@@ -16,7 +16,7 @@ export default {
     Object.assign(state, data);
   },
 
-  [types.RECEIVE_LOAD_MANAGED_LICENSES](state, licenses = []) {
+  [types.RECEIVE_MANAGED_LICENSES_SUCCESS](state, licenses = []) {
     const managedLicenses = licenses.map(normalizeLicense).reverse();
 
     Object.assign(state, {
@@ -25,20 +25,20 @@ export default {
       loadManagedLicensesError: false,
     });
   },
-  [types.RECEIVE_LOAD_MANAGED_LICENSES_ERROR](state, error) {
+  [types.RECEIVE_MANAGED_LICENSES_ERROR](state, error) {
     Object.assign(state, {
       managedLicenses: [],
       isLoadingManagedLicenses: false,
       loadManagedLicensesError: error,
     });
   },
-  [types.REQUEST_LOAD_MANAGED_LICENSES](state) {
+  [types.REQUEST_MANAGED_LICENSES](state) {
     Object.assign(state, {
       isLoadingManagedLicenses: true,
     });
   },
 
-  [types.RECEIVE_LOAD_PARSED_LICENSE_REPORT](state, { newLicenses, existingLicenses }) {
+  [types.RECEIVE_PARSED_LICENSE_REPORT_SUCCESS](state, { newLicenses, existingLicenses }) {
     Object.assign(state, {
       newLicenses,
       existingLicenses,
@@ -46,36 +46,13 @@ export default {
       loadLicenseReportError: false,
     });
   },
-  [types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR](state, error) {
+  [types.RECEIVE_PARSED_LICENSE_REPORT_ERROR](state, error) {
     Object.assign(state, {
       isLoadingLicenseReport: false,
       loadLicenseReportError: error,
     });
   },
-  [types.REQUEST_LOAD_PARSED_LICENSE_REPORT](state) {
-    Object.assign(state, {
-      isLoadingLicenseReport: true,
-    });
-  },
-
-  [types.RECEIVE_LOAD_LICENSE_REPORT](state, reports) {
-    const { headReport, baseReport } = reports;
-
-    Object.assign(state, {
-      headReport,
-      baseReport,
-      isLoadingLicenseReport: false,
-      loadLicenseReportError: false,
-    });
-  },
-  [types.RECEIVE_LOAD_LICENSE_REPORT_ERROR](state, error) {
-    Object.assign(state, {
-      managedLicenses: [],
-      isLoadingLicenseReport: false,
-      loadLicenseReportError: error,
-    });
-  },
-  [types.REQUEST_LOAD_LICENSE_REPORT](state) {
+  [types.REQUEST_PARSED_LICENSE_REPORT](state) {
     Object.assign(state, {
       isLoadingLicenseReport: true,
     });

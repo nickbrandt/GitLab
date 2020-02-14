@@ -55,10 +55,16 @@ describe Gitlab::Vulnerabilities::HistoryCache do
       end
     end
 
-    context 'when given an ApplicationInstance' do
+    context 'when given an InstanceSecurityDashboard' do
       it_behaves_like 'the history cache when given an expected Vulnerable' do
         let(:group) { create(:group) }
-        let(:vulnerable) { ApplicationInstance.new }
+        let(:user) { create(:user) }
+        let(:vulnerable) { InstanceSecurityDashboard.new(user) }
+
+        before do
+          project.add_developer(user)
+          user.security_dashboard_projects << project
+        end
       end
     end
   end
