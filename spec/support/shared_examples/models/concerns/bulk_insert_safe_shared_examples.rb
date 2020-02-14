@@ -15,6 +15,8 @@ RSpec.shared_examples 'a BulkInsertSafe model' do |klass|
     end.to_set
   end
 
+  # This is safe, because we `dup` the target_class earlier
+  # rubocop:disable RSpec/ClassMutation
   context 'when calling class methods directly' do
     it 'raises an error when method is not bulk-insert safe' do
       callback_method_blacklist.each do |m|
@@ -27,8 +29,7 @@ RSpec.shared_examples 'a BulkInsertSafe model' do |klass|
 
     it 'does not raise an error when method is bulk-insert safe' do
       BulkInsertSafe::CALLBACK_NAME_WHITELIST.each do |name|
-        # This is safe, because we `dup` the class earlier
-        expect { target_class.set_callback(name) {} }.not_to raise_error # rubocop:disable RSpec/ClassMutation
+        expect { target_class.set_callback(name) {} }.not_to raise_error
       end
     end
 
@@ -36,4 +37,5 @@ RSpec.shared_examples 'a BulkInsertSafe model' do |klass|
       expect { target_class.belongs_to(:other_record) }.not_to raise_error
     end
   end
+  # rubocop:enable RSpec/ClassMutation
 end

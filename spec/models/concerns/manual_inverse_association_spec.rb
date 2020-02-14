@@ -5,7 +5,8 @@ require 'spec_helper'
 describe ManualInverseAssociation do
   let(:model) do
     Class.new(MergeRequest) do
-      belongs_to :manual_association, class_name: 'MergeRequestDiff', foreign_key: :latest_merge_request_diff_id
+      belongs_to :manual_association, class_name: 'MergeRequestDiff', # rubocop:disable RSpec/ClassMutation
+        foreign_key: :latest_merge_request_diff_id
       manual_inverse_association :manual_association, :merge_request
     end
   end

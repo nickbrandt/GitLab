@@ -23,6 +23,10 @@ module RuboCop
           :set_callback,
           :skip_callback,
           :validates,
+          :has_one,
+          :has_many,
+          :has_and_belongs_to_many,
+          :belongs_to,
           # Methods below taken from ActiveRecord::Callbacks::CALLBACKS
           :after_initialize,
           :after_find,

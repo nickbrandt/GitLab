@@ -6,10 +6,12 @@ describe BatchDestroyDependentAssociations do
   class TestProject < ActiveRecord::Base
     self.table_name = 'projects'
 
+    # rubocop:disable RSpec/ClassMutation
     has_many :builds, dependent: :destroy
     has_many :notification_settings, as: :source, dependent: :delete_all
     has_many :pages_domains
     has_many :todos
+    # rubocop:enable RSpec/ClassMutation
 
     include BatchDestroyDependentAssociations
   end
