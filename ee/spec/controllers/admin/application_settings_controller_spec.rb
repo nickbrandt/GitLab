@@ -133,6 +133,19 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'merge request approvers rules' do
+      let(:settings) do
+        {
+          disable_overriding_approvers_per_merge_request: true,
+          prevent_merge_requests_author_approval: true,
+          prevent_merge_requests_committers_approval: true
+        }
+      end
+      let(:feature) { :admin_merge_request_approvers_rules }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     it 'updates repository_size_limit' do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 

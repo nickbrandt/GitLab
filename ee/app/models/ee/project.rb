@@ -258,7 +258,7 @@ module EE
     end
 
     def can_override_approvers?
-      !disable_overriding_approvers_per_merge_request?
+      !disable_overriding_approvers_per_merge_request
     end
 
     def shared_runners_available?
@@ -721,6 +721,28 @@ module EE
       return false unless feature_available?(:packages)
 
       packages.where(package_type: package_type).exists?
+    end
+
+    def disable_overriding_approvers_per_merge_request
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
+        super
+    end
+
+    def merge_requests_author_approval
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+
+      super
+    end
+
+    def merge_requests_disable_committers_approval
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
+        super
     end
 
     def license_compliance
