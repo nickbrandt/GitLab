@@ -684,30 +684,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#approvals_required' do
-    where(:license_value, :db_value, :project_db_value, :expected) do
-      true  | 5   | 6   | 6
-      true  | 6   | 5   | 6
-      true  | nil | 5   | 5
-      false | 5   | 6   | 0
-      false | nil | 5   | 0
-    end
-
-    with_them do
-      let(:merge_request) { build(:merge_request, approvals_before_merge: db_value) }
-
-      subject { merge_request.approvals_required }
-
-      before do
-        stub_licensed_features(merge_request_approvers: license_value)
-
-        merge_request.target_project.approvals_before_merge = project_db_value
-      end
-
-      it { is_expected.to eq(expected) }
-    end
-  end
-
   describe '#mergeable?' do
     let(:project) { create(:project) }
 
