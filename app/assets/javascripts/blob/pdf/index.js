@@ -34,7 +34,7 @@ export default () => {
         <div
           class="text-center loading"
           v-if="loading && !error">
-          <gl-loading-icon />
+          <gl-loading-icon size="lg"/>
         </div>
         <pdf-lab
           v-if="!loadError"
