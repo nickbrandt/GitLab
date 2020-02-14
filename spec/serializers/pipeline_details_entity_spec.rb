@@ -188,8 +188,10 @@ describe PipelineDetailsEntity do
             expect(names).to match_array(%w[build_1 build_2 build_3])
           end
 
+          expected_queries = Gitlab.ee? ? 42 : 29
+
           # This makes only one query to fetch all job artifacts
-          expect(recorder.count).to eq(42)
+          expect(recorder.count).to eq(expected_queries)
         end
       end
 
@@ -203,8 +205,10 @@ describe PipelineDetailsEntity do
             expect(names).to match_array(%w[build_1 build_2 build_3])
           end
 
+          expected_queries = Gitlab.ee? ? 44 : 31
+
           # This makes one query for each job artifact
-          expect(recorder.count).to eq(44)
+          expect(recorder.count).to eq(expected_queries)
         end
       end
     end
