@@ -3,7 +3,7 @@
 module EpicLinks
   class CreateService < IssuableLinks::CreateService
     def execute
-      unless can?(current_user, :admin_epic, issuable.group)
+      unless can?(current_user, :admin_epic_link, issuable.group)
         return error(issuables_not_found_message, 404)
       end
 
