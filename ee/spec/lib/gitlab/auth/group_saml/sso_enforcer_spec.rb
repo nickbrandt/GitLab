@@ -6,6 +6,10 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
   let(:saml_provider) { build_stubbed(:saml_provider, enforced_sso: true) }
   let(:session) { {} }
 
+  before do
+    stub_licensed_features(group_saml: true)
+  end
+
   around do |example|
     Gitlab::Session.with_session(session) do
       example.run

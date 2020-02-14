@@ -141,6 +141,10 @@ describe GroupPolicy do
 
       let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
 
+      before do
+        stub_licensed_features(group_saml: true)
+      end
+
       context 'when the session has been set globally' do
         around do |example|
           Gitlab::Session.with_session({}) do

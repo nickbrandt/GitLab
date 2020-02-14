@@ -80,6 +80,7 @@ describe GroupsController do
     let(:guest_user) { identity.user }
 
     before do
+      stub_licensed_features(group_saml: true)
       group.add_guest(guest_user)
       sign_in(guest_user)
     end

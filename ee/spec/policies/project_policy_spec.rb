@@ -16,6 +16,7 @@ describe ProjectPolicy do
   subject { described_class.new(current_user, project) }
 
   before do
+    stub_licensed_features(group_saml: true)
     project.add_maintainer(maintainer)
     project.add_developer(developer)
     project.add_reporter(reporter)
