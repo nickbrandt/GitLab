@@ -47,6 +47,15 @@ describe MergeRequests::MergeService do
         expect(note.note).to include 'merged'
       end
 
+      it 'is idempotent' do
+        # a first invocation of execute is performed on the before block
+        service.execute(merge_request)
+
+        expect(merge_request.merge_error).to be_falsey
+        expect(merge_request).to be_valid
+        expect(merge_request).to be_merged
+      end
+
       context 'when squashing' do
         let(:merge_params) do
           { commit_message: 'Merge commit message',
