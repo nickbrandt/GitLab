@@ -1451,7 +1451,8 @@ describe Project do
     before do
       allow(License).to receive(:current).and_return(global_license)
       allow(global_license).to receive(:features).and_return([
-        :epics, # Gold only
+        :subepics, # Gold only
+        :epics, # Silver and up
         :service_desk, # Silver and up
         :audit_events, # Bronze and up
         :geo # Global feature, should not be checked at namespace level
@@ -1477,7 +1478,7 @@ describe Project do
         let(:plan_license) { :silver }
 
         it 'filters for silver features' do
-          is_expected.to contain_exactly(:service_desk, :audit_events, :geo)
+          is_expected.to contain_exactly(:service_desk, :audit_events, :geo, :epics)
         end
       end
 
@@ -1485,7 +1486,7 @@ describe Project do
         let(:plan_license) { :gold }
 
         it 'filters for gold features' do
-          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
         end
       end
 
@@ -1502,7 +1503,7 @@ describe Project do
           let(:project) { create(:project, :public, group: group) }
 
           it 'includes all features in global license' do
-            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
           end
         end
       end
@@ -1510,7 +1511,7 @@ describe Project do
 
     context 'when namespace should not be checked' do
       it 'includes all features in global license' do
-        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
       end
     end
 

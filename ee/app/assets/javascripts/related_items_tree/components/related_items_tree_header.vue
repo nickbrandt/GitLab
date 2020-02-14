@@ -17,7 +17,7 @@ export default {
     EpicActionsSplitButton,
   },
   computed: {
-    ...mapState(['parentItem', 'descendantCounts']),
+    ...mapState(['parentItem', 'descendantCounts', 'allowSubEpics']),
     totalEpicsCount() {
       return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
     },
@@ -51,7 +51,7 @@ export default {
   <div class="card-header d-flex px-2">
     <div class="d-inline-flex flex-grow-1 lh-100 align-middle">
       <gl-tooltip :target="() => $refs.countBadge">
-        <p class="font-weight-bold m-0">
+        <p v-if="allowSubEpics" class="font-weight-bold m-0">
           {{ __('Epics') }} &#8226;
           <span class="text-secondary-400 font-weight-normal"
             >{{
@@ -75,11 +75,11 @@ export default {
         </p>
       </gl-tooltip>
       <div ref="countBadge" class="issue-count-badge">
-        <span class="d-inline-flex align-items-center">
+        <span v-if="allowSubEpics" class="d-inline-flex align-items-center">
           <icon :size="16" name="epic" class="text-secondary mr-1" />
           {{ totalEpicsCount }}
         </span>
-        <span class="ml-2 d-inline-flex align-items-center">
+        <span class="d-inline-flex align-items-center" :class="{ 'ml-2': allowSubEpics }">
           <icon :size="16" name="issues" class="text-secondary mr-1" />
           {{ totalIssuesCount }}
         </span>
@@ -88,6 +88,7 @@ export default {
     <div class="d-inline-flex js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">
         <epic-actions-split-button
+          v-if="allowSubEpics"
           class="qa-add-epics-button"
           @showAddEpicForm="showAddEpicForm"
           @showCreateEpicForm="showCreateEpicForm"
