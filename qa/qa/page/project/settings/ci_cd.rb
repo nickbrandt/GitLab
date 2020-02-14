@@ -9,6 +9,7 @@ module QA
 
           view 'app/views/projects/settings/ci_cd/show.html.haml' do
             element :autodevops_settings_content
+            element :deploy_tokens_settings
             element :runners_settings_content
             element :variables_settings_content
           end
@@ -22,6 +23,12 @@ module QA
           def expand_ci_variables(&block)
             expand_section(:variables_settings_content) do
               Settings::CiVariables.perform(&block)
+            end
+          end
+
+          def expand_deploy_tokens(&block)
+            expand_section(:deploy_tokens_settings) do
+              DeployTokens.perform(&block)
             end
           end
 

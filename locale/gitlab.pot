@@ -6438,6 +6438,9 @@ msgstr ""
 msgid "DeployTokens|Revoke"
 msgstr ""
 
+msgid "DeployTokens|Revoke %{b_start}%{name}%{b_end}?"
+msgstr ""
+
 msgid "DeployTokens|Revoke %{name}"
 msgstr ""
 
@@ -6459,7 +6462,7 @@ msgstr ""
 msgid "DeployTokens|Username"
 msgstr ""
 
-msgid "DeployTokens|You are about to revoke"
+msgid "DeployTokens|You are about to revoke %{b_start}%{name}%{b_end}."
 msgstr ""
 
 msgid "DeployTokens|Your New Deploy Token"

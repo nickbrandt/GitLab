@@ -6,7 +6,7 @@ module Groups
       skip_cross_project_access_check :show
       before_action :authorize_admin_group!
       before_action :authorize_update_max_artifacts_size!, only: [:update]
-      before_action :define_variables
+      before_action :define_variables, only: [:show, :create_deploy_token]
 
       def show
       end
