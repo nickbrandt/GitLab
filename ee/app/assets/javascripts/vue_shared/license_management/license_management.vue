@@ -3,18 +3,19 @@ import { mapState, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
+import AdminLicenseManagementRow from './components/admin_license_management_row.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
 import PaginatedList from '~/vue_shared/components/paginated_list.vue';
-import createStore from './store/index';
 
-const store = createStore();
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 export default {
   name: 'LicenseManagement',
   components: {
     AddLicenseForm,
     DeleteConfirmationModal,
+    AdminLicenseManagementRow,
     LicenseManagementRow,
     GlButton,
     GlLoadingIcon,
@@ -27,11 +28,16 @@ export default {
     },
   },
   data() {
-    return { formIsOpen: false };
+    return {
+      formIsOpen: false,
+      tableHeaders: [
+        { className: 'section-70', label: s__('Licenses|Policy') },
+        { className: 'section-30', label: s__('Licenses|Name') },
+      ],
+    };
   },
-  store,
   computed: {
-    ...mapState(['managedLicenses', 'isLoadingManagedLicenses']),
+    ...mapState(LICENSE_MANAGEMENT, ['managedLicenses', 'isLoadingManagedLicenses', 'isAdmin']),
   },
   mounted() {
     this.setAPISettings({
@@ -40,7 +46,11 @@ export default {
     this.fetchManagedLicenses();
   },
   methods: {
-    ...mapActions(['fetchManagedLicenses', 'setAPISettings', 'setLicenseApproval']),
+    ...mapActions(LICENSE_MANAGEMENT, [
+      'fetchManagedLicenses',
+      'setAPISettings',
+      'setLicenseApproval',
+    ]),
     openAddLicenseForm() {
       this.formIsOpen = true;
     },
@@ -59,17 +69,19 @@ export default {
 <template>
   <gl-loading-icon v-if="isLoadingManagedLicenses" />
   <div v-else class="license-management">
-    <delete-confirmation-modal />
+    <delete-confirmation-modal v-if="isAdmin" />
 
     <paginated-list
       :list="managedLicenses"
       :empty-search-message="$options.emptySearchMessage"
       :empty-message="$options.emptyMessage"
+      :filterable="isAdmin"
       filter="name"
       data-qa-selector="license_compliance_list"
     >
       <template #header>
         <gl-button
+          v-if="isAdmin"
           class="js-open-form order-1"
           :disabled="formIsOpen"
           variant="success"
@@ -78,9 +90,21 @@ export default {
         >
           {{ s__('LicenseCompliance|Add a license') }}
         </gl-button>
+
+        <template v-else>
+          <div
+            v-for="header in tableHeaders"
+            :key="header.label"
+            class="table-section"
+            :class="header.className"
+            role="rowheader"
+          >
+            {{ header.label }}
+          </div>
+        </template>
       </template>
 
-      <template #subheader>
+      <template v-if="isAdmin" #subheader>
         <div v-if="formIsOpen" class="prepend-top-default append-bottom-default">
           <add-license-form
             :managed-licenses="managedLicenses"
@@ -91,7 +115,8 @@ export default {
       </template>
 
       <template #default="{ listItem }">
-        <license-management-row :license="listItem" />
+        <admin-license-management-row v-if="isAdmin" :license="listItem" />
+        <license-management-row v-else :license="listItem" />
       </template>
     </paginated-list>
   </div>
