@@ -71,8 +71,10 @@ module QA
           end
 
           def click_group_insights_link
-            within_sidebar do
-              click_element(:group_insights_link)
+            hover_element(:analytics_link) do
+              within_submenu(:analytics_sidebar_submenu) do
+                click_element(:group_insights_link)
+              end
             end
           end
 

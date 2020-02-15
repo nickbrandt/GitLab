@@ -11,17 +11,22 @@ FactoryBot.define do
     report_type { :sast }
 
     trait :detected do
-      state { :detected }
+      state { Vulnerability.states[:detected] }
     end
 
     trait :resolved do
-      state { :resolved }
+      state { Vulnerability.states[:resolved] }
       resolved_at { Time.current }
     end
 
     trait :dismissed do
-      state { :dismissed }
+      state { Vulnerability.states[:dismissed] }
       closed_at { Time.current }
+    end
+
+    trait :confirmed do
+      state { Vulnerability.states[:confirmed] }
+      confirmed_at { Time.current }
     end
 
     trait :with_findings do

@@ -13,7 +13,7 @@ module EE
 
     override :group_overview_nav_link_paths
     def group_overview_nav_link_paths
-      if ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, @group)
+      if ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, @group, default_enabled: true)
         super
       else
         super + %w[

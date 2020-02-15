@@ -90,7 +90,7 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        not_found! if Feature.disabled?(:nuget_package_registry, authorized_user_project)
+        not_found! if Feature.disabled?(:nuget_package_registry, authorized_user_project, default_enabled: true)
         authorize_packages_feature!(authorized_user_project)
       end
 
@@ -129,7 +129,7 @@ module API
 
           track_event('push_package')
 
-          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id)
+          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id) # rubocop:disable CodeReuse/Worker
 
           created!
         rescue ObjectStorage::RemoteStoreError => e

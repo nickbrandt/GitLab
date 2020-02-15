@@ -30,7 +30,7 @@ class SamlProvider < ApplicationRecord
   end
 
   def enforced_sso?
-    enabled? && super && ::Feature.enabled?(:enforced_sso, group)
+    enabled? && super && group.feature_available?(:group_saml) && ::Feature.enabled?(:enforced_sso, group)
   end
 
   def enforced_group_managed_accounts?

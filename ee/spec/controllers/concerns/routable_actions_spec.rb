@@ -34,6 +34,7 @@ describe RoutableActions do
       let(:user) { identity.user }
 
       before do
+        stub_licensed_features(group_saml: true)
         sign_in(user)
       end
 

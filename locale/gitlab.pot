@@ -1958,6 +1958,9 @@ msgstr ""
 msgid "Any Milestone"
 msgstr ""
 
+msgid "Any branch"
+msgstr ""
+
 msgid "Any eligible user"
 msgstr ""
 
@@ -2033,6 +2036,9 @@ msgstr ""
 msgid "Apply template"
 msgstr ""
 
+msgid "Apply this approval rule to any branch or a specific protected branch."
+msgstr ""
+
 msgid "Applying a template will replace the existing issue description. Any changes you have made will be lost."
 msgstr ""
 
@@ -2084,6 +2090,9 @@ msgid "ApprovalRule|No. approvals required"
 msgstr ""
 
 msgid "ApprovalRule|Rule name"
+msgstr ""
+
+msgid "ApprovalRule|Target branch"
 msgstr ""
 
 msgid "ApprovalRule|e.g. QA, Security, etc."
@@ -9669,6 +9678,12 @@ msgstr ""
 msgid "GroupSAML|NameID Format"
 msgstr ""
 
+msgid "GroupSAML|Prohibit outer forks"
+msgstr ""
+
+msgid "GroupSAML|Prohibit outer forks for this group."
+msgstr ""
+
 msgid "GroupSAML|SAML Response Output"
 msgstr ""
 
@@ -9699,6 +9714,9 @@ msgstr ""
 msgid "GroupSAML|To be able to enable group managed accounts, you first need to enable enforced SSO."
 msgstr ""
 
+msgid "GroupSAML|To be able to prohibit outer forks, you first need to enforce dedicate group managed accounts."
+msgstr ""
+
 msgid "GroupSAML|Toggle SAML authentication"
 msgstr ""
 
@@ -9706,6 +9724,9 @@ msgid "GroupSAML|Valid SAML Response"
 msgstr ""
 
 msgid "GroupSAML|With group managed accounts enabled, all the users without a group managed account will be excluded from the group."
+msgstr ""
+
+msgid "GroupSAML|With prohibit outer forks flag enabled group members will be able to fork project only inside your group."
 msgstr ""
 
 msgid "GroupSAML|Your SCIM token"
@@ -10119,6 +10140,9 @@ msgid "IDE|Review"
 msgstr ""
 
 msgid "IDE|Successful commit"
+msgstr ""
+
+msgid "IDE|This option is disabled because you are not allowed to create merge requests in this project."
 msgstr ""
 
 msgid "IDE|This option is disabled because you don't have write permissions for the current branch."
@@ -11232,31 +11256,19 @@ msgstr ""
 msgid "LicenseCompliance|Add licenses manually to approve or blacklist"
 msgstr ""
 
-msgid "LicenseCompliance|Approve"
+msgid "LicenseCompliance|Allow"
 msgstr ""
 
-msgid "LicenseCompliance|Approve license"
-msgstr ""
-
-msgid "LicenseCompliance|Approve license?"
-msgstr ""
-
-msgid "LicenseCompliance|Approved"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist license"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist license?"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklisted"
+msgid "LicenseCompliance|Allowed"
 msgstr ""
 
 msgid "LicenseCompliance|Cancel"
+msgstr ""
+
+msgid "LicenseCompliance|Denied"
+msgstr ""
+
+msgid "LicenseCompliance|Deny"
 msgstr ""
 
 msgid "LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
@@ -11298,6 +11310,9 @@ msgid "LicenseCompliance|License details"
 msgstr ""
 
 msgid "LicenseCompliance|License name"
+msgstr ""
+
+msgid "LicenseCompliance|License review"
 msgstr ""
 
 msgid "LicenseCompliance|Packages"
@@ -11345,6 +11360,9 @@ msgstr ""
 msgid "Licenses|Components"
 msgstr ""
 
+msgid "Licenses|Detected in Project"
+msgstr ""
+
 msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest pipeline%{linkEnd} scan"
 msgstr ""
 
@@ -11358,6 +11376,15 @@ msgid "Licenses|License Compliance"
 msgstr ""
 
 msgid "Licenses|Name"
+msgstr ""
+
+msgid "Licenses|Policies"
+msgstr ""
+
+msgid "Licenses|Policy"
+msgstr ""
+
+msgid "Licenses|Specified policies in this project"
 msgstr ""
 
 msgid "Licenses|The license list details information about the licenses used within your project."
@@ -11906,6 +11933,9 @@ msgid "Merge request dependencies"
 msgstr ""
 
 msgid "Merge requests"
+msgstr ""
+
+msgid "Merge requests approvals"
 msgstr ""
 
 msgid "Merge requests are a place to propose changes you've made to a project and discuss those changes with others"
@@ -13999,6 +14029,9 @@ msgstr ""
 msgid "Please select a group."
 msgstr ""
 
+msgid "Please select a valid target branch"
+msgstr ""
+
 msgid "Please select and add a member"
 msgstr ""
 
@@ -14147,6 +14180,9 @@ msgid "Prevent environment from auto-stopping"
 msgstr ""
 
 msgid "Prevent users from changing their profile name"
+msgstr ""
+
+msgid "Prevent users from modifing merge request approvers list"
 msgstr ""
 
 msgid "Preview"
@@ -16373,6 +16409,9 @@ msgstr ""
 msgid "Rook"
 msgstr ""
 
+msgid "Rules that define what git pushes are accepted for a project. All newly created projects will use these settings."
+msgstr ""
+
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
@@ -17091,9 +17130,6 @@ msgstr ""
 msgid "Self monitoring project does not exist"
 msgstr ""
 
-msgid "Self-monitoring is not enabled on this GitLab server, contact your administrator."
-msgstr ""
-
 msgid "Self-monitoring project does not exist. Please check logs for any error messages"
 msgstr ""
 
@@ -17413,6 +17449,9 @@ msgid "Sets weight to %{weight}."
 msgstr ""
 
 msgid "Settings"
+msgstr ""
+
+msgid "Settings to prevent self-approval across all projects in the instance. Only an administrator can modify these settings."
 msgstr ""
 
 msgid "Severity: %{severity}"

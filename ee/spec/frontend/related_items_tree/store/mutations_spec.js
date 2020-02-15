@@ -19,6 +19,7 @@ describe('RelatedItemsTree', () => {
             issuesEndpoint: '/bar',
             autoCompleteEpics: true,
             autoCompleteIssues: false,
+            allowSubEpics: true,
           };
 
           mutations[types.SET_INITIAL_CONFIG](state, data);
@@ -27,6 +28,7 @@ describe('RelatedItemsTree', () => {
           expect(state).toHaveProperty('issuesEndpoint', '/bar');
           expect(state).toHaveProperty('autoCompleteEpics', true);
           expect(state).toHaveProperty('autoCompleteIssues', false);
+          expect(state).toHaveProperty('allowSubEpics', true);
         });
       });
 

@@ -101,7 +101,7 @@ module API
       put ':id/(-/)epics/:epic_iid' do
         Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/194104')
 
-        authorize_can_admin!
+        authorize_can_admin_epic!
         update_params = declared_params(include_missing: false)
         update_params.delete(:epic_iid)
 

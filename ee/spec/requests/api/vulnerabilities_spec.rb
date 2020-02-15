@@ -318,4 +318,61 @@ describe API::Vulnerabilities do
       it { expect { resolve_vulnerability }.to be_denied_for(:anonymous) }
     end
   end
+
+  describe 'POST /vulnerabilities/:id/confirm' do
+    before do
+      create_list(:vulnerabilities_finding, 2, vulnerability: vulnerability)
+    end
+
+    let_it_be(:project) { create(:project, :with_vulnerabilities) }
+    let(:vulnerability) { project.vulnerabilities.first }
+    let(:vulnerability_id) { vulnerability.id }
+
+    subject(:confirm_vulnerability) { post api("/vulnerabilities/#{vulnerability_id}/confirm", user) }
+
+    context 'with an authorized user with proper permissions' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'confirms a vulnerability and its associated findings' do
+        Timecop.freeze do
+          confirm_vulnerability
+
+          expect(response).to have_gitlab_http_status(201)
+          expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
+
+          expect(vulnerability.reload).to(
+            have_attributes(state: 'confirmed', confirmed_by: user, confirmed_at: be_like_time(Time.current)))
+          expect(vulnerability.findings).to all have_attributes(state: 'confirmed')
+        end
+      end
+
+      it_behaves_like 'responds with "not found" for an unknown vulnerability ID'
+
+      context 'when the vulnerability is already confirmed' do
+        let(:vulnerability) { create(:vulnerability, :confirmed, project: project) }
+
+        it 'responds with 304 Not Modified response' do
+          confirm_vulnerability
+
+          expect(response).to have_gitlab_http_status(304)
+        end
+      end
+
+      it_behaves_like 'forbids access to vulnerability API endpoint in case of disabled features'
+    end
+
+    describe 'permissions' do
+      it { expect { confirm_vulnerability }.to be_allowed_for(:admin) }
+      it { expect { confirm_vulnerability }.to be_allowed_for(:owner).of(project) }
+      it { expect { confirm_vulnerability }.to be_allowed_for(:maintainer).of(project) }
+      it { expect { confirm_vulnerability }.to be_allowed_for(:developer).of(project) }
+
+      it { expect { confirm_vulnerability }.to be_denied_for(:auditor) }
+      it { expect { confirm_vulnerability }.to be_denied_for(:reporter).of(project) }
+      it { expect { confirm_vulnerability }.to be_denied_for(:guest).of(project) }
+      it { expect { confirm_vulnerability }.to be_denied_for(:anonymous) }
+    end
+  end
 end

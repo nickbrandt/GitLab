@@ -38,7 +38,7 @@ module QA
         Page::MergeRequest::Show.perform(&:merge!)
 
         group.visit!
-        Page::Group::Menu.perform(&:click_group_analytics_item)
+        Page::Group::Menu.perform(&:click_contribution_analytics_item)
       end
 
       it 'tests contributions' do

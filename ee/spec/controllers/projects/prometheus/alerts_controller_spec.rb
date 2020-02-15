@@ -364,18 +364,32 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it 'returns a json object with the correct keys' do
-      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+      get :metrics_dashboard, params: request_params(id: metric.id, environment_id: alert.environment.id), format: :json
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response.keys).to contain_exactly('dashboard', 'status')
     end
 
     it 'is the correct embed' do
-      get :metrics_dashboard, params: request_params(id: alert.id), format: :json
+      get :metrics_dashboard, params: request_params(id: metric.id, environment_id: alert.environment.id), format: :json
 
       title = json_response['dashboard']['panel_groups'][0]['panels'][0]['title']
 
       expect(title).to eq(metric.title)
+    end
+
+    it 'finds the first alert embed without environment_id' do
+      get :metrics_dashboard, params: request_params(id: metric.id), format: :json
+
+      title = json_response['dashboard']['panel_groups'][0]['panels'][0]['title']
+
+      expect(title).to eq(metric.title)
+    end
+
+    it 'returns 404 for non-existant alerts' do
+      get :metrics_dashboard, params: request_params(id: 0), format: :json
+
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 

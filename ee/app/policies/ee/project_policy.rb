@@ -46,6 +46,27 @@ module EE
         !PushRule.global&.commit_committer_check
       end
 
+      with_scope :global
+      condition(:owner_cannot_modify_approvers_rules) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .disable_overriding_approvers_per_merge_request
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_author_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_author_approval
+      end
+
+      with_scope :global
+      condition(:owner_cannot_modify_merge_request_committer_setting) do
+        License.feature_available?(:admin_merge_request_approvers_rules) &&
+          ::Gitlab::CurrentSettings.current_application_settings
+            .prevent_merge_requests_committers_approval
+      end
+
       with_scope :subject
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
@@ -201,6 +222,10 @@ module EE
         enable :update_approvers
         enable :destroy_package
         enable :admin_feature_flags_client
+        enable :modify_approvers_rules
+        enable :modify_approvers_list
+        enable :modify_merge_request_author_setting
+        enable :modify_merge_request_committer_setting
       end
 
       rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
@@ -296,6 +321,22 @@ module EE
 
       rule { ip_enforcement_prevents_access }.policy do
         prevent :read_project
+      end
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_rules
+      end
+
+      rule { owner_cannot_modify_merge_request_author_setting & ~admin }.policy do
+        prevent :modify_merge_request_author_setting
+      end
+
+      rule { owner_cannot_modify_merge_request_committer_setting & ~admin }.policy do
+        prevent :modify_merge_request_committer_setting
+      end
+
+      rule { owner_cannot_modify_approvers_rules & ~admin }.policy do
+        prevent :modify_approvers_list
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal

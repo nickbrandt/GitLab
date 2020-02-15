@@ -3,6 +3,7 @@ export default () => ({
   licensesApiPath: null,
   canManageLicenses: false,
   currentLicenseInModal: null,
+  isAdmin: false,
   isDeleting: false,
   isLoadingLicenseReport: false,
   isLoadingManagedLicenses: false,

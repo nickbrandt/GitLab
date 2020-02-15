@@ -32,7 +32,7 @@ module Ci
 
         Ci::ProcessPipelineService
           .new(pipeline)
-          .execute
+          .execute(nil, initial_process: true)
 
         pipeline_created_counter.increment(source: :webide)
       end

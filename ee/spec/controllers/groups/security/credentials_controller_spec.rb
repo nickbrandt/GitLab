@@ -25,7 +25,7 @@ describe Groups::Security::CredentialsController do
 
     context 'when `credentials_inventory` feature is enabled' do
       before do
-        stub_licensed_features(credentials_inventory: true)
+        stub_licensed_features(credentials_inventory: true, group_saml: true)
       end
 
       context 'for a group that enforces group managed accounts' do

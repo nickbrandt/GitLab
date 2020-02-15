@@ -71,6 +71,44 @@ describe Gitlab::ImportExport::GroupTreeRestorer do
     end
   end
 
+  context 'excluded attributes' do
+    let!(:source_user) { create(:user, id: 123) }
+    let!(:importer_user) { create(:user) }
+    let(:group) { create(:group) }
+    let(:shared) { Gitlab::ImportExport::Shared.new(group) }
+    let(:group_tree_restorer) { described_class.new(user: importer_user, shared: shared, group: group, group_hash: nil) }
+    let(:group_json) { ActiveSupport::JSON.decode(IO.read(File.join(shared.export_path, 'group.json'))) }
+
+    shared_examples 'excluded attributes' do
+      excluded_attributes = %w[
+        id
+        name
+        path
+        owner_id
+        parent_id
+        created_at
+        updated_at
+        runners_token
+        runners_token_encrypted
+        saml_discovery_token
+      ]
+
+      before do
+        group.add_owner(importer_user)
+
+        setup_import_export_config('group_exports/complex')
+      end
+
+      excluded_attributes.each do |excluded_attribute|
+        it 'does not allow override of excluded attributes' do
+          expect(group_json[excluded_attribute]).not_to eq(group.public_send(excluded_attribute))
+        end
+      end
+    end
+
+    include_examples 'excluded attributes'
+  end
+
   context 'group.json file access check' do
     let(:user) { create(:user) }
     let!(:group) { create(:group, name: 'group2', path: 'group2') }
@@ -86,5 +124,32 @@ describe Gitlab::ImportExport::GroupTreeRestorer do
         expect(shared.errors).to include('Incorrect JSON format')
       end
     end
+  end
+
+  context 'group visibility levels' do
+    let(:user) { create(:user) }
+    let(:shared) { Gitlab::ImportExport::Shared.new(group) }
+    let(:group_tree_restorer) { described_class.new(user: user, shared: shared, group: group, group_hash: nil) }
+
+    before do
+      setup_import_export_config(filepath)
+
+      group_tree_restorer.restore
+    end
+
+    shared_examples 'with visibility level' do |visibility_level, expected_visibilities|
+      context "when visibility level is #{visibility_level}" do
+        let(:group) { create(:group, visibility_level) }
+        let(:filepath) { "group_exports/visibility_levels/#{visibility_level}" }
+
+        it "imports all subgroups as #{visibility_level}" do
+          expect(group.children.map(&:visibility_level)).to eq(expected_visibilities)
+        end
+      end
+    end
+
+    include_examples 'with visibility level', :public, [20, 10, 0]
+    include_examples 'with visibility level', :private, [0, 0, 0]
+    include_examples 'with visibility level', :internal, [10, 10, 0]
   end
 end

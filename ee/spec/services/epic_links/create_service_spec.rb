@@ -55,15 +55,19 @@ describe EpicLinks::CreateService do
       described_class.new(epic, user, params).execute
     end
 
-    context 'when epics feature is disabled' do
+    context 'when subepics feature is disabled' do
+      before do
+        stub_licensed_features(epics: true, subepics: false)
+      end
+
       subject { add_epic([valid_reference]) }
 
       include_examples 'returns an error'
     end
 
-    context 'when epics feature is enabled' do
+    context 'when subepics feature is enabled' do
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
       end
 
       context 'when an error occurs' do

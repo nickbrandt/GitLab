@@ -62,9 +62,14 @@ describe('License Report MR Widget', () => {
     actions = defaultActions,
   } = {}) => {
     const store = new Vuex.Store({
-      state,
-      getters,
-      actions,
+      modules: {
+        licenseManagement: {
+          namespaced: true,
+          state,
+          getters,
+          actions,
+        },
+      },
     });
     return mountComponentWithStore(Component, { props, store });
   };

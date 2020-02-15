@@ -1,0 +1,56 @@
+- @content_class = "limit-container-width" unless fluid_layout
+- add_to_breadcrumbs _("Vulnerability List"), project_security_vulnerabilities_path(@project)
+- breadcrumb_title @vulnerability.id
+- page_title @vulnerability.title
+- page_description @vulnerability.description
+
+.detail-page-header
+  .detail-page-header-body
+    .issuable-status-box.status-box.status-box-open.closed
+      %span= @vulnerability.state
+    - if @pipeline
+      %span#js-pipeline-created
+        - timeago = time_ago_with_tooltip(@pipeline.created_at)
+        - pipeline_link = '<a href="%{url}">%{id}</a>'.html_safe % { url: pipeline_url(@pipeline), id: @pipeline.id }
+        = _('Detected %{timeago} in pipeline %{pipeline_link}').html_safe % { pipeline_link: pipeline_link, timeago: timeago }
+    - else
+      %span#js-vulnerability-created
+        = time_ago_with_tooltip(@vulnerability.created_at)
+
+.issue-details.issuable-details
+  .detail-page-description.content-block
+    %h2.title= @vulnerability.title
+    .description
+      .md
+        %h3= "Description"
+        %p= @vulnerability.finding.description
+        %ul
+          %li= _("Severity: %{severity}") % { severity: @vulnerability.severity }
+          %li= _("Confidence: %{confidence}") % { confidence: @vulnerability.confidence }
+          %li= _("Report Type: %{report_type}") % { report_type: @vulnerability.report_type }
+
+          - if @vulnerability.finding.location["image"]
+            %li= _("Image: %{image}") % { image: @vulnerability.finding.location['image'] }
+
+          - if @vulnerability.finding.location["operating_system"]
+            %li= _("Namespace: %{namespace}") % { namespace: @vulnerability.finding.location['operating_system'] }
+
+        - if @vulnerability.finding.links.any?
+          %h3= _("Links")
+          %ul
+            - @vulnerability.finding.links.each do |link|
+              %li
+                %a{ :href=>link["url"], target: "_blank", rel: 'noopener noreferrer' }= link["url"]
+
+        - if @vulnerability.finding.identifiers.any?
+          %h3= _("Identifiers")
+          %ul
+            - @vulnerability.finding.identifiers.each do |identifier|
+              %li
+                %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
+        - if @vulnerability.finding.solution || @vulnerability.finding.remediations
+          #js-vulnerability-solution{ data: { vulnerability_state: @vulnerability.state,
+            solution: @vulnerability.finding.solution,
+            remediation: @vulnerability.finding.remediations&.first.to_json,
+            has_mr: !!@vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
+            vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities") } }

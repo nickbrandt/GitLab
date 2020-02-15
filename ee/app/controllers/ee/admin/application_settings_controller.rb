@@ -50,6 +50,10 @@ module EE
           attrs << :updating_name_disabled_for_users
         end
 
+        if License.feature_available?(:admin_merge_request_approvers_rules)
+          attrs += EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes
+        end
+
         attrs
       end
 

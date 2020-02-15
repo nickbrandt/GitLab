@@ -346,6 +346,9 @@ ActiveRecord::Schema.define(version: 2020_02_13_204737) do
     t.integer "elasticsearch_indexed_field_length_limit", default: 0, null: false
     t.integer "elasticsearch_max_bulk_size_mb", limit: 2, default: 10, null: false
     t.integer "elasticsearch_max_bulk_concurrency", limit: 2, default: 10, null: false
+    t.boolean "disable_overriding_approvers_per_merge_request", default: false, null: false
+    t.boolean "prevent_merge_requests_author_approval", default: false, null: false
+    t.boolean "prevent_merge_requests_committers_approval", default: false, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -4353,8 +4356,11 @@ ActiveRecord::Schema.define(version: 2020_02_13_204737) do
     t.datetime_with_timezone "resolved_at"
     t.integer "report_type", limit: 2, null: false
     t.integer "cached_markdown_version"
+    t.bigint "confirmed_by_id"
+    t.datetime_with_timezone "confirmed_at"
     t.index ["author_id"], name: "index_vulnerabilities_on_author_id"
     t.index ["closed_by_id"], name: "index_vulnerabilities_on_closed_by_id"
+    t.index ["confirmed_by_id"], name: "index_vulnerabilities_on_confirmed_by_id"
     t.index ["due_date_sourcing_milestone_id"], name: "index_vulnerabilities_on_due_date_sourcing_milestone_id"
     t.index ["epic_id"], name: "index_vulnerabilities_on_epic_id"
     t.index ["last_edited_by_id"], name: "index_vulnerabilities_on_last_edited_by_id"
@@ -5011,6 +5017,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_204737) do
   add_foreign_key "vulnerabilities", "projects", name: "fk_efb96ab1e2", on_delete: :cascade
   add_foreign_key "vulnerabilities", "users", column: "author_id", name: "fk_b1de915a15", on_delete: :nullify
   add_foreign_key "vulnerabilities", "users", column: "closed_by_id", name: "fk_cf5c60acbf", on_delete: :nullify
+  add_foreign_key "vulnerabilities", "users", column: "confirmed_by_id", name: "fk_959d40ad0a", on_delete: :nullify
   add_foreign_key "vulnerabilities", "users", column: "last_edited_by_id", name: "fk_1302949740", on_delete: :nullify
   add_foreign_key "vulnerabilities", "users", column: "resolved_by_id", name: "fk_76bc5f5455", on_delete: :nullify
   add_foreign_key "vulnerabilities", "users", column: "updated_by_id", name: "fk_7ac31eacb9", on_delete: :nullify

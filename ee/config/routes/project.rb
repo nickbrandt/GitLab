@@ -78,7 +78,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :summary, on: :collection
           end
 
-          resources :dashboard, only: [:show, :index], controller: :dashboard
+          resources :dashboard, only: [:index], controller: :dashboard
           resource :configuration, only: [:show], controller: :configuration
           resource :discover, only: [:show], controller: :discover
 
@@ -88,7 +88,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
 
-          resources :vulnerabilities, only: [:index]
+          resources :vulnerabilities, only: [:show, :index]
         end
 
         namespace :analytics do

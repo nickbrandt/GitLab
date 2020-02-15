@@ -9,6 +9,7 @@ module EE
       with_scope :subject
       condition(:ldap_synced) { @subject.ldap_synced? }
       condition(:epics_available) { @subject.feature_available?(:epics) }
+      condition(:subepics_available) { @subject.feature_available?(:subepics) }
       condition(:contribution_analytics_available) do
         @subject.feature_available?(:contribution_analytics)
       end
@@ -93,6 +94,10 @@ module EE
         enable :create_epic
         enable :admin_epic
         enable :update_epic
+      end
+
+      rule { reporter & subepics_available }.policy do
+        enable :admin_epic_link
       end
 
       rule { owner & epics_available }.enable :destroy_epic

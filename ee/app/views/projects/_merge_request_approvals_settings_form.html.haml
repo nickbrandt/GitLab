@@ -1,9 +1,13 @@
 - can_override_approvers = project.can_override_approvers?
+- can_modify_approvers = can?(current_user, :modify_approvers_rules, @project)
+- can_modify_merge_request_author_settings = can?(current_user, :modify_merge_request_author_setting, @project)
+- can_modify_merge_request_committer_settings = can?(current_user, :modify_merge_request_committer_setting, @project)
 
 .form-group
   = form.label :approver_ids, class: 'label-bold' do
     = _("Approval rules")
   #js-mr-approvals-settings{ data: { 'project_id': @project.id,
+    'can_edit': can_modify_approvers.to_s,
     'project_path': expose_path(api_v4_projects_path(id: @project.id)),
     'settings_path': expose_path(api_v4_projects_approval_settings_path(id: @project.id)),
     'rules_path': expose_path(api_v4_projects_approval_settings_rules_path(id: @project.id)),
@@ -26,7 +30,7 @@
 
 .form-group
   .form-check
-    = form.check_box(:disable_overriding_approvers_per_merge_request, { checked: can_override_approvers, class: 'form-check-input' }, false, true)
+    = form.check_box(:disable_overriding_approvers_per_merge_request, { checked: can_override_approvers, class: 'form-check-input', disabled: !can_modify_approvers }, false, true)
     = form.label :disable_overriding_approvers_per_merge_request, class: 'form-check-label' do
       %span= _('Can override approvers and approvals required per merge request')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals', anchor: 'prevent-overriding-default-approvals'), target: '_blank'
@@ -39,7 +43,7 @@
 
 .form-group.self-approval
   .form-check
-    = form.check_box :merge_requests_author_approval, { class: 'form-check-input', checked: !project.merge_requests_author_approval? }, false, true
+    = form.check_box :merge_requests_author_approval, { class: 'form-check-input', checked: !project.merge_requests_author_approval?, disabled: !can_modify_merge_request_author_settings }, false, true
     = form.label :merge_requests_author_approval, class: 'form-check-label' do
       %span= _('Prevent approval of merge requests by merge request author')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals',
@@ -47,7 +51,7 @@
 
 .form-group.committers-approval
   .form-check
-    = form.check_box :merge_requests_disable_committers_approval, class: 'form-check-input'
+    = form.check_box :merge_requests_disable_committers_approval, { disabled: !can_modify_merge_request_committer_settings, class: 'form-check-input' }
     = form.label :merge_requests_disable_committers_approval, class: 'form-check-label' do
       %span= _('Prevent approval of merge requests by merge request committers')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals',
