@@ -275,11 +275,6 @@ module EE
       @project.feature_available?(:tracing, current_user) && can?(current_user, :read_environment, @project)
     end
 
-    def project_incident_management_setting
-      @project_incident_management_setting ||= @project.incident_management_setting ||
-        @project.build_incident_management_setting
-    end
-
     override :can_import_members?
     def can_import_members?
       super && !membership_locked?
