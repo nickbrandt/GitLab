@@ -16,7 +16,7 @@ module EE
                 %r{
                   /clusters
                   /(?<cluster_id>\d+)
-                  [/]?
+                  /?
                 }x
               )
             end
