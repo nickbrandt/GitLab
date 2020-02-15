@@ -135,7 +135,6 @@ module EE
                                          epics: count(::Epic),
                                          feature_flags: count(Operations::FeatureFlag),
                                          geo_nodes: count(::GeoNode),
-                                         incident_issues: count_incident_issues,
                                          ldap_group_links: count(::LdapGroupLink),
                                          ldap_keys: count(::LDAPKey),
                                          ldap_users: count(::User.ldap),
@@ -146,7 +145,6 @@ module EE
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting),
-                                         projects_with_alerts_service_enabled: count(AlertsService.active),
                                          template_repositories:  count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
                                        },
                                        service_desk_counts,
@@ -166,12 +164,6 @@ module EE
 
         def epics_deepest_relationship_level
           { epics_deepest_relationship_level: ::Epic.deepest_relationship_level.to_i }
-        end
-
-        def count_incident_issues
-          return 0 unless License.feature_available?(:incident_management)
-
-          count(::Issue.authored(::User.alert_bot))
         end
 
         # Source: https://gitlab.com/gitlab-data/analytics/blob/master/transform/snowflake-dbt/data/ping_metrics_to_stage_mapping_data.csv
