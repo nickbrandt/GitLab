@@ -15974,7 +15974,7 @@ msgstr ""
 msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed."
 msgstr ""
 
-msgid "Removing group will also remove all child projects, including archived projects, and their resources."
+msgid "Removing this group will also remove all child projects, including archived projects, and their resources."
 msgstr ""
 
 msgid "Removing license…"
