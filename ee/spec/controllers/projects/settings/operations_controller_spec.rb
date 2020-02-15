@@ -96,14 +96,6 @@ describe Projects::Settings::OperationsController do
     let(:private_project) { create(:project, :private) }
     let(:internal_project) { create(:project, :internal) }
 
-    let(:incident_management_settings) do
-      {
-        create_issue: true,
-        send_email: true,
-        issue_template_key: 'some-key'
-      }
-    end
-
     before do
       public_project.add_maintainer(user)
       private_project.add_maintainer(user)
@@ -124,47 +116,6 @@ describe Projects::Settings::OperationsController do
         )
 
         expect(project.tracing_setting).to be_nil
-      end
-
-      it 'does not create incident_management_setting' do
-        update_project(
-          project,
-          incident_management_params: incident_management_settings
-        )
-
-        expect(project.incident_management_setting).to be_nil
-      end
-
-      context 'with existing incident_management_setting' do
-        let(:new_incident_management_settings) do
-          {
-            create_issue: false,
-            send_email: false,
-            issue_template_key: 'some-other-template'
-          }
-        end
-
-        let!(:incident_management_setting) do
-          create(:project_incident_management_setting,
-            project: project,
-            **incident_management_settings)
-        end
-
-        it 'does not update incident_management_setting' do
-          update_project(project,
-            incident_management_params: new_incident_management_settings)
-
-          setting = project.incident_management_setting
-          expect(setting.create_issue).to(
-            eq(incident_management_settings[:create_issue])
-          )
-          expect(setting.send_email).to(
-            eq(incident_management_settings[:send_email])
-          )
-          expect(setting.issue_template_key).to(
-            eq(incident_management_settings[:issue_template_key])
-          )
-        end
       end
     end
 
@@ -225,42 +176,6 @@ describe Projects::Settings::OperationsController do
           )
 
           expect(project.tracing_setting.external_url).to eq(tracing_url)
-        end
-
-        it 'creates incident management settings' do
-          update_project(
-            project,
-            incident_management_params: incident_management_settings
-          )
-
-          expect(project.incident_management_setting.create_issue).to(
-            eq(incident_management_settings.dig(:create_issue))
-          )
-          expect(project.incident_management_setting.send_email).to(
-            eq(incident_management_settings.dig(:send_email))
-          )
-          expect(project.incident_management_setting.issue_template_key).to(
-            eq(incident_management_settings.dig(:issue_template_key))
-          )
-        end
-
-        it 'creates tracing and incident management settings' do
-          update_project(
-            project,
-            tracing_params: { external_url: tracing_url },
-            incident_management_params: incident_management_settings
-          )
-
-          expect(project.tracing_setting.external_url).to eq(tracing_url)
-          expect(project.incident_management_setting.create_issue).to(
-            eq(incident_management_settings.dig(:create_issue))
-          )
-          expect(project.incident_management_setting.send_email).to(
-            eq(incident_management_settings.dig(:send_email))
-          )
-          expect(project.incident_management_setting.issue_template_key).to(
-            eq(incident_management_settings.dig(:issue_template_key))
-          )
         end
       end
 
@@ -341,72 +256,6 @@ describe Projects::Settings::OperationsController do
 
           expect(project.tracing_setting).to be_nil
         end
-      end
-
-      context 'with existing incident management setting' do
-        let(:project) { create(:project) }
-
-        let(:new_incident_management_settings) do
-          {
-            create_issue: false,
-            send_email: false,
-            issue_template_key: 'some-other-template'
-          }
-        end
-
-        let!(:incident_management_setting) do
-          create(:project_incident_management_setting,
-            project: project,
-            **incident_management_settings)
-        end
-
-        before do
-          project.add_maintainer(user)
-        end
-
-        it 'updates incident management setting' do
-          update_project(project,
-            incident_management_params: new_incident_management_settings)
-
-          setting = project.incident_management_setting
-          expect(setting.create_issue).to(
-            eq(new_incident_management_settings[:create_issue])
-          )
-          expect(setting.send_email).to(
-            eq(new_incident_management_settings[:send_email])
-          )
-          expect(setting.issue_template_key).to(
-            eq(new_incident_management_settings[:issue_template_key])
-          )
-        end
-      end
-
-      context 'updating each incident management setting' do
-        let(:project) { create(:project) }
-        let(:new_incident_management_settings) { {} }
-
-        before do
-          project.add_maintainer(user)
-        end
-
-        shared_examples 'a gitlab tracking event' do |params, event_key|
-          it "creates a gitlab tracking event #{event_key}" do
-            new_incident_management_settings = params
-
-            expect(Gitlab::Tracking).to receive(:event)
-              .with('IncidentManagement::Settings', event_key, kind_of(Hash))
-
-            update_project(project,
-              incident_management_params: new_incident_management_settings)
-          end
-        end
-
-        it_behaves_like 'a gitlab tracking event', { create_issue: '1' }, 'enabled_issue_auto_creation_on_alerts'
-        it_behaves_like 'a gitlab tracking event', { create_issue: '0' }, 'disabled_issue_auto_creation_on_alerts'
-        it_behaves_like 'a gitlab tracking event', { issue_template_key: 'template' }, 'enabled_issue_template_on_alerts'
-        it_behaves_like 'a gitlab tracking event', { issue_template_key: nil }, 'disabled_issue_template_on_alerts'
-        it_behaves_like 'a gitlab tracking event', { send_email: '1' }, 'enabled_sending_emails'
-        it_behaves_like 'a gitlab tracking event', { send_email: '0' }, 'disabled_sending_emails'
       end
 
       context 'updating tracing settings' do
