@@ -105,6 +105,12 @@ describe Projects::Security::VulnerabilitiesController do
 
         expect(response.body).to have_css("#js-pipeline-created")
       end
+
+      it 'renders the solution card' do
+        show_vulnerability
+
+        expect(response.body).to have_css("#js-vulnerability-solution")
+      end
     end
 
     context "when there's no attached pipeline" do
@@ -114,6 +120,12 @@ describe Projects::Security::VulnerabilitiesController do
         show_vulnerability
 
         expect(response.body).to have_css("#js-vulnerability-created")
+      end
+
+      it 'renders the solution card' do
+        show_vulnerability
+
+        expect(response.body).to have_css("#js-vulnerability-solution")
       end
     end
 
