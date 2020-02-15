@@ -48,3 +48,9 @@
             - @vulnerability.finding.identifiers.each do |identifier|
               %li
                 %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
+        - if @vulnerability.finding.solution || @vulnerability.finding.remediations
+          #js-vulnerability-solution{ data: { vulnerability_state: @vulnerability.state,
+            solution: @vulnerability.finding.solution,
+            remediation: @vulnerability.finding.remediations&.first.to_json,
+            has_mr: !!@vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
+            vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities") } }
