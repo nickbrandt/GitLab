@@ -13,9 +13,7 @@ const handleOnDismiss = ({ currentTarget }) => {
 };
 
 export default () => {
-  const dismissButton = document.querySelector('.js-dismiss-current-broadcast-notification');
-
-  if (dismissButton) {
-    dismissButton.addEventListener('click', handleOnDismiss);
-  }
+  document
+    .querySelectorAll('.js-dismiss-current-broadcast-notification')
+    .forEach(dismissButton => dismissButton.addEventListener('click', handleOnDismiss));
 };

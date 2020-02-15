@@ -117,7 +117,7 @@ describe API::BroadcastMessages do
 
         post api('/broadcast_messages', admin), params: attrs
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['dismissable']).to eq true
       end
     end
@@ -202,7 +202,7 @@ describe API::BroadcastMessages do
 
         put api("/broadcast_messages/#{message.id}", admin), params: attrs
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['dismissable']).to eq true
       end
     end

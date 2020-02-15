@@ -6,7 +6,7 @@ describe 'Broadcast Messages' do
   shared_examples 'a Broadcast Messages' do
     it 'shows broadcast message' do
       visit root_path
-  
+
       expect(page).to have_content 'SampleMessage'
     end
   end
@@ -14,18 +14,18 @@ describe 'Broadcast Messages' do
   shared_examples 'a dismissable Broadcast Messages' do
     it 'hides broadcast message after dismiss', :js do
       visit root_path
-  
+
       find('.js-dismiss-current-broadcast-notification').click
-  
+
       expect(page).not_to have_content 'SampleMessage'
     end
-  
+
     it 'broadcast message is still hidden after refresh', :js do
       visit root_path
-  
+
       find('.js-dismiss-current-broadcast-notification').click
       visit root_path
-  
+
       expect(page).not_to have_content 'SampleMessage'
     end
   end

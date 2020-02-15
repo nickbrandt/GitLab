@@ -29,6 +29,10 @@ describe BroadcastMessagesHelper do
   describe 'broadcast_message' do
     let(:current_broadcast_message) { BroadcastMessage.new(message: 'Current Message') }
 
+    before do
+      allow(helper).to receive(:current_user).and_return(create(:user))
+    end
+
     it 'returns nil when no current message' do
       expect(helper.broadcast_message(nil)).to be_nil
     end
