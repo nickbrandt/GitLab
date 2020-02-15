@@ -18,6 +18,7 @@ describe 'Admin Broadcast Messages' do
     fill_in 'broadcast_message_color', with: '#f2dede'
     fill_in 'broadcast_message_target_path', with: '*/user_onboarded'
     fill_in 'broadcast_message_font', with: '#b94a48'
+    check 'broadcast_message_dismissable'
     select Date.today.next_year.year, from: 'broadcast_message_ends_at_1i'
     click_button 'Add broadcast message'
 
@@ -26,6 +27,7 @@ describe 'Admin Broadcast Messages' do
     expect(page).to have_content '*/user_onboarded'
     expect(page).to have_selector 'strong', text: '4:00 CST to 5:00 CST'
     expect(page).to have_selector %(div[style="background-color: #f2dede; color: #b94a48"])
+    expect(page).to have_selector 'a', text: 'Dismiss'
   end
 
   it 'creates a customized broadcast notification message' do

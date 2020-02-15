@@ -14,7 +14,7 @@ describe BroadcastMessagesHelper do
 
       context 'when last broadcast message is hidden' do
         before do
-          helper.request.cookies["hide_broadcast_notification_message_#{broadcast_message_2.id}"] = 'true'
+          helper.request.cookies["hide_broadcast_message_#{broadcast_message_2.id}"] = 'true'
         end
 
         it { is_expected.to eq broadcast_message_1 }

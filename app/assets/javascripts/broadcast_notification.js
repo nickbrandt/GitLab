@@ -6,7 +6,7 @@ const handleOnDismiss = ({ currentTarget }) => {
     dataset: { id },
   } = currentTarget;
 
-  Cookies.set(`hide_broadcast_notification_message_${id}`, true);
+  Cookies.set(`hide_broadcast_message_${id}`, true);
 
   const notification = document.querySelector(`.js-broadcast-notification-${id}`);
   notification.parentNode.removeChild(notification);
