@@ -241,25 +241,16 @@ describe('RelatedItemsTreeApp', () => {
       });
     });
 
-    it('does not render issue actions split button', () => {
-      expect(findIssueActionsSplitButton().exists()).toBe(false);
-    });
-
     it('does not render create issue form', () => {
       expect(findCreateIssueForm().exists()).toBe(false);
     });
   });
 
-  describe('with epicNewIssue feature flag enabled', () => {
+  describe('issue actions split button', () => {
     beforeEach(() => {
-      window.gon.features = { epicNewIssue: true };
       wrapper = createComponent();
       wrapper.vm.$store.state.itemsFetchInProgress = false;
       return wrapper.vm.$nextTick();
-    });
-
-    afterEach(() => {
-      window.gon.features = {};
     });
 
     it('renders issue actions split button', () => {
