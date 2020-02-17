@@ -4,9 +4,8 @@
 #
 class SyncSecurityReportsToReportApprovalRulesWorker
   include ApplicationWorker
-  include PipelineQueue
+  include SecurityScansQueue
 
-  feature_category :static_application_security_testing
   latency_sensitive_worker!
   worker_resource_boundary :cpu
 

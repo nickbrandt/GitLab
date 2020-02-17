@@ -2,9 +2,7 @@
 
 class StoreSecurityScansWorker
   include ApplicationWorker
-
-  queue_namespace :security_scans
-  feature_category :static_application_security_testing
+  include SecurityScansQueue
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(build_id)

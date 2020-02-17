@@ -4,7 +4,7 @@
 #
 class StoreSecurityReportsWorker
   include ApplicationWorker
-  include PipelineQueue
+  include SecurityScansQueue
 
   def perform(pipeline_id)
     Ci::Pipeline.find(pipeline_id).try do |pipeline|
