@@ -1,0 +1,5 @@
+---
+title: Fix orphan issues that were promoted to epics
+merge_request: 23916
+author:
+type: fixed
