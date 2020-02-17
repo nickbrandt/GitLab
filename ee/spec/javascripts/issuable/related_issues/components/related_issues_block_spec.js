@@ -28,6 +28,10 @@ describe('RelatedIssuesBlock', () => {
       });
     });
 
+    it('displays "Linked issues" in the header', () => {
+      expect(wrapper.find('h3').text()).toContain('Linked issues');
+    });
+
     it('unable to add new related issues', () => {
       expect(wrapper.vm.$refs.issueCountBadgeAddButton).toBeUndefined();
     });
@@ -86,18 +90,40 @@ describe('RelatedIssuesBlock', () => {
   });
 
   describe('with relatedIssues', () => {
+    let categorizedHeadings;
+
     beforeEach(() => {
       wrapper = mount(RelatedIssuesBlock, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
-          relatedIssues: [issuable1, issuable2],
+          relatedIssues: [issuable1, issuable2, issuable3],
           issuableType: 'issue',
         },
       });
+
+      categorizedHeadings = wrapper.findAll('h4');
     });
 
     it('should render issue tokens items', () => {
-      expect(wrapper.findAll('.js-related-issues-token-list-item').length).toEqual(2);
+      expect(wrapper.findAll('.js-related-issues-token-list-item').length).toEqual(3);
+    });
+
+    it('shows "Blocks" heading', () => {
+      const blocks = linkedIssueTypesTextMap[linkedIssueTypesMap.BLOCKS];
+
+      expect(categorizedHeadings.at(0).text()).toBe(blocks);
+    });
+
+    it('shows "Is blocked by" heading', () => {
+      const isBlockedBy = linkedIssueTypesTextMap[linkedIssueTypesMap.IS_BLOCKED_BY];
+
+      expect(categorizedHeadings.at(1).text()).toBe(isBlockedBy);
+    });
+
+    it('shows "Relates to" heading', () => {
+      const relatesTo = linkedIssueTypesTextMap[linkedIssueTypesMap.RELATES_TO];
+
+      expect(categorizedHeadings.at(2).text()).toBe(relatesTo);
     });
   });
 
@@ -121,53 +147,6 @@ describe('RelatedIssuesBlock', () => {
         });
 
         expect(wrapper.contains(`.issue-count-badge-count .ic-${icon}`)).toBe(true);
-      });
-    });
-  });
-
-  describe('with :issue_link_types feature flag on', () => {
-    beforeEach(() => {
-      wrapper = mount(RelatedIssuesBlock, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          relatedIssues: [issuable1, issuable2, issuable3],
-          issuableType: 'issue',
-        },
-        provide: {
-          glFeatures: {
-            issueLinkTypes: true,
-          },
-        },
-      });
-    });
-
-    it('displays "Linked issues" in the header', () => {
-      expect(wrapper.find('h3').text()).toContain('Linked issues');
-    });
-
-    describe('categorized headings', () => {
-      let categorizedHeadings;
-
-      beforeEach(() => {
-        categorizedHeadings = wrapper.findAll('h4');
-      });
-
-      it('shows "Blocks" heading', () => {
-        const blocks = linkedIssueTypesTextMap[linkedIssueTypesMap.BLOCKS];
-
-        expect(categorizedHeadings.at(0).text()).toBe(blocks);
-      });
-
-      it('shows "Is blocked by" heading', () => {
-        const isBlockedBy = linkedIssueTypesTextMap[linkedIssueTypesMap.IS_BLOCKED_BY];
-
-        expect(categorizedHeadings.at(1).text()).toBe(isBlockedBy);
-      });
-
-      it('shows "Relates to" heading', () => {
-        const relatesTo = linkedIssueTypesTextMap[linkedIssueTypesMap.RELATES_TO];
-
-        expect(categorizedHeadings.at(2).text()).toBe(relatesTo);
       });
     });
   });

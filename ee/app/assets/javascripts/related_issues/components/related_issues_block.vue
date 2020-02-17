@@ -1,7 +1,5 @@
 <script>
-import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AddIssuableForm from './add_issuable_form.vue';
 import RelatedIssuesList from './related_issues_list.vue';
 import {
@@ -18,7 +16,6 @@ export default {
     AddIssuableForm,
     RelatedIssuesList,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     isFetching: {
       type: Boolean,
@@ -84,20 +81,12 @@ export default {
       return this.relatedIssues.length > 0;
     },
     categorisedIssues() {
-      if (this.glFeatures.issueLinkTypes) {
-        return Object.values(linkedIssueTypesMap)
-          .map(linkType => ({
-            linkType,
-            issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
-          }))
-          .filter(obj => obj.issues.length > 0);
-      }
-      return [
-        {
-          linkType: linkedIssueTypesMap.RELATES_TO,
-          issues: this.relatedIssues,
-        },
-      ];
+      return Object.values(linkedIssueTypesMap)
+        .map(linkType => ({
+          linkType,
+          issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
+        }))
+        .filter(obj => obj.issues.length > 0);
     },
     shouldShowTokenBody() {
       return this.hasRelatedIssues || this.isFetching;
@@ -117,32 +106,9 @@ export default {
     qaClass() {
       return issuableQaClassMap[this.issuableType];
     },
-    cardBodyCssClass() {
-      return this.glFeatures.issueLinkTypes
-        ? {
-            'linked-issues-card-body': true,
-            'bg-gray-light': true,
-            'gl-p-3': this.isFormVisible || this.shouldShowTokenBody,
-          }
-        : {};
-    },
-    formCssClass() {
-      if (this.glFeatures.issueLinkTypes) {
-        return ['bordered-box', 'bg-white'];
-      }
-      if (this.hasRelatedIssues) {
-        return [
-          'border-bottom-width-1px',
-          'border-bottom-style-solid',
-          'border-bottom-color-default',
-        ];
-      }
-      return [];
-    },
   },
   created() {
     this.linkedIssueTypesTextMap = linkedIssueTypesTextMap;
-    this.title = this.glFeatures.issueLinkTypes ? __('Linked issues') : __('Related issues');
   },
 };
 </script>
@@ -152,7 +118,7 @@ export default {
     <div class="card card-slim">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
         <h3 class="card-title mt-0 mb-0 h5">
-          {{ title }}
+          {{ __('Linked issues') }}
           <a v-if="hasHelpPath" :href="helpPath">
             <i
               class="related-issues-header-help-icon fa fa-question-circle"
@@ -184,11 +150,13 @@ export default {
           </div>
         </h3>
       </div>
-      <div :class="cardBodyCssClass">
+      <div
+        class="linked-issues-card-body bg-gray-light"
+        :class="{ 'gl-p-3': isFormVisible || shouldShowTokenBody }"
+      >
         <div
           v-if="isFormVisible"
-          class="js-add-related-issues-form-area card-body"
-          :class="formCssClass"
+          class="js-add-related-issues-form-area card-body bordered-box bg-white"
         >
           <add-issuable-form
             :is-submitting="isSubmitting"

@@ -17,13 +17,20 @@ describe('RelatedIssuesList', () => {
   });
 
   describe('with defaults', () => {
+    const heading = 'Related to';
+
     beforeEach(() => {
       wrapper = mount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
+          heading,
         },
       });
+    });
+
+    it('shows a heading', () => {
+      expect(wrapper.find('h4').text()).toContain(heading);
     });
 
     it('should not show loading icon', () => {
@@ -156,27 +163,6 @@ describe('RelatedIssuesList', () => {
       Array.from(listItems).forEach((item, index) => {
         expect(Number(item.dataset.orderingId)).toBe(relatedIssues[index].epicIssueId);
       });
-    });
-  });
-
-  describe('with :issue_link_types feature flag on', () => {
-    it('shows a heading', () => {
-      const heading = 'Related';
-
-      wrapper = mount(RelatedIssuesList, {
-        propsData: {
-          pathIdSeparator: PathIdSeparator.Issue,
-          issuableType: 'issue',
-          heading,
-        },
-        provide: {
-          glFeatures: {
-            issueLinkTypes: true,
-          },
-        },
-      });
-
-      expect(wrapper.find('h4').text()).toContain(heading);
     });
   });
 });
