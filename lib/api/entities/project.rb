@@ -130,3 +130,5 @@ module API
     end
   end
 end
+
+API::Entities::Project.prepend_if_ee('EE::API::Entities::Project', with_descendants: true)
