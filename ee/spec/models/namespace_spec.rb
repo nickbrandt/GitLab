@@ -843,27 +843,158 @@ describe Namespace do
     context 'with a group namespace' do
       let(:group) { create(:group) }
       let(:developer) { create(:user) }
-      let(:guest) { create(:user) }
 
       before do
         group.add_developer(developer)
-        group.add_guest(guest)
+        group.add_developer(create(:user, :blocked))
+        group.add_guest(create(:user))
       end
 
       context 'with a gold plan' do
-        it 'does not count guest users' do
+        before do
           create(:gitlab_subscription, namespace: group, hosted_plan: gold_plan)
+        end
 
+        it 'does not count guest users and counts only active users' do
           expect(group.billable_members_count).to eq(1)
+        end
+
+        context 'when group has a project and users invited to it' do
+          let(:project) { create(:project, namespace: group) }
+
+          before do
+            project.add_developer(create(:user))
+            project.add_guest(create(:user))
+            project.add_developer(developer)
+            project.add_developer(create(:user, :blocked))
+          end
+
+          it 'includes invited active users except guests to the group' do
+            expect(group.billable_members_count).to eq(2)
+          end
+
+          context 'when group is invited to the project' do
+            let(:invited_group) { create(:group) }
+
+            before do
+              invited_group.add_developer(create(:user))
+              invited_group.add_guest(create(:user))
+              invited_group.add_developer(create(:user, :blocked))
+              invited_group.add_developer(developer)
+              create(:project_group_link, project: project, group: invited_group)
+            end
+
+            it 'counts the only active users except guests of the invited groups' do
+              expect(group.billable_members_count).to eq(3)
+            end
+          end
+        end
+
+        context 'when group has been shared with another group' do
+          let(:shared_group) { create(:group) }
+
+          before do
+            shared_group.add_developer(create(:user))
+            shared_group.add_guest(create(:user))
+            shared_group.add_developer(create(:user, :blocked))
+
+            create(:group_group_link, { shared_with_group: group,
+              shared_group: shared_group })
+          end
+
+          context 'when feature is not enabled' do
+            before do
+              stub_feature_flags(share_group_with_group: false)
+            end
+
+            it 'does not include users coming from the shared groups' do
+              expect(group.billable_members_count).to eq(1)
+            end
+          end
+
+          context 'when feature is enabled' do
+            before do
+              stub_feature_flags(share_group_with_group: true)
+            end
+
+            it 'includes active users from the shared group to the billed members count' do
+              expect(group.billable_members_count).to eq(2)
+            end
+          end
         end
       end
 
       context 'with other plans' do
         %i[bronze_plan silver_plan].each do |plan|
-          it 'counts guest users' do
+          it 'counts active guest users' do
             create(:gitlab_subscription, namespace: group, hosted_plan: send(plan))
-
             expect(group.billable_members_count).to eq(2)
+          end
+
+          context 'when group has a project and users invited to it' do
+            let(:project) { create(:project, namespace: group) }
+
+            before do
+              create(:gitlab_subscription, namespace: group, hosted_plan: send(plan))
+              project.add_developer(create(:user))
+              project.add_guest(create(:user))
+              project.add_developer(create(:user, :blocked))
+              project.add_developer(developer)
+            end
+
+            it 'includes invited active users to the group' do
+              expect(group.billable_members_count).to eq(4)
+            end
+
+            context 'when group is invited to the project' do
+              let(:invited_group) { create(:group) }
+
+              before do
+                invited_group.add_developer(create(:user))
+                invited_group.add_developer(developer)
+                invited_group.add_guest(create(:user))
+                invited_group.add_developer(create(:user, :blocked))
+                create(:project_group_link, project: project, group: invited_group)
+              end
+
+              it 'counts the unique active users including guests of the invited groups' do
+                expect(group.billable_members_count).to eq(6)
+              end
+            end
+          end
+
+          context 'when group has been shared with another group' do
+            let(:shared_group) { create(:group) }
+
+            before do
+              create(:gitlab_subscription, namespace: group, hosted_plan: send(plan))
+              shared_group.add_developer(create(:user))
+              shared_group.add_guest(create(:user))
+              shared_group.add_developer(create(:user, :blocked))
+
+              create(:group_group_link, { shared_with_group: group,
+                shared_group: shared_group })
+            end
+
+            context 'when feature is not enabled' do
+              before do
+                stub_feature_flags(share_group_with_group: false)
+              end
+
+              it 'does not include users coming from the shared groups' do
+                expect(group.billable_members_count).to eq(2)
+              end
+            end
+
+            context 'when feature is enabled' do
+              before do
+                stub_feature_flags(share_group_with_group: true)
+              end
+
+              it 'includes active users from the shared group including guests to the billed members count' do
+                expect(group.billable_members_count).to eq(4)
+              end
+            end
           end
         end
       end

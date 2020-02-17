@@ -1,0 +1,5 @@
+---
+title: Include users from all sub-projects and shared groups when counting billing seats currently in use
+merge_request: 22967
+author:
+type: fixed
