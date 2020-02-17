@@ -1281,6 +1281,9 @@ msgstr ""
 msgid "Admin notes"
 msgstr ""
 
+msgid "AdminArea|Bots"
+msgstr ""
+
 msgid "AdminArea|Included Free in license"
 msgstr ""
 

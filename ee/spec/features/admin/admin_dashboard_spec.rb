@@ -17,6 +17,9 @@ describe 'Admin Dashboard' do
       project1.add_reporter(user)
       project2.add_developer(user)
 
+      create(:user, bot_type: :support_bot)
+      create(:user, bot_type: :alert_bot)
+
       sign_in(create(:admin))
     end
 
@@ -63,11 +66,12 @@ describe 'Admin Dashboard' do
         end
       end
 
-      it 'show correct amount of users per role' do
+      it 'shows correct amounts of users per role', :aggregate_failures do
         visit admin_dashboard_stats_path
 
         expect(page).to have_content('Users with highest role developer 2')
         expect(page).to have_content('Users with highest role reporter 1')
+        expect(page).to have_content('Bots 2')
       end
     end
   end
