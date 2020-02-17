@@ -2093,6 +2093,9 @@ msgstr ""
 msgid "An error ocurred while loading your content. Please try again."
 msgstr ""
 
+msgid "An example project for managing Kubernetes clusters integrated with GitLab."
+msgstr ""
+
 msgid "An instance-level serverless domain already exists."
 msgstr ""
 
@@ -15884,6 +15887,9 @@ msgid "ProjectTemplates|.NET Core"
 msgstr ""
 
 msgid "ProjectTemplates|Android"
+msgstr ""
+
+msgid "ProjectTemplates|GitLab Cluster Management"
 msgstr ""
 
 msgid "ProjectTemplates|Go Micro"
