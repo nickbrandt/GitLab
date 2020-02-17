@@ -125,9 +125,8 @@ module Backup
       end
     end
 
+    # rubocop: disable Cop/AvoidReturnFromBlocks
     def unpack
-      cleanup_required = true
-
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
@@ -153,9 +152,8 @@ module Backup
           progress.puts 'Please specify which one you want to restore:'
           progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
           exit 1
-        else
-          tar_file = backup_file_list.first
         end
+        tar_file = backup_file_list.first
 
         progress.print 'Unpacking backup ... '
 
@@ -168,6 +166,7 @@ module Backup
       end
       true
     end
+    # rubocop: enable Cop/AvoidReturnFromBlocks
 
     def tar_version
       tar_version, _ = Gitlab::Popen.popen(%w(tar --version))
