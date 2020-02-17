@@ -5,9 +5,9 @@ module EE
     module IssuesController
       extend ::Gitlab::Utils::Override
 
-      override :associations_to_preload
-      def associations_to_preload
-        super << { blocked_by_issues: { project: :project_feature } }
+      override :serializer_options
+      def serializer_options(issues)
+        super.merge(blocked_issue_ids: ::IssueLink.blocked_issue_ids(issues.map(&:id)))
       end
     end
   end

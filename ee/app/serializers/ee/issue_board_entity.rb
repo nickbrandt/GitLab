@@ -6,8 +6,8 @@ module EE
 
     prepended do
       expose :weight, if: ->(issue, _) { issue.supports_weight? }
-      expose :blocked do |issue|
-        issue.blocked_by_issues.any? { |blocked_by_issue| can?(request.current_user, :read_issue, blocked_by_issue) }
+      expose :blocked do |issue, options|
+        options[:blocked_issue_ids].present? && options[:blocked_issue_ids].include?(issue.id)
       end
     end
   end
