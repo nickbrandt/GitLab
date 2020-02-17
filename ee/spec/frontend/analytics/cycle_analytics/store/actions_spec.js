@@ -6,6 +6,7 @@ import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
+import httpStatusCodes from '~/lib/utils/http_status';
 import {
   group,
   summaryData,
@@ -21,7 +22,7 @@ import {
 } from '../mock_data';
 
 const stageData = { events: [] };
-const error = new Error('Request failed with status code 404');
+const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
 const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
@@ -125,7 +126,7 @@ describe('Cycle analytics actions', () => {
     describe('with a failing request', () => {
       beforeEach(() => {
         mock = new MockAdapter(axios);
-        mock.onGet(endpoints.stageData).replyOnce(404, { error });
+        mock.onGet(endpoints.stageData).replyOnce(httpStatusCodes.NOT_FOUND, { error });
       });
 
       it('dispatches receiveStageDataError on error', done => {
@@ -620,7 +621,7 @@ describe('Cycle analytics actions', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
         mock = new MockAdapter(axios);
-        mock.onPut(stageEndpoint({ stageId })).replyOnce(404);
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.NOT_FOUND);
       });
 
       it('dispatches receiveUpdateStageError', done => {
@@ -639,7 +640,7 @@ describe('Cycle analytics actions', () => {
             {
               type: 'receiveUpdateStageError',
               payload: {
-                status: 404,
+                status: httpStatusCodes.NOT_FOUND,
                 data,
               },
             },
@@ -655,7 +656,7 @@ describe('Cycle analytics actions', () => {
             state,
           },
           {
-            status: 422,
+            status: httpStatusCodes.UNPROCESSABLE_ENTITY,
             responseData: {
               errors: { name: ['is reserved'] },
             },
@@ -675,7 +676,7 @@ describe('Cycle analytics actions', () => {
             commit: () => {},
             state,
           },
-          { status: 400 },
+          { status: httpStatusCodes.BAD_REQUEST },
         );
 
         shouldFlashAMessage('There was a problem saving your custom stage, please try again');
@@ -759,7 +760,7 @@ describe('Cycle analytics actions', () => {
     describe('with a failed request', () => {
       beforeEach(() => {
         mock = new MockAdapter(axios);
-        mock.onDelete(stageEndpoint({ stageId })).replyOnce(404);
+        mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.NOT_FOUND);
       });
 
       it('dispatches receiveRemoveStageError', done => {
@@ -1236,7 +1237,7 @@ describe('Cycle analytics actions', () => {
 
     describe('with a failing request', () => {
       beforeEach(() => {
-        mock.onGet(endpoints.stageMedian).reply(404, { error });
+        mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.NOT_FOUND, { error });
       });
 
       it('will dispatch receiveStageMedianValuesError', done => {
@@ -1366,10 +1367,12 @@ describe('Cycle analytics actions', () => {
 
       beforeEach(() => {
         state = { ...state, selectedGroup };
-        mock.onPost(endpoints.baseStagesEndpointstageData).reply(422, {
-          message,
-          errors,
-        });
+        mock
+          .onPost(endpoints.baseStagesEndpointstageData)
+          .reply(httpStatusCodes.UNPROCESSABLE_ENTITY, {
+            message,
+            errors,
+          });
       });
 
       it(`dispatches the 'receiveCreateCustomStageError' action`, () =>
@@ -1386,7 +1389,7 @@ describe('Cycle analytics actions', () => {
                 data: customStageData,
                 errors,
                 message,
-                status: 422,
+                status: httpStatusCodes.UNPROCESSABLE_ENTITY,
               },
             },
           ],
@@ -1426,7 +1429,11 @@ describe('Cycle analytics actions', () => {
           {
             commit: () => {},
           },
-          { ...response, status: 422, errors: { name: ['is reserved'] } },
+          {
+            ...response,
+            status: httpStatusCodes.UNPROCESSABLE_ENTITY,
+            errors: { name: ['is reserved'] },
+          },
         );
 
         shouldFlashAMessage("'uh oh' stage already exists");
