@@ -4,9 +4,11 @@ require 'spec_helper'
 describe 'Group Value Stream Analytics', :js do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, name: "CA-test-group") }
+  let!(:group2) { create(:group, name: "CA-bad-test-group") }
   let!(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
   let!(:label) { create(:group_label, group: group) }
   let!(:label2) { create(:group_label, group: group) }
+  let!(:label3) { create(:group_label, group: group2) }
 
   let(:milestone) { create(:milestone, project: project) }
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
@@ -431,6 +433,17 @@ describe 'Group Value Stream Analytics', :js do
 
           it 'submit button is disabled' do
             expect(page).to have_button('Add stage', disabled: true)
+          end
+
+          it 'does not contain labels from outside the group' do
+            field = 'custom-stage-start-event-label'
+            page.find("[name=#{field}] .dropdown-toggle").click
+
+            menu = page.find("[name=#{field}] .dropdown-menu")
+
+            expect(menu).not_to have_content(label3.name)
+            expect(menu).to have_content(label.name)
+            expect(menu).to have_content(label2.name)
           end
 
           context 'with all required fields set' do

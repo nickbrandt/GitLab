@@ -269,8 +269,6 @@ describe('CustomStageForm', () => {
       });
 
       it('will notify if the current start and stop event pair is not valid', () => {
-        expect(wrapper.find(sel.invalidFeedback).exists()).toEqual(false);
-
         selectDropdownOption(wrapper, sel.startEvent, 2);
 
         return Vue.nextTick().then(() => {

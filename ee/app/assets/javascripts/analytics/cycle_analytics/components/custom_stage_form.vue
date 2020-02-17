@@ -58,10 +58,13 @@ export default {
     errors: {
       type: Object,
       required: false,
-      default: null,
+      default: () => ({}),
     },
   },
   data() {
+    const defaultErrors = this?.initialFields?.endEventIdentifier
+      ? {}
+      : { endEventIdentifier: [s__('CustomCycleAnalytics|Please select a start event first')] };
     return {
       labelEvents: getLabelEventsIdentifiers(this.events),
       fields: {
@@ -71,6 +74,7 @@ export default {
       fieldErrors: {
         ...defaultFields,
         ...this.errors,
+        ...defaultErrors,
       },
     };
   },
@@ -90,11 +94,6 @@ export default {
     },
     hasStartEvent() {
       return this.fields.startEventIdentifier;
-    },
-    endEventDescription() {
-      return !this.hasStartEvent
-        ? s__('CustomCycleAnalytics|Please select a start event first')
-        : '';
     },
     startEventRequiresLabel() {
       return isLabelEvent(this.labelEvents, this.fields.startEventIdentifier);
@@ -266,7 +265,6 @@ export default {
         <gl-form-group
           ref="endEventIdentifier"
           :label="s__('CustomCycleAnalytics|Stop event')"
-          :description="endEventDescription"
           :state="!hasFieldErrors('endEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
           @change.native="onUpdateEndEventField"

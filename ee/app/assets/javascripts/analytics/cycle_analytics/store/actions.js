@@ -24,7 +24,7 @@ const handleErrorOrRethrow = ({ action, error }) => {
 const isStageNameExistsError = ({ status, errors }) => {
   const ERROR_NAME_RESERVED = 'is reserved';
   if (status === httpStatus.UNPROCESSABLE_ENTITY) {
-    if (errors?.name.includes(ERROR_NAME_RESERVED)) return true;
+    if (errors?.name?.includes(ERROR_NAME_RESERVED)) return true;
   }
   return false;
 };
