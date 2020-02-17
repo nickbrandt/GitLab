@@ -2,7 +2,7 @@
 
 exports[`Design management large image component renders image 1`] = `
 <div
-  class="m-auto js-design-image h-100 w-100 d-flex-center"
+  class="m-auto js-design-image"
 >
   <img
     alt="test"
@@ -14,7 +14,7 @@ exports[`Design management large image component renders image 1`] = `
 
 exports[`Design management large image component renders loading state 1`] = `
 <div
-  class="m-auto js-design-image h-100 w-100 d-flex-center"
+  class="m-auto js-design-image"
   isloading="true"
 >
   <img
