@@ -1,5 +1,9 @@
 image: golang:1.11
 
+# Disable DIND for SAST because we need to execute a before_script in the gosec-sast job
+variables:
+  SAST_DISABLE_DIND: "true"
+
 verify:
   script:
   - make verify
@@ -33,3 +37,12 @@ test:release:
     - tags
   script:
     - git describe --exact-match
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+
+gosec-sast:
+  before_script:
+    - apk add make
+    - make install
