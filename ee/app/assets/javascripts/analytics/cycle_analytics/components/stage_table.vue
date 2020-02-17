@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import StageNavItem from './stage_nav_item.vue';
@@ -63,6 +64,11 @@ export default {
       type: Array,
       required: true,
     },
+    customStageFormErrors: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
     labels: {
       type: Array,
       required: true,
@@ -86,6 +92,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['customStageFormInitialData']),
     stageEventsHeight() {
       return `${this.stageNavHeight}px`;
     },
@@ -126,27 +133,6 @@ export default {
           displayHeader: !this.customStageFormActive,
         },
       ];
-    },
-    customStageInitialData() {
-      if (this.isEditingCustomStage) {
-        const {
-          id = null,
-          name = null,
-          startEventIdentifier = null,
-          startEventLabel: { id: startEventLabelId = null } = {},
-          endEventIdentifier = null,
-          endEventLabel: { id: endEventLabelId = null } = {},
-        } = this.currentStage;
-        return {
-          id,
-          name,
-          startEventIdentifier,
-          startEventLabelId,
-          endEventIdentifier,
-          endEventLabelId,
-        };
-      }
-      return {};
     },
   },
   mounted() {
@@ -207,11 +193,13 @@ export default {
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
-            :initial-fields="customStageInitialData"
+            :initial-fields="customStageFormInitialData"
             :is-editing-custom-stage="isEditingCustomStage"
+            :errors="customStageFormErrors"
             @submit="$emit('submit', $event)"
             @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
             @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
+            @clearErrors="$emit('clearCustomStageFormErrors')"
           />
           <template v-else>
             <stage-event-list

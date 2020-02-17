@@ -96,18 +96,24 @@ export default {
   },
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
     state.isCreatingCustomStage = true;
-    state.customStageFormInitData = {};
+    state.isEditingCustomStage = false;
+    state.customStageFormInitialData = null;
+    state.customStageFormErrors = null;
   },
-  [types.EDIT_CUSTOM_STAGE](state) {
+  [types.SHOW_EDIT_CUSTOM_STAGE_FORM](state, initialData) {
     state.isEditingCustomStage = true;
+    state.isCreatingCustomStage = false;
+    state.customStageFormInitialData = initialData;
+    state.customStageFormErrors = null;
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isEditingCustomStage = false;
     state.isCreatingCustomStage = false;
-    state.customStageFormInitData = {};
+    state.customStageFormInitialData = null;
+    state.customStageFormErrors = null;
   },
-  [types.SHOW_CUSTOM_STAGE_FORM](state) {
-    state.isCreatingCustomStage = true;
+  [types.CLEAR_CUSTOM_STAGE_FORM_ERRORS](state) {
+    state.customStageFormErrors = null;
   },
   [types.RECEIVE_SUMMARY_DATA_ERROR](state) {
     state.summary = [];
@@ -152,16 +158,34 @@ export default {
   },
   [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
     state.isSavingCustomStage = true;
+    state.customStageFormErrors = {};
   },
-  [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
+  [types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR](state, { errors = null } = {}) {
     state.isSavingCustomStage = false;
+    state.customStageFormErrors = convertObjectPropsToCamelCase(errors, { deep: true });
+  },
+  [types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS](state) {
+    state.isSavingCustomStage = false;
+    state.customStageFormErrors = null;
+    state.customStageFormInitialData = null;
   },
   [types.REQUEST_UPDATE_STAGE](state) {
     state.isLoading = true;
+    state.isSavingCustomStage = true;
+    state.customStageFormErrors = null;
   },
-  [types.RECEIVE_UPDATE_STAGE_RESPONSE](state) {
+  [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {
     state.isLoading = false;
     state.isSavingCustomStage = false;
+    state.isEditingCustomStage = false;
+    state.customStageFormErrors = null;
+    state.customStageFormInitialData = null;
+  },
+  [types.RECEIVE_UPDATE_STAGE_ERROR](state, { errors = null, data } = {}) {
+    state.isLoading = false;
+    state.isSavingCustomStage = false;
+    state.customStageFormErrors = convertObjectPropsToCamelCase(errors, { deep: true });
+    state.customStageFormInitialData = convertObjectPropsToCamelCase(data, { deep: true });
   },
   [types.REQUEST_REMOVE_STAGE](state) {
     state.isLoading = true;
