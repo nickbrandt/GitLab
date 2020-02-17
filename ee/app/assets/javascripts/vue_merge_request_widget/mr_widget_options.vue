@@ -253,6 +253,11 @@ export default {
 <template>
   <div v-if="mr" class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
+    <mr-widget-suggest-pipeline
+      v-if="shouldSuggestPipelines"
+      class="mr-widget-workflow"
+      :pipeline-path="mr.mergeRequestAddCiConfigPath"
+    />
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
       class="mr-widget-workflow"
