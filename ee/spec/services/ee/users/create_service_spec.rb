@@ -15,36 +15,38 @@ describe Users::CreateService do
 
   subject(:service) { described_class.new(current_user, params) }
 
-  context 'audit events' do
+  describe '#execute' do
     let(:operation) { service.execute }
 
-    include_examples 'audit event logging' do
-      let(:fail_condition!) do
-        expect_any_instance_of(User)
-          .to receive(:save).and_return(false)
+    context 'audit events' do
+      include_examples 'audit event logging' do
+        let(:fail_condition!) do
+          expect_any_instance_of(User)
+            .to receive(:save).and_return(false)
+        end
+
+        let(:attributes) do
+          {
+            author_id: current_user.id,
+            entity_id: @resource.id,
+            entity_type: 'User',
+            details: {
+              add: 'user',
+              author_name: current_user.name,
+              target_id: @resource.full_path,
+              target_type: 'User',
+              target_details: @resource.full_path
+            }
+          }
+        end
       end
 
-      let(:attributes) do
-        {
-           author_id: current_user.id,
-           entity_id: @resource.id,
-           entity_type: 'User',
-           details: {
-             add: 'user',
-             author_name: current_user.name,
-             target_id: @resource.full_path,
-             target_type: 'User',
-             target_details: @resource.full_path
-           }
-         }
-      end
-    end
+      context 'when audit is not required' do
+        let(:current_user) { nil }
 
-    context 'when audit is not required' do
-      let(:current_user) { nil }
-
-      it 'does not log audit event' do
-        expect { operation }.not_to change(AuditEvent, :count)
+        it 'does not log any audit event' do
+          expect { operation }.not_to change(AuditEvent, :count)
+        end
       end
     end
   end
