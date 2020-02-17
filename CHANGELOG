@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.22.0
+
+- Bump the version of golang.org/x/sys !456
+- Add friendly development error page for 502 !453
+
 v 8.21.0
 
 - Add route for group imports direct upload !455
