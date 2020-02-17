@@ -4,6 +4,7 @@ import {
   extractDiscussions,
   findVersionId,
   designUploadOptimisticResponse,
+  updateImageDiffNoteOptimisticResponse,
 } from 'ee/design_management/utils/design_management_utils';
 
 describe('extractCurrentDiscussion', () => {
@@ -72,7 +73,7 @@ describe('version parser', () => {
 });
 
 describe('optimistic responses', () => {
-  it('correctly generated for design upload', () => {
+  it('correctly generated for designManagementUpload', () => {
     jest.spyOn(underscore, 'uniqueId').mockImplementation(() => 1);
     const expectedResponse = {
       __typename: 'Mutation',
@@ -103,5 +104,33 @@ describe('optimistic responses', () => {
       },
     };
     expect(designUploadOptimisticResponse([{ name: 'test' }])).toEqual(expectedResponse);
+  });
+
+  it('correctly generated for updateImageDiffNoteOptimisticResponse', () => {
+    const mockNote = {
+      id: 'test-note-id',
+    };
+
+    const mockPosition = {
+      x: 10,
+      y: 10,
+      width: 10,
+      height: 10,
+    };
+
+    const expectedResponse = {
+      __typename: 'Mutation',
+      updateImageDiffNote: {
+        __typename: 'UpdateImageDiffNotePayload',
+        note: {
+          ...mockNote,
+          position: mockPosition,
+        },
+        errors: [],
+      },
+    };
+    expect(updateImageDiffNoteOptimisticResponse(mockNote, { position: mockPosition })).toEqual(
+      expectedResponse,
+    );
   });
 });
