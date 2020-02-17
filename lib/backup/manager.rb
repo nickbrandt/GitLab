@@ -127,6 +127,7 @@ module Backup
 
     def unpack
       cleanup_required = true
+
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
