@@ -21,17 +21,6 @@ FactoryBot.define do
   factory :note_on_epic, parent: :note, traits: [:on_epic]
 
   factory :diff_note_on_design, parent: :note, traits: [:on_design], class: 'DiffNote' do
-    position do
-      Gitlab::Diff::Position.new(
-        old_path: noteable.full_path,
-        new_path: noteable.full_path,
-        width: 10,
-        height: 10,
-        x: 1,
-        y: 1,
-        position_type: "image",
-        diff_refs: noteable.diff_refs
-      )
-    end
+    position { build(:image_diff_position, file: noteable.full_path, diff_refs: noteable.diff_refs) }
   end
 end
