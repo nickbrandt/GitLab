@@ -318,7 +318,9 @@ class GeoNode < ApplicationRecord
 
   def update_dependents_attributes
     if self.primary?
+      self.oauth_application&.destroy
       self.oauth_application = nil
+
       update_clone_url
     else
       update_oauth_application!
