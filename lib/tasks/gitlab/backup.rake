@@ -19,13 +19,13 @@ namespace :gitlab do
       backup = Backup::Manager.new(progress)
       backup.write_info
 
-      if !(ENV['SKIP'] && ENV['SKIP'].include?('tar'))
+      if ENV['SKIP'] && ENV['SKIP'].include?('tar')
+        backup.upload
+      else
         backup.pack
         backup.upload
         backup.cleanup
         backup.remove_old
-      else
-        backup.upload
       end
 
       progress.puts "Warning: Your gitlab.rb and gitlab-secrets.json files contain sensitive data \n" \

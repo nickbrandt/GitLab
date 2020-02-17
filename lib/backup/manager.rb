@@ -24,9 +24,6 @@ module Backup
     end
 
     def pack
-      # Make sure there is a connection
-      ActiveRecord::Base.connection.reconnect!
-
       Dir.chdir(backup_path) do
         # create archive
         progress.print "Creating backup archive: #{tar_file} ... "
@@ -113,9 +110,10 @@ module Backup
     # rubocop: disable Metrics/AbcSize
     def unpack
       cleanup_required = true
+
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
-          # User has indicated which backup he/she wants restored
+          # User has indicated which backup to restore
           tar_file = File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
 
           unless File.exist?(tar_file)
