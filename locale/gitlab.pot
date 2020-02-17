@@ -11123,6 +11123,9 @@ msgstr ""
 msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
+msgid "Kubernetes logs could not be converted into UTF-8. Check Gitlab logs for errors."
+msgstr ""
+
 msgid "Kubernetes popover"
 msgstr ""
 
