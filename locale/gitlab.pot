@@ -7017,6 +7017,9 @@ msgstr ""
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
 
+msgid "Elasticsearch returned status code: %{status_code}"
+msgstr ""
+
 msgid "Elastic|None. Select namespaces to index."
 msgstr ""
 
