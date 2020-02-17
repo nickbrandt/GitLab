@@ -161,7 +161,14 @@ In the following example:
 
 #### Custom collapsible sections
 
-Build scripts can introduce their own collapsible sections by marking the start and end of the section:
+You can create collapsible sections in job logs by manually outputting special codes
+that GitLab will use to determine what sections to collapse:
+
+- Section start marker: `section_start:UNIX_TIMESTAMP:SECTION_NAME\r\e[0K` + `TEXT_OF_SECTION_HEADER`
+- Section end marker: `section_end:UNIX_TIMESTAMP:SECTION_NAME\r\e[0K`
+
+You must add these codes to the script section of the CI configuration. For example,
+using `echo`:
 
 ```yaml
 job1:
@@ -171,7 +178,17 @@ job1:
     - echo -e "section_end:`date +%s`:my_first_section\r\e[0K"
 ```
 
-This produces the following output, where `1560896352` is the unix time the section started or ended; `my_first_section` is the name of the section, allowing the start and end markers to be matched up; `\r` is carriage return and `\e[0K` is the clear line ANSI escape code. The carriage return and clear line mean the section markers will not be visible at the console, but they can be seen in the job's raw output.
+In the example above:
+
+- `date +%s`: The Unix timestamp (for example `1560896352`).
+- `my_first_section`: The name given to the section.
+- `\r\e[0K`: Prevents the section markers from displaying in the rendered (colored)
+  job log, but they are displayed in the raw job log. To see them, in the top right
+  of the job log, click **{doc-text}** (**Show complete raw**).
+  - `\r`: carriage return.
+  - `\e[0K`: clear line ANSI escape code.
+
+Sample raw job log:
 
 ```plaintext
 section_start:1560896352:my_first_section\r\e[0KHeader of the 1st collapsible section
