@@ -4,6 +4,8 @@ import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
 import MREditModule from 'ee/approvals/stores/modules/mr_edit';
 import { createStoreOptions } from 'ee/approvals/stores';
 
+jest.mock('lodash/debounce', () => jest.fn(fn => fn));
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
@@ -80,10 +82,14 @@ describe('Rule Input', () => {
     wrapper.element.value = wrapper.props().rule.approvalsRequired + 1;
     wrapper.trigger('input');
 
-    expect(action).toHaveBeenCalledWith(
-      expect.anything(),
-      { approvalsRequired: 10, id: 5 },
-      undefined,
-    );
+    jest.runAllTimers();
+
+    return wrapper.vm.$nextTick().then(() => {
+      expect(action).toHaveBeenCalledWith(
+        expect.anything(),
+        { approvalsRequired: 10, id: 5 },
+        undefined,
+      );
+    });
   });
 });
