@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe SubscriptionsHelper do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:raw_plan_data) do
     [
       {
@@ -37,6 +39,23 @@ describe SubscriptionsHelper do
     it { is_expected.to include(full_name: 'First Last') }
     it { is_expected.to include(plan_data: '[{"id":"bronze_id","code":"bronze","price_per_year":48.0}]') }
     it { is_expected.to include(plan_id: 'bronze_id') }
+
+    describe 'new_user' do
+      where(:referer, :expected_result) do
+        'http://example.com/users/sign_up/welcome?foo=bar'             | 'true'
+        'http://example.com/users/sign_up/update_registration?foo=bar' | 'true'
+        'http://example.com'                                           | 'false'
+        nil                                                            | 'false'
+      end
+
+      with_them do
+        before do
+          allow(helper).to receive(:request).and_return(double(referer: referer))
+        end
+
+        it { is_expected.to include(new_user: expected_result) }
+      end
+    end
   end
 
   describe '#plan_title' do
