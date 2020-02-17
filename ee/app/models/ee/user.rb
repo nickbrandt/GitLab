@@ -62,7 +62,7 @@ module EE
         scope
       }
 
-      scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
+      scope :excluding_guests, -> { joins(:members).merge(::Member.non_guests).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
       scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
