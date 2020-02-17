@@ -144,6 +144,10 @@ module Gitlab
     def utc_date_regex
       @utc_date_regex ||= /\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/.freeze
     end
+
+    def issue
+      @issue ||= /(?<issue>\d+\b)/
+    end
   end
 end
 
