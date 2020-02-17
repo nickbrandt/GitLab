@@ -305,6 +305,49 @@ describe Issue do
     end
   end
 
+  context 'ES related specs', :elastic do
+    before do
+      stub_ee_application_setting(elasticsearch_indexing: true)
+    end
+
+    context 'when updating an Issue' do
+      let(:project) { create(:project, :public) }
+      let(:issue) { create(:issue, project: project, confidential: true) }
+
+      before do
+        Sidekiq::Testing.disable! do
+          create(:note, note: 'the_normal_note', noteable: issue, project: project)
+        end
+        Sidekiq::Testing.inline! do
+          project.maintain_elasticsearch_update
+
+          issue.update!(update_field => update_value)
+          Gitlab::Elastic::Helper.refresh_index
+        end
+      end
+
+      context 'when changing the confidential value' do
+        let(:update_field) { :confidential }
+        let(:update_value) { false }
+
+        it 'updates issue notes excluding system notes' do
+          expect(issue.elasticsearch_issue_notes_need_updating?).to eq(true)
+          expect(Note.elastic_search('the_normal_note', options: { project_ids: [issue.project.id] }).present?).to eq(true)
+        end
+      end
+
+      context 'when changing the title' do
+        let(:update_field) { :title }
+        let(:update_value) { 'abc' }
+
+        it 'does not update issue notes' do
+          expect(issue.elasticsearch_issue_notes_need_updating?).to eq(false)
+          expect(Note.elastic_search('the_normal_note', options: { project_ids: [issue.project.id] }).present?).to eq(false)
+        end
+      end
+    end
+  end
+
   describe 'relative positioning with group boards' do
     let(:group) { create(:group) }
     let!(:board) { create(:board, group: group) }

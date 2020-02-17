@@ -53,8 +53,7 @@ module Elastic
         :update,
         self.class.to_s,
         self.id,
-        self.es_id,
-        changed_fields: self.previous_changes.keys
+        self.es_id
       )
     end
 
