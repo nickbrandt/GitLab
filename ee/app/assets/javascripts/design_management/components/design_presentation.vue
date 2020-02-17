@@ -202,6 +202,10 @@ export default {
       this.currentAnnotationPosition = this.getAnnotationPositon(coordinates);
       this.$emit('openCommentForm', this.currentAnnotationPosition);
     },
+    moveNote({ noteId, discussionId, coordinates }) {
+      const position = this.getAnnotationPositon(coordinates);
+      this.$emit('moveNote', { noteId, discussionId, position });
+    },
   },
 };
 </script>
@@ -226,6 +230,7 @@ export default {
         :notes="discussionStartingNotes"
         :current-comment-form="currentCommentForm"
         @openCommentForm="openCommentForm"
+        @moveNote="moveNote"
       />
     </div>
   </div>
