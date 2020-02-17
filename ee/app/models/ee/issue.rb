@@ -10,6 +10,7 @@ module EE
       WEIGHT_ALL = 'Everything'.freeze
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
+      ELASTICSEARCH_PERMISSION_TRACKED_FIELDS = %w(assignee_ids author_id confidential).freeze
 
       include Elastic::ApplicationVersionedSearch
       include UsageStatistics
@@ -86,6 +87,24 @@ module EE
     # override
     def weight
       super if supports_weight?
+    end
+
+    # override
+    def maintain_elasticsearch_update
+      super
+
+      maintain_elasticsearch_issue_notes_update if elasticsearch_issue_notes_need_updating?
+    end
+
+    def maintain_elasticsearch_issue_notes_update
+      ::Note.searchable.where(noteable: self).find_each do |note|
+        note.maintain_elasticsearch_update
+      end
+    end
+
+    def elasticsearch_issue_notes_need_updating?
+      changed_fields = self.previous_changes.keys
+      changed_fields && (changed_fields & ELASTICSEARCH_PERMISSION_TRACKED_FIELDS).any?
     end
 
     def supports_weight?

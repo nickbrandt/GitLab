@@ -85,11 +85,11 @@ describe Groups::TransferService, '#execute' do
       project3 = create(:project, :repository, :private, namespace: group)
 
       expect(ElasticIndexerWorker).to receive(:perform_async)
-        .with(:update, "Project", project1.id, project1.es_id, changed_fields: array_including('visibility_level'))
+        .with(:update, "Project", project1.id, project1.es_id)
       expect(ElasticIndexerWorker).to receive(:perform_async)
-        .with(:update, "Project", project2.id, project2.es_id, changed_fields: array_including('visibility_level'))
+        .with(:update, "Project", project2.id, project2.es_id)
       expect(ElasticIndexerWorker).not_to receive(:perform_async)
-        .with(:update, "Project", project3.id, project3.es_id, changed_fields: array_including('visibility_level'))
+        .with(:update, "Project", project3.id, project3.es_id)
 
       transfer_service.execute(new_group)
 

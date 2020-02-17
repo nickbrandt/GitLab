@@ -32,8 +32,7 @@ module EE
               :update,
               project.class.to_s,
               project.id,
-              project.es_id,
-              changed_fields: ['visibility_level']
+              project.es_id
             )
           end
         end

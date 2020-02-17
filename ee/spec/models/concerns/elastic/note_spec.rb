@@ -112,7 +112,7 @@ describe Note, :elastic do
     issue = create :issue, project: project, updated_at: 1.minute.ago
 
     # Only issue should be updated
-    expect(ElasticIndexerWorker).to receive(:perform_async).with(:update, 'Issue', anything, anything, anything)
+    expect(ElasticIndexerWorker).to receive(:perform_async).with(:update, 'Issue', anything, anything)
     create :note, :system, project: project, noteable: issue
   end
 
