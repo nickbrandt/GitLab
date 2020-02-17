@@ -5,6 +5,16 @@ FactoryBot.define do
     sequence(:artifact_id)
     success { true }
 
+    trait :failed do
+      success { false }
+      retry_count { 1 }
+    end
+
+    trait :never_synced do
+      success { false }
+      retry_count { nil }
+    end
+
     trait :with_artifact do
       transient do
         artifact_type { nil } # e.g. :archive, :metadata, :trace ...

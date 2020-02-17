@@ -3,15 +3,17 @@
 class Geo::JobArtifactRegistry < Geo::BaseRegistry
   include Geo::Syncable
 
-  def self.artifact_id_in(ids)
-    where(artifact_id: ids)
-  end
+  MODEL_CLASS = ::Ci::JobArtifact
+  MODEL_FOREIGN_KEY = :artifact_id
 
-  def self.artifact_id_not_in(ids)
-    where.not(artifact_id: ids)
-  end
+  scope :never, -> { where(success: false, retry_count: nil) }
 
-  def self.pluck_artifact_key
-    where(nil).pluck(:artifact_id)
+  def self.failed
+    if Feature.enabled?(:geo_job_artifact_registry_ssot_sync)
+      where(success: false).where.not(retry_count: nil)
+    else
+      # Would do `super` except it doesn't work with an included scope
+      where(success: false)
+    end
   end
 end

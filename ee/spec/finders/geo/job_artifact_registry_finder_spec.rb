@@ -107,13 +107,13 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
 
     describe '#count_failed' do
       before do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id, success: false)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_synced_project.id)
         create(:geo_job_artifact_registry, artifact_id: job_artifact_unsynced_project.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_broken_storage_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_expired_synced_project.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_expired_broken_storage.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_synced_project.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_broken_storage.id, success: false)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_broken_storage_1.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_expired_synced_project.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_expired_broken_storage.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_remote_synced_project.id)
+        create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_remote_broken_storage.id)
       end
 
       context 'without selective sync' do
@@ -229,6 +229,21 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
   end
 
   context 'finds all the things' do
+    describe '#find_never_synced_registries' do
+      let!(:registry_job_artifact_1) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_synced_project.id) }
+      let!(:registry_job_artifact_2) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_unsynced_project.id) }
+      let!(:registry_job_artifact_3) { create(:geo_job_artifact_registry, artifact_id: job_artifact_broken_storage_1.id) }
+      let!(:registry_job_artifact_4) { create(:geo_job_artifact_registry, :failed, artifact_id: job_artifact_broken_storage_2.id) }
+      let!(:registry_job_artifact_remote_1) { create(:geo_job_artifact_registry, :never_synced, artifact_id: job_artifact_remote_synced_project.id) }
+
+      it 'returns registries for LFS objects that have never been synced' do
+        registries = subject.find_never_synced_registries(batch_size: 10)
+
+        expect(registries).to match_ids(registry_job_artifact_1, registry_job_artifact_2, registry_job_artifact_remote_1)
+      end
+    end
+
+
     describe '#find_unsynced' do
       before do
         create(:geo_job_artifact_registry, artifact_id: job_artifact_synced_project.id, success: false)
@@ -238,7 +253,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
 
       context 'without selective sync' do
         it 'returns job artifacts without an entry on the tracking database, ignoring expired ones' do
-          job_artifacts = subject.find_unsynced(batch_size: 10, except_artifact_ids: [job_artifact_unsynced_project.id])
+          job_artifacts = subject.find_unsynced(batch_size: 10, except_ids: [job_artifact_unsynced_project.id])
 
           expect(job_artifacts).to match_ids(job_artifact_remote_synced_project, job_artifact_remote_unsynced_project,
                                              job_artifact_broken_storage_2)
@@ -285,7 +300,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
       end
 
       it 'returns job artifacts excluding ones from the exception list' do
-        job_artifacts = subject.find_migrated_local(batch_size: 10, except_artifact_ids: [job_artifact_remote_synced_project.id])
+        job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
 
         expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
       end
@@ -321,7 +336,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns job artifacts excluding ones from the exception list' do
-          job_artifacts = subject.find_migrated_local(batch_size: 10, except_artifact_ids: [job_artifact_remote_synced_project.id])
+          job_artifacts = subject.find_migrated_local(batch_size: 10, except_ids: [job_artifact_remote_synced_project.id])
 
           expect(job_artifacts).to match_ids(job_artifact_remote_unsynced_project, job_artifact_remote_broken_storage)
         end
