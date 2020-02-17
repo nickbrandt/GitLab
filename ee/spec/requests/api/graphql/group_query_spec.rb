@@ -31,7 +31,7 @@ describe 'getting group information' do
       it 'allows access via session' do
         post_graphql(group_query(group), current_user: user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_data['group']['id']).to eq(group.to_global_id.to_s)
       end
 
@@ -39,7 +39,7 @@ describe 'getting group information' do
         token = create(:personal_access_token, user: user).token
         post_graphql(group_query(group), headers: { 'Authorization' => "Bearer #{token}" })
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_data['group']['id']).to eq(group.to_global_id.to_s)
       end
     end
