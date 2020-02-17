@@ -80,7 +80,15 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      stageNavHeight: 0,
+    };
+  },
   computed: {
+    stageEventsHeight() {
+      return `${this.stageNavHeight}px`;
+    },
     stageName() {
       return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
@@ -141,6 +149,9 @@ export default {
       return {};
     },
   },
+  mounted() {
+    this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
+  },
   methods: {
     medianValue(id) {
       return this.medians[id] ? this.medians[id] : null;
@@ -167,7 +178,7 @@ export default {
         </nav>
       </div>
       <div class="stage-panel-body">
-        <nav class="stage-nav">
+        <nav ref="stageNav" class="stage-nav">
           <ul>
             <stage-nav-item
               v-for="stage in stages"
@@ -189,7 +200,7 @@ export default {
             />
           </ul>
         </nav>
-        <div class="section stage-events">
+        <div class="section stage-events" :style="{ height: stageEventsHeight }">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <custom-stage-form
             v-else-if="isCreatingCustomStage || isEditingCustomStage"
