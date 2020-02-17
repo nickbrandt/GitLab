@@ -108,7 +108,6 @@ const sharedEnvironmentData = id => ({
   has_stop_action: false,
   id,
   last_deployment: null,
-  project_path: '/root/review-app',
   rollout_status: {},
   state: 'available',
   stop_path: `/root/review-app/environments/${id}/stop`,

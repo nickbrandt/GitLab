@@ -8,10 +8,6 @@ module EE
     prepended do
       expose :rollout_status, if: -> (*) { can_read_deploy_board? }, using: ::RolloutStatusEntity
 
-      expose :project_path do |environment|
-        project_path(environment.project)
-      end
-
       expose :logs_path, if: -> (*) { can_read_pod_logs? } do |environment|
         project_logs_path(environment.project, environment_name: environment.name)
       end
