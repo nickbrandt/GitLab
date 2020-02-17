@@ -107,10 +107,26 @@ module Backup
       end
     end
 
-    # rubocop: disable Metrics/AbcSize
-    def unpack
-      cleanup_required = true
+    def verify_restore
+      Dir.chdir(backup_path) do
+        ENV["VERSION"] = "#{settings[:db_version]}" if settings[:db_version].to_i > 0
+        # restoring mismatching backups can lead to unexpected problems
+        if settings[:gitlab_version] != Gitlab::VERSION
+          progress.puts(<<~HEREDOC.color(:red))
+            GitLab version mismatch:
+              Your current GitLab version (#{Gitlab::VERSION}) differs from the GitLab version in the backup!
+              Please switch to the following version and try again:
+              version: #{settings[:gitlab_version]}
+          HEREDOC
+          progress.puts
+          progress.puts "Hint: git checkout v#{settings[:gitlab_version]}"
+          exit 1
+        end
+      end
+    end
 
+    # rubocop: disable Cop/AvoidReturnFromBlocks
+    def unpack
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
@@ -124,9 +140,8 @@ module Backup
         else
           # check for existing backups in the backup dir
           if File.exist?(File.join(backup_path, 'backup_information.yml'))
-            tar_file = 'SKIP'
             progress.puts "Non tarred backup found in #{backup_path}, using that"
-            cleanup_required = false
+            return false
           elsif backup_file_list.empty?
             progress.puts "No backups found in #{backup_path}"
             progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
@@ -143,34 +158,18 @@ module Backup
           end
         end
 
-        unless tar_file == 'SKIP'
-          progress.print 'Unpacking backup ... '
+        progress.print 'Unpacking backup ... '
 
-          if Kernel.system(*%W(tar -xf #{tar_file}))
-            progress.puts 'done'.color(:green)
-          else
-            progress.puts 'unpacking backup failed'.color(:red)
-            exit 1
-          end
-        end
-
-        ENV["VERSION"] = "#{settings[:db_version]}" if settings[:db_version].to_i > 0
-
-        # restoring mismatching backups can lead to unexpected problems
-        if settings[:gitlab_version] != Gitlab::VERSION
-          progress.puts(<<~HEREDOC.color(:red))
-            GitLab version mismatch:
-              Your current GitLab version (#{Gitlab::VERSION}) differs from the GitLab version in the backup!
-              Please switch to the following version and try again:
-              version: #{settings[:gitlab_version]}
-          HEREDOC
-          progress.puts
-          progress.puts "Hint: git checkout v#{settings[:gitlab_version]}"
+        if Kernel.system(*%W(tar -xf #{tar_file}))
+          progress.puts 'done'.color(:green)
+        else
+          progress.puts 'unpacking backup failed'.color(:red)
           exit 1
         end
       end
-      cleanup_required
+      true
     end
+    # rubocop: enable Cop/AvoidReturnFromBlocks
 
     def tar_version
       tar_version, _ = Gitlab::Popen.popen(%w(tar --version))

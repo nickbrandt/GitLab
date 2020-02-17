@@ -41,6 +41,7 @@ namespace :gitlab do
 
       backup = Backup::Manager.new(progress)
       cleanup_required = backup.unpack
+      backup.verify_restore
 
       unless backup.skipped?('db')
         begin
