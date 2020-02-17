@@ -1,7 +1,6 @@
 import {
   normalizeLicense,
   getPackagesString,
-  getStatusTranslationsFromLicenseStatus,
   getIssueStatusFromLicenseStatus,
   convertToOldReportFormat,
 } from 'ee/vue_shared/license_management/store/utils';
@@ -43,24 +42,6 @@ describe('utils', () => {
       expect(getPackagesString(examplePackages, false, 3)).toBe(
         'Used by pg, puma, foo, bar, and baz',
       );
-    });
-  });
-
-  describe('getStatusTranslationsFromLicenseStatus', () => {
-    it('returns "Allowed" for allowed license status', () => {
-      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.APPROVED)).toBe(
-        'Allowed',
-      );
-    });
-
-    it('returns "Denied" status for denied license status', () => {
-      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.BLACKLISTED)).toBe(
-        'Denied',
-      );
-    });
-
-    it('returns "" for any other status', () => {
-      expect(getStatusTranslationsFromLicenseStatus()).toBe('');
     });
   });
 

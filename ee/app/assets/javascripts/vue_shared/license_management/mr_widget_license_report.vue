@@ -7,8 +7,6 @@ import { componentNames } from 'ee/reports/components/issue_body';
 import Icon from '~/vue_shared/components/icon.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
-
 import createStore from './store';
 
 const store = createStore();
@@ -65,8 +63,8 @@ export default {
     },
   },
   computed: {
-    ...mapState(LICENSE_MANAGEMENT, ['loadLicenseReportError']),
-    ...mapGetters(LICENSE_MANAGEMENT, [
+    ...mapState(['loadLicenseReportError']),
+    ...mapGetters([
       'licenseReport',
       'isLoading',
       'licenseSummaryText',
@@ -100,7 +98,7 @@ export default {
     this.fetchParsedLicenseReport();
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, ['setAPISettings', 'fetchParsedLicenseReport']),
+    ...mapActions(['setAPISettings', 'fetchParsedLicenseReport']),
   },
 };
 </script>

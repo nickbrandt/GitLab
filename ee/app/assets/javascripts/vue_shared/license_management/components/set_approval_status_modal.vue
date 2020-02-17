@@ -5,18 +5,20 @@ import { s__ } from '~/locale';
 import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import LicensePackages from './license_packages.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 export default {
   name: 'LicenseSetApprovalStatusModal',
   components: { SafeLink, LicensePackages, GlModal: DeprecatedModal2 },
   computed: {
-    ...mapState(LICENSE_MANAGEMENT, ['currentLicenseInModal', 'canManageLicenses']),
+    ...mapState(['currentLicenseInModal', 'canManageLicenses']),
     headerTitleText() {
       if (!this.canManageLicenses) {
         return s__('LicenseCompliance|License details');
       }
-      return s__('LicenseCompliance|License review');
+      if (this.canApprove) {
+        return s__('LicenseCompliance|Approve license?');
+      }
+      return s__('LicenseCompliance|Blacklist license?');
     },
     canApprove() {
       return (
@@ -34,11 +36,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, [
-      'resetLicenseInModal',
-      'approveLicense',
-      'blacklistLicense',
-    ]),
+    ...mapActions(['resetLicenseInModal', 'approveLicense', 'blacklistLicense']),
   },
 };
 </script>
@@ -99,7 +97,7 @@ export default {
         data-qa-selector="blacklist_license_button"
         @click="blacklistLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseCompliance|Deny') }}
+        {{ s__('LicenseCompliance|Blacklist license') }}
       </button>
       <button
         v-if="canApprove"
@@ -109,7 +107,7 @@ export default {
         data-qa-selector="approve_license_button"
         @click="approveLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseCompliance|Allow') }}
+        {{ s__('LicenseCompliance|Approve license') }}
       </button>
     </template>
   </gl-modal>

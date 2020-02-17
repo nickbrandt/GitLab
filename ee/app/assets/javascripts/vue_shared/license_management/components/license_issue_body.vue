@@ -2,7 +2,6 @@
 import { mapActions } from 'vuex';
 
 import LicensePackages from './license_packages.vue';
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 export default {
   name: 'LicenseIssueBody',
@@ -13,7 +12,7 @@ export default {
       required: true,
     },
   },
-  methods: { ...mapActions(LICENSE_MANAGEMENT, ['setLicenseInModal']) },
+  methods: { ...mapActions(['setLicenseInModal']) },
 };
 </script>
 

@@ -15,11 +15,7 @@ export default {
   [types.SET_API_SETTINGS](state, data) {
     Object.assign(state, data);
   },
-  [types.SET_IS_ADMIN](state, data) {
-    Object.assign(state, {
-      isAdmin: data,
-    });
-  },
+
   [types.RECEIVE_MANAGED_LICENSES_SUCCESS](state, licenses = []) {
     const managedLicenses = licenses.map(normalizeLicense).reverse();
 
