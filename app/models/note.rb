@@ -502,14 +502,8 @@ class Note < ApplicationRecord
     noteable.user_mentions.where(note: self)
   end
 
-  def cross_reference_not_visible_for?(user)
-    cross_reference? && !all_referenced_mentionables_allowed?(user)
-  end
-
-  # Using this method for checking `read` access on a note may result in incorrect permission granting
-  # check `spec/models/note_spec.rb` and `ee/spec/models/note_spec.rb` for corresponding specs
-  def visible_for?(user)
-    !cross_reference_not_visible_for?(user) && system_note_viewable_by?(user)
+  def cross_reference_visible_for?(user)
+    (!cross_reference? || all_referenced_mentionables_allowed?(user)) && system_note_viewable_by?(user)
   end
 
   private

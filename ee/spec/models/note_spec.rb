@@ -11,7 +11,7 @@ describe Note do
     let(:set_mentionable_text) { ->(txt) { subject.note = txt } }
   end
 
-  describe '#visible_for?' do
+  describe '#readable_by?' do
     let(:owner) { create(:group_member, :owner, group: group, user: create(:user)).user }
     let(:guest) { create(:group_member, :guest, group: group, user: create(:user)).user }
     let(:reporter) { create(:group_member, :reporter, group: group, user: create(:user)).user }
@@ -40,12 +40,12 @@ describe Note do
         end
 
         it 'returns visible but not readable for a non-member user' do
-          expect(note.visible_for?(non_member)).to be_truthy
+          expect(note.cross_reference_visible_for?(non_member)).to be_truthy
           expect(note.readable_by?(non_member)).to be_falsy
         end
 
         it 'returns visible but not readable for a nil user' do
-          expect(note.visible_for?(nil)).to be_truthy
+          expect(note.cross_reference_visible_for?(nil)).to be_truthy
           expect(note.readable_by?(nil)).to be_falsy
         end
       end

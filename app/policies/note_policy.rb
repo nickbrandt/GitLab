@@ -11,7 +11,7 @@ class NotePolicy < BasePolicy
 
   condition(:can_read_noteable) { can?(:"read_#{@subject.noteable_ability_name}") }
 
-  condition(:is_visible) { @subject.visible_for?(@user) }
+  condition(:is_visible) { @subject.cross_reference_visible_for?(@user) }
 
   rule { ~editable }.prevent :admin_note
 

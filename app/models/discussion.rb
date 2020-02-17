@@ -19,7 +19,7 @@ class Discussion
             :noteable_ability_name,
             :to_ability_name,
             :editable?,
-            :visible_for?,
+            :cross_reference_visible_for?,
             :resource_parent,
 
             to: :first_note

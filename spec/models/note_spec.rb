@@ -285,7 +285,7 @@ describe Note do
     end
   end
 
-  describe "#visible_for?" do
+  describe "#cross_reference_visible_for?" do
     using RSpec::Parameterized::TableSyntax
 
     let(:project) { create(:project, :public) }
@@ -296,26 +296,6 @@ describe Note do
     let(:non_member) { create(:user) }
 
     let(:note) { create(:note, project: project) }
-
-    where(:cross_reference_visible, :system_note_viewable, :result) do
-      true  | true  | false
-      false | true  | true
-      false | false | false
-    end
-
-    with_them do
-      it "returns expected result" do
-        expect(note).to receive(:cross_reference_not_visible_for?).twice.and_return(cross_reference_visible)
-
-        unless cross_reference_visible
-          expect(note).to receive(:system_note_viewable_by?).twice
-                            .with(user).and_return(system_note_viewable)
-        end
-
-        expect(note.visible_for?(user)).to eq result
-        expect(note.readable_by?(user)).to eq result
-      end
-    end
 
     context 'when project is public' do
       it_behaves_like 'users with note access' do
@@ -331,12 +311,12 @@ describe Note do
       end
 
       it 'returns visible but not readable for non-member user' do
-        expect(note.visible_for?(non_member)).to be_truthy
+        expect(note.cross_reference_visible_for?(non_member)).to be_truthy
         expect(note.readable_by?(non_member)).to be_falsy
       end
 
       it 'returns visible but not readable for a nil user' do
-        expect(note.visible_for?(nil)).to be_truthy
+        expect(note.cross_reference_visible_for?(nil)).to be_truthy
         expect(note.readable_by?(nil)).to be_falsy
       end
     end
@@ -380,7 +360,7 @@ describe Note do
     end
   end
 
-  describe "cross_reference_not_visible_for?" do
+  describe "cross_reference_visible_for?" do
     let_it_be(:private_user)    { create(:user) }
     let_it_be(:private_project) { create(:project, namespace: private_user.namespace) { |p| p.add_maintainer(private_user) } }
     let_it_be(:private_issue)   { create(:issue, project: private_project) }
@@ -390,11 +370,11 @@ describe Note do
 
     shared_examples "checks references" do
       it "returns true" do
-        expect(note.cross_reference_not_visible_for?(ext_issue.author)).to be_truthy
+        expect(note.cross_reference_visible_for?(ext_issue.author)).to be_falsy
       end
 
       it "returns false" do
-        expect(note.cross_reference_not_visible_for?(private_user)).to be_falsy
+        expect(note.cross_reference_visible_for?(private_user)).to be_truthy
       end
 
       it "returns false if user visible reference count set" do
@@ -402,14 +382,14 @@ describe Note do
         note.total_reference_count = 1
 
         expect(note).not_to receive(:reference_mentionables)
-        expect(note.cross_reference_not_visible_for?(ext_issue.author)).to be_falsy
+        expect(note.cross_reference_visible_for?(ext_issue.author)).to be_truthy
       end
 
       it "returns true if ref count is 0" do
         note.user_visible_reference_count = 0
 
         expect(note).not_to receive(:reference_mentionables)
-        expect(note.cross_reference_not_visible_for?(ext_issue.author)).to be_truthy
+        expect(note.cross_reference_visible_for?(ext_issue.author)).to be_falsy
       end
     end
 
@@ -454,7 +434,7 @@ describe Note do
         note.total_reference_count = 2
 
         expect(note).not_to receive(:reference_mentionables)
-        expect(note.cross_reference_not_visible_for?(ext_issue.author)).to be_truthy
+        expect(note.cross_reference_visible_for?(ext_issue.author)).to be_falsy
       end
     end
   end
