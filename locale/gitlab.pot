@@ -15869,6 +15869,9 @@ msgstr ""
 msgid "Remove child epic from an epic"
 msgstr ""
 
+msgid "Remove description history"
+msgstr ""
+
 msgid "Remove due date"
 msgstr ""
 
@@ -17790,6 +17793,9 @@ msgid "Something went wrong while applying the suggestion. Please try again."
 msgstr ""
 
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
+msgstr ""
+
+msgid "Something went wrong while deleting description changes. Please try again."
 msgstr ""
 
 msgid "Something went wrong while deleting the image."
