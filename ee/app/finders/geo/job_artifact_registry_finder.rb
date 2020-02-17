@@ -31,6 +31,33 @@ module Geo
       Ci::JobArtifact.not_expired
     end
 
+    # Returns untracked IDs as well as tracked IDs that are unused.
+    #
+    # Untracked IDs are model IDs that are supposed to be synced but don't yet
+    # have a registry entry.
+    #
+    # Unused tracked IDs are model IDs that are not supposed to be synced but
+    # already have a registry entry. For example:
+    #
+    #   - orphaned registries
+    #   - records that became excluded from selective sync
+    #   - records that are in object storage, and `sync_object_storage` became
+    #     disabled
+    #
+    # We compute both sets in this method to reduce the number of DB queries
+    # performed.
+    #
+    # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
+    def find_registry_differences(range)
+      source_ids = job_artifacts(fdw: false).where(id: range).pluck(::Ci::JobArtifact.arel_table[:id]) # rubocop:disable CodeReuse/ActiveRecord
+      tracked_ids = Geo::JobArtifactRegistry.pluck_model_ids_in_range(range)
+
+      untracked_ids = source_ids - tracked_ids
+      unused_tracked_ids = tracked_ids - source_ids
+
+      [untracked_ids, unused_tracked_ids]
+    end
+
     # Returns Geo::JobArtifactRegistry records that have never been synced.
     #
     # Does not care about selective sync, because it considers the Registry
@@ -57,7 +84,7 @@ module Geo
     # rubocop:enable CodeReuse/ActiveRecord
 
     # Deprecated in favor of the process using
-    # #find_missing_registry_ids and #find_never_synced_registries
+    # #find_registry_differences and #find_never_synced_registries
     #
     # Find limited amount of non replicated job artifacts.
     #
@@ -112,12 +139,12 @@ module Geo
 
     private
 
-    def job_artifacts
-      local_storage_only? ? all_job_artifacts.with_files_stored_locally : all_job_artifacts
+    def job_artifacts(fdw: true)
+      local_storage_only?(fdw: fdw) ? all_job_artifacts(fdw: fdw).with_files_stored_locally : all_job_artifacts(fdw: fdw)
     end
 
-    def all_job_artifacts
-      current_node.job_artifacts
+    def all_job_artifacts(fdw: true)
+      current_node(fdw: fdw).job_artifacts
     end
 
     def registries_for_job_artifacts

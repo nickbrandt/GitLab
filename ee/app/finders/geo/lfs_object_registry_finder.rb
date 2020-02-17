@@ -83,7 +83,7 @@ module Geo
     # rubocop:enable CodeReuse/ActiveRecord
 
     # Deprecated in favor of the process using
-    # #find_missing_registry_ids and #find_never_synced_registries
+    # #find_registry_differences and #find_never_synced_registries
     #
     # Find limited amount of non replicated lfs objects.
     #
