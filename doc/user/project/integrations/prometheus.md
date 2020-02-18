@@ -55,6 +55,17 @@ will help you to quickly create a deployment:
 1. Navigate to your project's **CI/CD > Pipelines** page, and run a pipeline on any branch.
 1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
+![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v12_8.png)
+
+#### Using the Metrics Dashboard
+
+##### Select an environment
+
+The **Environment** dropdown box above the dashboard displays the list of all [environments](#monitoring-cicd-environments).
+It enables you to search as you type through all environments and select the one you're looking for.
+
+![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
+
 #### About managed Prometheus deployments
 
 Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [official Helm chart](https://github.com/helm/charts/tree/master/stable/prometheus). Prometheus is only accessible within the cluster, with GitLab communicating through the [Kubernetes API](https://kubernetes.io/docs/concepts/overview/kubernetes-api/).
