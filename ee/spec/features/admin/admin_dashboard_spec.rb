@@ -21,6 +21,48 @@ describe 'Admin Dashboard' do
     end
 
     describe 'Roles stats' do
+      context 'for tooltip' do
+        let(:create_guest) { false }
+
+        before do
+          allow(License).to receive(:current).and_return(license)
+
+          if create_guest
+            project = create(:project_empty_repo)
+            guest_user = create(:user)
+            project.add_guest(guest_user)
+          end
+
+          visit admin_dashboard_stats_path
+        end
+
+        context 'when license is empty' do
+          let(:license) { nil }
+
+          it { expect(page).not_to have_css('span.has-tooltip') }
+        end
+
+        context 'when license is on a plan Ultimate' do
+          let(:license) { create(:license, plan: License::ULTIMATE_PLAN) }
+
+          context 'when guests do not exist' do
+            it { expect(page).not_to have_css('span.has-tooltip') }
+          end
+
+          context 'when guests exist' do
+            let(:create_guest) { true }
+
+            it { expect(page).to have_css('span.has-tooltip') }
+          end
+        end
+
+        context 'when license is on a plan other than Ultimate' do
+          let(:license) { create(:license, plan: License::PREMIUM_PLAN) }
+
+          it { expect(page).not_to have_css('span.has-tooltip') }
+        end
+      end
+
       it 'show correct amount of users per role' do
         visit admin_dashboard_stats_path
 

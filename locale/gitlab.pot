@@ -1281,6 +1281,9 @@ msgstr ""
 msgid "Admin notes"
 msgstr ""
 
+msgid "AdminArea|Included Free in license"
+msgstr ""
+
 msgid "AdminArea|Stop all jobs"
 msgstr ""
 
