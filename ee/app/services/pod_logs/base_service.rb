@@ -41,15 +41,6 @@ module PodLogs
       end
     end
 
-    def reactive_cache_updated(request, _opts)
-      case request
-      when CACHE_KEY_GET_POD_LOG
-        ::Gitlab::EtagCaching::Store.new.tap do |store|
-          store.touch(etag_path)
-        end
-      end
-    end
-
     private
 
     def valid_params
@@ -127,10 +118,6 @@ module PodLogs
     end
 
     def pod_logs(result)
-      raise NotImplementedError
-    end
-
-    def etag_path
       raise NotImplementedError
     end
 
