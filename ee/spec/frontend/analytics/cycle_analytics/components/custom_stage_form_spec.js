@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import createStore from 'ee/analytics/cycle_analytics/store';
+import { createLocalVue, mount } from '@vue/test-utils';
 import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
@@ -21,14 +23,22 @@ const initData = {
   endEventLabelId: groupLabels[1].id,
 };
 
+let store = null;
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('CustomStageForm', () => {
-  function createComponent(props) {
+  function createComponent(props = {}, stubs = {}) {
+    store = createStore();
     return mount(CustomStageForm, {
+      localVue,
+      store,
       propsData: {
         events,
         labels: groupLabels,
         ...props,
       },
+      stubs,
     });
   }
 
@@ -44,6 +54,9 @@ describe('CustomStageForm', () => {
     submit: '.js-save-stage',
     cancel: '.js-save-stage-cancel',
     invalidFeedback: '.invalid-feedback',
+    recoverStageDropdown: '.js-recover-hidden-stage-dropdown',
+    recoverStageDropdownTrigger: '.js-recover-hidden-stage-dropdown .dropdown-toggle',
+    hiddenStageDropdownOption: '.js-recover-hidden-stage-dropdown .dropdown-item',
   };
 
   function getDropdownOption(_wrapper, dropdown, index) {
@@ -122,7 +135,7 @@ describe('CustomStageForm', () => {
 
     describe('start event label', () => {
       beforeEach(() => {
-        wrapper = createComponent({}, false);
+        wrapper = createComponent();
       });
 
       afterEach(() => {
@@ -174,7 +187,7 @@ describe('CustomStageForm', () => {
     const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
 
     beforeEach(() => {
-      wrapper = createComponent({}, false);
+      wrapper = createComponent();
     });
 
     it('notifies that a start event needs to be selected first', () => {
@@ -251,7 +264,7 @@ describe('CustomStageForm', () => {
 
     describe('with a stop event selected and a change to the start event', () => {
       beforeEach(() => {
-        wrapper = createComponent({});
+        wrapper = createComponent();
 
         wrapper.setData({
           fields: {
@@ -518,15 +531,12 @@ describe('CustomStageForm', () => {
 
   describe('Editing a custom stage', () => {
     beforeEach(() => {
-      wrapper = createComponent(
-        {
-          isEditingCustomStage: true,
-          initialFields: {
-            ...initData,
-          },
+      wrapper = createComponent({
+        isEditingCustomStage: true,
+        initialFields: {
+          ...initData,
         },
-        false,
-      );
+      });
 
       wrapper.setData({
         fields: {
@@ -680,6 +690,63 @@ describe('CustomStageForm', () => {
       expect(wrapper.find({ ref: 'name' }).html()).toContain('is reserved');
       expect(wrapper.find({ ref: 'name' }).html()).toContain('cant be blank');
       expect(wrapper.find({ ref: 'startEventIdentifier' }).html()).toContain('cant be blank');
+    });
+  });
+
+  describe('recover stage dropdown', () => {
+    const formFieldStubs = {
+      'gl-form-group': true,
+      'gl-form-select': true,
+      'labels-selector': true,
+    };
+
+    beforeEach(() => {
+      wrapper = createComponent({}, formFieldStubs);
+    });
+
+    describe('without hidden stages', () => {
+      it('has the recover stage dropdown', () => {
+        expect(wrapper.find(sel.recoverStageDropdown).exists()).toBe(true);
+      });
+
+      it('has no stages available to recover', () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.find(sel.recoverStageDropdown).text()).toContain(
+            'All default stages are currently visible',
+          );
+        });
+      });
+    });
+
+    describe('with hidden stages', () => {
+      beforeEach(() => {
+        wrapper = createComponent({}, formFieldStubs);
+        store.state.stages = [{ id: 'my-stage', title: 'My default stage', hidden: true }];
+      });
+
+      it('has stages available to recover', () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          const txt = wrapper.find(sel.recoverStageDropdown).text();
+          expect(txt).not.toContain('All default stages are currently visible');
+          expect(txt).toContain('My default stage');
+        });
+      });
+
+      it(`emits the ${STAGE_ACTIONS.UPDATE} action when clicking on a stage to recover`, () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          wrapper
+            .findAll(sel.hiddenStageDropdownOption)
+            .at(0)
+            .trigger('click');
+
+          expect(wrapper.emitted()).toEqual({
+            [STAGE_ACTIONS.UPDATE]: [[{ hidden: false, id: 'my-stage' }]],
+          });
+        });
+      });
     });
   });
 });
