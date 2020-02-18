@@ -293,8 +293,9 @@ describe ApprovalMergeRequestRule do
           subject.group_users
         end
 
-        it 'does not cause queries' do
-          expect { subject.approvers }.not_to exceed_query_limit(0)
+        it 'does not perform any new queries when all users are loaded already' do
+          # single query is triggered for license check
+          expect { subject.approvers }.not_to exceed_query_limit(1)
         end
 
         it 'does not contain the author' do

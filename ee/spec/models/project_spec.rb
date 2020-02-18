@@ -508,6 +508,7 @@ describe Project do
 
         it 'shows proper setting' do
           expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
@@ -556,6 +557,7 @@ describe Project do
 
         it 'shows proper setting' do
           expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
