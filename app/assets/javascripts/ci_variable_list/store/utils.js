@@ -1,12 +1,15 @@
 import { __ } from '~/locale';
 
-const variableTypeHandler = type => (type === 'Variable' ? 'env_var' : 'file');
+const variableType = 'env_var';
+const fileType = 'file';
+
+const variableTypeHandler = type => (type === 'Variable' ? variableType : fileType);
 
 export const prepareDataForDisplay = variables => {
   const variablesToDisplay = [];
   variables.forEach(variable => {
     const variableCopy = variable;
-    if (variableCopy.variable_type === 'env_var') {
+    if (variableCopy.variable_type === variableType) {
       variableCopy.variable_type = __('Variable');
     } else {
       variableCopy.variable_type = __('File');
@@ -38,10 +41,4 @@ export const prepareDataForApi = (variable, destroy = false) => {
   return variableCopy;
 };
 
-export const prepareEnvironments = environments => {
-  const environmentNames = [];
-  environments.forEach(environment => {
-    environmentNames.push(environment.name);
-  });
-  return environmentNames;
-};
+export const prepareEnvironments = environments => environments.map(e => e.name);

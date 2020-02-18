@@ -2,6 +2,7 @@ import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import Api from '~/api';
 import createFlash from '~/flash';
+import { __ } from '~/locale';
 import { prepareDataForApi, prepareDataForDisplay, prepareEnvironments } from './utils';
 
 export const toggleValues = ({ commit }, valueState) => {
@@ -90,9 +91,7 @@ export const requestVariables = ({ commit }) => {
 export const receiveVariablesSuccess = ({ commit }, variables) => {
   commit(types.RECEIVE_VARIABLES_SUCCESS, variables);
 };
-export const receiveVariablesError = ({ commit }, error) => {
-  commit(types.RECEIVE_VARIABLES_ERROR, error);
-};
+
 export const fetchVariables = ({ dispatch, state }) => {
   dispatch('requestVariables');
 
@@ -101,9 +100,8 @@ export const fetchVariables = ({ dispatch, state }) => {
     .then(({ data }) => {
       dispatch('receiveVariablesSuccess', prepareDataForDisplay(data.variables));
     })
-    .catch(error => {
-      createFlash(error.response.data[0]);
-      dispatch('receiveVariablesError', error);
+    .catch(() => {
+      createFlash(__('There was an error fetching the variables.'));
     });
 };
 
@@ -144,10 +142,6 @@ export const receiveEnvironmentsSuccess = ({ commit }, environments) => {
   commit(types.RECEIVE_ENVIRONMENTS_SUCCESS, environments);
 };
 
-export const receiveEnvironmentsError = ({ commit }, error) => {
-  commit(types.RECEIVE_ENVIRONMENTS_ERROR, error);
-};
-
 export const fetchEnvironments = ({ dispatch, state }) => {
   dispatch('requestEnvironments');
 
@@ -155,8 +149,7 @@ export const fetchEnvironments = ({ dispatch, state }) => {
     .then(res => {
       dispatch('receiveEnvironmentsSuccess', prepareEnvironments(res.data));
     })
-    .catch(error => {
-      createFlash(error.response.data[0]);
-      dispatch('receiveEnvironmentsError', error);
+    .catch(() => {
+      createFlash(__('There was an error fetching the environments information.'));
     });
 };

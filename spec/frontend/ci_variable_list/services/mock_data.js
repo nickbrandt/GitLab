@@ -29,6 +29,48 @@ export default {
     },
   ],
 
+  mockVariablesApi: [
+    {
+      environment_scope: '*',
+      id: 113,
+      key: 'test_var',
+      masked: false,
+      protected: false,
+      value: 'test_val',
+      variable_type: 'env_var',
+    },
+    {
+      environment_scope: '*',
+      id: 114,
+      key: 'test_var_2',
+      masked: false,
+      protected: false,
+      value: 'test_val_2',
+      variable_type: 'file',
+    },
+  ],
+
+  mockVariablesDisplay: [
+    {
+      environment_scope: 'All environments',
+      id: 113,
+      key: 'test_var',
+      masked: false,
+      protected: false,
+      value: 'test_val',
+      variable_type: 'Variable',
+    },
+    {
+      environment_scope: 'All environments',
+      id: 114,
+      key: 'test_var_2',
+      masked: false,
+      protected: false,
+      value: 'test_val_2',
+      variable_type: 'File',
+    },
+  ],
+
   mockEnvironments: [
     {
       id: 28,

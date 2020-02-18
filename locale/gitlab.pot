@@ -19359,6 +19359,12 @@ msgstr ""
 msgid "There was an error fetching the Designs"
 msgstr ""
 
+msgid "There was an error fetching the environments information."
+msgstr ""
+
+msgid "There was an error fetching the variables."
+msgstr ""
+
 msgid "There was an error fetching value stream analytics stages."
 msgstr ""
 

@@ -11,10 +11,6 @@ export default {
     state.variables = variables;
   },
 
-  [types.RECEIVE_VARIABLES_ERROR](state) {
-    state.isLoading = false;
-  },
-
   [types.REQUEST_DELETE_VARIABLE](state) {
     state.isDeleting = true;
   },
@@ -66,11 +62,6 @@ export default {
     state.isLoading = false;
     state.environments = environments;
     state.environments.unshift(__('All environments'));
-  },
-
-  [types.RECEIVE_ENVIRONMENTS_ERROR](state, error) {
-    state.isLoading = false;
-    state.error = error;
   },
 
   [types.VARIABLE_BEING_EDITED](state, variable) {
