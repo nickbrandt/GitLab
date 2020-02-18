@@ -6,6 +6,7 @@ import {
   transformedDurationMedianData,
   durationChartPlottableData,
   durationChartPlottableMedianData,
+  allowedStages,
 } from '../mock_data';
 
 let state = null;
@@ -119,6 +120,22 @@ describe('Cycle analytics getters', () => {
       };
 
       expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual([]);
+    });
+  });
+
+  const hiddenStage = { ...allowedStages[2], hidden: true };
+  const givenStages = [allowedStages[0], allowedStages[1], hiddenStage];
+  describe.each`
+    func              | givenStages    | expectedStages
+    ${'hiddenStages'} | ${givenStages} | ${[hiddenStage]}
+    ${'activeStages'} | ${givenStages} | ${[allowedStages[0], allowedStages[1]]}
+  `('hiddenStages', ({ func, expectedStages, givenStages: stages }) => {
+    it(`'${func}' returns ${expectedStages.length} stages`, () => {
+      expect(getters[func]({ stages })).toEqual(expectedStages);
+    });
+
+    it(`'${func}' returns an empty array if there are no stages`, () => {
+      expect(getters[func]({ stages: [] })).toEqual([]);
     });
   });
 });

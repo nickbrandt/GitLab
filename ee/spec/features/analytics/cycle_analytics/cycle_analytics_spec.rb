@@ -299,7 +299,7 @@ describe 'Group Value Stream Analytics', :js do
     start_label_event = :issue_label_added
     stop_label_event = :issue_label_removed
 
-    let(:button_class) { '.js-add-stage-button' }
+    let(:add_stage_button) { '.js-add-stage-button' }
     let(:params) { { name: custom_stage_name, start_event_identifier: start_event_identifier, end_event_identifier: end_event_identifier } }
     let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
     let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage_name).ancestor(".stage-nav-item") }
@@ -334,34 +334,34 @@ describe 'Group Value Stream Analytics', :js do
 
       context 'Add a stage button' do
         it 'is visible' do
-          expect(page).to have_selector(button_class, visible: true)
+          expect(page).to have_selector(add_stage_button, visible: true)
           expect(page).to have_text('Add a stage')
         end
 
         it 'becomes active when clicked' do
-          expect(page).not_to have_selector("#{button_class}.active")
+          expect(page).not_to have_selector("#{add_stage_button}.active")
 
-          find(button_class).click
+          find(add_stage_button).click
 
-          expect(page).to have_selector("#{button_class}.active")
+          expect(page).to have_selector("#{add_stage_button}.active")
         end
 
         it 'displays the custom stage form when clicked' do
           expect(page).not_to have_text('New stage')
 
-          page.find(button_class).click
+          page.find(add_stage_button).click
 
           expect(page).to have_text('New stage')
         end
       end
 
       context 'Custom stage form' do
-        let(:show_form_button_class) { '.js-add-stage-button' }
+        let(:show_form_add_stage_button) { '.js-add-stage-button' }
 
         before do
           select_group
 
-          page.find(show_form_button_class).click
+          page.find(show_form_add_stage_button).click
           wait_for_requests
         end
 
@@ -535,6 +535,25 @@ describe 'Group Value Stream Analytics', :js do
 
       context 'Stage table' do
         context 'default stages' do
+          let(:nav) { page.find(stage_nav_selector) }
+
+          def open_recover_stage_dropdown
+            find(add_stage_button).click
+
+            expect(page).to have_content('New stage')
+            expect(page).to have_content('Recover hidden stage')
+
+            click_button "Recover hidden stage"
+
+            within(:css, '.js-recover-hidden-stage-dropdown') do
+              expect(find(".dropdown-menu")).to have_content('Default stages')
+            end
+          end
+
+          def active_stages
+            page.all(".stage-nav .stage-name").collect(&:text)
+          end
+
           before do
             select_group
 
@@ -553,14 +572,43 @@ describe 'Group Value Stream Analytics', :js do
             expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
           end
 
-          it 'will not appear in the stage table after being hidden' do
-            nav = page.find(stage_nav_selector)
-            expect(nav).to have_text("Issue")
+          context 'hidden' do
+            before do
+              click_button "Hide stage"
 
-            click_button "Hide stage"
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+            end
 
-            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
-            expect(nav).not_to have_text("Issue")
+            it 'will not appear in the stage table' do
+              expect(active_stages).not_to include("Issue")
+            end
+
+            it 'can be recovered' do
+              open_recover_stage_dropdown
+
+              expect(page.find('.js-recover-hidden-stage-dropdown')).to have_text('Issue')
+            end
+          end
+
+          context 'recovered' do
+            before do
+              click_button "Hide stage"
+
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+            end
+
+            it 'will appear in the stage table' do
+              open_recover_stage_dropdown
+
+              click_button("Issue")
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+
+              expect(page.find('.flash-notice')).to have_content 'Stage data updated'
+              expect(active_stages).to include("Issue")
+            end
           end
         end
 
