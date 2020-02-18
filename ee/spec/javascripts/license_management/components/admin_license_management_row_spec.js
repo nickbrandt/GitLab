@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import LicenseManagementRow from 'ee/vue_shared/license_management/components/license_management_row.vue';
+import AdminLicenseManagementRow from 'ee/vue_shared/license_management/components/admin_license_management_row.vue';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
@@ -10,8 +10,8 @@ import { approvedLicense } from 'ee_spec/license_management/mock_data';
 const visibleClass = 'visible';
 const invisibleClass = 'invisible';
 
-describe('LicenseManagementRow', () => {
-  const Component = Vue.extend(LicenseManagementRow);
+describe('AdminLicenseManagementRow', () => {
+  const Component = Vue.extend(AdminLicenseManagementRow);
 
   let vm;
   let store;
@@ -28,8 +28,13 @@ describe('LicenseManagementRow', () => {
     };
 
     store = new Vuex.Store({
-      state: {},
-      actions,
+      modules: {
+        licenseManagement: {
+          namespaced: true,
+          state: {},
+          actions,
+        },
+      },
     });
 
     const props = { license: approvedLicense };
@@ -48,8 +53,8 @@ describe('LicenseManagementRow', () => {
     });
 
     describe('computed', () => {
-      it('dropdownText returns `Approved`', () => {
-        expect(vm.dropdownText).toBe('Approved');
+      it('dropdownText returns `Allowed`', () => {
+        expect(vm.dropdownText).toBe('Allowed');
       });
 
       it('isApproved returns `true`', () => {
@@ -83,8 +88,8 @@ describe('LicenseManagementRow', () => {
     });
 
     describe('computed', () => {
-      it('dropdownText returns `Blacklisted`', () => {
-        expect(vm.dropdownText).toBe('Blacklisted');
+      it('dropdownText returns `Denied`', () => {
+        expect(vm.dropdownText).toBe('Denied');
       });
 
       it('isApproved returns `false`', () => {
@@ -164,7 +169,7 @@ describe('LicenseManagementRow', () => {
       expect(dropdownEl.innerText.trim()).toBe(vm.dropdownText);
     });
 
-    it('renders the dropdown with `Approved` and `Blacklisted` options', () => {
+    it('renders the dropdown with `Allowed` and `Denied` options', () => {
       const dropdownEl = vm.$el.querySelector('.dropdown');
 
       expect(dropdownEl).not.toBeNull();
@@ -172,12 +177,12 @@ describe('LicenseManagementRow', () => {
       const firstOption = findNthDropdown(0);
 
       expect(firstOption).not.toBeNull();
-      expect(firstOption.innerText.trim()).toBe('Approved');
+      expect(firstOption.innerText.trim()).toBe('Allowed');
 
       const secondOption = findNthDropdown(1);
 
       expect(secondOption).not.toBeNull();
-      expect(secondOption.innerText.trim()).toBe('Blacklisted');
+      expect(secondOption.innerText.trim()).toBe('Denied');
     });
   });
 });

@@ -22,11 +22,16 @@ describe('SetApprovalModal', () => {
     };
 
     store = new Vuex.Store({
-      state: {
-        currentLicenseInModal: licenseReport[0],
-        canManageLicenses: true,
+      modules: {
+        licenseManagement: {
+          namespaced: true,
+          state: {
+            currentLicenseInModal: licenseReport[0],
+            canManageLicenses: true,
+          },
+          actions,
+        },
       },
-      actions,
     });
 
     vm = mountComponentWithStore(Component, { store });
@@ -39,18 +44,20 @@ describe('SetApprovalModal', () => {
   describe('for approved license', () => {
     beforeEach(done => {
       store.replaceState({
-        currentLicenseInModal: {
-          ...licenseReport[0],
-          approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+        licenseManagement: {
+          currentLicenseInModal: {
+            ...licenseReport[0],
+            approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+          },
+          canManageLicenses: true,
         },
-        canManageLicenses: true,
       });
       Vue.nextTick(done);
     });
 
     describe('computed', () => {
-      it('headerTitleText returns `Blacklist license?`', () => {
-        expect(vm.headerTitleText).toBe('Blacklist license?');
+      it('headerTitleText returns `License review', () => {
+        expect(vm.headerTitleText).toBe('License review');
       });
 
       it('canApprove is false', () => {
@@ -67,20 +74,20 @@ describe('SetApprovalModal', () => {
         const headerEl = vm.$el.querySelector('.modal-title');
 
         expect(headerEl).not.toBeNull();
-        expect(headerEl.innerText.trim()).toBe('Blacklist license?');
+        expect(headerEl.innerText.trim()).toBe('License review');
       });
 
-      it('renders no Approve button in modal footer', () => {
+      it('renders no Allow button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-primary-action');
 
         expect(footerButton).toBeNull();
       });
 
-      it('renders Blacklist button in modal footer', () => {
+      it('renders Deny button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-secondary-action');
 
         expect(footerButton).not.toBeNull();
-        expect(footerButton.innerText.trim()).toBe('Blacklist license');
+        expect(footerButton.innerText.trim()).toBe('Deny');
       });
     });
   });
@@ -88,18 +95,20 @@ describe('SetApprovalModal', () => {
   describe('for unapproved license', () => {
     beforeEach(done => {
       store.replaceState({
-        currentLicenseInModal: {
-          ...licenseReport[0],
-          approvalStatus: undefined,
+        licenseManagement: {
+          currentLicenseInModal: {
+            ...licenseReport[0],
+            approvalStatus: undefined,
+          },
+          canManageLicenses: true,
         },
-        canManageLicenses: true,
       });
       Vue.nextTick(done);
     });
 
     describe('computed', () => {
-      it('headerTitleText returns `Approve license?`', () => {
-        expect(vm.headerTitleText).toBe('Approve license?');
+      it('headerTitleText returns `License review`', () => {
+        expect(vm.headerTitleText).toBe('License review');
       });
 
       it('canApprove is true', () => {
@@ -116,21 +125,21 @@ describe('SetApprovalModal', () => {
         const headerEl = vm.$el.querySelector('.modal-title');
 
         expect(headerEl).not.toBeNull();
-        expect(headerEl.innerText.trim()).toBe('Approve license?');
+        expect(headerEl.innerText.trim()).toBe('License review');
       });
 
-      it('renders Approve button in modal footer', () => {
+      it('renders Allow button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-primary-action');
 
         expect(footerButton).not.toBeNull();
-        expect(footerButton.innerText.trim()).toBe('Approve license');
+        expect(footerButton.innerText.trim()).toBe('Allow');
       });
 
-      it('renders Blacklist button in modal footer', () => {
+      it('renders Deny button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-secondary-action');
 
         expect(footerButton).not.toBeNull();
-        expect(footerButton.innerText.trim()).toBe('Blacklist license');
+        expect(footerButton.innerText.trim()).toBe('Deny');
       });
     });
   });
@@ -138,18 +147,20 @@ describe('SetApprovalModal', () => {
   describe('for blacklisted license', () => {
     beforeEach(done => {
       store.replaceState({
-        currentLicenseInModal: {
-          ...licenseReport[0],
-          approvalStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED,
+        licenseManagement: {
+          currentLicenseInModal: {
+            ...licenseReport[0],
+            approvalStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED,
+          },
+          canManageLicenses: true,
         },
-        canManageLicenses: true,
       });
       Vue.nextTick(done);
     });
 
     describe('computed', () => {
-      it('headerTitleText returns `Approve license?`', () => {
-        expect(vm.headerTitleText).toBe('Approve license?');
+      it('headerTitleText returns `License review`', () => {
+        expect(vm.headerTitleText).toBe('License review');
       });
 
       it('canApprove is true', () => {
@@ -166,17 +177,17 @@ describe('SetApprovalModal', () => {
         const headerEl = vm.$el.querySelector('.modal-title');
 
         expect(headerEl).not.toBeNull();
-        expect(headerEl.innerText.trim()).toBe('Approve license?');
+        expect(headerEl.innerText.trim()).toBe('License review');
       });
 
-      it('renders Approve button in modal footer', () => {
+      it('renders Allow button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-primary-action');
 
         expect(footerButton).not.toBeNull();
-        expect(footerButton.innerText.trim()).toBe('Approve license');
+        expect(footerButton.innerText.trim()).toBe('Allow');
       });
 
-      it('renders no Blacklist button in modal footer', () => {
+      it('renders no Deny button in modal footer', () => {
         const footerButton = vm.$el.querySelector('.js-modal-secondary-action');
 
         expect(footerButton).toBeNull();
@@ -187,11 +198,13 @@ describe('SetApprovalModal', () => {
   describe('for user without the rights to manage licenses', () => {
     beforeEach(done => {
       store.replaceState({
-        currentLicenseInModal: {
-          ...licenseReport[0],
-          approvalStatus: undefined,
+        licenseManagement: {
+          currentLicenseInModal: {
+            ...licenseReport[0],
+            approvalStatus: undefined,
+          },
+          canManageLicenses: false,
         },
-        canManageLicenses: false,
       });
       Vue.nextTick(done);
     });
@@ -284,7 +297,7 @@ describe('SetApprovalModal', () => {
 
         expect(actions.approveLicense).toHaveBeenCalledWith(
           jasmine.any(Object),
-          store.state.currentLicenseInModal,
+          store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );
       });
@@ -297,7 +310,7 @@ describe('SetApprovalModal', () => {
 
         expect(actions.blacklistLicense).toHaveBeenCalledWith(
           jasmine.any(Object),
-          store.state.currentLicenseInModal,
+          store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );
       });
@@ -309,10 +322,12 @@ describe('SetApprovalModal', () => {
     const badURL = 'javascript:alert("")';
 
     store.replaceState({
-      currentLicenseInModal: {
-        ...licenseReport[0],
-        url: badURL,
-        approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+      licenseManagement: {
+        currentLicenseInModal: {
+          ...licenseReport[0],
+          url: badURL,
+          approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+        },
       },
     });
     Vue.nextTick()

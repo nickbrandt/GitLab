@@ -5,9 +5,16 @@ import { LICENSE_LIST } from './store/constants';
 
 export default () => {
   const el = document.querySelector('#js-licenses-app');
-  const { endpoint, emptyStateSvgPath, documentationPath } = el.dataset;
+  const {
+    projectLicensesEndpoint,
+    emptyStateSvgPath,
+    documentationPath,
+    readLicensePoliciesEndpoint,
+    writeLicensePoliciesEndpoint,
+  } = el.dataset;
   const store = createStore();
-  store.dispatch(`${LICENSE_LIST}/setLicensesEndpoint`, endpoint);
+  store.dispatch('licenseManagement/setIsAdmin', Boolean(writeLicensePoliciesEndpoint));
+  store.dispatch(`${LICENSE_LIST}/setLicensesEndpoint`, projectLicensesEndpoint);
 
   return new Vue({
     el,
@@ -20,6 +27,7 @@ export default () => {
         props: {
           emptyStateSvgPath,
           documentationPath,
+          readLicensePoliciesEndpoint,
         },
       });
     },

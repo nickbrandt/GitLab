@@ -20,8 +20,8 @@ module QA::EE
             element :license_compliance_list
           end
 
-          view 'ee/app/assets/javascripts/vue_shared/license_management/components/license_management_row.vue' do
-            element :license_compliance_row
+          view 'ee/app/assets/javascripts/vue_shared/license_management/components/admin_license_management_row.vue' do
+            element :admin_license_compliance_row
             element :license_name_content
           end
 
@@ -30,13 +30,13 @@ module QA::EE
           end
 
           def has_approved_license?(name)
-            within_element(:license_compliance_row, text: name) do
+            within_element(:admin_license_compliance_row, text: name) do
               has_element?(:status_success_icon)
             end
           end
 
           def has_denied_license?(name)
-            within_element(:license_compliance_row, text: name) do
+            within_element(:admin_license_compliance_row, text: name) do
               has_element?(:status_failed_icon)
             end
           end

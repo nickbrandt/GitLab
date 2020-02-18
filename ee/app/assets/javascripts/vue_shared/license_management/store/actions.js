@@ -105,6 +105,11 @@ export const receiveSetLicenseApproval = ({ commit, dispatch, state }) => {
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);
 };
+
+export const setIsAdmin = ({ commit }, payload) => {
+  commit(types.SET_IS_ADMIN, payload);
+};
+
 export const setLicenseApproval = ({ dispatch, state }, payload) => {
   const { apiUrlManageLicenses } = state;
   const { license, newStatus } = payload;
