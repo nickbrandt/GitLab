@@ -5,7 +5,7 @@ module Geo
     # Iterates over syncable records and creates the corresponding registry
     # records which are missing. Then, the workers that actually schedule the
     # sync work only have to query the registry table for never-synced records.
-    class RegistryConsistencyWorker
+    class RegistryConsistencyWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
       prepend Reenqueuer
       include ::Gitlab::Geo::LogHelpers

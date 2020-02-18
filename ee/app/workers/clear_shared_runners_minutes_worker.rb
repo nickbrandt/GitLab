@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClearSharedRunnersMinutesWorker
+class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWorker
   LEASE_TIMEOUT = 3600
 
   include ApplicationWorker

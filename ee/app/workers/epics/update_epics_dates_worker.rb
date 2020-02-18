@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Epics
-  class UpdateEpicsDatesWorker
+  class UpdateEpicsDatesWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
 
     queue_namespace :epics

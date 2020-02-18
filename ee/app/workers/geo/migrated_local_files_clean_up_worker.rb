@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker
+  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
     include ::CronjobQueue
 
     MAX_CAPACITY = 1000

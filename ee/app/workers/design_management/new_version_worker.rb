@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DesignManagement
-  class NewVersionWorker
+  class NewVersionWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
 
     feature_category :design_management
