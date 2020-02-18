@@ -410,6 +410,7 @@ describe Projects::CreateService, '#execute' do
       it 'creates PrometheusService record', :aggregate_failures do
         project = create_project(user, opts.merge!(namespace_id: group.id))
         service = project.prometheus_service
+
         expect(service.active).to be true
         expect(service.manual_configuration?).to be false
         expect(service.persisted?).to be true
@@ -426,6 +427,7 @@ describe Projects::CreateService, '#execute' do
       it 'creates PrometheusService record', :aggregate_failures do
         project = create_project(user, opts)
         service = project.prometheus_service
+
         expect(service.active).to be true
         expect(service.manual_configuration?).to be false
         expect(service.persisted?).to be true
@@ -447,7 +449,7 @@ describe Projects::CreateService, '#execute' do
     context 'shared Prometheus application is not available' do
       it 'does not persist PrometheusService record', :aggregate_failures do
         project = create_project(user, opts)
-        
+
         expect(project.prometheus_service).to be_nil
       end
     end
