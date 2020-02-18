@@ -240,6 +240,26 @@ jest-as-if-foss:
   cache:
     policy: pull
 
+coverage-frontend:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .frontend:rules:default-frontend-jobs
+  needs: ["jest"]
+  stage: post-test
+  before_script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+  script:
+    - yarn node scripts/frontend/merge_coverage_frontend.js
+  artifacts:
+    name: coverage-frontend
+    expire_in: 31d
+    paths:
+      - coverage-frontend/
+  cache:
+    paths:
+      - .yarn-cache/
+
 .qa-frontend-node:
   extends:
     - .default-tags

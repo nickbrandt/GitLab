@@ -3,8 +3,8 @@ const Sequencer = require('@jest/test-sequencer').default;
 class ParallelCISequencer extends Sequencer {
   constructor() {
     super();
-    this.ciNodeIndex = parseInt(process.env.CI_NODE_INDEX || '1');
-    this.ciNodeTotal = parseInt(process.env.CI_NODE_TOTAL || '1');
+    this.ciNodeIndex = Number(process.env.CI_NODE_INDEX || '1');
+    this.ciNodeTotal = Number(process.env.CI_NODE_TOTAL || '1');
   }
 
   sort(tests) {
