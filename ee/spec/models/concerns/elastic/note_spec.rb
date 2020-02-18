@@ -46,7 +46,7 @@ describe Note, :elastic do
     # The note in the project you have no access to except as an administrator
     outside_note = create :note, note: 'bla-bla term2'
 
-    Gitlab::Elastic::Helper.refresh_index
+    ensure_elasticsearch_index!
 
     options = { project_ids: [issue.project.id] }
 
@@ -68,7 +68,7 @@ describe Note, :elastic do
         note.project.update!(visibility: Gitlab::VisibilityLevel::PUBLIC)
       end
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     project_ids = notes.map { |note| note.noteable.project.id }
@@ -130,7 +130,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id] }
@@ -145,7 +145,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: user }
@@ -160,7 +160,7 @@ describe Note, :elastic do
 
         Sidekiq::Testing.inline! do
           create_notes_for(issue, 'bla-bla term')
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end
 
         options = { project_ids: [issue.project.id], current_user: superuser }
@@ -178,7 +178,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: member }
@@ -195,7 +195,7 @@ describe Note, :elastic do
 
       Sidekiq::Testing.inline! do
         create_notes_for(issue, 'bla-bla term')
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       options = { project_ids: [issue.project.id], current_user: member }

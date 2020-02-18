@@ -76,7 +76,7 @@ describe Gitlab::Elastic::Indexer do
         current_commit = project.wiki.repository.commit('master').sha
 
         described_class.new(project, wiki: true).run(current_commit)
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       def indexed_wiki_paths_for(term)
@@ -209,7 +209,7 @@ describe Gitlab::Elastic::Indexer do
       current_commit = project.repository.commit('master').sha
 
       described_class.new(project).run(current_commit)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     def indexed_file_paths_for(term)

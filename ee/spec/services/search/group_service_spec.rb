@@ -47,7 +47,7 @@ describe Search::GroupService, :elastic do
         project1, project2, project3
       ]
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     context 'finding projects by name', :sidekiq_might_not_need_inline do
@@ -90,7 +90,7 @@ describe Search::GroupService, :elastic do
           [project, project2].each do |project|
             update_feature_access_level(project, feature_access_level)
           end
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'merge_requests', expected_count: expected_count) do |user|
             described_class.new(user, group, search: merge_request.title).execute
@@ -118,7 +118,7 @@ describe Search::GroupService, :elastic do
             ElasticCommitIndexerWorker.new.perform(project.id)
           end
           ElasticCommitIndexerWorker.new.perform(project.id)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'commits', expected_count: expected_count) do |user|
             described_class.new(user, group, search: 'initial').execute
@@ -150,7 +150,7 @@ describe Search::GroupService, :elastic do
           [project, project2].each do |project|
             update_feature_access_level(project, feature_access_level)
           end
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'issues', expected_count: expected_count) do |user|
             described_class.new(user, group, search: issue.title).execute
@@ -175,7 +175,7 @@ describe Search::GroupService, :elastic do
           project.wiki.create_page('test.md', '# term')
           project.wiki.index_wiki_blobs
           update_feature_access_level(project, feature_access_level)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'wiki_blobs', expected_count: expected_count) do |user|
             described_class.new(user, project.namespace, search: 'term').execute
@@ -197,7 +197,7 @@ describe Search::GroupService, :elastic do
             'issues_access_level' => issues_access_level,
             'merge_requests_access_level' => merge_requests_access_level
           )
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'milestones', expected_count: expected_count) do |user|
             described_class.new(user, group, search: milestone.title).execute
@@ -216,7 +216,7 @@ describe Search::GroupService, :elastic do
       with_them do
         it "respects visibility" do
           ElasticCommitIndexerWorker.new.perform(project.id)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expected_objects = expected_count == 1 ? [project] : []
 

@@ -90,7 +90,7 @@ describe Repository do
         project.repository.index_commits_and_blobs
         project1.repository.index_commits_and_blobs
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         expect(described_class.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
         expect(described_class.find_commits_by_message_with_elastic('initial').count).to eq(2)
@@ -103,7 +103,7 @@ describe Repository do
         project = create :project, :repository
 
         project.repository.index_commits_and_blobs
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
         expect(project.repository.find_commits_by_message_with_elastic('initial').count).to eq(1)

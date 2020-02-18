@@ -16,13 +16,15 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
   shared_examples 'an efficient database result' do
     it 'avoids N+1 database queries' do
       create(object, *creation_traits, creation_args)
-      Gitlab::Elastic::Helper.refresh_index
+
+      ensure_elasticsearch_index!
 
       control_count = ActiveRecord::QueryRecorder.new { visit path }.count
       expect(page).to have_css('.search-results') # Confirm there are search results to prevent false positives
 
       create_list(object, 10, *creation_traits, creation_args)
-      Gitlab::Elastic::Helper.refresh_index
+
+      ensure_elasticsearch_index!
 
       control_count = control_count + (10 * query_count_multiplier) + 1
 
@@ -79,7 +81,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
     before do
       create_list(:issue, 21, project: project, title: 'initial')
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it "has a pagination" do
@@ -97,7 +99,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
       issue = create(:issue, project: project, title: 'initial')
       create_list(:note, 21, noteable: issue, project: project, note: 'foo')
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it "has a pagination" do
@@ -116,7 +118,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
     before do
       project.repository.index_commits_and_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it "finds files" do
@@ -141,7 +143,9 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
         branch_name: 'master')
 
       project_2.repository.index_commits_and_blobs
-      Gitlab::Elastic::Helper.refresh_index
+
+      ensure_elasticsearch_index!
+
       project_2.destroy
 
       visit dashboard_projects_path
@@ -157,7 +161,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
       project.wiki.create_page('test.md', '# term')
       project.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it "finds files" do
@@ -175,7 +179,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
   describe 'I search through the commits' do
     before do
       project.repository.index_commits_and_blobs
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it "finds commits" do
@@ -207,7 +211,7 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
   describe 'I search globally', :js do
     before do
       create(:issue, project: project, title: 'project issue')
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       visit dashboard_projects_path
 

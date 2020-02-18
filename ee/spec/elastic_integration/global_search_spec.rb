@@ -153,7 +153,7 @@ describe 'GlobalSearch', :elastic do
       project.repository.index_commits_and_blobs
       project.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
   end
 

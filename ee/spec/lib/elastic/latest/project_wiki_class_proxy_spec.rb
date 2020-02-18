@@ -14,7 +14,7 @@ describe Elastic::Latest::ProjectWikiClassProxy do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
       Gitlab::Elastic::Indexer.new(project, wiki: true).run
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'returns FoundWikiPage', :sidekiq_inline do
