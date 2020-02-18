@@ -40,53 +40,52 @@ describe('SamlSettingsForm', () => {
     });
   });
 
-  it('correctly turns off dependent toggle', () => {
+  it('correctly disables dependent toggle', () => {
     samlSettingsForm.settings.forEach(s => {
       const { input } = s;
       input.value = true;
     });
 
-    const enforcedGroupManagedAccountSetting = samlSettingsForm.settings.find(
-      s => s.name === 'enforced-group-managed-accounts',
-    );
-    const prohibitForksSetting = samlSettingsForm.settings.find(
-      s => s.name === 'prohibited-outer-forks',
-    );
+    const findEnforcedGroupManagedAccountSetting = () =>
+      samlSettingsForm.settings.find(s => s.name === 'enforced-group-managed-accounts');
+    const findProhibitForksSetting = () =>
+      samlSettingsForm.settings.find(s => s.name === 'prohibited-outer-forks');
 
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
-    expect(prohibitForksSetting.toggle.hasAttribute('disabled')).toBe(false);
+    expect(findProhibitForksSetting().toggle.hasAttribute('disabled')).toBe(false);
 
-    enforcedGroupManagedAccountSetting.input.value = false;
+    findEnforcedGroupManagedAccountSetting().input.value = false;
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
 
-    expect(prohibitForksSetting.toggle.hasAttribute('disabled')).toBe(true);
-    expect(prohibitForksSetting.value).toBe(false);
+    expect(findProhibitForksSetting().toggle.hasAttribute('disabled')).toBe(true);
+    expect(findProhibitForksSetting().value).toBe(true);
   });
 
-  it('correctly turns off multiple dependent toggles', () => {
+  it('correctly disables multiple dependent toggles', () => {
     samlSettingsForm.settings.forEach(s => {
       const { input } = s;
       input.value = true;
     });
 
-    const [groupSamlSetting, ...otherSettings] = samlSettingsForm.settings;
+    let groupSamlSetting;
+    let otherSettings;
 
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
-    expect(samlSettingsForm.settings.map(s => s.value)).not.toContain(false);
-    expect(samlSettingsForm.settings.map(s => s.toggle.hasAttribute('disabled'))).not.toContain(
-      true,
-    );
+    [groupSamlSetting, ...otherSettings] = samlSettingsForm.settings;
+    expect(samlSettingsForm.settings.every(s => s.value)).toBe(true);
+    expect(samlSettingsForm.settings.some(s => s.toggle.hasAttribute('disabled'))).toBe(false);
 
     groupSamlSetting.input.value = false;
     samlSettingsForm.updateSAMLSettings();
     samlSettingsForm.updateView();
 
     return new Promise(window.requestAnimationFrame).then(() => {
-      expect(samlSettingsForm.settings.map(s => s.value)).not.toContain(true);
-      expect(otherSettings.map(s => s.toggle.hasAttribute('disabled'))).not.toContain(false);
+      [groupSamlSetting, ...otherSettings] = samlSettingsForm.settings;
+      expect(otherSettings.every(s => s.value)).toBe(true);
+      expect(otherSettings.every(s => s.toggle.hasAttribute('disabled'))).toBe(true);
     });
   });
 });
