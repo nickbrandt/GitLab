@@ -33,10 +33,6 @@
   min-width: 400px;
   flex-basis: 28%;
 
-  li {
-    list-style: none;
-  }
-
   .badge.badge-pill {
     margin-left: $gl-padding;
     background-color: $blue-400;
@@ -61,6 +57,7 @@
 
     .design-note {
       padding: $gl-padding;
+      list-style: none;
 
       a {
         color: inherit;
