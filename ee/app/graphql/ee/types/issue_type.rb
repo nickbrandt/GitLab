@@ -20,6 +20,12 @@ module EE
 
         field :design_collection, ::Types::DesignManagement::DesignCollectionType, null: true,
               description: 'Collection of design images associated with this issue'
+
+        field :health_status,
+          ::Types::HealthStatusEnum,
+          null: true,
+          description: 'Current health status',
+          feature_flag: :save_issuable_health_status
       end
     end
   end

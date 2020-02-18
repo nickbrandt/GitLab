@@ -16,6 +16,11 @@ module Mutations
                 required: false,
                 description: 'State event for the epic'
 
+      argument :health_status,
+               ::Types::HealthStatusEnum,
+               required: false,
+               description: 'The desired health status'
+
       field :epic,
             Types::EpicType,
             null: true,
