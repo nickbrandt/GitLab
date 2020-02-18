@@ -28,8 +28,8 @@ module Projects
 
     def create
       result = ::Projects::Licenses::CreatePolicyService
-                   .new(project, current_user, software_license_policy_params)
-                   .execute
+        .new(project, current_user, software_license_policy_params)
+        .execute
 
       if result[:status] == :success
         render json: LicenseEntity.represent(result[:software_license_policy]), status: :created
@@ -40,8 +40,8 @@ module Projects
 
     def update
       result = ::Projects::Licenses::UpdatePolicyService
-                   .new(project, current_user, software_license_policy_params)
-                   .execute(params[:id])
+        .new(project, current_user, software_license_policy_params)
+        .execute(params[:id])
 
       if result[:status] == :success
         render json: LicenseEntity.represent(result[:software_license_policy]), status: :ok
@@ -87,7 +87,7 @@ module Projects
 
     def write_license_policies_endpoint
       if can?(current_user, :admin_software_license_policy, @project)
-        api_v4_projects_managed_licenses_path(id: @project.id)
+        expose_path(api_v4_projects_managed_licenses_path(id: @project.id))
       else
         ''
       end
@@ -95,11 +95,11 @@ module Projects
 
     def licenses_app_data
       {
-          project_licenses_endpoint: project_licenses_path(@project, detected: true, format: :json),
-          read_license_policies_endpoint: api_v4_projects_managed_licenses_path(id: @project.id),
-          write_license_policies_endpoint: write_license_policies_endpoint,
-          documentation_path: help_page_path('user/application_security/license_compliance/index'),
-          empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg')
+        project_licenses_endpoint: project_licenses_path(@project, detected: true, format: :json),
+        read_license_policies_endpoint: expose_path(api_v4_projects_managed_licenses_path(id: @project.id)),
+        write_license_policies_endpoint: write_license_policies_endpoint,
+        documentation_path: help_page_path('user/application_security/license_compliance/index'),
+        empty_state_svg_path: helpers.image_path('illustrations/Dependency-list-empty-state.svg')
       }
     end
   end
