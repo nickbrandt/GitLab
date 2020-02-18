@@ -3,7 +3,7 @@
 class AdminEmailsWorker
   include ApplicationWorker
 
-  feature_category_not_owned!
+  feature_category :issue_tracking
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(recipient_id, subject, body)
