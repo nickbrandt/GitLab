@@ -25,6 +25,11 @@ export default {
       required: false,
       default: null,
     },
+    disableCommenting: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -34,11 +39,16 @@ export default {
   },
   computed: {
     overlayStyle() {
-      return {
+      const style = {
         width: `${this.dimensions.width}px`,
         height: `${this.dimensions.height}px`,
         ...this.position,
       };
+
+      if (this.disableCommenting) {
+        style.cursor = 'unset';
+      }
+      return style;
     },
     isMovingCurrentComment() {
       return Boolean(this.movingNoteStartPosition && !this.movingNoteStartPosition.noteId);
@@ -207,6 +217,7 @@ export default {
     @mouseleave="onNoteMouseup"
   >
     <button
+      v-show="!disableCommenting"
       type="button"
       class="btn-transparent position-absolute image-diff-overlay-add-comment w-100 h-100 js-add-image-diff-note-button"
       data-qa-selector="design_image_button"
@@ -222,15 +233,15 @@ export default {
           ? getNotePositionStyle(movingNoteNewPosition)
           : getNotePositionStyle(note.position)
       "
-      @mousedown="onNoteMousedown($event, note)"
-      @mouseup="onNoteMouseup"
+      @mousedown.stop="onNoteMousedown($event, note)"
+      @mouseup.stop="onNoteMouseup"
     />
     <design-note-pin
       v-if="currentCommentForm"
       :position="currentCommentPositionStyle"
       :repositioning="isMovingCurrentComment"
-      @mousedown="onNoteMousedown"
-      @mouseup="onNoteMouseup"
+      @mousedown.stop="onNoteMousedown"
+      @mouseup.stop="onNoteMouseup"
     />
   </div>
 </template>
