@@ -1,5 +1,7 @@
 <script>
 import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
+import { spriteIcon } from '~/lib/utils/common_utils';
+
 
 export default {
   name: 'SeverityBadge',
@@ -16,45 +18,53 @@ export default {
     severityTitle() {
       return SEVERITY_LEVELS[this.severity] || this.severity;
     },
+    iconHtml() {
+      return spriteIcon('severity-'+this.severity.toLowerCase());
+    },    
   },
 };
 </script>
 
 <template>
-  <div class="severity-badge" :class="className">{{ severityTitle }}</div>
+  <div class="severity-badge"><span v-html="iconHtml" :class="className"></span> {{ severityTitle }}</div>
 </template>
 
 <style>
 .severity-badge {
-  background-color: #f2f2f2;
-  border-radius: 0.3em;
-  color: #505050;
   display: inline-block;
   font-size: 0.9em;
-  font-weight: bold;
-  line-height: 1em;
   padding: 0.6em 0.4em 0.4em;
-  text-transform: uppercase;
+}
+
+.severity-badge svg {
+    height:12px;
+    width:12px;
+    margin-right:4px;
+    position:relative;
+    top:2px;
 }
 
 .severity-badge-critical {
-  background-color: #fae5e1;
-  color: #c0341e;
+  color: #8B2615;
 }
 
 .severity-badge-high {
-  background-color: #fff1de;
-  color: #de7e00;
+  color: #C0341D;
 }
 
 .severity-badge-medium {
-  background-color: #ede8fb;
-  color: #6d49cb;
+  color: #FCA429;
+}
+
+.severity-badge-low {
+  color: #FDBC60;
+}
+
+.severity-badge-info {
+  color: #418CD8;
 }
 
 .severity-badge-unknown {
-  background-color: #ffffff;
-  border: 1px solid;
-  color: #707070;
+  color: #919191;
 }
 </style>
