@@ -219,7 +219,7 @@ class GeoNode < ApplicationRecord
   end
 
   def job_artifacts
-    Ci::JobArtifact.all unless selective_sync?
+    return Ci::JobArtifact.all unless selective_sync?
 
     Ci::JobArtifact.project_id_in(projects)
   end
