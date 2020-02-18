@@ -336,13 +336,16 @@ module.exports = {
 
               if (stats.hasErrors()) {
                 console.error(info.errors.join('\n\n'));
+                return callback('DLL not compiled successfully.');
               }
 
               if (stats.hasWarnings()) {
                 console.warn(info.warnings.join('\n\n'));
+                console.warn('DLL compiled with warnings.');
+              } else {
+                console.log('DLL compiled successfully.');
               }
 
-              console.log('DLL compiled successfully.');
               dll.exists = true;
               callback();
             });
