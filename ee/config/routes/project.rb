@@ -93,6 +93,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         namespace :analytics do
           resources :code_reviews, only: [:index]
+          resource :issues_analytics, only: [:show]
         end
 
         resources :approvers, only: :destroy
