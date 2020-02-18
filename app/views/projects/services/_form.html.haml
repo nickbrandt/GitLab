@@ -14,7 +14,9 @@
       = render 'shared/service_settings', form: form, subject: @service
       - if @service.editable?
         .footer-block.row-content-block
-          = service_save_button(@service)
+          %button.btn.btn-success{ type: 'submit', disabled: @service.deprecated?, data: { qa_selector: 'save_changes_button' } }
+            .spinner.spinner-light.hidden.js-btn-spinner
+            %span.js-btn-label= _('Save changes')
           &nbsp;
           = link_to _('Cancel'), project_settings_integrations_path(@project), class: 'btn btn-cancel'
 
