@@ -118,11 +118,6 @@ module EE
         end
       end
 
-      class ProtectedEnvironment < Grape::Entity
-        expose :name
-        expose :deploy_access_levels, using: ::API::Entities::ProtectedRefAccess
-      end
-
       module IssueBasic
         extend ActiveSupport::Concern
 
@@ -267,25 +262,6 @@ module EE
             ::Gitlab::UrlBuilder.build(design)
           end
         end
-      end
-
-      class ProjectPushRule < Grape::Entity
-        extend EntityHelpers
-        expose :id, :project_id, :created_at
-        expose :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :deny_delete_tag
-        expose :member_check, :prevent_secrets, :author_email_regex
-        expose :file_name_regex, :max_file_size
-        expose_restricted :commit_committer_check, &:project
-        expose_restricted :reject_unsigned_commits, &:project
-      end
-
-      class LdapGroupLink < Grape::Entity
-        expose :cn, :group_access, :provider
-      end
-
-      class RelatedIssue < ::API::Entities::Issue
-        expose :issue_link_id
-        expose :issue_link_type, as: :link_type
       end
 
       class LinkedEpic < Grape::Entity
