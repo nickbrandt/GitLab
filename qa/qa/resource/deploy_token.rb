@@ -31,9 +31,7 @@ module QA
       def fabricate!
         project.visit!
 
-        Page::Project::Menu.act do
-          go_to_repository_settings
-        end
+        Page::Project::Menu.perform(&:go_to_ci_cd_settings)
 
         Page::Project::Settings::CICD.perform do |cicd|
           cicd.expand_deploy_tokens do |page|
