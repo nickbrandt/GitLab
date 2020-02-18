@@ -4,7 +4,7 @@
 - page_title @vulnerability.title
 - page_description @vulnerability.description
 
-.detail-page-header
+.detail-page-header.align-items-center
   .detail-page-header-body
     .issuable-status-box.status-box.status-box-open.closed
       %span= @vulnerability.state
@@ -16,6 +16,9 @@
     - else
       %span#js-vulnerability-created
         = time_ago_with_tooltip(@vulnerability.created_at)
+  %label.mb-0.mr-2= _('Status')
+  #vulnerability-show-header{ data: { state: @vulnerability.state,
+    id: @vulnerability.id } }
 
 .issue-details.issuable-details
   .detail-page-description.content-block
