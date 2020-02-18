@@ -116,6 +116,20 @@ module QA
               QA::Service::Omnibus.new(@name).act do
                 require 'uri'
 
+                # At this stage of the workflow, the 'geo-logcursor' service will
+                # be 'flapping' because the Secondary DB has not been replicated
+                # and is known to timeout when a `gitlab-ctl stop` is issued
+                # (it is called as part of the `replicate-geo-database`
+                # command).
+                #
+                # The timeout occurs because it can take longer than 60 secs for
+                # 'geo-logcursor' to stop, which is the maximum length of time
+                # runit will wait before deeming the service to 'timeout' and
+                # then returns a non-zero exit code.
+                #
+                # Let's always ensure we return a zero exit code here.
+                gitlab_ctl "stop || true"
+
                 host = URI(QA::Runtime::Scenario.geo_primary_address).host
                 slot = QA::Runtime::Scenario.geo_primary_name.tr('-', '_')
 
