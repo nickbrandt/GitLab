@@ -1,5 +1,5 @@
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import { n__, sprintf } from '~/locale';
+import { s__, n__, sprintf } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 /**
@@ -16,6 +16,15 @@ export const normalizeLicense = license => {
     ...rest,
     approvalStatus,
   };
+};
+
+export const getStatusTranslationsFromLicenseStatus = approvalStatus => {
+  if (approvalStatus === LICENSE_APPROVAL_STATUS.APPROVED) {
+    return s__('LicenseCompliance|Allowed');
+  } else if (approvalStatus === LICENSE_APPROVAL_STATUS.BLACKLISTED) {
+    return s__('LicenseCompliance|Denied');
+  }
+  return '';
 };
 
 export const getIssueStatusFromLicenseStatus = approvalStatus => {

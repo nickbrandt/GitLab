@@ -59,6 +59,20 @@ describe('License store actions', () => {
     });
   });
 
+  describe('setIsAdmin', () => {
+    it('commits SET_IS_ADMIN', done => {
+      testAction(
+        actions.setIsAdmin,
+        false,
+        state,
+        [{ type: mutationTypes.SET_IS_ADMIN, payload: false }],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
   describe('resetLicenseInModal', () => {
     it('commits RESET_LICENSE_IN_MODAL', done => {
       testAction(

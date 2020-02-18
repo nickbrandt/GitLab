@@ -25,11 +25,11 @@ describe('LicenseIssueBody', () => {
     it('clicking the button triggers openModal with the current license', () => {
       const linkEl = vm.$el.querySelector('.license-item > .btn-link');
 
-      expect(store.state.currentLicenseInModal).toBe(null);
+      expect(store.state.licenseManagement.currentLicenseInModal).toBe(null);
 
       linkEl.click();
 
-      expect(store.state.currentLicenseInModal).toBe(issue);
+      expect(store.state.licenseManagement.currentLicenseInModal).toBe(issue);
     });
   });
 
