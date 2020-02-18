@@ -201,21 +201,4 @@ describe ::PodLogs::BaseService do
       expect(result[:message]).to eq('Container does not exist')
     end
   end
-
-  describe '#reactive_cache_updated' do
-    context 'get_pod_log' do
-      let(:cache_key) { 'get_pod_log' }
-
-      it 'expires k8s_pod_logs etag cache' do
-        expected_path = "/root/autodevops-deploy/-/logs/k8s.json"
-        allow(subject).to receive(:etag_path).and_return(expected_path)
-
-        allow_next_instance_of(Gitlab::EtagCaching::Store) do |store|
-          allow(store).to receive(:touch).with(expected_path).and_call_original
-        end
-
-        subject.reactive_cache_updated(cache_key, {})
-      end
-    end
-  end
 end
