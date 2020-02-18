@@ -46,15 +46,5 @@ module PodLogs
         error_code: e.error_code
       })
     end
-
-    def etag_path
-      ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
-        environment.project,
-        params.merge({
-          environment_name: environment.name,
-          format: :json
-        })
-      )
-    end
   end
 end

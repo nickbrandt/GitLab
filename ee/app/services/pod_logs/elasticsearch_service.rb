@@ -52,15 +52,5 @@ module PodLogs
 
       success(result)
     end
-
-    def etag_path
-      ::Gitlab::Routing.url_helpers.elasticsearch_project_logs_path(
-        environment.project,
-        params.merge({
-          environment_name: environment.name,
-          format: :json
-        })
-      )
-    end
   end
 end

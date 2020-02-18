@@ -8,14 +8,6 @@ module EE
           ::Gitlab::EtagCaching::Router::Route.new(
             %r(^/groups/#{::Gitlab::PathRegex.full_namespace_route_regex}/-/epics/\d+/notes\z),
             'epic_notes'
-          ),
-          ::Gitlab::EtagCaching::Router::Route.new(
-            %r(#{::Gitlab::EtagCaching::Router::RESERVED_WORDS_PREFIX}/logs/k8s\.json(\?.*)?\z),
-            'k8s_pod_logs'
-          ),
-          ::Gitlab::EtagCaching::Router::Route.new(
-            %r(#{::Gitlab::EtagCaching::Router::RESERVED_WORDS_PREFIX}/logs/elasticsearch\.json(\?.*)?\z),
-            'elasticsearch_pod_logs'
           )
         ].freeze
 
