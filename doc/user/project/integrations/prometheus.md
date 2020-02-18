@@ -428,6 +428,29 @@ Note the following properties:
 
 ![single stat panel type](img/prometheus_dashboard_single_stat_panel_type.png)
 
+###### Percentile based results
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/201946) in GitLab 12.8.
+
+Query results sometimes need to be represented as a percentage value out of 100. You can use the `max_value` property at the root of the panel definition:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group Title'
+    panels:
+      - title: "Single Stat"
+        type: "single-stat"
+        max_value: 100
+        metrics:
+        - id: 10
+          query: 'max(go_memstats_alloc_bytes{job="prometheus"})'
+          unit: '%'
+          label: "Total"
+```
+
+For example, if you have a query value of `53.6`, adding `%` as the unit results in a single stat value of `53.6%`, but if the maximum expected value of the query is `120`, the value would be `44.6%`. Adding the `max_value` causes the correct percentage value to display.
+
 ##### Heatmaps
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/30581) in GitLab 12.5.
