@@ -1,4 +1,4 @@
-/* eslint-disable func-names, prefer-arrow-callback, no-var, no-alert */
+/* eslint-disable func-names, no-var, no-alert */
 /* global $ */
 /* global AP */
 
