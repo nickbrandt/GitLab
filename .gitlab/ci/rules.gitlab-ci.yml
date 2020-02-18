@@ -461,11 +461,11 @@
       changes: *code-qa-patterns
       when: manual
 
-.reports:schedule-dast:
+.reports:rules:schedule-dast:
   rules:
     - if: '$DAST_DISABLED || $GITLAB_FEATURES !~ /\bdast\b/'
       when: never
-    - <<: *if-dot-com-gitlab-org-schedule
+    - <<: *if-nightly-master-schedule
 
 ################
 # Review rules #

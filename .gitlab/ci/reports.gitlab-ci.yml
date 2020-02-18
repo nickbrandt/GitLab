@@ -167,17 +167,18 @@ dast:
   image:
     name: "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION"
   variables:
-    # To be done in a later iteration
-    # DAST_USERNAME: "root"
-    # DAST_USERNAME_FIELD: "user[login]"
-    # DAST_PASSWORD_FIELD: "user[passowrd]"
     DAST_VERSION: 1
+    DAST_USERNAME: "root"
+    DAST_USERNAME_FIELD: "user[login]"
+    DAST_PASSWORD_FIELD: "user[password]"
+    # FIXME: Remove the following line once ready
+    DAST_FULL_SCAN_ENABLED: "true"
   allow_failure: true
   script:
     - 'export DAST_WEBSITE="${DAST_WEBSITE:-$(cat environment_url.txt)}"'
-    # To be done in a later iteration
-    # - 'export DAST_AUTH_URL="${DAST_WEBSITE}/users/sign_in"'
-    # - 'export DAST_PASSWORD="${REVIEW_APPS_ROOT_PASSWORD}"'
+    - 'export DAST_AUTH_URL="${DAST_WEBSITE}/users/sign_in"'
+    - 'export DAST_AUTH_EXCLUDE_URLS="${DAST_WEBSITE}/users/sign_out"'
+    - 'export DAST_PASSWORD="${REVIEW_APPS_ROOT_PASSWORD}"'
     - /analyze -t $DAST_WEBSITE
   artifacts:
     paths:
@@ -187,9 +188,9 @@ dast:
     expire_in: 1 week  # GitLab-specific
 
 # To be done in a later iteration: https://gitlab.com/gitlab-org/gitlab/issues/31160#note_278188255
-# schedule:dast:
-#   extends:
-#     - dast
-#     - .reports:schedule-dast
-#   variables:
-#     DAST_FULL_SCAN_ENABLED: "true"
+schedule:dast:
+  extends:
+    - dast
+    - .reports:rules:schedule-dast
+  variables:
+    DAST_FULL_SCAN_ENABLED: "true"
