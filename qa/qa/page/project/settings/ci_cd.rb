@@ -11,9 +11,6 @@ module QA
             element :autodevops_settings_content
             element :runners_settings_content
             element :variables_settings_content
-          end
-
-          view 'app/views/shared/deploy_tokens/_index.html.haml' do
             element :deploy_tokens_settings
           end
 
