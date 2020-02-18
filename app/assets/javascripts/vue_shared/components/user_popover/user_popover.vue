@@ -3,6 +3,7 @@ import { GlPopover, GlSkeletonLoading } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarImage from '../user_avatar/user_avatar_image.vue';
 import { glEmojiTag } from '../../../emoji';
+import { s__, sprintf } from '~/locale';
 
 export default {
   name: 'UserPopover',
@@ -45,8 +46,21 @@ export default {
     nameIsLoading() {
       return !this.user.name;
     },
-    jobInfoIsLoading() {
-      return !this.user.loaded && this.user.organization === null;
+    workInformationIsLoading() {
+      return !this.user.loaded && this.workInformation === null;
+    },
+    workInformation() {
+      const { jobTitle, organization } = this.user;
+
+      if (organization && jobTitle) {
+        return sprintf(s__('Profile|%{jobTitle} at %{organization}'), { jobTitle, organization });
+      } else if (organization) {
+        return organization;
+      } else if (jobTitle) {
+        return jobTitle;
+      }
+
+      return null;
     },
     locationIsLoading() {
       return !this.user.loaded && this.user.location === null;
@@ -76,12 +90,16 @@ export default {
             <icon name="profile" class="category-icon flex-shrink-0" />
             <span class="ml-1">{{ user.bio }}</span>
           </div>
-          <div v-if="user.organization" class="js-organization d-flex mb-1">
-            <icon v-show="!jobInfoIsLoading" name="work" class="category-icon flex-shrink-0" />
-            <span class="ml-1">{{ user.organization }}</span>
+          <div v-if="workInformation" class="js-work-information d-flex mb-1">
+            <icon
+              v-show="!workInformationIsLoading"
+              name="work"
+              class="category-icon flex-shrink-0"
+            />
+            <span class="ml-1">{{ workInformation }}</span>
           </div>
           <gl-skeleton-loading
-            v-if="jobInfoIsLoading"
+            v-if="workInformationIsLoading"
             :lines="1"
             class="animation-container-small mb-1"
           />

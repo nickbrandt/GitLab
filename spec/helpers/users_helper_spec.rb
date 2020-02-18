@@ -178,4 +178,29 @@ describe UsersHelper do
       end
     end
   end
+
+  describe '#work_information' do
+    it "returns job title concatinated with organization if both are present" do
+      user = create(:user, organization: 'GitLab', job_title: 'Frontend Engineer')
+      expect(helper.work_information(user)).to eq('Frontend Engineer at GitLab')
+    end
+
+    it "returns organization if only organization is present" do
+      user = create(:user, organization: 'GitLab')
+      expect(helper.work_information(user)).to eq('GitLab')
+    end
+
+    it "returns job title if only job_title is present" do
+      user = create(:user, job_title: 'Frontend Engineer')
+      expect(helper.work_information(user)).to eq('Frontend Engineer')
+    end
+
+    it "returns nil if job_title and organization are not present" do
+      expect(helper.work_information(user)).to be_nil
+    end
+
+    it "returns nil user paramater is nil" do
+      expect(helper.work_information(nil)).to be_nil
+    end
+  end
 end

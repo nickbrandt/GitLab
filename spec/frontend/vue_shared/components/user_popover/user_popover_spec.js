@@ -11,6 +11,7 @@ const DEFAULT_PROPS = {
     location: 'Vienna',
     bio: null,
     organization: null,
+    jobTitle: null,
     status: null,
   },
 };
@@ -56,6 +57,7 @@ describe('User Popover Component', () => {
               location: null,
               bio: null,
               organization: null,
+              jobTitle: null,
               status: null,
             },
           },
@@ -85,29 +87,52 @@ describe('User Popover Component', () => {
   });
 
   describe('job data', () => {
-    it('should show only bio if no organization is available', () => {
+    it('should show only bio if organization and job title are not available', () => {
       const user = { ...DEFAULT_PROPS.user, bio: 'Engineer' };
 
       createWrapper({ user });
 
       expect(wrapper.text()).toContain('Engineer');
+      expect(wrapper.find('.js-work-information').exists()).toBe(false);
     });
 
-    it('should show only organization if no bio is available', () => {
+    it('should show only organization if job title is not available', () => {
       const user = { ...DEFAULT_PROPS.user, organization: 'GitLab' };
 
       createWrapper({ user });
 
-      expect(wrapper.text()).toContain('GitLab');
+      expect(wrapper.find('.js-work-information > span').text()).toBe('GitLab');
     });
 
-    it('should display bio and organization in separate lines', () => {
+    it('should show only job title if organization is not available', () => {
+      const user = { ...DEFAULT_PROPS.user, jobTitle: 'Frontend Engineer' };
+
+      createWrapper({ user });
+
+      expect(wrapper.find('.js-work-information > span').text()).toBe('Frontend Engineer');
+    });
+
+    it('should show organization and job title if they are both available', () => {
+      const user = {
+        ...DEFAULT_PROPS.user,
+        organization: 'GitLab',
+        jobTitle: 'Frontend Engineer',
+      };
+
+      createWrapper({ user });
+
+      expect(wrapper.find('.js-work-information > span').text()).toBe(
+        'Frontend Engineer at GitLab',
+      );
+    });
+
+    it('should display bio and job info in separate lines', () => {
       const user = { ...DEFAULT_PROPS.user, bio: 'Engineer', organization: 'GitLab' };
 
       createWrapper({ user });
 
       expect(wrapper.find('.js-bio').text()).toContain('Engineer');
-      expect(wrapper.find('.js-organization').text()).toContain('GitLab');
+      expect(wrapper.find('.js-work-information').text()).toContain('GitLab');
     });
 
     it('should not encode special characters in bio and organization', () => {
@@ -120,7 +145,7 @@ describe('User Popover Component', () => {
       createWrapper({ user });
 
       expect(wrapper.find('.js-bio').text()).toContain('Manager & Team Lead');
-      expect(wrapper.find('.js-organization').text()).toContain('Me & my <funky> Company');
+      expect(wrapper.find('.js-work-information').text()).toContain('Me & my <funky> Company');
     });
 
     it('shows icon for bio', () => {

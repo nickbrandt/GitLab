@@ -401,3 +401,18 @@
   line-height: 16px;
   text-align: center;
 }
+
+@mixin middle-dot-divider {
+  &::after {
+    content: '\00B7'; // Middle Dot
+    padding: 0 6px;
+    font-weight: $gl-font-weight-bold;
+  }
+
+  &:last-child {
+    &::after {
+      content: '';
+      padding: 0;
+    }
+  }
+}
