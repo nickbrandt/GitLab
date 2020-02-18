@@ -6,9 +6,7 @@ type: reference
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15643) in GitLab 11.7.
 
-
-
-GitLab supports using [Git push options](https://git-scm.com/docs/git-push#Documentation/git-push.txt--oltoptiongt)
+GitLab supports using client-side [Git push options](https://git-scm.com/docs/git-push#Documentation/git-push.txt--oltoptiongt)
 to perform various actions at the same time as pushing changes.
 
 Currently, there are push options available for:
@@ -114,6 +112,6 @@ pipeline succeeds:
 git mwps origin <local-branch-name>
 ```
 
-## Push Rules
+# Server-side Push Rules
 
-See also [Push Rules](https://docs.gitlab.com/ee/push_rules/push_rules.html) for further control options.
+For server-side options, See also [Push Rules](https://docs.gitlab.com/ee/push_rules/push_rules.html) for further control and enforcement options.
