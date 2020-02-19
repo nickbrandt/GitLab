@@ -41,7 +41,7 @@ export default {
     width:12px;
     margin-right:4px;
     position:relative;
-    top:2px;
+    top:1px;
 }
 
 .severity-badge-critical {
