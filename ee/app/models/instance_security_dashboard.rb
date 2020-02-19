@@ -2,7 +2,6 @@
 
 class InstanceSecurityDashboard
   extend ActiveModel::Naming
-  include ::Vulnerable
 
   def self.name
     'Instance'

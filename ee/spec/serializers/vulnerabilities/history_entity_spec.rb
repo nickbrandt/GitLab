@@ -3,13 +3,12 @@
 require 'spec_helper'
 
 describe Vulnerabilities::HistoryEntity do
-  let(:group) { create(:group) }
-  let(:project) { create(:project, group: group) }
+  let(:project) { create(:project) }
   let(:time) { Time.zone.parse('2018-11-10') }
 
   let(:entity) do
     travel_to(Time.zone.parse('2018-11-15')) do
-      described_class.represent(group.all_vulnerabilities.count_by_day_and_severity(3.months))
+      described_class.represent(project.vulnerability_findings.count_by_day_and_severity(3.months))
     end
   end
 

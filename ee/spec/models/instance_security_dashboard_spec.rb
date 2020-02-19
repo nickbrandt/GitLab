@@ -17,10 +17,6 @@ describe InstanceSecurityDashboard do
 
   subject { described_class.new(user, project_ids: project_ids) }
 
-  it_behaves_like Vulnerable do
-    let(:vulnerable) { described_class.new(user, project_ids: project_ids) }
-  end
-
   describe '.name' do
     it 'is programmatically named Instance' do
       expect(described_class.name).to eq('Instance')

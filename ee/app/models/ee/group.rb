@@ -10,7 +10,6 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
       include HasTimelogsReport
