@@ -10,16 +10,12 @@ module EE
       ::Feature.enabled?(:vue_package_list, subject)
     end
 
-    def npm_package_registry_url
-      expose_url(api_v4_packages_npm_package_name_path)
-    end
-
-    def conan_package_registry_url
-      expose_url("api/#{::API::API.version}/packages/conan")
-    end
-
     def nuget_package_registry_url(project_id)
       expose_url(api_v4_projects_packages_nuget_index_path(id: project_id, format: '.json'))
+    end
+
+    def package_registry_instance_url(registry_type)
+      expose_url("api/#{::API::API.version}/packages/#{registry_type}")
     end
 
     def package_registry_project_url(project_id, registry_type = :maven)

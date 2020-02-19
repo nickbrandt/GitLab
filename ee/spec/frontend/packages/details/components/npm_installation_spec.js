@@ -1,80 +1,76 @@
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 import { TrackingActions, TrackingLabels } from 'ee/packages/details/constants';
+import { npmPackage as packageEntity } from '../../mock_data';
+import { registryUrl as nugetPath } from '../mock_data';
 import Tracking from '~/tracking';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('NpmInstallation', () => {
   let wrapper;
 
-  const packageScope = '@fake-scope';
-  const packageName = 'my-package';
-  const packageScopeName = `${packageScope}/${packageName}`;
-  const registryUrl = 'https://gitlab.com/api/v4/packages/npm/';
-
-  const defaultProps = {
-    name: packageScopeName,
-    registryUrl: `${registryUrl}package_name`,
-    helpUrl: 'foo',
-  };
-
-  const npmInstall = `npm i ${packageScopeName}`;
-  const npmSetup = `echo ${packageScope}:registry=${registryUrl} >> .npmrc`;
-  const yarnInstall = `yarn add ${packageScopeName}`;
-  const yarnSetup = `echo \\"${packageScope}:registry\\" \\"${registryUrl}\\" >> .yarnrc`;
+  const npmCommandStr = 'npm install';
+  const npmSetupStr = 'npm setup';
+  const yarnCommandStr = 'npm install';
+  const yarnSetupStr = 'npm setup';
 
   const installationTab = () => wrapper.find('.js-installation-tab > a');
   const setupTab = () => wrapper.find('.js-setup-tab > a');
-  const installCommand = type => wrapper.find(`.js-${type}-install > input`);
-  const setupCommand = type => wrapper.find(`.js-${type}-setup > input`);
+  const npmInstallationCommand = () => wrapper.find('.js-npm-install > input');
+  const npmSetupCommand = () => wrapper.find('.js-npm-setup > input');
+  const yarnInstallationCommand = () => wrapper.find('.js-yarn-install > input');
+  const yarnSetupCommand = () => wrapper.find('.js-yarn-setup > input');
 
-  function createComponent(props = {}) {
-    const propsData = {
-      ...defaultProps,
-      ...props,
-    };
+  function createComponent(yarn = false) {
+    const store = new Vuex.Store({
+      state: {
+        packageEntity,
+        nugetPath,
+      },
+      getters: {
+        npmInstallationCommand: () => () => (yarn ? yarnCommandStr : npmCommandStr),
+        npmSetupCommand: () => () => (yarn ? yarnSetupStr : npmSetupStr),
+      },
+    });
 
     wrapper = mount(NpmInstallation, {
-      propsData,
+      localVue,
+      store,
     });
   }
+
+  beforeEach(() => {
+    createComponent();
+  });
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
   });
 
-  describe('registry url', () => {
-    it('creates the correct registry url', () => {
-      const testRegistryUrl = 'https://foo/baz/';
-
-      createComponent({
-        registryUrl: testRegistryUrl,
-      });
-
-      expect(wrapper.vm.packageRegistryUrl).toBe(testRegistryUrl);
+  describe('npm commands', () => {
+    it('renders the correct install command', () => {
+      expect(npmInstallationCommand().element.value).toBe(npmCommandStr);
     });
 
-    it('creates the correct registry url when the url already contains package_name', () => {
-      createComponent({
-        registryUrl: 'https://package_name/package_name/',
-      });
-
-      expect(wrapper.vm.packageRegistryUrl).toBe('https://package_name/');
+    it('renders the correct setup command', () => {
+      expect(npmSetupCommand().element.value).toBe(npmSetupStr);
     });
   });
 
-  describe('installation commands', () => {
+  describe('yarn commands', () => {
     beforeEach(() => {
-      createComponent();
+      createComponent(true);
     });
 
-    it('renders the correct npm commands', () => {
-      expect(installCommand('npm').element.value).toBe(npmInstall);
-      expect(setupCommand('npm').element.value).toBe(npmSetup);
+    it('renders the correct install command', () => {
+      expect(yarnInstallationCommand().element.value).toBe(yarnCommandStr);
     });
 
-    it('renders the correct yarn commands', () => {
-      expect(installCommand('yarn').element.value).toBe(yarnInstall);
-      expect(setupCommand('yarn').element.value).toBe(yarnSetup);
+    it('renders the correct setup command', () => {
+      expect(yarnSetupCommand().element.value).toBe(yarnSetupStr);
     });
   });
 
