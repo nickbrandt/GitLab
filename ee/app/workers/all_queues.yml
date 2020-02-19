@@ -421,7 +421,7 @@
   :feature_category: :issue_tracking
   :has_external_dependencies: 
   :latency_sensitive: 
-  :resource_boundary: :memory
+  :resource_boundary: :cpu
   :weight: 1
 - :name: ldap_group_sync
   :feature_category: :authentication_and_authorization
