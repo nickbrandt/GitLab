@@ -6,16 +6,6 @@ module BulkInsertableAssociations
   MissingAssociationError = Class.new(StandardError)
   NotBulkInsertSafeError = Class.new(StandardError)
 
-  class InvalidRecordsError < StandardError
-    attr_reader :records
-
-    def initialize(records)
-      super("Found #{records.size} invalid records when trying to bulk-insert." \
-        "Call `records` to see which records failed to validate.")
-      @records = records
-    end
-  end
-
   class_methods do
     def supports_bulk_insert?(association)
       association_class_for(association) < BulkInsertSafe
@@ -44,6 +34,18 @@ module BulkInsertableAssociations
       clear_pending_association_items
     end
 
+    def validate_pending_bulk_inserts(model_instance)
+      pending_association_items.each do |key, items|
+        items.each do |item|
+          unless item.valid?
+            item.errors.full_messages.each do |item_error|
+              model_instance.errors.add(key, item_error)
+            end
+          end
+        end
+      end
+    end
+
     private
 
     def pending_association_items
@@ -60,13 +62,9 @@ module BulkInsertableAssociations
 
     def get_validated_attributes(items, model_instance, association)
       all_attributes = []
-      invalid_items = []
       items.each do |item|
-        invalid_items << item unless item.valid?
         all_attributes << process_item_attributes!(item.attributes, model_instance, association)
       end
-
-      raise InvalidRecordsError.new(invalid_items) if invalid_items.any?
 
       all_attributes
     end
@@ -98,9 +96,16 @@ module BulkInsertableAssociations
     end
   end
 
+  def validate_pending_bulk_inserts
+    self.class.validate_pending_bulk_inserts(self)
+  end
+
   included do
     delegate :bulk_insert_on_save, to: self
     delegate :flush_pending_bulk_inserts, to: self
+
+    validate :validate_pending_bulk_inserts
+
     after_save { flush_pending_bulk_inserts(self) }
   end
 end

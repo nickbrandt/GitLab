@@ -179,14 +179,32 @@ describe BulkInsertableAssociations do
     end
 
     context 'when an item is not valid' do
-      it 'raises an error' do
-        items = create_invalid_items(parent: parent)
+      describe '.save' do
+        it 'invalidates the parent and returns false' do
+          items = create_invalid_items(parent: parent)
 
-        parent.bulk_insert_on_save(:bulk_foos, items)
+          parent.bulk_insert_on_save(:bulk_foos, items)
 
-        expect { parent.save! }.to raise_error(subject::InvalidRecordsError)
-        expect(BulkFoo.count).to eq(0)
-        expect(BulkParent.count).to eq(0)
+          expect(parent.save).to be false
+          expect(parent.errors[:bulk_foos].size).to eq(1)
+
+          expect(BulkFoo.count).to eq(0)
+          expect(BulkParent.count).to eq(0)
+        end
+      end
+
+      describe '.save!' do
+        it 'invalidates the parent and raises error' do
+          items = create_invalid_items(parent: parent)
+
+          parent.bulk_insert_on_save(:bulk_foos, items)
+
+          expect { parent.save! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(parent.errors[:bulk_foos].size).to eq(1)
+
+          expect(BulkFoo.count).to eq(0)
+          expect(BulkParent.count).to eq(0)
+        end
       end
     end
   end
