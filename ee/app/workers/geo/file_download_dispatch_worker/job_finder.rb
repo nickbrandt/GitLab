@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileDownloadDispatchWorker
+  class FileDownloadDispatchWorker # rubocop:disable Scalability/IdempotentWorker
     # This class is meant to be inherited, and is responsible for generating
     # batches of job arguments for FileDownloadWorker.
     #
@@ -12,7 +12,7 @@ module Geo
     #   * RESOURCE_ID_KEY
     #   * FILE_SERVICE_OBJECT_TYPE
     #
-    class JobFinder
+    class JobFinder # rubocop:disable Scalability/IdempotentWorker
       include Gitlab::Utils::StrongMemoize
 
       attr_reader :scheduled_file_ids

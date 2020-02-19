@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ElasticNamespaceRolloutWorker
+class ElasticNamespaceRolloutWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category :search

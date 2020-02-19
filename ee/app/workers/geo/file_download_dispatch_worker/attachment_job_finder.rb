@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileDownloadDispatchWorker
-    class AttachmentJobFinder < JobFinder
+  class FileDownloadDispatchWorker # rubocop:disable Scalability/IdempotentWorker
+    class AttachmentJobFinder < JobFinder # rubocop:disable Scalability/IdempotentWorker
       EXCEPT_RESOURCE_IDS_KEY = :except_file_ids
 
       def registry_finder

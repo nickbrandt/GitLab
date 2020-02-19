@@ -2,7 +2,7 @@
 
 module Geo
   module Scheduler
-    class PerShardSchedulerWorker
+    class PerShardSchedulerWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
       # rubocop:disable Scalability/CronWorkerContext
       # This worker does not perform work scoped to a context

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LdapSyncWorker
+class LdapSyncWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 

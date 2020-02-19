@@ -2,7 +2,7 @@
 
 module Packages
   module Nuget
-    class ExtractionWorker
+    class ExtractionWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
 
       queue_namespace :package_repositories

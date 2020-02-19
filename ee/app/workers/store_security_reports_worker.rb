@@ -2,7 +2,7 @@
 
 # Worker for storing security reports into the database.
 #
-class StoreSecurityReportsWorker
+class StoreSecurityReportsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include SecurityScansQueue
 

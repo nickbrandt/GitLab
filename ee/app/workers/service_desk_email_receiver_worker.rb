@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ServiceDeskEmailReceiverWorker < EmailReceiverWorker
+class ServiceDeskEmailReceiverWorker < EmailReceiverWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   def perform(raw)
