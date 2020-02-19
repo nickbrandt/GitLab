@@ -68,30 +68,4 @@ describe EE::AuditEvents::ProtectedBranchAuditEventService do
       end
     end
   end
-
-  describe '#enabled?' do
-    let(:service) { described_class.new(author, protected_branch, :any) }
-
-    subject { service.enabled? }
-
-    context 'when not licensed' do
-      before do
-        stub_licensed_features(audit_events: false,
-                               extended_audit_events: false,
-                               admin_audit_log: false)
-      end
-
-      it { is_expected.to be(false) }
-    end
-
-    context 'when licensed' do
-      before do
-        stub_licensed_features(audit_events: true,
-                               extended_audit_events: false,
-                               admin_audit_log: false)
-      end
-
-      it { is_expected.to be(true) }
-    end
-  end
 end

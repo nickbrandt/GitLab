@@ -6,7 +6,6 @@ import sortableConfig from 'ee/sortable/sortable_config';
 import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'RelatedIssuesList',
@@ -19,7 +18,6 @@ export default {
     IssueWeight,
     RelatedIssuableItem,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     canAdmin: {
       type: Boolean,
@@ -58,9 +56,6 @@ export default {
   computed: {
     validIssueWeight() {
       return this.issue && this.issue.weight >= 0;
-    },
-    shouldRenderHeading() {
-      return this.glFeatures.issueLinkTypes && this.heading;
     },
   },
   mounted() {
@@ -112,14 +107,10 @@ export default {
 
 <template>
   <div>
-    <h4 v-if="shouldRenderHeading" class="gl-font-size-14 mt-0">{{ heading }}</h4>
+    <h4 v-if="heading" class="gl-font-size-14 mt-0">{{ heading }}</h4>
     <div
-      class="related-issues-token-body"
-      :class="{
-        'sortable-container': canReorder,
-        'bordered-box': glFeatures.issueLinkTypes,
-        'bg-white': glFeatures.issueLinkTypes,
-      }"
+      class="related-issues-token-body bordered-box bg-white"
+      :class="{ 'sortable-container': canReorder }"
     >
       <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
         <gl-loading-icon ref="loadingIcon" label="Fetching linked issues" class="prepend-top-5" />

@@ -50,7 +50,7 @@ describe 'Epics through GroupQuery' do
       it_behaves_like 'a working graphql query'
 
       it 'returns epics successfully' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_errors).to be_nil
         expect(epic_node_array('id').first).to eq epic.to_global_id.to_s
         expect(graphql_data['group']['epicsEnabled']).to be_truthy

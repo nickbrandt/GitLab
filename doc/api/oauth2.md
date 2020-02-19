@@ -102,7 +102,7 @@ CAUTION: **Important:**
 Avoid using this flow for applications that store data outside of the GitLab
 instance. If you do, make sure to verify `application id` associated with the
 access token before granting access to the data
-(see [`/oauth/token/info`](https://github.com/doorkeeper-gem/doorkeeper/wiki/API-endpoint-descriptions-and-examples#get----oauthtokeninfo)).
+(see [`/oauth/token/info`](#retrieving-the-token-info)).
 
 Unlike the web flow, the client receives an `access token` immediately as a
 result of the authorization request. The flow does not use the client secret
@@ -212,3 +212,43 @@ or you can put the token to the Authorization header:
 ```
 curl --header "Authorization: Bearer OAUTH-TOKEN" https://gitlab.example.com/api/v4/user
 ```
+
+## Retrieving the Token Info
+
+To verify the details of a token, use the `token/info` endpoint provided by the Doorkeeper gem.
+For more information, see [`/oauth/token/info`](https://github.com/doorkeeper-gem/doorkeeper/wiki/API-endpoint-descriptions-and-examples#get----oauthtokeninfo).
+
+You must supply the access token, either:
+
+- As a parameter:
+
+   ```
+   GET https://gitlab.example.com/oauth/token/info?access_token=<OAUTH-TOKEN>
+   ```
+
+- In the Authorization header:
+
+   ```shell
+   curl --header "Authorization: Bearer <OAUTH-TOKEN>" https://gitlab.example.com/oauth/token/info
+   ```
+
+The following is an example response:
+
+```json
+{
+    "resource_owner_id": 1,
+    "scope": ["api"],
+    "expires_in": null,
+    "application": {"uid": "1cb242f495280beb4291e64bee2a17f330902e499882fe8e1e2aa875519cab33"},
+    "created_at": 1575890427
+}
+```
+
+### Deprecated fields
+
+The fields `scopes` and `expires_in_seconds` are included in the response.
+
+These are aliases for `scope` and `expires_in` respectively, and have been included to
+prevent breaking changes introduced in [doorkeeper 5.0.2](https://github.com/doorkeeper-gem/doorkeeper/wiki/Migration-from-old-versions#from-4x-to-5x).
+
+Don't rely on these fields as they will be removed in a later release.

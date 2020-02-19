@@ -6,7 +6,7 @@ describe API::NugetPackages do
   include EE::PackagesManagerApiSpecHelpers
 
   let_it_be(:user) { create(:user) }
-  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:project, reload: true) { create(:project, :public) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
 
   describe 'GET /api/v4/projects/:id/packages/nuget' do
@@ -56,10 +56,6 @@ describe API::NugetPackages do
 
             before do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
-            end
-
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
             end
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -126,10 +122,6 @@ describe API::NugetPackages do
 
             before do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
-            end
-
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
             end
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -208,10 +200,6 @@ describe API::NugetPackages do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
             end
 
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-            end
-
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
         end
@@ -278,10 +266,6 @@ describe API::NugetPackages do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
             end
 
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-            end
-
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
 
@@ -346,10 +330,6 @@ describe API::NugetPackages do
 
             before do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
-            end
-
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
             end
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -420,10 +400,6 @@ describe API::NugetPackages do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
             end
 
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-            end
-
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
           end
         end
@@ -489,10 +465,6 @@ describe API::NugetPackages do
 
             before do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
-            end
-
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
             end
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -567,10 +539,6 @@ describe API::NugetPackages do
 
             before do
               project.update!(visibility_level: Gitlab::VisibilityLevel.const_get(project_visibility_level, false))
-            end
-
-            after do
-              project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
             end
 
             it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]

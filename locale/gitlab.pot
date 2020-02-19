@@ -534,6 +534,9 @@ msgstr ""
 msgid "(removed)"
 msgstr ""
 
+msgid "*"
+msgstr ""
+
 msgid "+ %{amount} more"
 msgstr ""
 
@@ -1107,6 +1110,9 @@ msgstr ""
 msgid "Add comment now"
 msgstr ""
 
+msgid "Add domain"
+msgstr ""
+
 msgid "Add email address"
 msgstr ""
 
@@ -1535,7 +1541,13 @@ msgstr ""
 msgid "All changes are committed"
 msgstr ""
 
+msgid "All default stages are currently visible"
+msgstr ""
+
 msgid "All email addresses will be used to identify your commits."
+msgstr ""
+
+msgid "All environments"
 msgstr ""
 
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
@@ -1917,6 +1929,9 @@ msgid "An error occurred while validating username"
 msgstr ""
 
 msgid "An error occurred. Please try again."
+msgstr ""
+
+msgid "An instance-level serverless domain already exists."
 msgstr ""
 
 msgid "An issue can be a bug, a todo or a feature request that needs to be discussed in a project. Besides, issues are searchable and filterable."
@@ -4295,7 +4310,7 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}."
 msgstr ""
 
-msgid "ClusterIntegration|Learn more about %{startLink}ModSecurity%{endLink}"
+msgid "ClusterIntegration|Learn more about %{linkStart}ModSecurity%{linkEnd}"
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about %{startLink}Regions %{externalLinkIcon}%{endLink}."
@@ -4578,6 +4593,9 @@ msgid "ClusterIntegration|Something went wrong while uninstalling %{title}"
 msgstr ""
 
 msgid "ClusterIntegration|Something went wrong while updating Knative domain name."
+msgstr ""
+
+msgid "ClusterIntegration|Something went wrong while updating the Web Application Firewall."
 msgstr ""
 
 msgid "ClusterIntegration|Specifying a domain will allow you to use Auto Review Apps and Auto Deploy stages for %{auto_devops_start}Auto DevOps%{auto_devops_end}. The domain should have a wildcard DNS configured matching the domain."
@@ -6104,6 +6122,9 @@ msgstr ""
 msgid "Default projects limit"
 msgstr ""
 
+msgid "Default stages"
+msgstr ""
+
 msgid "Default: Directly import the Google Code email address or username"
 msgstr ""
 
@@ -6805,6 +6826,12 @@ msgid "Domain"
 msgstr ""
 
 msgid "Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled"
+msgstr ""
+
+msgid "Domain was successfully created."
+msgstr ""
+
+msgid "Domain was successfully updated."
 msgstr ""
 
 msgid "Don't have an account yet?"
@@ -8184,6 +8211,9 @@ msgstr ""
 msgid "Failed to upload object map file"
 msgstr ""
 
+msgid "Failed to verify domain ownership"
+msgstr ""
+
 msgid "Failure"
 msgstr ""
 
@@ -8362,6 +8392,9 @@ msgid "Fetching licenses failed. The request endpoint was not found."
 msgstr ""
 
 msgid "Fetching licenses failed. You are not permitted to perform this action."
+msgstr ""
+
+msgid "File"
 msgstr ""
 
 msgid "File Hooks"
@@ -11280,31 +11313,19 @@ msgstr ""
 msgid "LicenseCompliance|Add licenses manually to approve or blacklist"
 msgstr ""
 
-msgid "LicenseCompliance|Approve"
+msgid "LicenseCompliance|Allow"
 msgstr ""
 
-msgid "LicenseCompliance|Approve license"
-msgstr ""
-
-msgid "LicenseCompliance|Approve license?"
-msgstr ""
-
-msgid "LicenseCompliance|Approved"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist license"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklist license?"
-msgstr ""
-
-msgid "LicenseCompliance|Blacklisted"
+msgid "LicenseCompliance|Allowed"
 msgstr ""
 
 msgid "LicenseCompliance|Cancel"
+msgstr ""
+
+msgid "LicenseCompliance|Denied"
+msgstr ""
+
+msgid "LicenseCompliance|Deny"
 msgstr ""
 
 msgid "LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
@@ -11346,6 +11367,9 @@ msgid "LicenseCompliance|License details"
 msgstr ""
 
 msgid "LicenseCompliance|License name"
+msgstr ""
+
+msgid "LicenseCompliance|License review"
 msgstr ""
 
 msgid "LicenseCompliance|Packages"
@@ -11393,6 +11417,9 @@ msgstr ""
 msgid "Licenses|Components"
 msgstr ""
 
+msgid "Licenses|Detected in Project"
+msgstr ""
+
 msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest pipeline%{linkEnd} scan"
 msgstr ""
 
@@ -11406,6 +11433,15 @@ msgid "Licenses|License Compliance"
 msgstr ""
 
 msgid "Licenses|Name"
+msgstr ""
+
+msgid "Licenses|Policies"
+msgstr ""
+
+msgid "Licenses|Policy"
+msgstr ""
+
+msgid "Licenses|Specified policies in this project"
 msgstr ""
 
 msgid "Licenses|The license list details information about the licenses used within your project."
@@ -13453,7 +13489,7 @@ msgstr ""
 msgid "PackageRegistry|You are about to delete version %{boldStart}%{version}%{boldEnd} of %{boldStart}%{name}%{boldEnd}. Are you sure?"
 msgstr ""
 
-msgid "PackageRegistry|You may also need to setup authentication using an auth token.  %{linkStart}See the documentation%{linkEnd} to find out more."
+msgid "PackageRegistry|You may also need to setup authentication using an auth token. %{linkStart}See the documentation%{linkEnd} to find out more."
 msgstr ""
 
 msgid "PackageRegistry|npm"
@@ -15712,6 +15748,9 @@ msgstr ""
 msgid "Recipe"
 msgstr ""
 
+msgid "Recover hidden stage"
+msgstr ""
+
 msgid "Recovery Codes"
 msgstr ""
 
@@ -15793,9 +15832,6 @@ msgid "Related Merge Requests"
 msgstr ""
 
 msgid "Related Merged Requests"
-msgstr ""
-
-msgid "Related issues"
 msgstr ""
 
 msgid "Related merge requests"
@@ -17232,6 +17268,9 @@ msgstr ""
 msgid "Serverless"
 msgstr ""
 
+msgid "Serverless domain"
+msgstr ""
+
 msgid "ServerlessDetails|Function invocation metrics require Prometheus to be installed first."
 msgstr ""
 
@@ -17335,6 +17374,9 @@ msgid "Set a password on your account to pull or push via %{protocol}."
 msgstr ""
 
 msgid "Set a template repository for projects in this group"
+msgstr ""
+
+msgid "Set an instance-wide domain that will be available to all clusters when installing Knative."
 msgstr ""
 
 msgid "Set default and restrict visibility levels. Configure import sources and git access protocol."
@@ -18551,6 +18593,9 @@ msgstr ""
 msgid "Successfully unlocked"
 msgstr ""
 
+msgid "Successfully verified domain ownership"
+msgstr ""
+
 msgid "Suggest code changes which can be immediately applied in one click. Try it out!"
 msgstr ""
 
@@ -19393,6 +19438,12 @@ msgid "There was an error fetching median data for stages"
 msgstr ""
 
 msgid "There was an error fetching the Designs"
+msgstr ""
+
+msgid "There was an error fetching the environments information."
+msgstr ""
+
+msgid "There was an error fetching the variables."
 msgstr ""
 
 msgid "There was an error fetching value stream analytics stages."
@@ -21337,6 +21388,9 @@ msgstr ""
 msgid "Value Stream Analytics gives an overview of how much time it takes to go from idea to production in your project."
 msgstr ""
 
+msgid "Variable"
+msgstr ""
+
 msgid "Variables"
 msgstr ""
 
@@ -21538,6 +21592,30 @@ msgid "VulnerabilityChart|%{formattedStartDate} to today"
 msgstr ""
 
 msgid "VulnerabilityChart|Severity"
+msgstr ""
+
+msgid "VulnerabilityManagement|A true-positive and will fix"
+msgstr ""
+
+msgid "VulnerabilityManagement|Change status"
+msgstr ""
+
+msgid "VulnerabilityManagement|Confirm"
+msgstr ""
+
+msgid "VulnerabilityManagement|Dismiss"
+msgstr ""
+
+msgid "VulnerabilityManagement|Resolved"
+msgstr ""
+
+msgid "VulnerabilityManagement|Something went wrong, could not update vulnerability state."
+msgstr ""
+
+msgid "VulnerabilityManagement|Verified as fixed or mitigated"
+msgstr ""
+
+msgid "VulnerabilityManagement|Will not fix or a false-positive"
 msgstr ""
 
 msgid "Vulnerability|Class"

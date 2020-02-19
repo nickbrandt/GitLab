@@ -18,7 +18,7 @@ module LicenseHelper
     License.current&.maximum_user_count || 0
   end
 
-  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)
+  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?, in_html: true)
     return unless current_license
     return unless signed_in
     return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
@@ -48,12 +48,7 @@ module LicenseHelper
       message << 'service.'
     end
 
-    unless is_trial
-      renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
-      renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
-      link_end = '</a>'.html_safe
-      message << _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
-    end
+    message << renewal_instructions_message(in_html: in_html) unless is_trial
 
     message.join(' ').html_safe
   end
@@ -147,5 +142,17 @@ module LicenseHelper
 
   def active_user_count
     User.active.count
+  end
+
+  def renewal_instructions_message(in_html: true)
+    renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
+
+    renewal_faq_link_start = in_html ? "<a href='#{renewal_faq_url}' target='_blank'>".html_safe : ''
+    link_end = in_html ? '</a>'.html_safe : ''
+
+    message = _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
+    message += ' ' + renewal_faq_url unless in_html
+
+    message
   end
 end

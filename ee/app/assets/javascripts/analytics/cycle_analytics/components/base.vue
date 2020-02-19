@@ -76,6 +76,7 @@ export default {
       'durationChartPlottableData',
       'tasksByTypeChartData',
       'durationChartMedianData',
+      'activeStages',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -271,7 +272,7 @@ export default {
             v-if="selectedStage"
             class="js-stage-table"
             :current-stage="selectedStage"
-            :stages="stages"
+            :stages="activeStages"
             :medians="medians"
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"

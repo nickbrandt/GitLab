@@ -5,6 +5,7 @@ module Gitlab
     class Blob
       include Gitlab::BlobHelper
       include Gitlab::EncodingHelper
+      include Gitlab::Metrics::Methods
       extend Gitlab::Git::WrapsGitalyErrors
 
       # This number is the maximum amount of data that we want to display to
@@ -25,6 +26,19 @@ module Gitlab
       LFS_POINTER_MAX_SIZE = 200.bytes
 
       attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size, :binary
+
+      define_counter :gitlab_blob_truncated_true do
+        docstring 'blob.truncated? == true'
+      end
+
+      define_counter :gitlab_blob_truncated_false do
+        docstring 'blob.truncated? == false'
+      end
+
+      define_histogram :gitlab_blob_size do
+        docstring 'Gitlab::Git::Blob size'
+        buckets [1_000, 5_000, 10_000, 50_000, 100_000, 500_000, 1_000_000]
+      end
 
       class << self
         def find(repository, sha, path, limit: MAX_DATA_DISPLAY_SIZE)
@@ -110,6 +124,8 @@ module Gitlab
           self.__send__("#{key}=", options[key.to_sym]) # rubocop:disable GitlabSecurity/PublicSend
         end
 
+        record_metric_blob_size
+
         # Retain the actual size before it is encoded
         @loaded_size = @data.bytesize if @data
         @loaded_all_data = @loaded_size == size
@@ -187,6 +203,12 @@ module Gitlab
       alias_method :external_size, :lfs_size
 
       private
+
+      def record_metric_blob_size
+        return unless size
+
+        self.class.gitlab_blob_size.observe({}, size)
+      end
 
       def has_lfs_version_key?
         !empty? && text_in_repo? && data.start_with?("version https://git-lfs.github.com/spec")

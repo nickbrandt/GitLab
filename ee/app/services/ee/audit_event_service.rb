@@ -4,6 +4,11 @@ module EE
   module AuditEventService
     extend ::Gitlab::Utils::Override
     # rubocop:disable Gitlab/ModuleWithInstanceVariables
+
+    # Builds the @details attribute for member
+    #
+    # @param member [Member] the member whom is changed
+    # @return [AuditEventService]
     def for_member(member)
       action = @details[:action]
       old_access_level = @details[:old_access_level]
@@ -56,6 +61,14 @@ module EE
       self
     end
 
+    # Builds the @details attribute for project group link
+    #
+    # This expects [String] :action of :destroy, :create, :update to be
+    #   specified in @details attribute
+    #
+    # @param group_link [ProjectGroupLink] the project group link being changed
+    #
+    # @return [AuditEventService]
     def for_project_group_link(group_link)
       @details = custom_project_link_group_attributes(group_link)
                  .merge(author_name: @author.name,
@@ -66,6 +79,9 @@ module EE
       self
     end
 
+    # Builds the @details attribute for a failed login
+    #
+    # @return [AuditEventService]
     def for_failed_login
       ip = @details[:ip_address]
       auth = @details[:with] || 'STANDARD'
@@ -80,20 +96,25 @@ module EE
       self
     end
 
+    # Builds the @details attribute for changes
+    #
+    # @return [AuditEventService]
     def for_changes
       @details =
         {
-            change: @details[:as] || @details[:column],
-            from: @details[:from],
-            to: @details[:to],
-            author_name: @author.name,
-            target_id: @entity.id,
-            target_type: @entity.class.name,
-            target_details: @details[:target_details] || @entity.name
+          change: @details[:as] || @details[:column],
+          from: @details[:from],
+          to: @details[:to],
+          author_name: @author.name,
+          target_id: @entity.id,
+          target_type: @entity.class.name,
+          target_details: @details[:target_details] || @entity.name
         }
+
       self
     end
 
+    # Write event to file and create an event record in DB
     def security_event
       prepare_security_event
 
@@ -106,6 +127,10 @@ module EE
       end
     end
 
+    # Creates an event record in DB
+    #
+    # @return [nil] if audit events is not enabled
+    # @return [SecurityEvent] if record is persisted
     def unauth_security_event
       return unless audit_events_enabled?
 
@@ -120,14 +145,33 @@ module EE
       )
     end
 
+    # Builds the @details attribute for user
+    #
+    # This uses the [User] @entity as the target object being changed
+    #
+    # @param full_path [String] required if it is different from the User model
+    #   in @entity. This is for backward compatability and this parameter will
+    #   be dropped after all of these incorrect usages are removed.
+    #
+    # @return [AuditEventService]
     def for_user(full_path = @entity.full_path)
       for_custom_model('user', full_path)
     end
 
+    # Builds the @details attribute for project
+    #
+    # This uses the [Project] @entity as the target object being changed
+    #
+    # @return [AuditEventService]
     def for_project
       for_custom_model('project', @entity.full_path)
     end
 
+    # Builds the @details attribute for group
+    #
+    # This uses the [Group] @entity as the target object being changed
+    #
+    # @return [AuditEventService]
     def for_group
       for_custom_model('group', @entity.full_path)
     end
@@ -184,28 +228,28 @@ module EE
         case action
         when :destroy
           {
-              remove: model,
-              author_name: @author.name,
-              target_id: key_title,
-              target_type: model_class,
-              target_details: key_title
+            remove: model,
+            author_name: @author.name,
+            target_id: key_title,
+            target_type: model_class,
+            target_details: key_title
           }
         when :create
           {
-              add: model,
-              author_name: @author.name,
-              target_id: key_title,
-              target_type: model_class,
-              target_details: key_title
+            add: model,
+            author_name: @author.name,
+            target_id: key_title,
+            target_type: model_class,
+            target_details: key_title
           }
         when :custom
           {
-              custom_message: custom_message,
-              author_name: @author&.name,
-              target_id: key_title,
-              target_type: model_class,
-              target_details: key_title,
-              ip_address: @details[:ip_address]
+            custom_message: custom_message,
+            author_name: @author&.name,
+            target_id: key_title,
+            target_type: model_class,
+            target_details: key_title,
+            ip_address: @details[:ip_address]
           }
         end
 

@@ -98,9 +98,9 @@ describe('AddLicenseForm', () => {
       const radioButtonParents = vm.$el.querySelectorAll('.form-check');
 
       expect(radioButtonParents.length).toBe(2);
-      expect(radioButtonParents[0].innerText.trim()).toBe('Approve');
+      expect(radioButtonParents[0].innerText.trim()).toBe('Allow');
       expect(radioButtonParents[0].querySelector('.form-check-input')).not.toBeNull();
-      expect(radioButtonParents[1].innerText.trim()).toBe('Blacklist');
+      expect(radioButtonParents[1].innerText.trim()).toBe('Deny');
       expect(radioButtonParents[1].querySelector('.form-check-input')).not.toBeNull();
     });
 

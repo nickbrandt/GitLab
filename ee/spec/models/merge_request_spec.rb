@@ -128,6 +128,7 @@ describe MergeRequest do
       :dependency_scanning | :with_dependency_scanning_reports | :dependency_scanning
       :license_management  | :with_license_management_reports  | :license_management
       :license_management  | :with_license_scanning_reports    | :license_management
+      :license_scanning    | :with_license_scanning_reports    | :license_management
     end
 
     with_them do

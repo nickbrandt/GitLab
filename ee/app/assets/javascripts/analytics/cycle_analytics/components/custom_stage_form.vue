@@ -1,6 +1,15 @@
 <script>
+import { mapGetters } from 'vuex';
 import { isEqual } from 'underscore';
-import { GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
+import {
+  GlFormGroup,
+  GlFormInput,
+  GlFormSelect,
+  GlLoadingIcon,
+  GlDropdown,
+  GlDropdownHeader,
+  GlDropdownItem,
+} from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
@@ -30,6 +39,9 @@ export default {
     GlFormSelect,
     GlLoadingIcon,
     LabelsSelector,
+    GlDropdown,
+    GlDropdownHeader,
+    GlDropdownItem,
   },
   props: {
     events: {
@@ -79,6 +91,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['hiddenStages']),
     startEventOptions() {
       return [
         { value: null, text: s__('CustomCycleAnalytics|Select start event') },
@@ -148,6 +161,9 @@ export default {
         ? s__('CustomCycleAnalytics|Editing stage')
         : s__('CustomCycleAnalytics|New stage');
     },
+    hasHiddenStages() {
+      return this.hiddenStages.length;
+    },
   },
   watch: {
     initialFields(newFields) {
@@ -202,13 +218,28 @@ export default {
     onUpdateEndEventField() {
       this.$set(this.fieldErrors, 'endEventIdentifier', null);
     },
+    handleRecoverStage(id) {
+      this.$emit(STAGE_ACTIONS.UPDATE, { id, hidden: false });
+    },
   },
 };
 </script>
 <template>
   <form class="custom-stage-form m-4 mt-0">
-    <div class="mb-1">
+    <div class="mb-1 d-flex flex-row justify-content-between">
       <h4>{{ formTitle }}</h4>
+      <gl-dropdown :text="__('Recover hidden stage')" class="js-recover-hidden-stage-dropdown">
+        <gl-dropdown-header>{{ __('Default stages') }}</gl-dropdown-header>
+        <template v-if="hasHiddenStages">
+          <gl-dropdown-item
+            v-for="stage in hiddenStages"
+            :key="stage.id"
+            @click="handleRecoverStage(stage.id)"
+            >{{ stage.title }}</gl-dropdown-item
+          >
+        </template>
+        <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
+      </gl-dropdown>
     </div>
 
     <gl-form-group

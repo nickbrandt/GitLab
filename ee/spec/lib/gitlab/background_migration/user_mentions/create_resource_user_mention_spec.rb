@@ -3,6 +3,7 @@
 require 'spec_helper'
 require './db/post_migrate/20191115115043_migrate_epic_mentions_to_db'
 require './db/post_migrate/20191115115522_migrate_epic_notes_mentions_to_db'
+require './db/post_migrate/20200124110831_migrate_design_notes_mentions_to_db'
 
 describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
   include MigrationsHelpers
@@ -50,9 +51,13 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
         epics.create!(iid: 1, group_id: group.id, author_id: author.id, title: "epic title @#{author.username}",
                       title_html: "epic title  @#{author.username}", description: description_mentions)
       end
-      let!(:epic_without_mentions) do
+      let!(:epic2) do
         epics.create!(iid: 2, group_id: group.id, author_id: author.id, title: "epic title}",
                       title_html: "epic title", description: 'simple description')
+      end
+      let!(:epic3) do
+        epics.create!(iid: 2, group_id: group.id, author_id: author.id, title: "epic title}",
+                      title_html: "epic title", description: 'description with an email@example.com and some other @ char here.')
       end
 
       let(:user_mentions) { epic_user_mentions }
@@ -65,13 +70,38 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
       end
 
       context 'mentions in epic notes' do
-        let(:note1) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions) }
-        let(:note2) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'sample note') }
-        let(:note3) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions, system: true) }
-        let!(:note4) { notes.create!(noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
+        let!(:note1) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions) }
+        let!(:note2) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'sample note') }
+        let!(:note3) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions, system: true) }
+        # this not does not have actual mentions
+        let!(:note4) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
+        # this not points to an innexistent noteable record in desigs table
+        let!(:note5) { notes.create!(noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
 
         it_behaves_like 'resource notes mentions migration', MigrateEpicNotesMentionsToDb, Epic
       end
     end
+  end
+
+  describe 'design mentions' do
+    let(:projects) { table(:projects) }
+    let(:designs) { table(:design_management_designs) }
+    let(:design_user_mentions) { table(:design_user_mentions) }
+
+    let(:project) { projects.create!(id: 1, name: 'gitlab1', path: 'gitlab1', namespace_id: group.id, visibility_level: 0) }
+    let!(:design) { designs.create!(filename: 'test.png', project_id: project.id) }
+
+    let!(:note1) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
+    let!(:note2) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: 'sample note') }
+    let!(:note3) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
+    # this not does not have actual mentions
+    let!(:note4) { notes.create!(noteable_id: design.id, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
+    # this not points to an innexistent noteable record in desigs table
+    let!(:note5) { notes.create!(noteable_id: designs.maximum(:id) + 10, noteable_type: 'DesignManagement::Design', project_id: project.id, author_id: author.id, note: description_mentions) }
+
+    let(:user_mentions) { design_user_mentions }
+    let(:resource) { design }
+
+    it_behaves_like 'resource notes mentions migration', MigrateDesignNotesMentionsToDb, DesignManagement::Design
   end
 end

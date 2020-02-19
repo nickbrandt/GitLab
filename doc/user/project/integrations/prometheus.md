@@ -55,6 +55,17 @@ will help you to quickly create a deployment:
 1. Navigate to your project's **CI/CD > Pipelines** page, and run a pipeline on any branch.
 1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
+![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v12_8.png)
+
+#### Using the Metrics Dashboard
+
+##### Select an environment
+
+The **Environment** dropdown box above the dashboard displays the list of all [environments](#monitoring-cicd-environments).
+It enables you to search as you type through all environments and select the one you're looking for.
+
+![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
+
 #### About managed Prometheus deployments
 
 Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [official Helm chart](https://github.com/helm/charts/tree/master/stable/prometheus). Prometheus is only accessible within the cluster, with GitLab communicating through the [Kubernetes API](https://kubernetes.io/docs/concepts/overview/kubernetes-api/).
@@ -198,18 +209,23 @@ supported and will not be available in the UI.
 
 #### Duplicating a GitLab-defined dashboard
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/37238) in GitLab 12.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/37238) in GitLab 12.7.
+> - From [GitLab 12.8 onwards](https://gitlab.com/gitlab-org/gitlab/issues/39505), custom metrics are also duplicated when you duplicate a dashboard.
 
-You can save a copy of a GitLab defined dashboard that can be customized and adapted to your project. You can decide to save the dashboard new `.yml` file in the project's **default** branch or in a newly created branch with a name of your choosing.
+You can save a complete copy of a GitLab defined dashboard along with all custom metrics added to it.
+Resulting `.yml` file can be customized and adapted to your project.
+You can decide to save the dashboard `.yml` file in the project's **default** branch or in a
+new branch.
 
-1. Click on the "Duplicate dashboard" in the dashboard dropdown.
+1. Click **Duplicate dashboard** in the dashboard dropdown.
 
    NOTE: **Note:**
-   Only GitLab-defined dashboards can be duplicated.
+   You can duplicate only GitLab-defined dashboards.
 
-1. Input the file name and other information, such as a new commit message, and click on "Duplicate".
+1. Enter the file name and other information, such as the new commit's message, and click **Duplicate**.
 
-If you select your **default** branch, the new dashboard will become immediately available. If you select another branch, this branch should be merged to your **default** branch first.
+If you select your **default** branch, the new dashboard becomes immediately available.
+If you select another branch, this branch should be merged to your **default** branch first.
 
 #### Dashboard YAML properties
 
@@ -422,6 +438,29 @@ Note the following properties:
 | query | string | yes | For single stat panel types, you must use an [instant query](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries) |
 
 ![single stat panel type](img/prometheus_dashboard_single_stat_panel_type.png)
+
+###### Percentile based results
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/201946) in GitLab 12.8.
+
+Query results sometimes need to be represented as a percentage value out of 100. You can use the `max_value` property at the root of the panel definition:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group Title'
+    panels:
+      - title: "Single Stat"
+        type: "single-stat"
+        max_value: 100
+        metrics:
+        - id: 10
+          query: 'max(go_memstats_alloc_bytes{job="prometheus"})'
+          unit: '%'
+          label: "Total"
+```
+
+For example, if you have a query value of `53.6`, adding `%` as the unit results in a single stat value of `53.6%`, but if the maximum expected value of the query is `120`, the value would be `44.6%`. Adding the `max_value` causes the correct percentage value to display.
 
 ##### Heatmaps
 

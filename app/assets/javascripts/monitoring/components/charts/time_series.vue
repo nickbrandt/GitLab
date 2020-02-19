@@ -14,6 +14,7 @@ import {
   lineWidths,
   symbolSizes,
   dateFormats,
+  chartColorValues,
 } from '../../constants';
 import { makeDataSeries } from '~/helpers/monitor_helper';
 import { graphDataValidatorForValues } from '../../utils';
@@ -124,7 +125,7 @@ export default {
       // Transforms & supplements query data to render appropriate labels & styles
       // Input: [{ queryAttributes1 }, { queryAttributes2 }]
       // Output: [{ seriesAttributes1 }, { seriesAttributes2 }]
-      return this.graphData.metrics.reduce((acc, query) => {
+      return this.graphData.metrics.reduce((acc, query, i) => {
         const { appearance } = query;
         const lineType =
           appearance && appearance.line && appearance.line.type
@@ -145,7 +146,7 @@ export default {
           lineStyle: {
             type: lineType,
             width: lineWidth,
-            color: this.primaryColor,
+            color: chartColorValues[i % chartColorValues.length],
           },
           showSymbol: false,
           areaStyle: this.graphData.type === 'area-chart' ? areaStyle : undefined,
@@ -161,7 +162,8 @@ export default {
       );
     },
     chartOptions() {
-      const option = omit(this.option, 'series');
+      const { yAxis, xAxis } = this.option;
+      const option = omit(this.option, ['series', 'yAxis', 'xAxis']);
 
       const dataYAxis = {
         name: this.yAxisLabel,
@@ -172,7 +174,9 @@ export default {
         axisLabel: {
           formatter: num => roundOffFloat(num, 3).toString(),
         },
+        ...yAxis,
       };
+
       const deploymentsYAxis = {
         show: false,
         min: deploymentYAxisCoords.min,
@@ -183,18 +187,21 @@ export default {
         },
       };
 
+      const timeXAxis = {
+        name: __('Time'),
+        type: 'time',
+        axisLabel: {
+          formatter: date => dateFormat(date, dateFormats.timeOfDay),
+        },
+        axisPointer: {
+          snap: true,
+        },
+        ...xAxis,
+      };
+
       return {
         series: this.chartOptionSeries,
-        xAxis: {
-          name: __('Time'),
-          type: 'time',
-          axisLabel: {
-            formatter: date => dateFormat(date, dateFormats.timeOfDay),
-          },
-          axisPointer: {
-            snap: true,
-          },
-        },
+        xAxis: timeXAxis,
         yAxis: [dataYAxis, deploymentsYAxis],
         dataZoom: [this.dataZoomConfig],
         ...option,

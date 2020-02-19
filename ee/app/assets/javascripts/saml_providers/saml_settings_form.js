@@ -58,8 +58,23 @@ export default class SamlSettingsForm {
     this.dirtyFormChecker = new DirtyFormChecker(formSelector, () => this.updateView());
   }
 
-  getSettingValue(name) {
-    return this.settings.find(s => s.name === name).value;
+  findSetting(name) {
+    return this.settings.find(s => s.name === name);
+  }
+
+  getValueWithDeps(name) {
+    const setting = this.findSetting(name);
+    let currentDependsOn = setting.dependsOn;
+
+    while (currentDependsOn) {
+      const { value, dependsOn } = this.findSetting(currentDependsOn);
+      if (!value) {
+        return false;
+      }
+      currentDependsOn = dependsOn;
+    }
+
+    return setting.value;
   }
 
   init() {
@@ -95,28 +110,26 @@ export default class SamlSettingsForm {
   }
 
   updateToggles() {
-    this.settings.forEach(setting => {
-      const { helperText, callout, toggle } = setting;
-      if (setting.dependsOn) {
-        const dependencyToggleValue = this.getSettingValue(setting.dependsOn);
+    this.settings
+      .filter(setting => setting.dependsOn)
+      .forEach(setting => {
+        const { helperText, callout, toggle } = setting;
+        const dependentToggleValue = this.getValueWithDeps(setting.dependsOn);
         if (helperText) {
-          helperText.style.display = dependencyToggleValue ? 'none' : 'block';
+          helperText.style.display = dependentToggleValue ? 'none' : 'block';
         }
 
-        if (!dependencyToggleValue && setting.value) {
-          setting.toggle.click();
-        }
-        toggle.disabled = !dependencyToggleValue;
-      }
+        toggle.classList.toggle('is-disabled', dependentToggleValue);
+        toggle.disabled = !dependentToggleValue;
 
-      if (callout) {
-        callout.style.display = setting.value ? 'block' : 'none';
-      }
-    });
+        if (callout) {
+          callout.style.display = setting.value && dependentToggleValue ? 'block' : 'none';
+        }
+      });
   }
 
   updateView() {
-    if (this.getSettingValue('group-saml') && !this.dirtyFormChecker.isDirty) {
+    if (this.getValueWithDeps('group-saml') && !this.dirtyFormChecker.isDirty) {
       this.testButton.removeAttribute('disabled');
     } else {
       this.testButton.setAttribute('disabled', true);

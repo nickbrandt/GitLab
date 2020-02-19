@@ -9,10 +9,6 @@ describe Project do
 
   let(:project) { create(:project) }
 
-  it_behaves_like Vulnerable do
-    let(:vulnerable) { project }
-  end
-
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }
@@ -508,6 +504,7 @@ describe Project do
 
         it 'shows proper setting' do
           expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end
@@ -556,6 +553,7 @@ describe Project do
 
         it 'shows proper setting' do
           expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
         end
       end
     end

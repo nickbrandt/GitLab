@@ -48,3 +48,9 @@ export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
   }
   return { groupBy: [], data: [], seriesNames: [] };
 };
+
+const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
+  stages.filter(({ hidden = false }) => hidden === isHidden);
+
+export const hiddenStages = ({ stages }) => filterStagesByHiddenStatus(stages);
+export const activeStages = ({ stages }) => filterStagesByHiddenStatus(stages, false);
