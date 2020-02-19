@@ -597,7 +597,7 @@ describe('common_utils', () => {
       });
 
       it('returns an empty object if there are no keys', () => {
-        ['', {}, [], null].forEach(badObj => {
+        ['', {}, null].forEach(badObj => {
           expect(commonUtils.convertObjectPropsToSnakeCase(badObj)).toEqual({});
         });
       });
