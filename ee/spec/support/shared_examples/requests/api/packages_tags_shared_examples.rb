@@ -14,6 +14,7 @@ RSpec.shared_examples 'returns package tags' do |user_type|
   using RSpec::Parameterized::TableSyntax
 
   before do
+    stub_feature_flags(forward_npm_package_registry_requests: { enabled: false })
     project.send("add_#{user_type}", user) unless user_type == :no_type
   end
 
