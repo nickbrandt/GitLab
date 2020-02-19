@@ -191,6 +191,19 @@ you can enable this in the project settings:
 1. Check the **Auto-cancel redundant, pending pipelines** checkbox.
 1. Click **Save changes**.
 
+## Drop older active deployments
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/25276) in GitLab 12.9.
+
+The number of pipelines running for your project can be important enough so that
+concurrent deployment jobs are scheduled to run within the same time frame.
+
+This can lead to a situation where an older deployment job can be run after a
+newer one, which may not be a desired situation.
+
+To avoid such scenario, check the **Drop older active deployments**
+checkbox and save the changes.
+
 ## Pipeline Badges
 
 In the pipelines settings page you can find pipeline status and test coverage
