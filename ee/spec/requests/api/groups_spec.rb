@@ -248,7 +248,9 @@ describe API::Groups do
         end
 
         it 'returns 404 for a non existing group' do
-          ldap_sync(1328, user, :disable!)
+          non_existent_group_id = Group.maximum(:id).to_i + 1
+          ldap_sync(non_existent_group_id, user, :disable!)
+
           expect(response).to have_gitlab_http_status(404)
         end
       end
