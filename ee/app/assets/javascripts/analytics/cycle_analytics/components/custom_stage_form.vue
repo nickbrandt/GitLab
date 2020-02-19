@@ -70,13 +70,16 @@ export default {
     errors: {
       type: Object,
       required: false,
-      default: () => ({}),
+      default: null,
     },
   },
   data() {
     const defaultErrors = this?.initialFields?.endEventIdentifier
-      ? {}
-      : { endEventIdentifier: [s__('CustomCycleAnalytics|Please select a start event first')] };
+      ? { ...defaultFields, endEventIdentifier: null }
+      : {
+          ...defaultFields,
+          endEventIdentifier: [s__('CustomCycleAnalytics|Please select a start event first')],
+        };
     return {
       labelEvents: getLabelEventsIdentifiers(this.events),
       fields: {
@@ -84,9 +87,8 @@ export default {
         ...this.initialFields,
       },
       fieldErrors: {
-        ...defaultFields,
-        ...this.errors,
         ...defaultErrors,
+        ...this.errors,
       },
     };
   },
@@ -167,6 +169,8 @@ export default {
   },
   watch: {
     initialFields(newFields) {
+      console.log('newFields', newFields);
+
       this.fields = {
         ...defaultFields,
         ...newFields,
