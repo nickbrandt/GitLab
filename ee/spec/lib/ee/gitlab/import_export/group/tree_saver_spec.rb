@@ -138,6 +138,51 @@ describe Gitlab::ImportExport::Group::TreeSaver do
         expect(assignee_list['user_id']).to eq(user.id)
       end
     end
+
+    context 'when there are boards with predefined milestones' do
+      let(:milestone) { Milestone::Upcoming }
+
+      before do
+        create(:board, group: group, milestone_id: milestone.id)
+      end
+
+      it 'saves the milestone data' do
+        expect_successful_save(group_tree_saver)
+
+        board_data = saved_group_json['boards'].last
+
+        expect(board_data).to include(
+          'milestone_id' => milestone.id,
+          'milestone'    => {
+            'id'    => milestone.id,
+            'name'  => milestone.name,
+            'title' => milestone.title
+          }
+        )
+      end
+    end
+
+    context 'when there are boards with persisted milestones' do
+      let(:milestone) { create(:milestone) }
+
+      before do
+        create(:board, group: group, milestone: milestone)
+      end
+
+      it 'saves the milestone data' do
+        expect_successful_save(group_tree_saver)
+
+        board_data = saved_group_json['boards'].last
+
+        expect(board_data).to include(
+          'milestone_id' => milestone.id,
+          'milestone'    => a_hash_including(
+            'id'    => milestone.id,
+            'title' => milestone.title
+          )
+        )
+      end
+    end
   end
 
   def expect_successful_save(group_tree_saver)

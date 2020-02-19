@@ -3,6 +3,18 @@
 require 'spec_helper'
 
 describe Milestone do
+  describe 'MilestoneStruct#serializable_hash' do
+    let(:predefined_milestone) { described_class::MilestoneStruct.new('Test Milestone', '#test', 1) }
+
+    it 'presents the predefined milestone as a hash' do
+      expect(predefined_milestone.serializable_hash).to eq(
+        title: predefined_milestone.title,
+        name: predefined_milestone.name,
+        id: predefined_milestone.id
+      )
+    end
+  end
+
   describe 'modules' do
     context 'with a project' do
       it_behaves_like 'AtomicInternalId' do
