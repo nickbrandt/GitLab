@@ -17,7 +17,7 @@
       %span#js-vulnerability-created
         = time_ago_with_tooltip(@vulnerability.created_at)
   %label.mb-0.mr-2= _('Status')
-  #vulnerability-show-header{ data: { state: @vulnerability.state,
+  #js-vulnerability-show-header{ data: { state: @vulnerability.state,
     id: @vulnerability.id } }
 
 .issue-details.issuable-details
