@@ -1,10 +1,21 @@
 <script>
 import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
-import { spriteIcon } from '~/lib/utils/common_utils';
+import { GlIcon } from '@gitlab/ui';
 
+const classNameMap = {
+  'critical':'text-danger-800',
+  'high':'text-danger-600',
+  'medium':'text-warning-400',
+  'low':'text-warning-300',
+  'info':'text-primary-400',
+  'unknown':'text-secondary-400',
+};
 
 export default {
   name: 'SeverityBadge',
+  components: {
+    GlIcon
+  },  
   props: {
     severity: {
       type: String,
@@ -13,58 +24,29 @@ export default {
   },
   computed: {
     className() {
-      return `severity-badge-${this.severity.toLowerCase()}`;
+      return classNameMap[this.severity.toLowerCase()];
     },
+    iconName() {
+     return `severity-${this.severity.toLowerCase()}`;
+    },       
     severityTitle() {
-      return SEVERITY_LEVELS[this.severity] || this.severity;
+      return SEVERITY_LEVELS[this.severity.toLowerCase()] || this.severity;
     },
-    iconHtml() {
-      return spriteIcon('severity-'+this.severity.toLowerCase());
-    },    
   },
 };
 </script>
 
 <template>
-  <div class="severity-badge"><span v-html="iconHtml" :class="className"></span> {{ severityTitle }}</div>
+  <div class="severity-badge gl-text-gray-900"><span :class="className"><gl-icon :name="iconName" :size="12" /></span>{{ severityTitle }}</div>
 </template>
 
 <style>
 .severity-badge {
-  display: inline-block;
-  font-size: 0.9em;
-  padding: 0.6em 0.4em 0.4em;
+  text-align:left;
+  white-space:nowrap;
 }
-
 .severity-badge svg {
-    height:12px;
-    width:12px;
-    margin-right:4px;
-    position:relative;
-    top:1px;
+    margin-right:8px;
 }
 
-.severity-badge-critical {
-  color: #8B2615;
-}
-
-.severity-badge-high {
-  color: #C0341D;
-}
-
-.severity-badge-medium {
-  color: #FCA429;
-}
-
-.severity-badge-low {
-  color: #FDBC60;
-}
-
-.severity-badge-info {
-  color: #418CD8;
-}
-
-.severity-badge-unknown {
-  color: #919191;
-}
 </style>
