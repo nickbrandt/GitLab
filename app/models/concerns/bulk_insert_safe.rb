@@ -13,6 +13,8 @@ module BulkInsertSafe
     :destroy
   ].freeze
 
+  DEFAULT_BATCH_SIZE = 500
+
   MethodNotAllowedError = Class.new(StandardError)
 
   class_methods do
@@ -26,19 +28,25 @@ module BulkInsertSafe
       super
     end
 
-    def bulk_insert(items, validate: true, &handle_attributes)
+    def bulk_insert(items, validate: true, batch_size: DEFAULT_BATCH_SIZE, &handle_attributes)
       return true if items.empty?
       return false if validate && !items.all?(&:valid?)
 
-      insert_all(_bulk_insert_attributes(items, &handle_attributes))
+      items.each_slice(batch_size) do |item_batch|
+        insert_all(_bulk_insert_attributes(item_batch, &handle_attributes))
+      end
+
       true
     end
 
-    def bulk_insert!(items, validate: true, &handle_attributes)
+    def bulk_insert!(items, validate: true, batch_size: DEFAULT_BATCH_SIZE, &handle_attributes)
       return true if items.empty?
 
       items.each(&:validate!) if validate
-      insert_all!(_bulk_insert_attributes(items, &handle_attributes))
+      items.each_slice(batch_size) do |item_batch|
+        insert_all!(_bulk_insert_attributes(item_batch, &handle_attributes))
+      end
+
       true
     end
 

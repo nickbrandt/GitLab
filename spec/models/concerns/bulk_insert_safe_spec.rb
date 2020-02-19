@@ -63,4 +63,26 @@ describe BulkInsertSafe do
       expect { BulkInsertItem.include(InheritedSafeMethods) }.not_to raise_error
     end
   end
+
+  context 'when overriding default batch size' do
+    describe '.bulk_insert' do
+      it 'inserts items in the given number of batches' do
+        items = build_valid_items_for_bulk_insertion
+        expect(items.size).to eq(10)
+        expect(BulkInsertItem).to receive(:insert_all).twice
+
+        BulkInsertItem.bulk_insert(items, batch_size: 5)
+      end
+    end
+
+    describe '.bulk_insert!' do
+      it 'inserts items in the given number of batches' do
+        items = build_valid_items_for_bulk_insertion
+        expect(items.size).to eq(10)
+        expect(BulkInsertItem).to receive(:insert_all!).twice
+
+        BulkInsertItem.bulk_insert!(items, batch_size: 5)
+      end
+    end
+  end
 end
