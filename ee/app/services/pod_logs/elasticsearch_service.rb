@@ -51,6 +51,14 @@ module PodLogs
       )
 
       success(result)
+    rescue Elasticsearch::Transport::Transport::ServerError => e
+      ::Gitlab::ErrorTracking.track_exception(e)
+
+      error(_('Elasticsearch returned status code: %{status_code}') % {
+        # ServerError is the parent class of exceptions named after HTTP status codes, eg: "Elasticsearch::Transport::Transport::Errors::NotFound"
+        # there is no method on the exception other than the class name to determine the type of error encountered.
+        status_code: e.class.name.split('::').last
+      })
     end
   end
 end

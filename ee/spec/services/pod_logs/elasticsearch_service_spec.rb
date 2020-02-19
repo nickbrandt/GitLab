@@ -157,5 +157,19 @@ describe ::PodLogs::ElasticsearchService do
       expect(result[:status]).to eq(:error)
       expect(result[:message]).to eq('Unable to connect to Elasticsearch')
     end
+
+    it 'handles server errors from elasticsearch' do
+      allow_any_instance_of(::Clusters::Applications::ElasticStack)
+        .to receive(:elasticsearch_client)
+        .and_return(Elasticsearch::Transport::Client.new)
+      allow_any_instance_of(::Gitlab::Elasticsearch::Logs)
+        .to receive(:pod_logs)
+        .and_raise(Elasticsearch::Transport::Transport::Errors::ServiceUnavailable.new)
+
+      result = subject.send(:pod_logs, result_arg)
+
+      expect(result[:status]).to eq(:error)
+      expect(result[:message]).to eq('Elasticsearch returned status code: ServiceUnavailable')
+    end
   end
 end
