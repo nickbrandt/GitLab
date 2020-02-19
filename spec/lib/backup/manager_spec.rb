@@ -329,9 +329,7 @@ describe Backup::Manager do
           .with(hash_including(key: backup_filename, public: false))
           .and_return(true)
 
-        Dir.chdir(Gitlab.config.backup.path) do
-          subject.upload
-        end
+        subject.upload
       end
 
       it 'adds the DIRECTORY environment variable if present' do
@@ -341,9 +339,7 @@ describe Backup::Manager do
           .with(hash_including(key: "daily/#{backup_filename}", public: false))
           .and_return(true)
 
-        Dir.chdir(Gitlab.config.backup.path) do
-          subject.upload
-        end
+        subject.upload
       end
     end
 
@@ -373,9 +369,7 @@ describe Backup::Manager do
           .with(hash_excluding(public: false))
           .and_return(true)
 
-        Dir.chdir(Gitlab.config.backup.path) do
-          subject.upload
-        end
+        subject.upload
       end
     end
   end

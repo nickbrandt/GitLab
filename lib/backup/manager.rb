@@ -264,7 +264,7 @@ module Backup
     def create_attributes
       attrs = {
         key: remote_target,
-        body: File.open(tar_file),
+        body: File.open("#{backup_path}/#{tar_file}"),
         multipart_chunk_size: Gitlab.config.backup.upload.multipart_chunk_size,
         encryption: Gitlab.config.backup.upload.encryption,
         encryption_key: Gitlab.config.backup.upload.encryption_key,
