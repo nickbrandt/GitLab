@@ -32,6 +32,28 @@ const defaultFields = {
   endEventLabelId: null,
 };
 
+export const initializeFormData = ({ emptyFieldState, initialFields, errors }) => {
+  const defaultErrors = initialFields?.endEventIdentifier
+    ? { ...emptyFieldState, endEventIdentifier: null }
+    : {
+        ...emptyFieldState,
+        endEventIdentifier:
+          initialFields && !initialFields?.startEventIdentifier
+            ? [s__('CustomCycleAnalytics|Please select a start event first')]
+            : null,
+      };
+  return {
+    fields: {
+      ...emptyFieldState,
+      ...initialFields,
+    },
+    fieldErrors: {
+      ...defaultErrors,
+      ...errors,
+    },
+  };
+};
+
 export default {
   components: {
     GlFormGroup,
@@ -74,22 +96,11 @@ export default {
     },
   },
   data() {
-    const defaultErrors = this?.initialFields?.endEventIdentifier
-      ? { ...defaultFields, endEventIdentifier: null }
-      : {
-          ...defaultFields,
-          endEventIdentifier: [s__('CustomCycleAnalytics|Please select a start event first')],
-        };
+    const { initialFields = {}, errors = null } = this;
+    const formData = initializeFormData({ emptyFieldState: defaultFields, initialFields, errors });
     return {
       labelEvents: getLabelEventsIdentifiers(this.events),
-      fields: {
-        ...defaultFields,
-        ...this.initialFields,
-      },
-      fieldErrors: {
-        ...defaultErrors,
-        ...this.errors,
-      },
+      ...formData,
     };
   },
   computed: {
@@ -169,15 +180,15 @@ export default {
   },
   watch: {
     initialFields(newFields) {
-      console.log('newFields', newFields);
-
       this.fields = {
         ...defaultFields,
         ...newFields,
       };
+    },
+    errors(newErrors) {
       this.fieldErrors = {
         ...defaultFields,
-        ...this.errors,
+        ...newErrors,
       };
     },
   },

@@ -2,7 +2,9 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import { createLocalVue, mount } from '@vue/test-utils';
-import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
+import CustomStageForm, {
+  initializeFormData,
+} from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
   groupLabels,
@@ -745,6 +747,120 @@ describe('CustomStageForm', () => {
           expect(wrapper.emitted()).toEqual({
             [STAGE_ACTIONS.UPDATE]: [[{ hidden: false, id: 'my-stage' }]],
           });
+        });
+      });
+    });
+  });
+
+  describe('initializeFormData', () => {
+    describe('without a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with all fields set', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
         });
       });
     });
