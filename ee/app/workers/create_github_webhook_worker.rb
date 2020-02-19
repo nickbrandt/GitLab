@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateGithubWebhookWorker
+class CreateGithubWebhookWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include GrapePathHelpers::NamedRouteMatcher
 

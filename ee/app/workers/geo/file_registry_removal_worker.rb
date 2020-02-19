@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileRegistryRemovalWorker
+  class FileRegistryRemovalWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include GeoQueue
     include ::Gitlab::Geo::LogHelpers

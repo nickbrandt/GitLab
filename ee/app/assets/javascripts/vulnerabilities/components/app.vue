@@ -41,7 +41,7 @@ export default {
 </script>
 
 <template>
-  <div class="vulnerability-show-header">
+  <div>
     <gl-loading-icon v-if="isLoading" />
     <vulnerability-state-dropdown v-else :state="state" @change="onVulnerabilityStateChange" />
   </div>

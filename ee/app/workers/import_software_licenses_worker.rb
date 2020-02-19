@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ImportSoftwareLicensesWorker
+class ImportSoftwareLicensesWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   queue_namespace :cronjob

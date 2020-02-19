@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class StoreSecurityScansWorker
+class StoreSecurityScansWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include SecurityScansQueue
 

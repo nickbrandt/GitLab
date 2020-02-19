@@ -2,9 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import MockAdapter from 'axios-mock-adapter';
-import App from 'ee/vulnerability_management/components/app.vue';
+import App from 'ee/vulnerabilities/components/app.vue';
 import waitForPromises from 'helpers/wait_for_promises';
-import VulnerabilityStateDropdown from 'ee/vulnerability_management/components/vulnerability_state_dropdown.vue';
+import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
 
 const mockAxios = new MockAdapter(axios);
 jest.mock('~/flash');

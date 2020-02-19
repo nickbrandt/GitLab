@@ -2640,4 +2640,22 @@ describe Project do
       end
     end
   end
+
+  describe '#jira_subscription_exists?' do
+    subject { project.jira_subscription_exists? }
+
+    context 'jira connect subscription exists' do
+      let!(:jira_connect_subscription) { create(:jira_connect_subscription, namespace: project.namespace) }
+
+      it { is_expected.to eq(false) }
+
+      context 'dev panel integration is available' do
+        before do
+          stub_licensed_features(jira_dev_panel_integration: true)
+        end
+
+        it { is_expected.to eq(true) }
+      end
+    end
+  end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AdjournedProjectDeletionWorker
+class AdjournedProjectDeletionWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include ExceptionBacktrace
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProjectImportScheduleWorker
+class ProjectImportScheduleWorker # rubocop:disable Scalability/IdempotentWorker
   ImportStateNotFound = Class.new(StandardError)
 
   include ApplicationWorker

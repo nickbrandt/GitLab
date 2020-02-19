@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UpdateAllMirrorsWorker
+class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include CronjobQueue
 

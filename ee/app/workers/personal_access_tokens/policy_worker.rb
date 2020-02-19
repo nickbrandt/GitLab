@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PersonalAccessTokens
-  class PolicyWorker
+  class PolicyWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
 
     queue_namespace :personal_access_tokens

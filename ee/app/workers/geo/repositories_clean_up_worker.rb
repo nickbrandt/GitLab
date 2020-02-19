@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class RepositoriesCleanUpWorker
+  class RepositoriesCleanUpWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include ExclusiveLeaseGuard
     include GeoQueue

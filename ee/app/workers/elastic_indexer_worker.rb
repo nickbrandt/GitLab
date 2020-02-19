@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ElasticIndexerWorker
+class ElasticIndexerWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include Elasticsearch::Model::Client::ClassMethods
 

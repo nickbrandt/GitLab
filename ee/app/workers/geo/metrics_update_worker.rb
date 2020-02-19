@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class MetricsUpdateWorker
+  class MetricsUpdateWorker # rubocop:disable Scalability/IdempotentWorker
     include ApplicationWorker
     include ExclusiveLeaseGuard
     # rubocop:disable Scalability/CronWorkerContext

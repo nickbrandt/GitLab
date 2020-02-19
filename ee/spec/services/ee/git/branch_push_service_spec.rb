@@ -176,60 +176,46 @@ describe Git::BranchPushService do
       end
     end
 
-    context 'when feature is enabled' do
+    context 'has Jira dev panel integration license' do
       before do
-        stub_feature_flags(jira_connect_app: true)
+        stub_licensed_features(jira_dev_panel_integration: true)
       end
 
-      context 'has Jira dev panel integration license' do
+      context 'with a Jira subscription' do
         before do
-          stub_licensed_features(jira_dev_panel_integration: true)
+          create(:jira_connect_subscription, namespace: project.namespace)
         end
 
-        context 'with a Jira subscription' do
+        context 'branch name contains Jira issue key' do
+          let(:branch_to_sync) { 'branch-JIRA-123' }
+          let(:ref) { "refs/heads/#{branch_to_sync}" }
+
+          it_behaves_like 'enqueues Jira sync worker'
+        end
+
+        context 'commit message contains Jira issue key' do
+          let(:commits_to_sync) { [newrev] }
+
           before do
-            create(:jira_connect_subscription, namespace: project.namespace)
+            allow_any_instance_of(Commit).to receive(:safe_message).and_return('Commit with key JIRA-123')
           end
 
-          context 'branch name contains Jira issue key' do
-            let(:branch_to_sync) { 'branch-JIRA-123' }
-            let(:ref) { "refs/heads/#{branch_to_sync}" }
-
-            it_behaves_like 'enqueues Jira sync worker'
-          end
-
-          context 'commit message contains Jira issue key' do
-            let(:commits_to_sync) { [newrev] }
-
-            before do
-              allow_any_instance_of(Commit).to receive(:safe_message).and_return('Commit with key JIRA-123')
-            end
-
-            it_behaves_like 'enqueues Jira sync worker'
-          end
-
-          context 'branch name and commit message does not contain Jira issue key' do
-            it_behaves_like 'does not enqueue Jira sync worker'
-          end
+          it_behaves_like 'enqueues Jira sync worker'
         end
 
-        context 'without a Jira subscription' do
+        context 'branch name and commit message does not contain Jira issue key' do
           it_behaves_like 'does not enqueue Jira sync worker'
         end
       end
 
-      context 'does not have Jira dev panel integration license' do
-        before do
-          stub_licensed_features(jira_dev_panel_integration: false)
-        end
-
+      context 'without a Jira subscription' do
         it_behaves_like 'does not enqueue Jira sync worker'
       end
     end
 
-    context 'when feature is disabled' do
+    context 'does not have Jira dev panel integration license' do
       before do
-        stub_feature_flags(jira_connect_app: false)
+        stub_licensed_features(jira_dev_panel_integration: false)
       end
 
       it_behaves_like 'does not enqueue Jira sync worker'
