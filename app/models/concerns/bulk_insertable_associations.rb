@@ -26,9 +26,12 @@ module BulkInsertableAssociations
       return {} unless pending_association_items&.any?
 
       pending_association_items.each do |association, items|
-        attributes = get_validated_attributes(items, model_instance, association)
         association_class = association_class_for(association)
-        association_class.insert_all(attributes)
+        association_class.bulk_insert(items) do |item_attributes|
+          # wires up the foreign key column with the owner of this association
+          owner_id_attribute = reflections[association.to_s].foreign_key
+          item_attributes[owner_id_attribute] = model_instance.id
+        end
       end
     ensure
       clear_pending_association_items
@@ -58,32 +61,6 @@ module BulkInsertableAssociations
 
     def bulk_insert_context
       Thread.current['_bulk_insert_context'] ||= {}
-    end
-
-    def get_validated_attributes(items, model_instance, association)
-      all_attributes = []
-      items.each do |item|
-        all_attributes << process_item_attributes!(item.attributes, model_instance, association)
-      end
-
-      all_attributes
-    end
-
-    def process_item_attributes!(attributes, model_instance, association)
-      drop_nil_id!(attributes)
-      set_foreign_key!(attributes, model_instance, association)
-      attributes
-    end
-
-    # removes any `id` fields that are nil since these won't insert cleanly
-    def drop_nil_id!(attributes)
-      attributes.delete('id') unless attributes['id']
-    end
-
-    # wires up the foreign key column with the owner of this association
-    def set_foreign_key!(attributes, model_instance, association)
-      owner_id_attribute = reflections[association.to_s].foreign_key
-      attributes[owner_id_attribute] = model_instance.id
     end
 
     def association_class_for(association)
