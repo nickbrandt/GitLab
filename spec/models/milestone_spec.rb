@@ -191,6 +191,16 @@ describe Milestone do
     end
   end
 
+  describe '.predefined_id?' do
+    it 'returns true for a predefined Milestone ID' do
+      expect(Milestone.predefined_id?(described_class::Upcoming.id)).to be true
+    end
+
+    it 'returns false for a Milestone ID that is not predefined' do
+      expect(Milestone.predefined_id?(milestone.id)).to be false
+    end
+  end
+
   describe '.order_by_name_asc' do
     it 'sorts by name ascending' do
       milestone1 = create(:milestone, title: 'Foo')

@@ -46,5 +46,17 @@ describe Gitlab::ImportExport::Group::TreeRestorer do
         expect(lists.map(&:list_type)).to contain_exactly('assignee', 'milestone')
       end
     end
+
+    context 'boards' do
+      it 'has user generated milestones' do
+        board = group.boards.find_by(name: 'second board')
+        expect(board.milestone.title).to eq 'v4.0'
+      end
+
+      it 'does not have predefined milestones' do
+        board = group.boards.find_by(name: 'first board')
+        expect(board.milestone).to be_nil
+      end
+    end
   end
 end

@@ -134,11 +134,12 @@ class Milestone < ApplicationRecord
       reorder(nil).group(:state).count
     end
 
+    def predefined_id?(id)
+      [Any.id, None.id, Upcoming.id, Started.id].include?(id)
+    end
+
     def predefined?(milestone)
-      milestone == Any ||
-        milestone == None ||
-        milestone == Upcoming ||
-        milestone == Started
+      predefined_id?(milestone&.id)
     end
   end
 
