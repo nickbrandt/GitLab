@@ -57,7 +57,7 @@ describe ApprovalState do
       create_rule(users: committers)
     end
 
-    context 'when self approval is disabled' do
+    context 'when self approval is disabled on project level' do
       let(:merge_requests_author_approval) { false }
 
       it 'excludes authors' do
@@ -87,7 +87,7 @@ describe ApprovalState do
       end
     end
 
-    context 'when self approval is enabled' do
+    context 'when self approval is enabled on project level' do
       let(:merge_requests_author_approval) { true }
 
       it 'includes author' do
@@ -117,7 +117,7 @@ describe ApprovalState do
       end
     end
 
-    context 'when committers approval is enabled' do
+    context 'when committers approval is enabled on project level' do
       let(:merge_requests_author_approval) { true }
       let(:merge_requests_disable_committers_approval) { false }
 
@@ -148,7 +148,7 @@ describe ApprovalState do
       end
     end
 
-    context 'when committers approval is disabled' do
+    context 'when committers approval is disabled on project level' do
       let(:merge_requests_author_approval) { true }
       let(:merge_requests_disable_committers_approval) { true }
 
