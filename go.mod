@@ -10,7 +10,6 @@ require (
 	github.com/golang/gddo v0.0.0-20190419222130-af0f2af80721
 	github.com/golang/protobuf v1.3.2
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
@@ -22,11 +21,11 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/testify v1.4.0
 	gitlab.com/gitlab-org/gitaly v1.74.0
-	gitlab.com/gitlab-org/labkit v0.0.0-20190902063225-3253d7975ca7
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
-	golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
+	gitlab.com/gitlab-org/labkit v0.0.0-20200227174525-4f8041c014c2
+	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
+	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
-	golang.org/x/tools v0.0.0-20190621195816-6e04913cbbac
+	golang.org/x/tools v0.0.0-20200117161641-43d50277825c
 	google.golang.org/grpc v1.24.0
-	honnef.co/go/tools v0.0.1-2019.2.2
+	honnef.co/go/tools v0.0.1-2019.2.3
 )
