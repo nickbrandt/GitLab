@@ -8,7 +8,7 @@ module Gitlab
       def call(severity, timestamp, progname, data)
         output = {
           severity: severity,
-          time: timestamp.utc.iso8601(3)
+          time: timestamp.log_format
         }
 
         case data
@@ -34,7 +34,7 @@ module Gitlab
       def format_time(timestamp)
         return timestamp unless timestamp.is_a?(Numeric)
 
-        Time.at(timestamp).utc.iso8601(3)
+        Time.at(timestamp).log_format
       end
     end
   end

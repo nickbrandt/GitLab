@@ -11,7 +11,7 @@ module Gitlab
           data[:params] = process_params(data)
 
           attributes = {
-            time: datetime.utc.iso8601(3),
+            time: datetime.log_format,
             severity: severity,
             duration: time[:total],
             db: time[:db],

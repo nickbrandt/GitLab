@@ -9,7 +9,7 @@ module Gitlab
     def format_message(severity, timestamp, progname, message)
       data = {}
       data[:severity] = severity
-      data[:time] = timestamp.utc.iso8601(3)
+      data[:time] = timestamp.log_format
       data[Labkit::Correlation::CorrelationId::LOG_KEY] = Labkit::Correlation::CorrelationId.current_id
 
       case message

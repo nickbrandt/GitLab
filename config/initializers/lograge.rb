@@ -27,7 +27,7 @@ unless Gitlab::Runtime.sidekiq?
         .map { |k, v| { key: k, value: v } }
 
       payload = {
-        time: Time.now.utc.iso8601(3),
+        time: Time.now.log_format,
         params: Gitlab::Utils::LogLimitedArray.log_limited_array(params),
         remote_ip: event.payload[:remote_ip],
         user_id: event.payload[:user_id],

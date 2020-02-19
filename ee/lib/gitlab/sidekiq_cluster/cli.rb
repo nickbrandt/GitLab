@@ -29,7 +29,7 @@ module Gitlab
 
         # Use a log format similar to Sidekiq to make parsing/grepping easier.
         @logger.formatter = proc do |level, date, program, message|
-          "#{date.utc.iso8601(3)} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)} #{level}: #{message}\n"
+          "#{date.log_format} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)} #{level}: #{message}\n"
         end
       end
 
