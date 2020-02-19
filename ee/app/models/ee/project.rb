@@ -749,6 +749,10 @@ module EE
       ::Project.with_groups_level_repos_templates.exists?(id)
     end
 
+    def jira_subscription_exists?
+      feature_available?(:jira_dev_panel_integration) && JiraConnectSubscription.for_project(self).exists?
+    end
+
     private
 
     def group_hooks
