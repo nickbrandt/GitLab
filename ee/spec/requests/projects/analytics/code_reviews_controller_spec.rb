@@ -20,7 +20,7 @@ describe Projects::Analytics::CodeReviewsController, type: :request do
         it 'is success' do
           get project_analytics_code_reviews_path(project)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -32,7 +32,7 @@ describe Projects::Analytics::CodeReviewsController, type: :request do
         it 'is not found' do
           get project_analytics_code_reviews_path(project)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -45,7 +45,7 @@ describe Projects::Analytics::CodeReviewsController, type: :request do
       it 'is not found' do
         get project_analytics_code_reviews_path(project)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
