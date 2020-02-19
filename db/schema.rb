@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_13_220211) do
+ActiveRecord::Schema.define(version: 2020_02_18_213501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -4423,18 +4423,18 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
   create_table "vulnerability_occurrence_identifiers", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
-    t.bigint "occurrence_id", null: false
     t.bigint "identifier_id", null: false
+    t.bigint "finding_id", null: false
+    t.index ["finding_id", "identifier_id"], name: "vuln_finding_identifiers_on_finding_id_and_identifier_id", unique: true
     t.index ["identifier_id"], name: "index_vulnerability_occurrence_identifiers_on_identifier_id"
-    t.index ["occurrence_id", "identifier_id"], name: "index_vulnerability_occurrence_identifiers_on_unique_keys", unique: true
   end
 
   create_table "vulnerability_occurrence_pipelines", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
-    t.bigint "occurrence_id", null: false
     t.integer "pipeline_id", null: false
-    t.index ["occurrence_id", "pipeline_id"], name: "vulnerability_occurrence_pipelines_on_unique_keys", unique: true
+    t.bigint "finding_id", null: false
+    t.index ["finding_id", "pipeline_id"], name: "vuln_occurrence_pipelines_on_finding_id_and_pipeline_id", unique: true
     t.index ["pipeline_id"], name: "index_vulnerability_occurrence_pipelines_on_pipeline_id"
   end
 
@@ -5035,9 +5035,9 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
   add_foreign_key "vulnerability_issue_links", "issues", on_delete: :cascade
   add_foreign_key "vulnerability_issue_links", "vulnerabilities", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_identifiers", column: "identifier_id", on_delete: :cascade
-  add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_occurrences", column: "finding_id", name: "fk_2f98039360", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_pipelines", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
-  add_foreign_key "vulnerability_occurrence_pipelines", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_pipelines", "vulnerability_occurrences", column: "finding_id", name: "fk_feb6a91369", on_delete: :cascade
   add_foreign_key "vulnerability_occurrences", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_occurrences", "vulnerabilities", name: "fk_97ffe77653", on_delete: :nullify
   add_foreign_key "vulnerability_occurrences", "vulnerability_identifiers", column: "primary_identifier_id", on_delete: :cascade
