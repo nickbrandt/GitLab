@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'a BulkInsertSafe model' do |klass|
+RSpec.shared_examples 'a BulkInsertSafe model' do |klass, valid_items, invalid_items|
   # Call `.dup` on the class passed in, as a test in this set of examples
   # calls `belongs_to` on the class, thereby adding a new belongs_to
   # relationship to the model that can break remaining specs in the test suite.
@@ -33,6 +33,100 @@ RSpec.shared_examples 'a BulkInsertSafe model' do |klass|
 
     it 'does not raise an error when the call is triggered by belongs_to' do
       expect { target_class.belongs_to(:other_record) }.not_to raise_error
+    end
+  end
+
+  describe '.bulk_insert' do
+    context 'when all items are valid' do
+      it 'inserts them all' do
+        items = build_valid_items_for_bulk_insertion
+
+        expect(items).not_to be_empty
+        expect { target_class.bulk_insert(items) }.to change { target_class.count }.by(items.size)
+      end
+
+      it 'returns true' do
+        items = build_valid_items_for_bulk_insertion
+
+        expect(items).not_to be_empty
+        expect(target_class.bulk_insert(items)).to be true
+      end
+    end
+
+    context 'when some items are invalid' do
+      it 'does not insert any of them and returns false' do
+        items = build_invalid_items_for_bulk_insertion
+
+        # it is not always possible to create invalid items
+        if items.any?
+          expect(target_class.bulk_insert(items)).to be(false)
+          expect(target_class.count).to eq(0)
+        end
+      end
+
+      it 'inserts them anyway when bypassing validations' do
+        items = build_invalid_items_for_bulk_insertion
+
+        # it is not always possible to create invalid items
+        if items.any?
+          expect(target_class.bulk_insert(items, validate: false)).to be(true)
+          expect(target_class.count).to eq(items.size)
+        end
+      end
+    end
+
+    context 'when items are empty' do
+      it 'does nothing and returns true' do
+        expect(target_class.bulk_insert([])).to be(true)
+        expect(target_class.count).to eq(0)
+      end
+    end
+  end
+
+  describe '.bulk_insert!' do
+    context 'when all items are valid' do
+      it 'inserts them all' do
+        items = build_valid_items_for_bulk_insertion
+
+        expect(items).not_to be_empty
+        expect { target_class.bulk_insert!(items) }.to change { target_class.count }.by(items.size)
+      end
+
+      it 'returns true' do
+        items = build_valid_items_for_bulk_insertion
+
+        expect(items).not_to be_empty
+        expect(target_class.bulk_insert!(items)).to be true
+      end
+    end
+
+    context 'when some items are invalid' do
+      it 'does not insert any of them and raises an error' do
+        items = build_invalid_items_for_bulk_insertion
+
+        # it is not always possible to create invalid items
+        if items.any?
+          expect { target_class.bulk_insert!(items) }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(target_class.count).to eq(0)
+        end
+      end
+
+      it 'inserts them anyway when bypassing validations' do
+        items = build_invalid_items_for_bulk_insertion
+
+        # it is not always possible to create invalid items
+        if items.any?
+          expect(target_class.bulk_insert!(items, validate: false)).to be(true)
+          expect(target_class.count).to eq(items.size)
+        end
+      end
+    end
+
+    context 'when items are empty' do
+      it 'does nothing and returns true' do
+        expect(target_class.bulk_insert!([])).to be(true)
+        expect(target_class.count).to eq(0)
+      end
     end
   end
 end

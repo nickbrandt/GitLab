@@ -27,7 +27,9 @@ module BulkInsertableAssociations
 
       pending_association_items.each do |association, items|
         association_class = association_class_for(association)
-        association_class.bulk_insert(items) do |item_attributes|
+        # Note that we don't run validations again here because we already do
+        # it as part of the parent class
+        association_class.bulk_insert(items, validate: false) do |item_attributes|
           # wires up the foreign key column with the owner of this association
           owner_id_attribute = reflections[association.to_s].foreign_key
           item_attributes[owner_id_attribute] = model_instance.id

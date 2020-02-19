@@ -26,8 +26,20 @@ module BulkInsertSafe
       super
     end
 
-    def bulk_insert(items, &handle_attributes)
+    def bulk_insert(items, validate: true, &handle_attributes)
+      return true if items.empty?
+      return false if validate && !items.all?(&:valid?)
+
       insert_all(_bulk_insert_attributes(items, &handle_attributes))
+      true
+    end
+
+    def bulk_insert!(items, validate: true, &handle_attributes)
+      return true if items.empty?
+
+      items.each(&:validate!) if validate
+      insert_all!(_bulk_insert_attributes(items, &handle_attributes))
+      true
     end
 
     private

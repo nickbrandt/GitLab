@@ -5,6 +5,8 @@ require 'spec_helper'
 describe BulkInsertSafe do
   class BulkInsertItem < ApplicationRecord
     include BulkInsertSafe
+
+    validates :name, presence: true
   end
 
   module InheritedUnsafeMethods
@@ -20,6 +22,32 @@ describe BulkInsertSafe do
 
     included do
       after_initialize -> { "safe" }
+    end
+  end
+
+  before(:all) do
+    ActiveRecord::Schema.define do
+      create_table :bulk_insert_items, force: true do |t|
+        t.string :name, null: true
+      end
+    end
+  end
+
+  after(:all) do
+    ActiveRecord::Schema.define do
+      drop_table :bulk_insert_items, force: true
+    end
+  end
+
+  def build_valid_items_for_bulk_insertion
+    Array.new(10) do |n|
+      BulkInsertItem.new(name: "item-#{n}")
+    end
+  end
+
+  def build_invalid_items_for_bulk_insertion
+    Array.new(10) do |n|
+      BulkInsertItem.new # requires `name` to be set
     end
   end
 

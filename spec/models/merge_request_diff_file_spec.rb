@@ -3,6 +3,14 @@
 require 'spec_helper'
 
 describe MergeRequestDiffFile do
+  def build_valid_items_for_bulk_insertion
+    Array.new(10) { build(:merge_request_diff_file) }
+  end
+
+  def build_invalid_items_for_bulk_insertion
+    [] # class does not have any validations defined
+  end
+
   it_behaves_like 'a BulkInsertSafe model', MergeRequestDiffFile
 
   describe '#diff' do
