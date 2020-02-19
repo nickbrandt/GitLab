@@ -39,6 +39,7 @@ module API
             params do
               requires :name, type: String, desc: 'The name of the link'
               requires :url, type: String, desc: 'The URL of the link'
+              optional :filepath, type: String, desc: 'The filepath of the link'
             end
             post 'links' do
               authorize! :create_release, release
@@ -73,7 +74,8 @@ module API
               params do
                 optional :name, type: String, desc: 'The name of the link'
                 optional :url, type: String, desc: 'The URL of the link'
-                at_least_one_of :name, :url
+                optional :filepath, type: String, desc: 'The filepath of the link'
+                at_least_one_of :name, :url, :filepath
               end
               put do
                 authorize! :update_release, release

@@ -2439,34 +2439,36 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
   end
 
   create_table "merge_request_context_commit_diff_files", id: false, force: :cascade do |t|
+    t.bigint "merge_request_context_commit_id"
     t.binary "sha", null: false
     t.integer "relative_order", null: false
+    t.string "a_mode", limit: 255, null: false
+    t.string "b_mode", limit: 255, null: false
     t.boolean "new_file", null: false
     t.boolean "renamed_file", null: false
     t.boolean "deleted_file", null: false
     t.boolean "too_large", null: false
-    t.string "a_mode", limit: 255, null: false
-    t.string "b_mode", limit: 255, null: false
+    t.boolean "binary"
     t.text "new_path", null: false
     t.text "old_path", null: false
     t.text "diff"
-    t.boolean "binary"
-    t.bigint "merge_request_context_commit_id"
     t.index ["merge_request_context_commit_id", "sha"], name: "idx_mr_cc_diff_files_on_mr_cc_id_and_sha"
+    t.index ["merge_request_context_commit_id"], name: "idx_mr_cc_diff_files_on_mr_cc_id"
   end
 
   create_table "merge_request_context_commits", force: :cascade do |t|
+    t.bigint "merge_request_id"
     t.datetime_with_timezone "authored_date"
     t.datetime_with_timezone "committed_date"
-    t.integer "relative_order", null: false
     t.binary "sha", null: false
+    t.integer "relative_order", null: false
     t.text "author_name"
     t.text "author_email"
     t.text "committer_name"
     t.text "committer_email"
     t.text "message"
-    t.bigint "merge_request_id"
     t.index ["merge_request_id", "sha"], name: "index_mr_context_commits_on_merge_request_id_and_sha", unique: true
+    t.index ["merge_request_id"], name: "index_merge_request_context_commits_on_merge_request_id"
   end
 
   create_table "merge_request_diff_commits", id: false, force: :cascade do |t|
@@ -3646,6 +3648,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
     t.string "name", null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.string "filepath"
     t.index ["release_id", "name"], name: "index_release_links_on_release_id_and_name", unique: true
     t.index ["release_id", "url"], name: "index_release_links_on_release_id_and_url", unique: true
   end

@@ -195,8 +195,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
-        scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
+        resource :cycle_analytics, only: [:show]
+
+        namespace :cycle_analytics do
           scope :events, controller: 'events' do
             get :issue
             get :plan
@@ -207,7 +208,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :production
           end
         end
-        get '/cycle_analytics', to: redirect('%{namespace_id}/%{project_id}/-/value_stream_analytics')
 
         concerns :clusterable
 
@@ -301,6 +301,17 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           defaults: { format: 'json' },
           constraints: { template_type: %r{issue|merge_request}, format: 'json' }
 
+      resources :commit, only: [:show], constraints: { id: /\h{7,40}/ } do
+        member do
+          get :branches
+          get :pipelines
+          post :revert
+          post :cherry_pick
+          get :diff_for_path
+          get :merge_requests
+        end
+      end
+
       resource :pages, only: [:show, :update, :destroy] do
         resources :domains, except: :index, controller: 'pages_domains', constraints: { id: %r{[^/]+} } do
           member do
@@ -323,8 +334,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      post 'alerts/notify', to: 'alerting/notifications#create'
-
       resources :pipelines, only: [:index, :new, :create, :show, :destroy] do
         collection do
           resource :pipelines_settings, path: 'settings', only: [:show, :update]
@@ -343,7 +352,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :failures
           get :status
           get :test_report
-          get :test_reports_count
         end
 
         member do
@@ -374,7 +382,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :container_registry, only: [:index, :destroy, :show],
+      resources :container_registry, only: [:index, :destroy],
                                      controller: 'registry/repositories'
 
       namespace :registry do
@@ -471,8 +479,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                                             :forks, :group_links, :import, :avatar, :mirror,
                                             :cycle_analytics, :mattermost, :variables, :triggers,
                                             :environments, :protected_environments, :error_tracking,
-                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests,
-                                            :vulnerability_feedback, :security, :dependencies)
+                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests)
     end
 
     # rubocop: disable Cop/PutProjectRoutesUnderScope

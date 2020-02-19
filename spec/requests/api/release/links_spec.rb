@@ -141,9 +141,12 @@ describe API::Release::Links do
     let(:params) do
       {
         name: 'awesome-app.dmg',
-        url: 'https://example.com/download/awesome-app.dmg'
+        filepath: 'binaries/awesome-app.dmg',
+        url: 'https://example.com/download/v11.9.0-rc2/binaries/awesome-app.dmg'
       }
     end
+
+    let(:last_release_link) { release.links.last }
 
     it 'accepts the request' do
       post api("/projects/#{project.id}/releases/v0.1/assets/links", maintainer), params: params
@@ -157,8 +160,9 @@ describe API::Release::Links do
       end.to change { Releases::Link.count }.by(1)
 
       release.reload
-      expect(release.links.last.name).to eq('awesome-app.dmg')
-      expect(release.links.last.url).to eq('https://example.com/download/awesome-app.dmg')
+      expect(last_release_link.name).to eq('awesome-app.dmg')
+      expect(last_release_link.filepath).to eq('binaries/awesome-app.dmg')
+      expect(last_release_link.url).to eq('https://example.com/download/v11.9.0-rc2/binaries/awesome-app.dmg')
     end
 
     it 'matches response schema' do

@@ -41,6 +41,16 @@ describe Releases::Link do
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
+
+    context 'when duplicate filepath is added to a release' do
+      let!(:link) { create(:release_link, filepath: 'binaries/gitlab-runner-linux-amd64', release: release) }
+
+      it 'raises an error' do
+        expect do
+          create(:release_link, filepath: 'binaries/gitlab-runner-linux-amd64', release: release)
+        end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 
   describe '.sorted' do
@@ -98,6 +108,64 @@ describe Releases::Link do
 
       it 'will be invalid' do
         expect(link).to be_invalid
+      end
+    end
+  end
+
+  describe 'FILEPATH_REGEX' do
+    let(:link) { build(:release_link)}
+
+    context 'invalid filepaths' do
+      it 'cannot contain `http`' do
+        link.filepath = 'http://www.example.com'
+        expect(link).to be_invalid
+      end
+
+      it 'cannot contain `https`' do
+        link.filepath = 'https://www.example.com'
+        expect(link).to be_invalid
+      end
+
+      it 'cannot contain a `?`' do
+        link.filepath = 'example.com/?stuff=true'
+        expect(link).to be_invalid
+      end
+
+      it 'cannot contain a `:`' do
+        link.filepath = 'example:5000'
+        expect(link).to be_invalid
+      end
+
+      it 'cannot contain a `//`' do
+        link.filepath = 'https://example.com'
+        expect(link).to be_invalid
+      end
+    end
+
+    context 'valid filepaths' do
+      specify do
+        link.filepath = 'binaries/awesome-app.dmg'
+        expect(link).to be_valid
+      end
+
+      specify do
+        link.filepath = 'binaries/awesome-app-1'
+        expect(link).to be_valid
+      end
+
+      specify do
+        link.filepath = 'sub.example.com'
+        expect(link).to be_valid
+      end
+
+      specify do
+        link.filepath = 'example.com/path/to/file.exe'
+        expect(link).to be_valid
+      end
+
+      specify do
+        link.filepath = nil
+        expect(link).to be_valid
       end
     end
   end

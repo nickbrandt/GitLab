@@ -196,6 +196,28 @@ describe Projects::ReleasesController do
 
       it_behaves_like 'not found'
     end
+=begin
+    context 'assets direct links' do
+      let(:release) { create(:release, project: project, tag: 'v11.9.0') }
+      let!(:link) { create(:release_link, release: release, name: 'linux-amd64', filepath: 'binaries/linux-amd64', url: 'https://downloads.example.com/bin/gitlab-linux-amd64' )}
+      let(:tag) { CGI.escape('v11.9.0-rc2/binaries/linux-amd64') }
+      #let(:tag) { CGI.escape(release.tag) }
+
+      #let(:tag) { 'v11.9.0' }
+
+      it 'redirects to the asset direct link' do
+        subject
+
+        expect(response).to redirect_to('www.google.com')
+      end
+
+      it 'redirects with a status of 302' do
+        subject
+
+        expect(response).to have_http_status(302)
+      end
+    end
+=end
   end
 
   describe 'GET #evidence' do
