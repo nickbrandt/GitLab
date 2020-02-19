@@ -326,7 +326,10 @@ class Namespace < ApplicationRecord
   end
 
   def pages_virtual_domain
-    Pages::VirtualDomain.new(all_projects_with_pages, trim_prefix: full_path)
+    Pages::VirtualDomain.new(
+      all_projects_with_pages.includes(:route, :project_feature),
+      trim_prefix: full_path
+    )
   end
 
   def closest_setting(name)
