@@ -79,7 +79,7 @@ describe Groups::TransferService, '#execute' do
       stub_ee_application_setting(elasticsearch_indexing: true)
     end
 
-    it 'reindexes projects' do
+    it 'reindexes projects', :elastic do
       project1 = create(:project, :repository, :public, namespace: group)
       project2 = create(:project, :repository, :public, namespace: group)
       project3 = create(:project, :repository, :private, namespace: group)
