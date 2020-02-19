@@ -16308,9 +16308,6 @@ msgstr ""
 msgid "Resolve conflicts on source branch"
 msgstr ""
 
-msgid "Resolve discussion"
-msgstr ""
-
 msgid "Resolve thread"
 msgstr ""
 
@@ -20705,9 +20702,6 @@ msgid "Unmarks this %{noun} as Work In Progress."
 msgstr ""
 
 msgid "Unresolve"
-msgstr ""
-
-msgid "Unresolve discussion"
 msgstr ""
 
 msgid "Unresolve thread"
