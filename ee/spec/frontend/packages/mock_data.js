@@ -3,6 +3,12 @@ const _links = {
   delete_api_path: 'bar',
 };
 
+export const mockPipelineInfo = {
+  id: 1,
+  ref: 'branch-name',
+  sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+};
+
 export const mavenPackage = {
   created_at: '2015-12-10',
   id: 1,
@@ -49,6 +55,7 @@ export const npmPackage = {
   _links,
   build_info: {
     pipeline_id: 1,
+    pipeline: mockPipelineInfo,
   },
 };
 
@@ -108,10 +115,3 @@ export const mockTags = [
 ];
 
 export const packageList = [mavenPackage, { ...npmPackage, tags: mockTags }, conanPackage];
-
-export const mockPipelineInfo = {
-  id: 1,
-  ref: 'branch-name',
-  sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-  web_url: 'foo',
-};
