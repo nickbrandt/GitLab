@@ -26,3 +26,8 @@ export const TrackingActions = {
   COPY_NUGET_INSTALL_COMMAND: 'copy_nuget_install_command',
   COPY_NUGET_SETUP_COMMAND: 'copy_nuget_setup_command',
 };
+
+export const NpmManager = {
+  NPM: 'npm',
+  YARN: 'yarn',
+};

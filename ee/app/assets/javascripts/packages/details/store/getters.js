@@ -1,5 +1,6 @@
 import { s__ } from '~/locale';
 import { generateConanRecipe } from '../utils';
+import { NpmManager } from '../constants';
 
 export const packageHasPipeline = ({ packageEntity }) => {
   if (packageEntity?.build_info?.pipeline_id) {
@@ -78,6 +79,23 @@ export const mavenSetupXml = ({ mavenPath }) => `<repositories>
     <url>${mavenPath}</url>
   </snapshotRepository>
 </distributionManagement>`;
+
+export const npmInstallationCommand = ({ packageEntity }) => (type = NpmManager.NPM) => {
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  const instruction = type === NpmManager.NPM ? 'npm i' : 'yarn add';
+
+  return `${instruction} ${packageEntity.name}`;
+};
+
+export const npmSetupCommand = ({ packageEntity, npmPath }) => (type = NpmManager.NPM) => {
+  const scope = packageEntity.name.substring(0, packageEntity.name.indexOf('/'));
+
+  if (type === NpmManager.NPM) {
+    return `echo ${scope}:registry=${npmPath} >> .npmrc`;
+  }
+
+  return `echo \\"${scope}:registry\\" \\"${npmPath}\\" >> .yarnrc`;
+};
 
 export const nugetInstallationCommand = ({ packageEntity }) =>
   `nuget install ${packageEntity.name} -Source "GitLab"`;
