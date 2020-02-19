@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe InstancePolicy do
+describe InstanceSecurityDashboardPolicy do
   let(:current_user) { create(:user) }
   let(:user) { create(:user) }
 
