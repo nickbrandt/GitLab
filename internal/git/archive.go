@@ -166,7 +166,6 @@ func setArchiveHeaders(w http.ResponseWriter, format gitalypb.GetArchiveRequest_
 		w.Header().Set("Content-Type", "application/octet-stream")
 	}
 	w.Header().Set("Content-Transfer-Encoding", "binary")
-	w.Header().Set("Cache-Control", "private")
 }
 
 func prepareArchiveTempfile(dir string, prefix string) (*os.File, error) {
