@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_21_105436) do
+ActiveRecord::Schema.define(version: 2020_02_21_125249) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -4148,6 +4148,18 @@ ActiveRecord::Schema.define(version: 2020_02_21_105436) do
     t.index ["user_id", "key"], name: "index_user_custom_attributes_on_user_id_and_key", unique: true
   end
 
+  create_table "user_details", id: false, force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "bio", limit: 255, default: "", null: false
+    t.string "location", limit: 255, default: "", null: false
+    t.string "organization", limit: 255, default: "", null: false
+    t.string "linkedin", limit: 2048, default: "", null: false
+    t.string "twitter", limit: 2048, default: "", null: false
+    t.string "skype", limit: 2048, default: "", null: false
+    t.string "website_url", limit: 2048, default: "", null: false
+    t.index ["user_id"], name: "index_user_details_on_user_id", unique: true
+  end
+
   create_table "user_interacted_projects", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -4293,6 +4305,7 @@ ActiveRecord::Schema.define(version: 2020_02_21_105436) do
     t.index ["feed_token"], name: "index_users_on_feed_token"
     t.index ["ghost"], name: "index_users_on_ghost"
     t.index ["group_view"], name: "index_users_on_group_view"
+    t.index ["id"], name: "tmp_idx_on_user_id_user_details_sync", where: "(((COALESCE(bio, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(location, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(organization, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(linkedin, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(twitter, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(skype, ''::character varying))::text IS DISTINCT FROM ''::text) OR ((COALESCE(website_url, ''::character varying))::text IS DISTINCT FROM ''::text))"
     t.index ["incoming_email_token"], name: "index_users_on_incoming_email_token"
     t.index ["managing_group_id"], name: "index_users_on_managing_group_id"
     t.index ["name"], name: "index_users_on_name"
@@ -5003,6 +5016,7 @@ ActiveRecord::Schema.define(version: 2020_02_21_105436) do
   add_foreign_key "u2f_registrations", "users"
   add_foreign_key "user_callouts", "users", on_delete: :cascade
   add_foreign_key "user_custom_attributes", "users", on_delete: :cascade
+  add_foreign_key "user_details", "users", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "projects", name: "fk_722ceba4f7", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "users", name: "fk_0894651f08", on_delete: :cascade
   add_foreign_key "user_preferences", "users", on_delete: :cascade

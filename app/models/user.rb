@@ -162,6 +162,7 @@ class User < ApplicationRecord
 
   has_one :status, class_name: 'UserStatus'
   has_one :user_preference
+  has_one :user_detail
 
   #
   # Validations
