@@ -75,11 +75,21 @@ module QA
 
       it 'creates a multi-project pipeline' do
         Page::MergeRequest::Show.perform do |show|
-          pipeline_passed = show.retry_until(reload: true, max_attempts: 20, sleep_interval: 6) do
-            show.has_content?(/Pipeline #\d+ passed/)
+          pipeline_status = nil
+
+          Support::Retrier.retry_until(max_duration: 30, sleep_interval: 2) do
+            api_client = Runtime::API::Client.new(:gitlab)
+            request = Runtime::API::Request.new(api_client, "/projects/#{upstream_project.id}/pipelines")
+            response = JSON.parse(get request.url)
+
+            unless response.detect { |pipeline| pipeline['status'] != 'success' }
+              pipeline_status = 'success'
+            end
+
+            pipeline_status
           end
 
-          expect(pipeline_passed).to be_truthy, "The pipeline did not pass."
+          expect(pipeline_status).to be_truthy, "The pipeline did not pass."
 
           show.click_pipeline_link
         end
