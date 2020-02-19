@@ -9448,6 +9448,9 @@ msgstr ""
 msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
+msgid "Go to Pipelines"
+msgstr ""
+
 msgid "Go to Webhooks"
 msgstr ""
 
@@ -18894,6 +18897,9 @@ msgstr ""
 msgid "TagsPage|protected"
 msgstr ""
 
+msgid "Take a look at our %{beginner_link_start}Beginner's Guide to Continuous Integration%{link_end} and our<br />%{example_link_start}examples of GitLab CI/CD%{link_end} to see all the cool stuff you can do with it."
+msgstr ""
+
 msgid "Target Branch"
 msgstr ""
 
@@ -19021,6 +19027,9 @@ msgid "Thanks for your purchase!"
 msgstr ""
 
 msgid "Thanks! Don't show me this again"
+msgstr ""
+
+msgid "That's it, well done!"
 msgstr ""
 
 msgid "The \"%{group_path}\" group allows you to sign in with your Single Sign-On Account"
@@ -19247,6 +19256,9 @@ msgid "The phase of the development lifecycle."
 msgstr ""
 
 msgid "The pipeline has been deleted"
+msgstr ""
+
+msgid "The pipeline will now run automatically every time you commit code.<br />Pipelines are useful for deploying static web pages, detecting<br />vulnerabilities in dependencies, static or dynamic application security<br />testing (SAST and DAST), and so much more!"
 msgstr ""
 
 msgid "The pipelines schedule runs pipelines in the future, repeatedly, for specific branches or tags. Those scheduled pipelines will inherit limited project access based on their associated user."
