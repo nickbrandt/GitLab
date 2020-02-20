@@ -183,4 +183,22 @@ describe 'Commits' do
       expect(find('.js-project-refs-dropdown')).to have_content branch_name
     end
   end
+
+  context 'viewing commits for an author' do
+    let(:author_commit) { project.repository.commits(nil, limit: 1).first }
+    let(:author) { "#{author_commit.author_name} <#{author_commit.author_email}>" }
+    let(:commits) { project.repository.commits(nil, author: author, limit: 40) }
+
+    before do
+      project.add_maintainer(user)
+      sign_in(user)
+      visit project_commits_path(project, nil, author: author)
+    end
+
+    it 'includes the committed_date for each commit' do
+      commits.each do |commit|
+        expect(page).to have_content("authored #{commit.authored_date.strftime("%b %d, %Y")}")
+      end
+    end
+  end
 end
