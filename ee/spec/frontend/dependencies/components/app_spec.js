@@ -22,6 +22,7 @@ describe('DependenciesApp component', () => {
     endpoint: '/foo',
     emptyStateSvgPath: '/bar.svg',
     documentationPath: TEST_HOST,
+    supportDocumentationPath: `${TEST_HOST}/dependency_scanning#supported-languages`,
   };
 
   const factory = (props = basicAppProps) => {
@@ -87,6 +88,16 @@ describe('DependenciesApp component', () => {
     store.state[allNamespace].reportInfo.status = REPORT_STATUS.incomplete;
   };
 
+  const setStateNoDependencies = () => {
+    Object.assign(store.state[allNamespace], {
+      initialized: true,
+      isLoading: false,
+      dependencies: [],
+    });
+    store.state[allNamespace].pageInfo.total = 0;
+    store.state[allNamespace].reportInfo.status = REPORT_STATUS.noDependencies;
+  };
+
   const findJobFailedAlert = () => wrapper.find(DependencyListJobFailedAlert);
   const findIncompleteListAlert = () => wrapper.find(DependencyListIncompleteAlert);
   const findDependenciesTables = () => wrapper.findAll(PaginatedDependenciesTable);
@@ -102,6 +113,11 @@ describe('DependenciesApp component', () => {
     const componentWrapper = wrapper.find(Component);
     expect(componentWrapper.isVisible()).toBe(true);
     expect(componentWrapper.props()).toEqual(expect.objectContaining(props));
+  };
+
+  const expectComponentPropsToMatchSnapshot = Component => {
+    const componentWrapper = wrapper.find(Component);
+    expect(componentWrapper.props()).toMatchSnapshot();
   };
 
   const expectNoDependenciesTables = () => expect(findDependenciesTables()).toHaveLength(0);
@@ -149,6 +165,7 @@ describe('DependenciesApp component', () => {
 
       it('shows only the empty state', () => {
         expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+        expectComponentPropsToMatchSnapshot(GlEmptyState);
         expectNoHeader();
         expectNoDependenciesTables();
       });
@@ -322,6 +339,19 @@ describe('DependenciesApp component', () => {
         it('does not render the incomplete-list alert', () => {
           expect(findIncompleteListAlert().exists()).toBe(false);
         });
+      });
+    });
+
+    describe('given there are no dependencies detected', () => {
+      beforeEach(() => {
+        setStateNoDependencies();
+      });
+
+      it('shows only the empty state', () => {
+        expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+        expectComponentPropsToMatchSnapshot(GlEmptyState);
+        expectNoHeader();
+        expectNoDependenciesTables();
       });
     });
   });
