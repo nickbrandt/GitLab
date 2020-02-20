@@ -128,7 +128,11 @@ compile-assets pull-cache as-if-foss:
     - .default-before_script
     - .use-pg9
   stage: fixtures
-  needs: ["setup-test-env", "compile-assets pull-cache"]
+  needs:
+    - job: "setup-test-env"
+      artifacts: true
+    - job: "compile-assets pull-cache"
+      artifacts: true
   script:
     - date
     - scripts/gitaly-test-spawn
