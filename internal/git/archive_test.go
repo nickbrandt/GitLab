@@ -67,13 +67,15 @@ func TestSetArchiveHeaders(t *testing.T) {
 		w.Header().Set("Content-Type", "test")
 		w.Header().Set("Content-Length", "test")
 		w.Header().Set("Content-Disposition", "test")
-		w.Header().Set("Cache-Control", "test")
+
+		// This should be preserved
+		w.Header().Set("Cache-Control", "public, max-age=3600")
 
 		setArchiveHeaders(w, testCase.in, "filename")
 
 		testhelper.AssertResponseWriterHeader(t, w, "Content-Type", testCase.out)
 		testhelper.AssertResponseWriterHeader(t, w, "Content-Length")
 		testhelper.AssertResponseWriterHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
-		testhelper.AssertResponseWriterHeader(t, w, "Cache-Control", "private")
+		testhelper.AssertResponseWriterHeader(t, w, "Cache-Control", "public, max-age=3600")
 	}
 }
