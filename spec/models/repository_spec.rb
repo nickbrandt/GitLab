@@ -320,6 +320,20 @@ describe Repository do
       end
     end
 
+    context "when 'author' is set" do
+      let(:commit) { repository.commits(nil, limit: 1).first }
+      let(:known_author) { "#{commit.author_name} <#{commit.author_email}>" }
+      let(:unknown_author) { "The Man With No Name <zapp@brannigan.com>" }
+
+      it "returns commits from that author" do
+        expect(repository.commits(nil, author: known_author, limit: 1).size).to be > 0
+      end
+
+      it "doesn't returns commits from an unknown author" do
+        expect(repository.commits(nil, author: unknown_author, limit: 1).size).to eq(0)
+      end
+    end
+
     context "when 'all' flag is set" do
       it 'returns every commit from the repository' do
         expect(repository.commits(nil, all: true, limit: 60).size).to eq(60)
