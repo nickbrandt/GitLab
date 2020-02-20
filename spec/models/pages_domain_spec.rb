@@ -11,6 +11,11 @@ describe PagesDomain do
     it { is_expected.to belong_to(:project) }
   end
 
+  it 'downcases domain' do
+    domain = create(:pages_domain, domain: 'myDOMAIN.com')
+    expect(domain.domain).to eq('mydomain.com')
+  end
+
   describe 'validate domain' do
     subject(:pages_domain) { build(:pages_domain, domain: domain) }
 
