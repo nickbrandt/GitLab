@@ -54,10 +54,6 @@ scenario, the [new repository indexer](../../integration/elasticsearch.md#elasti
 needs to be enabled in your GitLab configuration. [Since GitLab v12.3](https://gitlab.com/gitlab-org/gitlab/issues/6481),
 the new indexer becomes the default and no configuration is required.
 
-NOTE: **Note:** While Gitaly can be used as a replacement for NFS, it's not recommended
-to use EFS as it may impact GitLab's performance. Review the [relevant documentation](../high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs)
-for more details.
-
 ### Network architecture
 
 The following list depicts what the network architecture of Gitaly is:

@@ -19,7 +19,7 @@ See [Running Gitaly on its own server](../gitaly/index.md#running-gitaly-on-its-
 in Gitaly documentation.
 
 Continue configuration of other components by going back to the
-[Scaling and High Availability](README.md#gitlab-components-and-install-instructions) page.
+[Scaling and High Availability](README.md#gitlab-components-and-configuration-instructions) page.
 
 ## Enable Monitoring
 

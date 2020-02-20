@@ -84,7 +84,7 @@ Advanced configuration options are supported and can be added if
 needed.
 
 Continue configuration of other components by going back to the
-[Scaling and High Availability](README.md#gitlab-components-and-install-instructions) page.
+[Scaling and High Availability](README.md#gitlab-components-and-configuration-instructions) page.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 

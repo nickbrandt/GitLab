@@ -23,32 +23,32 @@ in from some of our customers.
 ## Recommended Setups based on number of users
 
 - 1 - 1000 Users: A single node Omnibus setup with frequent backups. Refer to the [requirements page](https://docs.gitlab.com/ee/install/requirements.html) for further details of the specs you will require.
-- 2000 - 50000+ Users: A scaled HA environment based on one of our [Reference Architectures](#reference-architecture-recommendations) below.
+- 2000 - 50000+ Users: A scaled HA environment based on one of our [Reference Architectures](#reference-architectures) below.
 
-## GitLab Components and Installation Instructions
+## GitLab Components and Configuration Instructions
 
-Before we get into the architectures we should first detail the relevant GitLab
-[components](https://docs.gitlab.com/ee/development/architecture.html#component-diagram) and
-services it depends on along with our recommendations. They are presented in the order you would
-typically install them:
+The GitLab application depends on the following [components](https://docs.gitlab.com/ee/development/architecture.html#component-diagram)
+and services. They are included in the reference architectures along with our
+recommendations for their use and configuration. They are presented in the order
+in which you would typically configure them.
 
-| Component                                                                                                                                                         | Description                                                                                                                       | Install Instructions                                   |
+| Component                                                                                                                                                         | Description                                                                                                                       | Configuration Instructions                                   |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
 | [Load Balancer(s)](load_balancer.md)[^6]                                                                                                                          | Handles load balancing for the GitLab nodes where required.                                                                       | [Link](load_balancer.md)                               |
 | [Consul](https://docs.gitlab.com/ee/development/architecture.html#consul)[^3]                                                                                     | Service discovery and health checks/failover                                                                                      | [Link](consul.md)                                     |
 | [PostgreSQL](https://docs.gitlab.com/ee/development/architecture.html#postgresql)                                                                                 | Database                                                                                                                          | [Link](database.md) |
 | [PgBouncer](https://docs.gitlab.com/ee/development/architecture.html#pgbouncer)                                                                                   | Database Pool Manager                                                                                                             | [Link](pgbouncer.md)                                   |
 | [Redis](https://docs.gitlab.com/ee/development/architecture.html#redis)[^3] with Redis Sentinel                                                                   | Key/Value store for shared data with HA watcher service                                                                           | [Link](redis.md)        |
-| [Gitaly](https://docs.gitlab.com/ee/development/architecture.html#gitaly)[^2] [^5] [^7]                                                                           | Provides high-level storage and RPC access to Git repositories.                                                                   | [Link](gitaly.md)                                      |
+| [Gitaly](https://docs.gitlab.com/ee/development/architecture.html#gitaly)[^2] [^5] [^7]                                                                           | Recommended high-level storage for Git repository data.                                                                 | [Link](gitaly.md)                                      |
 | [Sidekiq](https://docs.gitlab.com/ee/development/architecture.html#sidekiq)                                                                                       | Asynchronous/Background jobs                                                                                                      |                                                        |
 | [S3 Object Storage service](object_storage.md)[^4]                                                                                                                | Recommended store for shared data objects such as LFS, Uploads, Artifacts, etc...                                                 | [Link](object_storage.md)                              |
 | [GitLab application nodes](https://docs.gitlab.com/ee/development/architecture.html#unicorn)[^1]                                                                  | (Unicorn / Puma, Workhorse) - Web-requests (UI, API, Git over HTTP)                                                               | [Link](gitlab.md)                                      |
-| [NFS](nfs.md)[^5] [^7]                                                                                                                                            | Shared disk storage service. Can be used as an alternative for Gitaly or Object Storage (unrecommended). Required for GitLab Pages. | [Link](nfs.md)                                         |
+| [NFS](nfs.md)[^5] [^7]                                                                                                                                            | Shared disk storage service. Can be used as an alternative for Gitaly or Object Storage. Required for GitLab Pages. | [Link](nfs.md)                                         |
 | [Prometheus](https://docs.gitlab.com/ee/development/architecture.html#prometheus) and [Grafana](https://docs.gitlab.com/ee/development/architecture.html#grafana) | GitLab environment monitoring                                                                                                     | [Link](monitoring_node.md)                             |
 
 In some cases, components can be combined on the same nodes to reduce complexity as well.
 
-## Reference Architecture Recommendations
+## Reference Architectures
 
 In this section we'll detail the Reference Architectures that can support large numbers
 of users. These were built, tested and verified by our Quality and Support teams.
@@ -216,8 +216,8 @@ On different cloud vendors a best effort like for like can be used.
       [Packages](../packages/index.md#using-object-storage) (Optional Feature),
       [Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (Optional Feature).
 
-[^5]: NFS can be used as an alternative for both repository data and object storage but this isn't
-      typically recommended for performance reasons. Note however it is required for
+[^5]: NFS can be used as an alternative for both repository data (replacing Gitaly) and
+      object storage but this isn't typically recommended for performance reasons. Note however it is required for
       [GitLab Pages](https://gitlab.com/gitlab-org/gitlab-pages/issues/196).
 
 [^6]: Our architectures have been tested and validated with [HAProxy](https://www.haproxy.org/)
