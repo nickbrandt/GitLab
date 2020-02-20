@@ -3,8 +3,6 @@
 module Packages
   module Nuget
     class PackagesVersionsPresenter
-      attr_reader :packages
-
       def initialize(packages)
         @packages = packages
       end
