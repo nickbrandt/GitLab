@@ -320,7 +320,7 @@ describe Issue do
           project.maintain_elasticsearch_update
 
           issue.update!(update_field => update_value)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end
       end
 

@@ -8,4 +8,6 @@ RSpec.configure do |config|
   config.after(:each, :elastic) do
     Gitlab::Elastic::Helper.delete_index
   end
+
+  config.include ElasticsearchHelpers, :elastic
 end

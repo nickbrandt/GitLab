@@ -48,13 +48,13 @@ describe ElasticIndexerWorker, :elastic do
         Sidekiq::Testing.disable! do
           object = create(type)
           subject.perform("index", name, object.id, object.es_id)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
           object.destroy
         end
 
         expect do
           subject.perform("delete", name, object.id, object.es_id, { 'es_parent' => object.es_parent })
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end.to change { Elasticsearch::Model.search('*').total_count }.by(-1)
       end
     end
@@ -81,13 +81,13 @@ describe ElasticIndexerWorker, :elastic do
     end
 
     ElasticCommitIndexerWorker.new.perform(project.id)
-    Gitlab::Elastic::Helper.refresh_index
+    ensure_elasticsearch_index!
 
     ## All database objects + data from repository. The absolute value does not matter
     expect(Elasticsearch::Model.search('*').total_count).to be > 40
 
     subject.perform("delete", "Project", project.id, project.es_id)
-    Gitlab::Elastic::Helper.refresh_index
+    ensure_elasticsearch_index!
 
     expect(Elasticsearch::Model.search('*').total_count).to be(0)
   end
