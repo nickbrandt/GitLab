@@ -7013,6 +7013,9 @@ msgstr ""
 msgid "Downvotes"
 msgstr ""
 
+msgid "Drop older active deployments"
+msgstr ""
+
 msgid "Due date"
 msgstr ""
 
@@ -22041,6 +22044,9 @@ msgid "Welcome to your Issue Board!"
 msgstr ""
 
 msgid "What are you searching for?"
+msgstr ""
+
+msgid "When a deployment is successful, allow older but still pending deployment(s) to be skipped"
 msgstr ""
 
 msgid "When a runner is locked, it cannot be assigned to other projects"
