@@ -25,13 +25,13 @@ export const toNounSeriesText = items => {
     return sprintf(s__('nounSeries|%{firstItem} and %{lastItem}'), {
       firstItem: items[0],
       lastItem: items[1],
-    });
+    }, false);
   }
 
   return items.reduce((item, nextItem, idx) =>
     idx === items.length - 1
-      ? sprintf(s__('nounSeries|%{item}, and %{lastItem}'), { item, lastItem: nextItem })
-      : sprintf(s__('nounSeries|%{item}, %{nextItem}'), { item, nextItem }),
+      ? sprintf(s__('nounSeries|%{item}, and %{lastItem}'), { item, lastItem: nextItem }, false)
+      : sprintf(s__('nounSeries|%{item}, %{nextItem}'), { item, nextItem }, false),
   );
 };
 
