@@ -20,6 +20,15 @@ describe 'Group Value Stream Analytics', :js do
     let!("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
 
+  shared_examples 'empty state' do
+    it 'displays an empty state before a group is selected' do
+      element = page.find('.row.empty-state')
+
+      expect(element).to have_content(_("Value Stream Analytics can help you determine your team’s velocity"))
+      expect(element.find('.svg-content img')['src']).to have_content('illustrations/analytics/cycle-analytics-empty-chart')
+    end
+  end
+
   before do
     stub_licensed_features(cycle_analytics_for_groups: true)
 
@@ -34,11 +43,94 @@ describe 'Group Value Stream Analytics', :js do
     visit analytics_cycle_analytics_path
   end
 
-  it 'displays an empty state before a group is selected' do
-    element = page.find('.row.empty-state')
+  it_behaves_like "empty state"
 
-    expect(element).to have_content("Value Stream Analytics can help you determine your team’s velocity")
-    expect(element.find('.svg-content img')['src']).to have_content('illustrations/analytics/cycle-analytics-empty-chart')
+  context 'deep linked url parameters' do
+    group_dropdown = '.js-groups-dropdown-filter'
+    projects_dropdown = '.js-projects-dropdown-filter'
+
+    before do
+      stub_licensed_features(cycle_analytics_for_groups: true)
+
+      group.add_owner(user)
+
+      sign_in(user)
+    end
+
+    shared_examples "group dropdown set" do
+      it "has the group dropdown prepopulated" do
+        element = page.find(group_dropdown)
+
+        expect(element).to have_content group.name
+      end
+    end
+
+    context 'without valid query parameters set' do
+      context 'with no group_id set' do
+        before do
+          visit analytics_cycle_analytics_path
+        end
+
+        it_behaves_like "empty state"
+      end
+
+      context 'with created_after date > created_before date' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?created_after=2019-12-31&created_before=2019-11-01"
+        end
+
+        it_behaves_like "empty state"
+      end
+
+      context 'with fake parameters' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?beans=not-cool"
+        end
+
+        it_behaves_like "empty state"
+      end
+    end
+
+    context 'with valid query parameters set' do
+      context 'with group_id set' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}"
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+
+      context 'with project_ids set' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}&project_ids[]=#{project.id}"
+        end
+
+        it "has the projects dropdown prepopulated" do
+          element = page.find(projects_dropdown)
+
+          expect(element).to have_content project.name
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+
+      context 'with created_before and created_after set' do
+        date_range = '.js-daterange-picker'
+
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}&created_before=2019-12-31&created_after=2019-11-01"
+        end
+
+        it "has the date range prepopulated" do
+          element = page.find(date_range)
+
+          expect(element.find('.js-daterange-picker-from input').value).to eq "2019-11-01"
+          expect(element.find('.js-daterange-picker-to input').value).to eq "2019-12-31"
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+    end
   end
 
   context 'displays correct fields after group selection' do

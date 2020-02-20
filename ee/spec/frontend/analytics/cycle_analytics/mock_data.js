@@ -202,3 +202,18 @@ export const transformedDurationMedianData = [
 ];
 
 export const durationChartPlottableMedianData = [['2018-12-31', 29], ['2019-01-01', 100]];
+
+export const selectedProjects = [
+  {
+    id: 1,
+    name: 'cool project',
+    pathWithNamespace: 'group/cool-project',
+    avatarUrl: null,
+  },
+  {
+    id: 2,
+    name: 'another cool project',
+    pathWithNamespace: 'group/another-cool-project',
+    avatarUrl: null,
+  },
+];

@@ -21,6 +21,7 @@ import {
   transformedDurationData,
   transformedTasksByTypeData,
   transformedDurationMedianData,
+  selectedProjects,
 } from '../mock_data';
 
 let state = null;
@@ -80,6 +81,7 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                          | ${{}}
     ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                          | ${{}}
     ${types.REQUEST_DURATION_MEDIAN_DATA}          | ${'isLoadingDurationChartMedianData'} | ${true}
+    ${types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS}    | ${'isLoading'}                        | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -89,8 +91,8 @@ describe('Cycle analytics mutations', () => {
   it.each`
     mutation                                       | payload                                                                                                                 | expectedState
     ${types.SET_FEATURE_FLAGS}                     | ${{ hasDurationChart: true }}                                                                                           | ${{ featureFlags: { hasDurationChart: true } }}
-    ${types.SET_SELECTED_GROUP}                    | ${{ fullPath: 'cool-beans' }}                                                                                           | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
-    ${types.SET_SELECTED_PROJECTS}                 | ${[606, 707, 808, 909]}                                                                                                 | ${{ selectedProjectIds: [606, 707, 808, 909] }}
+    ${types.SET_SELECTED_GROUP}                    | ${{ fullPath: 'cool-beans' }}                                                                                           | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjects: [] }}
+    ${types.SET_SELECTED_PROJECTS}                 | ${selectedProjects}                                                                                                     | ${{ selectedProjects }}
     ${types.SET_DATE_RANGE}                        | ${{ startDate, endDate }}                                                                                               | ${{ startDate, endDate }}
     ${types.SET_SELECTED_STAGE}                    | ${{ id: 'first-stage' }}                                                                                                | ${{ selectedStage: { id: 'first-stage' } }}
     ${types.UPDATE_SELECTED_DURATION_CHART_STAGES} | ${{ updatedDurationStageData: transformedDurationData, updatedDurationStageMedianData: transformedDurationMedianData }} | ${{ durationData: transformedDurationData, durationMedianData: transformedDurationMedianData }}
@@ -316,5 +318,31 @@ describe('Cycle analytics mutations', () => {
       mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
       expect(state.tasksByType).toEqual({ labelIds: [10, 30, 20] });
     });
+  });
+
+  describe(`${types.INITIALIZE_CYCLE_ANALYTICS}`, () => {
+    const initialData = {
+      group: { fullPath: 'cool-group' },
+      selectedProjects,
+      createdAfter: '2019-12-31',
+      createdBefore: '2020-01-01',
+    };
+
+    it.each`
+      stateKey              | expectedState
+      ${'isLoading'}        | ${true}
+      ${'selectedGroup'}    | ${initialData.group}
+      ${'selectedProjects'} | ${initialData.selectedProjects}
+      ${'startDate'}        | ${initialData.createdAfter}
+      ${'endDate'}          | ${initialData.createdBefore}
+    `(
+      '$mutation with payload $payload will update state with $expectedState',
+      ({ stateKey, expectedState }) => {
+        state = {};
+        mutations[types.INITIALIZE_CYCLE_ANALYTICS](state, initialData);
+
+        expect(state[stateKey]).toEqual(expectedState);
+      },
+    );
   });
 });

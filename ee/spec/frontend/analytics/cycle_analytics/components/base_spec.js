@@ -62,6 +62,12 @@ function createComponent({
     ...opts,
   });
 
+  comp.vm.$store.dispatch('initializeCycleAnalytics', {
+    group: mockData.group,
+    createdAfter: mockData.startDate,
+    createdBefore: mockData.endDate,
+  });
+
   if (withStageSelected) {
     comp.vm.$store.dispatch('setSelectedGroup', {
       ...mockData.group,
@@ -113,32 +119,16 @@ describe('Cycle Analytics component', () => {
   beforeEach(() => {
     mock = new MockAdapter(axios);
     wrapper = createComponent();
+
+    wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
+      createdAfter: mockData.startDate,
+      createdBefore: mockData.endDate,
+    });
   });
 
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
-  });
-
-  describe('mounted', () => {
-    const actionSpies = {
-      setDateRange: jest.fn(),
-    };
-
-    beforeEach(() => {
-      jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(mockData.endDate));
-      wrapper = createComponent({ opts: { methods: actionSpies } });
-    });
-
-    describe('initDateRange', () => {
-      it('dispatches setDateRange with skipFetch=true', () => {
-        expect(actionSpies.setDateRange).toHaveBeenCalledWith({
-          skipFetch: true,
-          startDate: mockData.startDate,
-          endDate: mockData.endDate,
-        });
-      });
-    });
   });
 
   describe('displays the components as required', () => {

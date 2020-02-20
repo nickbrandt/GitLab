@@ -18,7 +18,7 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   before_action :build_request_params, only: :show
 
   def build_request_params
-    @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params.merge(group: @group))
+    @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params.merge(group: @group), current_user: current_user)
   end
 
   def allowed_params

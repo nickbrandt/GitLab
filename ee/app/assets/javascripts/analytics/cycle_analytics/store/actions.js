@@ -1,11 +1,14 @@
 import dateFormat from 'dateformat';
 import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
+import { historyPushState } from '~/lib/utils/common_utils';
+import { setUrlParams } from '~/lib/utils/url_utility';
 import createFlash, { hideFlash } from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
+import { toYmd } from '../../shared/utils';
 
 const removeError = () => {
   const flashEl = document.querySelector('.flash-alert');
@@ -29,17 +32,50 @@ const isStageNameExistsError = ({ status, errors }) => {
   return false;
 };
 
+const updateUrlParams = (
+  { getters: { currentGroupPath, selectedProjectIds } },
+  additionalParams = {},
+) => {
+  historyPushState(
+    setUrlParams(
+      {
+        group_id: currentGroupPath,
+        'project_ids[]': selectedProjectIds,
+        ...additionalParams,
+      },
+      window.location.href,
+      true,
+    ),
+  );
+};
+
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
-export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 
-export const setSelectedProjects = ({ commit }, projectIds) =>
-  commit(types.SET_SELECTED_PROJECTS, projectIds);
+export const setSelectedGroup = ({ commit, getters }, group) => {
+  commit(types.SET_SELECTED_GROUP, group);
+  updateUrlParams({ getters });
+};
+
+export const setSelectedProjects = ({ commit, getters }, projects) => {
+  commit(types.SET_SELECTED_PROJECTS, projects);
+  updateUrlParams({ getters });
+};
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
 
-export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
+export const setDateRange = (
+  { commit, dispatch, getters },
+  { skipFetch = false, startDate, endDate },
+) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
+  updateUrlParams(
+    { getters },
+    {
+      created_after: toYmd(startDate),
+      created_before: toYmd(endDate),
+    },
+  );
 
   if (skipFetch) return false;
 
@@ -547,4 +583,18 @@ export const updateSelectedDurationChartStages = ({ state, commit }, stages) => 
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
   dispatch('fetchTasksByTypeData');
+};
+
+export const initializeCycleAnalyticsSuccess = ({ commit }) =>
+  commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
+
+export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {}) => {
+  commit(types.INITIALIZE_CYCLE_ANALYTICS, initialData);
+  if (initialData?.group?.fullPath) {
+    return dispatch('fetchCycleAnalyticsData').then(() =>
+      dispatch('initializeCycleAnalyticsSuccess'),
+    );
+  }
+
+  return dispatch('initializeCycleAnalyticsSuccess');
 };

@@ -1,10 +1,9 @@
 <script>
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
+import { PROJECTS_PER_PAGE } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
@@ -56,7 +55,7 @@ export default {
       'isCreatingCustomStage',
       'isEditingCustomStage',
       'selectedGroup',
-      'selectedProjectIds',
+      'selectedProjects',
       'selectedStage',
       'stages',
       'summary',
@@ -77,6 +76,7 @@ export default {
       'tasksByTypeChartData',
       'durationChartMedianData',
       'activeStages',
+      'selectedProjectIds',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -121,7 +121,6 @@ export default {
     },
   },
   mounted() {
-    this.initDateRange();
     this.setFeatureFlags({
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
       hasDurationChartMedian: this.glFeatures.cycleAnalyticsScatterplotMedianEnabled,
@@ -154,8 +153,7 @@ export default {
       this.fetchCycleAnalyticsData();
     },
     onProjectsSelect(projects) {
-      const projectIds = projects.map(value => value.id);
-      this.setSelectedProjects(projectIds);
+      this.setSelectedProjects(projects);
       this.fetchCycleAnalyticsData();
     },
     onStageSelect(stage) {
@@ -168,11 +166,6 @@ export default {
     },
     onShowEditStageForm(initData = {}) {
       this.showEditCustomStageForm(initData);
-    },
-    initDateRange() {
-      const endDate = new Date(Date.now());
-      const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
-      this.setDateRange({ skipFetch: true, startDate, endDate });
     },
     onCreateCustomStage(data) {
       this.createCustomStage(data);
@@ -215,6 +208,7 @@ export default {
         <groups-dropdown-filter
           class="js-groups-dropdown-filter dropdown-select"
           :query-params="$options.groupsQueryParams"
+          :default-group="selectedGroup"
           @selected="onGroupSelect"
         />
         <projects-dropdown-filter
@@ -224,6 +218,7 @@ export default {
           :group-id="selectedGroup.id"
           :query-params="$options.projectsQueryParams"
           :multi-select="$options.multiProjectSelect"
+          :default-projects="selectedProjects"
           @selected="onProjectsSelect"
         />
         <div
