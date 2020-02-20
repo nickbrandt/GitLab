@@ -1,0 +1,5 @@
+---
+title: Downcase all pages domains in database
+merge_request: 25613
+author:
+type: fixed
