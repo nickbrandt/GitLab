@@ -12,7 +12,7 @@ class PagesDomain < ApplicationRecord
   belongs_to :project
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"
 
-  before_validation :downcase_domain
+  before_validation :downcase_domain, on: :create
 
   validates :domain, hostname: { allow_numeric_hostname: true }
   validates :domain, uniqueness: true
@@ -293,7 +293,7 @@ class PagesDomain < ApplicationRecord
   end
 
   def downcase_domain
-    self.domain = domain.downcase
+    self.domain = domain&.downcase
   end
 end
 
