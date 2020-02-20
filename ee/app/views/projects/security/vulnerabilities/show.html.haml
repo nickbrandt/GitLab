@@ -17,8 +17,9 @@
       %span#js-vulnerability-created
         = time_ago_with_tooltip(@vulnerability.created_at)
   %label.mb-0.mr-2= _('Status')
-  #js-vulnerability-show-header{ data: { state: @vulnerability.state,
-    id: @vulnerability.id } }
+  #js-vulnerability-show-header{ data: { vulnerability: @vulnerability.to_json,
+    finding: @vulnerability.finding.to_json,
+    create_issue_url: create_vulnerability_feedback_issue_path(@vulnerability.finding.project) } }
 
 .issue-details.issuable-details
   .detail-page-description.content-block
