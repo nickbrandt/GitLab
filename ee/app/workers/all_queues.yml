@@ -490,7 +490,7 @@
   :feature_category: :issue_tracking
   :has_external_dependencies: 
   :latency_sensitive: 
-  :resource_boundary: :memory
+  :resource_boundary: :cpu
   :weight: 1
   :idempotent: 
 - :name: ldap_group_sync
