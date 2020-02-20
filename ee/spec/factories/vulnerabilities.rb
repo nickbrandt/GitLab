@@ -21,7 +21,7 @@ FactoryBot.define do
 
     trait :dismissed do
       state { Vulnerability.states[:dismissed] }
-      closed_at { Time.current }
+      dismissed_at { Time.current }
     end
 
     trait :confirmed do
