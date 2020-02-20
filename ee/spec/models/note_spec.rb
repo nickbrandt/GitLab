@@ -40,12 +40,12 @@ describe Note do
         end
 
         it 'returns visible but not readable for a non-member user' do
-          expect(note.cross_reference_visible_for?(non_member)).to be_truthy
+          expect(note.system_note_with_references_visible_for?(non_member)).to be_truthy
           expect(note.readable_by?(non_member)).to be_falsy
         end
 
         it 'returns visible but not readable for a nil user' do
-          expect(note.cross_reference_visible_for?(nil)).to be_truthy
+          expect(note.system_note_with_references_visible_for?(nil)).to be_truthy
           expect(note.readable_by?(nil)).to be_falsy
         end
       end
@@ -76,7 +76,7 @@ describe Note do
     end
   end
 
-  describe '#cross_reference?' do
+  describe '#system_note_with_references?' do
     [:relate_epic, :unrelate_epic].each do |type|
       it "delegates #{type} system note to the cross-reference regex" do
         note = create(:note, :system)
@@ -84,7 +84,7 @@ describe Note do
 
         expect(note).to receive(:matches_cross_reference_regex?).and_return(false)
 
-        note.cross_reference?
+        note.system_note_with_references?
       end
     end
   end

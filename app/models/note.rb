@@ -223,7 +223,7 @@ class Note < ApplicationRecord
   end
 
   # rubocop: disable CodeReuse/ServiceClass
-  def cross_reference?
+  def system_note_with_references?
     return unless system?
 
     if force_cross_reference_regex_check?
@@ -339,9 +339,9 @@ class Note < ApplicationRecord
     super
   end
 
-  # This method is to be used for checking read permissions on a note instead of `visible_for?`
+  # This method is to be used for checking read permissions on a note instead of `system_note_with_references_visible_for?`
   def readable_by?(user)
-    # note_policy accounts for #visible_for?(user) check when granting read access
+    # note_policy accounts for #system_note_with_references_visible_for?(user) check when granting read access
     Ability.allowed?(user, :read_note, self)
   end
 
@@ -502,8 +502,8 @@ class Note < ApplicationRecord
     noteable.user_mentions.where(note: self)
   end
 
-  def cross_reference_visible_for?(user)
-    (!cross_reference? || all_referenced_mentionables_allowed?(user)) && system_note_viewable_by?(user)
+  def system_note_with_references_visible_for?(user)
+    (!system_note_with_references? || all_referenced_mentionables_allowed?(user)) && system_note_viewable_by?(user)
   end
 
   private
