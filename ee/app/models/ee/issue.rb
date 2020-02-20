@@ -161,6 +161,10 @@ module EE
       IssueLink.inverse_link_type(type)
     end
 
+    def from_service_desk?
+      author.id == ::User.support_bot.id
+    end
+
     class_methods do
       extend ::Gitlab::Utils::Override
 

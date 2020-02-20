@@ -615,4 +615,20 @@ describe Issue do
   end
 
   it_behaves_like 'having health status'
+
+  describe '#service_desk?' do
+    subject { issue.from_service_desk? }
+
+    context 'when issue author is support bot' do
+      let(:issue) { create(:issue, author: ::User.support_bot) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when issue author is not support bot' do
+      let(:issue) { create(:issue) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
 end
