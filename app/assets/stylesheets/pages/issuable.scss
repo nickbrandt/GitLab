@@ -187,7 +187,6 @@
 
   .btn-link {
     color: inherit;
-    outline: none;
   }
 
   .issuable-header-text {
@@ -259,17 +258,6 @@
 
     a.edit-link:not([href]):hover {
       color: rgba($gray-normal, 0.2);
-    }
-
-    .lock-edit, // uses same style, different js behaviour
-    .edit-link {
-      @extend .btn-blank;
-      color: $gl-text-color;
-
-      &:hover {
-        text-decoration: underline;
-        color: $blue-800;
-      }
     }
   }
 
@@ -689,7 +677,6 @@
   }
 
   .btn-link {
-    outline: none;
     padding: 0;
   }
 

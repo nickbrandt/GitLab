@@ -108,7 +108,7 @@ export default {
       {{ sprintf(__('Lock %{issuableDisplayName}'), { issuableDisplayName: issuableDisplayName }) }}
       <button
         v-if="isEditable"
-        class="float-right lock-edit"
+        class="float-right lock-edit btn-link"
         type="button"
         data-track-event="click_edit_button"
         data-track-label="right_sidebar"
