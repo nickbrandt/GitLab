@@ -88,14 +88,17 @@ class GitlabProjectImport
     puts "Number of sql calls: #{count}"
   end
 
-  def with_gc_counter
-    gc_counts_before = GC.stat.select { |k, v| k =~ /count/ }
+  def with_gc_stats
+    GC.start # perform a full mark-and-sweep
+    stats_before = GC.stat
     yield
-    gc_counts_after = GC.stat.select { |k, v| k =~ /count/ }
-    stats = gc_counts_before.merge(gc_counts_after) { |k, vb, va| va - vb }
-    puts "Total GC count: #{stats[:count]}"
-    puts "Minor GC count: #{stats[:minor_gc_count]}"
-    puts "Major GC count: #{stats[:major_gc_count]}"
+    stats_after = GC.stat
+    stats_diff = stats_after.map do |key, after_value|
+      before_value = stats_before[key]
+      [key, before: before_value, after: after_value, diff: (before_value - after_value).abs]
+    end.to_h
+    puts "GC stats:"
+    puts stats_diff.pretty_inspect
   end
 
   def with_measure_time
@@ -109,7 +112,7 @@ class GitlabProjectImport
 
   def with_measuring
     puts "Measuring enabled..."
-    with_gc_counter do
+    with_gc_stats do
       with_count_queries do
         with_measure_time do
           yield
