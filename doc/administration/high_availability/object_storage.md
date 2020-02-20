@@ -2,9 +2,9 @@
 type: reference
 ---
 
-# S3 Object Storage
+# Cloud Object Storage
 
-GitLab supports utilizing an S3 Object Storage service over [NFS](nfs.md) for holding
+GitLab supports utilizing a Cloud Object Storage service over [NFS](nfs.md) for holding
 numerous types of data. This is recommended in larger setups as object storage is
 typically much more performant and reliable.
 

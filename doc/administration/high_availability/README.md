@@ -41,7 +41,7 @@ in which you would typically configure them.
 | [Redis](https://docs.gitlab.com/ee/development/architecture.html#redis)[^3] with Redis Sentinel                                                                   | Key/Value store for shared data with HA watcher service                                                                           | [Link](redis.md)        |
 | [Gitaly](https://docs.gitlab.com/ee/development/architecture.html#gitaly)[^2] [^5] [^7]                                                                           | Recommended high-level storage for Git repository data.                                                                 | [Link](gitaly.md)                                      |
 | [Sidekiq](https://docs.gitlab.com/ee/development/architecture.html#sidekiq)                                                                                       | Asynchronous/Background jobs                                                                                                      |                                                        |
-| [S3 Object Storage service](object_storage.md)[^4]                                                                                                                | Recommended store for shared data objects such as LFS, Uploads, Artifacts, etc...                                                 | [Link](object_storage.md)                              |
+| [Cloud Object Storage service](object_storage.md)[^4]                                                                                                                | Recommended store for shared data objects such as LFS, Uploads, Artifacts, etc...                                                 | [Link](object_storage.md)                              |
 | [GitLab application nodes](https://docs.gitlab.com/ee/development/architecture.html#unicorn)[^1]                                                                  | (Unicorn / Puma, Workhorse) - Web-requests (UI, API, Git over HTTP)                                                               | [Link](gitlab.md)                                      |
 | [NFS](nfs.md)[^5] [^7]                                                                                                                                            | Shared disk storage service. Can be used as an alternative for Gitaly or Object Storage. Required for GitLab Pages. | [Link](nfs.md)                                         |
 | [Prometheus](https://docs.gitlab.com/ee/development/architecture.html#prometheus) and [Grafana](https://docs.gitlab.com/ee/development/architecture.html#grafana) | GitLab environment monitoring                                                                                                     | [Link](monitoring_node.md)                             |
@@ -85,7 +85,7 @@ On different cloud vendors a best effort like for like can be used.
 | Redis[^3]                   | 3     | 2 vCPU, 7.5GB Memory  | n1-standard-2 |
 | Consul + Sentinel[^3]       | 3     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | Sidekiq                     | 4     | 2 vCPU, 7.5GB Memory  | n1-standard-2 |
-| S3 Object Storage[^4]       | -     | -                     | -             |
+| Cloud Object Storage[^4]       | -     | -                     | -             |
 | NFS Server[^5] [^7]         | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | Monitoring node             | 1     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  |
@@ -107,7 +107,7 @@ On different cloud vendors a best effort like for like can be used.
 | Redis[^3]                   | 3     | 2 vCPU, 7.5GB Memory  | n1-standard-2 |
 | Consul + Sentinel[^3]       | 3     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | Sidekiq                     | 4     | 2 vCPU, 7.5GB Memory  | n1-standard-2 |
-| S3 Object Storage[^4]       | -     | -                     | -             |
+| Cloud Object Storage[^4]       | -     | -                     | -             |
 | NFS Server[^5] [^7]         | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | Monitoring node             | 1     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  |
@@ -132,7 +132,7 @@ On different cloud vendors a best effort like for like can be used.
 | Redis Sentinel[^3] - Queues / Shared State | 3 | 1 vCPU, 1.7GB Memory | g1-small |
 | Consul                      | 3     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | Sidekiq                     | 4     | 4 vCPU, 15GB Memory   | n1-standard-4 |
-| S3 Object Storage[^4]       | -     | -                     | -             |
+| Cloud Object Storage[^4]       | -     | -                     | -             |
 | NFS Server[^5] [^7]         | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | Monitoring node             | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  |
@@ -157,7 +157,7 @@ On different cloud vendors a best effort like for like can be used.
 | Redis Sentinel[^3] - Queues / Shared State | 3 | 1 vCPU, 1.7GB Memory | g1-small |
 | Consul                      | 3     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | Sidekiq                     | 4     | 4 vCPU, 15GB Memory   | n1-standard-4 |
-| S3 Object Storage[^4]       | -     | -                     | -             |
+| Cloud Object Storage[^4]       | -     | -                     | -             |
 | NFS Server[^5] [^7]         | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | Monitoring node             | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  |
@@ -183,7 +183,7 @@ On different cloud vendors a best effort like for like can be used.
 | Consul                      | 3     | 2 vCPU, 1.8GB Memory  | n1-highcpu-2  |
 | Sidekiq                     | 4     | 4 vCPU, 15GB Memory   | n1-standard-4 |
 | NFS Server[^5] [^7]         | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
-| S3 Object Storage[^4]       | -     | -                     | -             |
+| Cloud Object Storage[^4]       | -     | -                     | -             |
 | Monitoring node             | 1     | 4 vCPU, 3.6GB Memory  | n1-highcpu-4  |
 | External load balancing node[^6] | 1 | 2 vCPU, 1.8GB Memory | n1-highcpu-2  |
 | Internal load balancing node[^6] | 1 | 8 vCPU, 7.2GB Memory | n1-highcpu-8  |
@@ -207,7 +207,7 @@ On different cloud vendors a best effort like for like can be used.
       and another for the Queues and Shared State classes respectively. We also recommend
       that you run the Redis Sentinel clusters separately as well for each Redis Cluster.
 
-[^4]: For data objects such as LFS, Uploads, Artifacts, etc... We recommend a S3 Object Storage
+[^4]: For data objects such as LFS, Uploads, Artifacts, etc... We recommend a Cloud Object Storage
       where possible over NFS due to better performance and availability. Several types of objects
       are supported for S3 storage - [Job artifacts](../job_artifacts.md#using-object-storage),
       [LFS](../lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage),
