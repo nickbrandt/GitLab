@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'slack-messenger'
-
 module ChatMessage
   class BaseMessage
     RELATIVE_LINK_REGEX = /!\[[^\]]*\]\((\/uploads\/[^\)]*)\)/.freeze

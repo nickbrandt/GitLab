@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'slack-messenger'
 
 module ChatMessage
   class PipelineMessage < BaseMessage
