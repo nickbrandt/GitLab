@@ -3,37 +3,37 @@
 require 'spec_helper'
 
 describe Ci::DailyCodeCoverageService, '#execute' do
-  let!(:pipeline) { create(:ci_pipeline, created_at: '2020-02-06 00:01:10') }
-  let!(:rspec_job) { create(:ci_build, pipeline: pipeline, name: 'rspec', coverage: 80) }
-  let!(:karma_job) { create(:ci_build, pipeline: pipeline, name: 'karma', coverage: 90) }
-  let!(:extra_job) { create(:ci_build, pipeline: pipeline, name: 'extra', coverage: nil) }
+  let!(:pipeline) { create(:ci_pipeline) }
+  let!(:rspec_job) { create(:ci_build, pipeline: pipeline, created_at: '2020-02-06 00:01:10', name: 'rspec', coverage: 80) }
+  let!(:karma_job) { create(:ci_build, pipeline: pipeline, created_at: '2020-02-06 00:01:12', name: 'karma', coverage: 90) }
+  let!(:extra_job) { create(:ci_build, pipeline: pipeline, created_at: '2020-02-06 00:01:14', name: 'extra', coverage: nil) }
 
   it 'creates daily code coverage record for each job in the pipeline that has coverage value' do
     described_class.new.execute(pipeline)
 
-    DailyCodeCoverage.find_by(name: 'rspec').tap do |coverage|
+    Ci::DailyCodeCoverage.find_by(name: 'rspec').tap do |coverage|
       expect(coverage).to have_attributes(
         project_id: pipeline.project.id,
-        last_pipeline_id: pipeline.id,
+        last_build_id: rspec_job.id,
         ref: pipeline.ref,
         name: rspec_job.name,
         coverage: rspec_job.coverage,
-        date: pipeline.created_at.to_date
+        date: rspec_job.created_at.to_date
       )
     end
 
-    DailyCodeCoverage.find_by(name: 'karma').tap do |coverage|
+    Ci::DailyCodeCoverage.find_by(name: 'karma').tap do |coverage|
       expect(coverage).to have_attributes(
         project_id: pipeline.project.id,
-        last_pipeline_id: pipeline.id,
+        last_build_id: karma_job.id,
         ref: pipeline.ref,
         name: karma_job.name,
         coverage: karma_job.coverage,
-        date: pipeline.created_at.to_date
+        date: karma_job.created_at.to_date
       )
     end
 
-    expect(DailyCodeCoverage.find_by(name: 'extra')).to be_nil
+    expect(Ci::DailyCodeCoverage.find_by(name: 'extra')).to be_nil
   end
 
   context 'when there is an existing daily code coverage for the matching date, project, ref, and name' do
@@ -41,21 +41,20 @@ describe Ci::DailyCodeCoverageService, '#execute' do
       create(
         :ci_pipeline,
         project: pipeline.project,
-        ref: pipeline.ref,
-        created_at: '2020-02-06 00:02:20'
+        ref: pipeline.ref
       )
     end
-    let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, name: 'rspec', coverage: 84) }
-    let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, name: 'karma', coverage: 92) }
+    let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, created_at: '2020-02-06 00:02:20', name: 'rspec', coverage: 84) }
+    let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, created_at: '2020-02-06 00:02:22', name: 'karma', coverage: 92) }
 
     before do
       # Create the existing daily code coverage records
       described_class.new.execute(pipeline)
     end
 
-    it "updates the existing record's coverage value and last_pipeline_id" do
-      rspec_coverage = DailyCodeCoverage.find_by(name: 'rspec')
-      karma_coverage = DailyCodeCoverage.find_by(name: 'karma')
+    it "updates the existing record's coverage value and last_build_id" do
+      rspec_coverage = Ci::DailyCodeCoverage.find_by(name: 'rspec')
+      karma_coverage = Ci::DailyCodeCoverage.find_by(name: 'karma')
 
       # Bump up the coverage values
       described_class.new.execute(new_pipeline)
@@ -64,28 +63,27 @@ describe Ci::DailyCodeCoverageService, '#execute' do
       karma_coverage.reload
 
       expect(rspec_coverage).to have_attributes(
-        last_pipeline_id: new_pipeline.id,
+        last_build_id: new_rspec_job.id,
         coverage: new_rspec_job.coverage
       )
 
       expect(karma_coverage).to have_attributes(
-        last_pipeline_id: new_pipeline.id,
+        last_build_id: new_karma_job.id,
         coverage: new_karma_job.coverage
       )
     end
   end
 
-  context 'when the ID of the given pipeline is older than the last_pipeline_id' do
+  context 'when the ID of the build is older than the last_build_id' do
     let!(:new_pipeline) do
       create(
         :ci_pipeline,
         project: pipeline.project,
-        ref: pipeline.ref,
-        created_at: '2020-02-06 00:02:20'
+        ref: pipeline.ref
       )
     end
-    let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, name: 'rspec', coverage: 84) }
-    let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, name: 'karma', coverage: 92) }
+    let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, created_at: '2020-02-06 00:02:20', name: 'rspec', coverage: 84) }
+    let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, created_at: '2020-02-06 00:02:22', name: 'karma', coverage: 92) }
 
     before do
       # Create the existing daily code coverage records
@@ -94,8 +92,8 @@ describe Ci::DailyCodeCoverageService, '#execute' do
     end
 
     it 'does not update the existing daily code coverage records' do
-      rspec_coverage = DailyCodeCoverage.find_by(name: 'rspec')
-      karma_coverage = DailyCodeCoverage.find_by(name: 'karma')
+      rspec_coverage = Ci::DailyCodeCoverage.find_by(name: 'rspec')
+      karma_coverage = Ci::DailyCodeCoverage.find_by(name: 'karma')
 
       # Run another one but for the older pipeline.
       # This simulates the scenario wherein the success worker
@@ -108,12 +106,12 @@ describe Ci::DailyCodeCoverageService, '#execute' do
       karma_coverage.reload
 
       expect(rspec_coverage).to have_attributes(
-        last_pipeline_id: new_pipeline.id,
+        last_build_id: new_rspec_job.id,
         coverage: new_rspec_job.coverage
       )
 
       expect(karma_coverage).to have_attributes(
-        last_pipeline_id: new_pipeline.id,
+        last_build_id: new_karma_job.id,
         coverage: new_karma_job.coverage
       )
     end

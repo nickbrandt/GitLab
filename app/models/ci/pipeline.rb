@@ -189,7 +189,10 @@ module Ci
       end
 
       after_transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success do |pipeline|
-        pipeline.run_after_commit { PipelineSuccessWorker.perform_async(pipeline.id) }
+        # We want to wait a little bit to ensure that all BuildFinishedWorkers finish first
+        # because this is where code coverage is parsed and stored in CI build records which
+        # the daily code coverage worker relies on.
+        pipeline.run_after_commit { Ci::DailyCodeCoverageWorker.perform_in(5.minutes, pipeline.id) }
       end
 
       after_transition do |pipeline, transition|

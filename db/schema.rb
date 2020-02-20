@@ -738,6 +738,17 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.index ["build_id"], name: "index_ci_builds_runner_session_on_build_id", unique: true
   end
 
+  create_table "ci_daily_code_coverages", force: :cascade do |t|
+    t.date "date", null: false
+    t.bigint "project_id", null: false
+    t.bigint "last_build_id", null: false
+    t.float "coverage", null: false
+    t.string "ref", null: false
+    t.string "name", null: false
+    t.index ["last_build_id"], name: "index_ci_daily_code_coverages_on_last_build_id"
+    t.index ["project_id", "ref", "name", "date"], name: "index_daily_code_coverage_unique_columns", unique: true, order: { date: :desc }
+  end
+
   create_table "ci_group_variables", id: :serial, force: :cascade do |t|
     t.string "key", null: false
     t.text "value"
@@ -1325,16 +1336,6 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.float "percentage_notes", default: 0.0, null: false
     t.float "percentage_projects_prometheus_active", default: 0.0, null: false
     t.float "percentage_service_desk_issues", default: 0.0, null: false
-  end
-
-  create_table "daily_code_coverages", force: :cascade do |t|
-    t.date "date", null: false
-    t.integer "project_id", null: false
-    t.integer "last_pipeline_id", null: false
-    t.float "coverage", null: false
-    t.string "ref", null: false
-    t.string "name", null: false
-    t.index ["project_id", "ref", "name", "date"], name: "index_daily_code_coverage_unique_columns", unique: true, order: { date: :desc }
   end
 
   create_table "dependency_proxy_blobs", id: :serial, force: :cascade do |t|
@@ -4775,6 +4776,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
   add_foreign_key "ci_builds_metadata", "ci_builds", column: "build_id", on_delete: :cascade
   add_foreign_key "ci_builds_metadata", "projects", on_delete: :cascade
   add_foreign_key "ci_builds_runner_session", "ci_builds", column: "build_id", on_delete: :cascade
+  add_foreign_key "ci_daily_code_coverages", "ci_builds", column: "last_build_id", on_delete: :cascade
+  add_foreign_key "ci_daily_code_coverages", "projects", on_delete: :cascade
   add_foreign_key "ci_group_variables", "namespaces", column: "group_id", name: "fk_33ae4d58d8", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "ci_builds", column: "job_id", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "projects", on_delete: :cascade
@@ -4842,8 +4845,6 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
   add_foreign_key "commit_user_mentions", "notes", on_delete: :cascade
   add_foreign_key "container_expiration_policies", "projects", on_delete: :cascade
   add_foreign_key "container_repositories", "projects"
-  add_foreign_key "daily_code_coverages", "ci_pipelines", column: "last_pipeline_id", on_delete: :cascade
-  add_foreign_key "daily_code_coverages", "projects", on_delete: :cascade
   add_foreign_key "dependency_proxy_blobs", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "dependency_proxy_group_settings", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade

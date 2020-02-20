@@ -1120,7 +1120,7 @@ describe Ci::Pipeline, :mailer do
           let(:from_status) { status }
 
           it 'schedules pipeline success worker' do
-            expect(PipelineSuccessWorker).to receive(:perform_async).with(pipeline.id)
+            expect(Ci::DailyCodeCoverageWorker).to receive(:perform_in).with(5.minutes, pipeline.id)
 
             pipeline.succeed
           end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe DailyCodeCoverageWorker do
+describe Ci::DailyCodeCoverageWorker do
   describe '#perform' do
     let!(:pipeline) { create(:ci_pipeline) }
 
