@@ -28,7 +28,7 @@ in from some of our customers.
 ## GitLab Components and Installation Instructions
 
 Before we get into the architectures we should first detail the relevant GitLab
-[components](https://docs.gitlab.com/ee/development/architecture.html#component-diagram) and / or
+[components](https://docs.gitlab.com/ee/development/architecture.html#component-diagram) and
 services it depends on along with our recommendations. They are presented in the order you would
 typically install them:
 
