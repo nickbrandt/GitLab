@@ -54,6 +54,10 @@ module EE
           attrs += EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes
         end
 
+        if License.feature_available?(:packages)
+          attrs << :npm_package_requests_forwarding
+        end
+
         attrs
       end
 

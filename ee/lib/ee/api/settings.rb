@@ -39,6 +39,10 @@ module EE
               attrs = attrs.except(*EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes)
             end
 
+            unless License.feature_available?(:packages)
+              attrs = attrs.except(:npm_package_requests_forwarding)
+            end
+
             attrs
           end
         end
