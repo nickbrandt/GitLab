@@ -611,7 +611,7 @@
   :urgency: :default
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: 
+  :idempotent: true
 - :name: pipeline_cache:expire_job_cache
   :feature_category: :continuous_integration
   :has_external_dependencies: 
