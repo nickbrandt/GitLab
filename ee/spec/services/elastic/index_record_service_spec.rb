@@ -32,7 +32,7 @@ describe Elastic::IndexRecordService, :elastic do
 
         expect do
           expect(subject.execute(object, true)).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end.to change { Elasticsearch::Model.search('*').records.size }.by(1)
       end
 
@@ -47,7 +47,7 @@ describe Elastic::IndexRecordService, :elastic do
 
         expect do
           expect(subject.execute(object, false)).to eq(true)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
       end
 
@@ -84,7 +84,7 @@ describe Elastic::IndexRecordService, :elastic do
       Sidekiq::Testing.inline! do
         expect(subject.execute(project, true)).to eq(true)
       end
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       # Fetch all child documents
       children = Elasticsearch::Model.search(
@@ -122,7 +122,7 @@ describe Elastic::IndexRecordService, :elastic do
       Sidekiq::Testing.inline! do
         expect(subject.execute(other_project, true)).to eq(true)
       end
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       # Only the project itself should be in the index
       expect(Elasticsearch::Model.search('*').total_count).to be 1
@@ -287,7 +287,7 @@ describe Elastic::IndexRecordService, :elastic do
     Sidekiq::Testing.inline! do
       project = create :project, :repository, :public
       note = create :note, project: project, note: 'note_1'
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }
@@ -303,7 +303,7 @@ describe Elastic::IndexRecordService, :elastic do
 
     Sidekiq::Testing.inline! do
       expect(subject.execute(project, true)).to eq(true)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(Note.elastic_search('note_1', options: options).present?).to eq(false)
@@ -322,7 +322,7 @@ describe Elastic::IndexRecordService, :elastic do
 
     Sidekiq::Testing.inline! do
       expect(subject.execute(project, true)).to eq(true)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(Project.elastic_search('project_1').present?).to eq(false)

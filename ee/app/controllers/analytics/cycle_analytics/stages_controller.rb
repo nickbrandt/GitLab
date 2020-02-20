@@ -68,7 +68,7 @@ module Analytics
       end
 
       def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params)
+        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params, current_user: current_user)
       end
 
       def data_collector

@@ -100,6 +100,7 @@ and included in `rules` definitions via [YAML anchors](../ci/yaml/README.md#anch
 | `if-master-refs`                                             | Matches if the current branch is `master`. | |
 | `if-master-or-tag`                                           | Matches if the pipeline is for the `master` branch or for a tag. | |
 | `if-merge-request`                                           | Matches if the pipeline is for a merge request. | |
+| `if-nightly-master-schedule`                                 | Matches if the pipeline is for a `master` scheduled pipeline with `$NIGHTLY` set. | |
 | `if-dot-com-gitlab-org-schedule`                             | Limits jobs creation to scheduled pipelines for the `gitlab-org` group on GitLab.com. | |
 | `if-dot-com-gitlab-org-master`                               | Limits jobs creation to the `master` branch for the `gitlab-org` group on GitLab.com. | |
 | `if-dot-com-gitlab-org-merge-request`                        | Limits jobs creation to merge requests for the `gitlab-org` group on GitLab.com. | |
@@ -135,17 +136,23 @@ graph RL;
   E[review-build-cng];
   F[build-qa-image];
   G[review-deploy];
-  I["karma, jest, webpack-dev-server, static-analysis"];
+  I["karma, jest"];
   I2["karma-as-if-foss, jest-as-if-foss<br/>(EE default refs only)"];
   J["compile-assets pull-push-cache<br/>(master only)"];
   J2["compile-assets pull-push-cache as-if-foss<br/>(EE master only)"];
   K[compile-assets pull-cache];
   K2["compile-assets pull-cache as-if-foss<br/>(EE default refs only)"];
+  U[frontend-fixtures];
+  U2["frontend-fixtures-as-if-foss<br/>(EE default refs only)"];
+  V["webpack-dev-server, static-analysis"];
   M[coverage];
   N["pages (master only)"];
   Q[package-and-qa];
   S["RSpec<br/>(e.g. rspec unit pg9)"]
   T[retrieve-tests-metadata];
+  QA["qa:internal, qa:selectors"];
+  QA2["qa:internal-as-if-foss, qa:selectors-as-if-foss<br/>(EE default refs only)"];
+  X["docs lint, code_quality, sast, dependency_scanning, danger-review"];
 
 subgraph "`prepare` stage"
     A
@@ -159,17 +166,26 @@ subgraph "`prepare` stage"
     T
     end
 
+subgraph "`fixture` stage"
+    U -.-> |needs and depends on| A;
+    U -.-> |needs and depends on| K;
+    U2 -.-> |needs and depends on| A;
+    U2 -.-> |needs and depends on| K2;
+    end
+
 subgraph "`test` stage"
     D -.-> |needs| A;
-    I -.-> |needs and depends on| A;
-    I -.-> |needs and depends on| K;
-    I2 -.-> |needs and depends on| A;
-    I2 -.-> |needs and depends on| K;
+    I -.-> |needs and depends on| U;
+    I2 -.-> |needs and depends on| U2;
     L -.-> |needs and depends on| A;
     S -.-> |needs and depends on| A;
     S -.-> |needs and depends on| K;
     S -.-> |needs and depends on| T;
     L["db:*, gitlab:setup, graphql-docs-verify, downtime_check"] -.-> |needs| A;
+    V -.-> |needs and depends on| K;
+    X -.-> |needs| T;
+    QA -.-> |needs| T;
+    QA2 -.-> |needs| T;
     end
 
 subgraph "`post-test` stage"

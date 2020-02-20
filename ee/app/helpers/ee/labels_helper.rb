@@ -2,6 +2,12 @@
 
 module EE
   module LabelsHelper
+    extend ActiveSupport::Concern
+
+    prepended do
+      singleton_class.prepend self
+    end
+
     def render_label(label, tooltip: true, link: nil, css: nil, dataset: nil)
       content = super
       content = scoped_label_wrapper(content, label) if label.scoped_label?
@@ -13,18 +19,8 @@ module EE
       %(<span class="d-inline-block position-relative scoped-label-wrapper">#{link}#{scoped_labels_doc_link(label)}</span>).html_safe
     end
 
-    def scoped_labels_doc_link(label)
-      text_color = ::LabelsHelper.text_color_for_bg(label.color)
-      content = %(<i class="fa fa-question-circle" style="background-color: #{label.color}; color: #{text_color}"></i>)
-      help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels')
-
-      %(<a href="#{help_url}" class="label scoped-label" target="_blank" rel="noopener">#{content}</a>)
-    end
-
     def label_tooltip_title(label)
-      # can't use `super` because this is called also as a module method from
-      # banzai
-      tooltip = ::LabelsHelper.label_tooltip_title(label)
+      tooltip = super
       tooltip = %(<span class='font-weight-bold scoped-label-tooltip-title'>Scoped label</span><br />#{tooltip}) if label.scoped_label?
 
       tooltip
@@ -59,6 +55,14 @@ module EE
       super + ['epics']
     end
 
-    module_function :scoped_label_wrapper, :scoped_labels_doc_link, :label_tooltip_title
+    private
+
+    def scoped_labels_doc_link(label)
+      text_color = text_color_for_bg(label.color)
+      content = %(<i class="fa fa-question-circle" style="background-color: #{label.color}; color: #{text_color}"></i>)
+      help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels')
+
+      %(<a href="#{help_url}" class="label scoped-label" target="_blank" rel="noopener">#{content}</a>)
+    end
   end
 end

@@ -11,7 +11,7 @@ describe Repository, :elastic do
     Sidekiq::Testing.inline! do
       project.repository.index_commits_and_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
   end
 
@@ -78,7 +78,7 @@ describe Repository, :elastic do
     before do
       project.repository.index_commits_and_blobs
       project1.repository.index_commits_and_blobs
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'returns commits' do
@@ -118,7 +118,7 @@ describe Repository, :elastic do
       project = create :project, :repository
 
       Gitlab::Elastic::Indexer.new(project).run
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
       expect(project.repository.find_commits_by_message_with_elastic('initial').count).to eq(1)

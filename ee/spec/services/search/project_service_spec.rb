@@ -40,7 +40,7 @@ describe Search::ProjectService do
           [project, project2].each do |project|
             update_feature_access_level(project, feature_access_level)
           end
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'merge_requests', expected_count: expected_count) do |user|
             described_class.new(project, user, search: merge_request.title).execute
@@ -69,7 +69,7 @@ describe Search::ProjectService do
             update_feature_access_level(project, feature_access_level)
             ElasticCommitIndexerWorker.new.perform(project.id)
           end
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'commits', expected_count: expected_count) do |user|
             described_class.new(project, user, search: 'initial').execute
@@ -101,7 +101,7 @@ describe Search::ProjectService do
           [project, project2].each do |project|
             update_feature_access_level(project, feature_access_level)
           end
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'issues', expected_count: expected_count) do |user|
             described_class.new(project, user, search: issue.title).execute
@@ -126,7 +126,7 @@ describe Search::ProjectService do
           project.wiki.create_page('test.md', '# term')
           project.wiki.index_wiki_blobs
           update_feature_access_level(project, feature_access_level)
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'wiki_blobs', expected_count: expected_count) do |user|
             described_class.new(project, user, search: 'term').execute
@@ -148,7 +148,7 @@ describe Search::ProjectService do
             'issues_access_level' => issues_access_level,
             'merge_requests_access_level' => merge_requests_access_level
           )
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           expect_search_results(user, 'milestones', expected_count: expected_count) do |user|
             described_class.new(project, user, search: milestone.title).execute

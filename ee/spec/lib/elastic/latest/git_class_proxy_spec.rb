@@ -13,7 +13,7 @@ describe Elastic::Latest::GitClassProxy do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
       Gitlab::Elastic::Indexer.new(project).run
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'returns FoundBlob', :sidekiq_inline do

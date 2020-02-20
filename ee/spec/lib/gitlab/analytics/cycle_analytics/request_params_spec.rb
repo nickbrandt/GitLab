@@ -3,9 +3,30 @@
 require 'spec_helper'
 
 describe Gitlab::Analytics::CycleAnalytics::RequestParams do
-  let(:params) { { created_after: '2019-01-01', created_before: '2019-03-01' } }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:root_group) { create(:group) }
+  let_it_be(:sub_group) { create(:group, parent: root_group) }
+  let_it_be(:sub_group_project) { create(:project, id: 1, group: sub_group) }
+  let_it_be(:root_group_projects) do
+    [
+      create(:project, id: 2, group: root_group),
+      create(:project, id: 3, group: root_group)
+    ]
+  end
 
-  subject { described_class.new(params) }
+  let(:project_ids) { root_group_projects.collect(&:id) }
+  let(:params) do
+    { created_after: '2019-01-01',
+      created_before: '2019-03-01',
+      project_ids: [2, 3],
+      group: root_group }
+  end
+
+  subject { described_class.new(params, current_user: user) }
+
+  before do
+    root_group.add_owner(user)
+  end
 
   describe 'validations' do
     it 'is valid' do
@@ -56,16 +77,31 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
   end
 
   describe 'optional `project_ids`' do
-    it { expect(subject.project_ids).to eq([]) }
-
     context 'when `project_ids` is not empty' do
-      let(:project_ids) { [1, 2, 3] }
-
-      before do
-        params[:project_ids] = project_ids
+      def json_project(project)
+        { id: project.id,
+          name: project.name,
+          path_with_namespace: project.path_with_namespace,
+          avatar_url: project.avatar_url }.to_json
       end
 
-      it { expect(subject.project_ids).to eq(project_ids) }
+      context 'with a valid group' do
+        it { expect(subject.project_ids).to eq(project_ids) }
+
+        it 'contains every project of the group' do
+          root_group_projects.each do |project|
+            expect(subject.to_data_attributes[:projects]).to include(json_project(project))
+          end
+        end
+      end
+
+      context 'without a valid group' do
+        before do
+          params[:group] = nil
+        end
+
+        it { expect(subject.to_data_attributes[:projects]).to eq(nil) }
+      end
     end
 
     context 'when `project_ids` is not an array' do
@@ -83,11 +119,25 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
 
       it { expect(subject.project_ids).to eq([]) }
     end
+
+    context 'when `project_ids` is empty' do
+      before do
+        params[:project_ids] = []
+      end
+
+      it { expect(subject.project_ids).to eq([]) }
+    end
+
+    context 'is a subgroup project' do
+      before do
+        params[:project_ids] = sub_group_project.id
+      end
+
+      it { expect(subject.project_ids).to eq([sub_group_project.id]) }
+    end
   end
 
   describe 'optional `group_id`' do
-    it { expect(subject.group).to be_nil }
-
     context 'when `group_id` is not empty' do
       let(:group_id) { 'ca-test-group' }
 
@@ -104,6 +154,14 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
       end
 
       it { expect(subject.group).to eq(nil) }
+    end
+
+    context 'when `group_id` is a subgroup' do
+      before do
+        params[:group] = sub_group.id
+      end
+
+      it { expect(subject.group).to eq(sub_group.id) }
     end
   end
 end

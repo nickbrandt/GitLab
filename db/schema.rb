@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_13_220211) do
+ActiveRecord::Schema.define(version: 2020_02_14_034836) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -349,6 +349,8 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
     t.boolean "disable_overriding_approvers_per_merge_request", default: false, null: false
     t.boolean "prevent_merge_requests_author_approval", default: false, null: false
     t.boolean "prevent_merge_requests_committers_approval", default: false, null: false
+    t.boolean "email_restrictions_enabled", default: false, null: false
+    t.text "email_restrictions"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -3768,7 +3770,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_220211) do
     t.string "sso_url", null: false
     t.boolean "enforced_sso", default: false, null: false
     t.boolean "enforced_group_managed_accounts", default: false, null: false
-    t.boolean "prohibited_outer_forks", default: false
+    t.boolean "prohibited_outer_forks", default: true, null: false
     t.index ["group_id"], name: "index_saml_providers_on_group_id"
   end
 
