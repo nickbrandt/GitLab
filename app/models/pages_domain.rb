@@ -12,8 +12,10 @@ class PagesDomain < ApplicationRecord
   belongs_to :project
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"
 
+  before_validation :downcase_domain
+
   validates :domain, hostname: { allow_numeric_hostname: true }
-  validates :domain, uniqueness: { case_sensitive: false }
+  validates :domain, uniqueness: true
   validates :certificate, :key, presence: true, if: :usage_serverless?
   validates :certificate, presence: { message: 'must be present if HTTPS-only is enabled' },
             if: :certificate_should_be_present?
@@ -265,7 +267,7 @@ class PagesDomain < ApplicationRecord
   def validate_pages_domain
     return unless domain
 
-    if domain.downcase.ends_with?(Settings.pages.host.downcase)
+    if domain.ends_with?(Settings.pages.host.downcase)
       self.errors.add(:domain, "*.#{Settings.pages.host} is restricted")
     end
   end
@@ -288,6 +290,10 @@ class PagesDomain < ApplicationRecord
 
   def certificate_should_be_present?
     !auto_ssl_enabled? && project&.pages_https_only?
+  end
+
+  def downcase_domain
+    self.domain = domain.downcase
   end
 end
 

@@ -59,7 +59,8 @@ describe API::Internal::Pages do
         context 'custom domain' do
           let(:namespace) { create(:namespace, name: 'gitlab-org') }
           let(:project) { create(:project, namespace: namespace, name: 'gitlab-ce') }
-          let!(:pages_domain) { create(:pages_domain, domain: 'pages.gitlab.io', project: project) }
+          let(:domain_name) { 'pages.gitlab.io' }
+          let!(:pages_domain) { create(:pages_domain, domain: domain_name, project: project) }
 
           context 'when there are no pages deployed for the related project' do
             it 'responds with 204 No Content' do
@@ -70,31 +71,42 @@ describe API::Internal::Pages do
           end
 
           context 'when there are pages deployed for the related project' do
-            it 'responds with the correct domain configuration' do
+            before do
               deploy_pages(project)
+            end
+            shared_examples 'respond with domain' do
+              it 'responds with the correct domain configuration' do
+                query_host('pages.gitlab.io')
 
-              query_host('pages.gitlab.io')
+                expect(response).to have_gitlab_http_status(:ok)
+                expect(response).to match_response_schema('internal/pages/virtual_domain')
 
-              expect(response).to have_gitlab_http_status(:ok)
-              expect(response).to match_response_schema('internal/pages/virtual_domain')
+                expect(json_response['certificate']).to eq(pages_domain.certificate)
+                expect(json_response['key']).to eq(pages_domain.key)
 
-              expect(json_response['certificate']).to eq(pages_domain.certificate)
-              expect(json_response['key']).to eq(pages_domain.key)
-
-              expect(json_response['lookup_paths']).to eq(
-                [
-                  {
-                    'project_id' => project.id,
-                    'access_control' => false,
-                    'https_only' => false,
-                    'prefix' => '/',
-                    'source' => {
-                      'type' => 'file',
-                      'path' => 'gitlab-org/gitlab-ce/public/'
+                expect(json_response['lookup_paths']).to eq(
+                  [
+                    {
+                      'project_id' => project.id,
+                      'access_control' => false,
+                      'https_only' => false,
+                      'prefix' => '/',
+                      'source' => {
+                        'type' => 'file',
+                        'path' => 'gitlab-org/gitlab-ce/public/'
+                      }
                     }
-                  }
-                ]
-              )
+                  ]
+                )
+              end
+            end
+
+            include_examples 'respond with domain'
+
+            context 'when domain contains mixed case' do
+              let(:domain_name) { 'paGes.gitLab.io' }
+
+              include_examples 'respond with domain'
             end
           end
         end
