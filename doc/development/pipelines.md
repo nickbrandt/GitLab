@@ -149,6 +149,9 @@ graph RL;
   Q[package-and-qa];
   S["RSpec<br/>(e.g. rspec unit pg9)"]
   T[retrieve-tests-metadata];
+  QA["qa:internal, qa:selectors"];
+  QA2["qa:internal-as-if-foss, qa:selectors-as-if-foss<br/>(EE default refs only)"];
+  X["docs lint, code_quality, sast, dependency_scanning, danger-review"];
 
 subgraph "`prepare` stage"
     A
@@ -179,6 +182,9 @@ subgraph "`test` stage"
     S -.-> |needs and depends on| T;
     L["db:*, gitlab:setup, graphql-docs-verify, downtime_check"] -.-> |needs| A;
     V -.-> |needs and depends on| K;
+    X -.-> |needs| T;
+    QA -.-> |needs| T;
+    QA2 -.-> |needs| T;
     end
 
 subgraph "`post-test` stage"
