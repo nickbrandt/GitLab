@@ -159,7 +159,7 @@ Example response:
 
 ### Create a deploy token
 
-Creates a new deploy token for a project.
+Creates a new deploy token for a group.
 
 ```
 POST /groups/:id/deploy_tokens
