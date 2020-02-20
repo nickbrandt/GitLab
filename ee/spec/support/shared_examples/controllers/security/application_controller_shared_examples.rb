@@ -27,7 +27,7 @@ RSpec.shared_examples Security::ApplicationController do
 
     context 'and the security dashboard feature is disabled' do
       it '404s' do
-        stub_feature_flags(security_dashboard: false)
+        stub_feature_flags(instance_security_dashboard: false)
 
         security_application_controller_child_action
 

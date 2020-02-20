@@ -155,7 +155,7 @@ describe Security::ProjectsController do
 
       context 'and the security dashboard feature is disabled' do
         it '404s' do
-          stub_feature_flags(security_dashboard: false)
+          stub_feature_flags(instance_security_dashboard: false)
 
           subject
 

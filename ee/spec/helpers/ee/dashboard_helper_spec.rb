@@ -13,13 +13,11 @@ describe DashboardHelper, type: :helper do
     end
 
     describe 'analytics' do
-      before do
-        allow(helper).to receive(:can?) { true }
-      end
-
       context 'when at least one analytics feature is enabled' do
         before do
           enable_only_one_analytics_feature_flag
+
+          stub_user_permissions_for(:analytics, false)
         end
 
         it 'includes analytics' do
@@ -34,7 +32,7 @@ describe DashboardHelper, type: :helper do
 
         context 'and the user has no access to instance statistics features' do
           before do
-            allow(helper).to receive(:can?) { false }
+            stub_user_permissions_for(:analytics, false)
           end
 
           it 'does not include analytics' do
@@ -43,6 +41,10 @@ describe DashboardHelper, type: :helper do
         end
 
         context 'and the user has access to instance statistics features' do
+          before do
+            stub_user_permissions_for(:analytics, true)
+          end
+
           it 'does include analytics' do
             expect(helper.dashboard_nav_links).to include(:analytics)
           end
@@ -50,95 +52,161 @@ describe DashboardHelper, type: :helper do
       end
     end
 
-    describe 'operations, environments and security' do
-      using RSpec::Parameterized::TableSyntax
-
-      before do
-        allow(helper).to receive(:can?).and_return(false)
-      end
-
-      where(:ability, :feature_flag, :nav_link) do
-        :read_operations_dashboard        | nil                     | :operations
-        :read_operations_dashboard        | :environments_dashboard | :environments
-        :read_instance_security_dashboard | :security_dashboard     | :security
-      end
-
-      with_them do
-        describe 'when the feature is enabled' do
+    describe 'operations dashboard link' do
+      context 'when the feature is available on the license' do
+        context 'and the user is authenticated' do
           before do
-            stub_feature_flags(feature_flag => true) unless feature_flag.nil?
+            stub_user_permissions_for(:operations, true)
           end
 
-          context 'and the feature is available on the license' do
-            context 'and the user is authenticated' do
-              before do
-                stub_resource_visibility(
-                  feature_flag,
-                  read_other_resources: true,
-                  read_security_dashboard: true,
-                  security_dashboard_available: true
-                )
-              end
+          it 'is included in the nav' do
+            expect(helper.dashboard_nav_links).to include(:operations)
+          end
+        end
 
-              it 'includes the nav link' do
-                expect(helper.dashboard_nav_links).to include(nav_link)
-              end
-            end
-
-            context 'and the user is not authenticated' do
-              let(:user) { nil }
-
-              before do
-                stub_resource_visibility(
-                  feature_flag,
-                  read_other_resources: false,
-                  read_security_dashboard: false,
-                  security_dashboard_available: true
-                )
-              end
-
-              it 'does not include the nav link' do
-                expect(helper.dashboard_nav_links).not_to include(nav_link)
-              end
-            end
+        context 'and the user is not authenticated' do
+          before do
+            stub_user_permissions_for(:operations, false)
           end
 
-          context 'and the feature is not available on the license' do
+          it 'is not included in the nav' do
+            expect(helper.dashboard_nav_links).not_to include(:operations)
+          end
+        end
+      end
+
+      context 'when the feature is not available on the license' do
+        before do
+          stub_user_permissions_for(:operations, false)
+        end
+
+        it 'is not included in the nav' do
+          expect(helper.dashboard_nav_links).not_to include(:operations)
+        end
+      end
+    end
+
+    describe 'environments dashboard link' do
+      context 'when the feature is enabled' do
+        before do
+          stub_feature_flags(environments_dashboard: true)
+        end
+
+        context 'and the feature is available on the license' do
+          context 'and the user is authenticated' do
             before do
-              stub_resource_visibility(
-                feature_flag,
-                read_other_resources: false,
-                read_security_dashboard: true,
-                security_dashboard_available: false
-              )
+              stub_user_permissions_for(:operations, true)
             end
 
-            it 'does not include the nav link' do
-              expect(helper.dashboard_nav_links).not_to include(nav_link)
+            it 'is included in the nav' do
+              expect(helper.dashboard_nav_links).to include(:environments)
             end
           end
 
-          def stub_resource_visibility(feature_flag, read_other_resources:, read_security_dashboard:, security_dashboard_available:)
-            if feature_flag == :security_dashboard
-              stub_licensed_features(feature_flag => security_dashboard_available)
+          context 'and the user is not authenticated' do
+            before do
+              stub_user_permissions_for(:operations, false)
+            end
 
-              allow(helper).to receive(:can?).and_return(read_security_dashboard)
-            else
-              allow(helper).to receive(:can?).with(user, ability).and_return(read_other_resources)
+            it 'is not included in the nav' do
+              expect(helper.dashboard_nav_links).not_to include(:environments)
             end
           end
         end
 
-        describe 'when the feature is disabled' do
+        context 'and the feature is not available on the license' do
           before do
-            stub_feature_flags(feature_flag => false) unless feature_flag.nil?
-            allow(helper).to receive(:can?).and_return(false)
+            stub_user_permissions_for(:operations, false)
           end
 
-          it 'does not include the nav link' do
-            expect(helper.dashboard_nav_links).not_to include(nav_link)
+          it 'is not included in the nav' do
+            expect(helper.dashboard_nav_links).not_to include(:environments)
           end
         end
+      end
+
+      context 'when the feature is not enabled' do
+        before do
+          stub_feature_flags(environments_dashboard: false)
+          stub_user_permissions_for(:operations, false)
+        end
+
+        it 'is not included in the nav' do
+          expect(helper.dashboard_nav_links).not_to include(:environments)
+        end
+      end
+    end
+
+    describe 'security dashboard link' do
+      context 'when the feature is enabled' do
+        before do
+          stub_feature_flags(instance_security_dashboard: true)
+        end
+
+        context 'and the feature is available on the license' do
+          before do
+            stub_licensed_features(security_dashboard: true)
+          end
+
+          context 'and the user is authenticated' do
+            before do
+              stub_user_permissions_for(:security, true)
+            end
+
+            it 'is included in the nav' do
+              expect(helper.dashboard_nav_links).to include(:security)
+            end
+          end
+
+          context 'and the user is not authenticated' do
+            before do
+              stub_user_permissions_for(:security, false)
+            end
+
+            it 'is not included in the nav' do
+              expect(helper.dashboard_nav_links).not_to include(:security)
+            end
+          end
+        end
+
+        context 'when the feature is not available on the license' do
+          before do
+            stub_licensed_features(security_dashboard: false)
+            stub_user_permissions_for(:security, true)
+          end
+
+          it 'is not included in the nav' do
+            expect(helper.dashboard_nav_links).not_to include(:security)
+          end
+        end
+      end
+
+      context 'when the feature is not enabled' do
+        before do
+          stub_feature_flags(instance_security_dashboard: false)
+          stub_licensed_features(security_dashboard: true)
+          stub_user_permissions_for(:security, true)
+        end
+
+        it 'is not included in the nav' do
+          expect(helper.dashboard_nav_links).not_to include(:security)
+        end
+      end
+    end
+
+    def stub_user_permissions_for(feature, enabled)
+      allow(helper).to receive(:can?).with(user, :read_cross_project).and_return(false)
+
+      can_read_instance_statistics = enabled && feature == :analytics
+      can_read_operations_dashboard = enabled && feature == :operations
+      can_read_instance_security_dashboard = enabled && feature == :security
+
+      allow(helper).to receive(:can?).with(user, :read_instance_statistics).and_return(can_read_instance_statistics)
+      allow(helper).to receive(:can?).with(user, :read_operations_dashboard).and_return(can_read_operations_dashboard)
+      allow_next_instance_of(InstanceSecurityDashboard) do |dashboard|
+        allow(helper).to(
+          receive(:can?).with(user, :read_instance_security_dashboard, dashboard).and_return(can_read_instance_security_dashboard)
+        )
       end
     end
   end
