@@ -1,21 +1,20 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import PackageList from './packages_list.vue';
 
 export default {
   components: {
     GlEmptyState,
-    GlLoadingIcon,
     PackageList,
   },
   computed: {
     ...mapState({
-      isLoading: 'isLoading',
       resourceId: state => state.config.resourceId,
       emptyListIllustration: state => state.config.emptyListIllustration,
       emptyListHelpUrl: state => state.config.emptyListHelpUrl,
+      totalItems: state => state.pagination.total,
     }),
     emptyListText() {
       return sprintf(
@@ -46,9 +45,7 @@ export default {
 </script>
 
 <template>
-  <gl-loading-icon v-if="isLoading" class="mt-2" />
   <package-list
-    v-else
     @page:changed="onPageChanged"
     @package:delete="onPackageDeleteRequest"
     @sort:changed="requestPackagesList"
