@@ -37,7 +37,7 @@ export default {
 </script>
 
 <template>
-  <div class="severity-badge gl-text-gray-900">
+  <div v-if="severity && severity != ' '" class="severity-badge gl-text-gray-900">
     <span :class="className"><gl-icon :name="iconName" :size="12"/></span>{{ severityTitle }}
   </div>
 </template>
