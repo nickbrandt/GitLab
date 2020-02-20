@@ -23,21 +23,11 @@ module EE
       end
 
       override :post_update_hooks
-      # rubocop: disable CodeReuse/ActiveRecord
       def post_update_hooks(updated_project_ids)
-        ::Project.where(id: updated_project_ids).find_each do |project|
-          # TODO: Refactor out this duplication per https://gitlab.com/gitlab-org/gitlab/issues/38232
-          if ::Gitlab::CurrentSettings.elasticsearch_indexing? && project.searchable?
-            ElasticIndexerWorker.perform_async(
-              :update,
-              project.class.to_s,
-              project.id,
-              project.es_id
-            )
-          end
+        ::Project.id_in(updated_project_ids).find_each do |project|
+          project.maintain_elasticsearch_update if project.maintaining_elasticsearch?
         end
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       def raise_ee_transfer_error(message)
         raise ::Groups::TransferService::TransferError, EE_ERROR_MESSAGES[message]
