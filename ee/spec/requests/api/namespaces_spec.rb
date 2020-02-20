@@ -279,7 +279,7 @@ describe API::Namespaces do
         do_get(owner)
 
         expect(json_response.keys).to match_array(%w[plan usage billing])
-        expect(json_response['plan'].keys).to match_array(%w[name code trial upgradable])
+        expect(json_response['plan'].keys).to match_array(%w[name code trial upgradable auto_renew])
         expect(json_response['plan']['name']).to eq('Silver')
         expect(json_response['plan']['code']).to eq('silver')
         expect(json_response['plan']['trial']).to eq(false)
