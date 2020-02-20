@@ -759,4 +759,53 @@ describe API::Projects do
       end
     end
   end
+
+  describe 'POST /projects/:id/fork' do
+    subject(:fork_call) { post api("/projects/#{group_project.id}/fork", user), params: { namespace: target_namespace.id } }
+
+    let!(:target_namespace) do
+      create(:group).tap { |g| g.add_owner(user) }
+    end
+    let!(:group_project) { create(:project, namespace: group)}
+    let(:group) { create(:group) }
+
+    before do
+      group.add_reporter(user)
+    end
+
+    context 'when project namespace has prohibit_outer_forks enabled' do
+      let(:group) do
+        create(:saml_provider, :enforced_group_managed_accounts, prohibited_outer_forks: true).group
+      end
+      let(:user) do
+        create(:user, managing_group: group).tap do |u|
+          create(:group_saml_identity, user: u, saml_provider: group.saml_provider)
+        end
+      end
+
+      before do
+        stub_feature_flags(enforced_sso_requires_session: false)
+        stub_licensed_features(group_saml: true)
+      end
+
+      context 'and target namespace is outer' do
+        it 'renders 404' do
+          expect { fork_call }.not_to change { ::Project.count }
+
+          expect(response).to have_gitlab_http_status(:not_found)
+          expect(json_response['message']).to eq "404 Target Namespace Not Found"
+        end
+      end
+
+      context 'and target namespace is inner to project namespace' do
+        let!(:target_namespace) { create(:group, parent: group) }
+
+        it 'forks the project' do
+          target_namespace.add_owner(user)
+
+          expect { fork_call }.to change { ::Project.count }.by(1)
+        end
+      end
+    end
+  end
 end

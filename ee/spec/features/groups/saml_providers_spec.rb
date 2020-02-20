@@ -75,7 +75,7 @@ describe 'SAML provider settings' do
     end
 
     context 'with existing SAML provider' do
-      let!(:saml_provider) { create(:saml_provider, group: group) }
+      let!(:saml_provider) { create(:saml_provider, group: group, prohibited_outer_forks: false) }
 
       it 'allows provider to be disabled', :js do
         visit group_saml_providers_path(group)
