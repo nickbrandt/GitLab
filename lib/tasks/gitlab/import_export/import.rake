@@ -98,7 +98,7 @@ class GitlabProjectImport
       [key, before: before_value, after: after_value, diff: (before_value - after_value).abs]
     end.to_h
     puts "GC stats:"
-    puts stats_diff.pretty_inspect
+    puts JSON.pretty_generate(stats_diff)
   end
 
   def with_measure_time
