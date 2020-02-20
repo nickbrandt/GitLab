@@ -20,7 +20,7 @@ export default () => ({
   isEditingCustomStage: false,
 
   selectedGroup: null,
-  selectedProjectIds: [],
+  selectedProjects: [],
   selectedStage: null,
 
   currentStageEvents: [],

@@ -9,10 +9,10 @@ export default {
   },
   [types.SET_SELECTED_GROUP](state, group) {
     state.selectedGroup = convertObjectPropsToCamelCase(group, { deep: true });
-    state.selectedProjectIds = [];
+    state.selectedProjects = [];
   },
-  [types.SET_SELECTED_PROJECTS](state, projectIds) {
-    state.selectedProjectIds = projectIds;
+  [types.SET_SELECTED_PROJECTS](state, projects) {
+    state.selectedProjects = projects;
   },
   [types.SET_SELECTED_STAGE](state, rawData) {
     state.selectedStage = convertObjectPropsToCamelCase(rawData);
@@ -235,5 +235,23 @@ export default {
         break;
     }
     state.tasksByType = { ...tasksByTypeRest, labelIds, ...updatedFilter };
+  },
+  [types.INITIALIZE_CYCLE_ANALYTICS](
+    state,
+    {
+      group: selectedGroup = null,
+      createdAfter: startDate = null,
+      createdBefore: endDate = null,
+      selectedProjects = [],
+    } = {},
+  ) {
+    state.isLoading = true;
+    state.selectedGroup = selectedGroup;
+    state.selectedProjects = selectedProjects;
+    state.startDate = startDate;
+    state.endDate = endDate;
+  },
+  [types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS](state) {
+    state.isLoading = false;
   },
 };
