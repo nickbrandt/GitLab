@@ -37,7 +37,7 @@ describe ProjectPolicy do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
         read_vulnerability create_vulnerability admin_vulnerability
-        admin_vulnerability_issue_link
+        admin_vulnerability_issue_link read_merge_train
       ]
     end
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
@@ -52,7 +52,7 @@ describe ProjectPolicy do
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
         read_vulnerability_feedback read_security_findings read_software_license_policy
-        read_threat_monitoring
+        read_threat_monitoring read_merge_train
       ]
     end
 

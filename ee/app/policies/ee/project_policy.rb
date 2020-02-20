@@ -187,6 +187,8 @@ module EE
 
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
+      rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
+
       rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
         enable :create_vulnerability
