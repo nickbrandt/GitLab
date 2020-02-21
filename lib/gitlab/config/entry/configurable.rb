@@ -88,6 +88,10 @@ module Gitlab
 
           def helpers(*nodes)
             nodes.each do |symbol|
+              if method_defined?("#{symbol}_defined?") || method_defined?("#{symbol}_value")
+                raise ArgumentError, "Method #{attribute}_defined? or #{attribute}_value already defined"
+              end
+
               define_method("#{symbol}_defined?") do
                 entries[symbol]&.specified?
               end

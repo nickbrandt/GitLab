@@ -9,23 +9,12 @@ module Gitlab
         # defining a downstream project trigger.
         #
         class Bridge < ::Gitlab::Config::Entry::Node
-          include ::Gitlab::Config::Entry::Configurable
-          include ::Gitlab::Config::Entry::Attributable
-          include ::Gitlab::Config::Entry::Inheritable
+          include ::Gitlab::Ci::Config::Entry::Processable
 
-          ALLOWED_KEYS = %i[trigger stage allow_failure only except
-                            when extends variables needs rules].freeze
+          ALLOWED_KEYS = %i[trigger allow_failure when variables needs].freeze
 
           validations do
-            validates :config, allowed_keys: ALLOWED_KEYS
-            validates :config, presence: true
-            validates :name, presence: true
-            validates :name, type: Symbol
-            validates :config, disallowed_keys: {
-                in: %i[only except when start_in],
-                message: 'key may not be used with `rules`'
-              },
-              if: :has_rules?
+            validates :config, allowed_keys: ALLOWED_KEYS + PROCESSABLE_ALLOWED_KEYS
 
             with_options allow_nil: true do
               validates :when,
@@ -62,22 +51,6 @@ module Gitlab
             description: 'Pipeline stage this job will be executed into.',
             inherit: false
 
-          entry :only, ::Gitlab::Ci::Config::Entry::Policy,
-            description: 'Refs policy this job will be executed for.',
-            default: ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY,
-            inherit: false
-
-          entry :except, ::Gitlab::Ci::Config::Entry::Policy,
-            description: 'Refs policy this job will be executed for.',
-            inherit: false
-
-          entry :rules, ::Gitlab::Ci::Config::Entry::Rules,
-            description: 'List of evaluable Rules to determine job inclusion.',
-            inherit: false,
-            metadata: {
-              allowed_when: %w[on_success on_failure always never manual delayed].freeze
-            }
-
           entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
             description: 'Environment variables available for this job.',
             inherit: false
@@ -95,55 +68,19 @@ module Gitlab
             true
           end
 
-          def compose!(deps = nil)
-            super do
-              has_workflow_rules = deps&.workflow&.has_rules?
-
-              # If workflow:rules: or rules: are used
-              # they are considered not compatible
-              # with `only/except` defaults
-              #
-              # Context: https://gitlab.com/gitlab-org/gitlab/merge_requests/21742
-              if has_rules? || has_workflow_rules
-                # Remove only/except defaults
-                # defaults are not considered as defined
-                @entries.delete(:only) unless only_defined?
-                @entries.delete(:except) unless except_defined?
-              end
-            end
-          end
-
-          def has_rules?
-            @config&.key?(:rules)
-          end
-
-          def name
-            @metadata[:name]
-          end
-
           def value
-            { name: name,
+            super.merge(
               trigger: (trigger_value if trigger_defined?),
               needs: (needs_value if needs_defined?),
               ignore: !!allow_failure,
-              stage: stage_value,
               when: when_value,
-              extends: extends_value,
               variables: (variables_value if variables_defined?),
-              rules: (rules_value if has_rules?),
-              only: only_value,
-              except: except_value,
-              scheduling_type: needs_defined? && !bridge_needs ? :dag : :stage }.compact
+              scheduling_type: needs_defined? && !bridge_needs ? :dag : :stage
+            ).compact
           end
 
           def bridge_needs
             needs_value[:bridge] if needs_value
-          end
-
-          private
-
-          def overwrite_entry(deps, key, current_entry)
-            deps.default[key] unless current_entry.specified?
           end
         end
       end
