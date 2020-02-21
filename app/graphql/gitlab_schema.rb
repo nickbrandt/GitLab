@@ -28,8 +28,6 @@ class GitlabSchema < GraphQL::Schema
 
   default_max_page_size 100
 
-  lazy_resolve ::Epics::LazyEpicAggregate, :epic_aggregate
-
   class << self
     def multiplex(queries, **kwargs)
       kwargs[:max_complexity] ||= max_query_complexity(kwargs[:context])
@@ -143,3 +141,5 @@ class GitlabSchema < GraphQL::Schema
     end
   end
 end
+
+GitlabSchema.prepend_if_ee('EE::GitlabSchema')

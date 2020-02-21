@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 describe Epics::Aggregate do
-
   let(:epic_type) { described_class::EPIC_TYPE }
   let(:issue_type) { described_class::ISSUE_TYPE }
 
@@ -12,6 +11,10 @@ describe Epics::Aggregate do
 
   let(:weight_sum) { Epics::EpicNode::WEIGHT_SUM }
   let(:count) { Epics::EpicNode::COUNT }
+
+  class Constants
+    include ::Epics::AggregateConstants
+  end
 
   context 'when CountAggregate' do
     subject { Epics::CountAggregate.new(sums) }

@@ -276,7 +276,3 @@ Rugged::Settings['search_path_global'] = Rails.root.join('tmp/tests').to_s
 
 # Disable timestamp checks for invisible_captcha
 InvisibleCaptcha.timestamp_enabled = false
-
-class Constants
-  include Epics::AggregateConstants
-end
