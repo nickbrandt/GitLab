@@ -21,14 +21,14 @@ describe API::ElasticsearchIndexedNamespaces do
       with_them do
         it 'errs' do
           put api(path, admin), params: { plan: plan, percentage: percentage }
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
     end
 
     it 'prohibits non-admin' do
       put api(path, non_admin), params: { plan: 'gold', percentage: 50 }
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -42,7 +42,7 @@ describe API::ElasticsearchIndexedNamespaces do
 
       put api(path, admin), params: { plan: 'gold', percentage: 50 }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -56,7 +56,7 @@ describe API::ElasticsearchIndexedNamespaces do
 
       put api(path, admin), params: { plan: 'gold', percentage: 50 }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 end

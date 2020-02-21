@@ -16,7 +16,7 @@ describe API::EpicLinks do
 
       subject
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     context 'unauthenticated user' do
@@ -25,7 +25,7 @@ describe API::EpicLinks do
       it 'returns 401 unauthorized error' do
         subject
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -34,7 +34,7 @@ describe API::EpicLinks do
 
       subject
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -59,7 +59,7 @@ describe API::EpicLinks do
 
         epics = json_response
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
         expect(epics.map { |epic| epic["id"] }).to eq([child_epic2.id, child_epic1.id])
       end
@@ -85,7 +85,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -95,7 +95,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
           expect(epic.reload.children).to include(child_epic)
         end
@@ -110,7 +110,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -134,7 +134,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -146,7 +146,7 @@ describe API::EpicLinks do
         it 'returns 201 status' do
           subject
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(response).to match_response_schema('public_api/v4/linked_epic', dir: 'ee')
           expect(epic.reload.children).to include(Epic.last)
         end
@@ -162,7 +162,7 @@ describe API::EpicLinks do
 
             subject
 
-            expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(:bad_request)
           end
         end
       end
@@ -193,7 +193,7 @@ describe API::EpicLinks do
         it 'returns status 200' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
           expect(json_response.map { |epic| epic['id'] }).to eq([sibling_1.id, child_epic.id, sibling_2.id])
         end
@@ -205,7 +205,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -230,7 +230,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -240,7 +240,7 @@ describe API::EpicLinks do
 
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
           expect(epic.reload.children).not_to include(child_epic)
         end

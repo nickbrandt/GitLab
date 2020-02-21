@@ -17,7 +17,7 @@ describe API::Epics do
 
         get api(url, user), params: params
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       context 'when epics feature is enabled' do
@@ -31,7 +31,7 @@ describe API::Epics do
 
           get api(url, user), params: params
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -77,7 +77,7 @@ describe API::Epics do
       end
 
       it 'returns 200 status' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'matches the response schema' do
@@ -100,7 +100,7 @@ describe API::Epics do
         create_list(:labeled_epic, 2, group: group, labels: [label_2])
 
         expect { get api(url, personal_access_token: pat), params: params }.not_to exceed_all_query_limit(control)
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       context 'with_label_details' do
@@ -141,7 +141,7 @@ describe API::Epics do
 
           get api(url), params: { labels: [label.title, label_1.title, label_2.title], with_labels_details: true }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect_paginated_array_response([epic.id])
           expect(json_response.first['labels'].pluck('name')).to match_array([label.title, label_1.title, label_2.title])
           expect(json_response.last['labels'].first).to match_schema('/public_api/v4/label_basic')
@@ -210,7 +210,7 @@ describe API::Epics do
 
         get api(url)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         expect(json_response).to contain_exactly(
           a_hash_including('upvotes' => 1, 'downvotes' => 0),
@@ -481,7 +481,7 @@ describe API::Epics do
       it 'returns 200 status' do
         get api(url)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'matches the response schema' do
@@ -543,7 +543,7 @@ describe API::Epics do
         it 'returns 400' do
           post api(url, user), params: { description: 'epic description' }
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
 
@@ -553,7 +553,7 @@ describe API::Epics do
         end
 
         it 'returns 201 status' do
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
         end
 
         it 'matches the response schema' do
@@ -630,7 +630,7 @@ describe API::Epics do
         it 'returns 403 forbidden error' do
           put api(url, user), params: params
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -640,7 +640,7 @@ describe API::Epics do
 
           put api(url, user)
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
 
@@ -655,7 +655,7 @@ describe API::Epics do
           end
 
           it 'returns 200 status' do
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           it 'matches the response schema' do
@@ -760,7 +760,7 @@ describe API::Epics do
 
           delete api(url, user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -772,7 +772,7 @@ describe API::Epics do
         it 'returns 204 status' do
           delete api(url, user)
 
-          expect(response).to have_gitlab_http_status(204)
+          expect(response).to have_gitlab_http_status(:no_content)
         end
 
         it 'removes an epic' do
