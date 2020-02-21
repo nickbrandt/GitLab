@@ -111,7 +111,3 @@ pipeline succeeds:
 ```shell
 git mwps origin <local-branch-name>
 ```
-
-## Server-side Push Rules
-
-For server-side options, See also [Push Rules](https://docs.gitlab.com/ee/push_rules/push_rules.html) for further control and enforcement options.
