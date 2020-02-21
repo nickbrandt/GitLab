@@ -3874,6 +3874,7 @@ ActiveRecord::Schema.define(version: 2020_02_24_163804) do
     t.boolean "template", default: false
     t.index ["project_id"], name: "index_services_on_project_id"
     t.index ["template"], name: "index_services_on_template"
+    t.index ["type", "project_id"], name: "index_services_on_type_and_project_id", unique: true, where: "(project_id IS NOT NULL)"
     t.index ["type"], name: "index_services_on_type"
   end
 
