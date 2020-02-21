@@ -488,11 +488,10 @@ describe 'Group Value Stream Analytics', :js do
           end
 
           it 'with a default name' do
-            name = 'issue'
-            fill_in 'custom-stage-name', with: name
+            fill_in 'custom-stage-name', with: 'issue'
             click_button 'Add stage'
 
-            expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+            expect(page).to have_button('Add stage', disabled: true)
           end
         end
 
@@ -616,11 +615,10 @@ describe 'Group Value Stream Analytics', :js do
           end
 
           it 'with a default name' do
-            name = 'issue'
-            fill_in name_field, with: name
+            fill_in name_field, with: 'issue'
             page.find(stage_save_button).click
 
-            expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+            expect(page.find(stage_form_class)).to have_text("Stage name already exists")
           end
         end
       end

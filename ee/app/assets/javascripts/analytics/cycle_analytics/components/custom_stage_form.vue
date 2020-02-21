@@ -13,7 +13,7 @@ import {
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
-import { STAGE_ACTIONS } from '../constants';
+import { STAGE_ACTIONS, DEFAULT_STAGE_NAMES } from '../constants';
 import {
   isStartEvent,
   isLabelEvent,
@@ -127,8 +127,14 @@ export default {
     endEventRequiresLabel() {
       return isLabelEvent(this.labelEvents, this.fields.endEventIdentifier);
     },
+    hasErrors() {
+      return (
+        this.eventMismatchError ||
+        Object.values(this.fieldErrors).some(errArray => errArray && errArray.length)
+      );
+    },
     isComplete() {
-      if (this.eventMismatchError) {
+      if (this.hasErrors) {
         return false;
       }
       const {
@@ -194,10 +200,14 @@ export default {
   },
   methods: {
     handleCancel() {
-      this.fields = {
-        ...defaultFields,
-        ...this.initialFields,
-      };
+      const { initialFields = {}, errors = null } = this;
+      const formData = initializeFormData({
+        emptyFieldState: defaultFields,
+        initialFields,
+        errors,
+      });
+      this.$set(this, 'fields', formData.fields);
+      this.$set(this, 'fieldErrors', formData.fieldErrors);
       this.$emit('cancel');
     },
     handleSave() {
@@ -220,6 +230,15 @@ export default {
     },
     fieldErrorMessage(key) {
       return this.fieldErrors[key]?.join('\n');
+    },
+    onUpdateNameField() {
+      if (DEFAULT_STAGE_NAMES.includes(this.fields.name.toLowerCase())) {
+        this.$set(this.fieldErrors, 'name', [
+          s__('CustomCycleAnalytics|Stage name already exists'),
+        ]);
+      } else {
+        this.$set(this.fieldErrors, 'name', []);
+      }
     },
     onUpdateStartEventField() {
       const initVal = this.initialFields?.endEventIdentifier
@@ -262,6 +281,7 @@ export default {
       :label="s__('CustomCycleAnalytics|Name')"
       :state="!hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
+      @change.native="onUpdateNameField"
     >
       <gl-form-input
         v-model="fields.name"

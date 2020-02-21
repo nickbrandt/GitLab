@@ -7,7 +7,7 @@ exports[`CustomStageForm Editing a custom stage isSavingCustomStage=true display
 `;
 
 exports[`CustomStageForm Start event with events does not select events with canBeStartEvent=false for the start events dropdown 1`] = `
-"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__177\\">
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__257\\">
   <option value=\\"\\">Select start event</option>
   <option value=\\"issue_created\\">Issue created</option>
   <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>
@@ -30,7 +30,7 @@ exports[`CustomStageForm Start event with events does not select events with can
 `;
 
 exports[`CustomStageForm Start event with events selects events with canBeStartEvent=true for the start events dropdown 1`] = `
-"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__137\\">
+"<select name=\\"custom-stage-start-event\\" required=\\"required\\" aria-required=\\"true\\" class=\\"gl-form-select custom-select\\" id=\\"__BVID__217\\">
   <option value=\\"\\">Select start event</option>
   <option value=\\"issue_created\\">Issue created</option>
   <option value=\\"issue_first_mentioned_in_commit\\">Issue first mentioned in a commit</option>

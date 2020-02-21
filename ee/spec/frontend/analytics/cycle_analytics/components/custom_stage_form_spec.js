@@ -79,6 +79,15 @@ describe('CustomStageForm', () => {
     });
   }
 
+  const findNameField = _wrapper => _wrapper.find({ ref: 'name' });
+  const findNameFieldInput = _wrapper => _wrapper.find(sel.name);
+
+  function setNameField(_wrapper, value = '') {
+    findNameFieldInput(_wrapper).setValue(value);
+    findNameFieldInput(_wrapper).trigger('change');
+    return _wrapper.vm.$nextTick();
+  }
+
   beforeEach(() => {
     wrapper = createComponent({});
   });
@@ -103,6 +112,25 @@ describe('CustomStageForm', () => {
       } else {
         expect(el.attributes('disabled')).toBeUndefined();
       }
+    });
+  });
+
+  describe('Name', () => {
+    describe('with a reserved name', () => {
+      beforeEach(() => {
+        wrapper = createComponent({});
+        return setNameField(wrapper, 'issue');
+      });
+
+      it('displays an error', () => {
+        expect(findNameField(wrapper).text()).toContain('Stage name already exists');
+      });
+
+      it('clears the error when the field changes', () => {
+        return setNameField(wrapper, 'not an issue').then(() => {
+          expect(findNameField(wrapper).text()).not.toContain('Stage name already exists');
+        });
+      });
     });
   });
 
@@ -165,7 +193,6 @@ describe('CustomStageForm', () => {
         expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
 
         wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
-        // TODO: make func for setting single field
         return Vue.nextTick()
           .then(() => {
             wrapper

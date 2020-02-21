@@ -5848,6 +5848,9 @@ msgstr ""
 msgid "CustomCycleAnalytics|Select stop event"
 msgstr ""
 
+msgid "CustomCycleAnalytics|Stage name already exists"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Start event"
 msgstr ""
 

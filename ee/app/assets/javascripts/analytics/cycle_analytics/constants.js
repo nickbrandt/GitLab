@@ -30,6 +30,8 @@ export const EMPTY_STAGE_TEXT = {
   ),
 };
 
+export const DEFAULT_STAGE_NAMES = [...Object.keys(EMPTY_STAGE_TEXT), 'total'];
+
 export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
 export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
 
