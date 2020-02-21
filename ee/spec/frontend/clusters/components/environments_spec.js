@@ -60,6 +60,10 @@ describe('Environments', () => {
       tableHeaders.forEach((headerText, i) => expect(headers.at(i).text()).toEqual(headerText));
     });
 
+    it('should stack on smaller devices', () => {
+      expect(table.classes()).toContain('b-table-stacked-md');
+    });
+
     describe('deployment instances', () => {
       let tableRows;
 
