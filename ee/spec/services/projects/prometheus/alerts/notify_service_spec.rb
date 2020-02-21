@@ -309,14 +309,6 @@ describe Projects::Prometheus::Alerts::NotifyService do
           it_behaves_like 'does not process incident issues'
         end
       end
-
-      context 'without license' do
-        before do
-          stub_licensed_features(incident_management: false)
-        end
-
-        it_behaves_like 'does not process incident issues'
-      end
     end
   end
 
