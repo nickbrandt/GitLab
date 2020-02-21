@@ -14047,6 +14047,9 @@ msgstr ""
 msgid "Please create a username with only alphanumeric characters."
 msgstr ""
 
+msgid "Please create an index before enabling indexing"
+msgstr ""
+
 msgid "Please enable and migrate to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
 msgstr ""
 

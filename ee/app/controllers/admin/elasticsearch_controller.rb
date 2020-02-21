@@ -4,7 +4,7 @@ class Admin::ElasticsearchController < Admin::ApplicationController
   before_action :check_elasticsearch_web_indexing_feature_flag!
 
   def check_elasticsearch_web_indexing_feature_flag!
-    render_404 unless Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true)
+    render_404 unless Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true) && Gitlab::Elastic::Helper.index_exists?
   end
 
   # POST

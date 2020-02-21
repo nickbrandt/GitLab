@@ -12,6 +12,57 @@ describe 'admin/application_settings/_elasticsearch_form' do
     allow(view).to receive(:expanded) { true }
   end
 
+  context 'es index dependent' do
+    before do
+      allow(Gitlab::CurrentSettings).to(receive(:elasticsearch_indexing?)).and_return(es_indexing)
+      allow(Gitlab::Elastic::Helper).to(receive(:index_exists?)).and_return(index_exists)
+    end
+
+    let(:warning_msg) { 'create an index before enabling indexing' }
+    let(:button_text) { 'Index all projects' }
+    let(:application_setting) { build(:application_setting, elasticsearch_indexing: es_indexing) }
+
+    context 'when elasticsearch index does not exist with indexing enabled' do
+      let(:es_indexing) { true }
+      let(:index_exists) { false }
+
+      it 'shows a warning and disables a button' do
+        render
+
+        expect(rendered).to have_content(warning_msg)
+        expect(rendered).to have_css('a.btn-success.disabled', text: button_text)
+        expect(rendered).to have_css('#application_setting_elasticsearch_indexing')
+        expect(rendered).not_to have_css('#application_setting_elasticsearch_indexing[disabled="disabled"]')
+      end
+    end
+
+    context 'when elasticsearch index does not exist with indexing disabled' do
+      let(:es_indexing) { false }
+      let(:index_exists) { false }
+
+      it 'shows a warning and disables a checkbox and hides an indexing button' do
+        render
+
+        expect(rendered).to have_content(warning_msg)
+        expect(rendered).not_to have_css('a.btn-success', text: button_text)
+        expect(rendered).to have_css('#application_setting_elasticsearch_indexing[disabled="disabled"]')
+      end
+    end
+
+    context 'when elasticsearch index exists' do
+      let(:es_indexing) { true }
+      let(:index_exists) { true }
+
+      it 'shows non-disabled index button without a warning' do
+        render
+
+        expect(rendered).to have_css('a.btn-success', text: button_text)
+        expect(rendered).not_to have_css('a.btn-success.disabled', text: button_text)
+        expect(rendered).not_to have_content(warning_msg)
+      end
+    end
+  end
+
   context 'when elasticsearch_aws_secret_access_key is not set' do
     let(:application_setting) { build(:application_setting) }
 

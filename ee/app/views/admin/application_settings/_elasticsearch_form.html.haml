@@ -22,14 +22,19 @@
         .sub-section
           .form-group
             .form-check
-              = f.check_box :elasticsearch_indexing, class: 'form-check-input', data: { qa_selector: 'indexing_checkbox' }
+              - indexing_enabled = Gitlab::CurrentSettings.elasticsearch_indexing?
+              - index_exists = Gitlab::Elastic::Helper.index_exists? rescue false
+              - disable_indexing_checkbox = !indexing_enabled && !index_exists # Disable this checkbox only when we haven't enabled indexing and we don't have an index
+              = f.check_box :elasticsearch_indexing, class: 'form-check-input', data: { qa_selector: 'indexing_checkbox' }, disabled: disable_indexing_checkbox
               = f.label :elasticsearch_indexing, class: 'form-check-label' do
                 Elasticsearch indexing
-
-              - if Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true) && Gitlab::CurrentSettings.elasticsearch_indexing?
+              - unless index_exists
+                .form-text.text-warning
+                  = _('Please create an index before enabling indexing')
+              - if Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true) && indexing_enabled
                 .form-text
                   = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
-                      class: 'btn btn-success', method: :post
+                      class: ['btn', 'btn-success', ('disabled' unless index_exists)], method: :post
 
           .form-group
             .form-check
