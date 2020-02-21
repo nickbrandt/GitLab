@@ -74,39 +74,40 @@ describe API::Internal::Pages do
             before do
               deploy_pages(project)
             end
-            shared_examples 'respond with domain' do
+            it 'responds with the correct domain configuration' do
+              query_host('pages.gitlab.io')
+
+              expect(response).to have_gitlab_http_status(:ok)
+              expect(response).to match_response_schema('internal/pages/virtual_domain')
+
+              expect(json_response['certificate']).to eq(pages_domain.certificate)
+              expect(json_response['key']).to eq(pages_domain.key)
+
+              expect(json_response['lookup_paths']).to eq(
+                [
+                  {
+                    'project_id' => project.id,
+                    'access_control' => false,
+                    'https_only' => false,
+                    'prefix' => '/',
+                    'source' => {
+                      'type' => 'file',
+                      'path' => 'gitlab-org/gitlab-ce/public/'
+                    }
+                  }
+                ]
+              )
+            end
+
+            context 'when domain contains mixed case' do
+              let(:domain_name) { 'paGes.gitLab.io' }
+
               it 'responds with the correct domain configuration' do
                 query_host('pages.gitlab.io')
 
                 expect(response).to have_gitlab_http_status(:ok)
                 expect(response).to match_response_schema('internal/pages/virtual_domain')
-
-                expect(json_response['certificate']).to eq(pages_domain.certificate)
-                expect(json_response['key']).to eq(pages_domain.key)
-
-                expect(json_response['lookup_paths']).to eq(
-                  [
-                    {
-                      'project_id' => project.id,
-                      'access_control' => false,
-                      'https_only' => false,
-                      'prefix' => '/',
-                      'source' => {
-                        'type' => 'file',
-                        'path' => 'gitlab-org/gitlab-ce/public/'
-                      }
-                    }
-                  ]
-                )
               end
-            end
-
-            include_examples 'respond with domain'
-
-            context 'when domain contains mixed case' do
-              let(:domain_name) { 'paGes.gitLab.io' }
-
-              include_examples 'respond with domain'
             end
           end
         end
