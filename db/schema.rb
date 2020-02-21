@@ -2537,6 +2537,7 @@ ActiveRecord::Schema.define(version: 2020_02_21_144534) do
     t.integer "diff_size"
     t.integer "modified_paths_size"
     t.integer "commits_count"
+    t.datetime_with_timezone "first_approved_at"
     t.index ["first_deployed_to_production_at"], name: "index_merge_request_metrics_on_first_deployed_to_production_at"
     t.index ["latest_closed_at"], name: "index_merge_request_metrics_on_latest_closed_at", where: "(latest_closed_at IS NOT NULL)"
     t.index ["latest_closed_by_id"], name: "index_merge_request_metrics_on_latest_closed_by_id"

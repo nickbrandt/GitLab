@@ -14,6 +14,7 @@ module MergeRequests
       if approval.destroy_all # rubocop: disable DestroyAll
         merge_request.reset_approval_cache!
         create_note(merge_request)
+        recalculate_approvals_metrics(merge_request)
 
         if currently_approved
           notification_service.async.unapprove_mr(merge_request, current_user)
@@ -29,6 +30,12 @@ module MergeRequests
 
     def create_note(merge_request)
       SystemNoteService.unapprove_mr(merge_request, current_user)
+    end
+
+    def recalculate_approvals_metrics(merge_request)
+      return unless merge_request.project.feature_available?(:code_review_analytics)
+
+      Analytics::CodeReviewMetricsWorker.perform_async('::Analytics::RefreshApprovalsData', merge_request.id, force: true)
     end
   end
 end

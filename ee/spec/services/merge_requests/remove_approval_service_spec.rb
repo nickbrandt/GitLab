@@ -50,6 +50,33 @@ describe MergeRequests::RemoveApprovalService do
 
         execute!
       end
+
+      context 'approvals metrics calculation' do
+        context 'when code_review_analytics project feature is available' do
+          before do
+            stub_licensed_features(code_review_analytics: true)
+          end
+
+          it 'schedules RefreshApprovalsData' do
+            expect(Analytics::CodeReviewMetricsWorker)
+              .to receive(:perform_async).with('::Analytics::RefreshApprovalsData', merge_request.id, force: true)
+
+            service.execute(merge_request)
+          end
+        end
+
+        context 'when code_review_analytics is not available' do
+          before do
+            stub_licensed_features(code_review_analytics: false)
+          end
+
+          it 'does not schedule for RefreshApprovalsData' do
+            expect(Analytics::CodeReviewMetricsWorker).not_to receive(:perform_async)
+
+            service.execute(merge_request)
+          end
+        end
+      end
     end
 
     context 'with an approved merge request' do

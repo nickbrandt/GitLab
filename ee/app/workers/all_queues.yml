@@ -430,6 +430,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: analytics_code_review_metrics
+  :feature_category: :code_analytics
+  :has_external_dependencies: 
+  :latency_sensitive: 
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: create_github_webhook
   :feature_category: :integrations
   :has_external_dependencies: true
