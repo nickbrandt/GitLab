@@ -265,42 +265,6 @@ module EE
         end
       end
 
-      class EpicIssueLink < Grape::Entity
-        expose :id
-        expose :relative_position
-        expose :epic do |epic_issue_link, _options|
-          ::EE::API::Entities::Epic.represent(epic_issue_link.epic, with_reference: true)
-        end
-        expose :issue, using: ::API::Entities::IssueBasic
-      end
-
-      class IssueLink < Grape::Entity
-        expose :source, as: :source_issue, using: ::API::Entities::IssueBasic
-        expose :target, as: :target_issue, using: ::API::Entities::IssueBasic
-        expose :link_type
-      end
-
-      class SpecialBoardFilter < Grape::Entity
-        expose :title
-      end
-
-      class ApprovalRuleShort < Grape::Entity
-        expose :id, :name, :rule_type
-      end
-
-      class ApprovalRule < ApprovalRuleShort
-        def initialize(object, options = {})
-          presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
-          super(presenter, options)
-        end
-
-        expose :approvers, as: :eligible_approvers, using: ::API::Entities::UserBasic
-        expose :approvals_required
-        expose :users, using: ::API::Entities::UserBasic
-        expose :groups, using: ::API::Entities::Group
-        expose :contains_hidden_groups?, as: :contains_hidden_groups
-      end
-
       class ProjectApprovalRule < ApprovalRule
         expose :protected_branches, using: ::API::Entities::ProtectedBranch, if: -> (rule, _) { rule.project.multiple_approval_rules_available? }
       end
