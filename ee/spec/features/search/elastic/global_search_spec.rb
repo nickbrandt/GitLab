@@ -49,10 +49,10 @@ describe 'Global elastic search', :elastic, :sidekiq_inline do
       let(:object) { :project }
       let(:creation_args) { { namespace: user.namespace } }
       let(:path) { search_path(search: 'project*', scope: 'projects') }
-      # Each Project requires 4 extra queries: one for each "count" (forks,
-      # open MRs, open Issues and access levels). This should be fixed per
-      # https://gitlab.com/gitlab-org/gitlab/issues/34457
-      let(:query_count_multiplier) { 4 }
+      # Each Project requires 5 extra queries: one for each "count" (forks,
+      # open MRs, open Issues, access levels and container repositories). This
+      # should be fixed per https://gitlab.com/gitlab-org/gitlab/issues/34457
+      let(:query_count_multiplier) { 5 }
 
       it_behaves_like 'an efficient database result'
     end

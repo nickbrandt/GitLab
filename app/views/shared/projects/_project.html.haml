@@ -17,6 +17,7 @@
 - css_controls_class << "with-pipeline-status" if show_pipeline_status_icon
 - avatar_container_class = project.creator && use_creator_avatar ? '' : 'rect-avatar'
 - license_name = project_license_name(project)
+- container_repositories = project.container_repositories.length
 
 %li.project-row.d-flex{ class: css_class }
   = cache(cache_key) do
@@ -93,6 +94,12 @@
                 title: _('Issues'), data: { container: 'body', placement: 'top' } do
               = sprite_icon('issues', size: 14, css_class: 'append-right-4')
               = number_with_delimiter(project.open_issues_count)
+          - if container_repositories > 0
+            = link_to project_container_registry_index_path(project),
+                class: "d-none d-xl-flex align-items-center icon-wrapper container-repository has-tooltip",
+                title: _('Container Registry'), data: { container: 'body', placement: 'top' } do
+              = sprite_icon('hook', size: 14, css_class: 'append-right-4')
+              = number_with_delimiter(container_repositories)
         .updated-note
           %span
             = _('Updated')

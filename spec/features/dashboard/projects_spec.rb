@@ -253,4 +253,22 @@ describe 'Dashboard Projects' do
     # additional query.
     expect { visit dashboard_projects_path }.not_to exceed_query_limit(control_count + 4)
   end
+
+  context 'container_repository icon' do
+    let(:container_repository) { create(:container_repository) }
+
+    it 'does not show the container_repository icon when a project does not contain any' do
+      visit dashboard_projects_path
+
+      expect(page).not_to have_css('.container-repository')
+    end
+
+    it 'shows container_repository icon with count when the project has at least one container repository' do
+      project.update!(container_repositories: [container_repository])
+
+      visit dashboard_projects_path
+
+      expect(find('.container-repository')).to have_content(1)
+    end
+  end
 end
