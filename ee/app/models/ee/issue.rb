@@ -65,6 +65,20 @@ module EE
       project.feature_available?(:multiple_issue_assignees)
     end
 
+    def blocked?
+      blocking_issues_ids.any?
+    end
+
+    # Used on EE::IssueEntity to expose blocking issues URLs
+    def blocked_by_issues(user)
+      return ::Issue.none unless blocked?
+
+      issues =
+        ::IssuesFinder.new(user).execute.where(id: blocking_issues_ids)
+
+      issues.preload(project: [:route, { namespace: [:route] }])
+    end
+
     # override
     def subscribed_without_subscriptions?(user, *)
       # TODO: this really shouldn't be necessary, because the support
@@ -195,6 +209,10 @@ module EE
     end
 
     private
+
+    def blocking_issues_ids
+      @blocking_issues_ids ||= ::IssueLink.blocking_issue_ids_for(self)
+    end
 
     def update_generic_alert_title
       update(title: "#{title} #{iid}")
