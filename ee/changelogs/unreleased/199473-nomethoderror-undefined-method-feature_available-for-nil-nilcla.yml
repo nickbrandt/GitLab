@@ -1,6 +1,0 @@
----
-title: Fix 500 error when browsing the roadmap page for a group the user is not authorized
-  to view
-merge_request: 24002
-author:
-type: fixed

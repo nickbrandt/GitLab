@@ -1,5 +1,0 @@
----
-title: Make sure type is set properly in Elasticsearch query when doing global search
-merge_request: 22821
-author:
-type: fixed
