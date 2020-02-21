@@ -441,7 +441,7 @@
   :feature_category: :design_management
   :has_external_dependencies: 
   :latency_sensitive: 
-  :resource_boundary: :unknown
+  :resource_boundary: :memory
   :weight: 1
   :idempotent: 
 - :name: elastic_batch_project_indexer

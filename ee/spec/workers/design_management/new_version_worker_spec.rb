@@ -6,11 +6,21 @@ describe DesignManagement::NewVersionWorker do
   describe '#perform' do
     let(:worker) { described_class.new }
 
+    before do
+      stub_feature_flags(design_management_resize_images: true)
+    end
+
     context 'the id is wrong or out-of-date' do
       let(:version_id) { -1 }
 
       it 'does not create system notes' do
         expect(SystemNoteService).not_to receive(:design_version_added)
+
+        worker.perform(version_id)
+      end
+
+      it 'does not invoke GenerateImageVersionsService' do
+        expect(DesignManagement::GenerateImageVersionsService).not_to receive(:new)
 
         worker.perform(version_id)
       end
@@ -24,10 +34,18 @@ describe DesignManagement::NewVersionWorker do
     end
 
     context 'the version id is valid' do
-      let_it_be(:version) { create(:design_version, :committed, designs_count: 2) }
+      let_it_be(:version) { create(:design_version, :with_lfs_file, designs_count: 2) }
 
       it 'creates a system note' do
         expect { worker.perform(version.id) }.to change { Note.system.count }.by(1)
+      end
+
+      it 'invokes GenerateImageVersionsService' do
+        expect_next_instance_of(DesignManagement::GenerateImageVersionsService) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        worker.perform(version.id)
       end
 
       it 'does not log anything' do
@@ -35,12 +53,24 @@ describe DesignManagement::NewVersionWorker do
 
         worker.perform(version.id)
       end
+
+      context 'when the `design_management_resize_images` flag is disabled' do
+        before do
+          stub_feature_flags(design_management_resize_images: false)
+        end
+
+        it 'does not invoke GenerateImageVersionsService' do
+          expect(DesignManagement::GenerateImageVersionsService).not_to receive(:new)
+
+          worker.perform(version.id)
+        end
+      end
     end
 
     context 'the version includes multiple types of action' do
       let_it_be(:version) do
-        create(:design_version, :committed,
-               created_designs: create_list(:design, 1),
+        create(:design_version, :with_lfs_file,
+               created_designs: create_list(:design, 1, :with_lfs_file),
                modified_designs: create_list(:design, 1))
       end
 

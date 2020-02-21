@@ -1417,10 +1417,11 @@ ActiveRecord::Schema.define(version: 2020_02_20_180944) do
     t.index ["project_id"], name: "index_design_management_designs_on_project_id"
   end
 
-  create_table "design_management_designs_versions", id: false, force: :cascade do |t|
+  create_table "design_management_designs_versions", force: :cascade do |t|
     t.bigint "design_id", null: false
     t.bigint "version_id", null: false
     t.integer "event", limit: 2, default: 0, null: false
+    t.string "image_v432x230", limit: 255
     t.index ["design_id", "version_id"], name: "design_management_designs_versions_uniqueness", unique: true
     t.index ["design_id"], name: "index_design_management_designs_versions_on_design_id"
     t.index ["event"], name: "index_design_management_designs_versions_on_event"
