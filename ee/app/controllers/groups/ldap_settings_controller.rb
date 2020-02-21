@@ -17,8 +17,7 @@ class Groups::LdapSettingsController < Groups::ApplicationController
   private
 
   def authorize_manage_ldap_settings!
-    # todo
-    # render_404 unless can?(current_user, :admin_ldap_settings, group)
+    render_404 unless can?(current_user, :admin_ldap_settings, group)
   end
 
   def require_ldap_enabled
