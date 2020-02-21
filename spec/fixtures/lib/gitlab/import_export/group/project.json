@@ -16,6 +16,20 @@
       "group_id": null
     }
   ],
+  "sprints": [
+    {
+      "id": 1,
+      "title": "Project sprint title",
+      "project_id": 8,
+      "description": "Project-level sprint description",
+      "due_date": null,
+      "created_at": "2016-06-14T15:02:04.415Z",
+      "updated_at": "2016-06-14T15:02:04.415Z",
+      "state": "active",
+      "iid": 1,
+      "group_id": null
+    }
+  ],
   "labels": [
     {
       "id": 2,
@@ -67,6 +81,18 @@
         "title": "Project milestone",
         "project_id": 8,
         "description": "Project-level milestone",
+        "due_date": null,
+        "created_at": "2016-06-14T15:02:04.415Z",
+        "updated_at": "2016-06-14T15:02:04.415Z",
+        "state": "active",
+        "iid": 1,
+        "group_id": null
+      },
+      "sprint": {
+        "id": 1,
+        "title": "Project sprint title",
+        "project_id": 8,
+        "description": "Project-level sprint description",
         "due_date": null,
         "created_at": "2016-06-14T15:02:04.415Z",
         "updated_at": "2016-06-14T15:02:04.415Z",
@@ -152,6 +178,17 @@
         "iid": 1,
         "group_id": 100
       },
+      "sprint": {
+        "id": 2,
+        "title": "A group sprint title",
+        "description": "Group-level sprint description",
+        "due_date": null,
+        "created_at": "2016-06-14T15:02:04.415Z",
+        "updated_at": "2016-06-14T15:02:04.415Z",
+        "state": "active",
+        "iid": 1,
+        "group_id": 100
+      },
       "label_links": [
         {
           "id": 11,
@@ -198,6 +235,17 @@
         "id": 2,
         "title": "A group milestone",
         "description": "Group-level milestone",
+        "due_date": null,
+        "created_at": "2016-06-14T15:02:04.415Z",
+        "updated_at": "2016-06-14T15:02:04.415Z",
+        "state": "active",
+        "iid": 1,
+        "group_id": 100
+      },
+      "sprint": {
+        "id": 2,
+        "title": "A group sprint title",
+        "description": "Group-level sprint description",
         "due_date": null,
         "created_at": "2016-06-14T15:02:04.415Z",
         "updated_at": "2016-06-14T15:02:04.415Z",

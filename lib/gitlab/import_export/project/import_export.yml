@@ -7,6 +7,7 @@ tree:
   project:
     - labels:
       - :priorities
+    - :sprints
     - milestones:
       - events:
         - :push_event_payload
@@ -23,6 +24,7 @@ tree:
       - label_links:
         - label:
           - :priorities
+      - :sprint
       - milestone:
         - events:
           - :push_event_payload
@@ -61,6 +63,7 @@ tree:
       - label_links:
         - label:
           - :priorities
+      - :sprint
       - milestone:
         - events:
           - :push_event_payload
@@ -190,6 +193,7 @@ excluded_attributes:
     - :merge_request_diff_id
   issues:
     - :milestone_id
+    - :sprint_id
     - :moved_to_id
     - :sent_notifications
     - :state_id
@@ -197,6 +201,7 @@ excluded_attributes:
     - :promoted_to_epic_id
   merge_request:
     - :milestone_id
+    - :sprint_id
     - :ref_fetched
     - :merge_jid
     - :rebase_jid
@@ -205,6 +210,7 @@ excluded_attributes:
     - :state_id
   merge_requests:
     - :milestone_id
+    - :sprint_id
     - :ref_fetched
     - :merge_jid
     - :rebase_jid

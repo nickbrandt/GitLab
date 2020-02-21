@@ -16,6 +16,8 @@ module Gitlab
           epics
           milestone
           milestones
+          sprint
+          sprints
           label
           labels
           group_label

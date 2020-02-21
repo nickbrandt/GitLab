@@ -30,9 +30,9 @@ module ConfigurationHelper
     names = names_from_tree(config_hash(config).dig(:tree, key))
     # Remove duplicated or add missing models
     # - project is not part of the tree, so it has to be added manually.
-    # - milestone, labels, merge_request have both singular and plural versions in the tree, so remove the duplicates.
+    # - milestone, sprints, labels, merge_request have both singular and plural versions in the tree, so remove the duplicates.
     # - User, Author... Models we do not care about for checking models
-    names.flatten.uniq - %w(milestones labels user author merge_request design) + [key.to_s]
+    names.flatten.uniq - %w(milestones sprints labels user author merge_request design) + [key.to_s]
   end
 
   def relation_class_for_name(relation_name)

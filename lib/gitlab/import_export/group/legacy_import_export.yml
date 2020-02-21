@@ -6,6 +6,7 @@
 tree:
   group:
     - :milestones
+    - :sprints
     - :badges
     - labels:
       - :priorities

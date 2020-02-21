@@ -26,6 +26,10 @@ RSpec.shared_examples 'restores project successfully' do |**results|
     expect(project.milestones.size).to eq(results.fetch(:milestones, 0))
   end
 
+  it 'has sprints' do
+    expect(project.sprints.size).to eq(results.fetch(:sprints, 0))
+  end
+
   it 'has issues' do
     expect(project.issues.size).to eq(results.fetch(:issues, 0))
   end

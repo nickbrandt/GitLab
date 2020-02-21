@@ -40,6 +40,8 @@ module Gitlab
         EXISTING_OBJECT_RELATIONS = %i[
           milestone
           milestones
+          sprint
+          sprints
           label
           labels
           project_label

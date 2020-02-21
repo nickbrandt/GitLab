@@ -6,6 +6,7 @@ issues:
 - assignees
 - updated_by
 - milestone
+- sprint
 - notes
 - resource_label_events
 - resource_weight_events
@@ -82,6 +83,13 @@ milestone:
 - boards
 - milestone_releases
 - releases
+sprint:
+- group
+- project
+- issues
+- labels
+- merge_requests
+- participants
 snippets:
 - author
 - project
@@ -111,6 +119,7 @@ merge_requests:
 - assignee
 - updated_by
 - milestone
+- sprint
 - notes
 - resource_label_events
 - resource_milestone_events
@@ -343,6 +352,7 @@ project:
 - labels
 - events
 - milestones
+- sprints
 - notes
 - snippets
 - hooks

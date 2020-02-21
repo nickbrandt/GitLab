@@ -23,6 +23,7 @@ Issue:
 - promoted_to_epic_id
 - lock_version
 - milestone_id
+- sprint_id
 - weight
 - time_estimate
 - relative_position
@@ -100,6 +101,18 @@ ProjectLabel:
 - description
 - priority
 Milestone:
+- id
+- title
+- project_id
+- group_id
+- description
+- due_date
+- start_date
+- created_at
+- updated_at
+- state
+- iid
+Sprint:
 - id
 - title
 - project_id
@@ -194,6 +207,7 @@ MergeRequest:
 - in_progress_merge_commit_sha
 - lock_version
 - milestone_id
+- sprint_id
 - approvals_before_merge
 - rebase_commit_sha
 - time_estimate

@@ -24,6 +24,8 @@ describe Group do
     it { is_expected.to have_many(:cluster_groups).class_name('Clusters::Group') }
     it { is_expected.to have_many(:clusters).class_name('Clusters::Cluster') }
     it { is_expected.to have_many(:container_repositories) }
+    it { is_expected.to have_many(:milestones) }
+    it { is_expected.to have_many(:sprints) }
 
     describe '#members & #requesters' do
       let(:requester) { create(:user) }

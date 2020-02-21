@@ -11,7 +11,7 @@ module Gitlab
       #   `ObjectBuilder.build(Label, label_attributes)`
       #    finds or initializes a label with the given attributes.
       #
-      # It also adds some logic around Group Labels/Milestones for edge cases.
+      # It also adds some logic around Group Labels/Timeboxes for edge cases.
       class ObjectBuilder < Base::ObjectBuilder
         def self.build(*args)
           ::Project.transaction do
@@ -66,8 +66,8 @@ module Gitlab
 
             if label?
               atts['type'] = 'ProjectLabel' # Always create project labels
-            elsif milestone?
-              if atts['group_id'] # Transform new group milestones into project ones
+            elsif timebox?
+              if atts['group_id'] # Transform new group timeboxes into project ones
                 atts['iid'] = nil
                 atts.delete('group_id')
               else
@@ -83,8 +83,8 @@ module Gitlab
           klass == Label
         end
 
-        def milestone?
-          klass == Milestone
+        def timebox?
+          klass.include?(Timebox)
         end
 
         def merge_request?
@@ -95,21 +95,21 @@ module Gitlab
           klass == Epic
         end
 
-        # If an existing group milestone used the IID
-        # claim the IID back and set the group milestone to use one available
+        # If an existing group timebox used the IID
+        # claim the IID back and set the group timebox to use one available
         # This is necessary to fix situations like the following:
-        #  - Importing into a user namespace project with exported group milestones
-        #    where the IID of the Group milestone could conflict with a project one.
+        #  - Importing into a user namespace project with exported group timeboxes
+        #    where the IID of the Group timebox could conflict with a project one.
         def claim_iid
-          # The milestone has to be a group milestone, as it's the only case where
+          # The timebox has to be a group timebox, as it's the only case where
           # we set the IID as the maximum. The rest of them are fixed.
-          milestone = project.milestones.find_by(iid: attributes['iid'])
+          timebox = project.send(klass.model_name.plural).find_by(iid: attributes['iid']) # rubocop:disable GitlabSecurity/PublicSend
 
-          return unless milestone
+          return unless timebox
 
-          milestone.iid = nil
-          milestone.ensure_project_iid!
-          milestone.save!
+          timebox.iid = nil
+          timebox.ensure_project_iid!
+          timebox.save!
         end
       end
     end

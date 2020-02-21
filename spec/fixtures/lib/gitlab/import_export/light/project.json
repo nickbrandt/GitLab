@@ -18,6 +18,20 @@
       "group_id": null
     }
   ],
+  "sprints": [
+    {
+      "id": 1,
+      "title": "A sprint title",
+      "project_id": 8,
+      "description": "Project-level sprint description",
+      "due_date": null,
+      "created_at": "2016-06-14T15:02:04.415Z",
+      "updated_at": "2016-06-14T15:02:04.415Z",
+      "state": "active",
+      "iid": 1,
+      "group_id": null
+    }
+  ],
   "labels": [
     {
       "id": 2,
@@ -69,6 +83,18 @@
         "title": "A milestone",
         "group_id": 8,
         "description": "Project-level milestone",
+        "due_date": null,
+        "created_at": "2016-06-14T15:02:04.415Z",
+        "updated_at": "2016-06-14T15:02:04.415Z",
+        "state": "active",
+        "iid": 1,
+        "group_id": null
+      },
+      "sprint": {
+        "id": 1,
+        "title": "A sprint title",
+        "group_id": 8,
+        "description": "Project-level sprint description",
         "due_date": null,
         "created_at": "2016-06-14T15:02:04.415Z",
         "updated_at": "2016-06-14T15:02:04.415Z",

@@ -497,6 +497,10 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
         expect(project.group.milestones.size).to eq(results.fetch(:milestones, 0))
       end
 
+      it 'has group sprint' do
+        expect(project.group.sprints.size).to eq(results.fetch(:sprints, 0))
+      end
+
       it 'has the correct visibility level' do
         # INTERNAL in the `project.json`, group's is PRIVATE
         expect(project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
@@ -560,6 +564,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
             labels: 2,
             label_with_priorities: 'A project label',
             milestones: 1,
+            sprints: 1,
             first_issue_labels: 1,
             services: 1
         end
@@ -574,6 +579,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
             labels: 2,
             label_with_priorities: 'A project label',
             milestones: 1,
+            sprints: 1,
             first_issue_labels: 1
         end
       end
@@ -594,6 +600,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
           issues: 0,
           labels: 0,
           milestones: 0,
+          sprints: 0,
           ci_pipelines: 2,
           external_pull_requests: 1,
           import_failures: 0
@@ -655,6 +662,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
           labels: 2,
           label_with_priorities: 'A project label',
           milestones: 1,
+          sprints: 1,
           first_issue_labels: 1,
           services: 1,
           import_failures: 1
@@ -756,11 +764,13 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
           labels: 2,
           label_with_priorities: 'A project label',
           milestones: 2,
+          sprints: 2,
           first_issue_labels: 1
 
         it_behaves_like 'restores group correctly',
           labels: 0,
           milestones: 0,
+          sprints: 0,
           first_issue_labels: 1
 
         it 'restores issue states' do
@@ -1014,20 +1024,25 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
           labels: 0,
           label_with_priorities: nil,
           milestones: 1,
+          sprints: 1,
           first_issue_labels: 0,
           services: 0,
-          import_failures: 1
+          import_failures: 2
 
         it 'records the failures in the database' do
-          import_failure = ImportFailure.last
+          import_failures = ImportFailure.last(2)
 
-          expect(import_failure.project_id).to eq(project.id)
-          expect(import_failure.relation_key).to eq('milestones')
-          expect(import_failure.relation_index).to be_present
-          expect(import_failure.exception_class).to eq('ActiveRecord::RecordInvalid')
-          expect(import_failure.exception_message).to be_present
-          expect(import_failure.correlation_id_value).not_to be_empty
-          expect(import_failure.created_at).to be_present
+          aggregate_failures 'test properties' do
+            import_failures.each do |import_failure|
+              expect(import_failure.project_id).to eq(project.id)
+              expect(import_failure.relation_key).to be_in(%w(milestones sprints))
+              expect(import_failure.relation_index).to be_present
+              expect(import_failure.exception_class).to eq('ActiveRecord::RecordInvalid')
+              expect(import_failure.exception_message).to be_present
+              expect(import_failure.correlation_id_value).not_to be_empty
+              expect(import_failure.created_at).to be_present
+            end
+          end
         end
       end
     end

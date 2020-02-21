@@ -61,6 +61,10 @@ describe Gitlab::ImportExport::Group::LegacyTreeRestorer do
         expect(@group.milestones.count).to eq(5)
       end
 
+      it 'has sprints' do
+        expect(@group.sprints.count).to eq(5)
+      end
+
       it 'has group children' do
         expect(@group.children.count).to eq(2)
       end
