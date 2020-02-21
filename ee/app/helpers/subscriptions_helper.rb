@@ -37,7 +37,7 @@ module SubscriptionsHelper
   end
 
   def group_data
-    current_user.free_namespaces.map do |namespace|
+    current_user.managed_free_namespaces.map do |namespace|
       {
         id: namespace.id,
         name: namespace.name,
