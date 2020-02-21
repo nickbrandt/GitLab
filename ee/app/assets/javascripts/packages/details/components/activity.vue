@@ -77,7 +77,9 @@ export default {
         </div>
 
         <div v-if="showDescription" ref="commit-message" class="prepend-top-8 d-none d-sm-block">
-          <pre class="append-bottom-0 border-0 p-0">{{ packagePipeline.git_commit_message }}</pre>
+          <pre class="commit-row-description append-bottom-0 gl-pl-8">{{
+            packagePipeline.git_commit_message
+          }}</pre>
         </div>
       </div>
 

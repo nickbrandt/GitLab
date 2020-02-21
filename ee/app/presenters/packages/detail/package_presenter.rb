@@ -16,7 +16,7 @@ module Packages
           project_id: @package.project_id,
           tags: @package.tags.as_json,
           updated_at: @package.updated_at,
-          version: @package.version,
+          version: @package.version
         }
 
         package_detail[:maven_metadatum] = @package.maven_metadatum if @package.maven_metadatum
