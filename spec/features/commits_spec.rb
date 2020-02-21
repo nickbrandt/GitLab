@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe 'Commits' do
-  let(:project) { create(:project, :repository) }
-  let(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:user) { create(:user) }
 
   describe 'CI' do
     before do
