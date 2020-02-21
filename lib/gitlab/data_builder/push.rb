@@ -94,10 +94,10 @@ module Gitlab
         # Total commits count
         commits_count ||= commits.size
 
-        # Get latest 20 commits ASC
-        commits_limited = commits.last(20)
+        # Get latest 50 commits ASC
+        commits_limited = commits.last(50)
 
-        # For performance purposes maximum 20 latest commits
+        # For performance purposes maximum 50 latest commits
         # will be passed as post receive hook data.
         # n+1: https://gitlab.com/gitlab-org/gitlab-foss/issues/38259
         commit_attrs = commits_limited.map do |commit|
