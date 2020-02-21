@@ -1,5 +1,0 @@
----
-title: Accept group path as ID when fetching notes from API
-merge_request: 23535
-author:
-type: fixed

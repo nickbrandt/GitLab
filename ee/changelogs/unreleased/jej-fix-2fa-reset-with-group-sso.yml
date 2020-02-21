@@ -1,5 +1,0 @@
----
-title: Group SSO handles locked users gracefully instead of showing 500 error
-merge_request: 20329
-author:
-type: fixed
