@@ -248,10 +248,6 @@ describe Gitlab::Ci::Config::Entry::Processable do
     end
 
     describe '#value' do
-      before do
-        entry.compose!
-      end
-
       context 'when entry is correct' do
         let(:config) do
           { stage: 'test' }

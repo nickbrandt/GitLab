@@ -20,12 +20,10 @@ module Gitlab
               validates :when,
                 inclusion: { in: %w[on_success on_failure always],
                               message: 'should be on_success, on_failure or always' }
-              validates :extends, type: String
-              validates :rules, array_of_hashes: true
             end
 
             validate on: :composed do
-              unless trigger.present? || bridge_needs.present?
+              unless trigger_defined? || bridge_needs.present?
                 errors.add(:config, 'should contain either a trigger or a needs:pipeline')
               end
             end
@@ -47,16 +45,13 @@ module Gitlab
             inherit: false,
             metadata: { allowed_needs: %i[job bridge] }
 
-          entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
-            description: 'Pipeline stage this job will be executed into.',
-            inherit: false
-
           entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
             description: 'Environment variables available for this job.',
             inherit: false
 
-          helpers(*ALLOWED_KEYS)
-          attributes(*ALLOWED_KEYS)
+          helpers :trigger, :needs, :variables
+
+          attributes :when, :allow_failure
 
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&
@@ -73,7 +68,7 @@ module Gitlab
               trigger: (trigger_value if trigger_defined?),
               needs: (needs_value if needs_defined?),
               ignore: !!allow_failure,
-              when: when_value,
+              when: self.when,
               variables: (variables_value if variables_defined?),
               scheduling_type: needs_defined? && !bridge_needs ? :dag : :stage
             ).compact

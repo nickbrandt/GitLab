@@ -54,7 +54,7 @@ module Gitlab
                 allowed_when: %w[on_success on_failure always never manual delayed].freeze
               }
 
-            helpers :stage, :only, :except, :rules, :extends
+            helpers :stage, :only, :except, :rules
 
             attributes :extends, :rules
           end
@@ -74,6 +74,8 @@ module Gitlab
                 @entries.delete(:only) unless only_defined? # rubocop:disable Gitlab/ModuleWithInstanceVariables
                 @entries.delete(:except) unless except_defined? # rubocop:disable Gitlab/ModuleWithInstanceVariables
               end
+
+              yield if block_given?
             end
           end
 
@@ -88,8 +90,8 @@ module Gitlab
           def value
             { name: name,
               stage: stage_value,
-              extends: extends_value,
-              rules: (rules_value if has_rules?),
+              extends: extends,
+              rules: rules_value,
               only: only_value,
               except: except_value }.compact
           end

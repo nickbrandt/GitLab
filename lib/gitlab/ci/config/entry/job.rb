@@ -131,7 +131,7 @@ module Gitlab
           helpers :before_script, :script, :type, :after_script,
                   :cache, :image, :services, :variables,
                   :artifacts, :environment, :coverage, :retry,
-                  :parallel, :needs, :interruptible, :release, :tags
+                  :needs, :interruptible, :release, :tags
 
           attributes :script, :tags, :allow_failure, :when, :dependencies,
                      :needs, :retry, :parallel, :start_in,
@@ -176,12 +176,15 @@ module Gitlab
               services: services_value,
               cache: cache_value,
               tags: tags_value,
+              when: self.when,
+              start_in: self.start_in,
+              dependencies: dependencies,
               variables: variables_defined? ? variables_value : {},
               environment: environment_defined? ? environment_value : nil,
               environment_name: environment_defined? ? environment_value[:name] : nil,
               coverage: coverage_defined? ? coverage_value : nil,
               retry: retry_defined? ? retry_value : nil,
-              parallel: parallel_defined? ? parallel_value.to_i : nil,
+              parallel: has_parallel? ? parallel.to_i : nil,
               interruptible: interruptible_defined? ? interruptible_value : nil,
               timeout: has_timeout? ? ChronicDuration.parse(timeout.to_s) : nil,
               artifacts: artifacts_value,
