@@ -13,7 +13,7 @@ module Gitlab
           ALLOWED_WHEN = %w[on_success on_failure always manual delayed].freeze
           ALLOWED_KEYS = %i[tags script type image services
                             allow_failure type when start_in artifacts cache
-                            dependencies before_script needs after_script variables
+                            dependencies before_script needs after_script
                             environment coverage retry parallel interruptible timeout
                             resource_group release].freeze
 
