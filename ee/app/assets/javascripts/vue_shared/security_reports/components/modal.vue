@@ -114,7 +114,9 @@ export default {
     dismissalFeedback() {
       return (
         this.vulnerability &&
-        (this.vulnerability.dismissal_feedback || this.vulnerability.dismissalFeedback)
+        // grouped security reports are populating `dismissalFeedback` and the dashboards `dismissal_feedback`
+        // https://gitlab.com/gitlab-org/gitlab/issues/207489 aims to use the same property in all cases
+        (this.vulnerability.dismissalFeedback || this.vulnerability.dismissal_feedback)
       );
     },
     isEditingExistingFeedback() {
