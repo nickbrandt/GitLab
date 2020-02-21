@@ -3937,7 +3937,6 @@ ActiveRecord::Schema.define(version: 2020_02_21_144534) do
     t.string "encrypted_secret_token", limit: 255
     t.string "encrypted_secret_token_iv", limit: 255
     t.boolean "secret", default: false, null: false
-    t.string "repository_storage", limit: 255, default: "default", null: false
     t.index ["author_id"], name: "index_snippets_on_author_id"
     t.index ["content"], name: "index_snippets_on_content_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["created_at"], name: "index_snippets_on_created_at"
