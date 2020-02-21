@@ -27,7 +27,7 @@ module EE
     def package_from_presenter(package)
       presenter = ::Packages::Detail::PackagePresenter.new(package)
 
-      presenter.detail_view
+      presenter.detail_view.to_json
     end
   end
 end

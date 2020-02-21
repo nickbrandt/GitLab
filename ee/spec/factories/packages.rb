@@ -31,7 +31,10 @@ FactoryBot.define do
 
       trait :with_build do
         after :create do |package|
-          create :package_build_info, package: package, pipeline: create(:ci_build, user: package.project.creator).pipeline
+          user = package.project.creator
+          pipeline = create(:ci_pipeline, user: user)
+          create(:ci_build, user: user, pipeline: pipeline)
+          create :package_build_info, package: package, pipeline: pipeline
         end
       end
     end
