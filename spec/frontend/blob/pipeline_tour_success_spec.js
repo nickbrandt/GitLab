@@ -1,23 +1,40 @@
-import PipelineTourSuccess from '~/blob/pipeline_tour_success';
+import pipelineTourSuccess from '~/blob/pipeline_tour_success_modal.vue';
+import { shallowMount } from '@vue/test-utils';
 import Cookies from 'js-cookie';
+import { GlSprintf, GlModal } from '@gitlab/ui';
 
-describe('PipelineTourSuccess', () => {
-  let pipelineSuccess;
-  const cookieName = 'some_cookie';
+describe('PipelineTourSuccessModal', () => {
+  let wrapper;
+  let cookieSpy;
+  const goToPipelinesPath = 'some_pipeline_path';
+  const commitCookie = 'some_cookie';
 
   beforeEach(() => {
-    setFixtures(`
-      <div class="modal js-success-pipeline-modal" data-commit-cookie="${cookieName}">
-      </div>
-    `);
-    jest.spyOn(Cookies, 'remove');
+    wrapper = shallowMount(pipelineTourSuccess, {
+      propsData: {
+        goToPipelinesPath,
+        commitCookie,
+      },
+    });
 
-    pipelineSuccess = new PipelineTourSuccess();
+    cookieSpy = jest.spyOn(Cookies, 'remove');
   });
 
-  it('launches the modal', () => {
-    pipelineSuccess.disableModalFromRenderingAgain();
+  afterEach(() => {
+    wrapper.destroy();
+  });
 
-    expect(Cookies.remove).toHaveBeenCalledWith(cookieName);
+  it('has expected structure', () => {
+    const modal = wrapper.find(GlModal);
+    const sprintf = modal.find(GlSprintf);
+
+    expect(modal.attributes('title')).toContain("That's it, well done!");
+    expect(sprintf.exists()).toBe(true);
+  });
+
+  it('calls to remove cookie', () => {
+    wrapper.vm.disableModalFromRenderingAgain();
+
+    expect(cookieSpy).toHaveBeenCalledWith(commitCookie);
   });
 });
