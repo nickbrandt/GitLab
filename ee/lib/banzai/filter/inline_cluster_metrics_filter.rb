@@ -3,8 +3,6 @@
 module Banzai
   module Filter
     class InlineClusterMetricsFilter < ::Banzai::Filter::InlineEmbedsFilter
-      include ::Gitlab::Utils::StrongMemoize
-
       def create_element(params)
         doc.document.create_element(
           'div',
@@ -39,7 +37,7 @@ module Banzai
           params[:cluster_id],
           # Only Project clusters are supported for now
           # admin and group cluster types may be supported in the future
-          cluster_type: 'project',
+          cluster_type: :project,
           embedded: true,
           format: :json,
           **query_params(params['url'])

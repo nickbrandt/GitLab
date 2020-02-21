@@ -7,7 +7,7 @@ describe Banzai::Filter::InlineClusterMetricsFilter do
 
   let!(:cluster) { create(:cluster) }
   let!(:project) { create(:project) }
-  let(:params) { [project.path, project.namespace.path, cluster.id] }
+  let(:params) { [project.namespace.path, project.path, cluster.id] }
   let(:query_params) { { group: 'Food metrics', title: 'Pizza Consumption', y_label: 'Slice Count' } }
 
   let(:trigger_url) { urls.metrics_namespace_project_cluster_url(*params, **query_params) }
