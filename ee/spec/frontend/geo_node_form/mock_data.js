@@ -28,6 +28,21 @@ export const MOCK_SYNC_SHARDS = [
   },
 ];
 
+export const MOCK_SYNC_NAMESPACES = [
+  {
+    name: 'Namespace 1',
+    id: 'namespace1',
+  },
+  {
+    name: 'Namespace 2',
+    id: 'namespace2',
+  },
+  {
+    name: 'namespace 3',
+    id: 'Namespace3',
+  },
+];
+
 export const MOCK_NODE = {
   id: 1,
   name: 'Mock Node',
@@ -35,7 +50,7 @@ export const MOCK_NODE = {
   primary: false,
   internalUrl: '',
   selectiveSyncType: '',
-  namespaceIds: [],
+  selectiveSyncNamespaceIds: [],
   selectiveSyncShards: [],
   reposMaxCapacity: 25,
   filesMaxCapacity: 10,
