@@ -11706,6 +11706,9 @@ msgstr ""
 msgid "Lock %{issuableDisplayName}"
 msgstr ""
 
+msgid "Lock membership of this group to LDAP"
+msgstr ""
+
 msgid "Lock memberships to LDAP synchronization"
 msgstr ""
 
