@@ -1,0 +1,5 @@
+---
+title: Fix encoding bug in k8s logs service
+merge_request: 25373
+author:
+type: fixed
