@@ -3,9 +3,10 @@
     .form-holder
       - if ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap
         .form-group.row
-          .col-sm-10
+          .col-sm-8
             .form-check
               = check_box_tag :lock_membership_to_ldap, :group, true, class: 'form-check-input'
               = label_tag :lock_membership_to_ldap, class: 'form-check-label' do
                 = _('Lock membership of this group to LDAP')
+          .col-sm-2
             = f.submit _('Save'), class: 'btn btn-success qa-save'
