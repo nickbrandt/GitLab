@@ -12381,6 +12381,9 @@ msgstr ""
 msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
+msgid "Metrics|Reload this page"
+msgstr ""
+
 msgid "Metrics|Show last"
 msgstr ""
 
