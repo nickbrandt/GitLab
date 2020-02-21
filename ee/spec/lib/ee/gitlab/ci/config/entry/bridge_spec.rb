@@ -67,6 +67,7 @@ describe Gitlab::Ci::Config::Entry::Bridge do
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] },
+                                      variables: {},
                                       scheduling_type: :dag)
         end
       end

@@ -14,7 +14,7 @@ module Gitlab
           include ::Gitlab::Config::Entry::Attributable
           include ::Gitlab::Config::Entry::Inheritable
 
-          PROCESSABLE_ALLOWED_KEYS = %i[extends stage only except rules].freeze
+          PROCESSABLE_ALLOWED_KEYS = %i[extends stage only except rules variables].freeze
 
           included do
             validations do
@@ -54,6 +54,10 @@ module Gitlab
                 allowed_when: %w[on_success on_failure always never manual delayed].freeze
               }
 
+            entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
+              description: 'Environment variables available for this job.',
+              inherit: false
+
             attributes :extends, :rules
           end
 
@@ -90,6 +94,7 @@ module Gitlab
               stage: stage_value,
               extends: extends,
               rules: rules_value,
+              variables: variables_defined? ? variables_value : {},
               only: only_value,
               except: except_value }.compact
           end
