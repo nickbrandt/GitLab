@@ -14,12 +14,13 @@ describe LabelsHelper do
       end
 
       it 'includes link to scoped labels documentation' do
-        scoped = scoped_label.title.split('::')
-        expect(render_label(scoped_label)).to match(%r(<span.+><span.+><span.+>#{scoped.first}</span><span.+>#{scoped.last}</span><a.+>.*question-circle.*</a></span></span>$))
+        scope, name = scoped_label.title.split(Label::SCOPED_LABEL_SEPARATOR)
+
+        expect(render_label(scoped_label)).to match(%r(<span.+>#{scope}</span><span.+>#{name}</span><a.+>.*question-circle.*</a>)m)
       end
 
       it 'does not include link to scoped label documentation for common labels' do
-        expect(render_label(label)).to match(%r(<span.+><span.+>#{label.name}</span></span>$))
+        expect(render_label(label)).to match(%r(<span.+><span.+>#{label.name}</span></span>$)m)
       end
     end
 
@@ -29,7 +30,7 @@ describe LabelsHelper do
       end
 
       it 'does not include link to scoped documentation' do
-        expect(render_label(scoped_label)).to match(%r(<span.+><span.+>#{scoped_label.name}</span></span>$))
+        expect(render_label(scoped_label)).to match(%r(<span.+><span.+>#{scoped_label.name}</span></span>$)m)
       end
     end
   end

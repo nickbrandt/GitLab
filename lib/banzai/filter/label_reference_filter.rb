@@ -93,14 +93,12 @@ module Banzai
         end
 
         presenter = object.present(issuable_subject: parent)
-        LabelsHelper.render_colored_label(presenter, label_suffix: label_suffix)
+        LabelsHelper.render_colored_label(presenter, suffix: label_suffix)
       end
 
       def wrap_link(link, label)
-        content = super
-        content = %(<span class="gl-label gl-label-sm">#{content}</span>)
-
-        content
+        presenter = label.present(issuable_subject: project || group)
+        LabelsHelper.wrap_label_html(link, small: true, label: presenter)
       end
 
       def full_path_ref?(matches)
@@ -112,10 +110,9 @@ module Banzai
       end
 
       def object_link_title(object, matches)
-        LabelsHelper.label_tooltip_title(object)
+        presenter = object.present(issuable_subject: project || group)
+        LabelsHelper.label_tooltip_title(presenter)
       end
     end
   end
 end
-
-Banzai::Filter::LabelReferenceFilter.prepend_if_ee('EE::Banzai::Filter::LabelReferenceFilter')

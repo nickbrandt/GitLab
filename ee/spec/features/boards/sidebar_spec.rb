@@ -263,8 +263,8 @@ describe 'Issue Boards', :js do
     end
 
     it 'removes existing scoped label' do
-      scoped1 = scoped_label_1.title.split('::')
-      scoped2 = scoped_label_2.title.split('::')
+      scoped1 = scoped_label_1.title.split(Label::SCOPED_LABEL_SEPARATOR)
+      scoped2 = scoped_label_2.title.split(Label::SCOPED_LABEL_SEPARATOR)
 
       click_card(card1)
 
