@@ -930,11 +930,11 @@ module EE
               end
             end
             expose :review_time do |mr|
-              next unless mr.metrics.first_comment_at
+              time = mr.metrics.review_time
 
-              review_time = (mr.metrics.merged_at || Time.now) - mr.metrics.first_comment_at
+              next unless time
 
-              (review_time / ActiveSupport::Duration::SECONDS_PER_HOUR).floor
+              (time / ActiveSupport::Duration::SECONDS_PER_HOUR).floor
             end
             expose :diff_stats
 
