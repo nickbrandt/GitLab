@@ -56,6 +56,14 @@ module Gitlab
         Project.__elasticsearch__.version(version).delete_index!
       end
 
+      def self.index_exists?(version = ::Elastic::MultiVersionUtil::TARGET_VERSION)
+        proxy = Project.__elasticsearch__.version(version)
+        client = proxy.client
+        index_name = proxy.index_name
+
+        client.indices.exists? index: index_name # rubocop:disable CodeReuse/ActiveRecord
+      end
+
       # Calls Elasticsearch refresh API to ensure data is searchable
       # immediately.
       # https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
