@@ -116,6 +116,22 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       expect(bridge.reload).to be_success
     end
 
+    context 'when bridge job has already any downstream pipelines' do
+      before do
+        bridge.sourced_pipelines.create!(
+          source_pipeline: bridge.pipeline,
+          source_project: bridge.project,
+          project: bridge.project,
+          pipeline: create(:ci_pipeline, project: bridge.project)
+        )
+      end
+
+      it 'does nothing' do
+        expect(Ci::CreatePipelineService).not_to receive(:new)
+        expect(service.execute(bridge)).to be_nil
+      end
+    end
+
     context 'when target ref is not specified' do
       let(:trigger) do
         { trigger: { project: downstream_project.full_path } }

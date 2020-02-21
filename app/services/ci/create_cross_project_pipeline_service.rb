@@ -7,6 +7,7 @@ module Ci
 
     def execute(bridge)
       @bridge = bridge
+      return if bridge.has_downstream_pipeline?
 
       pipeline_params = @bridge.downstream_pipeline_params
       target_ref = pipeline_params.dig(:target_revision, :ref)
