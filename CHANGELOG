@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.23.0
+
+- Don't set Cache-Control header for git archives !462
+
 v 8.22.0
 
 - Bump the version of golang.org/x/sys !456
