@@ -7,7 +7,8 @@ module EE
 
     # Builds the @details attribute for member
     #
-    # @param member [Member] the member whom is changed
+    # @param [Member] member object being audited
+    #
     # @return [AuditEventService]
     def for_member(member)
       action = @details[:action]
@@ -66,7 +67,7 @@ module EE
     # This expects [String] :action of :destroy, :create, :update to be
     #   specified in @details attribute
     #
-    # @param group_link [ProjectGroupLink] the project group link being changed
+    # @param [ProjectGroupLink] group_link object being audited
     #
     # @return [AuditEventService]
     def for_project_group_link(group_link)
@@ -129,8 +130,8 @@ module EE
 
     # Creates an event record in DB
     #
-    # @return [nil] if audit events is not enabled
-    # @return [SecurityEvent] if record is persisted
+    # @return [SecurityEvent, nil] if record is persisted or nil if audit events
+    #   features are not enabled
     def unauth_security_event
       return unless audit_events_enabled?
 
@@ -147,11 +148,11 @@ module EE
 
     # Builds the @details attribute for user
     #
-    # This uses the [User] @entity as the target object being changed
+    # This uses the [User] @entity as the target object being audited
     #
-    # @param full_path [String] required if it is different from the User model
-    #   in @entity. This is for backward compatability and this parameter will
-    #   be dropped after all of these incorrect usages are removed.
+    # @param [String] full_path required if it is different from the User model
+    #   in @entity. This is for backward compatability and will be dropped after
+    #   all of these incorrect usages are removed.
     #
     # @return [AuditEventService]
     def for_user(full_path = @entity.full_path)
@@ -160,7 +161,7 @@ module EE
 
     # Builds the @details attribute for project
     #
-    # This uses the [Project] @entity as the target object being changed
+    # This uses the [Project] @entity as the target object being audited
     #
     # @return [AuditEventService]
     def for_project
@@ -169,7 +170,7 @@ module EE
 
     # Builds the @details attribute for group
     #
-    # This uses the [Group] @entity as the target object being changed
+    # This uses the [Group] @entity as the target object being audited
     #
     # @return [AuditEventService]
     def for_group
