@@ -136,25 +136,23 @@ module Backup
             exit 1
           end
 
+        # check for existing backups in the backup dir
+        elsif File.exist?(File.join(backup_path, 'backup_information.yml'))
+          progress.puts "Non tarred backup found in #{backup_path}, using that"
+          break false
+        elsif backup_file_list.empty?
+          progress.puts "No backups found in #{backup_path}"
+          progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
+          exit 1
+        elsif backup_file_list.many?
+          progress.puts 'Found more than one backup:'
+          # print list of available backups
+          progress.puts " " + available_timestamps.join("\n ")
+          progress.puts 'Please specify which one you want to restore:'
+          progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
+          exit 1
         else
-          # check for existing backups in the backup dir
-          if File.exist?(File.join(backup_path, 'backup_information.yml'))
-            progress.puts "Non tarred backup found in #{backup_path}, using that"
-            return false
-          elsif backup_file_list.empty?
-            progress.puts "No backups found in #{backup_path}"
-            progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
-            exit 1
-          elsif backup_file_list.many?
-            progress.puts 'Found more than one backup:'
-            # print list of available backups
-            progress.puts " " + available_timestamps.join("\n ")
-            progress.puts 'Please specify which one you want to restore:'
-            progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
-            exit 1
-          else
-            tar_file = backup_file_list.first
-          end
+          tar_file = backup_file_list.first
         end
 
         progress.print 'Unpacking backup ... '
