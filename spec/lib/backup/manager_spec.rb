@@ -292,6 +292,22 @@ describe Backup::Manager do
         expect(progress).to have_received(:puts).with(a_string_matching('done'))
       end
     end
+
+    context 'when the is a non-tarred backup in the directory' do
+      before do
+        allow(Dir).to receieve(:glob).and_return(
+          [
+            'backup_information.yml'
+          ]
+        )
+
+        it 'selects the non-tarred backup to restore from' do
+          expect { subject.unpack }.to output.to_stdout
+          expect(progress).to have_received(:puts)
+            .with(a_string_matching('Non tarred backup found '))
+        end
+      end
+    end
   end
 
   describe '#upload' do
