@@ -1003,7 +1003,7 @@ describe API::Groups do
 
       it "uploads avatar for a group" do
         group = attributes_for_group_api request_access_enabled: false
-        group.merge!(avatar: fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif'))
+        group[:avatar] = fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif')
 
         post api("/groups", user3), params: group
 
