@@ -1,61 +1,115 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
-import { GlSkeletonLoading } from '@gitlab/ui';
+import { mapActions, mapState } from 'vuex';
+import _ from 'underscore';
+import tooltip from '~/vue_shared/directives/tooltip';
+import Icon from '~/vue_shared/components/icon.vue';
 import IdeTree from './ide_tree.vue';
-import ResizablePanel from './resizable_panel.vue';
-import ActivityBar from './activity_bar.vue';
 import RepoCommitSection from './repo_commit_section.vue';
-import CommitForm from './commit_sidebar/form.vue';
 import IdeReview from './ide_review.vue';
 import SuccessMessage from './commit_sidebar/success_message.vue';
 import IdeProjectHeader from './ide_project_header.vue';
-import { leftSidebarViews } from '../constants';
+import $ from 'jquery';
 
 export default {
   components: {
-    GlSkeletonLoading,
-    ResizablePanel,
-    ActivityBar,
+    Icon,
     RepoCommitSection,
     IdeTree,
-    CommitForm,
     IdeReview,
     SuccessMessage,
     IdeProjectHeader,
   },
+  directives: {
+    tooltip,
+  },
+  props: {
+    tabs: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+  },
   computed: {
-    ...mapState(['loading', 'currentActivityView', 'changedFiles', 'stagedFiles', 'lastCommitMsg']),
-    ...mapGetters(['currentProject', 'someUncommittedChanges']),
-    showSuccessMessage() {
-      return (
-        this.currentActivityView === leftSidebarViews.edit.name &&
-        (this.lastCommitMsg && !this.someUncommittedChanges)
-      );
+    ...mapState(['currentActivityView']),
+    shownTabs() {
+      return this.tabs.filter(tab => tab.show);
+    },
+    tabViews() {
+      return _.flatten(this.tabs.map(tab => tab.views));
+    },
+    aliveTabViews() {
+      return this.tabViews.filter(view => this.isAliveView(view.name));
+    },
+  },
+  methods: {
+    ...mapActions(['updateActivityBarView']),
+    buttonClasses(tab) {
+      return [this.isActiveTab(tab) ? 'active' : '', ...(tab.buttonClasses || [])];
+    },
+    clickTab(e, tab) {
+      // TODO: These do not work, you must use JQuery and currentTarget
+      // e.target.blur();
+      // e.target.tooltip('hide');
+      $(e.currentTarget).tooltip('hide');
+      $(e.currentTarget).blur();
+
+      this.updateActivityBarView(tab.views[0].name);
+    },
+    isActiveTab(tab) {
+      return tab.views.some(view => this.isActiveView(view.name));
+    },
+    isAliveView(viewName) {
+      // This will be replaced with a mapping to the isAliveView getter when this template is
+      // refactored to use collapsible_sidebar.vue
+      return this.currentActivityView === viewName;
+    },
+    isActiveView(viewName) {
+      // This will be replaced with a mapping to the isActiveView getter when this template is
+      // refactored to use collapsible_sidebar.vue
+      return this.currentActivityView === viewName;
     },
   },
 };
 </script>
 
 <template>
-  <resizable-panel :collapsible="false" :initial-width="340" side="left" class="flex-column">
-    <template v-if="loading">
-      <div class="multi-file-commit-panel-inner">
-        <div v-for="n in 3" :key="n" class="multi-file-loading-container">
-          <gl-skeleton-loading />
-        </div>
+  <div
+    data-qa-selector="ide_left_sidebar"
+    class="multi-file-commit-panel ide-sidebar ide-left-sidebar flex-row-reverse min-height-0"
+  >
+    <div
+      class="multi-file-commit-panel-inner d-flex flex-column align-items-stretch h-100 w-100 min-height-0"
+    >
+      <div
+        v-for="tabView in aliveTabViews"
+        v-show="isActiveView(tabView.name)"
+        :key="tabView.name"
+        :class="{ 'd-flex': isActiveView(tabView.name) }"
+        class="js-tab-view flex-fill overflow-hidden min-height-0"
+      >
+        <component :is="tabView.component" />
       </div>
-    </template>
-    <template v-else>
-      <ide-project-header :project="currentProject" />
-      <div class="ide-context-body d-flex flex-fill">
-        <activity-bar />
-        <div class="multi-file-commit-panel-inner">
-          <div class="multi-file-commit-panel-inner-content">
-            <component :is="currentActivityView" />
-          </div>
-          <commit-form />
-        </div>
-      </div>
-    </template>
-  </resizable-panel>
+      <slot name="footer"></slot>
+    </div>
+    <nav class="ide-activity-bar">
+      <ul class="list-unstyled">
+        <li v-for="tab of shownTabs" :key="tab.title">
+          <button
+            v-tooltip
+            :title="tab.title"
+            :aria-label="tab.title"
+            :class="buttonClasses(tab)"
+            data-container="body"
+            data-placement="right"
+            :data-qa-selector="`${tab.title.toLowerCase()}_tab_button`"
+            class="ide-sidebar-link"
+            type="button"
+            @click.prevent="clickTab($event, tab)"
+          >
+            <icon :size="16" :name="tab.icon" />
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </template>

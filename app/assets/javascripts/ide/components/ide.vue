@@ -5,10 +5,10 @@ import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import FindFile from '~/vue_shared/components/file_finder/index.vue';
 import NewModal from './new_dropdown/modal.vue';
-import IdeSidebar from './ide_side_bar.vue';
 import RepoTabs from './repo_tabs.vue';
 import IdeStatusBar from './ide_status_bar.vue';
 import RepoEditor from './repo_editor.vue';
+import LeftPane from './panes/left.vue';
 import RightPane from './panes/right.vue';
 import ErrorMessage from './error_message.vue';
 import CommitEditorHeader from './commit_sidebar/editor_header.vue';
@@ -16,7 +16,7 @@ import CommitEditorHeader from './commit_sidebar/editor_header.vue';
 export default {
   components: {
     NewModal,
-    IdeSidebar,
+    LeftPane,
     RepoTabs,
     IdeStatusBar,
     RepoEditor,
@@ -88,7 +88,7 @@ export default {
         @toggle="toggleFileFinder"
         @click="openFile"
       />
-      <ide-sidebar />
+      <left-pane />
       <div class="multi-file-edit-pane">
         <template v-if="activeFile">
           <commit-editor-header v-if="isCommitModeActive" :active-file="activeFile" />
