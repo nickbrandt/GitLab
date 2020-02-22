@@ -9,6 +9,11 @@ describe('ImageDiffViewer', () => {
     newPath: GREEN_BOX_IMAGE_URL,
     oldPath: RED_BOX_IMAGE_URL,
   };
+  const allProps = {
+    ...requiredProps,
+    oldSize: 2048,
+    newSize: 1024,
+  };
   let vm;
 
   function createComponent(props) {
@@ -50,9 +55,11 @@ describe('ImageDiffViewer', () => {
   });
 
   it('renders image diff for replaced', done => {
-    createComponent(requiredProps);
+    createComponent({ ...allProps });
 
     setTimeout(() => {
+      const metaInfoElements = vm.$el.querySelectorAll('.image-info');
+
       expect(vm.$el.querySelector('.added img').getAttribute('src')).toBe(GREEN_BOX_IMAGE_URL);
 
       expect(vm.$el.querySelector('.deleted img').getAttribute('src')).toBe(RED_BOX_IMAGE_URL);
@@ -66,35 +73,35 @@ describe('ImageDiffViewer', () => {
         'Onion skin',
       );
 
+      expect(metaInfoElements.length).toBe(2);
+      expect(metaInfoElements[0]).toHaveText('2.00 KiB');
+      expect(metaInfoElements[1]).toHaveText('1.00 KiB');
+
       done();
     });
   });
 
   it('renders image diff for new', done => {
-    createComponent(
-      Object.assign({}, requiredProps, {
-        diffMode: 'new',
-        oldPath: '',
-      }),
-    );
+    createComponent({ ...allProps, diffMode: 'new', oldPath: '' });
 
     setTimeout(() => {
+      const metaInfoElement = vm.$el.querySelector('.image-info');
+
       expect(vm.$el.querySelector('.added img').getAttribute('src')).toBe(GREEN_BOX_IMAGE_URL);
+      expect(metaInfoElement).toHaveText('1.00 KiB');
 
       done();
     });
   });
 
   it('renders image diff for deleted', done => {
-    createComponent(
-      Object.assign({}, requiredProps, {
-        diffMode: 'deleted',
-        newPath: '',
-      }),
-    );
+    createComponent({ ...allProps, diffMode: 'deleted', newPath: '' });
 
     setTimeout(() => {
+      const metaInfoElement = vm.$el.querySelector('.image-info');
+
       expect(vm.$el.querySelector('.deleted img').getAttribute('src')).toBe(RED_BOX_IMAGE_URL);
+      expect(metaInfoElement).toHaveText('2.00 KiB');
 
       done();
     });
@@ -105,16 +112,30 @@ describe('ImageDiffViewer', () => {
       components: {
         imageDiffViewer,
       },
+      data: {
+        ...allProps,
+        diffMode: 'renamed',
+      },
       template: `
-        <image-diff-viewer diff-mode="renamed" new-path="${GREEN_BOX_IMAGE_URL}" old-path="">
+        <image-diff-viewer
+          :diff-mode="diffMode"
+          :new-path="newPath"
+          :old-path="oldPath"
+          :new-size="newSize"
+          :old-size="oldSize"
+        >
           <span slot="image-overlay" class="overlay">test</span>
         </image-diff-viewer>
       `,
     }).$mount();
 
     setTimeout(() => {
+      const metaInfoElement = vm.$el.querySelector('.image-info');
+
       expect(vm.$el.querySelector('img').getAttribute('src')).toBe(GREEN_BOX_IMAGE_URL);
       expect(vm.$el.querySelector('.overlay')).not.toBe(null);
+
+      expect(metaInfoElement).toHaveText('2.00 KiB');
 
       done();
     });
@@ -122,7 +143,7 @@ describe('ImageDiffViewer', () => {
 
   describe('swipeMode', () => {
     beforeEach(done => {
-      createComponent(requiredProps);
+      createComponent({ ...requiredProps });
 
       setTimeout(() => {
         done();
@@ -141,7 +162,7 @@ describe('ImageDiffViewer', () => {
 
   describe('onionSkin', () => {
     beforeEach(done => {
-      createComponent(requiredProps);
+      createComponent({ ...requiredProps });
 
       setTimeout(() => {
         done();
