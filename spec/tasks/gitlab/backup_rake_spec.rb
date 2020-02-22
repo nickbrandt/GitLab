@@ -241,7 +241,7 @@ describe 'gitlab:app namespace rake task' do
         )
 
         expect(exit_status).to eq(0)
-        expect(tar_contents).to match('db/')
+        expect(tar_contents).to match('db')
         expect(tar_contents).to match('uploads.tar.gz')
         expect(tar_contents).to match('repositories/')
         expect(tar_contents).to match('builds.tar.gz')
