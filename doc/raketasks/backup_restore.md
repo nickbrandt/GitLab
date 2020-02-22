@@ -279,10 +279,10 @@ backup software) creating a `.tar` file might be wasted effort or even directly
 harmful, so you can skip this step by adding `tar` to the `SKIP` environment
 variable.
 
-Including `tar` in the `SKIP` variable will leave the files and directories
-containing the backup in the directory used for the intermediate files. These
-files will be overwritten when a new backup is created, so you should make sure
-it's copied elsewhere, because you can only have one backup on the system.
+Adding `tar` to the `SKIP` variable leaves the files and directories containing the
+backup in the directory used for the intermediate files. These files will be
+overwritten when a new backup is created, so you should make sure they are copied
+elsewhere, because you can only have one backup on the system.
 
 For Omnibus GitLab packages:
 
