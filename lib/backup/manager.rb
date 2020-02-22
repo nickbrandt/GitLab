@@ -125,7 +125,6 @@ module Backup
       end
     end
 
-    # rubocop: disable Cop/AvoidReturnFromBlocks
     def unpack
       Dir.chdir(backup_path) do
         if ENV['BACKUP'].present?
@@ -166,7 +165,6 @@ module Backup
       end
       true
     end
-    # rubocop: enable Cop/AvoidReturnFromBlocks
 
     def tar_version
       tar_version, _ = Gitlab::Popen.popen(%w(tar --version))
