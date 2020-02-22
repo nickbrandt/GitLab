@@ -570,6 +570,19 @@ describe API::Groups do
         expect(json_response['default_branch_protection']).to eq(::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
       end
 
+      it 'updates avatar' do
+        group_param = {
+          avatar: fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif')
+        }
+
+        put api("/groups/#{group1.id}", user1), params: group_param
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
+                                                  '-/system/group/avatar/'\
+                                                  "#{group1.id}/banana_sample.gif")
+      end
+
       it 'returns 404 for a non existing group' do
         put api('/groups/1328', user1), params: { name: new_group_name }
 
@@ -986,6 +999,18 @@ describe API::Groups do
         expect(json_response["path"]).to eq(group[:path])
         expect(json_response["request_access_enabled"]).to eq(group[:request_access_enabled])
         expect(json_response["visibility"]).to eq(Gitlab::VisibilityLevel.string_level(Gitlab::CurrentSettings.current_application_settings.default_group_visibility))
+      end
+
+      it "uploads avatar for a group" do
+        group = attributes_for_group_api request_access_enabled: false
+        group.merge!(avatar: fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif'))
+
+        post api("/groups", user3), params: group
+
+        group_id = json_response['id']
+        expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
+                                                  '-/system/group/avatar/'\
+                                                  "#{group_id}/banana_sample.gif")
       end
 
       it "creates a nested group" do
