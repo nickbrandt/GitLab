@@ -36,7 +36,7 @@ module AuthHelper
   end
 
   def icon_for_provider(name)
-    Gitlab::OAuth::Provider.icon_for(name)
+    Gitlab::Auth::OAuth::Provider.icon_for(name)
   end
 
   def form_based_provider_priority
