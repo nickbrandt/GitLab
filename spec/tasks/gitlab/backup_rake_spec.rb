@@ -28,12 +28,24 @@ describe 'gitlab:app namespace rake task' do
   before do
     stub_env('force', 'yes')
     FileUtils.rm(tars_glob, force: true)
+    FileUtils.rm('artifacts.tar.gz', force: true)
+    FileUtils.rm('builds.tar.gz', force: true)
+    FileUtils.rm('lfs.tar.gz', force: true)
+    FileUtils.rm('pages.tar.gz', force: true)
+    FileUtils.rm_rf('db', secure: true)
+    FileUtils.rm_rf('repositories', secure: true)
     reenable_backup_sub_tasks
     stub_container_registry_config(enabled: enable_registry)
   end
 
   after do
     FileUtils.rm(tars_glob, force: true)
+    FileUtils.rm('artifacts.tar.gz', force: true)
+    FileUtils.rm('builds.tar.gz', force: true)
+    FileUtils.rm('lfs.tar.gz', force: true)
+    FileUtils.rm('pages.tar.gz', force: true)
+    FileUtils.rm_rf('db', secure: true)
+    FileUtils.rm_rf('repositories', secure: true)
   end
 
   def run_rake_task(task_name)
@@ -61,15 +73,6 @@ describe 'gitlab:app namespace rake task' do
       end
 
       let(:gitlab_version) { Gitlab::VERSION }
-
-      it 'fails on mismatch' do
-        allow(YAML).to receive(:load_file)
-          .and_return({ gitlab_version: "not #{gitlab_version}" })
-
-        expect do
-          expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
-        end.to raise_error(SystemExit)
-      end
 
       context 'restore with matching gitlab version' do
         before do
@@ -376,6 +379,49 @@ describe 'gitlab:app namespace rake task' do
       expect(Rake::Task['gitlab:backup:registry:restore']).to receive :invoke
       expect(Rake::Task['gitlab:shell:setup']).to receive :invoke
       expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+    end
+  end
+
+  describe 'Skipping tar archive creation' do
+    before do
+      stub_env('SKIP', 'tar')
+    end
+
+    it 'created files with backup content and no tar archive' do
+      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+
+      dir_contents, _exit_status = Gitlab::Popen.popen(
+        %W{ls -la #{Gitlab.config.backup.path}}
+      )
+
+      expect(dir_contents).to match('backup_information.yml')
+      expect(dir_contents).to match('db')
+      expect(dir_contents).to match('uploads.tar.gz')
+      expect(dir_contents).to match('builds.tar.gz')
+      expect(dir_contents).to match('artifacts.tar.gz')
+      expect(dir_contents).to match('lfs.tar.gz')
+      expect(dir_contents).to match('pages.tar.gz')
+      expect(dir_contents).to match('registry.tar.gz')
+      expect(dir_contents).not_to match("_gitlab_backup.tar")
+    end
+
+    it 'those component files can be restored from' do
+      expect { run_rake_task("gitlab:backup:create") }.to output.to_stdout
+
+      allow(Rake::Task['gitlab:shell:setup'])
+        .to receive(:invoke).and_return(true)
+
+      expect(Rake::Task['gitlab:db:drop_tables']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:db:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:repo:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:uploads:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:builds:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:artifacts:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:pages:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:lfs:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:backup:registry:restore']).to receive :invoke
+      expect(Rake::Task['gitlab:shell:setup']).to receive :invoke
+      expect { run_rake_task("gitlab:backup:restore") }.to output.to_stdout
     end
   end
 
