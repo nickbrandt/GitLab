@@ -4988,20 +4988,6 @@
               "deprecationReason": null
             },
             {
-              "name": "descendantWeightSum",
-              "description": "Total weight of open and closed descendant epic's issues",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "EpicDescendantWeights",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "description",
               "description": "Description of the epic",
               "args": [
@@ -13079,47 +13065,6 @@
             {
               "name": "openedIssues",
               "description": "Number of opened epic issues",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [
-
-          ],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "EpicDescendantWeights",
-          "description": "Total weight of open and closed descendant issues",
-          "fields": [
-            {
-              "name": "closedIssues",
-              "description": "Total weight of completed (closed) issues in this epic, including epic descendants",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "openedIssues",
-              "description": "Total weight of opened issues in this epic, including epic descendants",
               "args": [
 
               ],

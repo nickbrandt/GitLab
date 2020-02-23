@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Epics::LazyEpicAggregate do
+  include_context 'includes EpicAggregate constants'
+
   let(:query_ctx) do
     {}
   end
@@ -40,7 +42,7 @@ describe Epics::LazyEpicAggregate do
 
   describe '#epic_aggregate' do
     let(:single_record) do
-      { iid: 6, issues_count: 4, issues_weight_sum: 9, parent_id: nil, issues_state_id: Constants::OPENED_ISSUE_STATE, epic_state_id: Constants::OPENED_EPIC_STATE }
+      { iid: 6, issues_count: 4, issues_weight_sum: 9, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE, epic_state_id: OPENED_EPIC_STATE }
     end
     let(:epic_info_node) { Epics::EpicNode.new(epic_id, [single_record] ) }
 
@@ -70,9 +72,9 @@ describe Epics::LazyEpicAggregate do
       end
       let(:fake_data) do
         {
-            epic_id => [{ epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 2, issues_weight_sum: 5, parent_id: nil, issues_state_id: Constants::OPENED_ISSUE_STATE }],
-            child_epic_id => [{ epic_state_id: Constants::CLOSED_EPIC_STATE, issues_count: 4, issues_weight_sum: 17, parent_id: epic_id, issues_state_id: Constants::CLOSED_ISSUE_STATE }],
-            other_epic_id => [{ epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 0, issues_weight_sum: 0, parent_id: nil, issues_state_id: nil }] # represents an epic with no parent and no issues
+            epic_id => [{ epic_state_id: OPENED_EPIC_STATE, issues_count: 2, issues_weight_sum: 5, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE }],
+            child_epic_id => [{ epic_state_id: CLOSED_EPIC_STATE, issues_count: 4, issues_weight_sum: 17, parent_id: epic_id, issues_state_id: CLOSED_ISSUE_STATE }],
+            other_epic_id => [{ epic_state_id: OPENED_EPIC_STATE, issues_count: 0, issues_weight_sum: 0, parent_id: nil, issues_state_id: nil }] # represents an epic with no parent and no issues
         }
       end
 
@@ -106,12 +108,12 @@ describe Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[epic_id]).to have_direct_sum(Constants::EPIC_TYPE, Constants::COUNT, Constants::CLOSED_EPIC_STATE, 1)
-          expect(tree[epic_id]).to have_direct_sum(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_direct_sum(Constants::EPIC_TYPE, Constants::COUNT, Constants::CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_direct_sum(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_direct_sum(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
 
-          expect(tree[child_epic_id]).to have_direct_sum(Constants::ISSUE_TYPE, Constants::COUNT, Constants::CLOSED_ISSUE_STATE, 4)
-          expect(tree[child_epic_id]).to have_direct_sum(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::CLOSED_ISSUE_STATE, 17)
+          expect(tree[child_epic_id]).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
+          expect(tree[child_epic_id]).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
         end
 
         it 'assembles recursive sums for the parent', :aggregate_failures do
@@ -120,11 +122,11 @@ describe Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[epic_id]).to have_aggregate(Constants::ISSUE_TYPE, Constants::COUNT, Constants::OPENED_ISSUE_STATE, 2)
-          expect(tree[epic_id]).to have_aggregate(Constants::ISSUE_TYPE, Constants::COUNT, Constants::CLOSED_ISSUE_STATE, 4)
-          expect(tree[epic_id]).to have_aggregate(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_aggregate(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::CLOSED_ISSUE_STATE, 17)
-          expect(tree[epic_id]).to have_aggregate(Constants::EPIC_TYPE, Constants::COUNT, Constants::CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 2)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
+          expect(tree[epic_id]).to have_aggregate(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
         end
       end
 

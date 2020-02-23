@@ -3,14 +3,16 @@
 require 'spec_helper'
 
 describe Epics::EpicNode do
+  include_context 'includes EpicAggregate constants'
+
   let(:epic_id) { 34 }
   let(:epic_iid) { 5 }
 
   describe '#initialize' do
     let(:fake_data) do
       [
-          { iid: epic_iid, epic_state_id: epic_state_id, issues_count: 1, issues_weight_sum: 2, parent_id: parent_id, issues_state_id: Constants::OPENED_ISSUE_STATE },
-          { iid: epic_iid, epic_state_id: epic_state_id, issues_count: 2, issues_weight_sum: 2, parent_id: parent_id, issues_state_id: Constants::CLOSED_ISSUE_STATE }
+          { iid: epic_iid, epic_state_id: epic_state_id, issues_count: 1, issues_weight_sum: 2, parent_id: parent_id, issues_state_id: OPENED_ISSUE_STATE },
+          { iid: epic_iid, epic_state_id: epic_state_id, issues_count: 2, issues_weight_sum: 2, parent_id: parent_id, issues_state_id: CLOSED_ISSUE_STATE }
       ]
     end
 
@@ -25,8 +27,8 @@ describe Epics::EpicNode do
       end
     end
 
-    it_behaves_like 'setting attributes based on the first record', { epic_state_id: Constants::OPENED_EPIC_STATE, parent_id: nil }
-    it_behaves_like 'setting attributes based on the first record', { epic_state_id: Constants::CLOSED_EPIC_STATE, parent_id: 2 }
+    it_behaves_like 'setting attributes based on the first record', { epic_state_id: OPENED_EPIC_STATE, parent_id: nil }
+    it_behaves_like 'setting attributes based on the first record', { epic_state_id: CLOSED_EPIC_STATE, parent_id: 2 }
   end
 
   describe '#assemble_issue_sums' do
@@ -35,7 +37,7 @@ describe Epics::EpicNode do
     context 'an epic with no issues' do
       let(:fake_data) do
         [
-            { iid: epic_iid, epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 0, issues_weight_sum: 0, parent_id: nil, issues_state_id: nil }
+            { iid: epic_iid, epic_state_id: OPENED_EPIC_STATE, issues_count: 0, issues_weight_sum: 0, parent_id: nil, issues_state_id: nil }
         ]
       end
 
@@ -50,7 +52,7 @@ describe Epics::EpicNode do
       context 'with a nonzero count but a zero weight' do
         let(:fake_data) do
           [
-              { iid: epic_iid, epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 0, parent_id: nil, issues_state_id: Constants::OPENED_ISSUE_STATE }
+              { iid: epic_iid, epic_state_id: OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 0, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE }
           ]
         end
 
@@ -58,14 +60,14 @@ describe Epics::EpicNode do
           subject.assemble_issue_sums
 
           expect(subject.direct_sums.count).to eq 1
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::COUNT, Constants::OPENED_ISSUE_STATE, 1)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
         end
       end
 
       context 'with a nonzero count and nonzero weight for a single state' do
         let(:fake_data) do
           [
-              { iid: epic_iid, epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 2, parent_id: nil, issues_state_id: Constants::OPENED_ISSUE_STATE }
+              { iid: epic_iid, epic_state_id: OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 2, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE }
           ]
         end
 
@@ -73,16 +75,16 @@ describe Epics::EpicNode do
           subject.assemble_issue_sums
 
           expect(subject.direct_sums.count).to eq 2
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::COUNT, Constants::OPENED_ISSUE_STATE, 1)
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::OPENED_ISSUE_STATE, 2)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
         end
       end
 
       context 'with a nonzero count and nonzero weight for multiple states' do
         let(:fake_data) do
           [
-              { iid: epic_iid, epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 2, parent_id: nil, issues_state_id: Constants::OPENED_ISSUE_STATE },
-              { iid: epic_iid, epic_state_id: Constants::OPENED_EPIC_STATE, issues_count: 3, issues_weight_sum: 5, parent_id: nil, issues_state_id: Constants::CLOSED_ISSUE_STATE }
+              { iid: epic_iid, epic_state_id: OPENED_EPIC_STATE, issues_count: 1, issues_weight_sum: 2, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE },
+              { iid: epic_iid, epic_state_id: OPENED_EPIC_STATE, issues_count: 3, issues_weight_sum: 5, parent_id: nil, issues_state_id: CLOSED_ISSUE_STATE }
           ]
         end
 
@@ -90,21 +92,21 @@ describe Epics::EpicNode do
           subject.assemble_issue_sums
 
           expect(subject.direct_sums.count).to eq 4
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::COUNT, Constants::OPENED_ISSUE_STATE, 1)
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::OPENED_ISSUE_STATE, 2)
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::COUNT, Constants::CLOSED_ISSUE_STATE, 3)
-          expect(subject).to have_direct_sum(Constants::ISSUE_TYPE, Constants::WEIGHT_SUM, Constants::CLOSED_ISSUE_STATE, 5)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 3)
+          expect(subject).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 5)
         end
       end
     end
   end
 
   describe '#assemble_epic_sums' do
-    subject { described_class.new(epic_id, [{ parent_id: nil, epic_state_id: Constants::CLOSED_EPIC_STATE }]) }
+    subject { described_class.new(epic_id, [{ parent_id: nil, epic_state_id: CLOSED_EPIC_STATE }]) }
 
     context 'with a child epic' do
       let(:child_epic_id) { 45 }
-      let!(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: Constants::CLOSED_EPIC_STATE }]) }
+      let!(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: CLOSED_EPIC_STATE }]) }
 
       before do
         subject.child_ids << child_epic_id
@@ -114,13 +116,13 @@ describe Epics::EpicNode do
         subject.assemble_epic_sums([child_epic_node])
 
         expect(subject.direct_sums.count).to eq 1
-        expect(subject).to have_direct_sum(Constants::EPIC_TYPE, Constants::COUNT, Constants::CLOSED_EPIC_STATE, 1)
+        expect(subject).to have_direct_sum(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
       end
     end
   end
 
   describe '#calculate_recursive_sums' do
-    subject { described_class.new(epic_id, [{ parent_id: nil, epic_state_id: Constants::CLOSED_EPIC_STATE }]) }
+    subject { described_class.new(epic_id, [{ parent_id: nil, epic_state_id: CLOSED_EPIC_STATE }]) }
 
     before do
       allow(subject).to receive(:direct_sums).and_return(direct_sums)
@@ -146,7 +148,7 @@ describe Epics::EpicNode do
 
       context 'with an issue with 0 weight' do
         let(:direct_sums) do
-          [Epics::EpicNode::Sum.new(Constants::COUNT, Constants::CLOSED_EPIC_STATE, Constants::ISSUE_TYPE, 1)]
+          [Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1)]
         end
 
         it 'returns a SumTotal with only a weight sum' do
@@ -160,8 +162,8 @@ describe Epics::EpicNode do
       context 'with an issue with nonzero weight' do
         let(:direct_sums) do
           [
-            Epics::EpicNode::Sum.new(Constants::COUNT, Constants::CLOSED_EPIC_STATE, Constants::ISSUE_TYPE, 1),
-            Epics::EpicNode::Sum.new(Constants::WEIGHT_SUM, Constants::CLOSED_EPIC_STATE, Constants::ISSUE_TYPE, 2)
+            Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1),
+            Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 2)
           ]
         end
 
@@ -179,10 +181,10 @@ describe Epics::EpicNode do
       let(:tree) do
         { epic_id => subject, child_epic_id => child_epic_node }
       end
-      let(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: Constants::CLOSED_EPIC_STATE }]) }
+      let(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: CLOSED_EPIC_STATE }]) }
       let(:direct_sums) do
         [ # only one opened epic, the child
-          Epics::EpicNode::Sum.new(Constants::COUNT, Constants::OPENED_EPIC_STATE, Constants::EPIC_TYPE, 1)
+          Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_EPIC_STATE, EPIC_TYPE, 1)
         ]
       end
 
@@ -194,8 +196,8 @@ describe Epics::EpicNode do
       context 'with a child that has issues of nonzero weight' do
         let(:child_sums) do
           [ # 1 issue of weight 2
-            Epics::EpicNode::Sum.new(Constants::COUNT, Constants::OPENED_ISSUE_STATE, Constants::ISSUE_TYPE, 1),
-            Epics::EpicNode::Sum.new(Constants::WEIGHT_SUM, Constants::OPENED_ISSUE_STATE, Constants::ISSUE_TYPE, 2)
+            Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 1),
+            Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 2)
           ]
         end
 

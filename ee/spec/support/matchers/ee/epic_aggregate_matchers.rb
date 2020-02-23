@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 RSpec::Matchers.define :have_direct_sum do |type, facet, state, value|
-  # supports_block_expectations
-
   match do |epic_node_result|
     expect(epic_node_result).not_to be_nil
     expect(epic_node_result.direct_sums).not_to be_empty
@@ -24,8 +22,6 @@ RSpec::Matchers.define :have_direct_sum do |type, facet, state, value|
 end
 
 RSpec::Matchers.define :have_aggregate do |type, facet, state, value|
-  supports_block_expectations
-
   match do |epic_node_result|
     aggregate_object = epic_node_result.aggregate_object_by(facet)
     expect(aggregate_object.send(method_name(type, state))).to eq value
@@ -38,12 +34,12 @@ RSpec::Matchers.define :have_aggregate do |type, facet, state, value|
   end
 
   def method_name(type, state)
-    if type == Constants::ISSUE_TYPE
-      return :opened_issues if state == Constants::OPENED_ISSUE_STATE
+    if type == ISSUE_TYPE
+      return :opened_issues if state == OPENED_ISSUE_STATE
 
       :closed_issues
-    elsif type == Constants::EPIC_TYPE
-      return :opened_epics if state == Constants::OPENED_EPIC_STATE
+    elsif type == EPIC_TYPE
+      return :opened_epics if state == OPENED_EPIC_STATE
 
       :closed_epics
     end
