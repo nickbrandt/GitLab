@@ -2,7 +2,7 @@
 import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import { GlIcon } from '@gitlab/ui';
 
-const classNameMap = {
+const CLASS_NAME_MAP = {
   critical: 'text-danger-800',
   high: 'text-danger-600',
   medium: 'text-warning-400',
@@ -23,21 +23,27 @@ export default {
     },
   },
   computed: {
+    hasSeverityBadge() {
+      return this.severity && this.severity !== ' ';
+    },
+    severityKey() {
+      return this.severity.toLowerCase();
+    },
     className() {
-      return classNameMap[this.severity.toLowerCase()];
+      return CLASS_NAME_MAP[this.severityKey];
     },
     iconName() {
-      return `severity-${this.severity.toLowerCase()}`;
+      return `severity-${this.severityKey}`;
     },
     severityTitle() {
-      return SEVERITY_LEVELS[this.severity.toLowerCase()] || this.severity;
+      return SEVERITY_LEVELS[this.severityKey] || this.severity;
     },
   },
 };
 </script>
 
 <template>
-  <div v-if="severity && severity != ' '" class="severity-badge gl-text-gray-900">
+  <div v-if="hasSeverityBadge" class="severity-badge gl-text-gray-900">
     <span :class="className"><gl-icon :name="iconName" :size="12"/></span>{{ severityTitle }}
   </div>
 </template>
