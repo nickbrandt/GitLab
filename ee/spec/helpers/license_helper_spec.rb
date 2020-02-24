@@ -10,7 +10,10 @@ describe LicenseHelper do
 
   describe '#license_message' do
     context 'license installed' do
+      subject { license_message(signed_in: true, is_admin: false) }
+
       let(:license) { double('License') }
+      let(:faq_link_regex) { /For renewal instructions <a href.*>view our Licensing FAQ\.<\/a>/ }
 
       before do
         allow(License).to receive(:current).and_return(license)
@@ -19,32 +22,16 @@ describe LicenseHelper do
         allow(license).to receive(:remaining_days).and_return(4)
       end
 
-      context 'in HTML' do
-        let(:faq_link_regex) { /For renewal instructions <a href.*>view our Licensing FAQ\.<\/a>/ }
+      it 'does NOT have a license faq link if license is a trial' do
+        allow(license).to receive(:trial?).and_return(true)
 
-        subject { license_message(signed_in: true, is_admin: false) }
-
-        it 'does NOT have a license faq link if license is a trial' do
-          allow(license).to receive(:trial?).and_return(true)
-
-          expect(subject).not_to match(faq_link_regex)
-        end
-
-        it 'has license faq link if license is not a trial' do
-          allow(license).to receive(:trial?).and_return(false)
-
-          expect(subject).to match(faq_link_regex)
-        end
+        expect(subject).not_to match(faq_link_regex)
       end
 
-      context 'not in HTML' do
-        subject { license_message(signed_in: true, is_admin: false, in_html: false) }
+      it 'has license faq link if license is not a trial' do
+        allow(license).to receive(:trial?).and_return(false)
 
-        it 'has license faq link if license is not a trial' do
-          allow(license).to receive(:trial?).and_return(false)
-
-          expect(subject).to match(/For renewal instructions view our Licensing FAQ. https:.*/)
-        end
+        expect(subject).to match(faq_link_regex)
       end
     end
 
