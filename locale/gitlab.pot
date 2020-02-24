@@ -6886,6 +6886,9 @@ msgstr ""
 msgid "Domain was successfully created."
 msgstr ""
 
+msgid "Domain was successfully deleted."
+msgstr ""
+
 msgid "Domain was successfully updated."
 msgstr ""
 

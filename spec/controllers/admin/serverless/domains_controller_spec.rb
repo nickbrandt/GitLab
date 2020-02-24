@@ -295,4 +295,62 @@ describe Admin::Serverless::DomainsController do
       end
     end
   end
+
+  describe '#destroy' do
+    let!(:domain) { create(:pages_domain, :instance_serverless) }
+
+    context 'non-admin user' do
+      before do
+        sign_in(user)
+      end
+
+      it 'responds with 404' do
+        delete :destroy, params: { id: domain.id }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'admin user' do
+      before do
+        sign_in(admin)
+      end
+
+      context 'with serverless_domain feature disabled' do
+        before do
+          stub_feature_flags(serverless_domain: false)
+        end
+
+        it 'responds with 404' do
+          delete :destroy, params: { id: domain.id }
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'when domain exists' do
+        context 'and is not associated to any clusters' do
+          it 'deletes the domain' do
+            expect { delete :destroy, params: { id: domain.id } }
+              .to change { PagesDomain.count }.from(1).to(0)
+
+            expect(response).to have_gitlab_http_status(:found)
+            expect(flash[:notice]).to include('Domain was successfully deleted.')
+          end
+        end
+      end
+
+      context 'when domain does not exist' do
+        before do
+          domain.destroy!
+        end
+
+        it 'responds with 404' do
+          delete :destroy, params: { id: domain.id }
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+  end
 end
