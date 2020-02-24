@@ -3,7 +3,7 @@ import * as types from 'ee/vue_shared/license_management/store/mutation_types';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 import { TEST_HOST } from 'spec/test_constants';
-import { approvedLicense } from 'ee_spec/license_management/mock_data';
+import { approvedLicense } from '../mock_data';
 
 describe('License store mutations', () => {
   let store;

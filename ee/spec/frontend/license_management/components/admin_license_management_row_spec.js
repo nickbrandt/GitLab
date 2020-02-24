@@ -4,11 +4,13 @@ import Vuex from 'vuex';
 import AdminLicenseManagementRow from 'ee/vue_shared/license_management/components/admin_license_management_row.vue';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { approvedLicense } from 'ee_spec/license_management/mock_data';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { approvedLicense } from '../mock_data';
 
 const visibleClass = 'visible';
 const invisibleClass = 'invisible';
+
+Vue.use(Vuex);
 
 describe('AdminLicenseManagementRow', () => {
   const Component = Vue.extend(AdminLicenseManagementRow);
@@ -22,9 +24,9 @@ describe('AdminLicenseManagementRow', () => {
 
   beforeEach(() => {
     actions = {
-      setLicenseInModal: jasmine.createSpy('setLicenseInModal'),
-      approveLicense: jasmine.createSpy('approveLicense'),
-      blacklistLicense: jasmine.createSpy('blacklistLicense'),
+      setLicenseInModal: jest.fn(),
+      approveLicense: jest.fn(),
+      blacklistLicense: jest.fn(),
     };
 
     store = new Vuex.Store({

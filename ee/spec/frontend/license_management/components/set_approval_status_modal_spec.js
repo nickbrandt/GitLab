@@ -3,9 +3,11 @@ import Vuex from 'vuex';
 
 import SetApprovalModal from 'ee/vue_shared/license_management/components/set_approval_status_modal.vue';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import { trimText } from 'spec/helpers/text_helper';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { licenseReport } from 'ee_spec/license_management/mock_data';
+import { trimText } from 'helpers/text_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { licenseReport } from '../mock_data';
+
+Vue.use(Vuex);
 
 describe('SetApprovalModal', () => {
   const Component = Vue.extend(SetApprovalModal);
@@ -16,9 +18,9 @@ describe('SetApprovalModal', () => {
 
   beforeEach(() => {
     actions = {
-      resetLicenseInModal: jasmine.createSpy('resetLicenseInModal'),
-      approveLicense: jasmine.createSpy('approveLicense'),
-      blacklistLicense: jasmine.createSpy('blacklistLicense'),
+      resetLicenseInModal: jest.fn(),
+      approveLicense: jest.fn(),
+      blacklistLicense: jest.fn(),
     };
 
     store = new Vuex.Store({
@@ -296,7 +298,7 @@ describe('SetApprovalModal', () => {
         linkEl.click();
 
         expect(actions.approveLicense).toHaveBeenCalledWith(
-          jasmine.any(Object),
+          expect.any(Object),
           store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );
@@ -309,7 +311,7 @@ describe('SetApprovalModal', () => {
         linkEl.click();
 
         expect(actions.blacklistLicense).toHaveBeenCalledWith(
-          jasmine.any(Object),
+          expect.any(Object),
           store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );

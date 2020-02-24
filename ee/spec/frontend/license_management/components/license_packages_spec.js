@@ -1,8 +1,8 @@
 import Vue from 'vue';
 
 import LicensePackages from 'ee/vue_shared/license_management/components/license_packages.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { licenseReport } from 'ee_spec/license_management/mock_data';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { licenseReport } from '../mock_data';
 
 const examplePackages = licenseReport[0].packages;
 

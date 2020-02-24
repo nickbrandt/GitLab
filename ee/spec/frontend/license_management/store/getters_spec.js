@@ -1,7 +1,7 @@
 import createState from 'ee/vue_shared/license_management/store/state';
 import * as getters from 'ee/vue_shared/license_management/store/getters';
 
-import { licenseReport as licenseReportMock } from 'ee_spec/license_management/mock_data';
+import { licenseReport as licenseReportMock } from '../mock_data';
 
 describe('getters', () => {
   let state;

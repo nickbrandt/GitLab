@@ -2,9 +2,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import DeleteConfirmationModal from 'ee/vue_shared/license_management/components/delete_confirmation_modal.vue';
-import { trimText } from 'spec/helpers/text_helper';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { approvedLicense } from 'ee_spec/license_management/mock_data';
+import { trimText } from 'helpers/text_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { approvedLicense } from '../mock_data';
+
+Vue.use(Vuex);
 
 describe('DeleteConfirmationModal', () => {
   const Component = Vue.extend(DeleteConfirmationModal);
@@ -14,8 +16,8 @@ describe('DeleteConfirmationModal', () => {
 
   beforeEach(() => {
     actions = {
-      resetLicenseInModal: jasmine.createSpy('resetLicenseInModal'),
-      deleteLicense: jasmine.createSpy('deleteLicense'),
+      resetLicenseInModal: jest.fn(),
+      deleteLicense: jest.fn(),
     };
 
     store = new Vuex.Store({
@@ -94,7 +96,7 @@ describe('DeleteConfirmationModal', () => {
         linkEl.click();
 
         expect(actions.deleteLicense).toHaveBeenCalledWith(
-          jasmine.any(Object),
+          expect.any(Object),
           store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );
