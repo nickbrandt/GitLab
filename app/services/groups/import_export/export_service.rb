@@ -18,6 +18,8 @@ module Groups
         end
 
         save!
+      ensure
+        cleanup
       end
 
       private
@@ -28,7 +30,7 @@ module Groups
         if savers.all?(&:save)
           notify_success
         else
-          cleanup_and_notify_error!
+          notify_error!
         end
       end
 
@@ -44,14 +46,12 @@ module Groups
         Gitlab::ImportExport::Saver.new(exportable: @group, shared: @shared)
       end
 
-      def cleanup_and_notify_error
-        FileUtils.rm_rf(shared.export_path)
-
-        notify_error
+      def cleanup
+        FileUtils.rm_rf(shared.archive_path) if shared&.archive_path
       end
 
-      def cleanup_and_notify_error!
-        cleanup_and_notify_error
+      def notify_error!
+        notify_error
 
         raise Gitlab::ImportExport::Error.new(shared.errors.to_sentence)
       end
