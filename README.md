@@ -147,6 +147,23 @@ the `authBackend` setting:
 gitlab-workhorse -authBackend http://localhost:8080/gitlab
 ```
 
+### Interaction of authBackend and authSocket
+
+The interaction between `authBackend` and `authSocket` can be a bit
+confusing. It comes down to: if `authSocket` is set it overrides the
+_host_ part of `authBackend` but not the relative path.
+
+In table form:
+
+|authBackend|authSocket|Workhorse connects to?|Rails relative URL|
+|---|---|---|---|
+|unset|unset|`localhost:8080`|`/`|
+|`http://localhost:3000`|unset|`localhost:3000`|`/`|
+|`http://localhost:3000/gitlab`|unset|`localhost:3000`|`/gitlab`|
+|unset|`/path/to/socket`|`/path/to/socket`|`/`|
+|`http://localhost:3000`|`/path/to/socket`|`/path/to/socket`|`/`|
+|`http://localhost:3000/gitlab`|`/path/to/socket`|`/path/to/socket`|`/gitlab`|
+
 ## Installation
 
 To install gitlab-workhorse you need [Go 1.8 or
