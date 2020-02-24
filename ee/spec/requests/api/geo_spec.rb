@@ -70,7 +70,9 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
@@ -109,7 +111,9 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
@@ -160,7 +164,9 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
         FileUploader.new(project).store!(fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
       end
 
@@ -212,7 +218,9 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
@@ -311,7 +319,9 @@ describe API::Geo do
     end
 
     it 'responds with 401 when the db_key_base is wrong' do
-      allow_any_instance_of(Gitlab::Geo::JwtRequestDecoder).to receive(:decode).and_raise(Gitlab::Geo::InvalidDecryptionKeyError)
+      allow_next_instance_of(Gitlab::Geo::JwtRequestDecoder) do |instance|
+        allow(instance).to receive(:decode).and_raise(Gitlab::Geo::InvalidDecryptionKeyError)
+      end
 
       request
 

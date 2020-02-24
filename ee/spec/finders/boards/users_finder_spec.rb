@@ -11,7 +11,9 @@ describe Boards::UsersFinder do
       let(:board) { create(:board, project: project) }
 
       it 'requests correct relations' do
-        expect_any_instance_of(MembersFinder).to receive(:execute).with(include_relations: [:direct, :descendants, :inherited]).and_call_original
+        expect_next_instance_of(MembersFinder) do |instance|
+          expect(instance).to receive(:execute).with(include_relations: [:direct, :descendants, :inherited]).and_call_original
+        end
 
         subject.execute
       end
@@ -34,7 +36,9 @@ describe Boards::UsersFinder do
       end
 
       it 'requests correct relations' do
-        expect_any_instance_of(GroupMembersFinder).to receive(:execute).with(include_relations: [:direct, :descendants, :inherited]).and_call_original
+        expect_next_instance_of(GroupMembersFinder) do |instance|
+          expect(instance).to receive(:execute).with(include_relations: [:direct, :descendants, :inherited]).and_call_original
+        end
 
         subject.execute
       end

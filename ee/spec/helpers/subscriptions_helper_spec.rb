@@ -23,7 +23,9 @@ describe SubscriptionsHelper do
 
   before do
     allow(helper).to receive(:params).and_return(plan_id: 'bronze_id')
-    allow_any_instance_of(FetchSubscriptionPlansService).to receive(:execute).and_return(raw_plan_data)
+    allow_next_instance_of(FetchSubscriptionPlansService) do |instance|
+      allow(instance).to receive(:execute).and_return(raw_plan_data)
+    end
   end
 
   describe '#subscription_data' do

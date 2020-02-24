@@ -107,8 +107,9 @@ describe Projects::WebIdeTerminalsController do
     let(:result) { { status: :success } }
 
     before do
-      allow_any_instance_of(::Ci::WebIdeConfigService)
-        .to receive(:execute).and_return(result)
+      allow_next_instance_of(::Ci::WebIdeConfigService) do |instance|
+        allow(instance).to receive(:execute).and_return(result)
+      end
 
       post :check_config, params: {
                             namespace_id: project.namespace.to_param,
@@ -145,8 +146,9 @@ describe Projects::WebIdeTerminalsController do
       let(:pipeline) { build.pipeline }
 
       before do
-        allow_any_instance_of(::Ci::CreateWebIdeTerminalService)
-          .to receive(:execute).and_return(status: :success, pipeline: pipeline)
+        allow_next_instance_of(::Ci::CreateWebIdeTerminalService) do |instance|
+          allow(instance).to receive(:execute).and_return(status: :success, pipeline: pipeline)
+        end
 
         subject
       end
@@ -169,8 +171,9 @@ describe Projects::WebIdeTerminalsController do
       let(:user) { admin }
 
       it 'returns 400' do
-        allow_any_instance_of(::Ci::CreateWebIdeTerminalService)
-          .to receive(:execute).and_return(status: :error, message: 'foobar')
+        allow_next_instance_of(::Ci::CreateWebIdeTerminalService) do |instance|
+          allow(instance).to receive(:execute).and_return(status: :error, message: 'foobar')
+        end
 
         subject
 
