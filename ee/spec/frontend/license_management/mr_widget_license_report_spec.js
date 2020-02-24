@@ -3,13 +3,13 @@ import Vuex from 'vuex';
 
 import LicenseManagement from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
 import { LOADING, ERROR, SUCCESS } from 'ee/vue_shared/security_reports/store/constants';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import {
   approvedLicense,
   blacklistedLicense,
   licenseReport as licenseReportMock,
-} from 'ee_spec/license_management/mock_data';
+} from './mock_data';
 
 describe('License Report MR Widget', () => {
   const Component = Vue.extend(LicenseManagement);
@@ -223,15 +223,13 @@ describe('License Report MR Widget', () => {
 
   it('should init store after mount', () => {
     const actions = {
-      setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
-      fetchParsedLicenseReport: jasmine
-        .createSpy('fetchParsedLicenseReport')
-        .and.callFake(() => {}),
+      setAPISettings: jest.fn(() => {}),
+      fetchParsedLicenseReport: jest.fn(() => {}),
     };
     vm = mountComponent({ actions });
 
     expect(actions.setAPISettings).toHaveBeenCalledWith(
-      jasmine.any(Object),
+      expect.any(Object),
       {
         apiUrlManageLicenses: apiUrl,
         licensesApiPath: defaultProps.licensesApiPath,
@@ -241,7 +239,7 @@ describe('License Report MR Widget', () => {
     );
 
     expect(actions.fetchParsedLicenseReport).toHaveBeenCalledWith(
-      jasmine.any(Object),
+      expect.any(Object),
       undefined,
       undefined,
     );

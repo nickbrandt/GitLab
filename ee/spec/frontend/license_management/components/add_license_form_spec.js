@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import LicenseIssueBody from 'ee/vue_shared/license_management/components/add_license_form.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 describe('AddLicenseForm', () => {
@@ -18,7 +18,7 @@ describe('AddLicenseForm', () => {
   describe('interaction', () => {
     it('clicking the Submit button submits the data and closes the form', done => {
       const name = 'LICENSE_TEST';
-      spyOn(vm, '$emit');
+      jest.spyOn(vm, '$emit').mockImplementation(() => {});
       vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
       vm.licenseName = name;
 
@@ -38,7 +38,7 @@ describe('AddLicenseForm', () => {
 
     it('clicking the Cancel button closes the form', () => {
       const linkEl = vm.$el.querySelector('.js-cancel');
-      spyOn(vm, '$emit');
+      jest.spyOn(vm, '$emit').mockImplementation(() => {});
       linkEl.click();
 
       expect(vm.$emit).toHaveBeenCalledWith('closeForm');

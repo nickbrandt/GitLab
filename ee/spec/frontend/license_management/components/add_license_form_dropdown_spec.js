@@ -2,7 +2,7 @@ import Vue from 'vue';
 import $ from 'jquery';
 import Dropdown from 'ee/vue_shared/license_management/components/add_license_form_dropdown.vue';
 import { KNOWN_LICENSES } from 'ee/vue_shared/license_management/constants';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('AddLicenseFormDropdown', () => {
   const Component = Vue.extend(Dropdown);
@@ -14,7 +14,7 @@ describe('AddLicenseFormDropdown', () => {
 
   it('emits `input` invent on change', () => {
     vm = mountComponent(Component);
-    spyOn(vm, '$emit');
+    jest.spyOn(vm, '$emit').mockImplementation(() => {});
 
     $(vm.$el)
       .val('LGPL')
@@ -48,8 +48,8 @@ describe('AddLicenseFormDropdown', () => {
       const options = $('.select2-drop .select2-result');
 
       expect(KNOWN_LICENSES.length).toEqual(options.length);
-      options.each(function() {
-        expect(KNOWN_LICENSES).toContain($(this).text());
+      options.each((index, optionEl) => {
+        expect(KNOWN_LICENSES).toContain($(optionEl).text());
       });
       done();
     });

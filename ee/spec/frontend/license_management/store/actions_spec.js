@@ -4,8 +4,8 @@ import * as mutationTypes from 'ee/vue_shared/license_management/store/mutation_
 import createState from 'ee/vue_shared/license_management/store/state';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { TEST_HOST } from 'spec/test_constants';
-import testAction from 'spec/helpers/vuex_action_helper';
-import { approvedLicense, blacklistedLicense } from 'ee_spec/license_management/mock_data';
+import testAction from 'helpers/vuex_action_helper';
+import { approvedLicense, blacklistedLicense } from '../mock_data';
 import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
@@ -169,7 +169,7 @@ describe('License store actions', () => {
         [],
         [
           { type: 'requestDeleteLicense' },
-          { type: 'receiveDeleteLicenseError', payload: jasmine.any(Error) },
+          { type: 'receiveDeleteLicenseError', payload: expect.any(Error) },
         ],
       )
         .then(done)
@@ -239,7 +239,7 @@ describe('License store actions', () => {
   describe('setLicenseApproval', () => {
     const newStatus = 'FAKE_STATUS';
 
-    describe('uses POST endpoint for existing licenses;', function() {
+    describe('uses POST endpoint for existing licenses;', () => {
       let putEndpointMock;
       let newLicense;
 
@@ -282,7 +282,7 @@ describe('License store actions', () => {
           [],
           [
             { type: 'requestSetLicenseApproval' },
-            { type: 'receiveSetLicenseApprovalError', payload: jasmine.any(Error) },
+            { type: 'receiveSetLicenseApprovalError', payload: expect.any(Error) },
           ],
         )
           .then(done)
@@ -290,7 +290,7 @@ describe('License store actions', () => {
       });
     });
 
-    describe('uses PATCH endpoint for existing licenses;', function() {
+    describe('uses PATCH endpoint for existing licenses;', () => {
       let patchEndpointMock;
       let licenseUrl;
 
@@ -333,7 +333,7 @@ describe('License store actions', () => {
           [],
           [
             { type: 'requestSetLicenseApproval' },
-            { type: 'receiveSetLicenseApprovalError', payload: jasmine.any(Error) },
+            { type: 'receiveSetLicenseApprovalError', payload: expect.any(Error) },
           ],
         )
           .then(done)
@@ -494,7 +494,7 @@ describe('License store actions', () => {
         [],
         [
           { type: 'requestManagedLicenses' },
-          { type: 'receiveManagedLicensesError', payload: jasmine.any(Error) },
+          { type: 'receiveManagedLicensesError', payload: expect.any(Error) },
         ],
       )
         .then(done)
@@ -613,7 +613,7 @@ describe('License store actions', () => {
           [],
           [
             { type: 'requestParsedLicenseReport' },
-            { type: 'receiveParsedLicenseReportError', payload: jasmine.any(Error) },
+            { type: 'receiveParsedLicenseReportError', payload: expect.any(Error) },
           ],
         )
           .then(done)
