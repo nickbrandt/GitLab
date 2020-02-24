@@ -24,6 +24,11 @@ export default {
       type: String,
       required: true,
     },
+    resizable: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -37,7 +42,7 @@ export default {
       },
     }),
     panelStyle() {
-      if (!this.collapsed) {
+      if (!this.collapsed && this.resizable) {
         return {
           width: `${this.width}px`,
         };
@@ -72,6 +77,7 @@ export default {
   >
     <slot></slot>
     <panel-resizer
+      v-if="resizable"
       :size.sync="width"
       :enabled="!collapsed"
       :start-size="initialWidth"

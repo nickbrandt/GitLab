@@ -26,10 +26,6 @@ export default {
       type: String,
       required: true,
     },
-    width: {
-      type: Number,
-      required: true,
-    },
   },
   computed: {
     ...mapState(['loading']),
@@ -98,17 +94,13 @@ export default {
 
 <template>
   <div
-    :class="`ide-${side}-sidebar`"
+    :class="[`ide-${side}-sidebar`, { 'flex-row-reverse': side === 'left' }]"
     :data-qa-selector="`ide_${side}_sidebar`"
     class="multi-file-commit-panel ide-sidebar"
   >
-    <resizable-panel
+    <div
       v-show="isOpen"
-      :collapsible="false"
-      :initial-width="width"
-      :min-size="width"
       :class="`ide-${side}-sidebar-${currentView}`"
-      :side="side"
       class="multi-file-commit-panel-inner"
     >
       <div class="h-100 d-flex flex-column align-items-stretch">
@@ -119,11 +111,13 @@ export default {
           :key="tabView.name"
           class="flex-fill js-tab-view"
         >
-          <component :is="tabView.component" />
+          <slot :component="tabView.component">
+            <component :is="tabView.component" />
+          </slot>
         </div>
         <slot name="footer"></slot>
       </div>
-    </resizable-panel>
+    </div>
     <nav class="ide-activity-bar">
       <ul class="list-unstyled">
         <li>

@@ -27,6 +27,7 @@ export const createStore = () =>
       branches,
       fileTemplates: fileTemplates(),
       rightPane: paneModule(),
+      leftPane: paneModule(),
       clientside: clientsideModule(),
     },
   });
