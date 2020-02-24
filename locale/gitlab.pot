@@ -9448,6 +9448,9 @@ msgstr ""
 msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
+msgid "Go to Pipelines"
+msgstr ""
+
 msgid "Go to Webhooks"
 msgstr ""
 
@@ -11685,6 +11688,12 @@ msgid "MD5"
 msgstr ""
 
 msgid "MERGED"
+msgstr ""
+
+msgid "MR widget|Take a look at our %{beginnerLinkStart}Beginner's Guide to Continuous Integration%{beginnerLinkEnd} and our %{exampleLinkStart}examples of GitLab CI/CD%{exampleLinkEnd} to see all the cool stuff you can do with it."
+msgstr ""
+
+msgid "MR widget|The pipeline will now run automatically every time you commit code. Pipelines are useful for deploying static web pages, detecting vulnerabilities in dependencies, static or dynamic application security testing (SAST and DAST), and so much more!"
 msgstr ""
 
 msgid "MRApprovals|Approved by"
@@ -19027,6 +19036,9 @@ msgid "Thanks for your purchase!"
 msgstr ""
 
 msgid "Thanks! Don't show me this again"
+msgstr ""
+
+msgid "That's it, well done!%{celebrate}"
 msgstr ""
 
 msgid "The \"%{group_path}\" group allows you to sign in with your Single Sign-On Account"
