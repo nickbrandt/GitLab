@@ -4,6 +4,8 @@ require 'spec_helper'
 describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   include JavaScriptFixturesHelpers
 
+  let_it_be(:license) { create(:license, plan: License::ULTIMATE_PLAN) }
+
   let_it_be(:group) { create(:group)}
   let_it_be(:project) { create(:project, :repository, namespace: group) }
   let_it_be(:user) { create(:user, :admin) }
@@ -149,8 +151,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
 
     before do
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
       sign_in(user)
     end
 
@@ -199,8 +199,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
 
     before do
-      stub_licensed_features(cycle_analytics_for_groups: true)
-
       sign_in(user)
     end
 
@@ -229,8 +227,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
 
     before do
-      stub_licensed_features(type_of_work_analytics: true)
-
       sign_in(user)
     end
 
