@@ -18,7 +18,7 @@ module LicenseHelper
     License.current&.maximum_user_count || 0
   end
 
-  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?, in_html: true)
+  def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)
     return unless current_license
     return unless signed_in
     return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
@@ -35,20 +35,18 @@ module LicenseHelper
 
       message << block_changes_message
 
-      message <<
-
-        if is_admin
-          'Upload a new license in the admin area'
-        else
-          'Ask an admin to upload a new license'
-        end
+      message << if is_admin
+                   'Upload a new license in the admin area'
+                 else
+                   'Ask an admin to upload a new license'
+                 end
 
       message << 'to'
       message << (current_license.block_changes? ? 'restore' : 'ensure uninterrupted')
       message << 'service.'
     end
 
-    message << renewal_instructions_message(in_html: in_html) unless is_trial
+    message << renewal_instructions_message unless is_trial
 
     message.join(' ').html_safe
   end
@@ -144,15 +142,12 @@ module LicenseHelper
     User.active.count
   end
 
-  def renewal_instructions_message(in_html: true)
+  def renewal_instructions_message
     renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
 
-    renewal_faq_link_start = in_html ? "<a href='#{renewal_faq_url}' target='_blank'>".html_safe : ''
-    link_end = in_html ? '</a>'.html_safe : ''
+    renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
+    link_end = '</a>'.html_safe
 
-    message = _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
-    message += ' ' + renewal_faq_url unless in_html
-
-    message
+    _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
   end
 end
