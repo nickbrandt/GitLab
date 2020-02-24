@@ -1137,6 +1137,9 @@ msgstr ""
 msgid "Add email address"
 msgstr ""
 
+msgid "Add environment"
+msgstr ""
+
 msgid "Add header and footer to emails. Please note that color settings will only be applied within the application interface"
 msgstr ""
 
@@ -5601,6 +5604,9 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+msgid "Create %{environment}"
+msgstr ""
+
 msgid "Create %{type} token"
 msgstr ""
 
@@ -7418,6 +7424,9 @@ msgstr ""
 msgid "Enter a number"
 msgstr ""
 
+msgid "Enter a whole number between 0 and 100"
+msgstr ""
+
 msgid "Enter at least three characters to search"
 msgstr ""
 
@@ -7440,6 +7449,9 @@ msgid "Enter new AWS Secret Access Key"
 msgstr ""
 
 msgid "Enter number of issues"
+msgstr ""
+
+msgid "Enter one or more user ID separated by commas"
 msgstr ""
 
 msgid "Enter the issue description"
@@ -8535,6 +8547,18 @@ msgid "FeatureFlags|Try again in a few moments or contact your support team."
 msgstr ""
 
 msgid "FeatureFlags|User IDs"
+msgstr ""
+
+msgid "FeatureFlag|Delete strategy"
+msgstr ""
+
+msgid "FeatureFlag|Percentage"
+msgstr ""
+
+msgid "FeatureFlag|Type"
+msgstr ""
+
+msgid "FeatureFlag|User IDs"
 msgstr ""
 
 msgid "Feb"
@@ -13884,6 +13908,9 @@ msgstr ""
 msgid "People without permission will never get a notification."
 msgstr ""
 
+msgid "Percent rollout (logged in users)"
+msgstr ""
+
 msgid "Percentage"
 msgstr ""
 
@@ -17409,6 +17436,9 @@ msgid "Select shards to replicate"
 msgstr ""
 
 msgid "Select source branch"
+msgstr ""
+
+msgid "Select strategy activation method"
 msgstr ""
 
 msgid "Select target branch"
@@ -21364,6 +21394,9 @@ msgid "User %{username} was successfully removed."
 msgstr ""
 
 msgid "User Cohorts are only shown when the %{usage_ping_link_start}usage ping%{usage_ping_link_end} is enabled."
+msgstr ""
+
+msgid "User IDs"
 msgstr ""
 
 msgid "User OAuth applications"
