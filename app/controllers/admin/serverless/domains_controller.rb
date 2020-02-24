@@ -31,6 +31,12 @@ class Admin::Serverless::DomainsController < Admin::ApplicationController
   end
 
   def destroy
+    if domain.serverless_domain_clusters.count > 0
+      return redirect_to admin_serverless_domains_path,
+                         status: :conflict,
+                         notice: _('Domain cannot be deleted while associated to one or more clusters.')
+    end
+
     domain.destroy!
 
     redirect_to admin_serverless_domains_path,

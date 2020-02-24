@@ -338,6 +338,20 @@ describe Admin::Serverless::DomainsController do
             expect(flash[:notice]).to include('Domain was successfully deleted.')
           end
         end
+
+        context 'and is associated to any clusters' do
+          before do
+            create(:serverless_domain_cluster, pages_domain: domain)
+          end
+
+          it 'does not delete the domain' do
+            expect { delete :destroy, params: { id: domain.id } }
+              .not_to change { PagesDomain.count }
+
+            expect(response).to have_gitlab_http_status(:conflict)
+            expect(flash[:notice]).to include('Domain cannot be deleted while associated to one or more clusters.')
+          end
+        end
       end
 
       context 'when domain does not exist' do

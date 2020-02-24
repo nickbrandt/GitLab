@@ -6880,6 +6880,9 @@ msgstr ""
 msgid "Domain"
 msgstr ""
 
+msgid "Domain cannot be deleted while associated to one or more clusters."
+msgstr ""
+
 msgid "Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled"
 msgstr ""
 
