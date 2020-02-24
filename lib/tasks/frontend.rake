@@ -9,6 +9,7 @@ unless Rails.env.production?
       ENV['NO_KNAPSACK'] = 'true'
       t.pattern = args[:pattern]
       t.rspec_opts = '--format documentation'
+      t.rspec_opts = '--profile'
     end
 
     desc 'GitLab | Frontend | Run JavaScript tests'
