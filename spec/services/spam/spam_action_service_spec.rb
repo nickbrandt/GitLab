@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-describe Spam::SpamCheckService do
+describe Spam::SpamActionService do
+  include_context 'includes Spam constants'
+
   let(:fake_ip) { '1.2.3.4' }
   let(:fake_user_agent) { 'fake-user-agent' }
   let(:fake_referrer) { 'fake-http-referrer' }
@@ -15,7 +17,7 @@ describe Spam::SpamCheckService do
 
   let_it_be(:project) { create(:project, :public) }
   let_it_be(:user) { create(:user) }
-  let_it_be(:issue) { create(:issue, project: project, author: user) }
+  let(:issue) { create(:issue, project: project, author: user) }
 
   before do
     issue.spam = false
@@ -51,7 +53,7 @@ describe Spam::SpamCheckService do
 
   shared_examples 'only checks for spam if a request is provided' do
     context 'when request is missing' do
-      let(:request) { nil }
+      subject { described_class.new(spammable: issue, request: nil) }
 
       it "doesn't check as spam" do
         subject
@@ -70,6 +72,7 @@ describe Spam::SpamCheckService do
 
   describe '#execute' do
     let(:request) { double(:request, env: env) }
+    let(:fake_verdict_service) { double(:spam_verdict_service) }
 
     let_it_be(:existing_spam_log) { create(:spam_log, user: user, recaptcha_verified: false) }
 
@@ -78,13 +81,17 @@ describe Spam::SpamCheckService do
       described_service.execute(user_id: user.id, api: nil, recaptcha_verified: recaptcha_verified, spam_log_id: existing_spam_log.id)
     end
 
+    before do
+      allow(Spam::SpamVerdictService).to receive(:new).and_return(fake_verdict_service)
+    end
+
     context 'when recaptcha was already verified' do
       let(:recaptcha_verified) { true }
 
-      it "updates spam log and doesn't check Akismet" do
+      it "doesn't check with the SpamVerdictService" do
         aggregate_failures do
-          expect(SpamLog).not_to receive(:create!)
-          expect(an_instance_of(described_class)).not_to receive(:check)
+          expect(SpamLog).to receive(:verify_recaptcha!)
+          expect(fake_verdict_service).not_to receive(:execute)
         end
 
         subject
@@ -101,12 +108,6 @@ describe Spam::SpamCheckService do
       context 'when spammable attributes have not changed' do
         before do
           issue.closed_at = Time.zone.now
-
-          allow(Spam::AkismetService).to receive(:new).and_return(double(spam?: true))
-        end
-
-        it 'returns false' do
-          expect(subject).to be_falsey
         end
 
         it 'does not create a spam log' do
@@ -120,9 +121,9 @@ describe Spam::SpamCheckService do
           issue.description = 'SPAM!'
         end
 
-        context 'when indicated as spam by Akismet' do
+        context 'when disallowed by the spam action service' do
           before do
-            allow(Spam::AkismetService).to receive(:new).and_return(double(spam?: true))
+            allow(fake_verdict_service).to receive(:execute).and_return(DISALLOW)
           end
 
           context 'when allow_possible_spam feature flag is false' do
@@ -150,13 +151,9 @@ describe Spam::SpamCheckService do
           end
         end
 
-        context 'when not indicated as spam by Akismet' do
+        context 'when spam action service allows creation' do
           before do
-            allow(Spam::AkismetService).to receive(:new).and_return(double(spam?: false))
-          end
-
-          it 'returns false' do
-            expect(subject).to be_falsey
+            allow(fake_verdict_service).to receive(:execute).and_return(ALLOW)
           end
 
           it 'does not create a spam log' do
