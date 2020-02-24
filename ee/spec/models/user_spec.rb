@@ -906,30 +906,54 @@ describe User do
     end
   end
 
-  describe '#free_namespaces' do
-    let_it_be(:user) { create(:user, :external) }
+  describe '#managed_free_namespaces' do
+    let_it_be(:user) { create(:user) }
     let_it_be(:licensed_group) { create(:group, plan: :bronze_plan) }
     let_it_be(:free_group_z) { create(:group, plan: :default_plan, name: 'Z') }
     let_it_be(:free_group_a) { create(:group, plan: :default_plan, name: 'A') }
 
-    subject { user.free_namespaces }
+    subject { user.managed_free_namespaces }
 
     context 'user with no groups' do
       it { is_expected.to eq [] }
     end
 
-    context 'member of a licensed group' do
+    context 'owner of a licensed group' do
       before do
-        licensed_group.add_guest(user)
+        licensed_group.add_owner(user)
       end
 
       it { is_expected.not_to include licensed_group }
     end
 
-    context 'member of 2 free groups' do
+    context 'guest of a free group' do
       before do
         free_group_a.add_guest(user)
-        free_group_z.add_guest(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'developer of a free group' do
+      before do
+        free_group_a.add_developer(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'maintainer of a free group' do
+      before do
+        free_group_a.add_maintainer(user)
+      end
+
+      it { is_expected.to include free_group_a }
+    end
+
+    context 'owner of 2 free groups' do
+      before do
+        free_group_a.add_owner(user)
+        free_group_z.add_owner(user)
       end
 
       it { is_expected.to eq [free_group_a, free_group_z] }

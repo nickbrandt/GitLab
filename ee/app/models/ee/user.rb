@@ -240,8 +240,8 @@ module EE
         .any?
     end
 
-    def free_namespaces
-      authorized_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
+    def managed_free_namespaces
+      manageable_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
     end
 
     override :has_current_license?
