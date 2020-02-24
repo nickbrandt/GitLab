@@ -91,7 +91,6 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        not_found! if Feature.disabled?(:nuget_package_registry, authorized_user_project, default_enabled: true)
         authorize_packages_feature!(authorized_user_project)
       end
 
