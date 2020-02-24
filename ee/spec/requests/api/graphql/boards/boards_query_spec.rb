@@ -13,7 +13,6 @@ describe 'get list of boards' do
 
   describe 'for a group' do
     let(:board_parent) { create(:group, :private) }
-    let(:boards_data) { graphql_data['group']['boards']['edges'] }
 
     it_behaves_like 'group and project boards query'
   end
