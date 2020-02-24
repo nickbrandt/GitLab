@@ -7,7 +7,7 @@ describe Ci::ProcessBuildService, '#execute' do
   let(:environment) { create(:environment, project: project, name: 'production') }
   let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
   let(:ci_build) { create(:ci_build, :created, environment: environment.name, user: user, when: :on_success) }
-  let(:current_status) { 'success' }
+  let(:current_status) { { name: 'success', is_ignored: false } }
 
   subject { described_class.new(project, user).execute(ci_build, current_status) }
 

@@ -67,6 +67,12 @@ module Gitlab
           @status_set.include?(:success_with_warnings)
         end
 
+        def ignored?
+          return false if none?
+
+          only_of?(:ignored)
+        end
+
         private
 
         def none?

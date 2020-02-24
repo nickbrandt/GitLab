@@ -77,10 +77,12 @@ module Ci
         private
 
         def status_for_array(statuses)
-          result = Gitlab::Ci::Status::Composite
-            .new(statuses)
-            .status
-          result || 'success'
+          status_composite = Gitlab::Ci::Status::Composite.new(statuses)
+
+          {
+            name: status_composite.status || 'success',
+            is_ignored: status_composite.ignored? || false
+          }
         end
 
         def all_statuses_grouped_by_stage_position

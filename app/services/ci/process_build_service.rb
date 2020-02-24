@@ -3,7 +3,7 @@
 module Ci
   class ProcessBuildService < BaseService
     def execute(build, current_status)
-      if valid_statuses_for_build(build).include?(current_status)
+      if should_run?(build, current_status)
         if build.schedulable?
           build.schedule
         elsif build.action?
@@ -25,20 +25,16 @@ module Ci
       build.enqueue
     end
 
-    def valid_statuses_for_build(build)
+    def should_run?(build, current_status)
       case build.when
-      when 'on_success'
-        build.scheduling_type_dag? ? %w[success] : %w[success skipped]
+      when 'on_success', 'manual', 'delayed'
+        %w[success].include?(current_status[:name]) || current_status[:is_ignored]
       when 'on_failure'
-        %w[failed]
+        %w[failed].include?(current_status[:name])
       when 'always'
-        %w[success failed skipped]
-      when 'manual'
-        %w[success skipped]
-      when 'delayed'
-        %w[success skipped]
+        %w[success failed].include?(current_status[:name]) || current_status[:is_ignored]
       else
-        []
+        false
       end
     end
   end

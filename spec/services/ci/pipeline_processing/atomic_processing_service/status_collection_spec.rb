@@ -18,7 +18,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection do
     it 'does update existing status of processable' do
       collection.set_processable_status(test_a.id, 'success', 100)
 
-      expect(collection.status_for_names(['test-a'])).to eq('success')
+      expect(collection.status_for_names(['test-a'])).to eq({ name: 'success', is_ignored: false })
     end
 
     it 'ignores a missing processable' do
@@ -28,7 +28,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection do
 
   describe '#status_of_all' do
     it 'returns composite status of the collection' do
-      expect(collection.status_of_all).to eq('running')
+      expect(collection.status_of_all).to eq({ name: 'running', is_ignored: false })
     end
   end
 
@@ -41,7 +41,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection do
 
     with_them do
       it 'returns composite status of given names' do
-        expect(collection.status_for_names(names)).to eq(status)
+        expect(collection.status_for_names(names)).to eq({ name: status, is_ignored: false })
       end
     end
   end
@@ -55,7 +55,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection do
 
     with_them do
       it 'returns composite status for processables in prior stages' do
-        expect(collection.status_for_prior_stage_position(stage)).to eq(status)
+        expect(collection.status_for_prior_stage_position(stage)).to eq({ name: status, is_ignored: false })
       end
     end
   end
@@ -69,7 +69,7 @@ describe Ci::PipelineProcessing::AtomicProcessingService::StatusCollection do
 
     with_them do
       it 'returns composite status for processables at a given stages' do
-        expect(collection.status_for_stage_position(stage)).to eq(status)
+        expect(collection.status_for_stage_position(stage)).to eq({ name: status, is_ignored: false })
       end
     end
   end

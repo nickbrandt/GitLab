@@ -644,6 +644,40 @@ shared_examples 'Pipeline Processing Service' do
 
       expect(all_builds_statuses).to eq(%w[success skipped pending])
     end
+
+    context 'when first build fails' do
+      it 'skips second stage and continues on third stage' do
+        expect(all_builds_statuses).to eq(%w[pending created created])
+
+        fail_running_or_pending
+
+        expect(all_builds_statuses).to eq(%w[failed pending created])
+
+        succeed_running_or_pending
+
+        expect(all_builds_statuses).to eq(%w[failed success skipped])
+      end
+    end
+  end
+
+  context 'when second stage has only on_failure jobs and first stage has allow_failure: true', :sidekiq_inline do
+    before do
+      create_build('check', stage_idx: 0, allow_failure: true)
+      create_build('build', stage_idx: 1, when: 'on_failure')
+      create_build('test', stage_idx: 2)
+
+      process_pipeline
+    end
+
+    it 'skips second stage and continues on third stage' do
+      expect(all_builds_statuses).to eq(%w[pending created created])
+      expect(stages).to eq(%w[pending created created])
+
+      builds.first.drop
+
+      expect(all_builds_statuses).to eq(%w[failed skipped pending])
+      expect(stages).to eq(%w[success skipped pending])
+    end
   end
 
   context 'when failed build in the middle stage is retried', :sidekiq_inline do
@@ -704,6 +738,24 @@ shared_examples 'Pipeline Processing Service' do
       expect(builds_statuses).to eq %w[failed success success]
 
       expect(pipeline.reload).to be_success
+    end
+  end
+
+  context 'when a job is skipped because of previous failure', :sidekiq_inline do
+    let!(:linux_build) { create_build('linux:build', stage: 'build', stage_idx: 0) }
+    let!(:linux_rspec) { create_build('linux:rspec', stage: 'test', stage_idx: 1) }
+    let!(:deploy) { create_build('deploy', stage: 'deploy', stage_idx: 2) }
+
+    it 'skips the next job' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(pending created created))
+      expect(all_builds_statuses).to eq(%w[pending created created])
+
+      linux_build.reset.drop!
+
+      expect(stages).to eq(%w(failed skipped skipped))
+      expect(all_builds_statuses).to eq(%w[failed skipped skipped])
     end
   end
 
@@ -794,7 +846,7 @@ shared_examples 'Pipeline Processing Service' do
       end
     end
 
-    context 'when one of the jobs is run on a failure' do
+    context 'when one of the jobs is run when on_failure' do
       let!(:linux_notify) { create_build('linux:notify', stage: 'deploy', stage_idx: 2, when: 'on_failure', scheduling_type: :dag) }
 
       let!(:linux_notify_on_build) { create(:ci_build_need, build: linux_notify, name: 'linux:build') }
@@ -878,9 +930,82 @@ shared_examples 'Pipeline Processing Service' do
         end
       end
     end
+
+    context 'when one needed job succeeds but other needed job fails' do
+      let!(:linux_deploy) do
+        create_build('deploy:linux', stage: 'deploy', stage_idx: 2, scheduling_type: :dag, needs: [
+          create(:ci_build_need, name: 'linux:rubocop'),
+          create(:ci_build_need, name: 'linux:rspec'),
+        ])
+      end
+      let!(:mac_deploy) do
+        create_build('deploy:mac', stage: 'deploy', stage_idx: 2, scheduling_type: :dag, needs: [
+          create(:ci_build_need, name: 'mac:rubocop'),
+          create(:ci_build_need, name: 'mac:rspec'),
+        ])
+      end
+
+      it 'runs mac path but skips linux path' do
+        expect(process_pipeline).to be_truthy
+
+        expect(stages).to eq(%w(pending created created))
+        expect(builds.pending).to contain_exactly(linux_build, mac_build)
+        expect(pipeline.reload.status).to eq('pending')
+
+        linux_build.reset.drop!
+        mac_build.reset.success!
+
+        expect(stages).to eq(%w(failed pending pending))
+        expect(builds.success).to contain_exactly(mac_build)
+        expect(builds.failed).to contain_exactly(linux_build)
+        expect(all_builds.skipped).to contain_exactly(linux_rspec, linux_rubocop, linux_deploy)
+        expect(builds.pending).to contain_exactly(mac_rspec, mac_rubocop)
+        expect(pipeline.reload.status).to eq('running')
+
+        mac_rspec.reset.success!
+        mac_rubocop.reset.success!
+
+        expect(stages).to eq(%w(failed success pending))
+        expect(builds.success).to contain_exactly(mac_build, mac_rspec, mac_rubocop)
+        expect(builds.failed).to contain_exactly(linux_build)
+        expect(builds.pending).to contain_exactly(mac_deploy)
+        expect(all_builds.skipped).to contain_exactly(linux_rspec, linux_rubocop, linux_deploy, deploy)
+        expect(pipeline.reload.status).to eq('running')
+
+        mac_deploy.reset.success!
+
+        expect(stages).to eq(%w(failed success success))
+        expect(builds.success).to contain_exactly(mac_build, mac_rspec, mac_rubocop, mac_deploy)
+        expect(pipeline.reload.status).to eq('failed')
+      end
+    end
   end
 
-  context 'when a needed job is skipped', :sidekiq_inline do
+  context 'when a needed job fails', :sidekiq_inline do
+    let!(:linux_rspec) { create_build('linux:rspec', stage: 'test', stage_idx: 0) }
+    let!(:deploy) do
+      create_build('deploy', stage: 'deploy', stage_idx: 1, scheduling_type: :dag, needs: [
+        create(:ci_build_need, name: 'linux:rspec')
+      ])
+    end
+
+    it 'skips the next job' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(pending created))
+      expect(all_builds.pending).to contain_exactly(linux_rspec)
+      expect(pipeline.reload.status).to eq('pending')
+
+      linux_rspec.reset.drop!
+
+      expect(stages).to eq(%w(failed skipped))
+      expect(all_builds.failed).to contain_exactly(linux_rspec)
+      expect(all_builds.skipped).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('failed')
+    end
+  end
+
+  context 'when a needed job is skipped because of previous failure', :sidekiq_inline do
     let!(:linux_build) { create_build('linux:build', stage: 'build', stage_idx: 0) }
     let!(:linux_rspec) { create_build('linux:rspec', stage: 'test', stage_idx: 1) }
     let!(:deploy) do
@@ -889,17 +1014,148 @@ shared_examples 'Pipeline Processing Service' do
       ])
     end
 
-    it 'skips the jobs depending on it' do
+    it 'skips the next job' do
       expect(process_pipeline).to be_truthy
 
       expect(stages).to eq(%w(pending created created))
       expect(all_builds.pending).to contain_exactly(linux_build)
+      expect(pipeline.reload.status).to eq('pending')
 
       linux_build.reset.drop!
 
       expect(stages).to eq(%w(failed skipped skipped))
       expect(all_builds.failed).to contain_exactly(linux_build)
       expect(all_builds.skipped).to contain_exactly(linux_rspec, deploy)
+      expect(pipeline.reload.status).to eq('failed')
+    end
+  end
+
+  context 'when a needed job is skipped and another needed job is success', :sidekiq_inline do
+    let!(:build_1) { create_build('build_1', stage: 'build', stage_idx: 0) }
+    let!(:build_2) { create_build('build_2', stage: 'build', stage_idx: 0) }
+    let!(:rspec) { create_build('rspec', stage: 'test', stage_idx: 1) }
+    let!(:deploy) do
+      create_build('deploy', stage: 'deploy', stage_idx: 2, scheduling_type: :dag, needs: [
+        create(:ci_build_need, name: 'build_1'),
+        create(:ci_build_need, name: 'rspec')
+      ])
+    end
+
+    it 'skips rspec, then skips deploy' do # TODO: WHAT IS THE EXPECTED BEHAVIOR?
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w[pending created created])
+      expect(all_builds_statuses).to eq(%w[pending pending created created])
+
+      build_1.reset.success!
+      build_2.reset.drop!
+
+      expect(stages).to eq(%w[failed skipped skipped])
+      expect(all_builds_statuses).to eq(%w[success failed skipped skipped])
+    end
+  end
+
+  context 'when a needed job is manual', :sidekiq_inline do
+    let!(:linux_build) { create_build('linux:build', stage: 'build', stage_idx: 0) }
+    let!(:linux_rspec) do
+      create_build('linux:rspec', stage: 'test', stage_idx: 1, when: 'manual', allow_failure: true)
+    end
+    let!(:deploy) do
+      create_build('deploy', stage: 'deploy', stage_idx: 2, scheduling_type: :dag, needs: [
+        create(:ci_build_need, name: 'linux:rspec')
+      ])
+    end
+
+    it 'runs the next job without waiting for the skipped job' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(pending created created))
+      expect(all_builds.pending).to contain_exactly(linux_build)
+
+      linux_build.reset.success!
+
+      expect(stages).to eq(%w(success skipped pending))
+      expect(all_builds.success).to contain_exactly(linux_build)
+      expect(all_builds.manual).to contain_exactly(linux_rspec)
+      expect(all_builds.pending).to contain_exactly(deploy)
+    end
+  end
+
+  context 'when first job is manual', :sidekiq_inline do
+    let!(:linux_build) do
+      create_build('linux:build', stage: 'build', stage_idx: 0, when: 'manual', allow_failure: true)
+    end
+    let!(:linux_rspec) do
+      create_build('linux:rspec', stage: 'test', stage_idx: 1)
+    end
+
+    it 'skips the job and runs the next one' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(skipped pending))
+      expect(all_builds.manual).to contain_exactly(linux_build)
+      expect(all_builds.pending).to contain_exactly(linux_rspec)
+    end
+  end
+
+  context 'when the first job is needed and allowed to fail', :sidekiq_inline do
+    let!(:test) do
+      create_build('test', stage: 'test', stage_idx: 0, allow_failure: true)
+    end
+    let!(:deploy) do
+      create_build('deploy', stage: 'deploy', stage_idx: 1, scheduling_type: :dag, needs: [
+        create(:ci_build_need, name: 'test')
+      ])
+    end
+
+    it 'ignores the failing job and runs the next job' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(pending created))
+      expect(all_builds.pending).to contain_exactly(test)
+      expect(all_builds.created).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('pending')
+
+      fail_running_or_pending
+
+      expect(stages).to eq(%w(success pending))
+      expect(all_builds.failed).to contain_exactly(test)
+      expect(all_builds.pending).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('pending')
+
+      succeed_pending
+
+      expect(stages).to eq(%w(success success))
+      expect(all_builds.failed).to contain_exactly(test)
+      expect(all_builds.success).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('success')
+    end
+  end
+
+  context 'when the first job is needed and manual', :sidekiq_inline do
+    let!(:test) do
+      create_build('test', stage: 'test', stage_idx: 0, when: 'manual', allow_failure: true)
+    end
+    let!(:deploy) do
+      create_build('deploy', stage: 'deploy', stage_idx: 1, scheduling_type: :dag, needs: [
+        create(:ci_build_need, name: 'test')
+      ])
+    end
+
+    it 'runs the next job without waiting for the skipped job' do
+      expect(process_pipeline).to be_truthy
+
+      expect(stages).to eq(%w(skipped pending))
+      expect(all_builds.manual).to contain_exactly(test)
+      expect(all_builds.pending).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('pending')
+
+      succeed_pending
+
+      expect(stages).to eq(%w(skipped success))
+      expect(all_builds.manual).to contain_exactly(test)
+      expect(all_builds.success).to contain_exactly(deploy)
+      expect(pipeline.reload.status).to eq('success')
     end
   end
 

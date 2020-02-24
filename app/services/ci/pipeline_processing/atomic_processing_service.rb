@@ -49,7 +49,7 @@ module Ci
         ids.in_groups_of(BATCH_SIZE, false, &method(:update_processables!))
 
         status = @collection.status_for_stage_position(stage.position)
-        stage.set_status(status)
+        stage.set_status(status[:name])
       end
 
       def update_processables!(ids)
@@ -64,7 +64,7 @@ module Ci
       end
 
       def update_pipeline!
-        pipeline.set_status(@collection.status_of_all)
+        pipeline.set_status(@collection.status_of_all[:name])
       end
 
       def update_statuses_processed!
@@ -77,7 +77,7 @@ module Ci
 
       def update_processable!(processable)
         status = processable_status(processable)
-        return unless HasStatus::COMPLETED_STATUSES.include?(status)
+        return unless HasStatus::COMPLETED_STATUSES.include?(status[:name])
 
         # transition status if possible
         Gitlab::OptimisticLocking.retry_lock(processable) do |subject|

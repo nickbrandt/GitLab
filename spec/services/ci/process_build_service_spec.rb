@@ -15,7 +15,7 @@ describe Ci::ProcessBuildService, '#execute' do
     let(:build) { create(:ci_build, :created, when: :on_success, user: user, project: project) }
 
     context 'when current status is success' do
-      let(:current_status) { 'success' }
+      let(:current_status) { { name: 'success', is_ignored: false } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('pending')
@@ -23,7 +23,7 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is skipped' do
-      let(:current_status) { 'skipped' }
+      let(:current_status) { { name: 'skipped', is_ignored: true } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('pending')
@@ -31,7 +31,7 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is failed' do
-      let(:current_status) { 'failed' }
+      let(:current_status) { { name: 'failed', is_ignored: false } }
 
       it 'does not change the build status' do
         expect { subject }.to change { build.status }.to('skipped')
@@ -43,7 +43,7 @@ describe Ci::ProcessBuildService, '#execute' do
     let(:build) { create(:ci_build, :created, when: :on_failure, user: user, project: project) }
 
     context 'when current status is success' do
-      let(:current_status) { 'success' }
+      let(:current_status) { { name: 'success', is_ignored: false } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('skipped')
@@ -51,7 +51,7 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is failed' do
-      let(:current_status) { 'failed' }
+      let(:current_status) { { name: 'failed', is_ignored: false } }
 
       it 'does not change the build status' do
         expect { subject }.to change { build.status }.to('pending')
@@ -63,7 +63,7 @@ describe Ci::ProcessBuildService, '#execute' do
     let(:build) { create(:ci_build, :created, when: :always, user: user, project: project) }
 
     context 'when current status is success' do
-      let(:current_status) { 'success' }
+      let(:current_status) { { name: 'success', is_ignored: false } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('pending')
@@ -71,7 +71,7 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is failed' do
-      let(:current_status) { 'failed' }
+      let(:current_status) { { name: 'failed', is_ignored: false } }
 
       it 'does not change the build status' do
         expect { subject }.to change { build.status }.to('pending')
@@ -83,7 +83,7 @@ describe Ci::ProcessBuildService, '#execute' do
     let(:build) { create(:ci_build, :created, :actionable, user: user, project: project) }
 
     context 'when current status is success' do
-      let(:current_status) { 'success' }
+      let(:current_status) { { name: 'success', is_ignored: false } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('manual')
@@ -91,7 +91,7 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is failed' do
-      let(:current_status) { 'failed' }
+      let(:current_status) { { name: 'failed', is_ignored: false } }
 
       it 'does not change the build status' do
         expect { subject }.to change { build.status }.to('skipped')
@@ -107,7 +107,7 @@ describe Ci::ProcessBuildService, '#execute' do
     let(:build) { create(:ci_build, :created, :schedulable, user: user, project: project) }
 
     context 'when current status is success' do
-      let(:current_status) { 'success' }
+      let(:current_status) { { name: 'success', is_ignored: false } }
 
       it 'changes the build status' do
         expect { subject }.to change { build.status }.to('scheduled')
@@ -115,32 +115,9 @@ describe Ci::ProcessBuildService, '#execute' do
     end
 
     context 'when current status is failed' do
-      let(:current_status) { 'failed' }
+      let(:current_status) { { name: 'failed', is_ignored: false } }
 
       it 'does not change the build status' do
-        expect { subject }.to change { build.status }.to('skipped')
-      end
-    end
-  end
-
-  context 'when build is scheduled with DAG' do
-    let(:pipeline) { create(:ci_pipeline, ref: 'master', project: project) }
-    let!(:build) { create(:ci_build, :created, when: :on_success, pipeline: pipeline, scheduling_type: :dag) }
-    let!(:other_build) { create(:ci_build, :created, when: :on_success, pipeline: pipeline) }
-    let!(:build_on_other_build) { create(:ci_build_need, build: build, name: other_build.name) }
-
-    context 'when current status is success' do
-      let(:current_status) { 'success' }
-
-      it 'enqueues the build' do
-        expect { subject }.to change { build.status }.to('pending')
-      end
-    end
-
-    context 'when current status is skipped' do
-      let(:current_status) { 'skipped' }
-
-      it 'skips the build' do
         expect { subject }.to change { build.status }.to('skipped')
       end
     end
