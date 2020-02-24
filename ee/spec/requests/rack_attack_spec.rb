@@ -86,7 +86,9 @@ describe 'Rack Attack EE throttles' do
 
   describe 'requests to prometheus alert notify endpoint with oauth token' do
     before do
-      allow_any_instance_of(Projects::Prometheus::Alerts::NotifyService).to receive(:execute).and_return true
+      allow_next_instance_of(Projects::Prometheus::Alerts::NotifyService) do |instance|
+        allow(instance).to receive(:execute).and_return true
+      end
     end
 
     it_behaves_like 'incident management rate limiting' do
@@ -96,7 +98,9 @@ describe 'Rack Attack EE throttles' do
 
   describe 'requests to generic alert notify endpoint with oauth token' do
     before do
-      allow_any_instance_of(Projects::Alerting::NotifyService).to receive(:execute).and_return double(success?: true)
+      allow_next_instance_of(Projects::Alerting::NotifyService) do |instance|
+        allow(instance).to receive(:execute).and_return double(success?: true)
+      end
     end
 
     it_behaves_like 'incident management rate limiting' do

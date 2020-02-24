@@ -58,8 +58,9 @@ describe Gitlab::Geo::Oauth::Session, :geo do
 
         api_response = double(parsed: true)
 
-        expect_any_instance_of(OAuth2::AccessToken)
-          .to receive(:get).with(%r{^#{api_url}}).and_return(api_response)
+        expect_next_instance_of(OAuth2::AccessToken) do |instance|
+          expect(instance).to receive(:get).with(%r{^#{api_url}}).and_return(api_response)
+        end
 
         subject.authenticate('any token')
       end

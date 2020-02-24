@@ -68,7 +68,9 @@ describe Gitlab::GitAccess do
         bad_commit = double("Commit", safe_message: 'Some change').as_null_object
         ref_object = double(name: 'heads/master')
         allow(bad_commit).to receive(:refs).and_return([ref_object])
-        allow_any_instance_of(Repository).to receive(:commits_between).and_return([bad_commit])
+        allow_next_instance_of(Repository) do |instance|
+          allow(instance).to receive(:commits_between).and_return([bad_commit])
+        end
 
         project.create_push_rule(commit_message_regex: "Change some files")
 
@@ -324,7 +326,9 @@ describe Gitlab::GitAccess do
           stub_licensed_features(geo: true)
           stub_current_geo_node(create(:geo_node))
 
-          allow_any_instance_of(Gitlab::Geo::HealthCheck).to receive(:db_replication_lag_seconds).and_return(current_replication_lag)
+          allow_next_instance_of(Gitlab::Geo::HealthCheck) do |instance|
+            allow(instance).to receive(:db_replication_lag_seconds).and_return(current_replication_lag)
+          end
         end
 
         context 'that has no DB replication lag' do

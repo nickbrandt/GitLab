@@ -27,7 +27,9 @@ describe Gitlab::BackgroundMigration::UpdateAuthorizedKeysFileSince do
     end
 
     it 'calls remove_keys_not_found_in_db on Gitlab::Shell' do
-      expect_any_instance_of(Gitlab::Shell).to receive(:remove_keys_not_found_in_db)
+      expect_next_instance_of(Gitlab::Shell) do |instance|
+        expect(instance).to receive(:remove_keys_not_found_in_db)
+      end
       subject
     end
   end
@@ -63,7 +65,9 @@ describe Gitlab::BackgroundMigration::UpdateAuthorizedKeysFileSince do
 
   describe '#remove_keys_not_found_in_db' do
     it 'calls remove_keys_not_found_in_db on Gitlab::Shell' do
-      expect_any_instance_of(Gitlab::Shell).to receive(:remove_keys_not_found_in_db)
+      expect_next_instance_of(Gitlab::Shell) do |instance|
+        expect(instance).to receive(:remove_keys_not_found_in_db)
+      end
       background_migration.remove_keys_not_found_in_db
     end
   end

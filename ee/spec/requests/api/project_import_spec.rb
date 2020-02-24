@@ -11,7 +11,9 @@ describe API::ProjectImport do
   let(:namespace) { create(:group) }
 
   before do
-    allow_any_instance_of(Gitlab::ImportExport).to receive(:storage_path).and_return(export_path)
+    allow_next_instance_of(Gitlab::ImportExport) do |instance|
+      allow(instance).to receive(:storage_path).and_return(export_path)
+    end
 
     namespace.add_owner(user)
   end

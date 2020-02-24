@@ -10,8 +10,9 @@ describe Groups::DependencyProxyForContainersController do
     allow(Gitlab.config.dependency_proxy)
       .to receive(:enabled).and_return(true)
 
-    allow_any_instance_of(DependencyProxy::RequestTokenService)
-      .to receive(:execute).and_return(token_response)
+    allow_next_instance_of(DependencyProxy::RequestTokenService) do |instance|
+      allow(instance).to receive(:execute).and_return(token_response)
+    end
   end
 
   describe 'GET #manifest' do
@@ -19,8 +20,9 @@ describe Groups::DependencyProxyForContainersController do
     let(:pull_response) { { status: :success, manifest: manifest } }
 
     before do
-      allow_any_instance_of(DependencyProxy::PullManifestService)
-        .to receive(:execute).and_return(pull_response)
+      allow_next_instance_of(DependencyProxy::PullManifestService) do |instance|
+        allow(instance).to receive(:execute).and_return(pull_response)
+      end
     end
 
     context 'feature enabled' do
@@ -87,8 +89,9 @@ describe Groups::DependencyProxyForContainersController do
     let(:blob_response) { { status: :success, blob: blob } }
 
     before do
-      allow_any_instance_of(DependencyProxy::FindOrCreateBlobService)
-        .to receive(:execute).and_return(blob_response)
+      allow_next_instance_of(DependencyProxy::FindOrCreateBlobService) do |instance|
+        allow(instance).to receive(:execute).and_return(blob_response)
+      end
     end
 
     context 'feature enabled' do

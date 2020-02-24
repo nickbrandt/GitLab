@@ -181,8 +181,9 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
 
     context 'when there is no from address' do
       before do
-        allow_any_instance_of(described_class).to receive(:from_address)
-          .and_return(nil)
+        allow_next_instance_of(described_class) do |instance|
+          allow(instance).to receive(:from_address).and_return(nil)
+        end
       end
 
       it "creates a new issue" do

@@ -38,7 +38,9 @@ describe API::Internal::Base do
     before do
       project.add_developer(user)
       allow(described_class).to receive(:identify).and_return(user)
-      allow_any_instance_of(Gitlab::Identifier).to receive(:identify).and_return(user)
+      allow_next_instance_of(Gitlab::Identifier) do |instance|
+        allow(instance).to receive(:identify).and_return(user)
+      end
       stub_current_geo_node(primary_node)
     end
 
