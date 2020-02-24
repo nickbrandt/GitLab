@@ -50,21 +50,26 @@ describe Boards::IssuesController do
           expect(development.issues.map(&:relative_position)).not_to include(nil)
         end
 
-        it 'returns blocked status for each issue' do
+        it 'returns blocked status for each issue where the blocking issue is still opened' do
           issue1 = create(:labeled_issue, project: project_1, labels: [development], relative_position: 1)
           issue2 = create(:labeled_issue, project: project_1, labels: [development], relative_position: 2)
           issue3 = create(:labeled_issue, project: project_1, labels: [development], relative_position: 3)
+          issue4 = create(:labeled_issue, project: project_1, labels: [development], relative_position: 4)
+          closed_issue = create(:issue, :closed, project: project_1)
+
           create(:issue_link, source: issue1, target: issue2, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
           create(:issue_link, source: issue2, target: issue3, link_type: IssueLink::TYPE_BLOCKS)
+          create(:issue_link, source: issue4, target: closed_issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
 
           list_issues user: user, board: board, list: list2
 
           expect(response).to match_response_schema('entities/issue_boards')
           issues = json_response['issues']
-          expect(issues.length).to eq 3
+          expect(issues.length).to eq 4
           expect(issues[0]['blocked']).to be_truthy
           expect(issues[1]['blocked']).to be_falsey
           expect(issues[2]['blocked']).to be_truthy
+          expect(issues[3]['blocked']).to be_falsey
         end
 
         context 'with search param' do

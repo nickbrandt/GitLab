@@ -56,8 +56,9 @@ describe IssueLink do
       link1 = create(:issue_link, link_type: described_class::TYPE_BLOCKS)
       link2 = create(:issue_link, link_type: described_class::TYPE_IS_BLOCKED_BY)
       link3 = create(:issue_link, link_type: described_class::TYPE_RELATES_TO)
+      link4 = create(:issue_link, source: create(:issue, :closed), link_type: described_class::TYPE_BLOCKS)
 
-      expect(described_class.blocked_issue_ids([link1.target_id, link2.source_id, link3.source_id]))
+      expect(described_class.blocked_issue_ids([link1.target_id, link2.source_id, link3.source_id, link4.target_id]))
         .to match_array([link1.target_id, link2.source_id])
     end
   end

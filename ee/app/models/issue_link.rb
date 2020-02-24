@@ -33,12 +33,27 @@ class IssueLink < ApplicationRecord
 
   def self.blocked_issue_ids(issue_ids)
     from_union([
-      IssueLink.select('target_id as issue_id').where(link_type: IssueLink::TYPE_BLOCKS).where(target_id: issue_ids),
-      IssueLink.select('source_id as issue_id').where(link_type: IssueLink::TYPE_IS_BLOCKED_BY).where(source_id: issue_ids)
+      blocked_issues(issue_ids, IssueLink::TYPE_BLOCKS),
+      blocked_issues(issue_ids, IssueLink::TYPE_IS_BLOCKED_BY)
     ]).pluck(:issue_id)
   end
 
   private
+
+  def self.blocked_issues(issue_ids, link_type)
+    if link_type == IssueLink::TYPE_BLOCKS
+      blocked_key = :target_id
+      blocking_key = :source_id
+    else
+      blocked_key = :source_id
+      blocking_key = :target_id
+    end
+
+    select("#{blocked_key} as issue_id")
+      .where(link_type: link_type).where(blocked_key => issue_ids)
+      .joins("INNER JOIN issues ON issues.id = issue_links.#{blocking_key}")
+      .where('issues.state_id' => Issuable::STATE_ID_MAP[:opened])
+  end
 
   def check_self_relation
     return unless source && target
