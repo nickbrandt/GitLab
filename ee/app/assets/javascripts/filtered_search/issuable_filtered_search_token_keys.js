@@ -16,6 +16,15 @@ const weightTokenKey = {
   tag: 'number',
 };
 
+const epicTokenKey = {
+  formattedKey: __('Epic'),
+  key: 'epic',
+  type: 'string',
+  param: 'id',
+  symbol: '&',
+  icon: 'epic',
+};
+
 const weightConditions = [
   {
     url: 'weight=None',
@@ -43,14 +52,42 @@ const weightConditions = [
   },
 ];
 
+const epicConditions = [
+  {
+    url: 'epic_id=None',
+    operator: '=',
+    tokenKey: 'epic',
+    value: __('None'),
+  },
+  {
+    url: 'epic_id=Any',
+    operator: '=',
+    tokenKey: 'epic',
+    value: __('Any'),
+  },
+  {
+    url: 'not[epic_id]=None',
+    operator: '!=',
+    tokenKey: 'epic',
+    value: __('None'),
+  },
+  {
+    url: 'not[epic_id]=Any',
+    operator: '!=',
+    tokenKey: 'epic',
+    value: __('Any'),
+  },
+];
+
 /**
  * Filter tokens for issues in EE.
  */
 class IssuesFilteredSearchTokenKeysEE extends FilteredSearchTokenKeys {
   constructor() {
-    super([...tokenKeys, weightTokenKey], alternativeTokenKeys, [
+    super([...tokenKeys, epicTokenKey, weightTokenKey], alternativeTokenKeys, [
       ...conditions,
       ...weightConditions,
+      ...epicConditions,
     ]);
   }
 
@@ -65,6 +102,13 @@ class IssuesFilteredSearchTokenKeysEE extends FilteredSearchTokenKeys {
 
     assigneeTokenKey.type = 'array';
     assigneeTokenKey.param = 'username[]';
+  }
+
+  removeEpicToken() {
+    const index = this.tokenKeys.findIndex(token => token.key === epicTokenKey.key);
+    if (index >= 0) {
+      this.tokenKeys.splice(index, 1);
+    }
   }
 }
 

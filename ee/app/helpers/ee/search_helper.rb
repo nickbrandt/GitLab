@@ -10,6 +10,12 @@ module EE
       options = super
       options[:data][:'multiple-assignees'] = 'true' if search_multiple_assignees?(type)
 
+      if @project&.group
+        options[:data]['epics-endpoint'] = group_epics_path(@project.group)
+      elsif @group.present?
+        options[:data]['epics-endpoint'] = group_epics_path(@group)
+      end
+
       options
     end
 

@@ -1728,6 +1728,9 @@ msgstr ""
 msgid "An error occurred when updating the issue weight"
 msgstr ""
 
+msgid "An error occurred while adding formatted title for epic"
+msgstr ""
+
 msgid "An error occurred while checking group path"
 msgstr ""
 
