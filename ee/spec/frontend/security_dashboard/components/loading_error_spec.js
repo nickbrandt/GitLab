@@ -4,6 +4,11 @@ import { GlEmptyState } from '@gitlab/ui';
 
 import LoadingError from 'ee/security_dashboard/components/loading_error.vue';
 
+const illustrations = {
+  401: '/401.svg',
+  403: '/403.svg',
+};
+
 describe('LoadingError component', () => {
   let wrapper;
 
@@ -11,6 +16,7 @@ describe('LoadingError component', () => {
     wrapper = shallowMount(LoadingError, {
       propsData: {
         errorCode,
+        illustrations,
       },
     });
   };
