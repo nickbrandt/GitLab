@@ -18810,13 +18810,7 @@ msgstr ""
 msgid "Subscription"
 msgstr ""
 
-msgid "Subscription creation failed because the specified project is not public."
-msgstr ""
-
 msgid "Subscription deletion failed."
-msgstr ""
-
-msgid "Subscription limit reached."
 msgstr ""
 
 msgid "Subscription successfully applied to \"%{group_name}\""
@@ -19738,7 +19732,7 @@ msgstr ""
 msgid "There are no unstaged changes"
 msgstr ""
 
-msgid "There is a limit of 2 subscriptions from or to a project."
+msgid "There is a limit of %{ci_project_subscriptions_limit} subscriptions from or to a project."
 msgstr ""
 
 msgid "There is already a repository with that name on disk"

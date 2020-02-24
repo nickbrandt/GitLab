@@ -16,6 +16,11 @@ describe Projects::SubscriptionsController do
 
     let(:upstream_project) { create(:project, :public) }
 
+    before do
+      plan_limits = create(:plan_limits, :default_plan)
+      plan_limits.update(ci_project_subscriptions: 2)
+    end
+
     context 'when user is authorized' do
       before do
         project.add_maintainer(user)
@@ -50,19 +55,19 @@ describe Projects::SubscriptionsController do
               end
             end
 
-            context 'when subscription count is on the limit' do
+            context 'when subscription count is above the limit' do
               before do
-                create_list(:ci_subscriptions_project, 2, downstream_project: project)
+                create_list(:ci_subscriptions_project, 2, upstream_project: upstream_project)
               end
 
               it 'does not create a new subscription' do
-                expect { post_create }.not_to change { project.upstream_project_subscriptions.count }.from(2)
+                expect { post_create }.not_to change { project.upstream_project_subscriptions.count }.from(0)
               end
 
               it 'sets the flash' do
                 post_create
 
-                expect(response).to set_flash[:warning].to('Subscription limit reached.')
+                expect(response).to set_flash[:alert].to(['Maximum number of ci project subscriptions (2) exceeded'])
               end
 
               it 'redirects to ci_cd settings' do
@@ -85,7 +90,7 @@ describe Projects::SubscriptionsController do
             it 'sets the flash' do
               post_create
 
-              expect(response).to set_flash[:alert].to('Subscription creation failed because the specified project is not public.')
+              expect(response).to set_flash[:alert].to(['Upstream project needs to be public'])
             end
 
             it 'redirects to ci_cd settings' do
