@@ -1,5 +1,0 @@
----
-title: Geo - Fix query to retrieve Job Artifacts when selective sync is disabled
-merge_request: 25388
-author:
-type: performance
