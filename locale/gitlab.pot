@@ -4820,6 +4820,9 @@ msgstr ""
 msgid "Code Review"
 msgstr ""
 
+msgid "Code Review Analytics displays a table of open merge requests considered to be in code review. There are currently no merge requests in review for this project and/or filters."
+msgstr ""
+
 msgid "Code owner approval is required"
 msgstr ""
 
@@ -22472,6 +22475,9 @@ msgid "You don't have any authorized applications"
 msgstr ""
 
 msgid "You don't have any deployments right now."
+msgstr ""
+
+msgid "You don't have any open merge requests"
 msgstr ""
 
 msgid "You don't have any projects available."
