@@ -20753,6 +20753,12 @@ msgstr ""
 msgid "Uninstalling"
 msgstr ""
 
+msgid "Units|ms"
+msgstr ""
+
+msgid "Units|s"
+msgstr ""
+
 msgid "Unknown"
 msgstr ""
 
