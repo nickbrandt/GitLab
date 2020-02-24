@@ -299,7 +299,7 @@ module Ci
     def tag_constraints
       unless has_tags? || run_untagged?
         errors.add(:tags_list,
-          'can not be empty when runner is not allowed to pick untagged jobs')
+          _('can not be empty when runner is not allowed to pick untagged jobs'))
       end
     end
 
@@ -309,25 +309,25 @@ module Ci
 
     def no_projects
       if projects.any?
-        errors.add(:runner, 'cannot have projects assigned')
+        errors.add(:runner, _('cannot have projects assigned'))
       end
     end
 
     def no_groups
       if groups.any?
-        errors.add(:runner, 'cannot have groups assigned')
+        errors.add(:runner, _('cannot have groups assigned'))
       end
     end
 
     def any_project
       unless projects.any?
-        errors.add(:runner, 'needs to be assigned to at least one project')
+        errors.add(:runner, _('needs to be assigned to at least one project'))
       end
     end
 
     def exactly_one_group
       unless groups.one?
-        errors.add(:runner, 'needs to be assigned to exactly one group')
+        errors.add(:runner, _('needs to be assigned to exactly one group'))
       end
     end
 

@@ -142,7 +142,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
     return if approval_project_rule.blank?
     return if merge_request.project == approval_project_rule.project
 
-    errors.add(:approval_project_rule, 'must be for the same project')
+    errors.add(:approval_project_rule, _('must be for the same project'))
   end
 
   def refresh_license_management_approvals(project_approval_rule)

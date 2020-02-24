@@ -105,7 +105,7 @@ class DeployToken < ApplicationRecord
   end
 
   def ensure_at_least_one_scope
-    errors.add(:base, "Scopes can't be blank") unless read_repository || read_registry
+    errors.add(:base, _("Scopes can't be blank")) unless read_repository || read_registry
   end
 
   def default_username
@@ -113,10 +113,10 @@ class DeployToken < ApplicationRecord
   end
 
   def no_groups
-    errors.add(:deploy_token, 'cannot have groups assigned') if group_deploy_tokens.any?
+    errors.add(:deploy_token, _('cannot have groups assigned')) if group_deploy_tokens.any?
   end
 
   def no_projects
-    errors.add(:deploy_token, 'cannot have projects assigned') if project_deploy_tokens.any?
+    errors.add(:deploy_token, _('cannot have projects assigned')) if project_deploy_tokens.any?
   end
 end

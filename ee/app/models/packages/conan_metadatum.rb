@@ -35,7 +35,7 @@ class Packages::ConanMetadatum < ApplicationRecord
 
   def conan_package_type
     unless package && package.conan?
-      errors.add(:base, 'Package type must be Conan')
+      errors.add(:base, _('Package type must be Conan'))
     end
   end
 end

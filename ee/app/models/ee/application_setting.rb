@@ -281,7 +281,7 @@ module EE
       return unless mirror_max_capacity && mirror_capacity_threshold
 
       if mirror_capacity_threshold > mirror_max_capacity
-        errors.add(:mirror_capacity_threshold, "Project's mirror capacity threshold can't be higher than it's maximum capacity")
+        errors.add(:mirror_capacity_threshold, _("Project's mirror capacity threshold can't be higher than it's maximum capacity"))
       end
     end
 

@@ -131,13 +131,13 @@ module EE
 
     def cannot_be_admin_and_auditor
       if admin? && auditor?
-        errors.add(:admin, "user cannot also be an Auditor.")
+        errors.add(:admin, _('user cannot also be an Auditor.'))
       end
     end
 
     def auditor_requires_license_add_on
       unless license_allows_auditor_user?
-        errors.add(:auditor, 'user cannot be created without the "GitLab_Auditor_User" addon')
+        errors.add(:auditor, _('user cannot be created without the "GitLab_Auditor_User" addon'))
       end
     end
 

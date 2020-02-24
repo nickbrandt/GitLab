@@ -306,7 +306,7 @@ module Clusters
         .where.not(id: id)
 
       if duplicate_management_clusters.any?
-        errors.add(:environment_scope, "cannot add duplicated environment scope")
+        errors.add(:environment_scope, _('cannot add duplicated environment scope'))
       end
     end
 
@@ -380,7 +380,7 @@ module Clusters
 
     def restrict_modification
       if provider&.on_creation?
-        errors.add(:base, "cannot modify during creation")
+        errors.add(:base, _('cannot modify during creation'))
         return false
       end
 
@@ -389,13 +389,13 @@ module Clusters
 
     def no_groups
       if groups.any?
-        errors.add(:cluster, 'cannot have groups assigned')
+        errors.add(:cluster, _('cannot have groups assigned'))
       end
     end
 
     def no_projects
       if projects.any?
-        errors.add(:cluster, 'cannot have projects assigned')
+        errors.add(:cluster, _('cannot have projects assigned'))
       end
     end
   end

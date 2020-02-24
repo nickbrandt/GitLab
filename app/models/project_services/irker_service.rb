@@ -79,7 +79,7 @@ class IrkerService < Service
 
     map_recipients
 
-    errors.add(:recipients, 'are all invalid') if channels.empty?
+    errors.add(:recipients, _('are all invalid')) if channels.empty?
     true
   end
 

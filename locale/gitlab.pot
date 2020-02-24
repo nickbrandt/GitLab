@@ -40,6 +40,9 @@ msgstr ""
 msgid " and %{sliced}"
 msgstr ""
 
+msgid " cant be 00000000 (branch removal)"
+msgstr ""
+
 msgid " degraded on %d point"
 msgid_plural " degraded on %d points"
 msgstr[0] ""
@@ -2007,6 +2010,9 @@ msgid "Ancestors"
 msgstr ""
 
 msgid "Anonymous"
+msgstr ""
+
+msgid "Another issue tracker is already in use. Only one issue tracker service can be active at a time"
 msgstr ""
 
 msgid "Anti-spam verification"
@@ -5809,6 +5815,9 @@ msgid "Current Project"
 msgstr ""
 
 msgid "Current node"
+msgstr ""
+
+msgid "Current node must be the primary node or you will be locking yourself out"
 msgstr ""
 
 msgid "Current password"
@@ -9767,6 +9776,9 @@ msgstr ""
 msgid "Group pipeline minutes were successfully reset."
 msgstr ""
 
+msgid "Group requires separate account"
+msgstr ""
+
 msgid "Group variables (inherited)"
 msgstr ""
 
@@ -10110,6 +10122,9 @@ msgid "Guideline"
 msgstr ""
 
 msgid "HTTP Basic: Access denied\\nYou must use a personal access token with 'api' scope for Git over HTTP.\\nYou can generate one at %{profile_personal_access_tokens_url}"
+msgstr ""
+
+msgid "Hashed Storage must be enabled to use Geo"
 msgstr ""
 
 msgid "Hashed repository storage paths"
@@ -10746,6 +10761,9 @@ msgstr ""
 msgid "Invalid field"
 msgstr ""
 
+msgid "Invalid file format with specified file type"
+msgstr ""
+
 msgid "Invalid file."
 msgstr ""
 
@@ -10837,6 +10855,9 @@ msgid "Issue cannot be found."
 msgstr ""
 
 msgid "Issue events"
+msgstr ""
+
+msgid "Issue or Merge Request ID is required"
 msgstr ""
 
 msgid "Issue template (optional)"
@@ -13365,6 +13386,12 @@ msgstr ""
 msgid "Only 'Reporter' roles and above on tiers Premium / Silver and above can see Value Stream Analytics."
 msgstr ""
 
+msgid "Only 1 appearances row can exist"
+msgstr ""
+
+msgid "Only Issue ID or Merge Request ID is required"
+msgstr ""
+
 msgid "Only Project Members"
 msgstr ""
 
@@ -13539,10 +13566,22 @@ msgstr ""
 msgid "Package Registry"
 msgstr ""
 
+msgid "Package already exists"
+msgstr ""
+
 msgid "Package deleted successfully"
 msgstr ""
 
 msgid "Package information"
+msgstr ""
+
+msgid "Package recipe already exists"
+msgstr ""
+
+msgid "Package type must be Conan"
+msgstr ""
+
+msgid "Package type must be Maven"
 msgstr ""
 
 msgid "Package was removed"
@@ -14961,6 +15000,9 @@ msgstr ""
 msgid "Project visibility level will be changed to match namespace rules when transferring to a group."
 msgstr ""
 
+msgid "Project's mirror capacity threshold can't be higher than it's maximum capacity"
+msgstr ""
+
 msgid "Project: %{name}"
 msgstr ""
 
@@ -15744,7 +15786,17 @@ msgstr ""
 msgid "Pull"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Puma is running with a thread count above 1 and the Rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
+=======
+msgid "Pull requests from fork are not supported"
+msgstr ""
+
+msgid "Puma is running with a thread count above 1 and the rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
+msgstr ""
+
+msgid "Puma is running with a thread count above 1. Information on deprecated GitLab features in this configuration is available in the %{link_start}documentation%{link_end}."
+>>>>>>> Add internationalization support to error messages
 msgstr ""
 
 msgid "Purchase more minutes"
@@ -16823,6 +16875,9 @@ msgid "Scoped label"
 msgstr ""
 
 msgid "Scopes"
+msgstr ""
+
+msgid "Scopes can't be blank"
 msgstr ""
 
 msgid "Scroll down"
@@ -19340,6 +19395,9 @@ msgstr ""
 msgid "The issue stage shows the time it takes from creating an issue to assigning the issue to a milestone, or add the issue to a list on your Issue Board. Begin creating issues to see data for this stage."
 msgstr ""
 
+msgid "The license key is invalid. Make sure it is exactly as you received it from GitLab Inc."
+msgstr ""
+
 msgid "The license was removed. GitLab has fallen back on the previous license."
 msgstr ""
 
@@ -19994,6 +20052,9 @@ msgstr ""
 msgid "This job will automatically run after its timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
 msgstr ""
 
+msgid "This license has already expired."
+msgstr ""
+
 msgid "This may expose confidential information as the selected fork is in another namespace that can have other members."
 msgstr ""
 
@@ -20199,6 +20260,9 @@ msgid "Time spent"
 msgstr ""
 
 msgid "Time to merge"
+msgstr ""
+
+msgid "Time to subtract exceeds the total time spent"
 msgstr ""
 
 msgid "Time tracking"
@@ -22881,6 +22945,9 @@ msgstr ""
 msgid "archived"
 msgstr ""
 
+msgid "are all invalid"
+msgstr ""
+
 msgid "assign yourself"
 msgstr ""
 
@@ -22902,6 +22969,12 @@ msgstr ""
 msgid "by %{user}"
 msgstr ""
 
+msgid "can not be empty when runner is not allowed to pick untagged jobs"
+msgstr ""
+
+msgid "cannot add duplicated environment scope"
+msgstr ""
+
 msgid "cannot be changed if a personal project has container registry tags."
 msgstr ""
 
@@ -22911,7 +22984,16 @@ msgstr ""
 msgid "cannot be modified"
 msgstr ""
 
+msgid "cannot be related to itself"
+msgstr ""
+
 msgid "cannot block others"
+msgstr ""
+
+msgid "cannot have groups assigned"
+msgstr ""
+
+msgid "cannot have projects assigned"
 msgstr ""
 
 msgid "cannot include leading slash or directory traversal."
@@ -22921,6 +23003,9 @@ msgid "cannot itself be blocked"
 msgstr ""
 
 msgid "cannot merge"
+msgstr ""
+
+msgid "cannot modify during creation"
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
@@ -23186,6 +23271,21 @@ msgstr ""
 msgid "does not have a supported extension. Only %{extension_list} are supported"
 msgstr ""
 
+msgid "does not have access to the project"
+msgstr ""
+
+msgid "does not have the same project as the milestone"
+msgstr ""
+
+msgid "does not match the diff refs"
+msgstr ""
+
+msgid "doesn't match the certificate"
+msgstr ""
+
+msgid "doesn't support new-style diff notes"
+msgstr ""
+
 msgid "done"
 msgstr ""
 
@@ -23289,6 +23389,15 @@ msgstr ""
 msgid "has already been taken"
 msgstr ""
 
+msgid "has to be a subgroup of the group"
+msgstr ""
+
+msgid "has to be the first element"
+msgstr ""
+
+msgid "has too deep level of nesting"
+msgstr ""
+
 msgid "help"
 msgstr ""
 
@@ -23324,7 +23433,13 @@ msgstr[1] ""
 msgid "invalid milestone state `%{state}`"
 msgstr ""
 
+msgid "invalid project"
+msgstr ""
+
 msgid "is"
+msgstr ""
+
+msgid "is a required field"
 msgstr ""
 
 msgid "is already associated to a GitLab Issue. New issue will not be associated."
@@ -23336,7 +23451,16 @@ msgstr ""
 msgid "is blocked by"
 msgstr ""
 
+msgid "is empty or does not exist"
+msgstr ""
+
 msgid "is enabled."
+msgstr ""
+
+msgid "is incomplete"
+msgstr ""
+
+msgid "is invalid"
 msgstr ""
 
 msgid "is invalid because there is downstream lock"
@@ -23351,6 +23475,9 @@ msgstr ""
 msgid "is not a descendant of the Group owning the template"
 msgstr ""
 
+msgid "is not a member of the project"
+msgstr ""
+
 msgid "is not a valid X509 certificate."
 msgstr ""
 
@@ -23361,6 +23488,18 @@ msgid "is not allowed for sign-up"
 msgstr ""
 
 msgid "is not an email you own"
+msgstr ""
+
+msgid "is not included in the list"
+msgstr ""
+
+msgid "is not linked to a SAML account"
+msgstr ""
+
+msgid "is not supported for this namespace"
+msgstr ""
+
+msgid "is not valid"
 msgstr ""
 
 msgid "is too long (%{current_value}). The maximum size is %{max_size}."
@@ -23432,6 +23571,9 @@ msgid "merged %{time_ago}"
 msgstr ""
 
 msgid "milestone should belong either to a project or a group."
+msgstr ""
+
+msgid "misses intermediates"
 msgstr ""
 
 msgid "missing"
@@ -23749,10 +23891,25 @@ msgstr ""
 msgid "mrWidget|to start a merge train when the pipeline succeeds"
 msgstr ""
 
+msgid "must be for the same project"
+msgstr ""
+
 msgid "must be greater than start date"
 msgstr ""
 
+msgid "must be present on both design and version"
+msgstr ""
+
+msgid "must be the same on design and version"
+msgstr ""
+
 msgid "n/a"
+msgstr ""
+
+msgid "needs to be assigned to at least one project"
+msgstr ""
+
+msgid "needs to be assigned to exactly one group"
 msgstr ""
 
 msgid "needs to be between 10 minutes and 1 month"
@@ -23786,6 +23943,9 @@ msgid "nounSeries|%{item}, %{nextItem}"
 msgstr ""
 
 msgid "nounSeries|%{item}, and %{lastItem}"
+msgstr ""
+
+msgid "only allowed for project cluster"
 msgstr ""
 
 msgid "opened %{timeAgoString} by %{user}"
@@ -24008,6 +24168,12 @@ msgid "updated %{time_ago}"
 msgstr ""
 
 msgid "user avatar"
+msgstr ""
+
+msgid "user cannot also be an Auditor."
+msgstr ""
+
+msgid "user cannot be created without the \"GitLab_Auditor_User\" addon"
 msgstr ""
 
 msgid "username"

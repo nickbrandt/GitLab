@@ -155,13 +155,13 @@ class DiffNote < Note
   def verify_supported
     return if supported?
 
-    errors.add(:noteable, "doesn't support new-style diff notes")
+    errors.add(:noteable, _("doesn't support new-style diff notes"))
   end
 
   def positions_complete
     return if self.original_position.complete? && self.position.complete?
 
-    errors.add(:position, "is incomplete")
+    errors.add(:position, _("is incomplete"))
   end
 
   def keep_around_commits

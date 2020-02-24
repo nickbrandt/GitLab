@@ -20,7 +20,7 @@ module EE
 
       def unique_environment_scope
         if clusterable.present? && clusterable.clusters.where(environment_scope: environment_scope).where.not(id: id).exists?
-          errors.add(:environment_scope, 'cannot add duplicated environment scope')
+          errors.add(:environment_scope, _('cannot add duplicated environment scope'))
         end
       end
     end

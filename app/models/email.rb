@@ -23,7 +23,7 @@ class Email < ApplicationRecord
   end
 
   def unique_email
-    self.errors.add(:email, 'has already been taken') if User.exists?(email: self.email)
+    self.errors.add(:email, _('has already been taken')) if User.exists?(email: self.email)
   end
 
   def accept_pending_invitations!

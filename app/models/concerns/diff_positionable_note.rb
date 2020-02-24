@@ -77,6 +77,6 @@ module DiffPositionableNote
   def diff_refs_match_commit
     return if self.original_position.diff_refs == commit&.diff_refs
 
-    errors.add(:commit_id, 'does not match the diff refs')
+    errors.add(:commit_id, _('does not match the diff refs'))
   end
 end

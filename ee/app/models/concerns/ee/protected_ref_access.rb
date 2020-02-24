@@ -89,7 +89,7 @@ module EE
       return unless group
 
       unless project.project_group_links.where(group: group).exists?
-        self.errors.add(:group, 'does not have access to the project')
+        self.errors.add(:group, _('does not have access to the project'))
       end
     end
 
@@ -97,7 +97,7 @@ module EE
       return unless user
 
       unless project.team.member?(user)
-        self.errors.add(:user, 'is not a member of the project')
+        self.errors.add(:user, _('is not a member of the project'))
       end
     end
   end

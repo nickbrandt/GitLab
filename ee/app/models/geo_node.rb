@@ -330,14 +330,14 @@ class GeoNode < ApplicationRecord
   # Prevent locking yourself out
   def require_current_node_to_be_primary
     if name == self.class.current_node_name
-      errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
+      errors.add(:base, _('Current node must be the primary node or you will be locking yourself out'))
     end
   end
 
   # Prevent creating a Geo Node unless Hashed Storage is enabled
   def require_hashed_storage
     unless Gitlab::CurrentSettings.hashed_storage_enabled?
-      errors.add(:base, 'Hashed Storage must be enabled to use Geo')
+      errors.add(:base, _('Hashed Storage must be enabled to use Geo'))
     end
   end
 

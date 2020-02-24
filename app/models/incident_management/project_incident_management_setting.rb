@@ -23,7 +23,7 @@ module IncidentManagement
     def issue_template_exists
       return unless issue_template_key.present?
 
-      errors.add(:issue_template_key, 'not found') unless issue_template
+      errors.add(:issue_template_key, _('not found')) unless issue_template
     end
 
     def issue_template

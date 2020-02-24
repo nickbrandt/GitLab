@@ -64,7 +64,7 @@ module Operations
 
     def first_default_scope
       unless scopes.first.environment_scope == '*'
-        errors.add(:default_scope, 'has to be the first element')
+        errors.add(:default_scope, _('has to be the first element'))
       end
     end
 

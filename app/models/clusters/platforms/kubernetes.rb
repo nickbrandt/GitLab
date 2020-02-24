@@ -188,7 +188,7 @@ module Clusters
 
       def no_namespace
         if namespace
-          errors.add(:namespace, 'only allowed for project cluster')
+          errors.add(:namespace, _('only allowed for project cluster'))
         end
       end
 
