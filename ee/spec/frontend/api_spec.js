@@ -641,4 +641,52 @@ describe('Api', () => {
       });
     });
   });
+
+  describe('GeoNode', () => {
+    let expectedUrl;
+    let mockNode;
+
+    beforeEach(() => {
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_nodes`;
+    });
+
+    describe('createGeoNode', () => {
+      it('POSTs with correct action', () => {
+        mockNode = {
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'post');
+        mock.onPost(expectedUrl).replyOnce(201, mockNode);
+
+        return Api.createGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.post).toHaveBeenCalledWith(expectedUrl, mockNode);
+        });
+      });
+    });
+
+    describe('updateGeoNode', () => {
+      it('PUTs with correct action', () => {
+        mockNode = {
+          id: 1,
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(`${expectedUrl}/${mockNode.id}`).replyOnce(201, mockNode);
+
+        return Api.updateGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.put).toHaveBeenCalledWith(`${expectedUrl}/${mockNode.id}`, mockNode);
+        });
+      });
+    });
+  });
 });

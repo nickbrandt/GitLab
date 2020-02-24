@@ -263,4 +263,14 @@ export default {
 
     return axios.post(url);
   },
+
+  createGeoNode(node) {
+    const url = Api.buildUrl(this.geoNodesPath);
+    return axios.post(url, node);
+  },
+
+  updateGeoNode(node) {
+    const url = Api.buildUrl(this.geoNodesPath);
+    return axios.put(`${url}/${node.id}`, node);
+  },
 };
