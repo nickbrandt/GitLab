@@ -38,9 +38,9 @@ describe('EpicItemTimelineComponent', () => {
       vm = createComponent({});
     });
 
-    describe('epicStartDateValues', () => {
+    describe('startDateValues', () => {
       it('returns object containing date parts from epic.startDate', () => {
-        expect(vm.epicStartDateValues).toEqual(
+        expect(vm.startDateValues).toEqual(
           jasmine.objectContaining({
             day: mockEpic.startDate.getDay(),
             date: mockEpic.startDate.getDate(),
@@ -52,9 +52,9 @@ describe('EpicItemTimelineComponent', () => {
       });
     });
 
-    describe('epicEndDateValues', () => {
+    describe('endDateValues', () => {
       it('returns object containing date parts from epic.endDate', () => {
-        expect(vm.epicEndDateValues).toEqual(
+        expect(vm.endDateValues).toEqual(
           jasmine.objectContaining({
             day: mockEpic.endDate.getDay(),
             date: mockEpic.endDate.getDate(),

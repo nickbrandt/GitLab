@@ -113,7 +113,7 @@ describe('WeeksPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -124,7 +124,7 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the week', () => {
@@ -134,17 +134,17 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('left: 0;');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toBe('left: 0;');
       });
 
-      it('returns proportional `left` value based on Epic startDate and days in the month', () => {
+      it('returns proportional `left` value based on Epic startDate and days in the week', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, {
             startDate: new Date(2018, 0, 15),
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toContain('left: 38');
+        expect(vm.getTimelineBarStartOffsetForWeeks(vm.epic)).toContain('left: 38');
       });
     });
 
