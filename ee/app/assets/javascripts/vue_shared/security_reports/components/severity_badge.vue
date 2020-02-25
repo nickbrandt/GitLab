@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     hasSeverityBadge() {
-      return this.severity && this.severity !== ' ';
+      return Boolean(this.severity && this.severity !== ' ');
     },
     severityKey() {
       return this.severity.toLowerCase();
