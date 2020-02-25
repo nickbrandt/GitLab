@@ -244,8 +244,8 @@ sudo gitlab-rake gitlab:geo:check
 
     When performing a Postgres major version (9 > 10) update this is expected. Follow:
 
-    - [initiate-the-replication-process](https://docs.gitlab.com/ee/administration/geo/replication/database.html#step-3-initiate-the-replication-process)
-    - [Geo database has an outdated FDW remote schema](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html#geo-database-has-an-outdated-fdw-remote-schema-error)
+    - [initiate-the-replication-process](database.md#step-3-initiate-the-replication-process)
+    - [Geo database has an outdated FDW remote schema](troubleshooting.md#geo-database-has-an-outdated-fdw-remote-schema-error)
 
 ## Fixing replication errors
 
@@ -494,7 +494,7 @@ If you encounter this message when running `gitlab-rake geo:set_secondary_as_pri
 or `gitlab-ctl promote-to-primary-node`, either:
 
 - Enter a Rails console and run:
-  
+
   ```ruby
   Rails.application.load_tasks; nil
   Gitlab::Geo.expire_cache_keys!([:primary_node, :current_node])
