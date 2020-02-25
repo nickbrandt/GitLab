@@ -30,7 +30,9 @@ RSpec.shared_examples 'restores project successfully' do |**results|
     expect(project.issues.size).to eq(results.fetch(:issues, 0))
   end
 
-  it 'does not set params that are excluded from import_export settings' do
+  # This test is quarantined because the use of magic number 999 causes failure on CI
+  # https://gitlab.com/gitlab-org/gitlab/issues/207932#note_293724442
+  it 'does not set params that are excluded from import_export settings', :quarantine do
     expect(project.import_type).to be_nil
     expect(project.creator_id).not_to eq 999
   end
