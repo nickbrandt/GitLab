@@ -6,18 +6,30 @@ import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
-import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
 import { toYmd } from 'ee/analytics/shared/utils';
 import { transformRawTasksByTypeData } from 'ee/analytics/cycle_analytics/utils';
 
-const endpoints = {
+const fixtureEndpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint
   stageEvents: stage => `analytics/value_stream_analytics/stages/${stage}/records.json`,
   stageMedian: stage => `analytics/value_stream_analytics/stages/${stage}/median.json`,
   summaryData: 'analytics/value_stream_analytics/summary.json',
+  groupLabels: 'api/group_labels.json',
 };
 
-export const groupLabels = mockLabels;
+export const endpoints = {
+  groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/labels/,
+  summaryData: /analytics\/value_stream_analytics\/summary/,
+  durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
+  stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
+  stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
+  baseStagesEndpoint: /analytics\/value_stream_analytics\/stages$/,
+  tasksByTypeData: /analytics\/type_of_work\/tasks_by_type/,
+};
+
+export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(
+  convertObjectPropsToCamelCase,
+);
 
 export const group = {
   id: 1,
@@ -30,10 +42,10 @@ export const group = {
 const getStageByTitle = (stages, title) =>
   stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
-export const summaryData = getJSONFixture(endpoints.summaryData);
+export const summaryData = getJSONFixture(fixtureEndpoints.summaryData);
 
 export const customizableStagesAndEvents = getJSONFixture(
-  endpoints.customizableCycleAnalyticsStagesAndEvents,
+  fixtureEndpoints.customizableCycleAnalyticsStagesAndEvents,
 );
 
 const dummyState = {};
@@ -56,7 +68,7 @@ const deepCamelCase = obj => convertObjectPropsToCamelCase(obj, { deep: true });
 export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging', 'production'];
 
 const stageFixtures = defaultStages.reduce((acc, stage) => {
-  const events = getJSONFixture(endpoints.stageEvents(stage));
+  const events = getJSONFixture(fixtureEndpoints.stageEvents(stage));
   return {
     ...acc,
     [stage]: events,
@@ -64,7 +76,7 @@ const stageFixtures = defaultStages.reduce((acc, stage) => {
 }, {});
 
 export const stageMedians = defaultStages.reduce((acc, stage) => {
-  const { value } = getJSONFixture(endpoints.stageMedian(stage));
+  const { value } = getJSONFixture(fixtureEndpoints.stageMedian(stage));
   return {
     ...acc,
     [stage]: value,

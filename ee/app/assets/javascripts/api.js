@@ -22,6 +22,7 @@ export default {
   cycleAnalyticsStagePath: '/-/analytics/value_stream_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath:
     '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
+  cycleAnalyticsGroupLabelsPath: '/api/:version/groups/:namespace_path/labels',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
   countriesPath: '/-/countries',
   countryStatesPath: '/-/country_states',
@@ -208,6 +209,19 @@ export default {
 
   cycleAnalyticsDurationChart(stageSlug, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsDurationChartPath).replace(':stage_id', stageSlug);
+
+    return axios.get(url, {
+      params,
+    });
+  },
+
+  cycleAnalyticsGroupLabels(groupId, params = {}) {
+    // TODO: This can be removed when we resolve the labels endpoint
+    // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25746
+    const url = Api.buildUrl(this.cycleAnalyticsGroupLabelsPath).replace(
+      ':namespace_path',
+      groupId,
+    );
 
     return axios.get(url, {
       params,

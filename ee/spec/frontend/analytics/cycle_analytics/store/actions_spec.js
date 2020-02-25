@@ -22,6 +22,7 @@ import {
   rawDurationMedianData,
   transformedDurationData,
   transformedDurationMedianData,
+  endpoints,
 } from '../mock_data';
 
 const stageData = { events: [] };
@@ -30,14 +31,6 @@ const flashErrorMessage = 'There was an error while fetching value stream analyt
 const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
-const endpoints = {
-  groupLabels: `/groups/${group.path}/-/labels`,
-  summaryData: '/analytics/value_stream_analytics/summary',
-  durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
-  stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
-  stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
-  baseStagesEndpoint: '/analytics/value_stream_analytics/stages',
-};
 
 const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stages/${stageId}`;
 
@@ -253,8 +246,8 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
     });
-    it(`commits the ${types.RECEIVE_STAGE_DATA_ERROR} mutation`, done => {
-      testAction(
+    it(`commits the ${types.RECEIVE_STAGE_DATA_ERROR} mutation`, () => {
+      return testAction(
         actions.receiveStageDataError,
         null,
         state,
@@ -264,7 +257,6 @@ describe('Cycle analytics actions', () => {
           },
         ],
         [],
-        done,
       );
     });
 
@@ -278,49 +270,58 @@ describe('Cycle analytics actions', () => {
   });
 
   describe('fetchGroupLabels', () => {
-    beforeEach(() => {
-      state = { ...state, selectedGroup };
-      mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
+    describe('succeeds', () => {
+      beforeEach(() => {
+        gon.api_version = 'v4';
+        state = { selectedGroup };
+        mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
+      });
+
+      it('dispatches receiveGroupLabels if the request succeeds', () => {
+        return testAction(
+          actions.fetchGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestGroupLabels' },
+            {
+              type: 'receiveGroupLabelsSuccess',
+              payload: groupLabels,
+            },
+          ],
+        );
+      });
     });
 
-    it('dispatches receiveGroupLabels if the request succeeds', done => {
-      testAction(
-        actions.fetchGroupLabels,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestGroupLabels' },
-          {
-            type: 'receiveGroupLabelsSuccess',
-            payload: groupLabels,
-          },
-        ],
-        done,
-      );
-    });
+    describe('with an error', () => {
+      beforeEach(() => {
+        state = { selectedGroup };
+        mock.onGet(endpoints.groupLabels).replyOnce(404);
+      });
 
-    it('dispatches receiveGroupLabelsError if the request fails', done => {
-      testAction(
-        actions.fetchGroupLabels,
-        null,
-        { ...state, selectedGroup: { fullPath: null } },
-        [],
-        [
-          { type: 'requestGroupLabels' },
-          {
-            type: 'receiveGroupLabelsError',
-            payload: error,
-          },
-        ],
-        done,
-      );
+      it('dispatches receiveGroupLabelsError if the request fails', () => {
+        return testAction(
+          actions.fetchGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestGroupLabels' },
+            {
+              type: 'receiveGroupLabelsError',
+              payload: error,
+            },
+          ],
+        );
+      });
     });
 
     describe('receiveGroupLabelsError', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
       });
+
       it('flashes an error message if the request fails', () => {
         actions.receiveGroupLabelsError({
           commit: () => {},

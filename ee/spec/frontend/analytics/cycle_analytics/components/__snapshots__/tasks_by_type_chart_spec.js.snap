@@ -28,17 +28,25 @@ exports[`TasksByTypeChart with data available filters labels with label dropdown
   <ul>
     <li>
       <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
-        <span style=\\"background-color: #BADA55;\\" class=\\"d-inline-block dropdown-label-box\\">
+        <span style=\\"background-color: #FF0000;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-        Foo Label
+
       </a>
     </li>
 
     <li>
       <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
-        <span style=\\"background-color: #0033CC;\\" class=\\"d-inline-block dropdown-label-box\\">
+        <span style=\\"background-color: #FFFFFF;\\" class=\\"d-inline-block dropdown-label-box\\">
               </span>
-        Foo::Bar
+
+      </a>
+    </li>
+
+    <li>
+      <a href=\\"#\\" class=\\"dropdown-menu-link is-active\\">
+        <span style=\\"background-color: #0000FF;\\" class=\\"d-inline-block dropdown-label-box\\">
+              </span>
+
       </a>
     </li>
   </ul>
@@ -58,7 +66,7 @@ exports[`TasksByTypeChart with data available should render the loading chart 1`
     <h3>Type of work</h3>
     <div>
       <p>Showing data for group 'Gitlab Org' from Dec 11, 2019 to Jan 10, 2020</p>
-      <tasks-by-type-filters-stub labels=\\"[object Object],[object Object]\\" selectedlabelids=\\"1,2,3\\" subjectfilter=\\"Issue\\"></tasks-by-type-filters-stub>
+      <tasks-by-type-filters-stub labels=\\"[object Object],[object Object],[object Object]\\" selectedlabelids=\\"1,2,3\\" subjectfilter=\\"Issue\\"></tasks-by-type-filters-stub>
       <gl-stacked-column-chart-stub data=\\"0,1,2,5,2,3,2,4,1\\" option=\\"[object Object]\\" presentation=\\"stacked\\" groupby=\\"Group 1,Group 2,Group 3\\" xaxistype=\\"category\\" xaxistitle=\\"Date\\" yaxistitle=\\"Number of tasks\\" seriesnames=\\"Cool label,Normal label\\" legendaveragetext=\\"Avg\\" legendmaxtext=\\"Max\\" y-axis-type=\\"value\\"></gl-stacked-column-chart-stub>
     </div>
   </div>
