@@ -12699,6 +12699,9 @@ msgstr ""
 msgid "Mirror repository"
 msgstr ""
 
+msgid "Mirror settings are only available to GitLab administrators."
+msgstr ""
+
 msgid "Mirror user"
 msgstr ""
 
