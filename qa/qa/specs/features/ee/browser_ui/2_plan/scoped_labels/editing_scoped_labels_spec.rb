@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  context 'Plan', :reliable, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/208021', type: :bug } do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }
