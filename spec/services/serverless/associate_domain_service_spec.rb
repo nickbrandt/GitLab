@@ -13,12 +13,6 @@ describe Serverless::AssociateDomainService do
   context 'when the domain is unchanged' do
     let(:creator) { create(:user) }
 
-    it 'does not schedule a ClusterConfigureIstioWorker' do
-      expect(ClusterConfigureIstioWorker).not_to receive(:perform_async)
-
-      subject.execute
-    end
-
     it 'does not update creator' do
       expect { subject.execute }.not_to change { sdc.reload.creator }
     end
@@ -35,12 +29,6 @@ describe Serverless::AssociateDomainService do
     it 'does not attempt to update creator' do
       expect { subject.execute }.not_to raise_error
     end
-
-    it 'schedules a ClusterConfigureIstioWorker for the cluster' do
-      expect(ClusterConfigureIstioWorker).to receive(:perform_async).with(knative.cluster_id)
-
-      subject.execute
-    end
   end
 
   context 'when a new domain is associated' do
@@ -49,12 +37,6 @@ describe Serverless::AssociateDomainService do
 
     it 'creates an association with the domain' do
       expect { subject.execute }.to change { knative.pages_domain.id }.from(sdc.pages_domain.id).to(pages_domain_id)
-    end
-
-    it 'schedules a ClusterConfigureIstioWorker for the cluster' do
-      expect(ClusterConfigureIstioWorker).to receive(:perform_async).with(knative.cluster_id)
-
-      subject.execute
     end
 
     it 'updates creator' do

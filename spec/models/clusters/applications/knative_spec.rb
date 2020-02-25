@@ -14,6 +14,7 @@ describe Clusters::Applications::Knative do
   before do
     allow(ClusterWaitForIngressIpAddressWorker).to receive(:perform_in)
     allow(ClusterWaitForIngressIpAddressWorker).to receive(:perform_async)
+    allow(ClusterConfigureIstioWorker).to receive(:perform_async)
   end
 
   describe 'associations' do
@@ -44,6 +45,32 @@ describe Clusters::Applications::Knative do
     it 'schedules a ClusterWaitForIngressIpAddressWorker' do
       expect(ClusterWaitForIngressIpAddressWorker).to have_received(:perform_in)
         .with(Clusters::Applications::Knative::FETCH_IP_ADDRESS_DELAY, 'knative', application.id)
+    end
+  end
+
+  describe 'configuring istio ingress gateway' do
+    context 'after installed' do
+      let(:application) { create(:clusters_applications_knative, :installing) }
+
+      before do
+        application.make_installed!
+      end
+
+      it 'schedules a ClusterConfigureIstioWorker' do
+        expect(ClusterConfigureIstioWorker).to have_received(:perform_async).with(application.cluster_id)
+      end
+    end
+
+    context 'after updated' do
+      let(:application) { create(:clusters_applications_knative, :updating) }
+
+      before do
+        application.make_installed!
+      end
+
+      it 'schedules a ClusterConfigureIstioWorker' do
+        expect(ClusterConfigureIstioWorker).to have_received(:perform_async).with(application.cluster_id)
+      end
     end
   end
 

@@ -17,8 +17,6 @@ module Serverless
 
       knative.pages_domain = knative.find_available_domain(pages_domain_id)
       knative.serverless_domain_cluster.update(creator: creator) if knative.pages_domain
-
-      ClusterConfigureIstioWorker.perform_async(knative.cluster_id)
     end
 
     private

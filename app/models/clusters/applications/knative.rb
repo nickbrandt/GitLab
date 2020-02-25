@@ -33,6 +33,12 @@ module Clusters
               FETCH_IP_ADDRESS_DELAY, application.name, application.id)
           end
         end
+
+        after_transition any => [:installed, :updated] do |application|
+          application.run_after_commit do
+            ClusterConfigureIstioWorker.perform_async(application.cluster_id)
+          end
+        end
       end
 
       default_value_for :version, VERSION
