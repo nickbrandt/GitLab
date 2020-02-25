@@ -4,7 +4,7 @@
 
 - if Feature.enabled?(:instance_level_integrations)
   - if show_admin_integrations_moved?
-    .gl-alert.gl-alert-tip.js-admin-integrations-moved.prepend-top-default{ role: 'alert', data: { feature_id: UserCalloutsHelper::ADMIN_INTEGRATIONS_MOVED, dismiss_endpoint: user_callouts_path } }
+    .gl-alert.gl-alert-tip.js-admin-integrations-moved.mt-3{ role: 'alert', data: { feature_id: UserCalloutsHelper::ADMIN_INTEGRATIONS_MOVED, dismiss_endpoint: user_callouts_path } }
       = sprite_icon('bulb', size: 16, css_class: 'gl-icon gl-alert-icon gl-alert-icon-no-title')
       %button.js-close.gl-alert-dismiss{ type: 'button', 'aria-label' => _('Dismiss') }
         = sprite_icon('close', size: 16, css_class: 'gl-icon')
@@ -13,6 +13,12 @@
         = _('Elasticsearch, PlantUML,  Slack application,  Third party offers, Snowplow, Amazon EKS have moved to Settings > General.')
       .gl-alert-actions
         = link_to _('Go to Settings'), admin_application_settings_path, class: 'btn gl-alert-action new-gl-button'
+
+  %h4= s_('Integrations|Apply integration settings to all Projects')
+  %p
+    = s_('Integrations|Integrations configured here will automatically apply to all projects on this instance.')
+    = link_to _('Learn more'), '#'
+  = render 'projects/services/integrations'
 
 - else
   = render_if_exists 'admin/application_settings/elasticsearch_form'

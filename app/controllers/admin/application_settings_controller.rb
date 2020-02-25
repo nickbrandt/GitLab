@@ -27,6 +27,13 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     define_method(action) { perform_update if submitted? }
   end
 
+  def integrations
+    perform_update if submitted?
+
+    # TODO: Update this with actual integrations
+    @integrations = Project.first.find_or_initialize_services.sort_by(&:title)
+  end
+
   def update
     perform_update
   end
