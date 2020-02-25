@@ -25,6 +25,7 @@ module Operations
       }
     validates :name, uniqueness: { scope: :project_id }
     validates :description, allow_blank: true, length: 0..255
+    validates :version, inclusion: { in: [1, 2], message: 'must be 1 or 2' }
     validate :first_default_scope, on: :create, if: :has_scopes?
 
     before_create :build_default_scope, unless: :has_scopes?

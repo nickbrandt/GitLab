@@ -16,6 +16,7 @@ describe Operations::FeatureFlag do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
+    it { is_expected.to validate_inclusion_of(:version).in_array([1, 2]).with_message('must be 1 or 2') }
 
     it_behaves_like 'AtomicInternalId', validate_presence: false do
       let(:internal_id_attribute) { :iid }
@@ -23,6 +24,17 @@ describe Operations::FeatureFlag do
       let(:scope) { :project }
       let(:scope_attrs) { { project: instance.project } }
       let(:usage) { :operations_feature_flags }
+    end
+  end
+
+  describe 'feature flag version' do
+    it 'defaults to 1 if unspecified' do
+      project = create(:project)
+
+      feature_flag = described_class.create(name: 'my_flag', project: project, active: true)
+
+      expect(feature_flag).to be_valid
+      expect(feature_flag.version).to eq(1)
     end
   end
 
