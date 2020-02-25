@@ -2,7 +2,9 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import { createLocalVue, mount } from '@vue/test-utils';
-import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
+import CustomStageForm, {
+  initializeFormData,
+} from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
   groupLabels,
@@ -77,6 +79,15 @@ describe('CustomStageForm', () => {
     });
   }
 
+  const findNameField = _wrapper => _wrapper.find({ ref: 'name' });
+  const findNameFieldInput = _wrapper => _wrapper.find(sel.name);
+
+  function setNameField(_wrapper, value = '') {
+    findNameFieldInput(_wrapper).setValue(value);
+    findNameFieldInput(_wrapper).trigger('change');
+    return _wrapper.vm.$nextTick();
+  }
+
   beforeEach(() => {
     wrapper = createComponent({});
   });
@@ -101,6 +112,25 @@ describe('CustomStageForm', () => {
       } else {
         expect(el.attributes('disabled')).toBeUndefined();
       }
+    });
+  });
+
+  describe('Name', () => {
+    describe('with a reserved name', () => {
+      beforeEach(() => {
+        wrapper = createComponent({});
+        return setNameField(wrapper, 'issue');
+      });
+
+      it('displays an error', () => {
+        expect(findNameField(wrapper).text()).toContain('Stage name already exists');
+      });
+
+      it('clears the error when the field changes', () => {
+        return setNameField(wrapper, 'not an issue').then(() => {
+          expect(findNameField(wrapper).text()).not.toContain('Stage name already exists');
+        });
+      });
     });
   });
 
@@ -163,7 +193,6 @@ describe('CustomStageForm', () => {
         expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
 
         wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
-        // TODO: make func for setting single field
         return Vue.nextTick()
           .then(() => {
             wrapper
@@ -745,6 +774,120 @@ describe('CustomStageForm', () => {
           expect(wrapper.emitted()).toEqual({
             [STAGE_ACTIONS.UPDATE]: [[{ hidden: false, id: 'my-stage' }]],
           });
+        });
+      });
+    });
+  });
+
+  describe('initializeFormData', () => {
+    describe('without a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with all fields set', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
         });
       });
     });
