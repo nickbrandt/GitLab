@@ -7,18 +7,18 @@ export default {
      */
     hasStartDateForMonth() {
       return (
-        this.epicStartDateValues.month === this.timeframeItem.getMonth() &&
-        this.epicStartDateValues.year === this.timeframeItem.getFullYear()
+        this.startDateValues.month === this.timeframeItem.getMonth() &&
+        this.startDateValues.year === this.timeframeItem.getFullYear()
       );
     },
     /**
      * Check if current epic ends within current month (timeline cell)
      */
     isTimeframeUnderEndDateForMonth(timeframeItem) {
-      if (this.epicEndDateValues.year <= timeframeItem.getFullYear()) {
-        return this.epicEndDateValues.month === timeframeItem.getMonth();
+      if (this.endDateValues.year <= timeframeItem.getFullYear()) {
+        return this.endDateValues.month === timeframeItem.getMonth();
       }
-      return this.epicEndDateValues.time < timeframeItem.getTime();
+      return this.endDateValues.time < timeframeItem.getTime();
     },
     /**
      * Return timeline bar width for current month (timeline cell) based on
@@ -40,13 +40,13 @@ export default {
      * 3. A "triangle" shape is shown at the beginning of timeline bar
      *    when startDate is out of range.
      */
-    getTimelineBarStartOffsetForMonths() {
+    getTimelineBarStartOffsetForMonths(roadmapItem) {
       const daysInMonth = totalDaysInMonth(this.timeframeItem);
-      const startDate = this.epicStartDateValues.date;
+      const startDate = this.startDateValues.date;
 
       if (
-        this.epic.startDateOutOfRange ||
-        (this.epic.startDateUndefined && this.epic.endDateOutOfRange)
+        roadmapItem.startDateOutOfRange ||
+        (roadmapItem.startDateUndefined && roadmapItem.endDateOutOfRange)
       ) {
         // If Epic startDate is out of timeframe range
         // OR
@@ -89,8 +89,8 @@ export default {
 
       const indexOfCurrentMonth = this.timeframe.indexOf(this.timeframeItem);
       const { cellWidth } = this.$options;
-      const epicStartDate = this.epicStartDateValues;
-      const epicEndDate = this.epicEndDateValues;
+      const itemStartDate = this.startDateValues;
+      const itemEndDate = this.endDateValues;
 
       // Start iteration from current month
       for (let i = indexOfCurrentMonth; i < this.timeframe.length; i += 1) {
@@ -105,7 +105,7 @@ export default {
             timelineBarWidth += this.getBarWidthForSingleMonth(
               cellWidth,
               daysInMonth,
-              epicEndDate.date - epicStartDate.date + 1,
+              itemEndDate.date - itemStartDate.date + 1,
             );
             // Break as Epic start and end date fall within current timeframe month itself!
             break;
@@ -115,17 +115,17 @@ export default {
             // If start date is first day of the month,
             // we need width of full cell (i.e. total days of month)
             // otherwise, we need width only for date from total days of month.
-            const date = epicStartDate.date === 1 ? daysInMonth : daysInMonth - epicStartDate.date;
+            const date = itemStartDate.date === 1 ? daysInMonth : daysInMonth - itemStartDate.date;
             timelineBarWidth += this.getBarWidthForSingleMonth(cellWidth, daysInMonth, date);
           }
         } else if (this.isTimeframeUnderEndDateForMonth(this.timeframe[i])) {
-          // If this is NOT current month but epicEndDate falls under
+          // If this is NOT current month but itemEndDate falls under
           // current timeframe month then calculate width
           // based on date of the month
           timelineBarWidth += this.getBarWidthForSingleMonth(
             cellWidth,
             daysInMonth,
-            epicEndDate.date,
+            itemEndDate.date,
           );
           // Break as Epic end date falls within current timeframe month!
           break;

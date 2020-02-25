@@ -10,8 +10,8 @@ export default {
       const quarterEnd = this.timeframeItem.range[2];
 
       return (
-        this.epicStartDateValues.time >= quarterStart.getTime() &&
-        this.epicStartDateValues.time <= quarterEnd.getTime()
+        this.startDateValues.time >= quarterStart.getTime() &&
+        this.startDateValues.time <= quarterEnd.getTime()
       );
     },
     /**
@@ -20,7 +20,7 @@ export default {
     isTimeframeUnderEndDateForQuarter(timeframeItem) {
       const quarterEnd = timeframeItem.range[2];
 
-      return this.epicEndDateValues.time <= quarterEnd.getTime();
+      return this.endDateValues.time <= quarterEnd.getTime();
     },
     /**
      * Return timeline bar width for current quarter (timeline cell) based on
@@ -45,13 +45,13 @@ export default {
      * Implementation of this method is identical to
      * MonthsPresetMixin#getTimelineBarStartOffsetForMonths
      */
-    getTimelineBarStartOffsetForQuarters() {
+    getTimelineBarStartOffsetForQuarters(roadmapItem) {
       const daysInQuarter = totalDaysInQuarter(this.timeframeItem.range);
-      const startDay = dayInQuarter(this.epic.startDate, this.timeframeItem.range);
+      const startDay = dayInQuarter(roadmapItem.startDate, this.timeframeItem.range);
 
       if (
-        this.epic.startDateOutOfRange ||
-        (this.epic.startDateUndefined && this.epic.endDateOutOfRange)
+        roadmapItem.startDateOutOfRange ||
+        (roadmapItem.startDateUndefined && roadmapItem.endDateOutOfRange)
       ) {
         return '';
       } else if (startDay === 1) {
@@ -85,13 +85,13 @@ export default {
      * Implementation of this method is identical to
      * MonthsPresetMixin#getTimelineBarWidthForMonths
      */
-    getTimelineBarWidthForQuarters() {
+    getTimelineBarWidthForQuarters(roadmapItem) {
       let timelineBarWidth = 0;
 
       const indexOfCurrentQuarter = this.timeframe.indexOf(this.timeframeItem);
       const { cellWidth } = this.$options;
-      const epicStartDate = this.epic.startDate;
-      const epicEndDate = this.epic.endDate;
+      const itemStartDate = roadmapItem.startDate;
+      const itemEndDate = roadmapItem.endDate;
 
       for (let i = indexOfCurrentQuarter; i < this.timeframe.length; i += 1) {
         const currentQuarter = this.timeframe[i].range;
@@ -101,14 +101,14 @@ export default {
             timelineBarWidth += this.getBarWidthForSingleQuarter(
               cellWidth,
               totalDaysInQuarter(currentQuarter),
-              dayInQuarter(epicEndDate, currentQuarter) -
-                dayInQuarter(epicStartDate, currentQuarter) +
+              dayInQuarter(itemEndDate, currentQuarter) -
+                dayInQuarter(itemStartDate, currentQuarter) +
                 1,
             );
             break;
           } else {
             const daysInQuarter = totalDaysInQuarter(currentQuarter);
-            const day = dayInQuarter(epicStartDate, currentQuarter);
+            const day = dayInQuarter(itemStartDate, currentQuarter);
             const date = day === 1 ? daysInQuarter : daysInQuarter - day;
 
             timelineBarWidth += this.getBarWidthForSingleQuarter(
@@ -121,7 +121,7 @@ export default {
           timelineBarWidth += this.getBarWidthForSingleQuarter(
             cellWidth,
             totalDaysInQuarter(currentQuarter),
-            dayInQuarter(epicEndDate, currentQuarter),
+            dayInQuarter(itemEndDate, currentQuarter),
           );
           break;
         } else {
