@@ -22,7 +22,7 @@ in from some of our customers.
 
 ## Recommended Setups based on number of users
 
-- 1 - 1000 Users: A single-node Omnibus setup with frequent backups. Refer to the [requirements page](https://docs.gitlab.com/ee/install/requirements.html) for further details of the specs you will require.
+- 1 - 1000 Users: A single-node [Omnibus](https://docs.gitlab.com/omnibus/) setup with frequent backups. Refer to the [requirements page](https://docs.gitlab.com/ee/install/requirements.html) for further details of the specs you will require.
 - 2000 - 50000+ Users: A scaled HA environment based on one of our [Reference Architectures](#reference-architectures) below.
 
 ## GitLab Components and Configuration Instructions
