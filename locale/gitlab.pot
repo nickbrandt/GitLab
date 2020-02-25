@@ -13655,16 +13655,10 @@ msgstr ""
 msgid "Pagination|Next"
 msgstr ""
 
-msgid "Pagination|Next ›"
-msgstr ""
-
 msgid "Pagination|Prev"
 msgstr ""
 
 msgid "Pagination|« First"
-msgstr ""
-
-msgid "Pagination|‹ Prev"
 msgstr ""
 
 msgid "Parameter"
