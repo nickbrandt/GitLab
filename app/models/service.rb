@@ -33,6 +33,7 @@ class Service < ApplicationRecord
   has_one :service_hook
 
   validates :project_id, presence: true, unless: proc { |service| service.template? }
+  validates :project_id, uniqueness: { scope: :type }, unless: -> { template? }
   validates :type, presence: true
 
   scope :visible, -> { where.not(type: 'GitlabIssueTrackerService') }
