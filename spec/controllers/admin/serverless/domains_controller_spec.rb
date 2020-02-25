@@ -15,7 +15,7 @@ describe Admin::Serverless::DomainsController do
       it 'responds with 404' do
         get :index
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -33,7 +33,7 @@ describe Admin::Serverless::DomainsController do
         it 'responds with 404' do
           get :index
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -81,7 +81,7 @@ describe Admin::Serverless::DomainsController do
       it 'responds with 404' do
         post :create, params: { pages_domain: create_params }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -98,7 +98,7 @@ describe Admin::Serverless::DomainsController do
         it 'responds with 404' do
           post :create, params: { pages_domain: create_params }
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -169,7 +169,7 @@ describe Admin::Serverless::DomainsController do
       it 'responds with 404' do
         put :update, params: { id: domain.id, pages_domain: update_params }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -186,7 +186,7 @@ describe Admin::Serverless::DomainsController do
         it 'responds with 404' do
           put :update, params: { id: domain.id, pages_domain: update_params }
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -221,7 +221,7 @@ describe Admin::Serverless::DomainsController do
         it 'returns 404' do
           put :update, params: { id: 0, pages_domain: update_params }
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -247,7 +247,7 @@ describe Admin::Serverless::DomainsController do
       it 'responds with 404' do
         post :verify, params: { id: domain.id }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -272,7 +272,7 @@ describe Admin::Serverless::DomainsController do
         it 'responds with 404' do
           post :verify, params: { id: domain.id }
 
-          expect(response.status).to eq(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
