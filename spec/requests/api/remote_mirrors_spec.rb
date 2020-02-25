@@ -39,6 +39,38 @@ describe API::RemoteMirrors do
     end
   end
 
+  describe 'POST /projects/:id/remote_mirrors' do
+    let(:route) { "/projects/#{project.id}/remote_mirrors" }
+
+    it 'requires `admin_remote_mirror` permission' do
+      post api(route, developer)
+
+      expect(response).to have_gitlab_http_status(:unauthorized)
+    end
+
+    it 'creates a remote mirror' do
+      project.add_maintainer(user)
+
+      post api(route, user), params: {
+        url: 'https://foo:bar@test.com'
+      }
+
+      expect(response).to have_gitlab_http_status(:success)
+      expect(response).to match_response_schema('remote_mirror')
+    end
+
+    it 'returns error if url is invalid' do
+      project.add_maintainer(user)
+
+      post api(route, user), params: {
+        url: 'ftp://foo:bar@test.com'
+      }
+
+      expect(response).to have_gitlab_http_status(:bad_request)
+      expect(json_response['message']['url']).to eq(["is blocked: Only allowed schemes are ssh, git, http, https"])
+    end
+  end
+
   describe 'PUT /projects/:id/remote_mirrors/:mirror_id' do
     let(:route) { ->(id) { "/projects/#{project.id}/remote_mirrors/#{id}" } }
     let(:mirror) { project.remote_mirrors.first }

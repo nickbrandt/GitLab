@@ -30,7 +30,8 @@ module API
         success Entities::RemoteMirror
       end
       params do
-        requries :url, type: String, desc: 'The URL for a remote mirror'
+        requires :url, type: String, desc: 'The URL for a remote mirror'
+        optional :only_protected_branches, type: Boolean, desc: 'Determines if only protected branches are mirrored'
       end
       post ':id/remote_mirrors' do
         create_params = declared_params(include_missing: false)
