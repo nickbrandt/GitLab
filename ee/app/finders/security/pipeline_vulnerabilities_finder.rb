@@ -73,6 +73,11 @@ module Security
       end
     end
 
+    # This finder is used for fetching vulnerabilities for any pipeline, if we used it to fetch
+    # vulnerabilities for a non-default-branch, the occurrences will be unpersisted, so we
+    # coerce the POROs into unpersisted AR records to give them a common object.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/33588#note_291849433 for more context
+    # on why this happens.
     def normalize_report_occurrences(report_occurrences, vulnerabilities)
       report_occurrences.map do |report_occurrence|
         occurrence_hash = report_occurrence.to_hash
