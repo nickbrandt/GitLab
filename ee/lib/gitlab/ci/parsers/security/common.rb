@@ -93,7 +93,8 @@ module Gitlab
           end
 
           def parse_level(input)
-            input.blank? ? 'undefined' : input.downcase
+            input = input&.downcase
+            input.blank? || input == 'undefined' ? 'unknown' : input
           end
 
           def create_location(location_data)
