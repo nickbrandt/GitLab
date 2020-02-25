@@ -16,6 +16,7 @@ module MergeRequests
 
         create_approval_note(merge_request)
         mark_pending_todos_as_done(merge_request)
+        calculate_approvals_metrics(merge_request)
 
         if merge_request.approvals_left.zero?
           notification_service.async.approve_mr(merge_request, current_user)
@@ -45,6 +46,12 @@ module MergeRequests
 
     def mark_pending_todos_as_done(merge_request)
       todo_service.mark_pending_todos_as_done(merge_request, current_user)
+    end
+
+    def calculate_approvals_metrics(merge_request)
+      return unless merge_request.project.feature_available?(:code_review_analytics)
+
+      Analytics::CodeReviewMetricsWorker.perform_async('::Analytics::RefreshApprovalsData', merge_request.id)
     end
   end
 end

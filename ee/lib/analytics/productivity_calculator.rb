@@ -25,6 +25,12 @@ module Analytics
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    # rubocop: disable CodeReuse/ActiveRecord
+    def first_approved_at
+      merge_request.approvals.order(id: :asc).limit(1).pluck(:created_at).first
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
     private
 
     attr_reader :merge_request
