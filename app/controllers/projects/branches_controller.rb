@@ -49,9 +49,7 @@ class Projects::BranchesController < Projects::ApplicationController
         service = ::Branches::DivergingCommitCountsService.new(repository)
         branches = BranchesFinder.new(repository, params.permit(names: [])).execute
 
-        Gitlab::GitalyClient.allow_n_plus_1_calls do
-          render json: branches.map { |branch| [branch.name, service.call(branch)] }.to_h
-        end
+        render json: branches.map { |branch| [branch.name, service.call(branch)] }.to_h
       end
     end
   end
