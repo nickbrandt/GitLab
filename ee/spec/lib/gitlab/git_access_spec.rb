@@ -49,13 +49,13 @@ describe Gitlab::GitAccess do
       it 'returns false when a commit message is missing required matches (positive regex match)' do
         project.create_push_rule(commit_message_regex: "@only.com")
 
-        expect { push_changes(changes) }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes(changes) }.to raise_error(described_class::ForbiddenError)
       end
 
       it 'returns false when a commit message contains forbidden characters (negative regex match)' do
         project.create_push_rule(commit_message_negative_regex: "@gmail.com")
 
-        expect { push_changes(changes) }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes(changes) }.to raise_error(described_class::ForbiddenError)
       end
 
       it 'returns true for tags' do
@@ -101,7 +101,7 @@ describe Gitlab::GitAccess do
         project.create_push_rule(commit_message_regex: "Change some files")
 
         # push to new branch, so use a blank old rev and new ref
-        expect { push_changes("#{start_sha} #{end_sha} refs/heads/master") }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes("#{start_sha} #{end_sha} refs/heads/master") }.to raise_error(described_class::ForbiddenError)
       end
     end
 
@@ -113,7 +113,7 @@ describe Gitlab::GitAccess do
       end
 
       it 'returns false for non-member user' do
-        expect { push_changes(changes) }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes(changes) }.to raise_error(described_class::ForbiddenError)
       end
 
       it 'returns true if committer is a gitlab member' do
@@ -136,7 +136,7 @@ describe Gitlab::GitAccess do
       it 'returns false when filename is prohibited' do
         project.create_push_rule(file_name_regex: "jpg$")
 
-        expect { push_changes(changes) }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes(changes) }.to raise_error(described_class::ForbiddenError)
       end
 
       it 'returns true if file name is allowed' do
@@ -162,7 +162,7 @@ describe Gitlab::GitAccess do
         project.create_push_rule(max_file_size: 1)
 
         expect(repository.new_blobs(end_sha)).to be_present
-        expect { push_changes(changes) }.to raise_error(described_class::UnauthorizedError)
+        expect { push_changes(changes) }.to raise_error(described_class::ForbiddenError)
       end
 
       it "returns true when size is allowed" do
@@ -194,7 +194,7 @@ describe Gitlab::GitAccess do
       it 'rejects the push' do
         expect do
           push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/master")
-        end.to raise_error(described_class::UnauthorizedError, /Your push has been rejected/)
+        end.to raise_error(described_class::ForbiddenError, /Your push has been rejected/)
       end
 
       context 'when deleting a branch' do
@@ -244,7 +244,7 @@ describe Gitlab::GitAccess do
 
             expect do
               push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
-            end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+            end.to raise_error(described_class::ForbiddenError, /Your push to this repository would cause it to exceed the size limit/)
           end
         end
 
@@ -294,7 +294,7 @@ describe Gitlab::GitAccess do
           it 'rejects the push' do
             expect do
               push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
-            end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+            end.to raise_error(described_class::ForbiddenError, /Your push to this repository would cause it to exceed the size limit/)
           end
         end
 
@@ -350,7 +350,7 @@ describe Gitlab::GitAccess do
     end
 
     context 'git push' do
-      it { expect { push_changes }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
+      it { expect { push_changes }.to raise_forbidden(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
     end
   end
 
@@ -423,7 +423,7 @@ describe Gitlab::GitAccess do
                 expect(&check).not_to raise_error,
                   -> { "expected #{action} to be allowed" }
               else
-                expect(&check).to raise_error(Gitlab::GitAccess::UnauthorizedError),
+                expect(&check).to raise_error(Gitlab::GitAccess::ForbiddenError),
                   -> { "expected #{action} to be disallowed" }
               end
             end
@@ -450,7 +450,7 @@ describe Gitlab::GitAccess do
                 expect(&check).not_to raise_error,
                   -> { "expected #{action} to be allowed" }
               else
-                expect(&check).to raise_error(Gitlab::GitAccess::UnauthorizedError),
+                expect(&check).to raise_error(Gitlab::GitAccess::ForbiddenError),
                   -> { "expected #{action} to be disallowed" }
               end
             end
@@ -642,11 +642,11 @@ describe Gitlab::GitAccess do
 
     context 'user without a smartcard session' do
       it 'does not allow pull changes' do
-        expect { pull_changes }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+        expect { pull_changes }.to raise_error(Gitlab::GitAccess::ForbiddenError)
       end
 
       it 'does not allow push changes' do
-        expect { push_changes }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+        expect { push_changes }.to raise_error(Gitlab::GitAccess::ForbiddenError)
       end
     end
 
@@ -687,7 +687,7 @@ describe Gitlab::GitAccess do
     access.check('git-upload-pack', changes)
   end
 
-  def raise_unauthorized(message)
-    raise_error(Gitlab::GitAccess::UnauthorizedError, message)
+  def raise_forbidden(message)
+    raise_error(Gitlab::GitAccess::ForbiddenError, message)
   end
 end
