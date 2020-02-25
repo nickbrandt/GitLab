@@ -7,7 +7,7 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
-import { ChildType } from 'ee/related_items_tree/constants';
+import { ChildType, treeItemChevronBtnClassName } from 'ee/related_items_tree/constants';
 import { PathIdSeparator } from 'ee/related_issues/constants';
 
 import Icon from '~/vue_shared/components/icon.vue';
@@ -140,6 +140,12 @@ describe('RelatedItemsTree', () => {
 
         expect(chevronButton.isVisible()).toBe(true);
         expect(chevronButton.attributes('title')).toBe('Collapse');
+      });
+
+      it('has the proper class on the expand/collapse button to avoid dragging', () => {
+        const chevronButton = wrapper.find(GlButton);
+
+        expect(chevronButton.attributes('class')).toContain(treeItemChevronBtnClassName);
       });
 
       it('renders expand/collapse icon', () => {

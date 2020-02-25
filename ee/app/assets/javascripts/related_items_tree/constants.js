@@ -40,3 +40,5 @@ export const RemoveItemModalProps = {
 export const OVERFLOW_AFTER = 5;
 
 export const itemRemoveModalId = 'item-remove-confirmation';
+
+export const treeItemChevronBtnClassName = 'btn-tree-item-chevron';

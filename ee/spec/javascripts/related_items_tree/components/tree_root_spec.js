@@ -7,6 +7,7 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
+import { treeItemChevronBtnClassName } from 'ee/related_items_tree/constants';
 
 import {
   mockQueryResponse,
@@ -116,6 +117,7 @@ describe('RelatedItemsTree', () => {
                   'ghost-class': 'tree-item-drag-active',
                   'data-parent-reference': mockParentItem.reference,
                   value: wrapper.vm.children,
+                  filter: `.${treeItemChevronBtnClassName}`,
                 }),
               );
             });

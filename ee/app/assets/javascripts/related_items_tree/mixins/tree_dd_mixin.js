@@ -1,7 +1,7 @@
 import Draggable from 'vuedraggable';
 
 import defaultSortableConfig from '~/sortable/sortable_config';
-import { idProp, relativePositions } from '../constants';
+import { idProp, relativePositions, treeItemChevronBtnClassName } from '../constants';
 
 export default {
   computed: {
@@ -17,6 +17,10 @@ export default {
         'ghost-class': 'tree-item-drag-active',
         'data-parent-reference': this.parentItem.reference,
         value: this.children,
+        // This filters out/ignores all the chevron buttons (used for
+        // expanding and collapsing epic tree items) so the drag action
+        // can only be performed on the actual item card.
+        filter: `.${treeItemChevronBtnClassName}`,
       };
 
       return this.userSignedIn ? options : {};
