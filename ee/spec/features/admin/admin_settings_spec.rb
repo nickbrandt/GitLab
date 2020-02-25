@@ -226,6 +226,21 @@ describe 'Admin updates EE-only settings' do
     end
   end
 
+  context 'package registry settings' do
+    before do
+      visit ci_cd_admin_application_settings_path
+    end
+
+    it 'allows you to change the npm_forwaring setting' do
+      page.within('#js-package-settings') do
+        check 'Enable forwarding of NPM package requests to npmjs.org'
+        click_button 'Save'
+      end
+
+      expect(current_settings.npm_package_requests_forwarding).to be true
+    end
+  end
+
   def current_settings
     ApplicationSetting.current_without_cache
   end
