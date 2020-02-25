@@ -592,23 +592,21 @@ describe API::Groups do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(response.message).to eq('Bad Request')
-        expect(json_response['message']).to eq('Failed to save group'\
-                                              ' {:avatar=>["file format is not supported.'\
+        expect(json_response['message']['avatar']).to eq(['file format is not supported.'\
                                               ' Please try one of the following supported formats:'\
-                                              'png, jpg, jpeg, gif, bmp, tiff, ico"]}')
+                                              ' png, jpg, jpeg, gif, bmp, tiff, ico'])
       end
 
       it 'returns 400 if file size exceeds allowed limit for group avatar' do
         group_param = {
-          avatar: fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
+          avatar: fixture_file_upload('spec/fixtures/big-image.png', 'image/png')
         }
 
         put api("/groups/#{group1.id}", user1), params: group_param
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(response.message).to eq('Bad Request')
-        expect(json_response['message']).to eq('Failed to save group'\
-                                              ' {:avatar=>["is too big (should be at most 200 KB)"]}')
+        expect(json_response['message']['avatar']).to eq(['is too big (should be at most 200 KB)'])
       end
 
       it 'returns 404 for a non existing group' do
@@ -1052,7 +1050,7 @@ describe API::Groups do
         expect(json_response['message']).to eq('Failed to save group'\
                                               ' {:avatar=>["file format is not supported.'\
                                               ' Please try one of the following supported formats:'\
-                                              'png, jpg, jpeg, gif, bmp, tiff, ico"]}')
+                                              ' png, jpg, jpeg, gif, bmp, tiff, ico"]}')
       end
 
       it 'returns 400 if group avatar file size exceeds allowed limit' do
