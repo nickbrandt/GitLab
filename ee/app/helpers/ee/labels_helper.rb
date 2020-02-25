@@ -8,15 +8,32 @@ module EE
       singleton_class.prepend self
     end
 
-    def render_label(label, tooltip: true, link: nil, css: nil, dataset: nil)
-      content = super
-      content = scoped_label_wrapper(content, label) if label.scoped_label?
+    def render_colored_label(label, suffix: '')
+      return super unless label.scoped_label?
 
-      content
+      scope_name, label_name = label.name.split(Label::SCOPED_LABEL_SEPARATOR)
+
+      render_label_text(
+        scope_name,
+        css_class: text_color_class_for_bg(label.color),
+        bg_color: label.color
+      ) + render_label_text(
+        label_name,
+        suffix: suffix
+      )
     end
 
-    def scoped_label_wrapper(link, label)
-      %(<span class="d-inline-block position-relative scoped-label-wrapper">#{link}#{scoped_labels_doc_link(label)}</span>).html_safe
+    def wrap_label_html(label_html, small:, label:)
+      return super unless label.scoped_label?
+
+      wrapper_classes = %w(gl-label gl-label-scoped)
+      wrapper_classes << 'gl-label-sm' if small
+
+      <<~HTML.chomp.html_safe
+        <span class="d-inline-block position-relative scoped-label-wrapper">
+          <span class="#{wrapper_classes.join(' ')}" style="color: #{label.color}">#{label_html + scoped_labels_doc_link}</span>
+        </span>
+      HTML
     end
 
     def label_tooltip_title(label)
@@ -57,12 +74,10 @@ module EE
 
     private
 
-    def scoped_labels_doc_link(label)
-      text_color = text_color_for_bg(label.color)
-      content = %(<i class="fa fa-question-circle" style="background-color: #{label.color}; color: #{text_color}"></i>)
-      help_url = ::Gitlab::Routing.url_helpers.help_page_url('user/project/labels.md', anchor: 'scoped-labels')
+    def scoped_labels_doc_link
+      help_url = ::Gitlab::Routing.url_helpers.help_page_path('user/project/labels.md', anchor: 'scoped-labels')
 
-      %(<a href="#{help_url}" class="label scoped-label" target="_blank" rel="noopener">#{content}</a>)
+      %(<a href="#{help_url}" class="gl-link gl-label-icon" target="_blank" rel="noopener"><i class="fa fa-question-circle"></i></a>).html_safe
     end
   end
 end

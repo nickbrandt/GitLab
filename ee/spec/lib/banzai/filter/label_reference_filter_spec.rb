@@ -16,14 +16,15 @@ describe Banzai::Filter::LabelReferenceFilter do
 
     it 'includes link to scoped documentation' do
       doc = reference_filter("See #{scoped_label.to_reference}")
+      scope, name = scoped_label.name.split(Label::SCOPED_LABEL_SEPARATOR)
 
-      expect(doc.to_html).to match(%r(<a.+><span.+>#{scoped_label.name}</span></a><a.+>.*question-circle.*</a>))
+      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scope}</span><span.+>#{name}</span></a><a.+>.*question-circle.*</a></span>))
     end
 
     it 'does not include link to scoped documentation for common labels' do
       doc = reference_filter("See #{label.to_reference}")
 
-      expect(doc.to_html).to match(%r(<a.+><span.+>#{label.name}</span></a>$))
+      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{label.name}</span></a></span>$))
     end
   end
 
@@ -32,10 +33,10 @@ describe Banzai::Filter::LabelReferenceFilter do
       stub_licensed_features(scoped_labels: false)
     end
 
-    it 'does not include link to scoped labels documentation' do
+    it 'renders label as a common label' do
       doc = reference_filter("See #{scoped_label.to_reference}")
 
-      expect(doc.to_html).to match(%r(<a.+><span.+>#{scoped_label.name}</span></a>$))
+      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped_label.name}</span></a></span>$))
     end
   end
 end
