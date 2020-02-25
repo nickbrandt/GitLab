@@ -85,7 +85,7 @@ describe API::Issues, :mailer do
       it 'matches V4 response schema' do
         get api('/issues', user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/issues', dir: 'ee')
       end
 
@@ -185,7 +185,7 @@ describe API::Issues, :mailer do
       it 'does not contain epic_iid in response' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
       end
     end
@@ -212,7 +212,7 @@ describe API::Issues, :mailer do
       it 'does not contain epic_iid in response' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
       end
     end
@@ -258,7 +258,7 @@ describe API::Issues, :mailer do
           it 'returns an error' do
             request
 
-            expect(response).to have_gitlab_http_status(403)
+            expect(response).to have_gitlab_http_status(:forbidden)
             expect(json_response['message']).to eq('403 Forbidden')
           end
         end
@@ -273,7 +273,7 @@ describe API::Issues, :mailer do
         it 'does not set epic on issue' do
           request
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(json_response['message']).to eq('404 Not found')
         end
       end
@@ -284,7 +284,7 @@ describe API::Issues, :mailer do
         it 'returns an error' do
           request
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
     end
@@ -306,7 +306,7 @@ describe API::Issues, :mailer do
       post api("/projects/#{project.id}/issues", user),
         params: { title: 'new issue', labels: 'label, label2', weight: 101, assignee_ids: [user2.id] }
 
-      expect(response).to have_gitlab_http_status(201)
+      expect(response).to have_gitlab_http_status(:created)
       expect(json_response['title']).to eq('new issue')
       expect(json_response['description']).to be_nil
       expect(json_response['labels']).to eq(%w(label label2))
@@ -325,7 +325,7 @@ describe API::Issues, :mailer do
     it 'updates an issue with no weight' do
       put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 101 }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['weight']).to eq(101)
     end
 
@@ -334,14 +334,14 @@ describe API::Issues, :mailer do
 
       put api("/projects/#{project.id}/issues/#{weighted_issue.iid}", user), params: { weight: nil }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['weight']).to be_nil
     end
 
     it 'returns 400 if weight is less than minimum weight' do
       put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: -1 }
 
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
       expect(json_response['message']['weight']).to be_present
     end
 
@@ -360,7 +360,7 @@ describe API::Issues, :mailer do
     it 'adds a note when the weight is changed' do
       put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['weight']).to eq(9)
     end
 
@@ -372,7 +372,7 @@ describe API::Issues, :mailer do
       it 'ignores the update' do
         put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 5 }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['weight']).to be_nil
         expect(issue.reload.read_attribute(:weight)).to be_nil
       end
