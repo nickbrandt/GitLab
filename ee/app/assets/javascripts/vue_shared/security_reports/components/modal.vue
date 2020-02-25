@@ -122,22 +122,6 @@ export default {
     isEditingExistingFeedback() {
       return this.dismissalFeedback && this.modal.isCommentingOnDismissal;
     },
-    valuedFields() {
-      const { data } = this.modal;
-      const result = {};
-
-      Object.keys(data).forEach(key => {
-        if (data[key].value && data[key].value.length) {
-          result[key] = data[key];
-          if (key === 'file' && this.vulnerability.blob_path) {
-            result[key].isLink = true;
-            result[key].url = this.vulnerability.blob_path;
-          }
-        }
-      });
-
-      return result;
-    },
     dismissalFeedbackObject() {
       if (this.dismissalFeedback) {
         return this.dismissalFeedback;
@@ -202,7 +186,7 @@ export default {
     class="modal-security-report-dast"
   >
     <slot>
-      <vulnerability-details :details="valuedFields" class="js-vulnerability-details" />
+      <vulnerability-details :vulnerability="vulnerability" class="js-vulnerability-details" />
 
       <solution-card
         :solution="solution"
