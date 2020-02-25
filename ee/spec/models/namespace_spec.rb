@@ -98,8 +98,8 @@ describe Namespace do
   end
 
   context 'validation' do
-    it do
-      is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+    it "ensures max_pages_size is an integer greater than 0 (or equal to 0 to indicate unlimited/maximum)" do
+      is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than_or_equal_to(0)
                        .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
     end
   end
