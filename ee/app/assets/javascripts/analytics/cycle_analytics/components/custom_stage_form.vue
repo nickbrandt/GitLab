@@ -38,7 +38,7 @@ export const initializeFormData = ({ emptyFieldState, initialFields, errors }) =
     : {
         ...emptyFieldState,
         endEventIdentifier:
-          initialFields && !initialFields?.startEventIdentifier
+          initialFields && !initialFields.startEventIdentifier
             ? [s__('CustomCycleAnalytics|Please select a start event first')]
             : null,
       };
@@ -97,10 +97,15 @@ export default {
   },
   data() {
     const { initialFields = {}, errors = null } = this;
-    const formData = initializeFormData({ emptyFieldState: defaultFields, initialFields, errors });
+    const { fields, fieldErrors } = initializeFormData({
+      emptyFieldState: defaultFields,
+      initialFields,
+      errors,
+    });
     return {
       labelEvents: getLabelEventsIdentifiers(this.events),
-      ...formData,
+      fields,
+      fieldErrors,
     };
   },
   computed: {
@@ -130,7 +135,7 @@ export default {
     hasErrors() {
       return (
         this.eventMismatchError ||
-        Object.values(this.fieldErrors).some(errArray => errArray && errArray.length)
+        Object.values(this.fieldErrors).some(errArray => errArray?.length)
       );
     },
     isComplete() {
@@ -281,7 +286,6 @@ export default {
       :label="s__('CustomCycleAnalytics|Name')"
       :state="!hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
-      @change.native="onUpdateNameField"
     >
       <gl-form-input
         v-model="fields.name"
@@ -290,6 +294,7 @@ export default {
         name="custom-stage-name"
         :placeholder="s__('CustomCycleAnalytics|Enter a name for the stage')"
         required
+        @change.native="onUpdateNameField"
       />
     </gl-form-group>
     <div class="d-flex" :class="{ 'justify-content-between': startEventRequiresLabel }">
@@ -333,7 +338,6 @@ export default {
           :label="s__('CustomCycleAnalytics|Stop event')"
           :state="!hasFieldErrors('endEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
-          @change.native="onUpdateEndEventField"
         >
           <gl-form-select
             v-model="fields.endEventIdentifier"
@@ -341,6 +345,7 @@ export default {
             :options="endEventOptions"
             :required="true"
             :disabled="!hasStartEvent"
+            @change.native="onUpdateEndEventField"
           />
         </gl-form-group>
       </div>
