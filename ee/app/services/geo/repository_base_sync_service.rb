@@ -204,7 +204,7 @@ module Geo
     end
 
     def temp_repo
-      @temp_repo ||= ::Repository.new(repository.full_path, repository.project, disk_path: disk_path_temp, repo_type: repository.repo_type)
+      @temp_repo ||= ::Repository.new(repository.full_path, repository.container, shard: repository.shard, disk_path: disk_path_temp, repo_type: repository.repo_type)
     end
 
     def clean_up_temporary_repository
