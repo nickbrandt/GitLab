@@ -44,7 +44,7 @@ class DueDateSelect {
         this.$selectbox.hide();
         this.$value.css('display', '');
       },
-      multiSelect: true,
+      shouldPropagate: false,
     });
   }
 
