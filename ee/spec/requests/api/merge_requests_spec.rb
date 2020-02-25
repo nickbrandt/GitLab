@@ -39,7 +39,7 @@ describe API::MergeRequests do
         it 'creates merge request with multiple assignees' do
           update_merge_request(params)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['assignees'].size).to eq(2)
           expect(json_response['assignees'].first['name']).to eq(user.name)
           expect(json_response['assignees'].second['name']).to eq(other_user.name)
@@ -55,7 +55,7 @@ describe API::MergeRequests do
         it 'creates merge request with a single assignee' do
           update_merge_request(params)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['assignees'].size).to eq(1)
           expect(json_response['assignees'].first['name']).to eq(user.name)
           expect(json_response.dig('assignee', 'name')).to eq(user.name)
@@ -74,7 +74,7 @@ describe API::MergeRequests do
           ]
         )
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         merge_request.reload
 
@@ -107,7 +107,7 @@ describe API::MergeRequests do
         it 'creates merge request with multiple assignees' do
           create_merge_request(assignee_ids: [user.id, user2.id])
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(json_response['assignees'].size).to eq(2)
           expect(json_response['assignees'].first['name']).to eq(user.name)
           expect(json_response['assignees'].second['name']).to eq(user2.name)
@@ -123,7 +123,7 @@ describe API::MergeRequests do
         it 'creates merge request with a single assignee' do
           create_merge_request(assignee_ids: [user.id, user2.id])
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(json_response['assignees'].size).to eq(1)
           expect(json_response['assignees'].first['name']).to eq(user.name)
           expect(json_response.dig('assignee', 'name')).to eq(user.name)
@@ -135,7 +135,7 @@ describe API::MergeRequests do
       it "returns merge_request" do
         create_merge_request(squash: true)
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(json_response['title']).to eq('Test merge_request')
         expect(json_response['labels']).to eq(%w(label label2))
         expect(json_response['milestone']['id']).to eq(milestone.id)
@@ -162,7 +162,7 @@ describe API::MergeRequests do
           end
 
           it 'sets approvals_before_merge' do
-            expect(response).to have_gitlab_http_status(201)
+            expect(response).to have_gitlab_http_status(:created)
             expect(json_response['message']).to eq(nil)
             expect(json_response['approvals_before_merge']).to eq(1)
           end
@@ -178,7 +178,7 @@ describe API::MergeRequests do
 
       put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
 
-      expect(response).to have_gitlab_http_status(406)
+      expect(response).to have_gitlab_http_status(:not_acceptable)
       expect(json_response['message']).to eq('Branch cannot be merged')
     end
 
@@ -190,7 +190,7 @@ describe API::MergeRequests do
 
       put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 
@@ -261,7 +261,7 @@ describe API::MergeRequests do
         let(:approvers_param) { 'any-other-string' }
 
         it 'returns a validation error' do
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eq("approver_ids should be an array, 'None' or 'Any'")
         end
       end
@@ -306,7 +306,7 @@ describe API::MergeRequests do
         let(:approvals_param) { 'any-other-string' }
 
         it 'returns a validation error' do
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eq("approved_by_ids should be an array, 'None' or 'Any'")
         end
       end
