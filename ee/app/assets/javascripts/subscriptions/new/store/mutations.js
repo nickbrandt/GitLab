@@ -9,6 +9,10 @@ export default {
     state.selectedPlan = selectedPlan;
   },
 
+  [types.UPDATE_SELECTED_GROUP](state, selectedGroup) {
+    state.selectedGroup = selectedGroup;
+  },
+
   [types.UPDATE_IS_SETUP_FOR_COMPANY](state, isSetupForCompany) {
     state.isSetupForCompany = isSetupForCompany;
   },

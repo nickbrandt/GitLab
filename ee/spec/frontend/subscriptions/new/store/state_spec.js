@@ -10,11 +10,18 @@ describe('projectsSelector default state', () => {
     { id: 'secondPlanId', code: 'silver', price_per_year: 228 },
   ];
 
+  const groupData = [
+    { id: 132, name: 'My first group', users: 3 },
+    { id: 483, name: 'My second group', users: 12 },
+  ];
+
   const initialData = {
     planData: JSON.stringify(planData),
+    groupData: JSON.stringify(groupData),
     planId: 'secondPlanId',
     setupForCompany: 'true',
     fullName: 'Full Name',
+    newUser: 'true',
   };
 
   const currentDate = new Date('2020-01-07T12:44:08.135Z');
@@ -67,12 +74,24 @@ describe('projectsSelector default state', () => {
   });
 
   describe('isSetupForCompany', () => {
-    it('sets the isSetupForCompany to true if provided setupForCompany is "true"', () => {
+    it('sets the isSetupForCompany to true if provided setupForCompany is "true" and the provided newUser is "true"', () => {
       expect(state.isSetupForCompany).toEqual(true);
     });
 
+    it('sets the isSetupForCompany to true if provided newUser is "false"', () => {
+      const modifiedState = createState({
+        ...initialData,
+        ...{ newUser: 'false' },
+      });
+
+      expect(modifiedState.isSetupForCompany).toEqual(true);
+    });
+
     it('sets the isSetupForCompany to false if provided setupForCompany is "false"', () => {
-      const modifiedState = createState({ ...initialData, ...{ setupForCompany: 'false' } });
+      const modifiedState = createState({
+        ...initialData,
+        ...{ setupForCompany: 'false' },
+      });
 
       expect(modifiedState.isSetupForCompany).toEqual(false);
     });
@@ -82,20 +101,31 @@ describe('projectsSelector default state', () => {
     expect(state.fullName).toEqual('Full Name');
   });
 
+  describe('groupData', () => {
+    it('sets the groupData to the provided parsed groupData', () => {
+      expect(state.groupData).toEqual([
+        { value: 132, text: 'My first group', numberOfUsers: 3 },
+        { value: 483, text: 'My second group', numberOfUsers: 12 },
+      ]);
+    });
+
+    it('sets the availablePlans to an empty array when no groupData is provided', () => {
+      const modifiedState = createState({ ...initialData, ...{ groupData: undefined } });
+
+      expect(modifiedState.groupData).toEqual([]);
+    });
+  });
+
+  it('sets the selectedGroup to null', () => {
+    expect(state.selectedGroup).toBeNull();
+  });
+
   it('sets the organizationName to null', () => {
     expect(state.organizationName).toBeNull();
   });
 
-  describe('numberOfUsers', () => {
-    it('sets the numberOfUsers to 0 when setupForCompany is true', () => {
-      expect(state.numberOfUsers).toEqual(0);
-    });
-
-    it('sets the numberOfUsers to 1 when setupForCompany is false', () => {
-      const modifiedState = createState({ ...initialData, ...{ setupForCompany: 'false' } });
-
-      expect(modifiedState.numberOfUsers).toEqual(1);
-    });
+  it('sets the numberOfUsers to 1', () => {
+    expect(state.numberOfUsers).toEqual(1);
   });
 
   it('sets the country to null', () => {
