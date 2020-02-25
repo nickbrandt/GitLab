@@ -2,6 +2,7 @@
 import { GlDaterangePicker, GlSprintf, GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import { getDayDifference } from '~/lib/utils/datetime_utility';
 import { __, sprintf } from '~/locale';
+import { OFFSET_DATE_BY_ONE } from '../constants';
 
 export default {
   components: {
@@ -45,6 +46,11 @@ export default {
       required: false,
       default: 0,
     },
+    includeSelectedDate: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -63,7 +69,8 @@ export default {
       },
     },
     numberOfDays() {
-      return getDayDifference(this.startDate, this.endDate);
+      const dayDifference = getDayDifference(this.startDate, this.endDate);
+      return this.includeSelectedDate ? dayDifference + OFFSET_DATE_BY_ONE : dayDifference;
     },
   },
 };

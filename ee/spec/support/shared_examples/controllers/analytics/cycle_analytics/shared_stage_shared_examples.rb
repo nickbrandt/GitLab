@@ -139,12 +139,12 @@ RSpec.shared_examples 'cycle analytics data endpoint examples' do
     end
   end
 
-  context 'when `created_after` is invalid' do
+  context 'when `created_after` is invalid, falls back to default date' do
     before do
       params[:created_after] = 'not-a-date'
     end
 
-    include_examples 'example for invalid parameter'
+    it { expect(subject).to have_gitlab_http_status(:success) }
   end
 
   context 'when `created_before` is invalid' do
