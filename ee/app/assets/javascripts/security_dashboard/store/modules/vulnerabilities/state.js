@@ -1,5 +1,3 @@
-import { __, s__ } from '~/locale';
-
 export default () => ({
   isLoadingVulnerabilities: true,
   errorLoadingVulnerabilities: false,

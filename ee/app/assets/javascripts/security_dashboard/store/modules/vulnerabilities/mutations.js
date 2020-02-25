@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
@@ -78,8 +77,8 @@ export default {
 
     Vue.set(state.modal, 'title', vulnerability.name);
 
-    Vue.set(state.modal.project, 'value', vulnerability.project && vulnerability.project.full_name);
-    Vue.set(state.modal.project, 'url', vulnerability.project && vulnerability.project.full_path);
+    Vue.set(state.modal.project, 'value', vulnerability.project?.full_name);
+    Vue.set(state.modal.project, 'url', vulnerability.project?.full_path);
 
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(

@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import { findIssueIndex, parseDiff } from './utils';
-import getFileLocation from './utils/get_file_location';
 import { visitUrl } from '~/lib/utils/url_utility';
 
 export default {

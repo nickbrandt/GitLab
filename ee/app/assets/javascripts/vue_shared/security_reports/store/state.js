@@ -1,5 +1,3 @@
-import { __, s__ } from '~/locale';
-
 export default () => ({
   blobPath: {
     head: null,
