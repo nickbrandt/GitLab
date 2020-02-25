@@ -583,6 +583,34 @@ describe API::Groups do
                                                   "#{group1.id}/banana_sample.gif")
       end
 
+      it 'returns 400 if file type is invalid to update avatar' do
+        group_param = {
+          avatar: fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
+        }
+
+        put api("/groups/#{group1.id}", user1), params: group_param
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(response.message).to eq('Bad Request')
+        expect(json_response['message']).to eq('Failed to save group'\
+                                              ' {:avatar=>["file format is not supported.'\
+                                              ' Please try one of the following supported formats:'\
+                                              'png, jpg, jpeg, gif, bmp, tiff, ico"]}')
+      end
+
+      it 'returns 400 if file size exceeds allowed limit for group avatar' do
+        group_param = {
+          avatar: fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
+        }
+
+        put api("/groups/#{group1.id}", user1), params: group_param
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(response.message).to eq('Bad Request')
+        expect(json_response['message']).to eq('Failed to save group'\
+                                              ' {:avatar=>["is too big (should be at most 200 KB)"]}')
+      end
+
       it 'returns 404 for a non existing group' do
         put api('/groups/1328', user1), params: { name: new_group_name }
 
@@ -1011,6 +1039,32 @@ describe API::Groups do
         expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
                                                   '-/system/group/avatar/'\
                                                   "#{group_id}/banana_sample.gif")
+      end
+
+      it 'returns a 400 if file type is invalid for group avatar' do
+        group = attributes_for_group_api request_access_enabled: false
+        group[:avatar] = fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
+
+        post api("/groups", user3), params: group
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(response.message).to eq('Bad Request')
+        expect(json_response['message']).to eq('Failed to save group'\
+                                              ' {:avatar=>["file format is not supported.'\
+                                              ' Please try one of the following supported formats:'\
+                                              'png, jpg, jpeg, gif, bmp, tiff, ico"]}')
+      end
+
+      it 'returns 400 if group avatar file size exceeds allowed limit' do
+        group = attributes_for_group_api request_access_enabled: false
+        group[:avatar] = fixture_file_upload('spec/fixtures/big-image.png', 'image/png')
+
+        post api("/groups", user3), params: group
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(response.message).to eq('Bad Request')
+        expect(json_response['message']).to eq('Failed to save group'\
+                                              ' {:avatar=>["is too big (should be at most 200 KB)"]}')
       end
 
       it "creates a nested group" do
