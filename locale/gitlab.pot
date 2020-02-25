@@ -1544,13 +1544,13 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
+msgid "Advanced Settings"
+msgstr ""
+
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
 msgstr ""
 
 msgid "Advanced search functionality"
-msgstr ""
-
-msgid "Advanced settings"
 msgstr ""
 
 msgid "After a successful password update you will be redirected to login screen."
@@ -4006,6 +4006,9 @@ msgstr ""
 msgid "ClusterIntegration|%{appList} was successfully installed on your Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|%{external_ip}.nip.io"
+msgstr ""
+
 msgid "ClusterIntegration|%{title} uninstalled successfully."
 msgstr ""
 
@@ -4042,7 +4045,7 @@ msgstr ""
 msgid "ClusterIntegration|Adding an integration will share the cluster across all projects."
 msgstr ""
 
-msgid "ClusterIntegration|Advanced options on this Kubernetes cluster's integration"
+msgid "ClusterIntegration|Advanced options on this Kubernetes cluster’s integration"
 msgstr ""
 
 msgid "ClusterIntegration|All data not committed to GitLab will be deleted and cannot be restored."
@@ -4076,9 +4079,6 @@ msgid "ClusterIntegration|An error occurred while trying to fetch zone machine t
 msgstr ""
 
 msgid "ClusterIntegration|Any running pipelines will be canceled."
-msgstr ""
-
-msgid "ClusterIntegration|Applications"
 msgstr ""
 
 msgid "ClusterIntegration|Apply for credit"
@@ -4130,9 +4130,6 @@ msgid "ClusterIntegration|Cloud Run"
 msgstr ""
 
 msgid "ClusterIntegration|Cluster being created"
-msgstr ""
-
-msgid "ClusterIntegration|Cluster health"
 msgstr ""
 
 msgid "ClusterIntegration|Cluster management project (alpha)"
@@ -4327,7 +4324,7 @@ msgstr ""
 msgid "ClusterIntegration|If you do not wish to delete all associated GitLab resources, you can simply remove the integration."
 msgstr ""
 
-msgid "ClusterIntegration|In order to view the health of your cluster, you must first install Prometheus below."
+msgid "ClusterIntegration|In order to view the health of your cluster, you must first install Prometheus in the Applications tab."
 msgstr ""
 
 msgid "ClusterIntegration|Ingress"
@@ -4349,9 +4346,6 @@ msgid "ClusterIntegration|Instance type"
 msgstr ""
 
 msgid "ClusterIntegration|Integrate Kubernetes cluster automation"
-msgstr ""
-
-msgid "ClusterIntegration|Integration status"
 msgstr ""
 
 msgid "ClusterIntegration|Issuer Email"
@@ -4388,9 +4382,6 @@ msgid "ClusterIntegration|Knative extends Kubernetes to provide a set of middlew
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster"
-msgstr ""
-
-msgid "ClusterIntegration|Kubernetes cluster details"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster is being created..."
@@ -4541,6 +4532,9 @@ msgid "ClusterIntegration|Prometheus"
 msgstr ""
 
 msgid "ClusterIntegration|Prometheus is an open-source monitoring system with %{gitlabIntegrationLink} to monitor deployed applications."
+msgstr ""
+
+msgid "ClusterIntegration|Provider details"
 msgstr ""
 
 msgid "ClusterIntegration|Provision Role ARN"
@@ -10259,6 +10253,9 @@ msgid "Header logo was successfully removed."
 msgstr ""
 
 msgid "Header message"
+msgstr ""
+
+msgid "Health"
 msgstr ""
 
 msgid "Health Check"
