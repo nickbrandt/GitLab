@@ -18564,9 +18564,6 @@ msgstr ""
 msgid "Subscription deletion failed."
 msgstr ""
 
-msgid "Subscription successfully applied to \"%{group_name}\""
-msgstr ""
-
 msgid "Subscription successfully created."
 msgstr ""
 
