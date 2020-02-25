@@ -16,7 +16,7 @@ class ApprovalProjectRule < ApplicationRecord
   alias_method :code_owner, :code_owner?
   validate :validate_default_license_report_name, on: :update, if: :report_approver?
 
-  validates :name, uniqueness: { scope: :project_id }
+  validates :name, uniqueness: { scope: [:project_id, :rule_type] }
   validates :rule_type, uniqueness: { scope: :project_id, message: proc { _('any-approver for the project already exists') } }, if: :any_approver?
 
   def self.applicable_to_branch(branch)
