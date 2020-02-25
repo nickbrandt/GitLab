@@ -257,8 +257,8 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     selectedGroup: { fullPath },
   } = state;
 
-  return Api.groupLabels(fullPath)
-    .then(data => dispatch('receiveGroupLabelsSuccess', data))
+  return Api.cycleAnalyticsGroupLabels(fullPath)
+    .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
     );

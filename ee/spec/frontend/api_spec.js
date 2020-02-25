@@ -543,6 +543,22 @@ describe('Api', () => {
           .catch(done.fail);
       });
     });
+
+    describe('cycleAnalyticsGroupLabels', () => {
+      it('fetches group level labels', done => {
+        const response = [];
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/labels`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsGroupLabels(groupId)
+          .then(({ data, config: { url } }) => {
+            expect(data).toEqual(response);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
   });
 
   describe('GeoDesigns', () => {
