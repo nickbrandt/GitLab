@@ -244,64 +244,13 @@ describe('vulnerabilities module mutations', () => {
         expect(state.modal.title).toEqual(vulnerability.name);
       });
 
-      it('should set the modal description', () => {
-        expect(state.modal.data.description.value).toEqual(vulnerability.description);
-      });
-
       it('should set the modal project', () => {
-        expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
-        expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
-      });
-
-      it('should set the modal file', () => {
-        expect(state.modal.data.file.value).toEqual(
-          `${vulnerability.location.file}:${vulnerability.location.start_line}`,
-        );
-      });
-
-      it('should set the modal className', () => {
-        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
-      });
-
-      it('should set the modal image', () => {
-        expect(state.modal.data.image.value).toEqual(vulnerability.location.image);
-      });
-
-      it('should set the modal namespace', () => {
-        expect(state.modal.data.namespace.value).toEqual(vulnerability.location.operating_system);
-      });
-
-      it('should set the modal identifiers', () => {
-        expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
-      });
-
-      it('should set the modal severity', () => {
-        expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
-      });
-
-      it('should set the modal class', () => {
-        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
-      });
-
-      it('should set the modal links', () => {
-        expect(state.modal.data.links.value).toEqual(vulnerability.links);
-      });
-
-      it('should set the modal instances', () => {
-        expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
+        expect(state.modal.project.value).toEqual(vulnerability.project.full_name);
+        expect(state.modal.project.url).toEqual(vulnerability.project.full_path);
       });
 
       it('should set the modal vulnerability', () => {
         expect(state.modal.vulnerability).toEqual(vulnerability);
-      });
-
-      it('should set the modal URL', () => {
-        const { url } = state.modal.data;
-        const { hostname, path } = vulnerability.location;
-        const expected = `${hostname}${path}`;
-
-        expect(url.value).toEqual(expected);
-        expect(url.url).toEqual(expected);
       });
     });
 
@@ -342,27 +291,6 @@ describe('vulnerabilities module mutations', () => {
         mutations[types.SET_MODAL_DATA](state, payload);
 
         expect(state.modal.vulnerability.hasIssue).toEqual(false);
-      });
-
-      it('should nullify the modal links', () => {
-        const payload = { vulnerability: { ...vulnerability, links: [] } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.links.value).toEqual(null);
-      });
-
-      it('should nullify the instances', () => {
-        const payload = { vulnerability: { ...vulnerability, instances: [] } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.instances.value).toEqual(null);
-      });
-
-      it('should nullify the file value', () => {
-        const payload = { vulnerability: { ...vulnerability, location: {} } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.file.value).toEqual(null);
       });
     });
   });

@@ -86,7 +86,7 @@ export default {
       );
     },
     project() {
-      return this.modal.data.project;
+      return this.modal.project;
     },
     solution() {
       return this.vulnerability && this.vulnerability.solution;
@@ -153,7 +153,6 @@ export default {
       } = gon;
 
       return {
-        project_id: this.project ? this.project.id : null,
         author: {
           id: current_user_id,
           name: current_user_fullname,

@@ -134,36 +134,8 @@ export default {
 
   [types.SET_ISSUE_MODAL_DATA](state, payload) {
     const { issue, status } = payload;
-    const fileLocation = getFileLocation(issue.location);
 
     Vue.set(state.modal, 'title', issue.title);
-    Vue.set(state.modal.data.description, 'value', issue.description);
-    Vue.set(state.modal.data.file, 'value', issue.location && issue.location.file);
-    Vue.set(state.modal.data.file, 'url', issue.urlPath);
-    Vue.set(state.modal.data.className, 'value', issue.location && issue.location.class);
-    Vue.set(state.modal.data.methodName, 'value', issue.location && issue.location.method);
-    Vue.set(state.modal.data.image, 'value', issue.location && issue.location.image);
-    Vue.set(state.modal.data.namespace, 'value', issue.location && issue.location.operating_system);
-    Vue.set(state.modal.data.url, 'value', fileLocation);
-    Vue.set(state.modal.data.url, 'url', fileLocation);
-
-    if (issue.identifiers && issue.identifiers.length > 0) {
-      Vue.set(state.modal.data.identifiers, 'value', issue.identifiers);
-    } else {
-      // Force a null value for identifiers to avoid showing an empty array
-      Vue.set(state.modal.data.identifiers, 'value', null);
-    }
-
-    Vue.set(state.modal.data.severity, 'value', issue.severity);
-
-    if (issue.links && issue.links.length > 0) {
-      Vue.set(state.modal.data.links, 'value', issue.links);
-    } else {
-      // Force a null value for links to avoid showing an empty array
-      Vue.set(state.modal.data.links, 'value', null);
-    }
-
-    Vue.set(state.modal.data.instances, 'value', issue.instances);
     Vue.set(state.modal, 'vulnerability', issue);
     Vue.set(state.modal, 'isResolved', status === 'success');
 

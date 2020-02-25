@@ -75,57 +75,12 @@ export default {
   },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
-    const { location } = vulnerability;
 
     Vue.set(state.modal, 'title', vulnerability.name);
-    Vue.set(state.modal.data.description, 'value', vulnerability.description);
-    Vue.set(
-      state.modal.data.project,
-      'value',
-      vulnerability.project && vulnerability.project.full_name,
-    );
-    Vue.set(
-      state.modal.data.project,
-      'url',
-      vulnerability.project && vulnerability.project.full_path,
-    );
 
-    Vue.set(
-      state.modal.data.identifiers,
-      'value',
-      vulnerability.identifiers.length && vulnerability.identifiers,
-    );
+    Vue.set(state.modal.project, 'value', vulnerability.project && vulnerability.project.full_name);
+    Vue.set(state.modal.project, 'url', vulnerability.project && vulnerability.project.full_path);
 
-    if (location) {
-      const {
-        file,
-        start_line: startLine,
-        end_line: endLine,
-        image,
-        operating_system: namespace,
-        class: className,
-      } = location;
-      const fileLocation = getFileLocation(location);
-
-      let lineSuffix = '';
-
-      if (startLine) {
-        lineSuffix += `:${startLine}`;
-        if (endLine && startLine !== endLine) {
-          lineSuffix += `-${endLine}`;
-        }
-      }
-
-      Vue.set(state.modal.data.className, 'value', className);
-      Vue.set(state.modal.data.file, 'value', file ? `${file}${lineSuffix}` : null);
-      Vue.set(state.modal.data.image, 'value', image);
-      Vue.set(state.modal.data.namespace, 'value', namespace);
-      Vue.set(state.modal.data.url, 'value', fileLocation);
-      Vue.set(state.modal.data.url, 'url', fileLocation);
-    }
-
-    Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
-    Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(
       state.modal.vulnerability,
@@ -143,18 +98,6 @@ export default {
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
     Vue.set(state.modal, 'isCommentingOnDismissal', false);
-
-    if (vulnerability.instances && vulnerability.instances.length) {
-      Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
-    } else {
-      Vue.set(state.modal.data.instances, 'value', null);
-    }
-
-    if (vulnerability.links && vulnerability.links.length) {
-      Vue.set(state.modal.data.links, 'value', vulnerability.links);
-    } else {
-      Vue.set(state.modal.data.links, 'value', null);
-    }
   },
   [types.REQUEST_CREATE_ISSUE](state) {
     state.isCreatingIssue = true;

@@ -286,8 +286,10 @@ describe('Security Reports modal', () => {
         modal: createState().modal,
       };
       propsData.modal.vulnerability.blob_path = blobPath;
-      propsData.modal.data.namespace.value = namespaceValue;
-      propsData.modal.data.file.value = fileValue;
+      propsData.modal.vulnerability.location = {
+        file: fileValue,
+        operating_system: namespaceValue,
+      };
       mountComponent({ propsData }, mount);
     });
 
@@ -295,23 +297,8 @@ describe('Security Reports modal', () => {
       const vulnerabilityDetails = wrapper.find('.js-vulnerability-details');
 
       expect(vulnerabilityDetails.exists()).toBe(true);
-      expect(vulnerabilityDetails.text()).toContain('foobar');
-    });
-
-    it('computes valued fields properly', () => {
-      expect(wrapper.vm.valuedFields).toMatchObject({
-        file: {
-          value: fileValue,
-          url: blobPath,
-          isLink: true,
-          text: 'File',
-        },
-        namespace: {
-          value: namespaceValue,
-          text: 'Namespace',
-          isLink: false,
-        },
-      });
+      expect(vulnerabilityDetails.text()).toContain(namespaceValue);
+      expect(vulnerabilityDetails.text()).toContain(fileValue);
     });
   });
 
