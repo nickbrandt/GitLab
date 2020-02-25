@@ -259,6 +259,12 @@
     a.edit-link:not([href]):hover {
       color: rgba($gray-normal, 0.2);
     }
+
+    .confidential-edit,
+    .lock-edit,
+    .edit-link {
+      @extend .btn-link;
+    }
   }
 
   .cross-project-reference {
