@@ -78,7 +78,7 @@ module EE
     end
 
     def elastic_stack_available?
-      !!deployment_platform&.cluster&.application_elastic_stack&.installed?
+      !!deployment_platform&.cluster&.application_elastic_stack&.available?
     end
 
     private
