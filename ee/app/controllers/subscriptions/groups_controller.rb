@@ -13,7 +13,12 @@ module Subscriptions
 
     def update
       if Groups::UpdateService.new(@group, current_user, group_params).execute
-        notice = _('Welcome to GitLab, %{first_name}!' % { first_name: current_user.first_name })
+        notice = if params[:new_user] == 'true'
+                   _('Welcome to GitLab, %{first_name}!' % { first_name: current_user.first_name })
+                 else
+                   _('Subscription successfully applied to "%{group_name}"' % { group_name: @group.name })
+                 end
+
         redirect_to group_path(@group), notice: notice
       else
         @group.path = @group.path_before_last_save || @group.path_was
