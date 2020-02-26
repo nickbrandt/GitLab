@@ -22,7 +22,6 @@ import * as mockData from '../mock_data';
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
-const baseStagesEndpoint = '/-/analytics/cycle_analytics/stages';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -50,7 +49,7 @@ function createComponent({
       emptyStateSvgPath,
       noDataSvgPath,
       noAccessSvgPath,
-      baseStagesEndpoint,
+      baseStagesEndpoint: mockData.endpoints.baseStagesEndpoint,
     },
     provide: {
       glFeatures: {
@@ -60,6 +59,12 @@ function createComponent({
       },
     },
     ...opts,
+  });
+
+  comp.vm.$store.dispatch('initializeCycleAnalytics', {
+    group: mockData.group,
+    createdAfter: mockData.startDate,
+    createdBefore: mockData.endDate,
   });
 
   if (withStageSelected) {
@@ -113,32 +118,16 @@ describe('Cycle Analytics component', () => {
   beforeEach(() => {
     mock = new MockAdapter(axios);
     wrapper = createComponent();
+
+    wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
+      createdAfter: mockData.startDate,
+      createdBefore: mockData.endDate,
+    });
   });
 
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
-  });
-
-  describe('mounted', () => {
-    const actionSpies = {
-      setDateRange: jest.fn(),
-    };
-
-    beforeEach(() => {
-      jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(mockData.endDate));
-      wrapper = createComponent({ opts: { methods: actionSpies } });
-    });
-
-    describe('initDateRange', () => {
-      it('dispatches setDateRange with skipFetch=true', () => {
-        expect(actionSpies.setDateRange).toHaveBeenCalledWith({
-          skipFetch: true,
-          startDate: mockData.startDate,
-          endDate: mockData.endDate,
-        });
-      });
-    });
   });
 
   describe('displays the components as required', () => {
@@ -411,8 +400,6 @@ describe('Cycle Analytics component', () => {
   });
 
   describe('with failed requests while loading', () => {
-    const { full_path: groupId } = mockData.group;
-
     function mockRequestCycleAnalyticsData({
       overrides = {},
       mockFetchStageData = true,
@@ -424,17 +411,17 @@ describe('Cycle Analytics component', () => {
       const defaultRequests = {
         fetchSummaryData: {
           status: defaultStatus,
-          endpoint: `/-/analytics/value_stream_analytics/summary`,
+          endpoint: mockData.endpoints.summaryData,
           response: [...mockData.summaryData],
         },
         fetchGroupStagesAndEvents: {
           status: defaultStatus,
-          endpoint: `/-/analytics/value_stream_analytics/stages`,
+          endpoint: mockData.endpoints.baseStagesEndpoint,
           response: { ...mockData.customizableStagesAndEvents },
         },
         fetchGroupLabels: {
           status: defaultStatus,
-          endpoint: `/groups/${groupId}/-/labels`,
+          endpoint: mockData.endpoints.groupLabels,
           response: [...mockData.groupLabels],
         },
         ...overrides,
@@ -442,26 +429,22 @@ describe('Cycle Analytics component', () => {
 
       if (mockFetchTasksByTypeData) {
         mock
-          .onGet(/analytics\/type_of_work\/tasks_by_type/)
+          .onGet(mockData.endpoints.tasksByTypeData)
           .reply(defaultStatus, { ...mockData.tasksByTypeData });
       }
 
       if (mockFetchDurationData) {
         mock
-          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/)
+          .onGet(mockData.endpoints.durationData)
           .reply(defaultStatus, [...mockData.rawDurationData]);
       }
 
       if (mockFetchStageMedian) {
-        mock
-          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/median/)
-          .reply(defaultStatus, { value: null });
+        mock.onGet(mockData.endpoints.stageMedian).reply(defaultStatus, { value: null });
       }
 
       if (mockFetchStageData) {
-        mock
-          .onGet(/analytics\/value_stream_analytics\/stages\/\d+\/records/)
-          .reply(defaultStatus, mockData.issueEvents);
+        mock.onGet(mockData.endpoints.stageData).reply(defaultStatus, mockData.issueEvents);
       }
 
       Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
@@ -497,7 +480,7 @@ describe('Cycle Analytics component', () => {
         overrides: {
           fetchSummaryData: {
             status: httpStatusCodes.NOT_FOUND,
-            endpoint: '/-/analytics/value_stream_analytics/summary',
+            endpoint: mockData.endpoints.summaryData,
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },
         },
@@ -514,6 +497,7 @@ describe('Cycle Analytics component', () => {
       mockRequestCycleAnalyticsData({
         overrides: {
           fetchGroupLabels: {
+            endpoint: mockData.endpoints.groupLabels,
             status: httpStatusCodes.NOT_FOUND,
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },
@@ -531,7 +515,7 @@ describe('Cycle Analytics component', () => {
       mockRequestCycleAnalyticsData({
         overrides: {
           fetchGroupStagesAndEvents: {
-            endPoint: '/-/analytics/value_stream_analytics/stages',
+            endPoint: mockData.endpoints.baseStagesEndpoint,
             status: httpStatusCodes.NOT_FOUND,
             response: { response: { status: httpStatusCodes.NOT_FOUND } },
           },

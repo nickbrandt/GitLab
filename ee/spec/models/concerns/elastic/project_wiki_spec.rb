@@ -13,7 +13,7 @@ describe ProjectWiki, :elastic do
       project.wiki.create_page("omega_page", "Bla bla term2")
       project.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
   end
 
@@ -41,7 +41,7 @@ describe ProjectWiki, :elastic do
 
       project.wiki.index_wiki_blobs(last_commit)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(project.wiki.elastic_search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(0)

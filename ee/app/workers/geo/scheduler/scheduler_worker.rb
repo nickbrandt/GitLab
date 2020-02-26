@@ -2,7 +2,7 @@
 
 module Geo
   module Scheduler
-    class SchedulerWorker
+    class SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
       include GeoQueue
       include ExclusiveLeaseGuard

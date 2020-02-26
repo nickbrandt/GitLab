@@ -26,6 +26,11 @@ export default {
     },
   },
   methods: {
+    labelTitle(label) {
+      // there are 2 possible endpoints for group labels
+      // one returns label.name the other label.title
+      return label?.name || label.title;
+    },
     isSelectedLabel(id) {
       return this.selectedLabelId && id === this.selectedLabelId;
     },
@@ -41,7 +46,7 @@ export default {
           class="d-inline-block dropdown-label-box"
         >
         </span>
-        {{ selectedLabel.title }}
+        {{ labelTitle(selectedLabel) }}
       </span>
       <span v-else>{{ __('Select a label') }}</span>
     </template>
@@ -56,7 +61,7 @@ export default {
     >
       <span :style="{ backgroundColor: label.color }" class="d-inline-block dropdown-label-box">
       </span>
-      {{ label.title }}
+      {{ labelTitle(label) }}
     </gl-dropdown-item>
   </gl-dropdown>
 </template>

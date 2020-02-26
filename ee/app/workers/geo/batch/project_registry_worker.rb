@@ -6,7 +6,7 @@ module Geo
     #
     # This class includes an Exclusive Lease guard and only one can be executed at the same time
     # If multiple jobs are scheduled, only one will run and the others will drop forever.
-    class ProjectRegistryWorker
+    class ProjectRegistryWorker # rubocop:disable Scalability/IdempotentWorker
       include ApplicationWorker
       include GeoQueue
       include ::Gitlab::Geo::LogHelpers

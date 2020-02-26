@@ -4,6 +4,7 @@ import createStore from 'ee/subscriptions/new/store';
 import * as types from 'ee/subscriptions/new/store/mutation_types';
 import Step from 'ee/subscriptions/new/components/checkout/step.vue';
 import Component from 'ee/subscriptions/new/components/checkout/subscription_details.vue';
+import { NEW_GROUP } from 'ee/subscriptions/new/constants';
 
 describe('Subscription Details', () => {
   const localVue = createLocalVue();
@@ -17,14 +18,18 @@ describe('Subscription Details', () => {
     { id: 'secondPlanId', code: 'silver', price_per_year: 228 },
   ];
 
+  const groupData = [
+    { id: 132, name: 'My first group', users: 3 },
+    { id: 483, name: 'My second group', users: 12 },
+  ];
+
   const initialData = {
     planData: JSON.stringify(planData),
+    groupData: JSON.stringify(groupData),
     planId: 'secondPlanId',
     setupForCompany: 'true',
     fullName: 'Full Name',
   };
-
-  const isStepValid = () => wrapper.find(Step).props('isValid');
 
   const createComponent = () => {
     wrapper = mount(Component, {
@@ -32,6 +37,11 @@ describe('Subscription Details', () => {
       store,
     });
   };
+
+  const organizationNameInput = () => wrapper.find({ ref: 'organization-name' });
+  const groupSelect = () => wrapper.find({ ref: 'group-select' });
+  const numberOfUsersInput = () => wrapper.find({ ref: 'number-of-users' });
+  const companyLink = () => wrapper.find({ ref: 'company-link' });
 
   beforeEach(() => {
     store = createStore(initialData);
@@ -42,58 +52,226 @@ describe('Subscription Details', () => {
     wrapper.destroy();
   });
 
-  describe('Setting up for personal use', () => {
+  describe('A new user setting up for personal use', () => {
     beforeEach(() => {
-      store.commit(types.UPDATE_IS_SETUP_FOR_COMPANY, false);
-      store.commit(types.UPDATE_NUMBER_OF_USERS, 1);
-    });
-
-    it('should be valid', () => {
-      expect(isStepValid()).toBe(true);
+      store.state.isNewUser = true;
+      store.state.isSetupForCompany = false;
     });
 
     it('should not display an input field for the company or group name', () => {
-      expect(wrapper.find('#organizationName').exists()).toBe(false);
+      expect(organizationNameInput().exists()).toBe(false);
+    });
+
+    it('should not display the group select', () => {
+      expect(groupSelect().exists()).toBe(false);
     });
 
     it('should disable the number of users input field', () => {
-      expect(wrapper.find('#numberOfUsers').attributes('disabled')).toBeDefined();
+      expect(numberOfUsersInput().attributes('disabled')).toBeDefined();
+    });
+
+    it('should set the min number of users to 1', () => {
+      expect(numberOfUsersInput().attributes('min')).toBe('1');
     });
 
     it('should show a link to change to setting up for a company', () => {
-      expect(wrapper.find('.company-link').exists()).toBe(true);
+      expect(companyLink().exists()).toBe(true);
     });
   });
 
-  describe('Setting up for a company or group', () => {
+  describe('A new user setting up for a company or group', () => {
     beforeEach(() => {
-      store.commit(types.UPDATE_IS_SETUP_FOR_COMPANY, true);
-      store.commit(types.UPDATE_NUMBER_OF_USERS, 0);
-    });
-
-    it('should be invalid', () => {
-      expect(isStepValid()).toBe(false);
+      store.state.isNewUser = true;
+      store.state.groupData = [];
     });
 
     it('should display an input field for the company or group name', () => {
-      expect(wrapper.find('#organizationName').exists()).toBe(true);
+      expect(organizationNameInput().exists()).toBe(true);
+    });
+
+    it('should not display the group select', () => {
+      expect(groupSelect().exists()).toBe(false);
     });
 
     it('should enable the number of users input field', () => {
-      expect(wrapper.find('#numberOfUsers').attributes('disabled')).toBeUndefined();
+      expect(numberOfUsersInput().attributes('disabled')).toBeUndefined();
     });
 
-    it('should not show the link to change to setting up for a company', () => {
-      expect(wrapper.find('.company-link').exists()).toBe(false);
+    it('should set the min number of users to 1', () => {
+      expect(numberOfUsersInput().attributes('min')).toBe('1');
     });
 
-    describe('filling in the company name and the number of users', () => {
-      it('should make the component valid', () => {
-        store.commit(types.UPDATE_ORGANIZATION_NAME, 'My Organization');
+    it('should not show a link to change to setting up for a company', () => {
+      expect(companyLink().exists()).toBe(false);
+    });
+  });
+
+  describe('An existing user without any groups', () => {
+    beforeEach(() => {
+      store.state.isNewUser = false;
+      store.state.groupData = [];
+    });
+
+    it('should display an input field for the company or group name', () => {
+      expect(organizationNameInput().exists()).toBe(true);
+    });
+
+    it('should not display the group select', () => {
+      expect(groupSelect().exists()).toBe(false);
+    });
+
+    it('should enable the number of users input field', () => {
+      expect(numberOfUsersInput().attributes('disabled')).toBeUndefined();
+    });
+
+    it('should set the min number of users to 1', () => {
+      expect(numberOfUsersInput().attributes('min')).toBe('1');
+    });
+
+    it('should not show a link to change to setting up for a company', () => {
+      expect(companyLink().exists()).toBe(false);
+    });
+  });
+
+  describe('An existing user with groups', () => {
+    beforeEach(() => {
+      store.state.isNewUser = false;
+    });
+
+    it('should not display an input field for the company or group name', () => {
+      expect(organizationNameInput().exists()).toBe(false);
+    });
+
+    it('should display the group select', () => {
+      expect(groupSelect().exists()).toBe(true);
+    });
+
+    it('should enable the number of users input field', () => {
+      expect(numberOfUsersInput().attributes('disabled')).toBeUndefined();
+    });
+
+    it('should set the min number of users to 1', () => {
+      expect(numberOfUsersInput().attributes('min')).toBe('1');
+    });
+
+    it('should not show a link to change to setting up for a company', () => {
+      expect(companyLink().exists()).toBe(false);
+    });
+
+    describe('selecting an existing group', () => {
+      beforeEach(() => {
+        store.commit(types.UPDATE_SELECTED_GROUP, 483);
+      });
+
+      it('should display the correct description', () => {
+        expect(wrapper.text()).toContain('Your subscription will be applied to this group');
+      });
+
+      it('should set the min number of users to 12', () => {
+        expect(numberOfUsersInput().attributes('min')).toBe('12');
+      });
+    });
+
+    describe('selecting "Create a new group', () => {
+      beforeEach(() => {
+        store.commit(types.UPDATE_SELECTED_GROUP, NEW_GROUP);
+      });
+
+      it('should display the correct description', () => {
+        expect(wrapper.text()).toContain("You'll create your new group after checkout");
+      });
+
+      it('should display an input field for the company or group name', () => {
+        expect(organizationNameInput().exists()).toBe(true);
+      });
+
+      it('should set the min number of users to 1', () => {
+        expect(numberOfUsersInput().attributes('min')).toBe('1');
+      });
+    });
+  });
+
+  describe('validations', () => {
+    const isStepValid = () => wrapper.find(Step).props('isValid');
+
+    describe('when setting up for a company', () => {
+      beforeEach(() => {
+        store.commit(types.UPDATE_IS_SETUP_FOR_COMPANY, true);
+        store.commit(types.UPDATE_SELECTED_PLAN, 'firstPlanId');
+        store.commit(types.UPDATE_ORGANIZATION_NAME, 'Organization name');
+        store.commit(types.UPDATE_SELECTED_GROUP, 483);
+        store.commit(types.UPDATE_NUMBER_OF_USERS, 14);
+      });
+
+      it('should be valid', () => {
+        expect(isStepValid()).toBe(true);
+      });
+
+      it('should be invalid when no plan is selected', () => {
+        store.commit(types.UPDATE_SELECTED_PLAN, null);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+
+      it('should be invalid when no organization name is given, and no group is selected', () => {
+        store.commit(types.UPDATE_ORGANIZATION_NAME, null);
+        store.commit(types.UPDATE_SELECTED_GROUP, null);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+
+      it('should be invalid when number of users is 0', () => {
+        store.commit(types.UPDATE_NUMBER_OF_USERS, 0);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+
+      it('should be invalid when number of users is smaller than the selected group users', () => {
+        store.commit(types.UPDATE_NUMBER_OF_USERS, 10);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+    });
+
+    describe('when not setting up for a company', () => {
+      beforeEach(() => {
+        store.commit(types.UPDATE_IS_SETUP_FOR_COMPANY, false);
+        store.commit(types.UPDATE_NUMBER_OF_USERS, 1);
+      });
+
+      it('should be valid', () => {
+        expect(isStepValid()).toBe(true);
+      });
+
+      it('should be invalid when no plan is selected', () => {
+        store.commit(types.UPDATE_SELECTED_PLAN, null);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+
+      it('should be invalid when no number of users is 0', () => {
+        store.commit(types.UPDATE_NUMBER_OF_USERS, 0);
+
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
+        });
+      });
+
+      it('should be invalid when no number of users is greater than 1', () => {
         store.commit(types.UPDATE_NUMBER_OF_USERS, 2);
 
-        return wrapper.vm.$nextTick().then(() => {
-          expect(isStepValid()).toBe(true);
+        return localVue.nextTick().then(() => {
+          expect(isStepValid()).toBe(false);
         });
       });
     });
@@ -109,15 +287,25 @@ describe('Subscription Details', () => {
     });
 
     it('should show the selected plan', () => {
-      expect(wrapper.find('.js-summary-line-1').text()).toEqual('Bronze plan');
+      expect(wrapper.find({ ref: 'summary-line-1' }).text()).toEqual('Bronze plan');
     });
 
     it('should show the entered group name', () => {
-      expect(wrapper.find('.js-summary-line-2').text()).toEqual('Group: My Organization');
+      expect(wrapper.find({ ref: 'summary-line-2' }).text()).toEqual('Group: My Organization');
     });
 
     it('should show the entered number of users', () => {
-      expect(wrapper.find('.js-summary-line-3').text()).toEqual('Users: 25');
+      expect(wrapper.find({ ref: 'summary-line-3' }).text()).toEqual('Users: 25');
+    });
+
+    describe('selecting an existing group', () => {
+      beforeEach(() => {
+        store.commit(types.UPDATE_SELECTED_GROUP, 483);
+      });
+
+      it('should show the selected group name', () => {
+        expect(wrapper.find({ ref: 'summary-line-2' }).text()).toEqual('Group: My second group');
+      });
     });
   });
 });

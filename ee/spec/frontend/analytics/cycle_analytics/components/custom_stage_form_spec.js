@@ -1,6 +1,10 @@
 import Vue from 'vue';
-import { mount } from '@vue/test-utils';
-import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
+import Vuex from 'vuex';
+import createStore from 'ee/analytics/cycle_analytics/store';
+import { createLocalVue, mount } from '@vue/test-utils';
+import CustomStageForm, {
+  initializeFormData,
+} from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { STAGE_ACTIONS } from 'ee/analytics/cycle_analytics/constants';
 import {
   groupLabels,
@@ -9,6 +13,7 @@ import {
   labelStopEvent,
   customStageStartEvents as startEvents,
   customStageStopEvents as stopEvents,
+  customStageFormErrors,
 } from '../mock_data';
 
 const initData = {
@@ -20,14 +25,22 @@ const initData = {
   endEventLabelId: groupLabels[1].id,
 };
 
+let store = null;
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('CustomStageForm', () => {
-  function createComponent(props) {
+  function createComponent(props = {}, stubs = {}) {
+    store = createStore();
     return mount(CustomStageForm, {
+      localVue,
+      store,
       propsData: {
         events,
         labels: groupLabels,
         ...props,
       },
+      stubs,
     });
   }
 
@@ -43,6 +56,9 @@ describe('CustomStageForm', () => {
     submit: '.js-save-stage',
     cancel: '.js-save-stage-cancel',
     invalidFeedback: '.invalid-feedback',
+    recoverStageDropdown: '.js-recover-hidden-stage-dropdown',
+    recoverStageDropdownTrigger: '.js-recover-hidden-stage-dropdown .dropdown-toggle',
+    hiddenStageDropdownOption: '.js-recover-hidden-stage-dropdown .dropdown-item',
   };
 
   function getDropdownOption(_wrapper, dropdown, index) {
@@ -56,497 +72,500 @@ describe('CustomStageForm', () => {
     getDropdownOption(_wrapper, dropdown, index).setSelected();
   }
 
-  describe('Empty form', () => {
-    beforeEach(() => {
-      wrapper = createComponent({}, false);
+  function setEventDropdowns({ startEventDropdownIndex = 1, stopEventDropdownIndex = 1 } = {}) {
+    selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
+    return Vue.nextTick().then(() => {
+      selectDropdownOption(wrapper, sel.endEvent, stopEventDropdownIndex);
     });
+  }
 
-    afterEach(() => {
-      wrapper.destroy();
+  const findNameField = _wrapper => _wrapper.find({ ref: 'name' });
+  const findNameFieldInput = _wrapper => _wrapper.find(sel.name);
+
+  function setNameField(_wrapper, value = '') {
+    findNameFieldInput(_wrapper).setValue(value);
+    findNameFieldInput(_wrapper).trigger('change');
+    return _wrapper.vm.$nextTick();
+  }
+
+  beforeEach(() => {
+    wrapper = createComponent({});
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+  });
+
+  describe.each([
+    ['Name', sel.name, true],
+    ['Start event', sel.startEvent, true],
+    ['Stop event', sel.endEvent, false],
+    ['Submit', sel.submit, false],
+    ['Cancel', sel.cancel, false],
+  ])('Default state', (field, $sel, enabledState) => {
+    const state = enabledState ? 'enabled' : 'disabled';
+    it(`field '${field}' is ${state}`, () => {
+      const el = wrapper.find($sel);
+      expect(el.exists()).toEqual(true);
+      if (!enabledState) {
+        expect(el.attributes('disabled')).toEqual('disabled');
+      } else {
+        expect(el.attributes('disabled')).toBeUndefined();
+      }
     });
+  });
 
-    describe.each([
-      ['Name', sel.name, true],
-      ['Start event', sel.startEvent, true],
-      ['Stop event', sel.endEvent, false],
-      ['Submit', sel.submit, false],
-      ['Cancel', sel.cancel, false],
-    ])('by default', (field, $sel, enabledState) => {
-      const state = enabledState ? 'enabled' : 'disabled';
-      it(`field '${field}' is ${state}`, () => {
-        const el = wrapper.find($sel);
-        expect(el.exists()).toEqual(true);
-        if (!enabledState) {
-          expect(el.attributes('disabled')).toEqual('disabled');
-        } else {
-          expect(el.attributes('disabled')).toBeUndefined();
-        }
+  describe('Name', () => {
+    describe('with a reserved name', () => {
+      beforeEach(() => {
+        wrapper = createComponent({});
+        return setNameField(wrapper, 'issue');
+      });
+
+      it('displays an error', () => {
+        expect(findNameField(wrapper).text()).toContain('Stage name already exists');
+      });
+
+      it('clears the error when the field changes', () => {
+        return setNameField(wrapper, 'not an issue').then(() => {
+          expect(findNameField(wrapper).text()).not.toContain('Stage name already exists');
+        });
+      });
+    });
+  });
+
+  describe('Start event', () => {
+    describe('with events', () => {
+      beforeEach(() => {
+        wrapper = createComponent({});
+      });
+
+      afterEach(() => {
+        wrapper.destroy();
+      });
+
+      it('selects events with canBeStartEvent=true for the start events dropdown', () => {
+        const select = wrapper.find(sel.startEvent);
+        expect(select.html()).toMatchSnapshot();
+      });
+
+      it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
+        const select = wrapper.find(sel.startEvent);
+        expect(select.html()).toMatchSnapshot();
+
+        stopEvents
+          .filter(ev => !ev.canBeStartEvent)
+          .forEach(ev => {
+            expect(select.html()).not.toHaveHtml(
+              `<option value="${ev.identifier}">${ev.name}</option>`,
+            );
+          });
       });
     });
 
-    describe('Start event', () => {
-      describe('with events', () => {
-        beforeEach(() => {
-          wrapper = createComponent({}, false);
+    describe('start event label', () => {
+      beforeEach(() => {
+        wrapper = createComponent();
+      });
+
+      afterEach(() => {
+        wrapper.destroy();
+      });
+
+      it('is hidden by default', () => {
+        expect(wrapper.find(sel.startEventLabel).exists()).toEqual(false);
+      });
+
+      it('will display the start event label field if a label event is selected', () => {
+        wrapper.setData({
+          fields: {
+            startEventIdentifier: labelStartEvent.identifier,
+          },
         });
 
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it('selects events with canBeStartEvent=true for the start events dropdown', () => {
-          const select = wrapper.find(sel.startEvent);
-          expect(select.html()).toMatchSnapshot();
-        });
-
-        it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
-          const select = wrapper.find(sel.startEvent);
-          expect(select.html()).toMatchSnapshot();
-
-          stopEvents
-            .filter(ev => !ev.canBeStartEvent)
-            .forEach(ev => {
-              expect(select.html()).not.toHaveHtml(
-                `<option value="${ev.identifier}">${ev.name}</option>`,
-              );
-            });
+        return Vue.nextTick().then(() => {
+          expect(wrapper.find(sel.startEventLabel).exists()).toEqual(true);
         });
       });
 
-      describe('start event label', () => {
-        beforeEach(() => {
-          wrapper = createComponent({}, false);
-        });
+      it('will set the "startEventLabelId" field when selected', () => {
+        const selectedLabelId = groupLabels[0].id;
+        expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
 
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it('is hidden by default', () => {
-          expect(wrapper.find(sel.startEventLabel).exists()).toEqual(false);
-        });
-
-        it('will display the start event label field if a label event is selected', done => {
-          wrapper.setData({
-            fields: {
-              startEventIdentifier: labelStartEvent.identifier,
-            },
-          });
-
-          Vue.nextTick(() => {
-            expect(wrapper.find(sel.startEventLabel).exists()).toEqual(true);
-            done();
-          });
-        });
-
-        it('will set the "startEventLabelId" field when selected', done => {
-          const selectedLabelId = groupLabels[0].id;
-          expect(wrapper.vm.fields.startEventLabelId).toEqual(null);
-
-          wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
-          Vue.nextTick(() => {
+        wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
+        return Vue.nextTick()
+          .then(() => {
             wrapper
               .find(sel.startEventLabel)
               .findAll('.dropdown-item')
               .at(1) // item at index 0 is 'select a label'
               .trigger('click');
 
-            Vue.nextTick(() => {
-              expect(wrapper.vm.fields.startEventLabelId).toEqual(selectedLabelId);
-              done();
-            });
+            return Vue.nextTick();
+          })
+          .then(() => {
+            expect(wrapper.vm.fields.startEventLabelId).toEqual(selectedLabelId);
           });
+      });
+    });
+  });
+
+  describe('Stop event', () => {
+    const startEventArrayIndex = 2;
+    const startEventDropdownIndex = 1;
+    const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
+
+    beforeEach(() => {
+      wrapper = createComponent();
+    });
+
+    it('notifies that a start event needs to be selected first', () => {
+      expect(wrapper.text()).toContain('Please select a start event first');
+    });
+
+    it('clears notification when a start event is selected', () => {
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
+      return Vue.nextTick().then(() => {
+        expect(wrapper.text()).not.toContain('Please select a start event first');
+      });
+    });
+
+    it('is enabled when a start event is selected', () => {
+      const el = wrapper.find(sel.endEvent);
+      expect(el.attributes('disabled')).toEqual('disabled');
+
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
+      return Vue.nextTick().then(() => {
+        expect(el.attributes('disabled')).toBeUndefined();
+      });
+    });
+
+    it('will update the list of stop events when a start event is changed', () => {
+      let stopOptions = wrapper.find(sel.endEvent).findAll('option');
+      const selectedStartEvent = startEvents[startEventDropdownIndex];
+      expect(stopOptions.length).toEqual(1);
+
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
+
+      return Vue.nextTick().then(() => {
+        stopOptions = wrapper.find(sel.endEvent);
+        selectedStartEvent.allowedEndEvents.forEach(identifier => {
+          expect(stopOptions.html()).toContain(identifier);
         });
       });
     });
 
-    describe('Stop event', () => {
-      const startEventArrayIndex = 2;
-      const startEventDropdownIndex = 1;
-      const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
+    it('will display all the valid stop events', () => {
+      let stopOptions = wrapper.find(sel.endEvent).findAll('option');
+      const possibleEndEvents = stopEvents.filter(ev => currAllowed.includes(ev.identifier));
 
+      expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
+
+      selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
+
+      return Vue.nextTick().then(() => {
+        stopOptions = wrapper.find(sel.endEvent);
+
+        possibleEndEvents.forEach(({ name, identifier }) => {
+          expect(stopOptions.html()).toContain(`<option value="${identifier}">${name}</option>`);
+        });
+      });
+    });
+
+    it('will not display stop events that are not in the list of allowed stop events', () => {
+      let stopOptions = wrapper.find(sel.endEvent).findAll('option');
+      const excludedEndEvents = stopEvents.filter(ev => !currAllowed.includes(ev.identifier));
+
+      expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
+
+      selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
+
+      return Vue.nextTick().then(() => {
+        stopOptions = wrapper.find(sel.endEvent);
+
+        excludedEndEvents.forEach(({ name, identifier }) => {
+          expect(wrapper.find(sel.endEvent).html()).not.toHaveHtml(
+            `<option value="${identifier}">${name}</option>`,
+          );
+        });
+      });
+    });
+
+    describe('with a stop event selected and a change to the start event', () => {
       beforeEach(() => {
-        wrapper = createComponent({}, false);
-      });
+        wrapper = createComponent();
 
-      it('notifies that a start event needs to be selected first', () => {
-        expect(wrapper.text()).toContain('Please select a start event first');
-      });
-
-      it('clears notification when a start event is selected', done => {
-        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
-        Vue.nextTick(() => {
-          expect(wrapper.text()).not.toContain('Please select a start event first');
-          done();
+        wrapper.setData({
+          fields: {
+            name: 'Cool stage',
+            startEventIdentifier: 'issue_created',
+            startEventLabelId: null,
+            endEventIdentifier: 'issue_stage_end',
+            endEventLabelId: null,
+          },
         });
       });
 
-      it('is enabled when a start event is selected', done => {
-        const el = wrapper.find(sel.endEvent);
-        expect(el.attributes('disabled')).toEqual('disabled');
+      afterEach(() => {
+        wrapper.destroy();
+      });
 
-        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
-        Vue.nextTick(() => {
-          expect(el.attributes('disabled')).toBeUndefined();
-          done();
+      it('will notify if the current start and stop event pair is not valid', () => {
+        selectDropdownOption(wrapper, sel.startEvent, 2);
+
+        return Vue.nextTick().then(() => {
+          expect(wrapper.find(sel.invalidFeedback).exists()).toEqual(true);
+          expect(wrapper.find(sel.invalidFeedback).text()).toContain(
+            'Start event changed, please select a valid stop event',
+          );
         });
       });
 
-      it('will update the list of stop events when a start event is changed', done => {
-        let stopOptions = wrapper.find(sel.endEvent).findAll('option');
-        const selectedStartEvent = startEvents[startEventDropdownIndex];
-        expect(stopOptions.length).toEqual(1);
-
-        selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
-
-        Vue.nextTick(() => {
-          stopOptions = wrapper.find(sel.endEvent);
-          selectedStartEvent.allowedEndEvents.forEach(identifier => {
-            expect(stopOptions.html()).toContain(identifier);
-          });
-          done();
+      it('will update the list of stop events', () => {
+        const se = wrapper.vm.endEventOptions;
+        selectDropdownOption(wrapper, sel.startEvent, 2);
+        return Vue.nextTick().then(() => {
+          expect(se[1].value).not.toEqual(wrapper.vm.endEventOptions[1].value);
         });
       });
 
-      it('will display all the valid stop events', done => {
-        let stopOptions = wrapper.find(sel.endEvent).findAll('option');
-        const possibleEndEvents = stopEvents.filter(ev => currAllowed.includes(ev.identifier));
+      it('will disable the submit button until a valid endEvent is selected', () => {
+        selectDropdownOption(wrapper, sel.startEvent, 2);
+        return Vue.nextTick().then(() => {
+          expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');
+        });
+      });
+    });
 
-        expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
+    describe('Stop event label', () => {
+      beforeEach(() => {
+        wrapper = createComponent({});
+      });
 
-        selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
+      afterEach(() => {
+        wrapper.destroy();
+      });
 
-        Vue.nextTick(() => {
-          stopOptions = wrapper.find(sel.endEvent);
+      it('is hidden by default', () => {
+        expect(wrapper.find(sel.startEventLabel).exists()).toEqual(false);
+      });
 
-          possibleEndEvents.forEach(({ name, identifier }) => {
-            expect(stopOptions.html()).toContain(`<option value="${identifier}">${name}</option>`);
-          });
-          done();
+      it('will display the stop event label field if a label event is selected', () => {
+        expect(wrapper.find(sel.endEventLabel).exists()).toEqual(false);
+
+        wrapper.setData({
+          fields: {
+            endEventIdentifier: labelStopEvent.identifier,
+            startEventIdentifier: labelStartEvent.identifier,
+          },
+        });
+
+        return Vue.nextTick().then(() => {
+          expect(wrapper.find(sel.endEventLabel).exists()).toEqual(true);
         });
       });
 
-      it('will not display stop events that are not in the list of allowed stop events', done => {
-        let stopOptions = wrapper.find(sel.endEvent).findAll('option');
-        const excludedEndEvents = stopEvents.filter(ev => !currAllowed.includes(ev.identifier));
+      it('will set the "endEventLabelId" field when selected', () => {
+        const selectedLabelId = groupLabels[1].id;
+        expect(wrapper.vm.fields.endEventLabelId).toEqual(null);
 
-        expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
-
-        selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
-
-        Vue.nextTick(() => {
-          stopOptions = wrapper.find(sel.endEvent);
-
-          excludedEndEvents.forEach(({ name, identifier }) => {
-            expect(wrapper.find(sel.endEvent).html()).not.toHaveHtml(
-              `<option value="${identifier}">${name}</option>`,
-            );
-          });
-          done();
-        });
-      });
-
-      describe('with a stop event selected and a change to the start event', () => {
-        beforeEach(() => {
-          wrapper = createComponent({}, false);
-
-          wrapper.setData({
-            fields: {
-              name: 'Cool stage',
-              startEventIdentifier: 'issue_created',
-              startEventLabelId: null,
-              endEventIdentifier: 'issue_stage_end',
-              endEventLabelId: null,
-            },
-          });
+        wrapper.setData({
+          fields: {
+            startEventIdentifier: labelStartEvent.identifier,
+            endEventIdentifier: labelStopEvent.identifier,
+          },
         });
 
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it('will notify if the current start and stop event pair is not valid', done => {
-          expect(wrapper.find(sel.invalidFeedback).exists()).toEqual(false);
-
-          selectDropdownOption(wrapper, sel.startEvent, 2);
-
-          Vue.nextTick(() => {
-            expect(wrapper.find(sel.invalidFeedback).exists()).toEqual(true);
-            expect(wrapper.find(sel.invalidFeedback).text()).toContain(
-              'Start event changed, please select a valid stop event',
-            );
-            done();
-          });
-        });
-
-        it('will update the list of stop events', done => {
-          const se = wrapper.vm.endEventOptions;
-          selectDropdownOption(wrapper, sel.startEvent, 2);
-          Vue.nextTick(() => {
-            expect(se[1].value).not.toEqual(wrapper.vm.endEventOptions[1].value);
-            done();
-          });
-        });
-
-        it('will disable the submit button until a valid endEvent is selected', done => {
-          selectDropdownOption(wrapper, sel.startEvent, 2);
-          Vue.nextTick(() => {
-            expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');
-            done();
-          });
-        });
-      });
-
-      describe('Stop event label', () => {
-        beforeEach(() => {
-          wrapper = createComponent({}, false);
-        });
-
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it('is hidden by default', () => {
-          expect(wrapper.find(sel.startEventLabel).exists()).toEqual(false);
-        });
-
-        it('will display the stop event label field if a label event is selected', done => {
-          expect(wrapper.find(sel.endEventLabel).exists()).toEqual(false);
-
-          wrapper.setData({
-            fields: {
-              endEventIdentifier: labelStopEvent.identifier,
-              startEventIdentifier: labelStartEvent.identifier,
-            },
-          });
-
-          Vue.nextTick(() => {
-            expect(wrapper.find(sel.endEventLabel).exists()).toEqual(true);
-            done();
-          });
-        });
-
-        it('will set the "endEventLabelId" field when selected', done => {
-          const selectedLabelId = groupLabels[1].id;
-          expect(wrapper.vm.fields.endEventLabelId).toEqual(null);
-
-          wrapper.setData({
-            fields: {
-              startEventIdentifier: labelStartEvent.identifier,
-              endEventIdentifier: labelStopEvent.identifier,
-            },
-          });
-
-          Vue.nextTick(() => {
+        return Vue.nextTick()
+          .then(() => {
             wrapper
               .find(sel.endEventLabel)
               .findAll('.dropdown-item')
               .at(2) // item at index 0 is 'select a label'
               .trigger('click');
 
-            Vue.nextTick(() => {
-              expect(wrapper.vm.fields.endEventLabelId).toEqual(selectedLabelId);
-              done();
-            });
+            return Vue.nextTick();
+          })
+          .then(() => {
+            expect(wrapper.vm.fields.endEventLabelId).toEqual(selectedLabelId);
           });
-        });
+      });
+    });
+  });
+
+  describe('Add stage button', () => {
+    beforeEach(() => {
+      wrapper = createComponent({});
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('has text `Add stage`', () => {
+      expect(wrapper.find(sel.submit).text()).toEqual('Add stage');
+    });
+
+    it('is enabled when all required fields are filled', () => {
+      const btn = wrapper.find(sel.submit);
+
+      expect(btn.attributes('disabled')).toEqual('disabled');
+      wrapper.find(sel.name).setValue('Cool stage');
+
+      return setEventDropdowns().then(() => {
+        expect(btn.attributes('disabled')).toBeUndefined();
       });
     });
 
-    describe('Add stage button', () => {
+    describe('with all fields set', () => {
+      const startEventDropdownIndex = 2;
+      const startEventArrayIndex = startEventDropdownIndex - 1;
+      const stopEventDropdownIndex = 1;
+
       beforeEach(() => {
-        wrapper = createComponent({}, false);
-
-        selectDropdownOption(wrapper, sel.startEvent, 1);
-
-        return Vue.nextTick(() => {
-          selectDropdownOption(wrapper, sel.endEvent, 1);
-          return Vue.nextTick();
-        });
-      });
-
-      afterEach(() => {
-        wrapper.destroy();
-      });
-
-      it('has text `Add stage`', () => {
-        expect(wrapper.find(sel.submit).text('value')).toEqual('Add stage');
-      });
-
-      it('is enabled when all required fields are filled', done => {
-        const btn = wrapper.find(sel.submit);
-
-        expect(btn.attributes('disabled')).toEqual('disabled');
+        wrapper = createComponent({});
         wrapper.find(sel.name).setValue('Cool stage');
-
-        Vue.nextTick(() => {
-          expect(btn.attributes('disabled')).toBeUndefined();
-          done();
-        });
-      });
-
-      describe('with all fields set', () => {
-        const startEventDropdownIndex = 2;
-        const startEventArrayIndex = startEventDropdownIndex - 1;
-        const stopEventIndex = 1;
-
-        beforeEach(() => {
-          wrapper = createComponent({}, false);
-
-          selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
-
-          return Vue.nextTick()
-            .then(() => {
-              selectDropdownOption(wrapper, sel.endEvent, stopEventIndex);
-              return Vue.nextTick();
-            })
-            .then(() => {
-              wrapper.find(sel.name).setValue('Cool stage');
-              return Vue.nextTick();
-            });
-        });
-
-        afterEach(() => {
-          wrapper.destroy();
-        });
-
-        it(`emits a ${STAGE_ACTIONS.CREATE} event when clicked`, done => {
-          let event = findEvent(STAGE_ACTIONS.CREATE);
-          expect(event).toBeUndefined();
-
-          wrapper.find(sel.submit).trigger('click');
-
-          Vue.nextTick(() => {
-            event = findEvent(STAGE_ACTIONS.CREATE);
-            expect(event).toBeTruthy();
-            expect(event.length).toEqual(1);
-            done();
-          });
-        });
-
-        it(`${STAGE_ACTIONS.CREATE} event receives the latest data`, () => {
-          const startEv = startEvents[startEventArrayIndex];
-          const selectedStopEvent = getDropdownOption(wrapper, sel.endEvent, stopEventIndex);
-          let event = findEvent(STAGE_ACTIONS.CREATE);
-          expect(event).toBeUndefined();
-
-          const res = [
-            {
-              id: null,
-              name: 'Cool stage',
-              start_event_identifier: startEv.identifier,
-              start_event_label_id: null,
-              end_event_identifier: selectedStopEvent.attributes('value'),
-              end_event_label_id: null,
-            },
-          ];
-
-          wrapper.find(sel.submit).trigger('click');
-          return Vue.nextTick().then(() => {
-            event = findEvent(STAGE_ACTIONS.CREATE);
-            expect(event[0]).toEqual(res);
-          });
-        });
-      });
-    });
-
-    describe('Cancel button', () => {
-      beforeEach(() => {
-        wrapper = createComponent({}, false);
-      });
-
-      afterEach(() => {
-        wrapper.destroy();
-      });
-
-      it('is enabled when the form is dirty', done => {
-        const btn = wrapper.find(sel.cancel);
-
-        expect(btn.attributes('disabled')).toEqual('disabled');
-        wrapper.find(sel.name).setValue('Cool stage');
-
-        Vue.nextTick(() => {
-          expect(btn.attributes('disabled')).toBeUndefined();
-          done();
-        });
-      });
-
-      it('will reset the fields when clicked', done => {
-        wrapper.setData({
-          fields: {
-            name: 'Cool stage pre',
-            startEventIdentifier: labelStartEvent.identifier,
-            endEventIdentifier: labelStopEvent.identifier,
-          },
-        });
-
-        Vue.nextTick(() => {
-          wrapper.find(sel.cancel).trigger('click');
-
-          Vue.nextTick(() => {
-            expect(wrapper.vm.fields).toEqual({
-              id: null,
-              name: null,
-              startEventIdentifier: null,
-              startEventLabelId: null,
-              endEventIdentifier: null,
-              endEventLabelId: null,
-            });
-            done();
-          });
-        });
-      });
-
-      it('will emit the `cancel` event when clicked', done => {
-        let ev = findEvent('cancel');
-        expect(ev).toBeUndefined();
-
-        wrapper.setData({
-          fields: {
-            name: 'Cool stage pre',
-          },
-        });
-
-        Vue.nextTick(() => {
-          wrapper.find(sel.cancel).trigger('click');
-
-          Vue.nextTick(() => {
-            ev = findEvent('cancel');
-            expect(ev).toBeTruthy();
-            expect(ev.length).toEqual(1);
-            done();
-          });
-        });
-      });
-    });
-
-    describe('isSavingCustomStage=true', () => {
-      beforeEach(() => {
-        wrapper = createComponent(
-          {
-            isSavingCustomStage: true,
-          },
-          false,
+        return Vue.nextTick().then(() =>
+          setEventDropdowns({ startEventDropdownIndex, stopEventDropdownIndex }),
         );
       });
 
-      it('displays a loading icon', () => {
-        expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
+      afterEach(() => {
+        wrapper.destroy();
       });
+
+      it(`emits a ${STAGE_ACTIONS.CREATE} event when clicked`, () => {
+        let event = findEvent(STAGE_ACTIONS.CREATE);
+        expect(event).toBeUndefined();
+
+        wrapper.find(sel.submit).trigger('click');
+
+        return Vue.nextTick().then(() => {
+          event = findEvent(STAGE_ACTIONS.CREATE);
+          expect(event).toBeTruthy();
+          expect(event.length).toEqual(1);
+        });
+      });
+
+      it(`${STAGE_ACTIONS.CREATE} event receives the latest data`, () => {
+        const startEv = startEvents[startEventArrayIndex];
+        const selectedStopEvent = getDropdownOption(wrapper, sel.endEvent, stopEventDropdownIndex);
+        let event = findEvent(STAGE_ACTIONS.CREATE);
+        expect(event).toBeUndefined();
+
+        const res = [
+          {
+            id: null,
+            name: 'Cool stage',
+            start_event_identifier: startEv.identifier,
+            start_event_label_id: null,
+            end_event_identifier: selectedStopEvent.attributes('value'),
+            end_event_label_id: null,
+          },
+        ];
+
+        wrapper.find(sel.submit).trigger('click');
+        return Vue.nextTick().then(() => {
+          event = findEvent(STAGE_ACTIONS.CREATE);
+          expect(event[0]).toEqual(res);
+        });
+      });
+    });
+  });
+
+  describe('Cancel button', () => {
+    beforeEach(() => {
+      wrapper = createComponent({});
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('is enabled when the form is dirty', () => {
+      const btn = wrapper.find(sel.cancel);
+
+      expect(btn.attributes('disabled')).toEqual('disabled');
+      wrapper.find(sel.name).setValue('Cool stage');
+
+      return Vue.nextTick().then(() => {
+        expect(btn.attributes('disabled')).toBeUndefined();
+      });
+    });
+
+    it('will reset the fields when clicked', () => {
+      wrapper.setData({
+        fields: {
+          name: 'Cool stage pre',
+          startEventIdentifier: labelStartEvent.identifier,
+          endEventIdentifier: labelStopEvent.identifier,
+        },
+      });
+
+      return Vue.nextTick()
+        .then(() => {
+          wrapper.find(sel.cancel).trigger('click');
+
+          return Vue.nextTick();
+        })
+        .then(() => {
+          expect(wrapper.vm.fields).toEqual({
+            id: null,
+            name: null,
+            startEventIdentifier: null,
+            startEventLabelId: null,
+            endEventIdentifier: null,
+            endEventLabelId: null,
+          });
+        });
+    });
+
+    it('will emit the `cancel` event when clicked', () => {
+      let ev = findEvent('cancel');
+      expect(ev).toBeUndefined();
+
+      wrapper.setData({
+        fields: {
+          name: 'Cool stage pre',
+        },
+      });
+
+      return Vue.nextTick()
+        .then(() => {
+          wrapper.find(sel.cancel).trigger('click');
+          return Vue.nextTick();
+        })
+        .then(() => {
+          ev = findEvent('cancel');
+          expect(ev).toBeTruthy();
+          expect(ev.length).toEqual(1);
+        });
+    });
+  });
+
+  describe('isSavingCustomStage=true', () => {
+    beforeEach(() => {
+      wrapper = createComponent(
+        {
+          isSavingCustomStage: true,
+        },
+        false,
+      );
+    });
+
+    it('displays a loading icon', () => {
+      expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
     });
   });
 
   describe('Editing a custom stage', () => {
     beforeEach(() => {
-      wrapper = createComponent(
-        {
-          isEditingCustomStage: true,
-          initialFields: {
-            ...initData,
-          },
+      wrapper = createComponent({
+        isEditingCustomStage: true,
+        initialFields: {
+          ...initData,
         },
-        false,
-      );
+      });
 
       wrapper.setData({
         fields: {
@@ -562,7 +581,7 @@ describe('CustomStageForm', () => {
     });
 
     describe('Cancel button', () => {
-      it('will reset the fields to initial state when clicked', done => {
+      it('will reset the fields to initial state when clicked', () => {
         wrapper.setData({
           fields: {
             name: 'Cool stage pre',
@@ -571,16 +590,14 @@ describe('CustomStageForm', () => {
           },
         });
 
-        Vue.nextTick(() => {
-          wrapper.find(sel.cancel).trigger('click');
-
-          Vue.nextTick(() => {
-            expect(wrapper.vm.fields).toEqual({
-              ...initData,
-            });
-            done();
+        return Vue.nextTick()
+          .then(() => {
+            wrapper.find(sel.cancel).trigger('click');
+            return Vue.nextTick();
+          })
+          .then(() => {
+            expect(wrapper.vm.fields).toEqual({ ...initData });
           });
-        });
       });
     });
 
@@ -593,33 +610,31 @@ describe('CustomStageForm', () => {
         expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');
       });
 
-      it('is enabled when a field is changed and fields are valid', done => {
+      it('is enabled when a field is changed and fields are valid', () => {
         wrapper.setData({
           fields: {
             name: 'Cool updated form',
           },
         });
 
-        Vue.nextTick(() => {
+        return Vue.nextTick().then(() => {
           expect(wrapper.find(sel.submit).attributes('disabled')).toBeUndefined();
-          done();
         });
       });
 
-      it('is disabled when a field is changed but fields are incomplete', done => {
+      it('is disabled when a field is changed but fields are incomplete', () => {
         wrapper.setData({
           fields: {
             name: '',
           },
         });
 
-        Vue.nextTick(() => {
+        return Vue.nextTick().then(() => {
           expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');
-          done();
         });
       });
 
-      it(`emits a ${STAGE_ACTIONS.UPDATE} event when clicked`, done => {
+      it(`emits a ${STAGE_ACTIONS.UPDATE} event when clicked`, () => {
         let ev = findEvent(STAGE_ACTIONS.UPDATE);
         expect(ev).toBeUndefined();
 
@@ -629,29 +644,31 @@ describe('CustomStageForm', () => {
           },
         });
 
-        Vue.nextTick(() => {
-          wrapper.find(sel.submit).trigger('click');
-
-          Vue.nextTick(() => {
+        return Vue.nextTick()
+          .then(() => {
+            wrapper.find(sel.submit).trigger('click');
+            return Vue.nextTick();
+          })
+          .then(() => {
             ev = findEvent(STAGE_ACTIONS.UPDATE);
             expect(ev).toBeTruthy();
             expect(ev.length).toEqual(1);
-            done();
           });
-        });
       });
 
-      it('`submit` event receives the latest data', done => {
+      it('`submit` event receives the latest data', () => {
         wrapper.setData({
           fields: {
             name: 'Cool updated form',
           },
         });
 
-        Vue.nextTick(() => {
-          wrapper.find(sel.submit).trigger('click');
-
-          Vue.nextTick(() => {
+        return Vue.nextTick()
+          .then(() => {
+            wrapper.find(sel.submit).trigger('click');
+            return Vue.nextTick();
+          })
+          .then(() => {
             const submitted = findEvent(STAGE_ACTIONS.UPDATE)[0];
             expect(submitted).not.toEqual([initData]);
             expect(submitted).toEqual([
@@ -664,29 +681,214 @@ describe('CustomStageForm', () => {
                 name: 'Cool updated form',
               },
             ]);
-
-            done();
           });
-        });
       });
     });
 
     describe('isSavingCustomStage=true', () => {
       beforeEach(() => {
-        wrapper = createComponent(
-          {
-            isEditingCustomStage: true,
-            initialFields: {
-              ...initData,
-            },
-            isSavingCustomStage: true,
+        wrapper = createComponent({
+          isEditingCustomStage: true,
+          initialFields: {
+            ...initData,
           },
-          false,
-        );
+          isSavingCustomStage: true,
+        });
       });
-
       it('displays a loading icon', () => {
         expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
+      });
+    });
+  });
+
+  describe('With errors', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        initialFields: initData,
+        errors: customStageFormErrors,
+      });
+
+      return Vue.nextTick();
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('renders the errors for the relevant fields', () => {
+      expect(wrapper.find({ ref: 'name' }).html()).toContain('is reserved');
+      expect(wrapper.find({ ref: 'name' }).html()).toContain('cant be blank');
+      expect(wrapper.find({ ref: 'startEventIdentifier' }).html()).toContain('cant be blank');
+    });
+  });
+
+  describe('recover stage dropdown', () => {
+    const formFieldStubs = {
+      'gl-form-group': true,
+      'gl-form-select': true,
+      'labels-selector': true,
+    };
+
+    beforeEach(() => {
+      wrapper = createComponent({}, formFieldStubs);
+    });
+
+    describe('without hidden stages', () => {
+      it('has the recover stage dropdown', () => {
+        expect(wrapper.find(sel.recoverStageDropdown).exists()).toBe(true);
+      });
+
+      it('has no stages available to recover', () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.find(sel.recoverStageDropdown).text()).toContain(
+            'All default stages are currently visible',
+          );
+        });
+      });
+    });
+
+    describe('with hidden stages', () => {
+      beforeEach(() => {
+        wrapper = createComponent({}, formFieldStubs);
+        store.state.stages = [{ id: 'my-stage', title: 'My default stage', hidden: true }];
+      });
+
+      it('has stages available to recover', () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          const txt = wrapper.find(sel.recoverStageDropdown).text();
+          expect(txt).not.toContain('All default stages are currently visible');
+          expect(txt).toContain('My default stage');
+        });
+      });
+
+      it(`emits the ${STAGE_ACTIONS.UPDATE} action when clicking on a stage to recover`, () => {
+        wrapper.find(sel.recoverStageDropdownTrigger).trigger('click');
+        return wrapper.vm.$nextTick().then(() => {
+          wrapper
+            .findAll(sel.hiddenStageDropdownOption)
+            .at(0)
+            .trigger('click');
+
+          expect(wrapper.emitted()).toEqual({
+            [STAGE_ACTIONS.UPDATE]: [[{ hidden: false, id: 'my-stage' }]],
+          });
+        });
+      });
+    });
+  });
+
+  describe('initializeFormData', () => {
+    describe('without a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {},
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({});
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: ['Please select a start event first'],
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with a startEventIdentifier', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            startEventIdentifier: 'start-event',
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({ startEventIdentifier: 'start-event' });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
+        });
+      });
+    });
+
+    describe('with all fields set', () => {
+      it('with no errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {},
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+        });
+      });
+
+      it('with field errors', () => {
+        const res = initializeFormData({
+          initialFields: {
+            id: 1,
+            name: 'cool-stage',
+            startEventIdentifier: 'start-event',
+            endEventIdentifier: 'end-event',
+            startEventLabelId: 10,
+            endEventLabelId: 20,
+          },
+          errors: {
+            name: ['is reserved'],
+          },
+        });
+        expect(res.fields).toEqual({
+          id: 1,
+          name: 'cool-stage',
+          startEventIdentifier: 'start-event',
+          endEventIdentifier: 'end-event',
+          startEventLabelId: 10,
+          endEventLabelId: 20,
+        });
+        expect(res.fieldErrors).toEqual({
+          endEventIdentifier: null,
+          name: ['is reserved'],
+        });
       });
     });
   });

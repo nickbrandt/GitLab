@@ -1,11 +1,11 @@
 performance:
   stage: performance
-  image: docker:stable
+  image: docker:19.03.5
   allow_failure: true
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
-    - docker:stable-dind
+    - docker:19.03.5-dind
   script:
     - |
       if ! docker info &>/dev/null; then

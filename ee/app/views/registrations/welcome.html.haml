@@ -3,7 +3,7 @@
 .row.flex-grow-1.bg-gray-light
   .d-flex.flex-column.align-items-center.w-100.gl-p-3
     .edit-profile.login-page.d-flex.flex-column.align-items-center.pt-lg-3
-      - if in_paid_signup_flow?
+      - if in_subscription_flow?
         #progress-bar
       %h2.center= _('Welcome to GitLab.com<br>@%{name}!').html_safe % { name: html_escape(current_user.first_name) }
       %p
@@ -19,7 +19,7 @@
             .form-text.text-muted= _('This will help us personalize your onboarding experience.')
         .row
           .form-group.col-sm-12
-            = f.label :setup_for_company, _('Who will be using this GitLab subscription?'), class: 'label-bold'
+            = f.label :setup_for_company, setup_for_company_label_text, class: 'label-bold'
             .d-flex.flex-column.flex-lg-row
               .flex-grow-1
                 = f.radio_button :setup_for_company, true
@@ -30,4 +30,4 @@
         .row
           .form-group.col-sm-12.mb-0
             = button_tag class: %w[btn btn-success w-100] do
-              = in_paid_signup_flow? ? _('Continue') : _('Get started!')
+              = in_subscription_flow? || in_trial_flow? ? _('Continue') : _('Get started!')

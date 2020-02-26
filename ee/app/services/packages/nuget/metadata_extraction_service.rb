@@ -7,8 +7,6 @@ module Packages
 
       ExtractionError = Class.new(StandardError)
 
-      attr_reader :package_file_id
-
       XPATHS = {
         package_name: '//xmlns:package/xmlns:metadata/xmlns:id',
         package_version: '//xmlns:package/xmlns:metadata/xmlns:version'
@@ -30,7 +28,7 @@ module Packages
 
       def package_file
         strong_memoize(:package_file) do
-          ::Packages::PackageFile.find_by_id(package_file_id)
+          ::Packages::PackageFile.find_by_id(@package_file_id)
         end
       end
 

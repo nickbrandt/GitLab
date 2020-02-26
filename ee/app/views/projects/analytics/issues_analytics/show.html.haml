@@ -1,0 +1,3 @@
+- page_title _('Issues Analytics')
+= render 'shared/issuable/search_bar', type: :issues_analytics, show_sorting_dropdown: false
+#js-issues-analytics{ data: { endpoint: project_analytics_issues_analytics_path(@project) } }

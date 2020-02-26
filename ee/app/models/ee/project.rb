@@ -20,7 +20,6 @@ module EE
       include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
-      include Vulnerable
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
 
@@ -549,7 +548,6 @@ module EE
         [].tap do |services|
           services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
-          services.push('alerts') unless alerts_service_available?
         end
       end
     end
@@ -683,15 +681,6 @@ module EE
       end
     end
 
-    def alerts_service_available?
-      feature_available?(:incident_management)
-    end
-
-    override :alerts_service_activated?
-    def alerts_service_activated?
-      alerts_service_available? && alerts_service&.active?
-    end
-
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
@@ -729,6 +718,7 @@ module EE
       ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
         super
     end
+    alias_method :disable_overriding_approvers_per_merge_request?, :disable_overriding_approvers_per_merge_request
 
     def merge_requests_author_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
@@ -737,6 +727,7 @@ module EE
 
       super
     end
+    alias_method :merge_requests_author_approval?, :merge_requests_author_approval
 
     def merge_requests_disable_committers_approval
       return super unless License.feature_available?(:admin_merge_request_approvers_rules)
@@ -744,6 +735,7 @@ module EE
       ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
         super
     end
+    alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
 
     def license_compliance
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
@@ -754,6 +746,10 @@ module EE
       return true if namespace_id == ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id
 
       ::Project.with_groups_level_repos_templates.exists?(id)
+    end
+
+    def jira_subscription_exists?
+      feature_available?(:jira_dev_panel_integration) && JiraConnectSubscription.for_project(self).exists?
     end
 
     private

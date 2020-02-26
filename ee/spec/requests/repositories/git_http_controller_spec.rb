@@ -37,7 +37,7 @@ describe Repositories::GitHttpController, type: :request do
         it "allows access" do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -45,7 +45,7 @@ describe Repositories::GitHttpController, type: :request do
         it "does not allow access" do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
           expect(response.body).to eq('Project requires smartcard login. Please login to GitLab using a smartcard.')
         end
       end
@@ -58,7 +58,7 @@ describe Repositories::GitHttpController, type: :request do
         it "allows access" do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end

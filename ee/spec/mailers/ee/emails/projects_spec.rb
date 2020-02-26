@@ -13,6 +13,20 @@ describe EE::Emails::Projects do
     end
   end
 
+  shared_examples 'shows the incident issues url' do
+    context 'create issue setting enabled' do
+      before do
+        create(:project_incident_management_setting, project: project, create_issue: true)
+      end
+
+      let(:incident_issues_url) do
+        project_issues_url(project, label_name: 'incident')
+      end
+
+      it { is_expected.to have_body_text(incident_issues_url) }
+    end
+  end
+
   let_it_be(:user) { create(:user) }
 
   describe '#prometheus_alert_fired_email' do
@@ -58,6 +72,8 @@ describe EE::Emails::Projects do
         is_expected.to have_body_text(alert.full_query)
         is_expected.to have_body_text(metrics_url)
       end
+
+      it_behaves_like 'shows the incident issues url'
     end
 
     context 'with no payload' do
@@ -83,6 +99,7 @@ describe EE::Emails::Projects do
 
       before do
         alert_params['annotations'] = { 'title' => title }
+        alert_params['generatorURL'] = 'http://localhost:9090/graph?g0.expr=vector%281%29&g0.tab=1'
       end
 
       it_behaves_like 'an email sent from GitLab'
@@ -98,8 +115,6 @@ describe EE::Emails::Projects do
         is_expected.to have_body_text(project.full_path)
         is_expected.not_to have_body_text('Description:')
         is_expected.not_to have_body_text('Environment:')
-        is_expected.not_to have_body_text('Metric:')
-        is_expected.to have_body_text(metrics_url)
       end
 
       context 'with annotated description' do
@@ -114,6 +129,8 @@ describe EE::Emails::Projects do
           is_expected.to have_body_text(description)
         end
       end
+
+      it_behaves_like 'shows the incident issues url'
     end
   end
 end

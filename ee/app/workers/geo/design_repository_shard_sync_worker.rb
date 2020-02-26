@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class DesignRepositoryShardSyncWorker < RepositoryShardSyncWorker
+  class DesignRepositoryShardSyncWorker < RepositoryShardSyncWorker # rubocop:disable Scalability/IdempotentWorker
     private
 
     def schedule_job(project_id)

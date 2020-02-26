@@ -1,7 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
-import actionsModule, * as actions from 'ee/insights/stores/modules/insights/actions';
+
 import axios from '~/lib/utils/axios_utils';
+import testAction from 'spec/helpers/vuex_action_helper';
+
+import actionsModule, * as actions from 'ee/insights/stores/modules/insights/actions';
+import { CHART_TYPES } from 'ee/insights/constants';
 
 const ERROR_MESSAGE = 'TEST_ERROR_MESSAGE';
 
@@ -9,11 +12,13 @@ describe('Insights store actions', () => {
   const key = 'bugsPerTeam';
   const chart = {
     title: 'Bugs Per Team',
-    type: 'stacked-bar',
+    type: CHART_TYPES.STACKED_BAR,
     query: {
       name: 'filter_issues_by_label_category',
       filter_label: 'bug',
       category_labels: ['Plan', 'Create', 'Manage'],
+      group_by: 'month',
+      issuable_type: 'issue',
     },
   };
   const page = {
@@ -149,7 +154,7 @@ describe('Insights store actions', () => {
   });
 
   describe('receiveChartDataSuccess', () => {
-    const chartData = { type: 'bar', data: {} };
+    const chartData = { type: CHART_TYPES.BAR, data: {} };
 
     it('commits RECEIVE_CHART_SUCCESS', done => {
       testAction(
@@ -194,7 +199,7 @@ describe('Insights store actions', () => {
     const payload = { endpoint: `${gl.TEST_HOST}/query`, chart };
 
     const chartData = {
-      labels: ['January'],
+      labels: ['January', 'February'],
       datasets: [
         {
           label: 'Dataset 1',

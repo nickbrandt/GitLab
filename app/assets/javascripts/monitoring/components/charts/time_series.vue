@@ -4,7 +4,7 @@ import { GlLink, GlButton, GlTooltip, GlResizeObserverDirective } from '@gitlab/
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import { s__, __ } from '~/locale';
-import { roundOffFloat } from '~/lib/utils/common_utils';
+import { getFormatter } from '~/lib/utils/unit_format';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
 import {
@@ -14,6 +14,7 @@ import {
   lineWidths,
   symbolSizes,
   dateFormats,
+  chartColorValues,
 } from '../../constants';
 import { makeDataSeries } from '~/helpers/monitor_helper';
 import { graphDataValidatorForValues } from '../../utils';
@@ -35,6 +36,8 @@ const timestampToISODate = timestamp => new Date(timestamp).toISOString();
 const events = {
   datazoom: 'datazoom',
 };
+
+const yValFormatter = getFormatter('number');
 
 export default {
   components: {
@@ -111,7 +114,6 @@ export default {
         isDeployment: false,
         sha: '',
       },
-      showTitleTooltip: false,
       width: 0,
       height: chartHeight,
       svgs: {},
@@ -124,7 +126,7 @@ export default {
       // Transforms & supplements query data to render appropriate labels & styles
       // Input: [{ queryAttributes1 }, { queryAttributes2 }]
       // Output: [{ seriesAttributes1 }, { seriesAttributes2 }]
-      return this.graphData.metrics.reduce((acc, query) => {
+      return this.graphData.metrics.reduce((acc, query, i) => {
         const { appearance } = query;
         const lineType =
           appearance && appearance.line && appearance.line.type
@@ -145,7 +147,7 @@ export default {
           lineStyle: {
             type: lineType,
             width: lineWidth,
-            color: this.primaryColor,
+            color: chartColorValues[i % chartColorValues.length],
           },
           showSymbol: false,
           areaStyle: this.graphData.type === 'area-chart' ? areaStyle : undefined,
@@ -161,7 +163,8 @@ export default {
       );
     },
     chartOptions() {
-      const option = omit(this.option, 'series');
+      const { yAxis, xAxis } = this.option;
+      const option = omit(this.option, ['series', 'yAxis', 'xAxis']);
 
       const dataYAxis = {
         name: this.yAxisLabel,
@@ -170,9 +173,11 @@ export default {
         boundaryGap: [0.1, 0.1],
         scale: true,
         axisLabel: {
-          formatter: num => roundOffFloat(num, 3).toString(),
+          formatter: num => yValFormatter(num, 3),
         },
+        ...yAxis,
       };
+
       const deploymentsYAxis = {
         show: false,
         min: deploymentYAxisCoords.min,
@@ -183,18 +188,21 @@ export default {
         },
       };
 
+      const timeXAxis = {
+        name: __('Time'),
+        type: 'time',
+        axisLabel: {
+          formatter: date => dateFormat(date, dateFormats.timeOfDay),
+        },
+        axisPointer: {
+          snap: true,
+        },
+        ...xAxis,
+      };
+
       return {
         series: this.chartOptionSeries,
-        xAxis: {
-          name: __('Time'),
-          type: 'time',
-          axisLabel: {
-            formatter: date => dateFormat(date, dateFormats.timeOfDay),
-          },
-          axisPointer: {
-            snap: true,
-          },
-        },
+        xAxis: timeXAxis,
         yAxis: [dataYAxis, deploymentsYAxis],
         dataZoom: [this.dataZoomConfig],
         ...option,
@@ -278,12 +286,6 @@ export default {
       return `${this.graphData.y_label}`;
     },
   },
-  mounted() {
-    const graphTitleEl = this.$refs.graphTitle;
-    if (graphTitleEl && graphTitleEl.scrollWidth > graphTitleEl.offsetWidth) {
-      this.showTitleTooltip = true;
-    }
-  },
   created() {
     this.setSvg('rocket');
     this.setSvg('scroll-handle');
@@ -313,7 +315,8 @@ export default {
             this.tooltip.commitUrl = deploy.commitUrl;
           } else {
             const { seriesName, color, dataIndex } = dataPoint;
-            const value = yVal.toFixed(3);
+            const value = yValFormatter(yVal, 3);
+
             this.tooltip.content.push({
               name: seriesName,
               dataIndex,
@@ -380,24 +383,7 @@ export default {
 </script>
 
 <template>
-  <div v-gl-resize-observer-directive="onResize" class="prometheus-graph">
-    <div class="prometheus-graph-header">
-      <h5
-        ref="graphTitle"
-        class="prometheus-graph-title js-graph-title text-truncate append-right-8"
-      >
-        {{ graphData.title }}
-      </h5>
-      <gl-tooltip :target="() => $refs.graphTitle" :disabled="!showTitleTooltip">
-        {{ graphData.title }}
-      </gl-tooltip>
-      <div
-        class="prometheus-graph-widgets js-graph-widgets flex-fill"
-        data-qa-selector="prometheus_graph_widgets"
-      >
-        <slot></slot>
-      </div>
-    </div>
+  <div v-gl-resize-observer-directive="onResize">
     <component
       :is="glChartComponent"
       ref="chart"

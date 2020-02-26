@@ -14,6 +14,10 @@ const projectId = 5678;
 const sourceBranch = 'feature-branch-1';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
+const loadingErrorIllustrations = {
+  401: '/401.svg',
+  403: '/403.svg',
+};
 
 describe('Pipeline Security Dashboard component', () => {
   let store;
@@ -43,6 +47,7 @@ describe('Pipeline Security Dashboard component', () => {
         sourceBranch,
         vulnerabilitiesEndpoint,
         vulnerabilityFeedbackHelpPath,
+        loadingErrorIllustrations,
       },
       ...options,
     });

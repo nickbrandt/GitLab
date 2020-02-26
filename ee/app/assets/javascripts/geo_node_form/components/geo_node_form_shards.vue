@@ -1,6 +1,6 @@
 <script>
 import { GlIcon, GlDropdown, GlButton } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
+import { __, n__ } from '~/locale';
 import { SELECTIVE_SYNC_SHARDS } from '../constants';
 
 export default {
@@ -25,7 +25,8 @@ export default {
       if (this.selectedShards.length === 0) {
         return __('Select shards to replicate');
       }
-      return sprintf(__('Shards selected: %{count}'), { count: this.selectedShards.length });
+
+      return n__('%d shard selected', '%d shards selected', this.selectedShards.length);
     },
     noSyncShards() {
       return this.syncShardsOptions.length === 0;

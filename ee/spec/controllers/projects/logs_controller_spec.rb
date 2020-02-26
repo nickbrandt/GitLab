@@ -73,7 +73,9 @@ describe Projects::LogsController do
     before do
       stub_licensed_features(pod_logs: true)
 
-      allow_any_instance_of(::PodLogs::KubernetesService).to receive(:execute).and_return(service_result)
+      allow_next_instance_of(::PodLogs::KubernetesService) do |instance|
+        allow(instance).to receive(:execute).and_return(service_result)
+      end
     end
 
     shared_examples 'resource not found' do |message|

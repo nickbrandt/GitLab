@@ -70,7 +70,7 @@ export default {
       this.itemToDelete = {};
     },
     encodeListItem(item) {
-      const params = JSON.stringify({ name: item.path, tags_path: item.tags_path });
+      const params = JSON.stringify({ name: item.path, tags_path: item.tags_path, id: item.id });
       return window.btoa(params);
     },
   },
@@ -78,7 +78,7 @@ export default {
 </script>
 
 <template>
-  <div class="position-absolute w-100 slide-enter-from-element">
+  <div class="w-100 slide-enter-from-element">
     <gl-empty-state
       v-if="config.characterError"
       :title="s__('ContainerRegistry|Docker connection error')"

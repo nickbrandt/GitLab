@@ -6,7 +6,7 @@ import { MOCK_SYNC_SHARDS } from '../mock_data';
 describe('GeoNodeFormShards', () => {
   let wrapper;
 
-  const propsData = {
+  const defaultProps = {
     selectedShards: [],
     syncShardsOptions: MOCK_SYNC_SHARDS,
   };
@@ -16,9 +16,12 @@ describe('GeoNodeFormShards', () => {
     isSelected: jest.fn(),
   };
 
-  const createComponent = () => {
+  const createComponent = (props = {}) => {
     wrapper = mount(GeoNodeFormShards, {
-      propsData,
+      propsData: {
+        ...defaultProps,
+        ...props,
+      },
       methods: {
         ...actionSpies,
       },
@@ -44,8 +47,7 @@ describe('GeoNodeFormShards', () => {
     describe('DropdownItems', () => {
       beforeEach(() => {
         delete actionSpies.isSelected;
-        createComponent();
-        wrapper.setProps({
+        createComponent({
           selectedShards: [MOCK_SYNC_SHARDS[0].value],
         });
       });
@@ -80,8 +82,7 @@ describe('GeoNodeFormShards', () => {
 
       describe('when shard is in selectedShards', () => {
         beforeEach(() => {
-          createComponent();
-          wrapper.setProps({
+          createComponent({
             selectedShards: [MOCK_SYNC_SHARDS[0].value],
           });
         });
@@ -94,8 +95,7 @@ describe('GeoNodeFormShards', () => {
 
       describe('when shard is not in selectedShards', () => {
         beforeEach(() => {
-          createComponent();
-          wrapper.setProps({
+          createComponent({
             selectedShards: [MOCK_SYNC_SHARDS[0].value],
           });
         });
@@ -114,8 +114,7 @@ describe('GeoNodeFormShards', () => {
 
       describe('when shard is in selectedShards', () => {
         beforeEach(() => {
-          createComponent();
-          wrapper.setProps({
+          createComponent({
             selectedShards: [MOCK_SYNC_SHARDS[0].value],
           });
         });
@@ -127,8 +126,7 @@ describe('GeoNodeFormShards', () => {
 
       describe('when shard is not in selectedShards', () => {
         beforeEach(() => {
-          createComponent();
-          wrapper.setProps({
+          createComponent({
             selectedShards: [MOCK_SYNC_SHARDS[0].value],
           });
         });
@@ -143,8 +141,7 @@ describe('GeoNodeFormShards', () => {
       describe('dropdownTitle', () => {
         describe('when selectedShards is empty', () => {
           beforeEach(() => {
-            createComponent();
-            wrapper.setProps({
+            createComponent({
               selectedShards: [],
             });
           });
@@ -154,17 +151,30 @@ describe('GeoNodeFormShards', () => {
           });
         });
 
-        describe('when selectedShards is not empty', () => {
+        describe('when selectedShards length === 1', () => {
           beforeEach(() => {
-            createComponent();
-            wrapper.setProps({
+            createComponent({
               selectedShards: [MOCK_SYNC_SHARDS[0].value],
             });
           });
 
-          it('returns Shards selected: `this.selectedShards.length`', () => {
+          it('returns `this.selectedShards.length` shard selected', () => {
             expect(wrapper.vm.dropdownTitle).toBe(
-              `Shards selected: ${wrapper.vm.selectedShards.length}`,
+              `${wrapper.vm.selectedShards.length} shard selected`,
+            );
+          });
+        });
+
+        describe('when selectedShards length > 1', () => {
+          beforeEach(() => {
+            createComponent({
+              selectedShards: [MOCK_SYNC_SHARDS[0].value, MOCK_SYNC_SHARDS[1].value],
+            });
+          });
+
+          it('returns `this.selectedShards.length` shards selected', () => {
+            expect(wrapper.vm.dropdownTitle).toBe(
+              `${wrapper.vm.selectedShards.length} shards selected`,
             );
           });
         });
@@ -184,8 +194,7 @@ describe('GeoNodeFormShards', () => {
 
       describe('when syncShardsOptions.length === 0', () => {
         beforeEach(() => {
-          createComponent();
-          wrapper.setProps({
+          createComponent({
             syncShardsOptions: [],
           });
         });

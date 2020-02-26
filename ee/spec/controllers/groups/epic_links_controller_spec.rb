@@ -176,6 +176,8 @@ describe Groups::EpicLinksController do
       epic1.update(parent: parent_epic)
     end
 
+    let(:features_when_forbidden) { { epics: false } }
+
     subject { delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id } }
 
     it_behaves_like 'unlicensed subepics action'

@@ -4,13 +4,14 @@ type: reference
 
 # Issues Analytics **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7478) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7478) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/196561) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.9 at the project level.
 
 Issues Analytics is a bar graph which illustrates the number of issues created each month.
 The default timespan is 13 months, which includes the current month, and the 12 months
 prior.
 
-To access the chart, navigate to a group's sidebar and select **Issues > Analytics**.
+To access the chart, navigate to your group or project sidebar and select **{chart}** **Analytics > Issues Analytics**.
 
 Hover over each bar to see the total number of issues.
 
@@ -28,7 +29,7 @@ You can change the total number of months displayed by setting a URL parameter.
 For example, `https://gitlab.com/groups/gitlab-org/-/issues_analytics?months_back=15`
 shows a total of 15 months for the chart in the GitLab.org group.
 
-![Issues created per month](img/issues_created_per_month.png)
+![Issues created per month](img/issues_created_per_month_v12_8.png)
 
 <!-- ## Troubleshooting
 

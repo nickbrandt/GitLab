@@ -58,14 +58,14 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
   end
 
   def reverify_all
-    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:reverify_repositories)
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:reverify_repositories) # rubocop:disable CodeReuse/Worker
 
     flash[:toast] = s_('Geo|All projects are being scheduled for re-verify')
     redirect_back_or_default(default: admin_geo_projects_path)
   end
 
   def resync_all
-    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories)
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories) # rubocop:disable CodeReuse/Worker
 
     flash[:toast] = s_('Geo|All projects are being scheduled for re-sync')
     redirect_back_or_default(default: admin_geo_projects_path)

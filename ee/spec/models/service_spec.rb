@@ -9,7 +9,6 @@ describe Service do
         github
         jenkins
         jenkins_deprecated
-        alerts
       )
     end
 

@@ -70,8 +70,8 @@ module EE
       noteable&.after_note_destroyed(self)
     end
 
-    override :visible_for?
-    def visible_for?(user)
+    override :system_note_with_references_visible_for?
+    def system_note_with_references_visible_for?(user)
       return false unless super
 
       return true unless system_note_for_epic? && created_before_noteable?
@@ -82,7 +82,7 @@ module EE
     private
 
     def system_note_for_epic?
-      for_epic? && system?
+      system? && for_epic?
     end
 
     def created_before_noteable?

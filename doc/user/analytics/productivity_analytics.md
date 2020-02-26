@@ -12,8 +12,6 @@ Software Development Life Cycle (SDLC) process, Productivity Analytics provides 
 
 Productivity can slow down for many reasons ranging from degrading code base to quickly growing teams. In order to investigate, department or team leaders can start by visualizing the time it takes for merge requests to be merged.
 
-By default, a data migration job covering three months of historical data will kick off when deploying Productivity Analytics for the first time.
-
 ## Supported features
 
 Productivity Analytics allows GitLab users to:
@@ -25,10 +23,7 @@ Productivity Analytics allows GitLab users to:
 
 ## Accessing metrics and visualizations
 
-To access the **Productivity Analytics** page:
-
-1. Go to **Analytics** from the top navigation bar.
-1. Select **Productivity Analytics** from the menu.
+To access the chart, navigate to a group's sidebar and select **Analytics > Productivity Analytics**.
 
 The following metrics and visualizations are available on a project or group level - currently only covering **merged** merge requests:
 

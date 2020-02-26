@@ -4,7 +4,7 @@
 - page_title @vulnerability.title
 - page_description @vulnerability.description
 
-.detail-page-header
+.detail-page-header.align-items-center
   .detail-page-header-body
     .issuable-status-box.status-box.status-box-open.closed
       %span= @vulnerability.state
@@ -16,6 +16,10 @@
     - else
       %span#js-vulnerability-created
         = time_ago_with_tooltip(@vulnerability.created_at)
+  %label.mb-0.mr-2= _('Status')
+  #js-vulnerability-show-header{ data: { vulnerability: @vulnerability.to_json,
+    finding: @vulnerability.finding.to_json,
+    create_issue_url: create_vulnerability_feedback_issue_path(@vulnerability.finding.project) } }
 
 .issue-details.issuable-details
   .detail-page-description.content-block
@@ -48,3 +52,9 @@
             - @vulnerability.finding.identifiers.each do |identifier|
               %li
                 %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
+        - if @vulnerability.finding.solution || @vulnerability.finding.remediations
+          #js-vulnerability-solution{ data: { vulnerability_state: @vulnerability.state,
+            solution: @vulnerability.finding.solution,
+            remediation: @vulnerability.finding.remediations&.first.to_json,
+            has_mr: !!@vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
+            vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities") } }

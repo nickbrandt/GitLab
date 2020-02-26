@@ -1,29 +1,21 @@
 import { mount } from '@vue/test-utils';
 import DesignOverlay from 'ee/design_management/components/design_overlay.vue';
+import notes from '../mock_data/notes';
 
 describe('Design overlay component', () => {
   let wrapper;
 
-  const notes = [
-    {
-      position: {
-        height: 100,
-        width: 100,
-        x: 10,
-        y: 15,
-      },
-    },
-    {
-      position: {
-        height: 50,
-        width: 50,
-        x: 25,
-        y: 25,
-      },
-    },
-  ];
-
   const mockDimensions = { width: 100, height: 100 };
+  const mockNoteNotAuthorised = {
+    id: 'note-not-authorised',
+    discussion: { id: 'discussion-not-authorised' },
+    position: {
+      x: 1,
+      y: 80,
+      ...mockDimensions,
+    },
+    userPermissions: {},
+  };
 
   const findOverlay = () => wrapper.find('.image-diff-overlay');
   const findAllNotes = () => wrapper.findAll('.js-image-badge');
@@ -66,10 +58,10 @@ describe('Design overlay component', () => {
       x: 10,
       y: 10,
     };
+
     wrapper
       .find('.image-diff-overlay-add-comment')
       .trigger('click', { offsetX: newCoordinates.x, offsetY: newCoordinates.y });
-
     return wrapper.vm.$nextTick().then(() => {
       expect(wrapper.emitted('openCommentForm')).toEqual([
         [{ x: newCoordinates.x, y: newCoordinates.y }],
@@ -113,6 +105,78 @@ describe('Design overlay component', () => {
 
       return wrapper.vm.$nextTick().then(() => {
         expect(findFirstBadge().attributes().style).toBe('left: 20px; top: 30px;');
+      });
+    });
+  });
+
+  describe('when moving notes', () => {
+    it('should update badge style when note is being moved', () => {
+      createComponent({
+        notes,
+      });
+
+      const { position } = notes[0];
+
+      return clickAndDragBadge(
+        findFirstBadge(),
+        { x: position.x, y: position.y },
+        { x: 20, y: 20 },
+      ).then(() => {
+        expect(findFirstBadge().attributes().style).toBe('left: 20px; top: 20px; cursor: move;');
+      });
+    });
+
+    it('should emit `moveNote` event when note-moving action ends', () => {
+      createComponent({ notes });
+      const note = notes[0];
+      const { position } = note;
+      const newCoordinates = { x: 20, y: 20 };
+
+      wrapper.setData({
+        movingNoteNewPosition: {
+          ...position,
+          ...newCoordinates,
+        },
+        movingNoteStartPosition: {
+          noteId: notes[0].id,
+          discussionId: notes[0].discussion.id,
+          ...position,
+        },
+      });
+
+      const badge = findFirstBadge();
+      return clickAndDragBadge(badge, { x: position.x, y: position.y }, newCoordinates)
+        .then(() => {
+          badge.trigger('mouseup');
+          return wrapper.vm.$nextTick();
+        })
+        .then(() => {
+          expect(wrapper.emitted('moveNote')).toEqual([
+            [
+              {
+                noteId: notes[0].id,
+                discussionId: notes[0].discussion.id,
+                coordinates: newCoordinates,
+              },
+            ],
+          ]);
+        });
+    });
+
+    it('should do nothing if [adminNote] permission is not present', () => {
+      createComponent({
+        dimensions: mockDimensions,
+        notes: [mockNoteNotAuthorised],
+      });
+
+      const badge = findAllNotes().at(0);
+      return clickAndDragBadge(
+        badge,
+        { x: mockNoteNotAuthorised.x, y: mockNoteNotAuthorised.y },
+        { x: 20, y: 20 },
+      ).then(() => {
+        expect(wrapper.vm.movingNoteStartPosition).toBeNull();
+        expect(findFirstBadge().attributes().style).toBe('left: 1px; top: 80px;');
       });
     });
   });
@@ -254,5 +318,26 @@ describe('Design overlay component', () => {
 
       expect(wrapper.vm.getNoteRelativePosition(position)).toEqual({ left: 25, top: 25 });
     });
+  });
+
+  describe('canMoveNote', () => {
+    it.each`
+      adminNotePermission | canMoveNoteResult
+      ${true}             | ${true}
+      ${false}            | ${false}
+      ${undefined}        | ${false}
+    `(
+      'returns [$canMoveNoteResult] when [adminNote permission] is [$adminNotePermission]',
+      ({ adminNotePermission, canMoveNoteResult }) => {
+        createComponent();
+
+        const note = {
+          userPermissions: {
+            adminNote: adminNotePermission,
+          },
+        };
+        expect(wrapper.vm.canMoveNote(note)).toBe(canMoveNoteResult);
+      },
+    );
   });
 });

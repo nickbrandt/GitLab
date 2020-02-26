@@ -41,7 +41,7 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
       jobs = batch_ids.map { |id| [id, :index] }
 
-      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext
+      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext, CodeReuse/Worker
     end
   end
 
@@ -58,7 +58,7 @@ class ElasticsearchIndexedNamespace < ApplicationRecord
 
       jobs = batch_ids.map { |id| [id, :delete] }
 
-      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext
+      ElasticNamespaceIndexerWorker.bulk_perform_async(jobs) # rubocop:disable Scalability/BulkPerformWithContext, CodeReuse/Worker
     end
   end
 

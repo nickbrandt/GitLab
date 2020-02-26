@@ -343,6 +343,7 @@ class Project < ApplicationRecord
   delegate :last_pipeline, to: :commit, allow_nil: true
   delegate :external_dashboard_url, to: :metrics_setting, allow_nil: true, prefix: true
   delegate :default_git_depth, :default_git_depth=, to: :ci_cd_settings, prefix: :ci
+  delegate :forward_deployment_enabled, :forward_deployment_enabled=, :forward_deployment_enabled?, to: :ci_cd_settings
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -1373,7 +1374,7 @@ class Project < ApplicationRecord
     @lfs_storage_project ||= begin
       result = self
 
-      # TODO: Make this go to the fork_network root immeadiatly
+      # TODO: Make this go to the fork_network root immediately
       # dependant on the discussion in: https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
       result = result.fork_source while result&.forked?
 
@@ -2334,7 +2335,7 @@ class Project < ApplicationRecord
   end
 
   def alerts_service_activated?
-    false
+    alerts_service&.active?
   end
 
   def self_monitoring?

@@ -16,6 +16,10 @@ module Ci
     include FromUnion
     include UpdatedAtFilterable
 
+    PROJECT_ROUTE_AND_NAMESPACE_ROUTE = {
+      project: [:project_feature, :route, { namespace: :route }]
+    }.freeze
+
     BridgeStatusError = Class.new(StandardError)
 
     sha_attribute :source_sha
@@ -214,7 +218,7 @@ module Ci
         end
       end
 
-      after_transition created: any - [:failed] do |pipeline|
+      after_transition created: :pending do |pipeline|
         next unless pipeline.bridge_triggered?
         next if pipeline.bridge_waiting?
 

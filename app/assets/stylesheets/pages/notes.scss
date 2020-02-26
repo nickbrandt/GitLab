@@ -283,7 +283,7 @@ $note-form-margin-left: 72px;
         text-transform: lowercase;
       }
 
-      a {
+      a:not(.gl-link) {
         color: $blue-600;
       }
 
@@ -311,13 +311,18 @@ $note-form-margin-left: 72px;
       overflow: hidden;
 
       .description-version {
+        position: relative;
+
+        .btn.delete-description-history {
+          position: absolute;
+          top: 18px;
+          right: 10px;
+        }
+
         pre {
           max-height: $dropdown-max-height-lg;
           white-space: pre-wrap;
-
-          &.loading-state {
-            height: 94px;
-          }
+          padding-right: 30px;
         }
       }
 
@@ -665,6 +670,16 @@ $note-form-margin-left: 72px;
 
   a:hover {
     text-decoration: underline;
+  }
+
+  .gl-label-link:hover,
+  .gl-label-icon:hover {
+    text-decoration: none;
+    color: inherit;
+
+    .gl-label-text:last-of-type {
+      text-decoration: underline;
+    }
   }
 }
 

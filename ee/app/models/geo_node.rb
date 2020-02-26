@@ -219,7 +219,7 @@ class GeoNode < ApplicationRecord
   end
 
   def job_artifacts
-    Ci::JobArtifact.all unless selective_sync?
+    return Ci::JobArtifact.all unless selective_sync?
 
     Ci::JobArtifact.project_id_in(projects)
   end
@@ -318,7 +318,9 @@ class GeoNode < ApplicationRecord
 
   def update_dependents_attributes
     if self.primary?
+      self.oauth_application&.destroy
       self.oauth_application = nil
+
       update_clone_url
     else
       update_oauth_application!

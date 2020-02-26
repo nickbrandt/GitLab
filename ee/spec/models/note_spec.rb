@@ -11,13 +11,14 @@ describe Note do
     let(:set_mentionable_text) { ->(txt) { subject.note = txt } }
   end
 
-  describe '#visible_for?' do
+  describe '#readable_by?' do
     let(:owner) { create(:group_member, :owner, group: group, user: create(:user)).user }
     let(:guest) { create(:group_member, :guest, group: group, user: create(:user)).user }
     let(:reporter) { create(:group_member, :reporter, group: group, user: create(:user)).user }
     let(:maintainer) { create(:group_member, :maintainer, group: group, user: create(:user)).user }
+    let(:non_member) { create(:user) }
 
-    let(:group) { create(:group) }
+    let(:group) { create(:group, :public) }
     let(:epic) { create(:epic, group: group, author: owner, created_at: 1.day.ago) }
 
     before do
@@ -27,53 +28,55 @@ describe Note do
     context 'note created after epic' do
       let(:note) { create(:system_note, noteable: epic, created_at: 1.minute.ago) }
 
-      it 'returns true for an owner' do
-        expect(note.visible_for?(owner)).to be_truthy
+      it_behaves_like 'users with note access' do
+        let(:users) { [owner, reporter, maintainer, guest, non_member, nil] }
       end
 
-      it 'returns true for a reporter' do
-        expect(note.visible_for?(reporter)).to be_truthy
-      end
+      context 'when group is private' do
+        let(:group) { create(:group, :private) }
 
-      it 'returns true for a maintainer' do
-        expect(note.visible_for?(maintainer)).to be_truthy
-      end
+        it_behaves_like 'users with note access' do
+          let(:users) { [owner, reporter, maintainer, guest] }
+        end
 
-      it 'returns true for a guest user' do
-        expect(note.visible_for?(guest)).to be_truthy
-      end
+        it 'returns visible but not readable for a non-member user' do
+          expect(note.system_note_with_references_visible_for?(non_member)).to be_truthy
+          expect(note.readable_by?(non_member)).to be_falsy
+        end
 
-      it 'returns true for a nil user' do
-        expect(note.visible_for?(nil)).to be_truthy
+        it 'returns visible but not readable for a nil user' do
+          expect(note.system_note_with_references_visible_for?(nil)).to be_truthy
+          expect(note.readable_by?(nil)).to be_falsy
+        end
       end
     end
 
     context 'when note is older than epic' do
-      let(:older_note) { create(:system_note, noteable: epic, created_at: 2.days.ago) }
+      let(:note) { create(:system_note, noteable: epic, created_at: 2.days.ago) }
 
-      it 'returns true for the owner' do
-        expect(older_note.visible_for?(owner)).to be_truthy
+      it_behaves_like 'users with note access' do
+        let(:users) { [owner, reporter, maintainer] }
       end
 
-      it 'returns true for a reporter' do
-        expect(older_note.visible_for?(reporter)).to be_truthy
+      it_behaves_like 'users without note access' do
+        let(:users) { [guest, non_member, nil] }
       end
 
-      it 'returns true for a maintainer' do
-        expect(older_note.visible_for?(maintainer)).to be_truthy
-      end
+      context 'when group is private' do
+        let(:group) { create(:group, :private) }
 
-      it 'returns false for a guest user' do
-        expect(older_note.visible_for?(guest)).to be_falsy
-      end
+        it_behaves_like 'users with note access' do
+          let(:users) { [owner, reporter, maintainer] }
+        end
 
-      it 'returns false for a nil user' do
-        expect(older_note.visible_for?(nil)).to be_falsy
+        it_behaves_like 'users without note access' do
+          let(:users) { [guest, non_member, nil] }
+        end
       end
     end
   end
 
-  describe '#cross_reference?' do
+  describe '#system_note_with_references?' do
     [:relate_epic, :unrelate_epic].each do |type|
       it "delegates #{type} system note to the cross-reference regex" do
         note = create(:note, :system)
@@ -81,7 +84,7 @@ describe Note do
 
         expect(note).to receive(:matches_cross_reference_regex?).and_return(false)
 
-        note.cross_reference?
+        note.system_note_with_references?
       end
     end
   end

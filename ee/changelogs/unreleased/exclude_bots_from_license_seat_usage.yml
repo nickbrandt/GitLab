@@ -1,5 +1,0 @@
----
-title: Exclude GitLab generated bot users from using a license seat
-merge_request: 24275
-author:
-type: changed

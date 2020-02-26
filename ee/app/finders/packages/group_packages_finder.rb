@@ -4,7 +4,7 @@ module Packages
   class GroupPackagesFinder
     attr_reader :current_user, :group, :params
 
-    def initialize(current_user, group, params = { exclude_subgroups: false })
+    def initialize(current_user, group, params = { exclude_subgroups: false, order_by: 'created_at', sort: 'asc' })
       @current_user = current_user
       @group = group
       @params = params
@@ -19,7 +19,9 @@ module Packages
     private
 
     def packages_for_group_projects
-      packages = ::Packages::Package.for_projects(group_projects_visible_to_current_user)
+      packages = ::Packages::Package
+        .for_projects(group_projects_visible_to_current_user)
+        .sort_by_attribute("#{params[:order_by]}_#{params[:sort]}")
 
       return packages unless package_type
 

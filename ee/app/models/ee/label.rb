@@ -4,7 +4,8 @@ module EE
   module Label
     extend ActiveSupport::Concern
 
-    SCOPED_LABEL_PATTERN = /^.*::/.freeze
+    SCOPED_LABEL_SEPARATOR = '::'
+    SCOPED_LABEL_PATTERN = /^.*#{SCOPED_LABEL_SEPARATOR}/.freeze
 
     def scoped_label?
       SCOPED_LABEL_PATTERN.match?(name)

@@ -95,52 +95,7 @@ describe('AddIssuableForm', () => {
       });
     });
 
-    it('should emit the `addIssuableFormSubmit` event when submitting pending issues', () => {
-      wrapper = mount(AddIssuableForm, {
-        propsData: {
-          inputValue: 'foo #123',
-          pendingReferences: [issuable1.reference, issuable2.reference],
-          pathIdSeparator,
-        },
-      });
-
-      spyOn(wrapper.vm, '$emit');
-      const newInputValue = 'filling in things';
-      const inputEl = findFormInput(wrapper);
-      inputEl.value = newInputValue;
-      wrapper.vm.onFormSubmit();
-
-      expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', {
-        pendingReferences: newInputValue,
-        linkedIssueType: linkedIssueTypesMap.RELATES_TO,
-      });
-    });
-
-    it('should emit the `addIssuableFormCancel` event when canceling form to collapse', () => {
-      spyOn(wrapper.vm, '$emit');
-      wrapper.vm.onFormCancel();
-
-      expect(wrapper.vm.$emit).toHaveBeenCalledWith('addIssuableFormCancel');
-    });
-  });
-
-  describe('with :issue_link_types feature flag on', () => {
-    beforeEach(() => {
-      wrapper = mount(AddIssuableForm, {
-        propsData: {
-          inputValue: '',
-          pendingReferences: [],
-          pathIdSeparator,
-        },
-        provide: {
-          glFeatures: {
-            issueLinkTypes: true,
-          },
-        },
-      });
-    });
-
-    describe('radio buttons', () => {
+    describe('form radio buttons', () => {
       let radioInputs;
 
       beforeEach(() => {
@@ -165,6 +120,16 @@ describe('AddIssuableForm', () => {
     });
 
     describe('when the form is submitted', () => {
+      beforeEach(() => {
+        wrapper = mount(AddIssuableForm, {
+          propsData: {
+            inputValue: '',
+            pendingReferences: [],
+            pathIdSeparator,
+          },
+        });
+      });
+
       it('emits an event with a "relates_to" link type when the "relates to" radio input selected', done => {
         spyOn(wrapper.vm, '$emit');
 

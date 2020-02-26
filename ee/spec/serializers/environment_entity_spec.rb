@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe EnvironmentEntity do
   include KubernetesHelpers
+  include Gitlab::Routing.url_helpers
 
   let(:user) { create(:user) }
   let(:environment) { create(:environment) }
@@ -51,14 +52,32 @@ describe EnvironmentEntity do
         stub_licensed_features(pod_logs: true)
       end
 
-      it 'exposes logs_path' do
+      it 'exposes logs keys' do
         expect(subject).to include(:logs_path)
+        expect(subject).to include(:logs_api_path)
+        expect(subject).to include(:enable_advanced_logs_querying)
+      end
+
+      it 'uses k8s api when ES is not available' do
+        expect(subject[:logs_api_path]).to eq(k8s_project_logs_path(environment.project, environment_name: environment.name, format: :json))
+      end
+
+      it 'uses ES api when ES is available' do
+        allow(environment).to receive(:elastic_stack_available?).and_return(true)
+
+        expect(subject[:logs_api_path]).to eq(elasticsearch_project_logs_path(environment.project, environment_name: environment.name, format: :json))
       end
     end
 
     context 'when pod_logs are not available' do
-      it 'does not expose logs_path' do
+      before do
+        stub_licensed_features(pod_logs: false)
+      end
+
+      it 'does not expose logs keys' do
         expect(subject).not_to include(:logs_path)
+        expect(subject).not_to include(:logs_api_path)
+        expect(subject).not_to include(:enable_advanced_logs_querying)
       end
     end
   end

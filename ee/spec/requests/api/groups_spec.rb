@@ -58,7 +58,7 @@ describe API::Groups do
         it 'returns 200' do
           get api("/groups/#{private_group.id}", user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -70,13 +70,13 @@ describe API::Groups do
         it 'returns 404 for request from ip not in the range' do
           get api("/groups/#{private_group.id}", user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 200 for request from ip in the range' do
           get api("/groups/#{private_group.id}", user), headers: { 'REMOTE_ADDR' => '192.168.0.0' }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -118,7 +118,7 @@ describe API::Groups do
         stub_licensed_features(custom_file_templates_for_namespace: false)
 
         expect { subject }.not_to change { group.reload.file_template_project_id }
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).not_to have_key('file_template_project_id')
       end
 
@@ -126,7 +126,7 @@ describe API::Groups do
         stub_licensed_features(custom_file_templates_for_namespace: true)
 
         expect { subject }.to change { group.reload.file_template_project_id }.to(project.id)
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['file_template_project_id']).to eq(project.id)
       end
     end
@@ -142,7 +142,7 @@ describe API::Groups do
             put api("/groups/#{group.id}", user), params: { shared_runners_minutes_limit: 133 }
           end.not_to change { group.shared_runners_minutes_limit }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -153,7 +153,7 @@ describe API::Groups do
           expect { subject }.to(
             change { group.reload.shared_runners_minutes_limit }.from(nil).to(133))
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['shared_runners_minutes_limit']).to eq(133)
         end
       end
@@ -176,7 +176,7 @@ describe API::Groups do
               post api("/groups", another_user), params: group
             end.not_to change { Group.count }
 
-            expect(response).to have_gitlab_http_status(403)
+            expect(response).to have_gitlab_http_status(:forbidden)
           end
         end
 
@@ -191,7 +191,7 @@ describe API::Groups do
             created_group = Group.find(json_response['id'])
 
             expect(created_group.shared_runners_minutes_limit).to eq(133)
-            expect(response).to have_gitlab_http_status(201)
+            expect(response).to have_gitlab_http_status(:created)
             expect(json_response['shared_runners_minutes_limit']).to eq(133)
           end
         end
@@ -213,7 +213,7 @@ describe API::Groups do
         context 'when the group is ready to sync' do
           it 'returns 202 Accepted' do
             ldap_sync(group.id, user, :disable!)
-            expect(response).to have_gitlab_http_status(202)
+            expect(response).to have_gitlab_http_status(:accepted)
           end
 
           it 'queues a sync job' do
@@ -233,7 +233,7 @@ describe API::Groups do
 
           it 'returns 202 Accepted' do
             ldap_sync(group.id, user, :disable!)
-            expect(response).to have_gitlab_http_status(202)
+            expect(response).to have_gitlab_http_status(:accepted)
           end
 
           it 'does not queue a sync job' do
@@ -248,22 +248,24 @@ describe API::Groups do
         end
 
         it 'returns 404 for a non existing group' do
-          ldap_sync(1328, user, :disable!)
-          expect(response).to have_gitlab_http_status(404)
+          non_existent_group_id = Group.maximum(:id).to_i + 1
+          ldap_sync(non_existent_group_id, user, :disable!)
+
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
       context 'when authenticated as the admin' do
         it 'returns 202 Accepted' do
           ldap_sync(group.id, admin, :disable!)
-          expect(response).to have_gitlab_http_status(202)
+          expect(response).to have_gitlab_http_status(:accepted)
         end
       end
 
       context 'when authenticated as a non-owner user that can see the group' do
         it 'returns 403' do
           ldap_sync(group.id, another_user, :disable!)
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -271,7 +273,7 @@ describe API::Groups do
         it 'returns 404' do
           ldap_sync(private_group.id, user, :disable!)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -284,7 +286,7 @@ describe API::Groups do
       it 'returns 404 (same as CE would)' do
         ldap_sync(group.id, admin, :disable!)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -360,7 +362,7 @@ describe API::Groups do
         it 'returns 200 response' do
           get api(path, user)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         it 'includes the correct pagination headers' do
@@ -452,7 +454,7 @@ describe API::Groups do
           it 'returns 200 response' do
             get api(path, user)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
 
           context 'response schema' do
@@ -497,7 +499,7 @@ describe API::Groups do
           expect { subject }.to change(GroupDestroyWorker.jobs, :size).by(1)
         end
 
-        expect(response).to have_gitlab_http_status(202)
+        expect(response).to have_gitlab_http_status(:accepted)
       end
     end
 
@@ -516,7 +518,7 @@ describe API::Groups do
             subject
             group.reload
 
-            expect(response).to have_gitlab_http_status(202)
+            expect(response).to have_gitlab_http_status(:accepted)
             expect(group.marked_for_deletion_on).to eq(Date.today)
             expect(group.deleting_user).to eq(user)
           end
@@ -534,7 +536,7 @@ describe API::Groups do
           it 'returns error' do
             subject
 
-            expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(:bad_request)
             expect(json_response['message']).to eq('error')
           end
         end
@@ -577,7 +579,7 @@ describe API::Groups do
           it 'restores the group to original state' do
             subject
 
-            expect(response).to have_gitlab_http_status(201)
+            expect(response).to have_gitlab_http_status(:created)
             expect(json_response['marked_for_deletion_on']).to be_falsey
           end
         end
@@ -590,7 +592,7 @@ describe API::Groups do
           it 'returns error' do
             subject
 
-            expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(:bad_request)
             expect(json_response['message']).to eq('error')
           end
         end
@@ -602,7 +604,7 @@ describe API::Groups do
         it 'returns 403' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -615,7 +617,7 @@ describe API::Groups do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

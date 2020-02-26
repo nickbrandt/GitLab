@@ -2,11 +2,6 @@
 
 class InstanceSecurityDashboard
   extend ActiveModel::Naming
-  include ::Vulnerable
-
-  def self.name
-    'Instance'
-  end
 
   def initialize(user, project_ids: [])
     @project_ids = project_ids

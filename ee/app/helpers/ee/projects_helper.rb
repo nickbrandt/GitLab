@@ -6,7 +6,7 @@ module EE
 
     override :sidebar_projects_paths
     def sidebar_projects_paths
-      if ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, @project)
+      if ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, @project, default_enabled: true)
         super
       else
         super + %w[
@@ -36,6 +36,7 @@ module EE
       ]
     end
 
+    # rubocop: disable Metrics/CyclomaticComplexity
     override :get_project_nav_tabs
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
@@ -71,12 +72,17 @@ module EE
         nav_tabs << :operations
       end
 
+      if project.feature_available?(:issues_analytics) && can?(current_user, :read_project, project)
+        nav_tabs << :issues_analytics
+      end
+
       if project.insights_available?
         nav_tabs << :project_insights
       end
 
       nav_tabs
     end
+    # rubocop: enable Metrics/CyclomaticComplexity
 
     override :tab_ability_map
     def tab_ability_map
@@ -273,11 +279,6 @@ module EE
       return true if super
 
       @project.feature_available?(:tracing, current_user) && can?(current_user, :read_environment, @project)
-    end
-
-    def project_incident_management_setting
-      @project_incident_management_setting ||= @project.incident_management_setting ||
-        @project.build_incident_management_setting
     end
 
     override :can_import_members?

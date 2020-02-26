@@ -6,6 +6,8 @@ import {
   mavenInstallationXml,
   mavenInstallationCommand,
   mavenSetupXml,
+  npmInstallationCommand,
+  npmSetupCommand,
   nugetInstallationCommand,
   nugetSetupCommand,
 } from 'ee/packages/details/store/getters';
@@ -23,6 +25,7 @@ import {
   registryUrl,
 } from '../mock_data';
 import { generateConanRecipe } from 'ee/packages/details/utils';
+import { NpmManager } from 'ee/packages/details/constants';
 
 describe('Getters PackageDetails Store', () => {
   let state;
@@ -35,6 +38,7 @@ describe('Getters PackageDetails Store', () => {
     pipelineError: mockPipelineError,
     conanPath: registryUrl,
     mavenPath: registryUrl,
+    npmPath: registryUrl,
     nugetPath: registryUrl,
   };
 
@@ -52,6 +56,11 @@ describe('Getters PackageDetails Store', () => {
   const mavenCommandStr = generateMavenCommand(packageWithoutBuildInfo.maven_metadatum);
   const mavenInstallationXmlBlock = generateXmlCodeBlock(packageWithoutBuildInfo.maven_metadatum);
   const mavenSetupXmlBlock = generateMavenSetupXml();
+
+  const npmInstallStr = `npm i ${npmPackage.name}`;
+  const npmSetupStr = `echo @Test:registry=${registryUrl} >> .npmrc`;
+  const yarnInstallStr = `yarn add ${npmPackage.name}`;
+  const yarnSetupStr = `echo \\"@Test:registry\\" \\"${registryUrl}\\" >> .yarnrc`;
 
   const nugetInstallationCommandStr = `nuget install ${nugetPackage.name} -Source "GitLab"`;
   const nugetSetupCommandStr = `nuget source Add -Name "GitLab" -Source "${registryUrl}" -UserName <your_username> -Password <your_token>`;
@@ -119,6 +128,32 @@ describe('Getters PackageDetails Store', () => {
       setupState();
 
       expect(mavenSetupXml(state)).toEqual(mavenSetupXmlBlock);
+    });
+  });
+
+  describe('npm string getters', () => {
+    it('gets the correct npmInstallationCommand for NPM', () => {
+      setupState({ packageEntity: npmPackage });
+
+      expect(npmInstallationCommand(state)(NpmManager.NPM)).toEqual(npmInstallStr);
+    });
+
+    it('gets the correct npmSetupCommand for NPM', () => {
+      setupState({ packageEntity: npmPackage });
+
+      expect(npmSetupCommand(state)(NpmManager.NPM)).toEqual(npmSetupStr);
+    });
+
+    it('gets the correct npmInstallationCommand for Yarn', () => {
+      setupState({ packageEntity: npmPackage });
+
+      expect(npmInstallationCommand(state)(NpmManager.YARN)).toEqual(yarnInstallStr);
+    });
+
+    it('gets the correct npmSetupCommand for Yarn', () => {
+      setupState({ packageEntity: npmPackage });
+
+      expect(npmSetupCommand(state)(NpmManager.YARN)).toEqual(yarnSetupStr);
     });
   });
 

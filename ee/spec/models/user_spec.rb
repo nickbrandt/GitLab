@@ -583,37 +583,6 @@ describe User do
     end
   end
 
-  describe 'internal methods' do
-    let!(:user) { create(:user) }
-    let!(:ghost) { described_class.ghost }
-    let!(:support_bot) { described_class.support_bot }
-    let!(:alert_bot) { described_class.alert_bot }
-    let!(:visual_review_bot) { described_class.visual_review_bot }
-    let!(:non_internal) { [user] }
-    let!(:internal) { [ghost, support_bot, alert_bot, visual_review_bot] }
-
-    it 'returns non internal users' do
-      expect(described_class.internal).to eq(internal)
-      expect(internal.all?(&:internal?)).to eq(true)
-    end
-
-    it 'returns internal users' do
-      expect(described_class.non_internal).to eq(non_internal)
-      expect(non_internal.all?(&:internal?)).to eq(false)
-    end
-
-    describe '#bot?' do
-      it 'marks bot users' do
-        expect(user.bot?).to eq(false)
-        expect(ghost.bot?).to eq(false)
-
-        expect(support_bot.bot?).to eq(true)
-        expect(alert_bot.bot?).to eq(true)
-        expect(visual_review_bot.bot?).to eq(true)
-      end
-    end
-  end
-
   describe '#using_license_seat?' do
     let(:user) { create(:user) }
 
@@ -934,6 +903,60 @@ describe User do
           end
         end
       end
+    end
+  end
+
+  describe '#managed_free_namespaces' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:licensed_group) { create(:group, plan: :bronze_plan) }
+    let_it_be(:free_group_z) { create(:group, plan: :default_plan, name: 'Z') }
+    let_it_be(:free_group_a) { create(:group, plan: :default_plan, name: 'A') }
+
+    subject { user.managed_free_namespaces }
+
+    context 'user with no groups' do
+      it { is_expected.to eq [] }
+    end
+
+    context 'owner of a licensed group' do
+      before do
+        licensed_group.add_owner(user)
+      end
+
+      it { is_expected.not_to include licensed_group }
+    end
+
+    context 'guest of a free group' do
+      before do
+        free_group_a.add_guest(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'developer of a free group' do
+      before do
+        free_group_a.add_developer(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'maintainer of a free group' do
+      before do
+        free_group_a.add_maintainer(user)
+      end
+
+      it { is_expected.to include free_group_a }
+    end
+
+    context 'owner of 2 free groups' do
+      before do
+        free_group_a.add_owner(user)
+        free_group_z.add_owner(user)
+      end
+
+      it { is_expected.to eq [free_group_a, free_group_z] }
     end
   end
 end

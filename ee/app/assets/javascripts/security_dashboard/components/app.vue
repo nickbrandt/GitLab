@@ -55,6 +55,11 @@ export default {
       required: false,
       default: null,
     },
+    loadingErrorIllustrations: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   computed: {
     ...mapState('vulnerabilities', ['modal', 'pageInfo', 'loadingVulnerabilitiesErrorCode']),
@@ -144,6 +149,7 @@ export default {
     <loading-error
       v-if="loadingVulnerabilitiesFailedWithRecognizedErrorCode"
       :error-code="loadingVulnerabilitiesErrorCode"
+      :illustrations="loadingErrorIllustrations"
     />
     <template v-else>
       <header>

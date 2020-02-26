@@ -10,6 +10,7 @@ module EE
       WEIGHT_ALL = 'Everything'.freeze
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
+      ELASTICSEARCH_PERMISSION_TRACKED_FIELDS = %w(assignee_ids author_id confidential).freeze
 
       include Elastic::ApplicationVersionedSearch
       include UsageStatistics
@@ -42,9 +43,6 @@ module EE
 
       has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
       has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
-
-      has_many :blocked_by_issue_links, -> { where(link_type: IssueLink::TYPE_BLOCKS) }, class_name: 'IssueLink', foreign_key: :target_id
-      has_many :blocked_by_issues, through: :blocked_by_issue_links, source: :source
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
@@ -89,6 +87,24 @@ module EE
     # override
     def weight
       super if supports_weight?
+    end
+
+    # override
+    def maintain_elasticsearch_update
+      super
+
+      maintain_elasticsearch_issue_notes_update if elasticsearch_issue_notes_need_updating?
+    end
+
+    def maintain_elasticsearch_issue_notes_update
+      ::Note.searchable.where(noteable: self).find_each do |note|
+        note.maintain_elasticsearch_update
+      end
+    end
+
+    def elasticsearch_issue_notes_need_updating?
+      changed_fields = self.previous_changes.keys
+      changed_fields && (changed_fields & ELASTICSEARCH_PERMISSION_TRACKED_FIELDS).any?
     end
 
     def supports_weight?

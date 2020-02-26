@@ -275,12 +275,12 @@ module EE
     def to_reference(from = nil, full: false)
       reference = "#{self.class.reference_prefix}#{iid}"
 
-      return reference unless (cross_reference?(from) && !group.projects.include?(from)) || full
+      return reference unless (cross_referenced?(from) && !group.projects.include?(from)) || full
 
       "#{group.full_path}#{reference}"
     end
 
-    def cross_reference?(from)
+    def cross_referenced?(from)
       from && from != group
     end
 

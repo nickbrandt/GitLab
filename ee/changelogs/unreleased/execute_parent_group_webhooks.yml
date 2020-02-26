@@ -1,5 +1,0 @@
----
-title: Fix group hook triggering from subgroup project
-merge_request: 23333
-author:
-type: fixed

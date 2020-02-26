@@ -92,8 +92,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:license_management_enabled) do
-        @subject.feature_available?(:license_management)
+      condition(:license_scanning_enabled) do
+        @subject.feature_available?(:license_scanning) || @subject.feature_available?(:license_management)
       end
 
       with_scope :subject
@@ -187,6 +187,8 @@ module EE
 
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
+      rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
+
       rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
         enable :create_vulnerability
@@ -200,7 +202,7 @@ module EE
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
-      rule { license_management_enabled & can?(:download_code) }.enable :read_licenses
+      rule { license_scanning_enabled & can?(:download_code) }.enable :read_licenses
 
       rule { can?(:read_licenses) }.enable :read_software_license_policy
 
@@ -228,7 +230,7 @@ module EE
         enable :modify_merge_request_committer_setting
       end
 
-      rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
+      rule { license_scanning_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
 
       rule { pod_logs_enabled & can?(:maintainer_access) }.enable :read_pod_logs
       rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts

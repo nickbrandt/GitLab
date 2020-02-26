@@ -75,7 +75,7 @@ describe 'SAML provider settings' do
     end
 
     context 'with existing SAML provider' do
-      let!(:saml_provider) { create(:saml_provider, group: group) }
+      let!(:saml_provider) { create(:saml_provider, group: group, prohibited_outer_forks: false) }
 
       it 'allows provider to be disabled', :js do
         visit group_saml_providers_path(group)
@@ -119,11 +119,10 @@ describe 'SAML provider settings' do
       context 'enforced_group_managed_accounts enabled', :js do
         before do
           create(:group_saml_identity, saml_provider: saml_provider, user: user)
+          stub_feature_flags(group_managed_accounts: true)
         end
 
-        it 'updates the flag' do
-          stub_feature_flags(group_managed_accounts: true)
-
+        it 'updates the enforced_group_managed_accounts flag' do
           visit group_saml_providers_path(group)
 
           find('.js-group-saml-enforced-sso-toggle').click
@@ -131,15 +130,26 @@ describe 'SAML provider settings' do
 
           expect { submit }.to change { saml_provider.reload.enforced_group_managed_accounts }.to(true)
         end
+
+        it 'updates the prohibited_outer_forks flag' do
+          visit group_saml_providers_path(group)
+
+          find('.js-group-saml-enforced-sso-toggle').click
+          find('.js-group-saml-enforced-group-managed-accounts-toggle').click
+          find('.js-group-saml-prohibited-outer-forks-toggle').click
+
+          expect { submit }.to change { saml_provider.reload.prohibited_outer_forks }.to(true)
+        end
       end
 
       context 'enforced_group_managed_accounts disabled' do
-        it 'does not update the flag' do
+        it 'does not render toggles' do
           stub_feature_flags(group_managed_accounts: false)
 
           visit group_saml_providers_path(group)
 
           expect(page).not_to have_selector('.js-group-saml-enforced-group-managed-accounts-toggle')
+          expect(page).not_to have_selector('.js-group-saml-prohibited-outer-forks-toggle')
         end
       end
     end

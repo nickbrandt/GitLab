@@ -47,7 +47,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
       project1.wiki.create_page('index_page', ' term')
       project1.wiki.index_wiki_blobs
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
 
       result = described_class.new(user, 'term', project.id)
       expect(result.notes_count).to eq(1)
@@ -68,7 +68,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
         project.wiki.create_page('index_page', 'term')
         project.wiki.index_wiki_blobs
 
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         result = described_class.new(guest, 'term', project.id)
         expect(result.wiki_blobs_count).to eq(1)
@@ -153,7 +153,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     let!(:security_issue_2) { create(:issue, :confidential, title: 'Security issue 2', project: project, assignees: [assignee]) }
 
     before do
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'does not list project confidential issues for non project members' do

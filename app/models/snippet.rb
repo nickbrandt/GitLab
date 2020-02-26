@@ -17,8 +17,7 @@ class Snippet < ApplicationRecord
   include HasRepository
   extend ::Gitlab::Utils::Override
 
-  ignore_column :storage_version, remove_with: '12.9', remove_after: '2020-03-22'
-  ignore_column :repository_storage, remove_with: '12.10', remove_after: '2020-04-22'
+  ignore_column :repository_storage, remove_with: '12.10', remove_after: '2020-03-22'
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
@@ -198,7 +197,11 @@ class Snippet < ApplicationRecord
   end
 
   def blob
-    @blob ||= Blob.decorate(SnippetBlob.new(self), nil)
+    @blob ||= Blob.decorate(SnippetBlob.new(self), self)
+  end
+
+  def blobs
+    repository.ls_files(repository.root_ref).map { |file| Blob.lazy(self, repository.root_ref, file) }
   end
 
   def hook_attrs
@@ -209,7 +212,7 @@ class Snippet < ApplicationRecord
     super.to_s
   end
 
-  def sanitized_file_name
+  def self.sanitized_file_name(file_name)
     file_name.gsub(/[^a-zA-Z0-9_\-\.]+/, '')
   end
 

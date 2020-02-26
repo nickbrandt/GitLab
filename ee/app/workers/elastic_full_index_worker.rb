@@ -4,7 +4,7 @@
 # indexing the repository, wiki and its nested models
 # (e.g. )issues and notes etc.)
 # Intended for full site indexing.
-class ElasticFullIndexWorker
+class ElasticFullIndexWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   sidekiq_options retry: 2

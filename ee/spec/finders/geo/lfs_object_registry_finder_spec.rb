@@ -36,7 +36,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
   context 'counts all the things' do
     describe '#count_syncable' do
       before do
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -82,7 +84,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
         create(:geo_upload_registry, :avatar)
 
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -129,7 +133,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id)
 
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -146,7 +152,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
         end
 
         it 'counts LFS objects that has been synced' do
@@ -188,7 +196,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_5.id)
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
 
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
@@ -233,7 +243,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id, missing_on_primary: true)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_1.id, missing_on_primary: true)
 
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
@@ -451,7 +463,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_3.id)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
 
-        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+        allow_next_instance_of(LfsObjectsProject) do |instance|
+          allow(instance).to receive(:update_project_statistics).and_return(nil)
+        end
 
         create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
         create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -543,7 +557,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
           create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_remote_2)
@@ -565,7 +581,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
           create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_2)
@@ -612,7 +630,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_1)
           create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -631,7 +651,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_1)
           create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -664,7 +686,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
           create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
@@ -682,7 +706,9 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'shards', selective_sync_shards: ['broken']) }
 
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+          allow_next_instance_of(LfsObjectsProject) do |instance|
+            allow(instance).to receive(:update_project_statistics).and_return(nil)
+          end
 
           create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
           create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)

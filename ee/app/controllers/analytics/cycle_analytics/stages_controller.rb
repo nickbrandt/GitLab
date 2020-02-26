@@ -68,7 +68,7 @@ module Analytics
       end
 
       def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params)
+        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params, current_user: current_user)
       end
 
       def data_collector
@@ -120,11 +120,11 @@ module Analytics
       end
 
       def update_params
-        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id, :hidden)
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id, :hidden, :start_event_label_id, :end_event_label_id)
       end
 
       def create_params
-        params.permit(:name, :start_event_identifier, :end_event_identifier)
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :start_event_label_id, :end_event_label_id)
       end
 
       def delete_params

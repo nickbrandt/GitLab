@@ -1,5 +1,0 @@
----
-title: Display proper error messages on vulnerabilities fetch failure
-merge_request: 23812
-author:
-type: changed

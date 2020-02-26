@@ -40,6 +40,7 @@ module EE
               optional :max_seats_used, type: Integer, default: 0, desc: 'The max number of active users detected in the last month'
               optional :plan_code, type: String, desc: 'The code of the purchased plan'
               optional :end_date, type: Date, desc: 'The date when subscription expires'
+              optional :auto_renew, type: Grape::API::Boolean, desc: 'Whether the subscription auto renews'
               optional :trial, type: Grape::API::Boolean, desc: 'Whether the subscription is trial'
               optional :trial_ends_on, type: Date, desc: 'The date when the trial expires'
               optional :trial_starts_on, type: Date, desc: 'The date when the trial starts'

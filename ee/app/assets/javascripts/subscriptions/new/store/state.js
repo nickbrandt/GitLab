@@ -9,6 +9,13 @@ const parsePlanData = planData =>
     pricePerUserPerYear: plan.price_per_year,
   }));
 
+const parseGroupData = groupData =>
+  JSON.parse(groupData).map(group => ({
+    value: group.id,
+    text: group.name,
+    numberOfUsers: group.users,
+  }));
+
 const determineSelectedPlan = (planId, plans) => {
   if (planId && plans.find(plan => plan.value === planId)) {
     return planId;
@@ -16,18 +23,28 @@ const determineSelectedPlan = (planId, plans) => {
   return plans[0] && plans[0].value;
 };
 
-export default ({ planData = '[]', planId, setupForCompany, fullName, newUser }) => {
+export default ({
+  planData = '[]',
+  planId,
+  setupForCompany,
+  fullName,
+  newUser,
+  groupData = '[]',
+}) => {
   const availablePlans = parsePlanData(planData);
+  const isNewUser = parseBoolean(newUser);
 
   return {
     currentStep: STEPS[0],
-    isSetupForCompany: parseBoolean(setupForCompany),
+    isSetupForCompany: parseBoolean(setupForCompany) || !isNewUser,
     availablePlans,
     selectedPlan: determineSelectedPlan(planId, availablePlans),
-    newUser: parseBoolean(newUser),
+    isNewUser,
     fullName,
+    groupData: parseGroupData(groupData),
+    selectedGroup: null,
     organizationName: null,
-    numberOfUsers: parseBoolean(setupForCompany) ? 0 : 1,
+    numberOfUsers: 1,
     country: null,
     streetAddressLine1: null,
     streetAddressLine2: null,

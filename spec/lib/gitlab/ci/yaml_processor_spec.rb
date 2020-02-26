@@ -87,6 +87,29 @@ module Gitlab
           end
         end
 
+        describe 'tags entry with default values' do
+          it 'applies default values' do
+            config = YAML.dump({ default: { tags: %w[A B] },
+                                 rspec: { script: "rspec" } })
+
+            config_processor = Gitlab::Ci::YamlProcessor.new(config)
+
+            expect(config_processor.stage_builds_attributes("test").size).to eq(1)
+            expect(config_processor.stage_builds_attributes("test").first).to eq({
+              stage: "test",
+              stage_idx: 2,
+              name: "rspec",
+              only: { refs: %w[branches tags] },
+              options: { script: ["rspec"] },
+              scheduling_type: :stage,
+              tag_list: %w[A B],
+              allow_failure: false,
+              when: "on_success",
+              yaml_variables: []
+            })
+          end
+        end
+
         describe 'interruptible entry' do
           describe 'interruptible job' do
             let(:config) do
@@ -2396,7 +2419,9 @@ module Gitlab
 
           it 'returns errors and empty configuration' do
             expect(subject.valid?).to eq(false)
-            expect(subject.errors).to eq(['jobs:rspec config contains unknown keys: bad_tags', 'jobs:rspec rules should be an array of hashes'])
+            expect(subject.errors).to contain_exactly(
+              'jobs:rspec config contains unknown keys: bad_tags',
+              'jobs:rspec rules should be an array of hashes')
             expect(subject.content).to be_blank
           end
         end

@@ -9,6 +9,7 @@ issues:
 - notes
 - resource_label_events
 - resource_weight_events
+- resource_milestone_events
 - sentry_issue
 - label_links
 - labels
@@ -36,8 +37,6 @@ issues:
 - vulnerability_links
 - related_vulnerabilities
 - user_mentions
-- blocked_by_issue_links
-- blocked_by_issues
 events:
 - author
 - project
@@ -111,6 +110,7 @@ merge_requests:
 - milestone
 - notes
 - resource_label_events
+- resource_milestone_events
 - label_links
 - labels
 - last_edited_by
@@ -567,6 +567,8 @@ designs: *design
 actions:
 - design
 - version
+- uploads
+- file_uploads
 versions: &version
 - author
 - issue

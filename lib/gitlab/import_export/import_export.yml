@@ -173,7 +173,6 @@ excluded_attributes:
     - :secret
     - :encrypted_secret_token
     - :encrypted_secret_token_iv
-    - :repository_storage
   merge_request_diff:
     - :external_diff
     - :stored_externally
@@ -377,3 +376,6 @@ ee:
       - protected_environments:
         - :deploy_access_levels
       - :service_desk_setting
+  excluded_attributes:
+    actions:
+      - image_v432x230

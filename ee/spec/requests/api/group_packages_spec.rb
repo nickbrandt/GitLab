@@ -5,8 +5,8 @@ require 'spec_helper'
 describe API::GroupPackages do
   let(:group) { create(:group, :public) }
   let(:project) { create(:project, :public, namespace: group) }
-  let!(:package1) { create(:npm_package, project: project) }
-  let!(:package2) { create(:npm_package, project: project) }
+  let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
+  let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
   let(:user) { create(:user) }
 
   subject { get api(url) }
@@ -18,6 +18,42 @@ describe API::GroupPackages do
     context 'with packages feature enabled' do
       before do
         stub_licensed_features(packages: true)
+      end
+
+      context 'with sorting' do
+        let(:package3) { create(:maven_package, project: project, version: '1.1.1', name: 'zzz') }
+
+        before do
+          travel_to(1.day.ago) do
+            package3
+          end
+        end
+
+        context 'without sorting params' do
+          let(:packages) { [package3, package1, package2] }
+
+          it 'sorts by created_at asc' do
+            subject
+
+            expect(json_response.map { |package| package['id'] }).to eq(packages.map(&:id))
+          end
+        end
+
+        it_behaves_like 'package sorting', 'name' do
+          let(:packages) { [package1, package2, package3] }
+        end
+
+        it_behaves_like 'package sorting', 'created_at' do
+          let(:packages) { [package3, package1, package2] }
+        end
+
+        it_behaves_like 'package sorting', 'version' do
+          let(:packages) { [package3, package2, package1] }
+        end
+
+        it_behaves_like 'package sorting', 'type' do
+          let(:packages) { [package3, package1, package2] }
+        end
       end
 
       context 'with private group' do

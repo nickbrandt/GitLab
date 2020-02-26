@@ -9,6 +9,7 @@ describe PagesDomain do
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
+    it { is_expected.to have_many(:serverless_domain_clusters) }
   end
 
   describe 'validate domain' do
@@ -103,6 +104,14 @@ describe PagesDomain do
 
   describe 'validate certificate' do
     subject { domain }
+
+    context 'serverless domain' do
+      it 'requires certificate and key to be present' do
+        expect(build(:pages_domain, :without_certificate, :without_key, usage: :serverless)).not_to be_valid
+        expect(build(:pages_domain, :without_certificate, usage: :serverless)).not_to be_valid
+        expect(build(:pages_domain, :without_key, usage: :serverless)).not_to be_valid
+      end
+    end
 
     context 'with matching key' do
       let(:domain) { build(:pages_domain) }
@@ -555,6 +564,28 @@ describe PagesDomain do
     end
   end
 
+  describe '.instance_serverless' do
+    subject { described_class.instance_serverless }
+
+    before do
+      create(:pages_domain, wildcard: true)
+      create(:pages_domain, :instance_serverless)
+      create(:pages_domain, scope: :instance)
+      create(:pages_domain, :instance_serverless)
+      create(:pages_domain, usage: :serverless)
+    end
+
+    it 'returns domains that are wildcard, instance-level, and serverless' do
+      expect(subject.length).to eq(2)
+
+      subject.each do |domain|
+        expect(domain.wildcard).to eq(true)
+        expect(domain.usage).to eq('serverless')
+        expect(domain.scope).to eq('instance')
+      end
+    end
+  end
+
   describe '.need_auto_ssl_renewal' do
     subject { described_class.need_auto_ssl_renewal }
 
@@ -610,6 +641,14 @@ describe PagesDomain do
           project.reload.pages_metadatum&.deployed
         }.from(nil).to(true)
       end
+    end
+  end
+
+  describe '.find_by_domain_case_insensitive' do
+    it 'lookup is case-insensitive' do
+      pages_domain = create(:pages_domain, domain: "Pages.IO")
+
+      expect(PagesDomain.find_by_domain_case_insensitive('pages.io')).to eq(pages_domain)
     end
   end
 end

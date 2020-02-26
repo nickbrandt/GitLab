@@ -6,10 +6,11 @@ import {
   transformedDurationMedianData,
   durationChartPlottableData,
   durationChartPlottableMedianData,
+  allowedStages,
+  selectedProjects,
 } from '../mock_data';
 
 let state = null;
-const selectedProjectIds = [5, 8, 11];
 
 describe('Cycle analytics getters', () => {
   describe('hasNoAccessError', () => {
@@ -60,7 +61,7 @@ describe('Cycle analytics getters', () => {
         },
         startDate,
         endDate,
-        selectedProjectIds,
+        selectedProjects,
       };
     });
 
@@ -68,9 +69,13 @@ describe('Cycle analytics getters', () => {
       param               | value
       ${'created_after'}  | ${'2018-12-15'}
       ${'created_before'} | ${'2019-01-14'}
-      ${'project_ids'}    | ${[5, 8, 11]}
+      ${'project_ids'}    | ${[1, 2]}
     `('should return the $param with value $value', ({ param, value }) => {
-      expect(getters.cycleAnalyticsRequestParams(state)).toMatchObject({ [param]: value });
+      expect(
+        getters.cycleAnalyticsRequestParams(state, { selectedProjectIds: [1, 2] }),
+      ).toMatchObject({
+        [param]: value,
+      });
     });
   });
 
@@ -119,6 +124,22 @@ describe('Cycle analytics getters', () => {
       };
 
       expect(getters.durationChartMedianData(stateWithDurationMedianData)).toEqual([]);
+    });
+  });
+
+  const hiddenStage = { ...allowedStages[2], hidden: true };
+  const givenStages = [allowedStages[0], allowedStages[1], hiddenStage];
+  describe.each`
+    func              | givenStages    | expectedStages
+    ${'hiddenStages'} | ${givenStages} | ${[hiddenStage]}
+    ${'activeStages'} | ${givenStages} | ${[allowedStages[0], allowedStages[1]]}
+  `('hiddenStages', ({ func, expectedStages, givenStages: stages }) => {
+    it(`'${func}' returns ${expectedStages.length} stages`, () => {
+      expect(getters[func]({ stages })).toEqual(expectedStages);
+    });
+
+    it(`'${func}' returns an empty array if there are no stages`, () => {
+      expect(getters[func]({ stages: [] })).toEqual([]);
     });
   });
 });

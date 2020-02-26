@@ -51,7 +51,7 @@ describe API::Geo do
 
         get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       it 'responds with 200 when IP is allowed' do
@@ -59,7 +59,7 @@ describe API::Geo do
 
         get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -70,13 +70,15 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
         get api("/geo/transfers/attachment/#{upload.id}"), headers: { Authorization: 'Test' }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       context 'attachment file exists' do
@@ -85,7 +87,7 @@ describe API::Geo do
         it 'responds with 200 with X-Sendfile' do
           request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers['Content-Type']).to eq('application/octet-stream')
           expect(response.headers['X-Sendfile']).to eq(note.attachment.path)
         end
@@ -97,7 +99,7 @@ describe API::Geo do
         it 'responds with 404' do
           get api("/geo/transfers/attachment/100000"), headers: not_found_req_header
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -109,13 +111,15 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
         get api("/geo/transfers/avatar/#{upload.id}"), headers: { Authorization: 'Test' }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       context 'avatar file exists' do
@@ -124,7 +128,7 @@ describe API::Geo do
         it 'responds with 200 with X-Sendfile' do
           request
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers['Content-Type']).to eq('application/octet-stream')
           expect(response.headers['X-Sendfile']).to eq(user.avatar.path)
         end
@@ -136,7 +140,7 @@ describe API::Geo do
         it 'responds with 404' do
           get api("/geo/transfers/avatar/100000"), headers: not_found_req_header
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -146,7 +150,7 @@ describe API::Geo do
 
           get api("/geo/transfers/avatar/#{upload.id}"), headers: req_header
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response.headers['Content-Type']).to eq('application/octet-stream')
           expect(response.headers['X-Sendfile']).to eq(user.avatar.path)
         end
@@ -160,14 +164,16 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
         FileUploader.new(project).store!(fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
       end
 
       it 'responds with 401 with invalid auth header' do
         get api("/geo/transfers/file/#{upload.id}"), headers: { Authorization: 'Test' }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       context 'when the Upload record exists' do
@@ -177,7 +183,7 @@ describe API::Geo do
           it 'responds with 200 with X-Sendfile' do
             request
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response.headers['Content-Type']).to eq('application/octet-stream')
             expect(response.headers['X-Sendfile']).to end_with('dk.png')
           end
@@ -191,7 +197,7 @@ describe API::Geo do
 
             get api("/geo/transfers/file/#{upload.id}"), headers: req_header
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
@@ -201,7 +207,7 @@ describe API::Geo do
         it 'responds with 404' do
           get api("/geo/transfers/file/100000"), headers: not_found_req_header
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -212,13 +218,15 @@ describe API::Geo do
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
-        allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
+        allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
+          allow(instance).to receive(:requesting_node).and_return(secondary_node)
+        end
       end
 
       it 'responds with 401 with invalid auth header' do
         get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: { Authorization: 'Test' }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       context 'LFS object exists' do
@@ -228,7 +236,7 @@ describe API::Geo do
           it 'responds with 200 with X-Sendfile' do
             request
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response.headers['Content-Type']).to eq('application/octet-stream')
             expect(response.headers['X-Sendfile']).to eq(lfs_object.file.path)
           end
@@ -242,7 +250,7 @@ describe API::Geo do
 
             get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: req_header
 
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
             expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
@@ -252,7 +260,7 @@ describe API::Geo do
         it 'responds with 404' do
           get api("/geo/transfers/lfs/100000"), headers: not_found_req_header
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -307,15 +315,17 @@ describe API::Geo do
     it 'responds with 401 with invalid auth header' do
       post api('/geo/status'), headers: { Authorization: 'Test' }
 
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
 
     it 'responds with 401 when the db_key_base is wrong' do
-      allow_any_instance_of(Gitlab::Geo::JwtRequestDecoder).to receive(:decode).and_raise(Gitlab::Geo::InvalidDecryptionKeyError)
+      allow_next_instance_of(Gitlab::Geo::JwtRequestDecoder) do |instance|
+        allow(instance).to receive(:decode).and_raise(Gitlab::Geo::InvalidDecryptionKeyError)
+      end
 
       request
 
-      expect(response).to have_gitlab_http_status(401)
+      expect(response).to have_gitlab_http_status(:unauthorized)
     end
 
     describe 'allowed IPs' do
@@ -324,7 +334,7 @@ describe API::Geo do
 
         request
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
       it 'responds with 201 when IP is allowed' do
@@ -332,7 +342,7 @@ describe API::Geo do
 
         request
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
     end
 
@@ -345,7 +355,7 @@ describe API::Geo do
       it 'updates the status and responds with 201' do
         expect { request }.to change { GeoNodeStatus.count }.by(1)
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(secondary_node.reload.status.projects_count).to eq(10)
       end
 
@@ -360,7 +370,7 @@ describe API::Geo do
 
         post api('/geo/status'), params: data, headers: geo_base_request.headers
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
       end
 
       it_behaves_like 'with terms enforced'
@@ -381,7 +391,7 @@ describe API::Geo do
         it 'responds with 400' do
           post api('/geo/proxy_git_push_ssh/info_refs'), params: nil
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing')
         end
       end
@@ -397,7 +407,7 @@ describe API::Geo do
           it 'responds with 401' do
             post(api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: 'invalid', data: data })
 
-            expect(response).to have_gitlab_http_status(401)
+            expect(response).to have_gitlab_http_status(:unauthorized)
             expect(json_response['error']).to be_nil
           end
         end
@@ -408,7 +418,7 @@ describe API::Geo do
 
             post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
 
-            expect(response).to have_gitlab_http_status(500)
+            expect(response).to have_gitlab_http_status(:internal_server_error)
             expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
             expect(json_response['result']).to be_nil
           end
@@ -429,7 +439,7 @@ describe API::Geo do
 
             post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(Base64.decode64(json_response['result'])).to eql('something here')
           end
         end
@@ -441,7 +451,7 @@ describe API::Geo do
         it 'responds with 400' do
           post api('/geo/proxy_git_push_ssh/push'), params: nil
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing, output is missing')
         end
       end
@@ -458,7 +468,7 @@ describe API::Geo do
           it 'responds with 401' do
             post(api('/geo/proxy_git_push_ssh/push'), params: { secret_token: 'invalid', data: data, output: output })
 
-            expect(response).to have_gitlab_http_status(401)
+            expect(response).to have_gitlab_http_status(:unauthorized)
             expect(json_response['error']).to be_nil
           end
         end
@@ -468,7 +478,7 @@ describe API::Geo do
             expect(git_push_ssh_proxy).to receive(:push).and_raise('deliberate exception raised')
             post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
 
-            expect(response).to have_gitlab_http_status(500)
+            expect(response).to have_gitlab_http_status(:internal_server_error)
             expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
             expect(json_response['result']).to be_nil
           end
@@ -489,7 +499,7 @@ describe API::Geo do
 
             post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
 
-            expect(response).to have_gitlab_http_status(201)
+            expect(response).to have_gitlab_http_status(:created)
             expect(Base64.decode64(json_response['result'])).to eql('something here')
           end
         end

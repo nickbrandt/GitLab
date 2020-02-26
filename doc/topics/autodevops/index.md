@@ -109,6 +109,7 @@ To make full use of Auto DevOps, you will need:
 
   1. A [Kubernetes 1.12+ cluster](../../user/project/clusters/index.md) for the project. The easiest
      way is to add a [new cluster using the GitLab UI](../../user/project/clusters/add_remove_clusters.md#add-new-cluster).
+     For Kubernetes 1.16+ clusters, there is some additional configuration for [Auto Deploy for Kubernetes 1.16+](#kubernetes-116).
   1. NGINX Ingress. You can deploy it to your Kubernetes cluster by installing
      the [GitLab-managed app for Ingress](../../user/clusters/applications.md#ingress),
      once you have configured GitLab's Kubernetes integration in the previous step.
@@ -635,6 +636,30 @@ be pulled again, e.g. after pod eviction, Kubernetes will fail to do so
 as it will be attempting to fetch the image using
 `CI_REGISTRY_PASSWORD`.
 
+#### Kubernetes 1.16+
+
+> [Introduced](https://gitlab.com/gitlab-org/charts/auto-deploy-app/-/merge_requests/51) in GitLab 12.8.
+
+CAUTION: **Deprecation**
+The default value of `extensions/v1beta1` for the `deploymentApiVersion` setting is
+deprecated, and is scheduled to be changed to a new default of `apps/v1` in
+[GitLab 13.0](https://gitlab.com/gitlab-org/charts/auto-deploy-app/issues/47).
+
+In Kubernetes 1.16 onwards, a number of [APIs were removed](https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/),
+including support for `Deployment` in the `extensions/v1beta1` version.
+
+To use Auto Deploy on a Kubernetes 1.16+ cluster, you must:
+
+1. Set the following in the [`.gitlab/auto-deploy-values.yaml` file](#customize-values-for-helm-chart):
+
+   ```yml
+   deploymentApiVersion: apps/v1
+   ```
+
+1. Set the `POSTGRES_ENABLED` variable to `false`. This will disable Auto Deploy's deployment of PostgreSQL.
+Support for enabling Auto Deploy's deployment of PostgreSQL in a Kubernetes 1.16+ cluster
+is [planned](https://gitlab.com/gitlab-org/charts/auto-deploy-app/issues/28).
+
 #### Migrations
 
 > [Introduced][ce-21955] in GitLab 11.4
@@ -717,15 +742,15 @@ workers:
 > [Introduced](https://gitlab.com/gitlab-org/charts/auto-deploy-app/-/merge_requests/30) in GitLab 12.7.
 
 By default, all Kubernetes pods are
-[non-isolated](https://kubernetes.io/docs/concepts/services-networking/network-policies/#isolated-and-non-isolated-pods)
+[non-isolated](https://kubernetes.io/docs/concepts/services-networking/network-policies/#isolated-and-non-isolated-pods),
 and accept traffic from any source. You can use
 [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 to restrict connections to selected pods or namespaces.
 
 NOTE: **Note:**
 You must use a Kubernetes network plugin that implements support for
-`NetworkPolicy`, the default network plugin for Kubernetes (`kubenet`)
-[doesn't implement](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/#kubenet)
+`NetworkPolicy`. The default network plugin for Kubernetes (`kubenet`)
+[does not implement](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/#kubenet)
 support for it. The [Cilium](https://cilium.io/) network plugin can be
 installed as a [cluster application](../../user/clusters/applications.md#install-cilium-using-gitlab-ci)
 to enable support for network policies.
@@ -733,20 +758,20 @@ to enable support for network policies.
 You can enable deployment of a network policy by setting the following
 in the `.gitlab/auto-deploy-values.yaml` file:
 
-```yml
+```yaml
 networkPolicy:
   enabled: true
 ```
 
 The default policy deployed by the auto deploy pipeline will allow
 traffic within a local namespace and from the `gitlab-managed-apps`
-namespace, all other inbound connection will be blocked. Outbound
+namespace. All other inbound connection will be blocked. Outbound
 traffic is not affected by the default policy.
 
 You can also provide a custom [policy specification](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#networkpolicyspec-v1-networking-k8s-io)
 via the `.gitlab/auto-deploy-values.yaml` file, for example:
 
-```yml
+```yaml
 networkPolicy:
   enabled: true
   spec:
@@ -893,12 +918,12 @@ instead of the default `ruby:latest`:
 1. Set `AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS` to `--build-arg=RUBY_VERSION=alpine`.
 1. Add the following to a custom `Dockerfile`:
 
-    ```docker
-    ARG RUBY_VERSION=latest
-    FROM ruby:$RUBY_VERSION
+   ```dockerfile
+   ARG RUBY_VERSION=latest
+   FROM ruby:$RUBY_VERSION
 
-    # ... put your stuff here
-    ```
+   # ... put your stuff here
+   ```
 
 NOTE: **Note:**
 Passing in complex values (newlines and spaces, for example) will likely
@@ -930,14 +955,14 @@ In projects:
   1. Activate the experimental `Dockerfile` syntax by adding the following
      to the top of the file:
 
-     ```docker
+     ```dockerfile
      # syntax = docker/dockerfile:experimental
      ```
 
   1. To make secrets available in any `RUN $COMMAND` in the `Dockerfile`, mount
      the secret file and source it prior to running `$COMMAND`:
 
-     ```docker
+     ```dockerfile
      RUN --mount=type=secret,id=auto-devops-build-secrets . /run/secrets/auto-devops-build-secrets && $COMMAND
      ```
 

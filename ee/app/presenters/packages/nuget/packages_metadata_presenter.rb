@@ -6,8 +6,6 @@ module Packages
       include API::Helpers::Packages::Nuget::MetadataPresenterHelpers
       include Gitlab::Utils::StrongMemoize
 
-      attr_reader :packages
-
       COUNT = 1.freeze
 
       def initialize(packages)
@@ -56,7 +54,7 @@ module Packages
 
       def sorted_versions
         strong_memoize(:sorted_versions) do
-          versions = packages.map(&:version).compact
+          versions = @packages.map(&:version).compact
           VersionSorter.sort(versions)
         end
       end

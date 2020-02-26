@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 
 import Cookies from 'js-cookie';
 import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { convertObjectPropsToCamelCase, parseBoolean } from '~/lib/utils/common_utils';
 
 import createStore from './store';
 import EpicApp from './components/epic_app.vue';
@@ -54,7 +54,10 @@ export default (epicCreate = false) => {
     store,
     components: { EpicApp },
     created() {
-      this.setEpicMeta(epicMeta);
+      this.setEpicMeta({
+        ...epicMeta,
+        allowSubEpics: parseBoolean(el.dataset.allowSubEpics),
+      });
       this.setEpicData(epicData);
     },
     methods: {

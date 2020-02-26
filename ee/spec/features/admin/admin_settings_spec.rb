@@ -9,6 +9,7 @@ describe 'Admin updates EE-only settings' do
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     sign_in(create(:admin))
     allow(License).to receive(:feature_available?).and_return(true)
+    allow(Gitlab::Elastic::Helper).to receive(:index_exists?).and_return(true)
   end
 
   context 'Geo settings' do
@@ -222,6 +223,21 @@ describe 'Admin updates EE-only settings' do
       it 'Does not show option to allow group owners to manage ldap' do
         expect(page).not_to have_css('#application_setting_allow_group_owners_to_manage_ldap')
       end
+    end
+  end
+
+  context 'package registry settings' do
+    before do
+      visit ci_cd_admin_application_settings_path
+    end
+
+    it 'allows you to change the npm_forwaring setting' do
+      page.within('#js-package-settings') do
+        check 'Enable forwarding of NPM package requests to npmjs.org'
+        click_button 'Save'
+      end
+
+      expect(current_settings.npm_package_requests_forwarding).to be true
     end
   end
 

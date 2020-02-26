@@ -133,6 +133,7 @@ Releases::Link:
 - id
 - url
 - name
+- filepath
 - created_at
 - updated_at
 ProjectMember:
@@ -270,6 +271,7 @@ MergeRequest::Metrics:
 - diff_size
 - modified_paths_size
 - commits_count
+- first_approved_at
 Ci::Pipeline:
 - id
 - project_id
@@ -769,7 +771,9 @@ DesignManagement::Design:
 - project_id
 - filename
 DesignManagement::Action:
+- id
 - event
+- image_v432x230
 DesignManagement::Version:
 - id
 - created_at

@@ -65,7 +65,7 @@ describe Issue, :elastic do
       # The issue I have no access to except as an administrator
       create :issue, title: 'bla-bla term3', project: create(:project, :private)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }
@@ -85,7 +85,7 @@ describe Issue, :elastic do
       # MergeRequest with the same iid should not be found in Issue search
       create :merge_request, title: 'bla-bla', source_project: project, iid: issue.iid
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     # User needs to be admin or the MergeRequest would just be filtered by

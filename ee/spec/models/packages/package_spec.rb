@@ -134,6 +134,16 @@ RSpec.describe Packages::Package, type: :model do
         is_expected.to match_array([package2, package3])
       end
     end
+
+    describe '.without_version_like' do
+      let(:version_pattern) { '%.0.0%' }
+
+      subject { described_class.without_version_like(version_pattern) }
+
+      it 'includes packages without the version pattern' do
+        is_expected.to match_array([package2, package3])
+      end
+    end
   end
 
   context 'conan scopes' do
@@ -160,6 +170,17 @@ RSpec.describe Packages::Package, type: :model do
     end
   end
 
+  describe '.without_nuget_temporary_name' do
+    let!(:package1) { create(:nuget_package) }
+    let!(:package2) { create(:nuget_package, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+    subject { described_class.without_nuget_temporary_name }
+
+    it 'does not include nuget temporary packages' do
+      expect(subject).to eq([package1])
+    end
+  end
+
   describe '.processed' do
     let!(:package1) { create(:nuget_package) }
     let!(:package2) { create(:npm_package) }
@@ -167,12 +188,12 @@ RSpec.describe Packages::Package, type: :model do
 
     subject { described_class.processed }
 
-    it { is_expected.to eq([package1, package2, package3]) }
+    it { is_expected.to match_array([package1, package2, package3]) }
 
     context 'with temporary packages' do
       let!(:package1) { create(:nuget_package, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
 
-      it { is_expected.to eq([package2, package3]) }
+      it { is_expected.to match_array([package2, package3]) }
     end
   end
 
@@ -187,48 +208,73 @@ RSpec.describe Packages::Package, type: :model do
   end
 
   context 'with several packages' do
-    let_it_be(:package1) { create(:nuget_package, name: 'FooBarish') }
-    let_it_be(:package2) { create(:npm_package) }
+    let_it_be(:package1) { create(:nuget_package, name: 'FooBar') }
+    let_it_be(:package2) { create(:nuget_package, name: 'foobar') }
     let_it_be(:package3) { create(:npm_package) }
+    let_it_be(:package4) { create(:npm_package) }
 
     describe '.pluck_names' do
-      subject { described_class.pluck_names.sort }
+      subject { described_class.pluck_names }
 
-      it { is_expected.to match_array([package1, package2, package3].map(&:name).sort) }
+      it { is_expected.to match_array([package1, package2, package3, package4].map(&:name)) }
     end
 
     describe '.pluck_versions' do
-      subject { described_class.pluck_versions.sort }
+      subject { described_class.pluck_versions }
 
-      it { is_expected.to match_array([package1, package2, package3].map(&:version).sort) }
+      it { is_expected.to match_array([package1, package2, package3, package4].map(&:version)) }
     end
 
     describe '.with_name_like' do
-      subject { described_class.with_name_like(package_name) }
+      subject { described_class.with_name_like(name_term) }
 
       context 'with downcase name' do
-        let(:package_name) { 'foobarish' }
+        let(:name_term) { 'foobar' }
 
-        it { is_expected.to match_array([package1]) }
+        it { is_expected.to match_array([package1, package2]) }
       end
 
       context 'with prefix wildcard' do
-        let(:package_name) { '%arish' }
+        let(:name_term) { '%ar' }
 
-        it { is_expected.to match_array([package1]) }
+        it { is_expected.to match_array([package1, package2]) }
       end
 
       context 'with suffix wildcard' do
-        let(:package_name) { 'foo%' }
+        let(:name_term) { 'foo%' }
 
-        it { is_expected.to match_array([package1]) }
+        it { is_expected.to match_array([package1, package2]) }
       end
 
       context 'with surrounding wildcards' do
-        let(:package_name) { '%ooba%' }
+        let(:name_term) { '%ooba%' }
 
-        it { is_expected.to match_array([package1]) }
+        it { is_expected.to match_array([package1, package2]) }
       end
+    end
+
+    describe '.search_by_name' do
+      let(:query) { 'oba' }
+
+      subject { described_class.search_by_name(query) }
+
+      it { is_expected.to match_array([package1, package2]) }
+    end
+  end
+
+  describe '.select_distinct_name' do
+    let_it_be(:nuget_package) { create(:nuget_package) }
+    let_it_be(:nuget_packages) { create_list(:nuget_package, 3, name: nuget_package.name, project: nuget_package.project) }
+    let_it_be(:maven_package) { create(:maven_package) }
+    let_it_be(:maven_packages) { create_list(:maven_package, 3, name: maven_package.name, project: maven_package.project) }
+
+    subject { described_class.select_distinct_name }
+
+    it 'returns only distinct names' do
+      packages = subject
+
+      expect(packages.size).to eq(2)
+      expect(packages.pluck(:name)).to match_array([nuget_package.name, maven_package.name])
     end
   end
 end

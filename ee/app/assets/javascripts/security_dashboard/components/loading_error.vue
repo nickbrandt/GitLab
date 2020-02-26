@@ -2,7 +2,6 @@
 import { GlEmptyState } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import { LOADING_VULNERABILITIES_ERROR_CODES as ERROR_CODES } from '../store/modules/vulnerabilities/constants';
-import { imagePath } from '~/lib/utils/common_utils';
 
 const description = s__(
   'Security Reports|Security reports can only be accessed by authorized users.',
@@ -15,12 +14,10 @@ export default {
       description,
       primaryButtonText: __('Sign in'),
       primaryButtonLink: '/users/sign_in',
-      svgPath: imagePath('illustrations/user-not-logged-in.svg'),
     },
     [ERROR_CODES.FORBIDDEN]: {
       title: s__('Security Reports|You do not have sufficient permissions to access this report'),
       description,
-      svgPath: imagePath('illustrations/lock_promotion.svg'),
     },
   },
   components: {
@@ -32,10 +29,17 @@ export default {
       required: true,
       validator: value => Object.values(ERROR_CODES).includes(value),
     },
+    illustrations: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
 };
 </script>
 
 <template>
-  <gl-empty-state v-bind="$options.emptyStatePropsMap[errorCode]" />
+  <gl-empty-state
+    v-bind="{ ...$options.emptyStatePropsMap[errorCode], svgPath: illustrations[errorCode] }"
+  />
 </template>

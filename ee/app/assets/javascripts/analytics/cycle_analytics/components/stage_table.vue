@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import StageNavItem from './stage_nav_item.vue';
@@ -63,6 +64,11 @@ export default {
       type: Array,
       required: true,
     },
+    customStageFormErrors: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
     labels: {
       type: Array,
       required: true,
@@ -80,7 +86,16 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      stageNavHeight: 0,
+    };
+  },
   computed: {
+    ...mapState(['customStageFormInitialData']),
+    stageEventsHeight() {
+      return `${this.stageNavHeight}px`;
+    },
     stageName() {
       return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
@@ -119,27 +134,9 @@ export default {
         },
       ];
     },
-    customStageInitialData() {
-      if (this.isEditingCustomStage) {
-        const {
-          id = null,
-          name = null,
-          startEventIdentifier = null,
-          startEventLabel: { id: startEventLabelId = null } = {},
-          endEventIdentifier = null,
-          endEventLabel: { id: endEventLabelId = null } = {},
-        } = this.currentStage;
-        return {
-          id,
-          name,
-          startEventIdentifier,
-          startEventLabelId,
-          endEventIdentifier,
-          endEventLabelId,
-        };
-      }
-      return {};
-    },
+  },
+  mounted() {
+    this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
   },
   methods: {
     medianValue(id) {
@@ -167,7 +164,7 @@ export default {
         </nav>
       </div>
       <div class="stage-panel-body">
-        <nav class="stage-nav">
+        <nav ref="stageNav" class="stage-nav">
           <ul>
             <stage-nav-item
               v-for="stage in stages"
@@ -189,18 +186,20 @@ export default {
             />
           </ul>
         </nav>
-        <div class="section stage-events">
+        <div class="section stage-events" :style="{ height: stageEventsHeight }">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <custom-stage-form
             v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
-            :initial-fields="customStageInitialData"
+            :initial-fields="customStageFormInitialData"
             :is-editing-custom-stage="isEditingCustomStage"
+            :errors="customStageFormErrors"
             @submit="$emit('submit', $event)"
             @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
             @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
+            @clearErrors="$emit('clearCustomStageFormErrors')"
           />
           <template v-else>
             <stage-event-list

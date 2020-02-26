@@ -2,6 +2,7 @@ import createFlash from '~/flash';
 import { extractCurrentDiscussion, extractDesign } from './design_management_utils';
 import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
+  UPDATE_IMAGE_DIFF_NOTE_ERROR,
   ADD_DISCUSSION_COMMENT_ERROR,
   UPLOAD_DESIGN_ERROR,
   designDeletionError,
@@ -148,6 +149,43 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
   });
 };
 
+const updateImageDiffNoteInStore = (store, updateImageDiffNote, query, variables) => {
+  const data = store.readQuery({
+    query,
+    variables,
+  });
+
+  const design = extractDesign(data);
+  const discussion = extractCurrentDiscussion(
+    design.discussions,
+    updateImageDiffNote.note.discussion.id,
+  );
+
+  discussion.node = {
+    ...discussion.node,
+    notes: {
+      ...discussion.node.notes,
+      edges: [
+        // the first note is original discussion, and includes the pin `position`
+        {
+          __typename: 'NoteEdge',
+          node: updateImageDiffNote.note,
+        },
+        ...discussion.node.notes.edges.slice(1),
+      ],
+    },
+  };
+
+  store.writeQuery({
+    query,
+    variables,
+    data: {
+      ...data,
+      design,
+    },
+  });
+};
+
 const addNewDesignToStore = (store, designManagementUpload, query) => {
   const data = store.readQuery(query);
 
@@ -241,6 +279,14 @@ export const updateStoreAfterAddImageDiffNote = (store, data, query, queryVariab
     onError(data, ADD_IMAGE_DIFF_NOTE_ERROR);
   } else {
     addImageDiffNoteToStore(store, data, query, queryVariables);
+  }
+};
+
+export const updateStoreAfterUpdateImageDiffNote = (store, data, query, queryVariables) => {
+  if (hasErrors(data)) {
+    onError(data, UPDATE_IMAGE_DIFF_NOTE_ERROR);
+  } else {
+    updateImageDiffNoteInStore(store, data, query, queryVariables);
   }
 };
 

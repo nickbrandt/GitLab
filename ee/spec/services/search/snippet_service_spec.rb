@@ -59,7 +59,7 @@ describe Search::SnippetService do
         with_them do
           it "respects visibility" do
             update_feature_access_level(project, feature_access_level)
-            Gitlab::Elastic::Helper.refresh_index
+            ensure_elasticsearch_index!
 
             expected_objects = expected_count == 0 ? [] : [snippet]
 
@@ -90,7 +90,7 @@ describe Search::SnippetService do
 
         with_them do
           it "respects visibility" do
-            Gitlab::Elastic::Helper.refresh_index
+            ensure_elasticsearch_index!
             expected_objects = expected_count == 0 ? [] : [snippet]
 
             expect_search_results(user, 'snippet_titles', expected_objects: expected_objects) do |user|

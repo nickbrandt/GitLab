@@ -66,6 +66,7 @@ class License < ApplicationRecord
     design_management
     disable_name_update_for_users
     email_additional_text
+    epics
     extended_audit_events
     external_authorization_service_api_management
     feature_flags
@@ -111,13 +112,13 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
-    epics
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management
     insights
     issuable_health_status
     license_management
+    license_scanning
     personal_access_token_expiration_policy
     pod_logs
     prometheus_alerts

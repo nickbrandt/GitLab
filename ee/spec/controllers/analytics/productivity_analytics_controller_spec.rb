@@ -74,7 +74,9 @@ describe Analytics::ProductivityAnalyticsController do
 
     before do
       merge_requests = double
-      allow_any_instance_of(ProductivityAnalyticsFinder).to receive(:execute).and_return(merge_requests)
+      allow_next_instance_of(ProductivityAnalyticsFinder) do |instance|
+        allow(instance).to receive(:execute).and_return(merge_requests)
+      end
       allow(ProductivityAnalytics)
         .to receive(:new)
               .with(merge_requests: merge_requests, sort: params[:sort])

@@ -32,10 +32,6 @@ module EE
           ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods, legacy_deployments: legacy_deployments)
         end
 
-        def elastic_stack_available?
-          !!cluster.application_elastic_stack&.installed?
-        end
-
         private
 
         def read_deployments(namespace)

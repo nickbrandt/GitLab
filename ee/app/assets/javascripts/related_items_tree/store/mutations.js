@@ -12,6 +12,7 @@ export default {
       autoCompleteIssues,
       projectsEndpoint,
       userSignedIn,
+      allowSubEpics,
     },
   ) {
     state.epicsEndpoint = epicsEndpoint;
@@ -20,6 +21,7 @@ export default {
     state.autoCompleteIssues = autoCompleteIssues;
     state.projectsEndpoint = projectsEndpoint;
     state.userSignedIn = userSignedIn;
+    state.allowSubEpics = allowSubEpics;
   },
 
   [types.SET_INITIAL_PARENT_ITEM](state, data) {

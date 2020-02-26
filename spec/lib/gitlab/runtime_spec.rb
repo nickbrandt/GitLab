@@ -50,7 +50,7 @@ describe Gitlab::Runtime do
       allow(puma_type).to receive_message_chain(:cli_config, :options).and_return(max_threads: 2)
     end
 
-    it_behaves_like "valid runtime", :puma, 2
+    it_behaves_like "valid runtime", :puma, 3
   end
 
   context "unicorn" do
@@ -71,7 +71,7 @@ describe Gitlab::Runtime do
       allow(sidekiq_type).to receive(:options).and_return(concurrency: 2)
     end
 
-    it_behaves_like "valid runtime", :sidekiq, 2
+    it_behaves_like "valid runtime", :sidekiq, 4
   end
 
   context "console" do
@@ -96,5 +96,13 @@ describe Gitlab::Runtime do
     end
 
     it_behaves_like "valid runtime", :geo_log_cursor, 1
+  end
+
+  context "rails runner" do
+    before do
+      stub_const('::Rails::Command::RunnerCommand', double('::Rails::Command::RunnerCommand'))
+    end
+
+    it_behaves_like "valid runtime", :rails_runner, 1
   end
 end

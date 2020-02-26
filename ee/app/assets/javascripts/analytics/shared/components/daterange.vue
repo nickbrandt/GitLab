@@ -74,8 +74,8 @@ export default {
       :default-min-date="minDate"
       :max-date-range="maxDateRange"
       theme="animate-picker"
-      start-picker-class="d-flex flex-column flex-lg-row align-items-lg-center mr-lg-2 mb-2 mb-md-0"
-      end-picker-class="d-flex flex-column flex-lg-row align-items-lg-center"
+      start-picker-class="js-daterange-picker-from d-flex flex-column flex-lg-row align-items-lg-center mr-lg-2 mb-2 mb-md-0"
+      end-picker-class="js-daterange-picker-to d-flex flex-column flex-lg-row align-items-lg-center"
     />
     <div
       v-if="maxDateRange"

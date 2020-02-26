@@ -203,31 +203,50 @@ describe('EpicSidebarComponent', () => {
       expect(vm.$el.querySelector('.js-labels-block')).not.toBeNull();
     });
 
-    it('renders ancestors list', done => {
-      store.dispatch('toggleSidebarFlag', false);
+    describe('when sub-epics feature is available', () => {
+      it('renders ancestors list', done => {
+        store.dispatch('toggleSidebarFlag', false);
+        store.dispatch('setEpicMeta', {
+          ...mockEpicMeta,
+          allowSubEpics: false,
+        });
 
-      vm.$nextTick()
-        .then(() => {
-          const ancestorsEl = vm.$el.querySelector('.block.ancestors');
+        vm.$nextTick()
+          .then(() => {
+            expect(vm.$el.querySelector('.block.ancestors')).toBeNull();
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
 
-          const reverseAncestors = [...mockAncestors].reverse();
+    describe('when sub-epics feature is not available', () => {
+      it('does not render ancestors list', done => {
+        store.dispatch('toggleSidebarFlag', false);
 
-          const getEls = selector => Array.from(ancestorsEl.querySelectorAll(selector));
+        vm.$nextTick()
+          .then(() => {
+            const ancestorsEl = vm.$el.querySelector('.block.ancestors');
 
-          expect(ancestorsEl).not.toBeNull();
+            const reverseAncestors = [...mockAncestors].reverse();
 
-          expect(getEls('li.vertical-timeline-row').length).toBe(reverseAncestors.length);
+            const getEls = selector => Array.from(ancestorsEl.querySelectorAll(selector));
 
-          expect(getEls('a').map(el => el.innerText.trim())).toEqual(
-            reverseAncestors.map(a => a.title),
-          );
+            expect(ancestorsEl).not.toBeNull();
 
-          expect(getEls('li.vertical-timeline-row a').map(a => a.getAttribute('href'))).toEqual(
-            reverseAncestors.map(a => a.url),
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+            expect(getEls('li.vertical-timeline-row').length).toBe(reverseAncestors.length);
+
+            expect(getEls('a').map(el => el.innerText.trim())).toEqual(
+              reverseAncestors.map(a => a.title),
+            );
+
+            expect(getEls('li.vertical-timeline-row a').map(a => a.getAttribute('href'))).toEqual(
+              reverseAncestors.map(a => a.url),
+            );
+          })
+          .then(done)
+          .catch(done.fail);
+      });
     });
 
     it('renders participants list element', () => {

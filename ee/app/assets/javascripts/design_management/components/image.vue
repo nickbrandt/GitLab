@@ -83,7 +83,7 @@ export default {
 </script>
 
 <template>
-  <div class="m-auto js-design-image" :class="{ 'h-100 w-100 d-flex-center': !imageStyle }">
+  <div class="m-auto js-design-image">
     <img
       ref="contentImg"
       class="mh-100"

@@ -20,7 +20,7 @@ export default () => ({
   isEditingCustomStage: false,
 
   selectedGroup: null,
-  selectedProjectIds: [],
+  selectedProjects: [],
   selectedStage: null,
 
   currentStageEvents: [],
@@ -31,6 +31,9 @@ export default () => ({
   medians: {},
 
   customStageFormEvents: [],
+  customStageFormErrors: null,
+  customStageFormInitialData: null,
+
   tasksByType: {
     subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
     labelIds: [],

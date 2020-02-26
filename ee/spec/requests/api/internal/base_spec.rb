@@ -38,7 +38,9 @@ describe API::Internal::Base do
     before do
       project.add_developer(user)
       allow(described_class).to receive(:identify).and_return(user)
-      allow_any_instance_of(Gitlab::Identifier).to receive(:identify).and_return(user)
+      allow_next_instance_of(Gitlab::Identifier) do |instance|
+        allow(instance).to receive(:identify).and_return(user)
+      end
       stub_current_geo_node(primary_node)
     end
 
@@ -55,7 +57,7 @@ describe API::Internal::Base do
           it 'includes current Geo secondary lag in the output' do
             post api('/internal/post_receive'), params: valid_params
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response['messages']).to include({
               'type' => 'basic',
               'message' => "Current replication lag: 17 seconds"
@@ -69,7 +71,7 @@ describe API::Internal::Base do
           it 'does not include current Geo secondary lag in the output' do
             post api('/internal/post_receive'), params: valid_params
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
           end
         end
@@ -80,7 +82,7 @@ describe API::Internal::Base do
           it 'does not include current Geo secondary lag in the output' do
             post api('/internal/post_receive'), params: valid_params
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
           end
         end
@@ -90,7 +92,7 @@ describe API::Internal::Base do
         it 'does not include current Geo secondary lag in the output' do
           post api('/internal/post_receive'), params: valid_params
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
         end
       end
@@ -105,7 +107,7 @@ describe API::Internal::Base do
       it 'does not include current Geo secondary lag in the output' do
         post api('/internal/post_receive'), params: valid_params
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
       end
     end
@@ -130,7 +132,7 @@ describe API::Internal::Base do
                protocol: 'ssh'
              })
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -158,7 +160,7 @@ describe API::Internal::Base do
           end
 
           it "does not allow access because project can't be found" do
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -174,7 +176,7 @@ describe API::Internal::Base do
           end
 
           it "allows access" do
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
 
@@ -184,7 +186,7 @@ describe API::Internal::Base do
           end
 
           it "does not allow access because project can't be found" do
-            expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(:not_found)
           end
         end
       end
@@ -227,7 +229,7 @@ describe API::Internal::Base do
         it "allows access" do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
 
@@ -235,7 +237,7 @@ describe API::Internal::Base do
         it "does not allow access" do
           subject
 
-          expect(response).to have_gitlab_http_status(401)
+          expect(response).to have_gitlab_http_status(:unauthorized)
           expect(json_response['message']).to eql('Project requires smartcard login. Please login to GitLab using a smartcard.')
         end
       end
@@ -248,7 +250,7 @@ describe API::Internal::Base do
         it "allows access" do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
       end
     end
@@ -318,7 +320,7 @@ describe API::Internal::Base do
 
         lfs_auth_user(user.id, project)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['repository_http_path']).to eq(geo_primary_http_url_to_repo(project))
       end
     end

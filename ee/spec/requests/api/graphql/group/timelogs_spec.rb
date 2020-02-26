@@ -59,7 +59,7 @@ describe 'Timelogs through GroupQuery' do
       it_behaves_like 'a working graphql query'
 
       it 'returns timelogs successfully' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_errors).to be_nil
         expect(node_array.size).to eq 1
         expect(graphql_data['group']['groupTimelogsEnabled']).to be_truthy

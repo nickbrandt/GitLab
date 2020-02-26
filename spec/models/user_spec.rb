@@ -303,6 +303,20 @@ describe User, :do_not_mock_admin_mode do
         end
       end
 
+      context 'bad regex' do
+        before do
+          allow_any_instance_of(ApplicationSetting).to receive(:domain_whitelist).and_return(['([a-zA-Z0-9]+)+\.com'])
+        end
+
+        it 'does not hang on evil input' do
+          user = build(:user, email: 'user@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!.com')
+
+          expect do
+            Timeout.timeout(2.seconds) { user.valid? }
+          end.not_to raise_error
+        end
+      end
+
       context 'when a signup domain is whitelisted and subdomains are allowed' do
         before do
           allow_any_instance_of(ApplicationSetting).to receive(:domain_whitelist).and_return(['example.com', '*.example.com'])
@@ -356,6 +370,20 @@ describe User, :do_not_mock_admin_mode do
           allow_any_instance_of(ApplicationSetting).to receive(:domain_blacklist).and_return(['example.com'])
         end
 
+        context 'bad regex' do
+          before do
+            allow_any_instance_of(ApplicationSetting).to receive(:domain_blacklist).and_return(['([a-zA-Z0-9]+)+\.com'])
+          end
+
+          it 'does not hang on evil input' do
+            user = build(:user, email: 'user@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!.com')
+
+            expect do
+              Timeout.timeout(2.seconds) { user.valid? }
+            end.not_to raise_error
+          end
+        end
+
         context 'when a signup domain is blacklisted' do
           it 'accepts info@test.com' do
             user = build(:user, email: 'info@test.com')
@@ -398,6 +426,73 @@ describe User, :do_not_mock_admin_mode do
           it 'rejects info@example.com' do
             user = build(:user, email: 'info@example.com')
             expect(user).not_to be_valid
+          end
+        end
+      end
+
+      context 'email restrictions' do
+        context 'when email restriction is disabled' do
+          before do
+            stub_application_setting(email_restrictions_enabled: false)
+            stub_application_setting(email_restrictions: '\+')
+          end
+
+          it 'does accept email address' do
+            user = build(:user, email: 'info+1@test.com')
+
+            expect(user).to be_valid
+          end
+        end
+
+        context 'when email restrictions is enabled' do
+          before do
+            stub_application_setting(email_restrictions_enabled: true)
+            stub_application_setting(email_restrictions: '([\+]|\b(\w*gitlab.com\w*)\b)')
+          end
+
+          it 'does not accept email address with + characters' do
+            user = build(:user, email: 'info+1@test.com')
+
+            expect(user).not_to be_valid
+          end
+
+          it 'does not accept email with a gitlab domain' do
+            user = build(:user, email: 'info@gitlab.com')
+
+            expect(user).not_to be_valid
+          end
+
+          it 'adds an error message when email is not accepted' do
+            user = build(:user, email: 'info@gitlab.com')
+
+            expect(user).not_to be_valid
+            expect(user.errors.messages[:email].first).to eq(_('is not allowed for sign-up'))
+          end
+
+          it 'does accept a valid email address' do
+            user = build(:user, email: 'info@test.com')
+
+            expect(user).to be_valid
+          end
+
+          context 'when feature flag is turned off' do
+            before do
+              stub_feature_flags(email_restrictions: false)
+            end
+
+            it 'does accept the email address' do
+              user = build(:user, email: 'info+1@test.com')
+
+              expect(user).to be_valid
+            end
+          end
+
+          context 'when created_by_id is set' do
+            it 'does accept the email address' do
+              user = build(:user, email: 'info+1@test.com', created_by_id: 1)
+
+              expect(user).to be_valid
+            end
           end
         end
       end
@@ -1915,18 +2010,28 @@ describe User, :do_not_mock_admin_mode do
 
   describe '#all_emails' do
     let(:user) { create(:user) }
+    let!(:email_confirmed) { create :email, user: user, confirmed_at: Time.now }
+    let!(:email_unconfirmed) { create :email, user: user }
 
-    it 'returns all emails' do
-      email_confirmed   = create :email, user: user, confirmed_at: Time.now
-      email_unconfirmed = create :email, user: user
-      user.reload
+    context 'when `include_private_email` is true' do
+      it 'returns all emails' do
+        expect(user.reload.all_emails).to contain_exactly(
+          user.email,
+          user.private_commit_email,
+          email_unconfirmed.email,
+          email_confirmed.email
+        )
+      end
+    end
 
-      expect(user.all_emails).to contain_exactly(
-        user.email,
-        user.private_commit_email,
-        email_unconfirmed.email,
-        email_confirmed.email
-      )
+    context 'when `include_private_email` is false' do
+      it 'does not include the private commit email' do
+        expect(user.reload.all_emails(include_private_email: false)).to contain_exactly(
+          user.email,
+          email_unconfirmed.email,
+          email_confirmed.email
+        )
+      end
     end
   end
 
@@ -4198,6 +4303,19 @@ describe User, :do_not_mock_admin_mode do
 
       expect(described_class.humans).to match_array([human])
       expect(described_class.bots).to match_array([bot])
+    end
+  end
+
+  describe '#hook_attrs' do
+    it 'includes name, username, avatar_url, and email' do
+      user = create(:user)
+      user_attributes = {
+        name: user.name,
+        username: user.username,
+        avatar_url: user.avatar_url(only_path: false),
+        email: user.email
+      }
+      expect(user.hook_attrs).to eq(user_attributes)
     end
   end
 end

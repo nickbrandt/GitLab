@@ -41,7 +41,7 @@ describe API::Search do
         create(:wiki_page, wiki: wiki, attrs: { title: 'home', content: "Awesome page" })
 
         project.wiki.index_wiki_blobs
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }
       end
@@ -52,7 +52,7 @@ describe API::Search do
     context 'for commits scope', :sidekiq_might_not_need_inline do
       before do
         project.repository.index_commits_and_blobs
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
       end
@@ -63,7 +63,7 @@ describe API::Search do
     context 'for blobs scope', :sidekiq_might_not_need_inline do
       before do
         project.repository.index_commits_and_blobs
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
 
         get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
       end

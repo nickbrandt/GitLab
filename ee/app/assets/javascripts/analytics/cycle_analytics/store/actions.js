@@ -1,11 +1,14 @@
 import dateFormat from 'dateformat';
 import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
+import { historyPushState } from '~/lib/utils/common_utils';
+import { setUrlParams } from '~/lib/utils/url_utility';
 import createFlash, { hideFlash } from '~/flash';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
+import { toYmd } from '../../shared/utils';
 
 const removeError = () => {
   const flashEl = document.querySelector('.flash-alert');
@@ -21,17 +24,58 @@ const handleErrorOrRethrow = ({ action, error }) => {
   action();
 };
 
+const isStageNameExistsError = ({ status, errors }) => {
+  const ERROR_NAME_RESERVED = 'is reserved';
+  if (status === httpStatus.UNPROCESSABLE_ENTITY) {
+    if (errors?.name?.includes(ERROR_NAME_RESERVED)) return true;
+  }
+  return false;
+};
+
+const updateUrlParams = (
+  { getters: { currentGroupPath, selectedProjectIds } },
+  additionalParams = {},
+) => {
+  historyPushState(
+    setUrlParams(
+      {
+        group_id: currentGroupPath,
+        'project_ids[]': selectedProjectIds,
+        ...additionalParams,
+      },
+      window.location.href,
+      true,
+    ),
+  );
+};
+
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
-export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 
-export const setSelectedProjects = ({ commit }, projectIds) =>
-  commit(types.SET_SELECTED_PROJECTS, projectIds);
+export const setSelectedGroup = ({ commit, getters }, group) => {
+  commit(types.SET_SELECTED_GROUP, group);
+  updateUrlParams({ getters });
+};
+
+export const setSelectedProjects = ({ commit, getters }, projects) => {
+  commit(types.SET_SELECTED_PROJECTS, projects);
+  updateUrlParams({ getters });
+};
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
 
-export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
+export const setDateRange = (
+  { commit, dispatch, getters },
+  { skipFetch = false, startDate, endDate },
+) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
+  updateUrlParams(
+    { getters },
+    {
+      created_after: toYmd(startDate),
+      created_before: toYmd(endDate),
+    },
+  );
 
   if (skipFetch) return false;
 
@@ -135,12 +179,36 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
 
-export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
-export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
+export const hideCustomStageForm = ({ commit }) => {
+  commit(types.HIDE_CUSTOM_STAGE_FORM);
+  removeError();
+};
 
-export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
-  commit(types.EDIT_CUSTOM_STAGE);
+export const showCustomStageForm = ({ commit }) => {
+  commit(types.SHOW_CUSTOM_STAGE_FORM);
+  removeError();
+};
+
+export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}) => {
+  const {
+    id = null,
+    name = null,
+    startEventIdentifier = null,
+    startEventLabel: { id: startEventLabelId = null } = {},
+    endEventIdentifier = null,
+    endEventLabel: { id: endEventLabelId = null } = {},
+  } = selectedStage;
+
+  commit(types.SHOW_EDIT_CUSTOM_STAGE_FORM, {
+    id,
+    name,
+    startEventIdentifier,
+    startEventLabelId,
+    endEventIdentifier,
+    endEventLabelId,
+  });
   dispatch('setSelectedStage', selectedStage);
+  removeError();
 };
 
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
@@ -189,8 +257,8 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     selectedGroup: { fullPath },
   } = state;
 
-  return Api.groupLabels(fullPath)
-    .then(data => dispatch('receiveGroupLabelsSuccess', data))
+  return Api.cycleAnalyticsGroupLabels(fullPath)
+    .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
     );
@@ -236,27 +304,36 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
     );
 };
 
-export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
-export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
-  createFlash(__(`Your custom stage '${title}' was created`), 'notice');
-
-  return dispatch('fetchGroupStagesAndEvents').then(() => dispatch('fetchSummaryData'));
+export const clearCustomStageFormErrors = ({ commit }) => {
+  commit(types.CLEAR_CUSTOM_STAGE_FORM_ERRORS);
+  removeError();
 };
 
-export const receiveCreateCustomStageError = ({ commit }, { error, data }) => {
-  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
+export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
+export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_SUCCESS);
+  createFlash(sprintf(__(`Your custom stage '%{title}' was created`), { title }), 'notice');
 
-  const { name } = data;
-  const { status } = error;
-  // TODO: check for 403, 422 etc
-  // Follow up issue to investigate https://gitlab.com/gitlab-org/gitlab/issues/36685
-  const message =
-    status !== httpStatus.UNPROCESSABLE_ENTITY
-      ? __(`'${name}' stage already exists'`)
+  return Promise.resolve()
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchSummaryData'))
+    .catch(() => {
+      createFlash(__('There was a problem refreshing the data, please try again'));
+    });
+};
+
+export const receiveCreateCustomStageError = (
+  { commit },
+  { status = 400, errors = {}, data = {} } = {},
+) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_ERROR, { errors });
+  const { name = null } = data;
+  const flashMessage =
+    name && isStageNameExistsError({ status, errors })
+      ? sprintf(__(`'%{name}' stage already exists`), { name })
       : __('There was a problem saving your custom stage, please try again');
 
-  createFlash(message);
+  createFlash(flashMessage);
 };
 
 export const createCustomStage = ({ dispatch, state }, data) => {
@@ -266,8 +343,15 @@ export const createCustomStage = ({ dispatch, state }, data) => {
   dispatch('requestCreateCustomStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
-    .then(response => dispatch('receiveCreateCustomStageSuccess', response))
-    .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
+    .then(response => {
+      const { status, data: responseData } = response;
+      return dispatch('receiveCreateCustomStageSuccess', { status, data: responseData });
+    })
+    .catch(({ response } = {}) => {
+      const { data: { message, errors } = null, status = 400 } = response;
+
+      dispatch('receiveCreateCustomStageError', { data, message, errors, status });
+    });
 };
 
 export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {
@@ -313,28 +397,28 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
 export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
-  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
 
-  dispatch('fetchGroupStagesAndEvents');
-  dispatch('setSelectedStage', updatedData);
+  return Promise.all([
+    dispatch('fetchGroupStagesAndEvents'),
+    dispatch('setSelectedStage', updatedData),
+  ]).catch(() => {
+    createFlash(__('There was a problem refreshing the data, please try again'));
+  });
 };
 
 export const receiveUpdateStageError = (
   { commit },
-  { error: { response: { status = 400, data: errorData } = {} } = {}, data },
+  { status, responseData: { errors = null } = {}, data = {} },
 ) => {
-  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
-  const ERROR_NAME_RESERVED = 'is reserved';
+  commit(types.RECEIVE_UPDATE_STAGE_ERROR, { errors, data });
 
-  let message = __('There was a problem saving your custom stage, please try again');
-  if (status && status === httpStatus.UNPROCESSABLE_ENTITY) {
-    const { errors } = errorData;
-    const { name } = data;
-    if (errors.name && errors.name[0] === ERROR_NAME_RESERVED) {
-      message = __(`'${name}' stage already exists`);
-    }
-  }
+  const { name = null } = data;
+  const message =
+    name && isStageNameExistsError({ status, errors })
+      ? sprintf(__(`'%{name}' stage already exists`), { name })
+      : __('There was a problem saving your custom stage, please try again');
 
   createFlash(__(message));
 };
@@ -348,7 +432,9 @@ export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
 
   return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
-    .catch(error => dispatch('receiveUpdateStageError', { error, data: { id, ...rest } }));
+    .catch(({ response: { status = 400, data: responseData } = {} }) =>
+      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...rest } }),
+    );
 };
 
 export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);
@@ -497,4 +583,18 @@ export const updateSelectedDurationChartStages = ({ state, commit }, stages) => 
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
   dispatch('fetchTasksByTypeData');
+};
+
+export const initializeCycleAnalyticsSuccess = ({ commit }) =>
+  commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
+
+export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {}) => {
+  commit(types.INITIALIZE_CYCLE_ANALYTICS, initialData);
+  if (initialData?.group?.fullPath) {
+    return dispatch('fetchCycleAnalyticsData').then(() =>
+      dispatch('initializeCycleAnalyticsSuccess'),
+    );
+  }
+
+  return dispatch('initializeCycleAnalyticsSuccess');
 };

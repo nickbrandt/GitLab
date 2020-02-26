@@ -48,7 +48,8 @@ module Quality
       resource_names = raw_resource_names
       command = [
         'delete',
-        %(--namespace "#{namespace}")
+        %(--namespace "#{namespace}"),
+        '--ignore-not-found'
       ]
 
       Array(release_name).each do |release|
@@ -63,7 +64,7 @@ module Quality
         'get',
         RESOURCE_LIST,
         %(--namespace "#{namespace}"),
-        '-o custom-columns=NAME:.metadata.name'
+        '-o name'
       ]
       run_command(command).lines.map(&:strip)
     end

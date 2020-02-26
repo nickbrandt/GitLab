@@ -235,11 +235,17 @@ module Gitlab
       # PostgreSQL constraint names have a limit of 63 bytes. The logic used
       # here is based on Rails' foreign_key_name() method, which unfortunately
       # is private so we can't rely on it directly.
-      def concurrent_foreign_key_name(table, column)
+      #
+      # prefix:
+      # - The default prefix is `fk_` for backward compatibility with the existing
+      # concurrent foreign key helpers.
+      # - For standard rails foreign keys the prefix is `fk_rails_`
+      #
+      def concurrent_foreign_key_name(table, column, prefix: 'fk_')
         identifier = "#{table}_#{column}_fk"
         hashed_identifier = Digest::SHA256.hexdigest(identifier).first(10)
 
-        "fk_#{hashed_identifier}"
+        "#{prefix}#{hashed_identifier}"
       end
 
       # Long-running migrations may take more than the timeout allowed by
@@ -688,7 +694,7 @@ module Gitlab
           start_id, end_id = batch.pluck('MIN(id), MAX(id)').first
           max_index = index
 
-          BackgroundMigrationWorker.perform_in(
+          migrate_in(
             index * interval,
             'CopyColumn',
             [table, column, temp_column, start_id, end_id]
@@ -697,7 +703,7 @@ module Gitlab
 
         # Schedule the renaming of the column to happen (initially) 1 hour after
         # the last batch finished.
-        BackgroundMigrationWorker.perform_in(
+        migrate_in(
           (max_index * interval) + 1.hour,
           'CleanupConcurrentTypeChange',
           [table, column, temp_column]
@@ -779,7 +785,7 @@ module Gitlab
           start_id, end_id = batch.pluck('MIN(id), MAX(id)').first
           max_index = index
 
-          BackgroundMigrationWorker.perform_in(
+          migrate_in(
             index * interval,
             'CopyColumn',
             [table, old_column, new_column, start_id, end_id]
@@ -788,7 +794,7 @@ module Gitlab
 
         # Schedule the renaming of the column to happen (initially) 1 hour after
         # the last batch finished.
-        BackgroundMigrationWorker.perform_in(
+        migrate_in(
           (max_index * interval) + 1.hour,
           'CleanupConcurrentRename',
           [table, old_column, new_column]
@@ -1024,14 +1030,14 @@ into similar problems in the future (e.g. when new tables are created).
             # We push multiple jobs at a time to reduce the time spent in
             # Sidekiq/Redis operations. We're using this buffer based approach so we
             # don't need to run additional queries for every range.
-            BackgroundMigrationWorker.bulk_perform_async(jobs)
+            bulk_migrate_async(jobs)
             jobs.clear
           end
 
           jobs << [job_class_name, [start_id, end_id]]
         end
 
-        BackgroundMigrationWorker.bulk_perform_async(jobs) unless jobs.empty?
+        bulk_migrate_async(jobs) unless jobs.empty?
       end
 
       # Queues background migration jobs for an entire table, batched by ID range.
@@ -1042,6 +1048,7 @@ into similar problems in the future (e.g. when new tables are created).
       # job_class_name - The background migration job class as a string
       # delay_interval - The duration between each job's scheduled time (must respond to `to_f`)
       # batch_size - The maximum number of rows per job
+      # other_arguments - Other arguments to send to the job
       #
       # Example:
       #
@@ -1059,7 +1066,7 @@ into similar problems in the future (e.g. when new tables are created).
       #         # do something
       #       end
       #     end
-      def queue_background_migration_jobs_by_range_at_intervals(model_class, job_class_name, delay_interval, batch_size: BACKGROUND_MIGRATION_BATCH_SIZE)
+      def queue_background_migration_jobs_by_range_at_intervals(model_class, job_class_name, delay_interval, batch_size: BACKGROUND_MIGRATION_BATCH_SIZE, other_arguments: [])
         raise "#{model_class} does not have an ID to use for batch ranges" unless model_class.column_names.include?('id')
 
         # To not overload the worker too much we enforce a minimum interval both
@@ -1074,7 +1081,7 @@ into similar problems in the future (e.g. when new tables are created).
           # `BackgroundMigrationWorker.bulk_perform_in` schedules all jobs for
           # the same time, which is not helpful in most cases where we wish to
           # spread the work over time.
-          BackgroundMigrationWorker.perform_in(delay_interval * index, job_class_name, [start_id, end_id])
+          migrate_in(delay_interval * index, job_class_name, [start_id, end_id] + other_arguments)
         end
       end
 
@@ -1131,6 +1138,30 @@ into similar problems in the future (e.g. when new tables are created).
         END
 
         execute(sql)
+      end
+
+      def migrate_async(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.perform_async(*args)
+        end
+      end
+
+      def migrate_in(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.perform_in(*args)
+        end
+      end
+
+      def bulk_migrate_in(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.bulk_perform_in(*args)
+        end
+      end
+
+      def bulk_migrate_async(*args)
+        with_migration_context do
+          BackgroundMigrationWorker.bulk_perform_async(*args)
+        end
       end
 
       private
@@ -1190,6 +1221,10 @@ into similar problems in the future (e.g. when new tables are created).
           You can disable transactions by calling `disable_ddl_transaction!` in the body of
           your migration class
         ERROR
+      end
+
+      def with_migration_context(&block)
+        Gitlab::ApplicationContext.with_context(caller_id: self.class.to_s, &block)
       end
     end
   end

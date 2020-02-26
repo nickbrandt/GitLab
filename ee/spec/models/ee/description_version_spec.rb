@@ -53,6 +53,14 @@ describe DescriptionVersion do
         .count
     end
 
+    it 'expires issuable etag cache' do
+      version = epic.description_versions.last
+
+      expect(epic).to receive(:expire_note_etag_cache)
+
+      version.delete!
+    end
+
     context 'when start_id is not present' do
       it 'only soft deletes description_version' do
         version = epic.description_versions.last

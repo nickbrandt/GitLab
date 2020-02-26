@@ -27,7 +27,7 @@ module Geo
       end
 
       def job_artifacts
-        Geo::Fdw::Ci::JobArtifact.all unless selective_sync?
+        return Geo::Fdw::Ci::JobArtifact.all unless selective_sync?
 
         query = Geo::Fdw::Ci::JobArtifact.project_id_in(projects).select(:id)
         cte = Gitlab::SQL::CTE.new(:restricted_job_artifacts, query)

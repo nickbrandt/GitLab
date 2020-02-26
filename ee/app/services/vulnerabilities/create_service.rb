@@ -35,7 +35,7 @@ module Vulnerabilities
         author: @author,
         project: @project,
         title: finding.name,
-        state: :detected,
+        state: Vulnerability.states[:detected],
         severity: finding.severity,
         severity_overridden: false,
         confidence: finding.confidence,

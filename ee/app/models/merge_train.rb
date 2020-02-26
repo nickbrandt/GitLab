@@ -68,7 +68,12 @@ class MergeTrain < ApplicationRecord
   scope :active, -> { with_status(*ACTIVE_STATUSES) }
   scope :complete, -> { with_status(*COMPLETE_STATUSES) }
   scope :for_target, -> (project_id, branch) { where(target_project_id: project_id, target_branch: branch) }
-  scope :by_id, -> { order('merge_trains.id ASC') }
+  scope :by_id, -> (sort = :asc) { order(id: sort) }
+
+  scope :preload_api_entities, -> do
+    preload(:user, merge_request: MergeRequest::PROJECT_ROUTE_AND_NAMESPACE_ROUTE,
+                   pipeline: Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE)
+  end
 
   class << self
     def all_active_mrs_in_train(target_project_id, target_branch)

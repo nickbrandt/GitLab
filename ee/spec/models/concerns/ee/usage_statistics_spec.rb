@@ -32,8 +32,9 @@ describe EE::UsageStatistics do
 
     context 'the count query times out' do
       before do
-        allow_any_instance_of(ActiveRecord::Relation)
-          .to receive(:count).and_raise(ActiveRecord::StatementInvalid.new(''))
+        allow_next_instance_of(ActiveRecord::Relation) do |instance|
+          allow(instance).to receive(:count).and_raise(ActiveRecord::StatementInvalid.new(''))
+        end
       end
 
       it 'does not raise an error' do

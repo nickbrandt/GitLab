@@ -62,7 +62,7 @@ module EE
         scope
       }
 
-      scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
+      scope :excluding_guests, -> { joins(:members).merge(::Member.non_guests).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
       scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
@@ -238,6 +238,10 @@ module EE
         .where("namespaces.id IN (#{namespace_union})") # rubocop:disable GitlabSecurity/SqlInjection
         .where.not(plans: { id: nil })
         .any?
+    end
+
+    def managed_free_namespaces
+      manageable_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
     end
 
     override :has_current_license?

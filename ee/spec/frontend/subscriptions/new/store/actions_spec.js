@@ -77,6 +77,23 @@ describe('Subscriptions Actions', () => {
     });
   });
 
+  describe('updateSelectedGroup', () => {
+    it('updates the selected group, resets the organization name and updates the number of users', done => {
+      testAction(
+        actions.updateSelectedGroup,
+        'groupId',
+        { selectedGroupUsers: 3 },
+        [
+          { type: 'UPDATE_SELECTED_GROUP', payload: 'groupId' },
+          { type: 'UPDATE_ORGANIZATION_NAME', payload: null },
+          { type: 'UPDATE_NUMBER_OF_USERS', payload: 3 },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
   describe('toggleIsSetupForCompany', () => {
     it('toggles the isSetupForCompany value', done => {
       testAction(

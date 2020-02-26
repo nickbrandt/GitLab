@@ -9,7 +9,7 @@ module EE
       def execute_hooks(merge_request, action = 'open', old_rev: nil, old_associations: {})
         super
 
-        return unless jira_subscription_exists?
+        return unless project.jira_subscription_exists?
 
         if Atlassian::JiraIssueKeyExtractor.has_keys?(merge_request.title, merge_request.description)
           JiraConnect::SyncMergeRequestWorker.perform_async(merge_request.id)
@@ -19,12 +19,6 @@ module EE
       private
 
       attr_accessor :blocking_merge_requests_params
-
-      def jira_subscription_exists?
-        ::Feature.enabled?(:jira_connect_app) &&
-          project.feature_available?(:jira_dev_panel_integration) &&
-          JiraConnectSubscription.for_project(project).exists?
-      end
 
       override :filter_params
       def filter_params(merge_request)

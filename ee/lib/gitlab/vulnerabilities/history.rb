@@ -25,7 +25,7 @@ module Gitlab
       private
 
       def vulnerability_findings
-        ::Security::VulnerabilityFindingsFinder.new(vulnerable, params: filters).execute(:all)
+        ::Security::VulnerabilityFindingsFinder.new(pipeline_ids, params: filters).execute
       end
 
       def cached_vulnerability_history
@@ -58,6 +58,10 @@ module Gitlab
         return filters[:project_id] if filters.key?('project_id')
 
         vulnerable.project_ids_with_security_reports
+      end
+
+      def pipeline_ids
+        vulnerable.all_pipelines.with_vulnerabilities.success
       end
     end
   end

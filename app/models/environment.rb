@@ -12,6 +12,7 @@ class Environment < ApplicationRecord
 
   has_many :deployments, -> { visible }, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :successful_deployments, -> { success }, class_name: 'Deployment'
+  has_many :active_deployments, -> { active }, class_name: 'Deployment'
   has_many :prometheus_alerts, inverse_of: :environment
 
   has_one :last_deployment, -> { success.order('deployments.id DESC') }, class_name: 'Deployment'
@@ -92,6 +93,10 @@ class Environment < ApplicationRecord
     after_transition do |environment|
       environment.expire_etag_cache
     end
+  end
+
+  def self.for_id_and_slug(id, slug)
+    find_by(id: id, slug: slug)
   end
 
   def self.max_deployment_id_sql

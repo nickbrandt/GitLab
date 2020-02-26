@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import createStore from './store';
 import GeoNodeFormApp from './components/app.vue';
 
 Vue.use(Translate);
@@ -10,6 +11,7 @@ export default () => {
 
   return new Vue({
     el,
+    store: createStore(),
     components: {
       GeoNodeFormApp,
     },

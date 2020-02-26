@@ -3,6 +3,11 @@
 module ProjectsHelper
   prepend_if_ee('::EE::ProjectsHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
+  def project_incident_management_setting
+    @project_incident_management_setting ||= @project.incident_management_setting ||
+      @project.build_incident_management_setting
+  end
+
   def link_to_project(project)
     link_to namespace_project_path(namespace_id: project.namespace, id: project), title: h(project.name) do
       title = content_tag(:span, project.name, class: 'project-name')
@@ -376,6 +381,14 @@ module ProjectsHelper
     @project.grafana_integration&.enabled?
   end
 
+  def project_license_name(project)
+    project.repository.license&.name
+  rescue GRPC::Unavailable, GRPC::DeadlineExceeded, Gitlab::Git::CommandError => e
+    Gitlab::ErrorTracking.track_exception(e)
+
+    nil
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
@@ -656,6 +669,9 @@ module ProjectsHelper
       project_members#index
       integrations#show
       services#edit
+      hooks#index
+      hooks#edit
+      hook_logs#show
       repository#show
       ci_cd#show
       operations#show
@@ -715,8 +731,7 @@ module ProjectsHelper
   end
 
   def settings_container_registry_expiration_policy_available?(project)
-    Feature.enabled?(:registry_retention_policies_settings, project) &&
-      Gitlab.config.registry.enabled &&
+    Gitlab.config.registry.enabled &&
       can?(current_user, :destroy_container_image, project)
   end
 end

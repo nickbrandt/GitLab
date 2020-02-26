@@ -33,7 +33,7 @@ describe 'GET /groups/*group_id/-/security/projects' do
       get group_security_vulnerable_projects_path(group, format: :json)
     end.not_to exceed_query_limit(control_count)
 
-    expect(response).to have_gitlab_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(json_response.size).to be(3)
   end
 end

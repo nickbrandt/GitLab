@@ -36,6 +36,7 @@ export default () => ({
   showCreateEpicForm: false,
   autoCompleteEpics: false,
   autoCompleteIssues: false,
+  allowSubEpics: false,
   removeItemModalProps: {
     parentItem: {},
     item: {},

@@ -23,7 +23,7 @@ module Vulnerabilities
           raise ActiveRecord::Rollback
         end
 
-        @vulnerability.update(state: :dismissed, closed_by: @user, closed_at: Time.current)
+        @vulnerability.update(state: Vulnerability.states[:dismissed], closed_by: @user, closed_at: Time.current)
       end
 
       @vulnerability

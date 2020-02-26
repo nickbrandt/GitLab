@@ -13,6 +13,7 @@ export const REQUEST_SET_LICENSE_APPROVAL = 'REQUEST_SET_LICENSE_APPROVAL';
 export const RESET_LICENSE_IN_MODAL = 'RESET_LICENSE_IN_MODAL';
 export const SET_API_SETTINGS = 'SET_API_SETTINGS';
 export const SET_LICENSE_IN_MODAL = 'SET_LICENSE_IN_MODAL';
+export const SET_IS_ADMIN = 'SET_IS_ADMIN';
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
