@@ -26,8 +26,8 @@ describe ScopedLabelSet do
 
       expect(sets.size).to eq 3
       expect(get_labels(sets, nil)).to match_array([labels[0].id, labels[1].id])
-      expect(get_labels(sets, 'key::')).to match_array([labels[2].id, labels[3].id])
-      expect(get_labels(sets, 'key::another key::')).to match_array([labels[4].id, labels[5].id])
+      expect(get_labels(sets, 'key')).to match_array([labels[2].id, labels[3].id])
+      expect(get_labels(sets, 'key::another key')).to match_array([labels[4].id, labels[5].id])
     end
   end
 

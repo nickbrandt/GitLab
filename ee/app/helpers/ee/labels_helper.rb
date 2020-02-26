@@ -11,14 +11,12 @@ module EE
     def render_colored_label(label, suffix: '')
       return super unless label.scoped_label?
 
-      scope_name, label_name = label.name.split(Label::SCOPED_LABEL_SEPARATOR)
-
       render_label_text(
-        scope_name,
+        label.scoped_label_key,
         css_class: text_color_class_for_bg(label.color),
         bg_color: label.color
       ) + render_label_text(
-        label_name,
+        label.scoped_label_value,
         suffix: suffix
       )
     end
