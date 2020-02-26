@@ -6,7 +6,9 @@ describe ApprovalProjectRule do
   subject { create(:approval_project_rule) }
 
   describe 'validations' do
-    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
+    it 'is invalid when name not unique within rule type and project' do
+      is_expected.to validate_uniqueness_of(:name).scoped_to([:project_id, :rule_type])
+    end
   end
 
   describe '.regular' do

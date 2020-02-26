@@ -16,6 +16,10 @@ describe ApprovalMergeRequestRule do
       expect(build(:approval_merge_request_rule, name: nil)).not_to be_valid
     end
 
+    it 'is invalid when name not unique within rule type and merge request' do
+      is_expected.to validate_uniqueness_of(:name).scoped_to([:merge_request_id, :rule_type])
+    end
+
     context 'approval_project_rule is set' do
       let(:approval_project_rule) { build(:approval_project_rule) }
       let(:merge_request_rule) { build(:approval_merge_request_rule, merge_request: merge_request, approval_project_rule: approval_project_rule) }
