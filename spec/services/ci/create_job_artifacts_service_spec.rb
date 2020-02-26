@@ -121,10 +121,11 @@ describe Ci::CreateJobArtifactsService do
       end
     end
 
-    shared_examples 'object storage' do |klass, message, expected_message|
+    shared_examples 'rescues object storage error' do |klass, message, expected_message|
       it "handles #{klass}" do
-        allow_any_instance_of(JobArtifactUploader)
-          .to receive(:store!).and_raise(klass, message)
+        allow_next_instance_of(JobArtifactUploader) do |uploader|
+          allow(uploader).to receive(:store!).and_raise(klass, message)
+        end
 
         expect(Gitlab::ErrorTracking)
           .to receive(:track_exception)
@@ -138,8 +139,13 @@ describe Ci::CreateJobArtifactsService do
       end
     end
 
-    it_behaves_like 'object storage', Errno::EIO, 'some/path', 'Input/output error - some/path'
-    it_behaves_like 'object storage', Google::Apis::ServerError, 'Server error'
-    it_behaves_like 'object storage', Signet::RemoteServerError, 'The service is currently unavailable'
+    it_behaves_like 'rescues object storage error',
+      Errno::EIO, 'some/path', 'Input/output error - some/path'
+
+    it_behaves_like 'rescues object storage error',
+      Google::Apis::ServerError, 'Server error'
+
+    it_behaves_like 'rescues object storage error',
+      Signet::RemoteServerError, 'The service is currently unavailable'
   end
 end

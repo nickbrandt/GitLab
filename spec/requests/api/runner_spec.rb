@@ -1983,8 +1983,9 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
           let(:params) { { artifact_type: :archive, artifact_format: :zip } }
 
           it 'does not store artifacts' do
-            allow_any_instance_of(JobArtifactUploader)
-              .to receive(:store!).and_raise(Errno::EIO)
+            allow_next_instance_of(JobArtifactUploader) do |uploader|
+              allow(uploader).to receive(:store!).and_raise(Errno::EIO)
+            end
 
             upload_artifacts(file_upload, headers_with_token, params)
 
