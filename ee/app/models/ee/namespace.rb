@@ -326,6 +326,14 @@ module EE
       1
     end
 
+    # When a purchasing a GL.com plan for a User namespace
+    # we only charge for a single user.
+    # This method is overwritten in Group where we made the calculation
+    # for Group namespaces.
+    def billed_user_ids(_requested_hosted_plan = nil)
+      [owner_id]
+    end
+
     def eligible_for_trial?
       ::Gitlab.com? &&
         parent_id.nil? &&

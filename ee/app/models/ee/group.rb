@@ -244,25 +244,32 @@ module EE
       project
     end
 
+    override :billable_members_count
+    def billable_members_count(requested_hosted_plan = nil)
+      billed_user_ids(requested_hosted_plan).count
+    end
+
     # For now, we are not billing for members with a Guest role for subscriptions
     # with a Gold plan. The other plans will treat Guest members as a regular member
     # for billing purposes.
     #
     # We are plucking the user_ids from the "Members" table in an array and
-    # concatenating the array of user_ids with ruby "|" (pipe) method to generate
-    # one single array of unique user_ids.
-    override :billable_members_count
-    def billable_members_count(requested_hosted_plan = nil)
+    # converting the array of user_ids to a Set which will have unique user_ids.
+    def billed_user_ids(requested_hosted_plan = nil)
       if [actual_plan_name, requested_hosted_plan].include?(Plan::GOLD)
-        (billed_group_members.non_guests.distinct.pluck(:user_id) |
-        billed_project_members.non_guests.distinct.pluck(:user_id) |
-        billed_shared_group_members.non_guests.distinct.pluck(:user_id) |
-        billed_invited_group_members.non_guests.distinct.pluck(:user_id)).count
+        strong_memoize(:gold_billed_user_ids) do
+          (billed_group_members.non_guests.distinct.pluck(:user_id) +
+          billed_project_members.non_guests.distinct.pluck(:user_id) +
+          billed_shared_group_members.non_guests.distinct.pluck(:user_id) +
+          billed_invited_group_members.non_guests.distinct.pluck(:user_id)).to_set
+        end
       else
-        (billed_group_members.distinct.pluck(:user_id) |
-        billed_project_members.distinct.pluck(:user_id) |
-        billed_shared_group_members.distinct.pluck(:user_id) |
-        billed_invited_group_members.distinct.pluck(:user_id)).count
+        strong_memoize(:non_gold_billed_user_ids) do
+          (billed_group_members.distinct.pluck(:user_id) +
+          billed_project_members.distinct.pluck(:user_id) +
+          billed_shared_group_members.distinct.pluck(:user_id) +
+          billed_invited_group_members.distinct.pluck(:user_id)).to_set
+        end
       end
     end
 
