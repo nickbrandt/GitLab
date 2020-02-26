@@ -252,7 +252,9 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('should fetch related issues', done => {
+      // https://gitlab.com/gitlab-org/gitlab/issues/207376
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('should fetch related issues', done => {
         Vue.nextTick(() => {
           expect(vm.state.relatedIssues.length).toEqual(2);
           expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);
