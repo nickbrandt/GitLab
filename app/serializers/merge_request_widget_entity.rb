@@ -95,8 +95,7 @@ class MergeRequestWidgetEntity < Grape::Entity
       merge_request.all_pipelines.none? &&
       merge_request.commits_count.positive? &&
       can?(current_user, :read_build, merge_request.source_project) &&
-      can?(current_user, :create_pipeline, merge_request.source_project) &&
-      can?(current_user, :push_code, merge_request.source_project)
+      can?(current_user, :create_pipeline, merge_request.source_project)
   end
 end
 
