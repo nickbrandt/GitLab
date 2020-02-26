@@ -30,7 +30,7 @@ describe API::NpmPackages do
     it 'denies request without oauth token' do
       get_package(package)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
   end
 
@@ -80,7 +80,7 @@ describe API::NpmPackages do
 
         get_package_with_token(package)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -89,7 +89,7 @@ describe API::NpmPackages do
 
       get_package(package)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     def get_package(package, params = {})
@@ -113,21 +113,21 @@ describe API::NpmPackages do
       it 'returns the file with an access token' do
         get_file_with_token(package_file)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'returns the file with a job token' do
         get_file_with_job_token(package_file)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.media_type).to eq('application/octet-stream')
       end
 
       it 'denies download with no token' do
         get_file(package_file)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -137,7 +137,7 @@ describe API::NpmPackages do
       it 'returns the file with no token needed' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response.media_type).to eq('application/octet-stream')
       end
 
@@ -156,7 +156,7 @@ describe API::NpmPackages do
 
         get_file_with_token(package_file)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -173,7 +173,7 @@ describe API::NpmPackages do
 
       get_file(package_file)
 
-      expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(:forbidden)
     end
 
     def get_file(package_file, params = {})
@@ -201,7 +201,7 @@ describe API::NpmPackages do
             expect { upload_package_with_token(package_name, params) }
               .not_to change { project.packages.count }
 
-            expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(:bad_request)
           end
 
           context 'with empty versions' do
@@ -211,7 +211,7 @@ describe API::NpmPackages do
               expect { upload_package_with_token(package_name, params) }
               .not_to change { project.packages.count }
 
-              expect(response).to have_gitlab_http_status(400)
+              expect(response).to have_gitlab_http_status(:bad_request)
             end
           end
         end
@@ -224,7 +224,7 @@ describe API::NpmPackages do
             expect { upload_package_with_token(package_name, params) }
               .not_to change { project.packages.count }
 
-            expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(:bad_request)
           end
         end
       end
@@ -244,7 +244,7 @@ describe API::NpmPackages do
               .and change { Packages::PackageFile.count }.by(1)
               .and change { Packages::Tag.count }.by(1)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
 
@@ -253,7 +253,7 @@ describe API::NpmPackages do
             .to change { project.packages.count }.by(1)
             .and change { Packages::PackageFile.count }.by(1)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         context 'with an authenticated job token' do
@@ -272,7 +272,7 @@ describe API::NpmPackages do
           it 'creates the package metadata' do
             upload_package_with_token(package_name, params)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(project.reload.packages.find(json_response['id']).build_info.pipeline).to eq job.pipeline
           end
         end
@@ -287,7 +287,7 @@ describe API::NpmPackages do
           expect { upload_package_with_token(package_name, params) }
             .not_to change { project.packages.count }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -302,7 +302,7 @@ describe API::NpmPackages do
             .and change { Packages::Dependency.count}.by(4)
             .and change { Packages::DependencyLink.count}.by(6)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         context 'with existing dependencies' do
@@ -513,7 +513,7 @@ describe API::NpmPackages do
   end
 
   def expect_a_valid_package_response
-    expect(response).to have_gitlab_http_status(200)
+    expect(response).to have_gitlab_http_status(:ok)
     expect(response.media_type).to eq('application/json')
     expect(response).to match_response_schema('public_api/v4/packages/npm_package', dir: 'ee')
     expect(json_response['name']).to eq(package.name)

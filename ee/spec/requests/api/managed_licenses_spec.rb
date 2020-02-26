@@ -25,7 +25,7 @@ describe API::ManagedLicenses do
       it 'returns a forbidden status' do
         get api("/projects/#{project.id}/managed_licenses", dev_user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -33,7 +33,7 @@ describe API::ManagedLicenses do
       it 'returns project managed licenses' do
         get api("/projects/#{project.id}/managed_licenses", dev_user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('managed_licenses', dir: 'ee')
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
@@ -46,7 +46,7 @@ describe API::ManagedLicenses do
       it 'returns project managed licenses to users with read permissions' do
         get api("/projects/#{project.id}/managed_licenses", reporter_user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('managed_licenses', dir: 'ee')
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
@@ -59,14 +59,14 @@ describe API::ManagedLicenses do
       it 'returns project managed licenses for public project' do
         get api("/projects/#{project.id}/managed_licenses")
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('managed_licenses', dir: 'ee')
       end
 
       it 'responses with 404 Not Found for not existing project' do
         get api("/projects/0/managed_licenses")
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       context 'when project is private' do
@@ -77,7 +77,7 @@ describe API::ManagedLicenses do
         it 'responses with 404 Not Found' do
           get api("/projects/#{project.id}/managed_licenses")
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -88,7 +88,7 @@ describe API::ManagedLicenses do
       it 'returns project managed license details' do
         get api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", dev_user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
@@ -99,7 +99,7 @@ describe API::ManagedLicenses do
         escaped_name = CGI.escape(software_license_policy.name)
         get api("/projects/#{project.id}/managed_licenses/#{escaped_name}", dev_user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
@@ -109,7 +109,7 @@ describe API::ManagedLicenses do
       it 'responds with 404 Not Found if requesting non-existing managed license' do
         get api("/projects/#{project.id}/managed_licenses/1234512345", dev_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -117,7 +117,7 @@ describe API::ManagedLicenses do
       it 'returns project managed license details' do
         get api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", reporter_user)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
@@ -129,7 +129,7 @@ describe API::ManagedLicenses do
       it 'does not return project managed license details' do
         get api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}")
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end
@@ -145,7 +145,7 @@ describe API::ManagedLicenses do
             }
         end.to change {project.software_license_policies.count}.by(1)
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response).to have_key('id')
         expect(json_response['name']).to eq('NEW_LICENSE_NAME')
@@ -161,7 +161,7 @@ describe API::ManagedLicenses do
             }
         end.not_to change {project.software_license_policies.count}
 
-        expect(response).to have_gitlab_http_status(400)
+        expect(response).to have_gitlab_http_status(:bad_request)
       end
     end
 
@@ -173,7 +173,7 @@ describe API::ManagedLicenses do
             approval_status: 'approved'
           }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -185,7 +185,7 @@ describe API::ManagedLicenses do
             approval_status: 'approved'
           }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -197,7 +197,7 @@ describe API::ManagedLicenses do
             approval_status: 'approved'
           }
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end
@@ -214,7 +214,7 @@ describe API::ManagedLicenses do
 
         updated_software_license_policy = project.software_license_policies.reload.first
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
 
         # Check that response is equal to the updated object
@@ -234,7 +234,7 @@ describe API::ManagedLicenses do
       it 'responds with 404 Not Found if requesting non-existing managed license' do
         patch api("/projects/#{project.id}/managed_licenses/1234512345", maintainer_user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -242,7 +242,7 @@ describe API::ManagedLicenses do
       it 'does not update managed license' do
         patch api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", dev_user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -250,7 +250,7 @@ describe API::ManagedLicenses do
       it 'does not update managed license' do
         patch api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", reporter_user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -258,7 +258,7 @@ describe API::ManagedLicenses do
       it 'does not update managed license' do
         patch api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}")
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end
@@ -269,7 +269,7 @@ describe API::ManagedLicenses do
         expect do
           delete api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", maintainer_user)
 
-          expect(response).to have_gitlab_http_status(204)
+          expect(response).to have_gitlab_http_status(:no_content)
         end.to change {project.software_license_policies.count}.by(-1)
       end
 
@@ -277,7 +277,7 @@ describe API::ManagedLicenses do
         expect do
           delete api("/projects/#{project.id}/managed_licenses/1234512345", maintainer_user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end.not_to change {project.software_license_policies.count}
       end
     end
@@ -287,7 +287,7 @@ describe API::ManagedLicenses do
         expect do
           delete api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", dev_user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end.not_to change {project.software_license_policies.count}
       end
     end
@@ -297,7 +297,7 @@ describe API::ManagedLicenses do
         expect do
           delete api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", reporter_user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end.not_to change {project.software_license_policies.count}
       end
     end
@@ -307,7 +307,7 @@ describe API::ManagedLicenses do
         expect do
           delete api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}")
 
-          expect(response).to have_gitlab_http_status(401)
+          expect(response).to have_gitlab_http_status(:unauthorized)
         end.not_to change {project.software_license_policies.count}
       end
     end
