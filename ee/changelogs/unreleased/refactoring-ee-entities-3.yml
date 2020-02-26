@@ -1,0 +1,5 @@
+---
+title: Separate ee entities into own class file
+merge_request: 25709
+author: Rajendra Kadam
+type: added
