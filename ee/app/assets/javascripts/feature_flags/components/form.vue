@@ -202,6 +202,12 @@ export default {
     shouldDisplayUserIds(scope) {
       return scope.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID || scope.shouldIncludeUserIds;
     },
+    onStrategyChange(index) {
+      const scope = this.filteredScopes[index];
+      scope.shouldIncludeUserIds =
+        scope.rolloutUserIds.length > 0 &&
+        scope.rolloutStrategy === ROLLOUT_STRATEGY_PERCENT_ROLLOUT;
+    },
   },
 };
 </script>
@@ -256,6 +262,7 @@ export default {
             <div
               v-for="(scope, index) in filteredScopes"
               :key="scope.id"
+              ref="scopeRow"
               class="gl-responsive-table-row"
               role="row"
             >
@@ -281,9 +288,9 @@ export default {
                     @clearInput="env => (scope.environmentScope = '')"
                   />
 
-                  <gl-badge v-if="permissionsFlag && scope.protected" variant="success">{{
-                    s__('FeatureFlags|Protected')
-                  }}</gl-badge>
+                  <gl-badge v-if="permissionsFlag && scope.protected" variant="success">
+                    {{ s__('FeatureFlags|Protected') }}
+                  </gl-badge>
                 </div>
               </div>
 
@@ -314,6 +321,7 @@ export default {
                       v-model="scope.rolloutStrategy"
                       :disabled="!scope.active"
                       class="form-control select-control w-100 js-rollout-strategy"
+                      @change="onStrategyChange(index)"
                     >
                       <option :value="$options.ROLLOUT_STRATEGY_ALL_USERS">
                         {{ s__('FeatureFlags|All users') }}
@@ -433,9 +441,9 @@ export default {
                   {{ s__('FeatureFlags|Rollout Strategy') }}
                 </div>
                 <div class="table-mobile-content js-rollout-strategy form-inline">
-                  <label class="sr-only" for="new-rollout-strategy-placeholder">
-                    {{ s__('FeatureFlags|Rollout Strategy') }}
-                  </label>
+                  <label class="sr-only" for="new-rollout-strategy-placeholder">{{
+                    s__('FeatureFlags|Rollout Strategy')
+                  }}</label>
                   <div class="select-wrapper col-12 col-md-8 p-0">
                     <select
                       id="new-rollout-strategy-placeholder"

@@ -49,7 +49,7 @@ export const mapToScopesViewModel = scopesFromRails =>
 
       // eslint-disable-next-line no-underscore-dangle
       shouldBeDestroyed: Boolean(s._destroy),
-      shouldIncludeUserIds: rolloutUserIds.length > 0,
+      shouldIncludeUserIds: rolloutUserIds.length > 0 && percentStrategy !== null,
     };
   });
 /**

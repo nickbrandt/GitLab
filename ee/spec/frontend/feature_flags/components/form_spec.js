@@ -14,21 +14,11 @@ import { featureFlag } from '../mock_data';
 
 describe('feature flag form', () => {
   let wrapper;
-  let oldGon;
   const requiredProps = {
     cancelPath: 'feature_flags',
     submitText: 'Create',
     environmentsEndpoint: '/environments.json',
   };
-
-  beforeEach(() => {
-    oldGon = window.gon;
-    window.gon = { features: { featureFlagsUsersPerEnvironment: true } };
-  });
-
-  afterEach(() => {
-    window.gon = oldGon;
-  });
 
   const factory = (props = {}) => {
     wrapper = shallowMount(Form, {
@@ -36,7 +26,6 @@ describe('feature flag form', () => {
       provide: {
         glFeatures: {
           featureFlagPermissions: true,
-          featureFlagsUsersPerEnvironment: true,
         },
       },
     });
@@ -171,6 +160,15 @@ describe('feature flag form', () => {
             wrapper.vm.$nextTick(() => {
               expect(wrapper.find(ToggleButton).props('disabledInput')).toBe(true);
               done();
+            });
+          });
+        });
+        describe('on strategy change', () => {
+          it('should not include user IDs if All Users is selected', () => {
+            const scope = wrapper.find({ ref: 'scopeRow' });
+            scope.find('select').setValue(ROLLOUT_STRATEGY_ALL_USERS);
+            return wrapper.vm.$nextTick().then(() => {
+              expect(scope.find('#rollout-user-id-0').exists()).toBe(false);
             });
           });
         });
@@ -354,6 +352,7 @@ describe('feature flag form', () => {
                 rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 rolloutPercentage: '55',
                 rolloutUserIds: '',
+                shouldIncludeUserIds: false,
               },
               {
                 id: expect.any(String),
@@ -374,6 +373,7 @@ describe('feature flag form', () => {
                 rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
                 rolloutUserIds: '',
+                shouldIncludeUserIds: false,
               },
             ]);
           });
