@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::LazyEpicAggregate do
+describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
   include_context 'includes EpicAggregate constants'
 
   let(:query_ctx) do
@@ -44,7 +44,7 @@ describe Epics::LazyEpicAggregate do
     let(:single_record) do
       { iid: 6, issues_count: 4, issues_weight_sum: 9, parent_id: nil, issues_state_id: OPENED_ISSUE_STATE, epic_state_id: OPENED_EPIC_STATE }
     end
-    let(:epic_info_node) { Epics::EpicNode.new(epic_id, [single_record] ) }
+    let(:epic_info_node) { Gitlab::Graphql::Aggregations::Epics::EpicNode.new(epic_id, [single_record] ) }
 
     subject { described_class.new(query_ctx, epic_id, :count) }
 
@@ -59,7 +59,7 @@ describe Epics::LazyEpicAggregate do
 
       it 'does not make the query again' do
         expect(epic_info_node).to receive(:aggregate_object_by).with(subject.facet)
-        expect(Epics::BulkEpicAggregateLoader).not_to receive(:new)
+        expect(Gitlab::Graphql::Aggregations::Epics::BulkEpicAggregateLoader).not_to receive(:new)
 
         subject.epic_aggregate
       end
@@ -79,8 +79,8 @@ describe Epics::LazyEpicAggregate do
       end
 
       before do
-        allow(Epics::EpicNode).to receive(:aggregate_object_by).and_call_original
-        expect_any_instance_of(Epics::BulkEpicAggregateLoader).to receive(:execute).and_return(fake_data)
+        allow(Gitlab::Graphql::Aggregations::Epics::EpicNode).to receive(:aggregate_object_by).and_call_original
+        expect_any_instance_of(Gitlab::Graphql::Aggregations::Epics::BulkEpicAggregateLoader).to receive(:execute).and_return(fake_data)
       end
 
       it 'clears the pending IDs' do

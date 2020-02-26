@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::BulkEpicAggregateLoader do
+describe Gitlab::Graphql::Aggregations::Epics::BulkEpicAggregateLoader do
   let_it_be(:closed_issue_state_id) { Issue.available_states[:closed] }
   let_it_be(:opened_issue_state_id) { Issue.available_states[:opened] }
 

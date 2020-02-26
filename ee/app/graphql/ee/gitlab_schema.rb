@@ -5,7 +5,7 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      lazy_resolve ::Epics::LazyEpicAggregate, :epic_aggregate
+      lazy_resolve ::Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate, :epic_aggregate
     end
   end
 end

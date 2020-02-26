@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Epics::EpicNode do
+describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
   include_context 'includes EpicAggregate constants'
 
   let(:epic_id) { 34 }
@@ -148,7 +148,7 @@ describe Epics::EpicNode do
 
       context 'with an issue with 0 weight' do
         let(:direct_sums) do
-          [Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1)]
+          [Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1)]
         end
 
         it 'returns a SumTotal with only a weight sum' do
@@ -162,8 +162,8 @@ describe Epics::EpicNode do
       context 'with an issue with nonzero weight' do
         let(:direct_sums) do
           [
-            Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1),
-            Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 2)
+            Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(COUNT_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 1),
+            Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, CLOSED_EPIC_STATE, ISSUE_TYPE, 2)
           ]
         end
 
@@ -184,7 +184,7 @@ describe Epics::EpicNode do
       let(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: CLOSED_EPIC_STATE }]) }
       let(:direct_sums) do
         [ # only one opened epic, the child
-          Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_EPIC_STATE, EPIC_TYPE, 1)
+          Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_EPIC_STATE, EPIC_TYPE, 1)
         ]
       end
 
@@ -196,8 +196,8 @@ describe Epics::EpicNode do
       context 'with a child that has issues of nonzero weight' do
         let(:child_sums) do
           [ # 1 issue of weight 2
-            Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 1),
-            Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 2)
+            Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(COUNT_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 1),
+            Gitlab::Graphql::Aggregations::Epics::EpicNode::Sum.new(WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, ISSUE_TYPE, 2)
           ]
         end
 
