@@ -958,7 +958,7 @@ In this example, if the first rule matches, then the job will have `when: manual
 Jobs with `rules:` can cause two pipelines to be created unexpectedly:
 
 - One pipeline from pushing a commit to a branch.
-- A second ["detached" pipeline for a merge request](merge_request_pipelines.md).
+- A second ["detached" pipeline for a merge request](../merge_request_pipelines/index.md).
 
 `only` and `except` jobs do not trigger merge request pipelines by default, but this
 is not the case for jobs with `rules:`, which may be surprising if migrating from `only`
