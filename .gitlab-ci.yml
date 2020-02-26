@@ -1,4 +1,4 @@
-image: golang:1.11
+image: golang:1.12
 
 # Disable DIND for SAST because we need to execute a before_script in the gosec-sast job
 variables:
@@ -21,15 +21,16 @@ verify:
   - apt-get update && apt-get -y install libimage-exiftool-perl
   - make test
 
-test using go 1.11:
-  <<: *test_definition
-
 test using go 1.12:
   image: golang:1.12
   <<: *test_definition
 
 test using go 1.13:
   image: golang:1.13
+  <<: *test_definition
+
+test using go 1.14:
+  image: golang:1.14
   <<: *test_definition
 
 test:release:
