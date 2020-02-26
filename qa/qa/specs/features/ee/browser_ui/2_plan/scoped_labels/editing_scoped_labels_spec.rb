@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  context 'Plan', :reliable, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/208021', type: :bug } do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }
@@ -44,13 +44,13 @@ module QA
 
           show.select_all_activities_filter
 
-          expect(show.text_of_labels_block).to have_content(new_label_same_scope)
-          expect(show.text_of_labels_block).to have_content(new_label_different_scope)
-          expect(show.text_of_labels_block).to have_content(new_label_same_scope_multi_colon)
-          expect(show.text_of_labels_block).to have_content(new_label_different_scope_multi_colon)
+          expect(show.text_of_labels_block).to have_content(new_label_same_scope.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content(new_label_different_scope.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content(new_label_same_scope_multi_colon.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content(new_label_different_scope_multi_colon.gsub('::', ' '))
 
-          expect(show.text_of_labels_block).not_to have_content(initial_label)
-          expect(show.text_of_labels_block).not_to have_content(initial_label_multi_colon)
+          expect(show.text_of_labels_block).not_to have_content(initial_label.gsub('::', ' '))
+          expect(show.text_of_labels_block).not_to have_content(initial_label_multi_colon.gsub('::', ' '))
         end
       end
     end
