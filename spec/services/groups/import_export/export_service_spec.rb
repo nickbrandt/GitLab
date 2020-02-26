@@ -19,7 +19,7 @@ describe Groups::ImportExport::ExportService do
     end
 
     it 'saves the models' do
-      expect(Gitlab::ImportExport::GroupTreeSaver).to receive(:new).and_call_original
+      expect(Gitlab::ImportExport::Group::TreeSaver).to receive(:new).and_call_original
 
       service.execute
     end
