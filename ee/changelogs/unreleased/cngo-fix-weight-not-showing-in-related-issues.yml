@@ -1,0 +1,5 @@
+---
+title: Fix weight not showing in linked issues
+merge_request: 25718
+author:
+type: fixed

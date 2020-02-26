@@ -1,4 +1,6 @@
-import { mount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
+import IssueDueDate from '~/boards/components/issue_due_date.vue';
+import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
 import RelatedIssuesList from 'ee/related_issues/components/related_issues_list.vue';
 import {
   issuable1,
@@ -20,7 +22,7 @@ describe('RelatedIssuesList', () => {
     const heading = 'Related to';
 
     beforeEach(() => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
@@ -40,7 +42,7 @@ describe('RelatedIssuesList', () => {
 
   describe('with isFetching=true', () => {
     beforeEach(() => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           isFetching: true,
@@ -56,7 +58,7 @@ describe('RelatedIssuesList', () => {
 
   describe('methods', () => {
     beforeEach(() => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
@@ -104,7 +106,7 @@ describe('RelatedIssuesList', () => {
 
   describe('issuableOrderingId returns correct issuable order id when', () => {
     it('issuableType is epic', () => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
@@ -115,7 +117,7 @@ describe('RelatedIssuesList', () => {
     });
 
     it('issuableType is issue', () => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'epic',
@@ -134,7 +136,7 @@ describe('RelatedIssuesList', () => {
     });
 
     it('issuableType is epic', () => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'epic',
@@ -150,7 +152,7 @@ describe('RelatedIssuesList', () => {
     });
 
     it('issuableType is issue', () => {
-      wrapper = mount(RelatedIssuesList, {
+      wrapper = shallowMount(RelatedIssuesList, {
         propsData: {
           pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
@@ -163,6 +165,26 @@ describe('RelatedIssuesList', () => {
       Array.from(listItems).forEach((item, index) => {
         expect(Number(item.dataset.orderingId)).toBe(relatedIssues[index].epicIssueId);
       });
+    });
+  });
+
+  describe('related item contents', () => {
+    beforeAll(() => {
+      wrapper = mount(RelatedIssuesList, {
+        propsData: {
+          issuableType: 'issue',
+          pathIdSeparator: PathIdSeparator.Issue,
+          relatedIssues: [issuable1],
+        },
+      });
+    });
+
+    it('shows weight', () => {
+      expect(wrapper.find(IssueWeight).text()).toBe(issuable1.weight.toString());
+    });
+
+    it('shows due date', () => {
+      expect(wrapper.find(IssueDueDate).text()).toBe('Nov 22, 2010');
     });
   });
 });
