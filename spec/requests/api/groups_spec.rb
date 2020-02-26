@@ -21,6 +21,28 @@ describe API::Groups do
     group2.add_owner(user2)
   end
 
+  shared_examples 'it uploads group avatar' do
+    it 'returns avatar url in response' do
+      make_upload_request
+
+      group_id = json_response['id']
+      expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
+                                                  '-/system/group/avatar/'\
+                                                  "#{group_id}/banana_sample.gif")
+    end
+  end
+
+  shared_examples 'it returns 400 for bad upload request' do
+    it 'returns 400' do
+      make_upload_request
+
+      expect(response).to have_gitlab_http_status(:bad_request)
+      expect(response.message).to eq('Bad Request')
+
+      expect(json_response['message']).to eq(message)
+    end
+  end
+
   describe "GET /groups" do
     context "when unauthenticated" do
       it "returns public groups" do
@@ -539,6 +561,13 @@ describe API::Groups do
   describe 'PUT /groups/:id' do
     let(:new_group_name) { 'New Group'}
 
+    def make_upload_request
+      group_param = {
+        avatar: fixture_file_upload(file_path)
+      }
+      put api("/groups/#{group1.id}", user1), params: group_param
+    end
+
     context 'when authenticated as the group owner' do
       it 'updates the group' do
         put api("/groups/#{group1.id}", user1), params: {
@@ -570,43 +599,26 @@ describe API::Groups do
         expect(json_response['default_branch_protection']).to eq(::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
       end
 
-      it 'updates avatar' do
-        group_param = {
-          avatar: fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif')
-        }
+      context 'group avatar update' do
+        context 'when appropriate file is used' do
+          let(:file_path) { 'spec/fixtures/banana_sample.gif' }
 
-        put api("/groups/#{group1.id}", user1), params: group_param
+          it_behaves_like 'it uploads group avatar'
+        end
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
-                                                  '-/system/group/avatar/'\
-                                                  "#{group1.id}/banana_sample.gif")
-      end
+        context 'when invalid file is used' do
+          let(:file_path) { 'spec/fixtures/doc_sample.txt' }
+          let(:message) { { "avatar" => ["file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico"] } }
 
-      it 'returns 400 if file type is invalid to update avatar' do
-        group_param = {
-          avatar: fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
-        }
+          it_behaves_like 'it returns 400 for bad upload request'
+        end
 
-        put api("/groups/#{group1.id}", user1), params: group_param
+        context 'when file is too big' do
+          let(:file_path) { 'spec/fixtures/big-image.png' }
+          let(:message) { { "avatar" => ["is too big (should be at most 200 KB)"] } }
 
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(response.message).to eq('Bad Request')
-        expect(json_response['message']['avatar']).to eq(['file format is not supported.'\
-                                              ' Please try one of the following supported formats:'\
-                                              ' png, jpg, jpeg, gif, bmp, tiff, ico'])
-      end
-
-      it 'returns 400 if file size exceeds allowed limit for group avatar' do
-        group_param = {
-          avatar: fixture_file_upload('spec/fixtures/big-image.png', 'image/png')
-        }
-
-        put api("/groups/#{group1.id}", user1), params: group_param
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(response.message).to eq('Bad Request')
-        expect(json_response['message']['avatar']).to eq(['is too big (should be at most 200 KB)'])
+          it_behaves_like 'it returns 400 for bad upload request'
+        end
       end
 
       it 'returns 404 for a non existing group' do
@@ -979,6 +991,12 @@ describe API::Groups do
   end
 
   describe "POST /groups" do
+    def make_upload_request
+      group = attributes_for_group_api request_access_enabled: false
+      group[:avatar] = fixture_file_upload(file_path)
+      post api("/groups", user3), params: group
+    end
+
     context "when authenticated as user without group permissions" do
       it "does not create group" do
         group = attributes_for_group_api
@@ -1027,42 +1045,26 @@ describe API::Groups do
         expect(json_response["visibility"]).to eq(Gitlab::VisibilityLevel.string_level(Gitlab::CurrentSettings.current_application_settings.default_group_visibility))
       end
 
-      it "uploads avatar for a group" do
-        group = attributes_for_group_api request_access_enabled: false
-        group[:avatar] = fixture_file_upload('spec/fixtures/banana_sample.gif', 'image/gif')
+      context 'group avatar upload' do
+        context 'when appropriate file is used' do
+          let(:file_path) { 'spec/fixtures/banana_sample.gif' }
 
-        post api("/groups", user3), params: group
+          it_behaves_like 'it uploads group avatar'
+        end
 
-        group_id = json_response['id']
-        expect(json_response['avatar_url']).to eq('http://localhost/uploads/'\
-                                                  '-/system/group/avatar/'\
-                                                  "#{group_id}/banana_sample.gif")
-      end
+        context 'when invalid file is used' do
+          let(:file_path) { 'spec/fixtures/doc_sample.txt' }
+          let(:message)   { 'Failed to save group {:avatar=>["file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico"]}' }
 
-      it 'returns a 400 if file type is invalid for group avatar' do
-        group = attributes_for_group_api request_access_enabled: false
-        group[:avatar] = fixture_file_upload('spec/fixtures/doc_sample.txt', 'text/plain')
+          it_behaves_like 'it returns 400 for bad upload request'
+        end
 
-        post api("/groups", user3), params: group
+        context 'when file is too big' do
+          let(:file_path) { 'spec/fixtures/big-image.png' }
+          let(:message)   { 'Failed to save group {:avatar=>["is too big (should be at most 200 KB)"]}' }
 
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(response.message).to eq('Bad Request')
-        expect(json_response['message']).to eq('Failed to save group'\
-                                              ' {:avatar=>["file format is not supported.'\
-                                              ' Please try one of the following supported formats:'\
-                                              ' png, jpg, jpeg, gif, bmp, tiff, ico"]}')
-      end
-
-      it 'returns 400 if group avatar file size exceeds allowed limit' do
-        group = attributes_for_group_api request_access_enabled: false
-        group[:avatar] = fixture_file_upload('spec/fixtures/big-image.png', 'image/png')
-
-        post api("/groups", user3), params: group
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(response.message).to eq('Bad Request')
-        expect(json_response['message']).to eq('Failed to save group'\
-                                              ' {:avatar=>["is too big (should be at most 200 KB)"]}')
+          it_behaves_like 'it returns 400 for bad upload request'
+        end
       end
 
       it "creates a nested group" do
