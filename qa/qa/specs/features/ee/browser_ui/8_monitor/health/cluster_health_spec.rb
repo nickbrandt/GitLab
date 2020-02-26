@@ -42,7 +42,7 @@ module QA
       def verify_cluster_health_graphs
         Page::Project::Operations::Kubernetes::Show.perform do |cluster|
           cluster.refresh
-          expect(cluster).to have_cluster_health_title
+          cluster.open_health
 
           cluster.wait_for_cluster_health
         end
