@@ -185,7 +185,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline).execute }
 
           it 'returns all vulnerability severity levels' do
-            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[undefined unknown low medium high critical info])
+            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[unknown low medium high critical info])
           end
         end
 
@@ -203,7 +203,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline).execute }
 
           it 'returns all vulnerability confidence levels' do
-            expect(subject.occurrences.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
+            expect(subject.occurrences.map(&:confidence).uniq).to match_array %w[unknown low medium high]
           end
         end
 
@@ -222,8 +222,8 @@ describe Security::PipelineVulnerabilitiesFinder do
 
           it 'filters by all params' do
             expect(subject.occurrences.count).to eq(cs_count + dast_count + ds_count + sast_count)
-            expect(subject.occurrences.map(&:confidence).uniq).to match_array(%w[undefined unknown low medium high])
-            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[undefined unknown low medium high critical info])
+            expect(subject.occurrences.map(&:confidence).uniq).to match_array(%w[unknown low medium high])
+            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[unknown low medium high critical info])
           end
         end
 
