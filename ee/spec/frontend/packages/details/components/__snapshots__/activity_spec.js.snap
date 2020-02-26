@@ -2,7 +2,7 @@
 
 exports[`PackageActivity render to match the default snapshot when no pipeline 1`] = `
 <div
-  class="append-bottom-default"
+  class="mb-3"
 >
   <h3
     class="gl-font-size-16"
@@ -21,7 +21,7 @@ exports[`PackageActivity render to match the default snapshot when no pipeline 1
       class="well-segment d-flex align-items-center"
     >
       <gl-icon-stub
-        class="append-right-8 d-none d-sm-block"
+        class="mr-2 d-none d-sm-block"
         name="clock"
         size="16"
       />
@@ -36,7 +36,7 @@ exports[`PackageActivity render to match the default snapshot when no pipeline 1
 
 exports[`PackageActivity render to match the default snapshot when there is a pipeline 1`] = `
 <div
-  class="append-bottom-default"
+  class="mb-3"
 >
   <h3
     class="gl-font-size-16"
@@ -85,7 +85,7 @@ exports[`PackageActivity render to match the default snapshot when there is a pi
         class="d-flex align-items-center"
       >
         <gl-icon-stub
-          class="append-right-8 d-none d-sm-block"
+          class="mr-2 d-none d-sm-block"
           name="pipeline"
           size="16"
         />
@@ -100,7 +100,7 @@ exports[`PackageActivity render to match the default snapshot when there is a pi
       class="well-segment d-flex align-items-center"
     >
       <gl-icon-stub
-        class="append-right-8 d-none d-sm-block"
+        class="mr-2 d-none d-sm-block"
         name="clock"
         size="16"
       />

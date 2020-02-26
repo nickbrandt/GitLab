@@ -47,7 +47,7 @@ export default {
 </script>
 
 <template>
-  <div class="append-bottom-default">
+  <div class="mb-3">
     <h3 class="gl-font-size-16">{{ __('Activity') }}</h3>
 
     <div ref="commit-info" class="info-well">
@@ -61,7 +61,8 @@ export default {
             v-gl-tooltip
             :title="$options.i18n.showCommit"
             :aria-label="$options.i18n.showCommit"
-            class="text-expander append-right-5 d-none d-sm-flex"
+            class="text-expander mr-2 d-none d-sm-flex"
+            type="button"
             @click="toggleShowDescription"
           >
             <gl-icon name="ellipsis_h" :size="12" />
@@ -76,8 +77,8 @@ export default {
           />
         </div>
 
-        <div v-if="showDescription" ref="commit-message" class="prepend-top-8 d-none d-sm-block">
-          <pre class="commit-row-description append-bottom-0 gl-pl-8">{{
+        <div v-if="showDescription" ref="commit-message" class="mt-2 d-none d-sm-block">
+          <pre class="commit-row-description mb-0 pl-2">{{
             packagePipeline.git_commit_message
           }}</pre>
         </div>
@@ -85,7 +86,7 @@ export default {
 
       <div v-if="packagePipeline" ref="pipeline-info" class="well-segment">
         <div class="d-flex align-items-center">
-          <gl-icon name="pipeline" class="append-right-8 d-none d-sm-block" />
+          <gl-icon name="pipeline" class="mr-2 d-none d-sm-block" />
 
           <gl-sprintf :message="$options.i18n.pipelineText">
             <template #link>
@@ -105,7 +106,7 @@ export default {
             <template #author
               >{{ packagePipeline.user.name }}
               <gl-avatar
-                class="prepend-left-8 d-none d-sm-block"
+                class="ml-2 d-none d-sm-block"
                 :src="packagePipeline.user.avatar_url"
                 :size="24"
             /></template>
@@ -114,7 +115,7 @@ export default {
       </div>
 
       <div class="well-segment d-flex align-items-center">
-        <gl-icon name="clock" class="append-right-8 d-none d-sm-block" />
+        <gl-icon name="clock" class="mr-2 d-none d-sm-block" />
 
         <gl-sprintf :message="$options.i18n.publishText">
           <template #timestamp>

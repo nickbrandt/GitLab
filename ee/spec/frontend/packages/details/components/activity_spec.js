@@ -37,6 +37,7 @@ describe('PackageActivity', () => {
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
+    wrapper = null;
   });
 
   describe('render', () => {
