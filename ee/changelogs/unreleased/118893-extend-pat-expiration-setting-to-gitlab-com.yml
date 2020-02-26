@@ -1,0 +1,6 @@
+---
+title: Do not apply instance level PAT expiry policy to the PATs of users in group
+  managed accounts
+merge_request: 25963
+author:
+type: other

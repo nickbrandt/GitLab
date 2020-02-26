@@ -46,7 +46,8 @@ describe PersonalAccessToken do
   end
 
   describe 'validations' do
-    let(:personal_access_token) { build(:personal_access_token) }
+    let(:user) { build(:user) }
+    let(:personal_access_token) { build(:personal_access_token, user: user) }
 
     it 'allows to define expires_at' do
       personal_access_token.expires_at = 1.day.from_now
@@ -68,23 +69,45 @@ describe PersonalAccessToken do
         stub_ee_application_setting(max_personal_access_token_lifetime: pat_expiration_policy)
       end
 
+      shared_examples_for 'instance level PAT expiry rules are not enforced' do
+        it 'allows expiry to be after the max_personal_access_token_lifetime' do
+          personal_access_token.expires_at = max_expiration_date + 1.day
+
+          expect(personal_access_token).to be_valid
+        end
+
+        it 'can be blank' do
+          personal_access_token.expires_at = nil
+
+          expect(personal_access_token).to be_valid
+        end
+      end
+
       context 'when the feature is licensed' do
         before do
           stub_licensed_features(personal_access_token_expiration_policy: true)
         end
 
-        it 'requires to be less or equal than the max_personal_access_token_lifetime' do
-          personal_access_token.expires_at = max_expiration_date + 1.day
+        context 'when the user does not belong to a managed group' do
+          it 'requires to be less or equal than the max_personal_access_token_lifetime' do
+            personal_access_token.expires_at = max_expiration_date + 1.day
 
-          expect(personal_access_token).not_to be_valid
-          expect(personal_access_token.errors[:expires_at].first).to eq('is invalid')
+            expect(personal_access_token).not_to be_valid
+            expect(personal_access_token.errors[:expires_at].first).to eq('is invalid')
+          end
+
+          it "can't be blank" do
+            personal_access_token.expires_at = nil
+
+            expect(personal_access_token).not_to be_valid
+            expect(personal_access_token.errors[:expires_at].first).to eq("can't be blank")
+          end
         end
 
-        it "can't be blank" do
-          personal_access_token.expires_at = nil
+        context 'when the user belongs to a managed group' do
+          let(:user) { build(:user, :group_managed) }
 
-          expect(personal_access_token).not_to be_valid
-          expect(personal_access_token.errors[:expires_at].first).to eq("can't be blank")
+          it_behaves_like 'instance level PAT expiry rules are not enforced'
         end
       end
 
@@ -93,11 +116,7 @@ describe PersonalAccessToken do
           stub_licensed_features(personal_access_token_expiration_policy: false)
         end
 
-        it 'allows to be after the max_personal_access_token_lifetime' do
-          personal_access_token.expires_at = max_expiration_date + 1.day
-
-          expect(personal_access_token).to be_valid
-        end
+        it_behaves_like 'instance level PAT expiry rules are not enforced'
       end
     end
   end

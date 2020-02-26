@@ -12,7 +12,7 @@ module PersonalAccessTokens
 
       return unless expiration_date
 
-      User.with_invalid_expires_at_tokens(expiration_date).find_each do |user|
+      User.not_managed.with_invalid_expires_at_tokens(expiration_date).find_each do |user|
         PersonalAccessTokens::RevokeInvalidTokens.new(user, expiration_date).execute
       end
     end

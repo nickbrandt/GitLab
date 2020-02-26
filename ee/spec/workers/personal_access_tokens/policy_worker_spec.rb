@@ -11,22 +11,6 @@ RSpec.describe PersonalAccessTokens::PolicyWorker, type: :worker do
       stub_application_setting(max_personal_access_token_lifetime: limit)
     end
 
-    context "when a token doesn't have an expiration time" do
-      let(:expire_at) { nil }
-
-      it 'enforces the policy on tokens' do
-        expect { subject.perform }.to change { pat.reload.revoked }.from(false).to(true)
-      end
-    end
-
-    context 'when a token expires after the given time' do
-      let(:expire_at) { 8.days.from_now.to_date }
-
-      it 'enforces the policy on tokens' do
-        expect { subject.perform }.to change { pat.reload.revoked }.from(false).to(true)
-      end
-    end
-
     context 'when a token is valid' do
       let(:expire_at) { 5.days.from_now.to_date }
 
@@ -47,6 +31,46 @@ RSpec.describe PersonalAccessTokens::PolicyWorker, type: :worker do
         expect(PersonalAccessTokens::RevokeInvalidTokens).not_to receive(:new)
 
         subject.perform
+      end
+    end
+
+    context 'invalid tokens' do
+      context 'PATs of users that do not belong to a managed group' do
+        context "when a token doesn't have an expiration time" do
+          let(:expire_at) { nil }
+
+          it 'enforces the policy on tokens' do
+            expect { subject.perform }.to change { pat.reload.revoked }.from(false).to(true)
+          end
+        end
+
+        context 'when a token expires after the given time' do
+          let(:expire_at) { 8.days.from_now.to_date }
+
+          it 'enforces the policy on tokens' do
+            expect { subject.perform }.to change { pat.reload.revoked }.from(false).to(true)
+          end
+        end
+      end
+
+      context 'PATs of users that belongs to a managed group' do
+        let!(:pat_of_managed_user) { create(:personal_access_token, expires_at: expire_at, user: build(:user, :group_managed)) }
+
+        context "when a token doesn't have an expiration time" do
+          let(:expire_at) { nil }
+
+          it 'does not enforce the policy on tokens' do
+            expect { subject.perform }.not_to change { pat_of_managed_user.reload.revoked }
+          end
+        end
+
+        context 'when a token expires after the given time' do
+          let(:expire_at) { 8.days.from_now.to_date }
+
+          it 'does not enforce the policy on tokens' do
+            expect { subject.perform }.not_to change { pat_of_managed_user.reload.revoked }
+          end
+        end
       end
     end
   end
