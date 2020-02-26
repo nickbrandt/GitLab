@@ -153,20 +153,25 @@ export default {
 
   computed: {
     tabs() {
-      return [
+      const tabsArray = [
         {
           name: s__('Available'),
           scope: 'available',
           count: this.state.availableCounter,
           isActive: this.scope === 'available',
         },
-        {
+      ];
+
+      if (this.state.stoppedCounter > 0) {
+        tabsArray.push({
           name: s__('Stopped'),
           scope: 'stopped',
           count: this.state.stoppedCounter,
           isActive: this.scope === 'stopped',
-        },
-      ];
+        });
+      }
+
+      return tabsArray;
     },
   },
 
