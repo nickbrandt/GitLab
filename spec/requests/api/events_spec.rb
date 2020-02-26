@@ -115,21 +115,15 @@ describe API::Events do
       end
 
       context 'when the list of events includes wiki page events' do
-        let(:page) do
-          wiki = create(:project_wiki, project: private_project, user: user)
-          create(:wiki_page, wiki: wiki)
-        end
-
-        before do
-          [Event::CREATED, Event::UPDATED, Event::DESTROYED].each do |event|
-            EventCreateService.new.wiki_event(page, event, nil)
-          end
-        end
-
         it 'returns information about the wiki event', :aggregate_failures do
+          page = create(:wiki_page, project: private_project)
+          [Event::CREATED, Event::UPDATED, Event::DESTROYED].each do |action|
+            create(:wiki_page_event, wiki_page: page, action: action, author: user)
+          end
+
           get api("/users/#{user.id}/events", user)
 
-          wiki_events = json_response.select { |e| e['target_type'] == 'WikiPageMeta' }
+          wiki_events = json_response.select { |e| e['target_type'] == 'WikiPage::Meta' }
           action_names = wiki_events.map { |e| e['action_name'] }
           titles = wiki_events.map { |e| e['target_title'] }
           slugs = wiki_events.map { |e| e.dig('wiki_page', 'slug') }
