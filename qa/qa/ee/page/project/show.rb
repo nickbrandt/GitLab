@@ -24,7 +24,9 @@ module QA
           end
 
           def wait_for_import_success
-            has_text?('The project was successfully imported.', wait: QA::Support::Repeater::DEFAULT_MAX_WAIT_TIME)
+            wait_until(max_duration: 120, sleep_interval: 1) do
+              has_text?('The project was successfully imported.')
+            end
           end
         end
       end
