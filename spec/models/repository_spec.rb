@@ -325,13 +325,13 @@ describe Repository do
         commit = repository.commits(nil, limit: 1).first
         known_author = "#{commit.author_name} <#{commit.author_email}>"
 
-        expect(repository.commits(nil, author: known_author, limit: 1).size).to be > 0
+        expect(repository.commits(nil, author: known_author, limit: 1)).not_to be_empty
       end
 
       it "doesn't returns commits from an unknown author" do
         unknown_author = "The Man With No Name <zapp@brannigan.com>"
 
-        expect(repository.commits(nil, author: unknown_author, limit: 1).size).to eq(0)
+        expect(repository.commits(nil, author: unknown_author, limit: 1)).to be_empty
       end
     end
 
