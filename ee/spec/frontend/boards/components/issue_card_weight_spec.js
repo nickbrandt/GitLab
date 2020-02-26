@@ -1,59 +1,53 @@
-import Vue from 'vue';
+import { shallowMount } from '@vue/test-utils';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
 
-describe('IssueCardWeight component', () => {
-  let vm;
-  let Component;
-
-  beforeAll(() => {
-    Component = Vue.extend(IssueCardWeight);
+function mountIssueCardWeight(propsData) {
+  return shallowMount(IssueCardWeight, {
+    propsData,
   });
+}
+
+describe('IssueCardWeight', () => {
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
-  it('renders weight', () => {
-    vm = mountComponent(Component, {
-      weight: 5,
+  describe('weight text', () => {
+    it('shows 0 when weight is 0', () => {
+      wrapper = mountIssueCardWeight({
+        weight: 0,
+      });
+
+      expect(wrapper.find('.board-card-info-text').text()).toContain(0);
     });
 
-    expect(vm.$el.querySelector('.board-card-info-text').innerText).toContain('5');
+    it('shows 5 when weight is 5', () => {
+      wrapper = mountIssueCardWeight({
+        weight: 5,
+      });
+
+      expect(wrapper.find('.board-card-info-text').text()).toContain('5');
+    });
   });
 
   it('renders a link when no tag is specified', () => {
-    vm = mountComponent(Component, {
+    wrapper = mountIssueCardWeight({
       weight: 2,
     });
 
-    expect(vm.$el.querySelector('a.board-card-info')).toBeDefined();
+    expect(wrapper.find('span.board-card-info').exists()).toBe(false);
+    expect(wrapper.find('a.board-card-info').exists()).toBe(true);
   });
 
   it('renders the tag when it is explicitly specified', () => {
-    vm = mountComponent(Component, {
+    wrapper = mountIssueCardWeight({
       weight: 2,
       tagName: 'span',
     });
 
-    expect(vm.$el.querySelector('span.board-card-info')).toBeDefined();
-    expect(vm.$el.querySelector('a.board-card-info')).toBeNull();
-  });
-
-  describe('with weight=0', () => {
-    beforeEach(() => {
-      vm = mountComponent(Component, {
-        weight: 0,
-      });
-    });
-
-    afterEach(() => {
-      vm.$destroy();
-    });
-
-    it('renders weight', () => {
-      expect(vm.$el.querySelector('.board-card-info-text')).toBeDefined();
-      expect(vm.$el.querySelector('.board-card-info-text').innerText).toContain(0);
-    });
+    expect(wrapper.find('span.board-card-info').exists()).toBe(true);
+    expect(wrapper.find('a.board-card-info').exists()).toBe(false);
   });
 });
