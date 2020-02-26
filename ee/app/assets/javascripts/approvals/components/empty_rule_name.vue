@@ -24,6 +24,7 @@ export default {
     <span id="popovercontainer" class="ml-2 align-self-end">
       <icon
         id="pop-approver"
+        tabindex="0"
         name="question-o"
         :aria-label="__('help')"
         :size="14"
@@ -33,7 +34,7 @@ export default {
         target="pop-approver"
         container="popovercontainer"
         placement="top"
-        triggers="focus"
+        triggers="hover focus"
       >
         <template #title>{{ __('Who can be an approver?') }}</template>
         <ul class="pl-3">
