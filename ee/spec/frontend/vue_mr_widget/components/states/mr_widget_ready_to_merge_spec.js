@@ -269,7 +269,7 @@ describe('ReadyToMerge', () => {
         const button = findMergeButton();
 
         expect(button.exists()).toBe(true);
-        expect(button.attributes('disabled')).toBe('disabled');
+        expect(button.attributes('disabled')).toBe('true');
       });
     });
   });
