@@ -97,50 +97,11 @@ describe('security reports mutations', () => {
 
   describe('SET_ISSUE_MODAL_DATA', () => {
     it('has default data', () => {
-      expect(stateCopy.modal.data.description.value).toEqual(null);
-      expect(stateCopy.modal.data.description.text).toEqual('Description');
-      expect(stateCopy.modal.data.description.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.identifiers.value).toEqual([]);
-      expect(stateCopy.modal.data.identifiers.text).toEqual('Identifiers');
-      expect(stateCopy.modal.data.identifiers.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.file.value).toEqual(null);
-      expect(stateCopy.modal.data.file.text).toEqual('File');
-      expect(stateCopy.modal.data.file.isLink).toEqual(true);
-
-      expect(stateCopy.modal.data.className.value).toEqual(null);
-      expect(stateCopy.modal.data.className.text).toEqual('Class');
-      expect(stateCopy.modal.data.className.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.methodName.value).toEqual(null);
-      expect(stateCopy.modal.data.methodName.text).toEqual('Method');
-      expect(stateCopy.modal.data.methodName.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.namespace.value).toEqual(null);
-      expect(stateCopy.modal.data.namespace.text).toEqual('Namespace');
-      expect(stateCopy.modal.data.namespace.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.severity.value).toEqual(null);
-      expect(stateCopy.modal.data.severity.text).toEqual('Severity');
-      expect(stateCopy.modal.data.severity.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.links.value).toEqual([]);
-      expect(stateCopy.modal.data.links.text).toEqual('Links');
-      expect(stateCopy.modal.data.links.isLink).toEqual(false);
-
-      expect(stateCopy.modal.data.instances.value).toEqual([]);
-      expect(stateCopy.modal.data.instances.text).toEqual('Instances');
-      expect(stateCopy.modal.data.instances.isLink).toEqual(false);
-
       expect(stateCopy.modal.vulnerability.isDismissed).toEqual(false);
       expect(stateCopy.modal.vulnerability.hasIssue).toEqual(false);
 
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(false);
       expect(stateCopy.modal.isDismissingVulnerability).toEqual(false);
-
-      expect(stateCopy.modal.data.url.value).toEqual(null);
-      expect(stateCopy.modal.data.url.url).toEqual(null);
 
       expect(stateCopy.modal.title).toEqual(null);
       expect(stateCopy.modal.learnMoreUrl).toEqual(null);
@@ -194,23 +155,6 @@ describe('security reports mutations', () => {
       mutations[types.SET_ISSUE_MODAL_DATA](stateCopy, { issue, status });
 
       expect(stateCopy.modal.title).toEqual(issue.title);
-      expect(stateCopy.modal.data.description.value).toEqual(issue.description);
-      expect(stateCopy.modal.data.file.value).toEqual(issue.location.file);
-      expect(stateCopy.modal.data.file.url).toEqual(issue.urlPath);
-      expect(stateCopy.modal.data.className.value).toEqual(issue.location.class);
-      expect(stateCopy.modal.data.methodName.value).toEqual(issue.location.method);
-      expect(stateCopy.modal.data.namespace.value).toEqual(issue.location.operating_system);
-      expect(stateCopy.modal.data.image.value).toEqual(issue.location.image);
-      expect(stateCopy.modal.data.identifiers.value).toEqual(issue.identifiers);
-      expect(stateCopy.modal.data.severity.value).toEqual(issue.severity);
-      expect(stateCopy.modal.data.links.value).toEqual(issue.links);
-      expect(stateCopy.modal.data.instances.value).toEqual(issue.instances);
-      expect(stateCopy.modal.data.url.value).toEqual(
-        `${issue.location.hostname}${issue.location.path}`,
-      );
-      expect(stateCopy.modal.data.url.url).toEqual(
-        `${issue.location.hostname}${issue.location.path}`,
-      );
       expect(stateCopy.modal.vulnerability).toEqual(issue);
       expect(stateCopy.modal.isResolved).toEqual(true);
     });

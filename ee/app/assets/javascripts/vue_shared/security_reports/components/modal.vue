@@ -86,7 +86,7 @@ export default {
       );
     },
     project() {
-      return this.modal.data.project;
+      return this.modal.project;
     },
     solution() {
       return this.vulnerability && this.vulnerability.solution;
@@ -122,22 +122,6 @@ export default {
     isEditingExistingFeedback() {
       return this.dismissalFeedback && this.modal.isCommentingOnDismissal;
     },
-    valuedFields() {
-      const { data } = this.modal;
-      const result = {};
-
-      Object.keys(data).forEach(key => {
-        if (data[key].value && data[key].value.length) {
-          result[key] = data[key];
-          if (key === 'file' && this.vulnerability.blob_path) {
-            result[key].isLink = true;
-            result[key].url = this.vulnerability.blob_path;
-          }
-        }
-      });
-
-      return result;
-    },
     dismissalFeedbackObject() {
       if (this.dismissalFeedback) {
         return this.dismissalFeedback;
@@ -153,7 +137,6 @@ export default {
       } = gon;
 
       return {
-        project_id: this.project ? this.project.id : null,
         author: {
           id: current_user_id,
           name: current_user_fullname,
@@ -203,7 +186,7 @@ export default {
     class="modal-security-report-dast"
   >
     <slot>
-      <vulnerability-details :details="valuedFields" class="js-vulnerability-details" />
+      <vulnerability-details :vulnerability="vulnerability" class="js-vulnerability-details" />
 
       <solution-card
         :solution="solution"

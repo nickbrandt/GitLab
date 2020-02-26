@@ -1,5 +1,3 @@
-import { __, s__ } from '~/locale';
-
 export default () => ({
   blobPath: {
     head: null,
@@ -67,66 +65,6 @@ export default () => ({
   modal: {
     title: null,
 
-    // Dynamic data rendered for each issue
-    data: {
-      description: {
-        value: null,
-        text: s__('ciReport|Description'),
-        isLink: false,
-      },
-      url: {
-        value: null,
-        url: null,
-        text: __('URL'),
-        isLink: true,
-      },
-      file: {
-        value: null,
-        url: null,
-        text: s__('ciReport|File'),
-        isLink: true,
-      },
-      identifiers: {
-        value: [],
-        text: s__('ciReport|Identifiers'),
-        isLink: false,
-      },
-      severity: {
-        value: null,
-        text: s__('ciReport|Severity'),
-        isLink: false,
-      },
-      className: {
-        value: null,
-        text: s__('ciReport|Class'),
-        isLink: false,
-      },
-      methodName: {
-        value: null,
-        text: s__('ciReport|Method'),
-        isLink: false,
-      },
-      image: {
-        value: null,
-        text: s__('ciReport|Image'),
-        isLink: false,
-      },
-      namespace: {
-        value: null,
-        text: s__('ciReport|Namespace'),
-        isLink: false,
-      },
-      links: {
-        value: [],
-        text: s__('ciReport|Links'),
-        isLink: false,
-      },
-      instances: {
-        value: [],
-        text: s__('ciReport|Instances'),
-        isLink: false,
-      },
-    },
     learnMoreUrl: null,
 
     vulnerability: {
