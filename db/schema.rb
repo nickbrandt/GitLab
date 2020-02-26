@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_24_163804) do
+ActiveRecord::Schema.define(version: 2020_02_26_162239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -4356,7 +4356,6 @@ ActiveRecord::Schema.define(version: 2020_02_24_163804) do
     t.bigint "start_date_sourcing_milestone_id"
     t.bigint "due_date_sourcing_milestone_id"
     t.bigint "closed_by_id"
-    t.datetime_with_timezone "closed_at"
     t.integer "state", limit: 2, default: 1, null: false
     t.integer "severity", limit: 2, null: false
     t.boolean "severity_overridden", default: false
@@ -4368,6 +4367,7 @@ ActiveRecord::Schema.define(version: 2020_02_24_163804) do
     t.integer "cached_markdown_version"
     t.bigint "confirmed_by_id"
     t.datetime_with_timezone "confirmed_at"
+    t.datetime_with_timezone "dismissed_at"
     t.index ["author_id"], name: "index_vulnerabilities_on_author_id"
     t.index ["closed_by_id"], name: "index_vulnerabilities_on_closed_by_id"
     t.index ["confirmed_by_id"], name: "index_vulnerabilities_on_confirmed_by_id"
