@@ -43,6 +43,7 @@ export default {
     :ok-title="title"
     ok-variant="success"
     :cancel-title="__('Cancel')"
+    size="sm"
     @ok.prevent="submit"
   >
     <rule-form ref="form" :init-rule="rule" :is-mr-edit="isMrEdit" />
