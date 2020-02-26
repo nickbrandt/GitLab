@@ -13,6 +13,7 @@ module EE
         created_at: event.created_at,
         noteable: resource,
         event: event,
+        discussion_id: event.discussion_id,
         system_note_metadata: ::SystemNoteMetadata.new(action: 'weight'),
         resource_parent: resource_parent
       }

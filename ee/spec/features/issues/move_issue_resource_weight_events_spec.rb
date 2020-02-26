@@ -41,14 +41,14 @@ describe 'Resource weight events', :js do
         visit project_issue_path(target_project, issue)
         wait_for_all_requests
 
-        expect(page).to have_content 'changed weight to 2'
-        expect(page).to have_content 'changed weight to 3'
+        expect(page).to have_content('changed weight to 2', count: 1)
+        expect(page).to have_content('changed weight to 3', count: 1)
 
         visit project_issue_path(project, issue)
         wait_for_all_requests
 
-        expect(page).to have_content 'changed weight to 2'
-        expect(page).to have_content 'changed weight to 3'
+        expect(page).to have_content('changed weight to 2', count: 1)
+        expect(page).to have_content('changed weight to 3', count: 1)
         expect(page).to have_content 'Closed'
       end
     end
