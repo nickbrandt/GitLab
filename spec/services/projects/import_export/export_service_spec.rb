@@ -27,7 +27,7 @@ describe Projects::ImportExport::ExportService do
     end
 
     it 'saves the models' do
-      expect(Gitlab::ImportExport::ProjectTreeSaver).to receive(:new).and_call_original
+      expect(Gitlab::ImportExport::Project::TreeSaver).to receive(:new).and_call_original
 
       service.execute
     end
