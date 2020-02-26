@@ -16,9 +16,8 @@ describe Banzai::Filter::LabelReferenceFilter do
 
     it 'includes link to scoped documentation' do
       doc = reference_filter("See #{scoped_label.to_reference}")
-      scope, name = scoped_label.name.split(Label::SCOPED_LABEL_SEPARATOR)
 
-      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scope}</span><span.+>#{name}</span></a><a.+>.*question-circle.*</a></span>))
+      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped_label.scoped_label_key}</span><span.+>#{scoped_label.scoped_label_value}</span></a><a.+>.*question-circle.*</a></span>))
     end
 
     it 'does not include link to scoped documentation for common labels' do
