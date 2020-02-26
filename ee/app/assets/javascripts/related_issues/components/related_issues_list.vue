@@ -53,11 +53,6 @@ export default {
       default: () => [],
     },
   },
-  computed: {
-    validIssueWeight() {
-      return this.issue && this.issue.weight >= 0;
-    },
-  },
   mounted() {
     if (this.canReorder) {
       this.sortable = Sortable.create(
@@ -146,7 +141,7 @@ export default {
             class="qa-related-issuable-item"
             @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
           >
-            <span v-if="validIssueWeight" slot="weight" class="order-md-1">
+            <span v-if="issue.weight > 0" slot="weight" class="order-md-1">
               <issue-weight
                 :weight="issue.weight"
                 class="item-weight d-flex align-items-center"
