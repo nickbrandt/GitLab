@@ -7,7 +7,7 @@ describe SnippetBlobPresenter do
     let_it_be(:snippet) { create(:personal_snippet) }
 
     before do
-      allow_next_instance_of(ActionController::Base) do |instance|
+      allow_next_instance_of(described_class) do |instance|
         allow(instance).to receive(:current_user).and_return(nil)
       end
     end
@@ -28,7 +28,13 @@ describe SnippetBlobPresenter do
         let(:snippet) { create(:personal_snippet, file_name: 'test.md', content: '*foo*') }
 
         it 'returns rich markdown content' do
-          expect(subject).to eq '<div class="file-content md md-file"><p data-sourcepos="1:1-1:5" dir="auto"><em>foo</em></p></div>'
+          expected = <<~HTML
+            <div class="file-content md">
+            <p data-sourcepos="1:1-1:5" dir="auto"><em>foo</em></p>
+            </div>
+          HTML
+
+          expect(subject).to eq(expected)
         end
       end
 
@@ -36,7 +42,7 @@ describe SnippetBlobPresenter do
         let(:snippet) { create(:personal_snippet, file_name: 'test.ipynb') }
 
         it 'returns rich notebook content' do
-          expect(subject.strip).to eq '<div class="file-content" data-endpoint="http://127.0.0.1:3000/snippets/'+ snippet.id.to_s + '/raw" id="js-notebook-viewer"></div>'
+          expect(subject.strip).to eq %Q(<div class="file-content" data-endpoint="/snippets/#{snippet.id}/raw" id="js-notebook-viewer"></div>)
         end
       end
 
@@ -44,7 +50,7 @@ describe SnippetBlobPresenter do
         let(:snippet) { create(:personal_snippet, file_name: 'openapi.yml') }
 
         it 'returns rich openapi content' do
-          expect(subject).to eq '<div class="file-content" data-endpoint="http://127.0.0.1:3000/snippets/'+ snippet.id.to_s + '/raw" id="js-openapi-viewer"></div>'
+          expect(subject).to eq %Q(<div class="file-content" data-endpoint="/snippets/#{snippet.id}/raw" id="js-openapi-viewer"></div>\n)
         end
       end
 
@@ -52,9 +58,11 @@ describe SnippetBlobPresenter do
         let(:snippet) { create(:personal_snippet, file_name: 'test.svg') }
 
         it 'returns rich svg content' do
-          snippet.file_name = 'test.svg'
+          result = Nokogiri::HTML::DocumentFragment.parse(subject)
+          image_tag = result.search('img').first
 
-          expect(subject).to eq '<div class="file-content" data-endpoint="http://127.0.0.1:3000/snippets/'+ snippet.id.to_s + '/raw" id="js-openapi-viewer"></div>'
+          expect(image_tag.attr('src')).to include("data:#{snippet.blob.mime_type};base64")
+          expect(image_tag.attr('alt')).to eq('test.svg')
         end
       end
 
