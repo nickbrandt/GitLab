@@ -2,6 +2,7 @@
   cache:
     paths:
       - vendor/ruby/
+      - public/assets/webpack/
       - .yarn-cache/
       - tmp/cache/assets/sprockets
       - tmp/cache/babel-loader
@@ -28,13 +29,14 @@
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
   cache:
-    key: "assets-compile:production:vendor_ruby:.yarn-cache:tmp_cache_assets_sprockets:tmp_cache_webpack:v9"
+    key: "assets-compile:production:v1"
   artifacts:
     name: webpack-report
     expire_in: 31d
     paths:
       - webpack-report/
-      - public/assets/
+      - public/assets/application-*.css
+      - public/assets/application-*.css.gz
   script:
     - node --version
     - retry yarn install --frozen-lockfile --production --cache-folder .yarn-cache --prefer-offline
@@ -79,7 +81,7 @@ gitlab:assets:compile pull-cache:
     NODE_OPTIONS: --max_old_space_size=3584
     WEBPACK_VENDOR_DLL: "true"
   cache:
-    key: "assets-compile:v9"
+    key: "assets-compile:test:v1"
   artifacts:
     expire_in: 7d
     paths:
@@ -100,7 +102,7 @@ compile-assets pull-push-cache as-if-foss:
     - .as-if-foss
   cache:
     policy: pull-push
-    key: "assets-compile:v9:foss"
+    key: "assets-compile:test:as-if-foss:v1"
 
 compile-assets pull-cache:
   extends:
@@ -116,7 +118,7 @@ compile-assets pull-cache as-if-foss:
     - .as-if-foss
   cache:
     policy: pull
-    key: "assets-compile:v9:foss"
+    key: "assets-compile:test:as-if-foss:v1"
 
 .frontend-fixtures-base:
   extends:
