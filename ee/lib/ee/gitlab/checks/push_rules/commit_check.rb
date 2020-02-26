@@ -27,14 +27,14 @@ module EE
               end
             end
           rescue ::PushRule::MatchError => e
-            raise ::Gitlab::GitAccess::UnauthorizedError, e.message
+            raise ::Gitlab::GitAccess::ForbiddenError, e.message
           end
 
           private
 
           def push_rule_commit_check(commit)
             error = check_commit(commit)
-            raise ::Gitlab::GitAccess::UnauthorizedError, error if error
+            raise ::Gitlab::GitAccess::ForbiddenError, error if error
           end
 
           # If commit does not pass push rule validation the whole push should be rejected.

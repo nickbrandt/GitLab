@@ -108,13 +108,13 @@ describe Gitlab::Checks::DiffCheck do
         it_behaves_like 'check ignored when push rule unlicensed'
 
         it "returns an error if a new or renamed filed doesn't match the file name regex" do
-          expect { subject.validate! }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "File name README was blacklisted by the pattern READ*.")
+          expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, "File name README was blacklisted by the pattern READ*.")
         end
 
         it 'returns an error if the regex is invalid' do
           push_rule.file_name_regex = '+'
 
-          expect { subject.validate! }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /\ARegular expression '\+' is invalid/)
+          expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, /\ARegular expression '\+' is invalid/)
         end
       end
 
@@ -164,7 +164,7 @@ describe Gitlab::Checks::DiffCheck do
               project.repository.commits_between(old_rev, new_rev)
             )
 
-            expect { subject.validate! }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /File name #{file_path} was blacklisted by the pattern/)
+            expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, /File name #{file_path} was blacklisted by the pattern/)
           end
         end
       end
@@ -177,7 +177,7 @@ describe Gitlab::Checks::DiffCheck do
       it 'returns an error if the changes update a path locked by another user' do
         path_lock
 
-        expect { subject.validate! }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "The path 'README' is locked by #{path_lock.user.name}")
+        expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, "The path 'README' is locked by #{path_lock.user.name}")
       end
 
       it 'memoizes the validate_path_locks? call' do
