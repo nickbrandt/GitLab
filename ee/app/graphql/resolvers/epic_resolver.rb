@@ -92,5 +92,10 @@ module Resolvers
 
       complexity
     end
+
+    # https://gitlab.com/gitlab-org/gitlab/issues/205312
+    def self.complexity_multiplier(args)
+      0.001
+    end
   end
 end
