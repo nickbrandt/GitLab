@@ -30,6 +30,8 @@ exports[`Package code instruction single line to match the default snapshot 1`] 
       title="Copy npm install command"
       type="button"
     >
+      <!---->
+       
       <svg
         class="gl-icon s16"
       >
