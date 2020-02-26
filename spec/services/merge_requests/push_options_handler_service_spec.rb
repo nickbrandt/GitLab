@@ -25,6 +25,10 @@ RSpec.describe MergeRequests::PushOptionsHandlerService do
   let(:default_branch_changes) { "d14d6c0abdd253381df51a723d58691b2ee1ab08 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/#{project.default_branch}" }
   let(:error_mr_required) { "A merge_request.create push option is required to create a merge request for branch #{source_branch}" }
 
+  before do
+    stub_licensed_features(multiple_merge_request_assignees: false)
+  end
+
   shared_examples_for 'a service that can create a merge request' do
     subject(:last_mr) { MergeRequest.last }
 
@@ -114,6 +118,17 @@ RSpec.describe MergeRequests::PushOptionsHandlerService do
       service.execute
 
       expect(last_mr.label_ids.count).to eq(count)
+    end
+  end
+
+  # In the foss version of GitLab, there can be only one assignee
+  shared_examples_for 'a service that can change one assignee of a merge request' do
+    subject(:last_mr) { MergeRequest.last }
+
+    it 'changes assignee count' do
+      service.execute
+
+      expect(last_mr.assignees.count).to eq(1)
     end
   end
 
@@ -588,6 +603,68 @@ RSpec.describe MergeRequests::PushOptionsHandlerService do
 
       it_behaves_like 'a service that does not create a merge request'
       it_behaves_like 'a service that can change labels of a merge request', 1
+    end
+
+    context 'with a deleted branch' do
+      let(:changes) { deleted_branch_changes }
+
+      it_behaves_like 'a service that does nothing'
+    end
+
+    context 'with the project default branch' do
+      let(:changes) { default_branch_changes }
+
+      it_behaves_like 'a service that does nothing'
+    end
+  end
+
+  describe '`assign` push option' do
+    let(:push_options) { { assign: { user2.id => 1, user3.id => 1 } } }
+
+    context 'with a new branch' do
+      let(:changes) { new_branch_changes }
+
+      it_behaves_like 'a service that does not create a merge request'
+
+      it 'adds an error to the service' do
+        service.execute
+
+        expect(service.errors).to include(error_mr_required)
+      end
+
+      context 'when coupled with the `create` push option in foss' do
+        let(:push_options) { { create: true, assign: { user2.id => 1, user3.id => 1 } } }
+
+        it_behaves_like 'a service that can create a merge request'
+        it_behaves_like 'a service that can change one assignee of a merge request'
+      end
+    end
+
+    context 'with an existing branch but no open MR' do
+      let(:changes) { existing_branch_changes }
+
+      it_behaves_like 'a service that does not create a merge request'
+
+      it 'adds an error to the service' do
+        service.execute
+
+        expect(service.errors).to include(error_mr_required)
+      end
+
+      context 'when coupled with the `create` push option in foss' do
+        let(:push_options) { { create: true, assign: { user2.id => 1, user3.id => 1 } } }
+
+        it_behaves_like 'a service that can create a merge request'
+        it_behaves_like 'a service that can change one assignee of a merge request'
+      end
+    end
+
+    context 'with an existing branch that has a merge request open in foss' do
+      let(:changes) { existing_branch_changes }
+      let!(:merge_request) { create(:merge_request, source_project: project, source_branch: source_branch)}
+
+      it_behaves_like 'a service that does not create a merge request'
+      it_behaves_like 'a service that can change one assignee of a merge request'
     end
 
     context 'with a deleted branch' do
