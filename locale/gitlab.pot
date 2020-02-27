@@ -6700,6 +6700,9 @@ msgstr ""
 msgid "Difference between start date and now"
 msgstr ""
 
+msgid "DiffsCompareBaseBranch|(HEAD)"
+msgstr ""
+
 msgid "DiffsCompareBaseBranch|(base)"
 msgstr ""
 
