@@ -658,8 +658,6 @@ describe Gitlab::Database::MigrationHelpers do
       end
 
       context 'when a column limit is set' do
-        let(:column) { Project.columns.find { |c| c.name == "id" } }
-
         it 'adds the column with a limit' do
           allow(model).to receive(:transaction_open?).and_return(false)
           allow(model).to receive(:transaction).and_yield
