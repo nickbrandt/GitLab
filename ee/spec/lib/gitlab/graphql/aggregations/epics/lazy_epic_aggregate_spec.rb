@@ -58,8 +58,8 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
       end
 
       it 'does not make the query again' do
-        expect(epic_info_node).to receive(:aggregate_object_by).with(subject.facet)
-        expect(Gitlab::Graphql::Aggregations::Epics::BulkEpicAggregateLoader).not_to receive(:new)
+        expect(epic_info_node).to receive(:aggregate_count)
+        expect(Gitlab::Graphql::Loaders::BulkEpicAggregateLoader).not_to receive(:new)
 
         subject.epic_aggregate
       end
@@ -79,8 +79,8 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
       end
 
       before do
-        allow(Gitlab::Graphql::Aggregations::Epics::EpicNode).to receive(:aggregate_object_by).and_call_original
-        expect_any_instance_of(Gitlab::Graphql::Aggregations::Epics::BulkEpicAggregateLoader).to receive(:execute).and_return(fake_data)
+        allow(Gitlab::Graphql::Aggregations::Epics::EpicNode).to receive(:aggregate_count).and_call_original
+        expect_any_instance_of(Gitlab::Graphql::Loaders::BulkEpicAggregateLoader).to receive(:execute).and_return(fake_data)
       end
 
       it 'clears the pending IDs' do
@@ -108,12 +108,12 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[epic_id]).to have_direct_sum(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
-          expect(tree[epic_id]).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_direct_sum(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_immediate_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_immediate_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
 
-          expect(tree[child_epic_id]).to have_direct_sum(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
-          expect(tree[child_epic_id]).to have_direct_sum(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
+          expect(tree[child_epic_id]).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
+          expect(tree[child_epic_id]).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
         end
 
         it 'assembles recursive sums for the parent', :aggregate_failures do
@@ -122,22 +122,23 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 2)
-          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
-          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
-          expect(tree[epic_id]).to have_aggregate(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 2)
+          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
+          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
+          expect(tree[epic_id]).to have_aggregate(tree, EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
         end
       end
 
       context 'for a standalone epic with no issues' do
-        it 'assembles direct sums', :aggregate_failures do
+        it 'assembles direct totals', :aggregate_failures do
           subject.epic_aggregate
 
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[other_epic_id].direct_sums).to be_empty
+          expect(tree[other_epic_id].immediate_count_totals).to be_empty
+          expect(tree[other_epic_id].immediate_weight_sum_totals).to be_empty
         end
       end
     end

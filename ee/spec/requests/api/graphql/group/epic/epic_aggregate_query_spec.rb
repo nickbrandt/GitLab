@@ -57,102 +57,103 @@ describe 'Epic aggregates (count and weight)' do
       post_graphql(query, current_user: current_user)
     end
 
-  shared_examples 'counts properly' do
-    it_behaves_like 'a working graphql query'
+    shared_examples 'counts properly' do
+      it_behaves_like 'a working graphql query'
 
-    it 'returns the epic counts' do
-      epic_count_result = {
-        "openedEpics" => 1,
-        "closedEpics" => 2
-      }
-
-      is_expected.to include(
-        a_hash_including('descendantCounts' => a_hash_including(epic_count_result))
-      )
-    end
-
-    it 'returns the issue counts' do
-      issue_count_result = {
-        "openedIssues" => 1,
-        "closedIssues" => 1
-      }
-
-      is_expected.to include(
-        a_hash_including('descendantCounts' => a_hash_including(issue_count_result))
-      )
-    end
-  end
-
-  context 'with feature flag enabled' do
-    before do
-      stub_feature_flags(unfiltered_epic_aggregates: true)
-    end
-
-    it 'uses the LazyEpicAggregate service' do
-      # one for count, one for weight_sum, even though the share the same tree state as part of the context
-      expect(Epics::LazyEpicAggregate).to receive(:new).twice
-
-      post_graphql(query, current_user: current_user)
-    end
-
-    it_behaves_like 'counts properly'
-
-    it 'returns the weights' do
-      descendant_weight_result = {
-          "openedIssues" => 5,
-          "closedIssues" => 7
-      }
-
-      is_expected.to include(
-        a_hash_including('descendantWeightSum' => a_hash_including(descendant_weight_result))
-      )
-    end
-  end
-
-  context 'with feature flag disabled' do
-    before do
-      stub_feature_flags(unfiltered_epic_aggregates: false)
-    end
-
-    context 'when requesting counts' do
-      let(:epic_aggregates_query) do
-        <<~QUERY
-        nodes {
-          descendantCounts {
-            openedEpics
-            closedEpics
-            openedIssues
-            closedIssues
-          }
+      it 'returns the epic counts' do
+        epic_count_result = {
+          "openedEpics" => 1,
+          "closedEpics" => 2
         }
-        QUERY
+
+        is_expected.to include(
+          a_hash_including('descendantCounts' => a_hash_including(epic_count_result))
+        )
       end
 
-      it 'uses the DescendantCountService' do
-        expect(Epics::DescendantCountService).to receive(:new)
+      it 'returns the issue counts' do
+        issue_count_result = {
+          "openedIssues" => 1,
+          "closedIssues" => 1
+        }
+
+        is_expected.to include(
+          a_hash_including('descendantCounts' => a_hash_including(issue_count_result))
+        )
+      end
+    end
+
+    context 'with feature flag enabled' do
+      before do
+        stub_feature_flags(unfiltered_epic_aggregates: true)
+      end
+
+      it 'uses the LazyEpicAggregate service' do
+        # one for count, one for weight_sum, even though the share the same tree state as part of the context
+        expect(Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate).to receive(:new).twice
 
         post_graphql(query, current_user: current_user)
       end
 
       it_behaves_like 'counts properly'
+
+      it 'returns the weights' do
+        descendant_weight_result = {
+            "openedIssues" => 5,
+            "closedIssues" => 7
+        }
+
+        is_expected.to include(
+          a_hash_including('descendantWeightSum' => a_hash_including(descendant_weight_result))
+        )
+      end
     end
 
-    context 'when requesting weights' do
-      let(:epic_aggregates_query) do
-        <<~QUERY
-        nodes {
-          descendantWeightSum {
-            openedIssues
-            closedIssues
-          }
-        }
-        QUERY
+    context 'with feature flag disabled' do
+      before do
+        stub_feature_flags(unfiltered_epic_aggregates: false)
       end
 
-      it 'returns an error' do
-        post_graphql(query, current_user: current_user)
+      context 'when requesting counts' do
+        let(:epic_aggregates_query) do
+          <<~QUERY
+          nodes {
+            descendantCounts {
+              openedEpics
+              closedEpics
+              openedIssues
+              closedIssues
+            }
+          }
+          QUERY
+        end
 
-        expect_graphql_errors_to_include /Field 'descendantWeightSum' doesn't exist on type 'Epic/
+        it 'uses the DescendantCountService' do
+          expect(Epics::DescendantCountService).to receive(:new)
+
+          post_graphql(query, current_user: current_user)
+        end
+
+        it_behaves_like 'counts properly'
+      end
+
+      context 'when requesting weights' do
+        let(:epic_aggregates_query) do
+          <<~QUERY
+          nodes {
+            descendantWeightSum {
+              openedIssues
+              closedIssues
+            }
+          }
+          QUERY
+        end
+
+        it 'returns an error' do
+          post_graphql(query, current_user: current_user)
+
+          expect_graphql_errors_to_include /Field 'descendantWeightSum' doesn't exist on type 'Epic/
+        end
       end
     end
   end

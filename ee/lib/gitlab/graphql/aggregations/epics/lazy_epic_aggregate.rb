@@ -5,7 +5,7 @@ module Gitlab
     module Aggregations
       module Epics
         class LazyEpicAggregate
-          include Constants
+          include ::Gitlab::Graphql::Aggregations::Epics::Constants
 
           attr_reader :facet, :epic_id, :lazy_state
 
@@ -38,7 +38,7 @@ module Gitlab
             if loaded_epic_info_node
               # The pending IDs were already loaded,
               # so return the result of that previous load
-              loaded_epic_info_node.aggregate_object_by(@facet)
+              aggregate_object(loaded_epic_info_node)
             else
               load_records_into_tree
             end
@@ -56,16 +56,16 @@ module Gitlab
             pending_ids = @lazy_state[:pending_ids].to_a
 
             # Fire off the db query and get the results (grouped by epic_id and facet)
-            raw_epic_aggregates = Epics::BulkEpicAggregateLoader.new(epic_ids: pending_ids).execute
+            raw_epic_aggregates = Gitlab::Graphql::Loaders::BulkEpicAggregateLoader.new(epic_ids: pending_ids).execute
 
-            # Assemble the tree and sum everything
+            # Assemble the tree and sum immediate child epic/issues
             create_structure_from(raw_epic_aggregates)
 
             @lazy_state[:pending_ids].clear
 
             # Now, get the matching node and return its aggregate depending on the facet:
             epic_node = @lazy_state[:tree][@epic_id]
-            epic_node.aggregate_object_by(@facet)
+            aggregate_object(epic_node)
           end
 
           def create_structure_from(aggregate_records)
@@ -78,8 +78,7 @@ module Gitlab
             end
 
             associate_parents_and_children
-            assemble_direct_sums
-            calculate_recursive_sums
+            assemble_immediate_totals
           end
 
           # each of the methods below are done one after the other
@@ -89,18 +88,20 @@ module Gitlab
             end
           end
 
-          def assemble_direct_sums
+          def assemble_immediate_totals
             tree.each do |_, node|
-              node.assemble_issue_sums
+              node.assemble_issue_totals
 
               node_children = tree.select { |_, child_node| node.epic_id == child_node.parent_id }.values
-              node.assemble_epic_sums(node_children)
+              node.assemble_epic_totals(node_children)
             end
           end
 
-          def calculate_recursive_sums
-            tree.each do |_, node|
-              node.calculate_recursive_sums(tree)
+          def aggregate_object(node)
+            if @facet == COUNT
+              node.aggregate_count(tree)
+            else
+              node.aggregate_weight_sum(tree)
             end
           end
         end

@@ -1,36 +1,38 @@
 # frozen_string_literal: true
 
-# This class represents an Epic's aggregate information (added up counts) about its child epics and direct issues
+# This class represents an Epic's aggregate information (added up counts) about its child epics and immediate issues
 
 module Gitlab
   module Graphql
     module Aggregations
       module Epics
         class EpicNode
-          include Constants
+          include ::Gitlab::Graphql::Aggregations::Epics::Constants
+          include Gitlab::Utils::StrongMemoize
 
           attr_reader :epic_id, :epic_state_id, :epic_info_flat_list, :parent_id,
-                      :direct_sums, # we calculate these and recursively add them
-                      :sum_total
+                      :immediate_count_totals, :immediate_weight_sum_totals, # only counts/weights of immediate issues and child epic counts
+                      :count_aggregate, :weight_sum_aggregate
 
-          attr_accessor :child_ids
+          attr_accessor :child_ids, :calculated_count_totals, :calculated_weight_sum_totals
 
           def initialize(epic_id, flat_info_list)
             # epic aggregate records from the DB loader look like the following:
             # { 1 => [{iid: 1, epic_state_id: 1, issues_count: 1, issues_weight_sum: 2, parent_id: nil, state_id: 2}] ... }
-            # They include the sum of each epic's direct issues, grouped by status,
+            # They include the sum of each epic's immediate issues, grouped by status,
             # so in order to get a sum of the entire tree, we have to add that up recursively
             @epic_id = epic_id
             @epic_info_flat_list = flat_info_list
             @child_ids = []
-            @direct_sums = []
+            @immediate_count_totals = []
+            @immediate_weight_sum_totals = []
 
             set_epic_attributes(flat_info_list.first) # there will always be one
           end
 
-          def assemble_issue_sums
+          def assemble_issue_totals
             # this is a representation of the epic's
-            # direct child issues and epics that have come from the DB
+            # immediate child issues and epics that have come from the DB
             [OPENED_ISSUE_STATE, CLOSED_ISSUE_STATE].each do |issue_state|
               matching_issue_state_entry = epic_info_flat_list.find do |epic_info_node|
                 epic_info_node[:issues_state_id] == issue_state
@@ -41,48 +43,102 @@ module Gitlab
             end
           end
 
-          def assemble_epic_sums(children)
+          def assemble_epic_totals(children)
             [OPENED_EPIC_STATE, CLOSED_EPIC_STATE].each do |epic_state|
               create_sum_if_needed(COUNT, epic_state, EPIC_TYPE, children.select { |node| node.epic_state_id == epic_state }.count)
             end
           end
 
-          def calculate_recursive_sums(tree)
-            return sum_total if sum_total
-
-            @sum_total = SumTotal.new
-            child_ids.each do |child_id|
-              child = tree[child_id]
-              # get the child's totals, add to your own
-              child_sums = child.calculate_recursive_sums(tree).sums
-              sum_total.add(child_sums)
+          def aggregate_count(tree)
+            strong_memoize(:count_aggregate) do
+              calculate_recursive_sums(COUNT, tree)
+              OpenStruct.new({
+                opened_issues: sum_objects(COUNT, OPENED_ISSUE_STATE, ISSUE_TYPE),
+                closed_issues: sum_objects(COUNT, CLOSED_ISSUE_STATE, ISSUE_TYPE),
+                opened_epics: sum_objects(COUNT, OPENED_EPIC_STATE, EPIC_TYPE),
+                closed_epics: sum_objects(COUNT, CLOSED_EPIC_STATE, EPIC_TYPE)
+              })
             end
-            sum_total.add(direct_sums)
-            sum_total
           end
 
-          def aggregate_object_by(facet)
-            sum_total.by_facet(facet)
+          def aggregate_weight_sum(tree)
+            strong_memoize(:weight_sum_aggregate) do
+              calculate_recursive_sums(WEIGHT_SUM, tree)
+              OpenStruct.new({
+                opened_issues: sum_objects(WEIGHT_SUM, OPENED_ISSUE_STATE, ISSUE_TYPE),
+                closed_issues: sum_objects(WEIGHT_SUM, CLOSED_ISSUE_STATE, ISSUE_TYPE)
+              })
+            end
+          end
+
+          def immediate_totals(facet)
+            strong_memoize(:"immediate_#{facet}_totals") do
+              []
+            end
+          end
+
+          def calculated_totals(facet)
+            if facet == COUNT
+              return calculated_count_totals
+            end
+
+            calculated_weight_sum_totals
           end
 
           def to_s
-            { epic_id: @epic_id, parent_id: @parent_id, direct_sums: direct_sums, child_ids: child_ids }.to_json
+            {
+                epic_id: @epic_id,
+                parent_id: @parent_id,
+                immediate_count_totals: immediate_count_totals,
+                immediate_weight_sum_totals: immediate_weight_sum_totals,
+                child_ids: child_ids
+            }.to_json
           end
 
           alias_method :inspect, :to_s
           alias_method :id, :epic_id
 
+          def calculate_recursive_sums(facet, tree)
+            return calculated_totals(facet) if calculated_totals(facet)
+
+            sum_total = []
+            child_ids.each do |child_id|
+              child = tree[child_id]
+              # get the child's totals, add to your own
+              child_sums = child.calculate_recursive_sums(facet, tree)
+              sum_total.concat(child_sums)
+            end
+            sum_total.concat(immediate_totals(facet))
+            set_calculated_total(facet, sum_total)
+          end
+
           private
+
+          def sum_objects(facet, state, type)
+            sums = calculated_totals(facet) || []
+            matching = sums.select { |sum| sum.state == state && sum.type == type }
+            return 0 if sums.empty?
+
+            matching.map(&:value).reduce(:+) || 0
+          end
 
           def create_sum_if_needed(facet, state, type, value)
             return if value.nil? || value < 1
 
-            direct_sums << Sum.new(facet, state, type, value)
+            immediate_totals(facet) << Sum.new(facet, state, type, value)
           end
 
           def set_epic_attributes(record)
             @epic_state_id = record[:epic_state_id]
             @parent_id = record[:parent_id]
+          end
+
+          def set_calculated_total(facet, calculated_sums)
+            if facet == COUNT
+              @calculated_count_totals = calculated_sums
+            else
+              @calculated_weight_sum_totals = calculated_sums
+            end
           end
 
           Sum = Struct.new(:facet, :state, :type, :value) do

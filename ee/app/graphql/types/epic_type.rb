@@ -2,6 +2,8 @@
 
 module Types
   class EpicType < BaseObject
+    include ::Gitlab::Graphql::Aggregations::Epics::Constants
+
     graphql_name 'Epic'
     description 'Represents an epic.'
 
@@ -124,17 +126,17 @@ module Types
       description: 'Number of open and closed descendant epics and issues',
       resolve: -> (epic, args, ctx) do
         if Feature.enabled?(:unfiltered_epic_aggregates)
-          Epics::LazyEpicAggregate.new(ctx, epic.id, Epics::LazyEpicAggregate::COUNT)
+          Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, COUNT)
         else
           Epics::DescendantCountService.new(epic, ctx[:current_user])
         end
       end
 
     field :descendant_weight_sum, Types::EpicDescendantWeightSumType, null: true, complexity: 10,
-      description: "Total weight of open and closed descendant epic's issues",
+      description: "Total weight of open and closed issues in the epic and its descendants",
       feature_flag: :unfiltered_epic_aggregates,
       resolve: -> (epic, args, ctx) do
-        Epics::LazyEpicAggregate.new(ctx, epic.id, Epics::LazyEpicAggregate::WEIGHT_SUM)
+        Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
       end
 
     field :health_status,
