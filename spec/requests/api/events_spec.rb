@@ -114,6 +114,32 @@ describe API::Events do
         expect(json_response.size).to eq(1)
       end
 
+      context 'when the list of events includes wiki page events' do
+        let(:page) do
+          wiki = create(:project_wiki, project: private_project, user: user)
+          create(:wiki_page, wiki: wiki)
+        end
+
+        before do
+          [Event::CREATED, Event::UPDATED, Event::DESTROYED].each do |event|
+            EventCreateService.new.wiki_event(page, event, nil)
+          end
+        end
+
+        it 'returns information about the wiki event', :aggregate_failures do
+          get api("/users/#{user.id}/events", user)
+
+          wiki_events = json_response.select { |e| e['target_type'] == 'WikiPageMeta' }
+          action_names = wiki_events.map { |e| e['action_name'] }
+          titles = wiki_events.map { |e| e['target_title'] }
+          slugs = wiki_events.map { |e| e.dig('wiki_page', 'slug') }
+
+          expect(action_names).to contain_exactly('created', 'updated', 'destroyed')
+          expect(titles).to all(eq(page.title))
+          expect(slugs).to all(eq(page.slug))
+        end
+      end
+
       context 'when the list of events includes push events' do
         let(:event) do
           create(:push_event, author: user, project: private_project)
