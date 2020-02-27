@@ -3725,8 +3725,7 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
   create_table "requirements", force: :cascade do |t|
     t.integer "state", limit: 2, default: 1, null: false
     t.integer "iid", null: false
-    t.bigint "project_id"
-    t.bigint "group_id"
+    t.bigint "project_id", null: false
     t.bigint "author_id"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -3734,8 +3733,6 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
     t.text "title_html"
     t.index ["author_id"], name: "index_requirements_on_author_id"
     t.index ["created_at"], name: "index_requirements_on_created_at"
-    t.index ["group_id", "iid"], name: "index_requirements_on_group_id_and_iid", unique: true, where: "(group_id IS NOT NULL)"
-    t.index ["group_id"], name: "index_requirements_on_group_id"
     t.index ["project_id", "iid"], name: "index_requirements_on_project_id_and_iid", unique: true, where: "(project_id IS NOT NULL)"
     t.index ["project_id"], name: "index_requirements_on_project_id"
     t.index ["state"], name: "index_requirements_on_state"
@@ -5017,7 +5014,6 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
   add_foreign_key "releases", "users", column: "author_id", name: "fk_8e4456f90f", on_delete: :nullify
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
   add_foreign_key "repository_languages", "projects", on_delete: :cascade
-  add_foreign_key "requirements", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "requirements", "projects", on_delete: :cascade
   add_foreign_key "requirements", "users", column: "author_id", on_delete: :nullify
   add_foreign_key "resource_label_events", "epics", on_delete: :cascade
