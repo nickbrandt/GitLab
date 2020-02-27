@@ -32,5 +32,25 @@ describe Groups::MilestonesController do
         expect(milestones.map {|x| x['title']}).not_to include(private_milestone.title)
       end
     end
+
+    describe 'GET #show' do
+      let(:milestone) { create(:milestone, group: public_group) }
+      let(:show_path) { group_milestone_path(public_group, milestone) }
+
+      it 'avoids N+1 database queries' do
+        projects = create_list(:project, 3, :public, :merge_requests_enabled, :issues_enabled, group: public_group)
+        projects.each do |project|
+          create_list(:issue, 2, milestone: milestone, project: project)
+        end
+        control = ActiveRecord::QueryRecorder.new(skip_cached: false) { get show_path }
+
+        projects = create_list(:project, 3, :public, :merge_requests_enabled, :issues_enabled, group: public_group)
+        projects.each do |project|
+          create_list(:issue, 2, milestone: milestone, project: project)
+        end
+
+        expect { get show_path }.not_to exceed_all_query_limit(control)
+      end
+    end
   end
 end
