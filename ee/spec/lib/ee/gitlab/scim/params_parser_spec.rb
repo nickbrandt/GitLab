@@ -98,4 +98,18 @@ describe EE::Gitlab::Scim::ParamsParser do
       expect(described_class.new(Operations: operations).deprovision_user?).to be false
     end
   end
+
+  describe '#reprovision_user?' do
+    it 'returns true when reprovisioning' do
+      operations = [{ 'op': 'Replace', 'path': 'active', 'value': 'True' }]
+
+      expect(described_class.new(Operations: operations).reprovision_user?).to be true
+    end
+
+    it 'returns false when not reprovisioning' do
+      operations = [{ 'op': 'Replace', 'path': 'active', 'value': 'False' }]
+
+      expect(described_class.new(Operations: operations).reprovision_user?).to be false
+    end
+  end
 end
