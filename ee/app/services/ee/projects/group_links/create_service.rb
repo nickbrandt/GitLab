@@ -8,7 +8,7 @@ module EE
 
         override :execute
         def execute(group)
-          return error(error_message, 409) unless group_allowed_to_be_shared_with?(group)
+          return error(error_message, 409) unless allowed_to_be_shared_with?(group)
 
           result = super
 
@@ -18,10 +18,17 @@ module EE
 
         private
 
-        def group_allowed_to_be_shared_with?(group)
-          return true unless project.root_ancestor.kind == 'group' && project.root_ancestor.enforced_sso?
+        def allowed_to_be_shared_with?(group)
+          project_can_be_shared_with_group = project_can_be_shared_with_group?(group, project)
+          source_project_can_be_shared_with_group = project.forked? ? project_can_be_shared_with_group?(group, project.forked_from_project) : true
 
-          group.root_ancestor == project.root_ancestor
+          project_can_be_shared_with_group && source_project_can_be_shared_with_group
+        end
+
+        def project_can_be_shared_with_group?(group, given_project)
+          return true unless given_project.root_ancestor.kind == 'group' && given_project.root_ancestor.enforced_sso?
+
+          group.root_ancestor == given_project.root_ancestor
         end
 
         def error_message
