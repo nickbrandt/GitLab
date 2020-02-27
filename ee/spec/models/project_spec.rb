@@ -631,14 +631,6 @@ describe Project do
         it_behaves_like 'returns nil when the feature is not available'
 
         it { is_expected.to eq(true) }
-
-        context 'when sub_group_webhooks feature flag is disabled' do
-          before do
-            stub_feature_flags(sub_group_webhooks: false)
-          end
-
-          it { is_expected.to eq(false) }
-        end
       end
     end
   end
@@ -677,32 +669,12 @@ describe Project do
 
         it_behaves_like 'triggering group webhook'
 
-        context 'when sub_group_webhooks feature flag is disabled' do
-          before do
-            stub_feature_flags(sub_group_webhooks: false)
-          end
-
-          it_behaves_like 'triggering group webhook'
-        end
-
         context 'in sub group' do
           let(:sub_group) { create :group, parent: group }
           let(:sub_sub_group) { create :group, parent: sub_group }
           let(:project) { create(:project, namespace: sub_sub_group) }
 
           it_behaves_like 'triggering group webhook'
-
-          context 'when sub_group_webhooks feature flag is disabled' do
-            before do
-              stub_feature_flags(sub_group_webhooks: false)
-            end
-
-            it 'does not execute the hook' do
-              expect(WebHookService).not_to receive(:new).with(group_hook, { some: 'info' }, 'push_hooks')
-
-              project.execute_hooks(some: 'info')
-            end
-          end
         end
       end
     end
