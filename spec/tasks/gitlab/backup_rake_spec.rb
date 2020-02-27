@@ -390,19 +390,18 @@ describe 'gitlab:app namespace rake task' do
     it 'created files with backup content and no tar archive' do
       expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
 
-      dir_contents, _exit_status = Gitlab::Popen.popen(
-        %W{ls -la #{Gitlab.config.backup.path}}
-      )
+      dir_contents = Dir.children(Gitlab.config.backup.path)
 
-      expect(dir_contents).to match('backup_information.yml')
-      expect(dir_contents).to match('db')
-      expect(dir_contents).to match('uploads.tar.gz')
-      expect(dir_contents).to match('builds.tar.gz')
-      expect(dir_contents).to match('artifacts.tar.gz')
-      expect(dir_contents).to match('lfs.tar.gz')
-      expect(dir_contents).to match('pages.tar.gz')
-      expect(dir_contents).to match('registry.tar.gz')
-      expect(dir_contents).not_to match("_gitlab_backup.tar")
+      expect(dir_contents).to contain_exactly(
+        'backup_information.yml',
+        'db',
+        'uploads.tar.gz',
+        'builds.tar.gz',
+        'artifacts.tar.gz',
+        'lfs.tar.gz',
+        'pages.tar.gz',
+        'registry.tar.gz'
+      )
     end
 
     it 'those component files can be restored from' do
