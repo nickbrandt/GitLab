@@ -353,6 +353,7 @@ describe Backup::Manager do
           expect { subject.unpack }.to output.to_stdout
           expect(progress).to have_received(:puts)
             .with(a_string_matching('Non tarred backup found '))
+          expect(Kernel).not_to receive(:system)
         end
       end
     end
