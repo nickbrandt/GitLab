@@ -199,7 +199,7 @@ describe API::Vulnerabilities do
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
-            have_attributes(state: 'dismissed', closed_by: user, closed_at: be_like_time(Time.current)))
+            have_attributes(state: 'dismissed', dismissed_by: user, dismissed_at: be_like_time(Time.current)))
           expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
         end
       end

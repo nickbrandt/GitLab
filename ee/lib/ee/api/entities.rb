@@ -890,7 +890,7 @@ module EE
         expose :updated_by_id
         expose :last_edited_by_id
         expose :resolved_by_id
-        expose :closed_by_id
+        expose :dismissed_by_id
 
         expose :start_date
         expose :due_date
@@ -899,7 +899,7 @@ module EE
         expose :updated_at
         expose :last_edited_at
         expose :resolved_at
-        expose :closed_at
+        expose :dismissed_at
       end
 
       class VulnerabilityRelatedIssue < ::API::Entities::IssueBasic
