@@ -1170,6 +1170,171 @@ describe('add vulnerability dismissal comment', () => {
   });
 });
 
+describe('dismiss multiple vulnerabilities', () => {
+  let state;
+  let selectedVulnerabilities;
+
+  beforeEach(() => {
+    state = initialState();
+    state.vulnerabilities = mockDataVulnerabilities;
+    selectedVulnerabilities = {
+      [state.vulnerabilities[0].id]: true,
+      [state.vulnerabilities[1].id]: true,
+    };
+    state.selectedVulnerabilities = selectedVulnerabilities;
+  });
+
+  describe('dismissSelectedVulnerabilities', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('should fire the dismissSelected mutations when all is well', done => {
+      mock
+        .onPost(state.vulnerabilities[0].create_vulnerability_feedback_dismissal_path)
+        .replyOnce(200)
+        .onPost(state.vulnerabilities[1].create_vulnerability_feedback_dismissal_path)
+        .replyOnce(200);
+
+      testAction(
+        actions.dismissSelectedVulnerabilities,
+        {},
+        state,
+        [],
+        [
+          { type: 'requestDismissSelectedVulnerabilities' },
+          {
+            type: 'receiveDismissSelectedVulnerabilitiesSuccess',
+          },
+        ],
+        () => {
+          expect(mock.history.post).toHaveLength(2);
+          expect(mock.history.post[0].url).toEqual(
+            state.vulnerabilities[0].create_vulnerability_feedback_dismissal_path,
+          );
+          done();
+        },
+      );
+    });
+
+    it('should trigger the error state when something goes wrong', done => {
+      mock
+        .onPost(state.vulnerabilities[0].create_vulnerability_feedback_dismissal_path)
+        .replyOnce(200)
+        .onPost(state.vulnerabilities[1].create_vulnerability_feedback_dismissal_path)
+        .replyOnce(500);
+
+      testAction(
+        actions.dismissSelectedVulnerabilities,
+        {},
+        state,
+        [],
+        [
+          { type: 'requestDismissSelectedVulnerabilities' },
+          { type: 'receiveDismissSelectedVulnerabilitiesError', payload: { flashError: true } },
+        ],
+        done,
+      );
+    });
+
+    describe('receiveDismissSelectedVulnerabilitiesSuccess', () => {
+      it(`should commit ${types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS}`, done => {
+        testAction(
+          actions.receiveDismissSelectedVulnerabilitiesSuccess,
+          { selectedVulnerabilities },
+          state,
+          [{ type: types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('receiveDismissSelectedVulnerabilitiesError', () => {
+      it(`should commit ${types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR}`, done => {
+        testAction(
+          actions.receiveDismissSelectedVulnerabilitiesError,
+          {},
+          state,
+          [{ type: types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR }],
+          [],
+          done,
+        );
+      });
+    });
+  });
+});
+
+describe('selecting vulnerabilities', () => {
+  let state;
+
+  beforeEach(() => {
+    state = initialState();
+  });
+
+  describe('selectVulnerability', () => {
+    it(`selectVulnerability should commit ${types.SELECT_VULNERABILITY}`, done => {
+      const id = 1234;
+
+      testAction(
+        actions.selectVulnerability,
+        { id },
+        state,
+        [{ type: types.SELECT_VULNERABILITY, payload: id }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('deselectVulnerability', () => {
+    it(`should commit ${types.DESELECT_VULNERABILITY}`, done => {
+      const id = 1234;
+
+      testAction(
+        actions.deselectVulnerability,
+        { id },
+        state,
+        [{ type: types.DESELECT_VULNERABILITY, payload: id }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('selectAllVulnerabilities', () => {
+    it(`should commit ${types.SELECT_ALL_VULNERABILITIES}`, done => {
+      testAction(
+        actions.selectAllVulnerabilities,
+        {},
+        state,
+        [{ type: types.SELECT_ALL_VULNERABILITIES }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('deselectAllVulnerabilities', () => {
+    it(`should commit ${types.DESELECT_ALL_VULNERABILITIES}`, done => {
+      testAction(
+        actions.deselectAllVulnerabilities,
+        {},
+        state,
+        [{ type: types.DESELECT_ALL_VULNERABILITIES }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
 describe('showDismissalDeleteButtons', () => {
   let state;
 

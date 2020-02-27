@@ -36,4 +36,14 @@ export const getFilteredVulnerabilitiesHistory = (state, getters) => name => {
   });
 };
 
+export const selectedVulnerabilitiesCount = state =>
+  Object.keys(state.selectedVulnerabilities).length;
+
+export const isSelectingVulnerabilities = (state, getters) =>
+  getters.selectedVulnerabilitiesCount > 0;
+
+export const hasSelectedAllVulnerabilities = (state, getters) =>
+  getters.isSelectingVulnerabilities &&
+  getters.selectedVulnerabilitiesCount === state.vulnerabilities.length;
+
 export default () => {};

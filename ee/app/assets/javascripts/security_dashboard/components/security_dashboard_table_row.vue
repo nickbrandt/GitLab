@@ -1,6 +1,6 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
+import { mapActions, mapState } from 'vuex';
+import { GlButton, GlSkeletonLoading, GlFormCheckbox } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
@@ -11,6 +11,7 @@ export default {
   name: 'SecurityDashboardTableRow',
   components: {
     GlButton,
+    GlFormCheckbox,
     GlSkeletonLoading,
     Icon,
     SeverityBadge,
@@ -30,6 +31,8 @@ export default {
     },
   },
   computed: {
+    ...mapState(['dashboardType']),
+    ...mapState('vulnerabilities', ['selectedVulnerabilities']),
     severity() {
       return this.vulnerability.severity || ' ';
     },
@@ -56,16 +59,35 @@ export default {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
       return Boolean(path) && !this.hasIssue;
     },
-    ...mapState(['dashboardType']),
+    isSelected() {
+      return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
+    },
   },
   methods: {
-    ...mapActions('vulnerabilities', ['openModal']),
+    ...mapActions('vulnerabilities', ['openModal', 'selectVulnerability', 'deselectVulnerability']),
+    toggleVulnerability() {
+      if (this.isSelected) {
+        return this.deselectVulnerability(this.vulnerability);
+      }
+      return this.selectVulnerability(this.vulnerability);
+    },
   },
 };
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row p-2" :class="{ dismissed: isDismissed }">
+  <div
+    class="gl-responsive-table-row vulnerabilities-row p-2"
+    :class="{ dismissed: isDismissed, 'gl-bg-blue-50': isSelected }"
+  >
+    <div class="table-section">
+      <gl-form-checkbox
+        :checked="isSelected"
+        class="my-0 ml-1 mr-3"
+        @change="toggleVulnerability"
+      />
+    </div>
+
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
