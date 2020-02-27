@@ -2595,7 +2595,7 @@ input EpicSetSubscriptionInput {
   """
   The iid of the epic to mutate
   """
-  iid: String!
+  iid: ID!
 
   """
   The desired state of the subscription
@@ -7799,7 +7799,7 @@ input UpdateEpicInput {
   """
   The iid of the epic to mutate
   """
-  iid: String!
+  iid: ID!
 
   """
   The IDs of labels to be removed from the epic.
