@@ -28,6 +28,7 @@ describe 'gitlab:app namespace rake task' do
   before do
     stub_env('force', 'yes')
     FileUtils.rm(tars_glob, force: true)
+    FileUtils.rm('backup_information.yml', force: true)
     FileUtils.rm('artifacts.tar.gz', force: true)
     FileUtils.rm('builds.tar.gz', force: true)
     FileUtils.rm('lfs.tar.gz', force: true)
@@ -40,6 +41,7 @@ describe 'gitlab:app namespace rake task' do
 
   after do
     FileUtils.rm(tars_glob, force: true)
+    FileUtils.rm('backup_information.yml', force: true)
     FileUtils.rm('artifacts.tar.gz', force: true)
     FileUtils.rm('builds.tar.gz', force: true)
     FileUtils.rm('lfs.tar.gz', force: true)
