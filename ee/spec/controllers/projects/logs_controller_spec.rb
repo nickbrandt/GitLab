@@ -58,118 +58,109 @@ describe Projects::LogsController do
     end
   end
 
-  describe "GET #k8s" do
+  shared_examples 'pod logs service' do |endpoint, service|
     let(:service_result) do
       {
         status: :success,
         logs: ['Log 1', 'Log 2', 'Log 3'],
-        message: 'message',
         pods: [pod_name],
         pod_name: pod_name,
         container_name: container
       }
     end
+    let(:service_result_json) { JSON.parse(service_result.to_json) }
+
+    let_it_be(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project]) }
 
     before do
       stub_licensed_features(pod_logs: true)
 
-      allow_next_instance_of(::PodLogs::KubernetesService) do |instance|
+      allow_next_instance_of(service) do |instance|
         allow(instance).to receive(:execute).and_return(service_result)
       end
     end
 
-    shared_examples 'resource not found' do |message|
-      it 'returns 400', :aggregate_failures do
-        get :k8s, params: environment_params(pod_name: pod_name, format: :json)
+    it 'returns 404 when unlicensed' do
+      stub_licensed_features(pod_logs: false)
 
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['message']).to eq(message)
-        expect(json_response['pods']).to match_array([pod_name])
-        expect(json_response['pod_name']).to eq(pod_name)
-        expect(json_response['container_name']).to eq(container)
-      end
+      get endpoint, params: environment_params(pod_name: pod_name, format: :json)
+
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
-    it 'returns the logs for a specific pod', :aggregate_failures do
-      get :k8s, params: environment_params(pod_name: pod_name, format: :json)
+    it 'returns the service result' do
+      get endpoint, params: environment_params(pod_name: pod_name, format: :json)
 
       expect(response).to have_gitlab_http_status(:success)
-      expect(json_response["logs"]).to match_array(["Log 1", "Log 2", "Log 3"])
-      expect(json_response["pods"]).to match_array([pod_name])
-      expect(json_response['message']).to eq(service_result[:message])
-      expect(json_response['pod_name']).to eq(pod_name)
-      expect(json_response['container_name']).to eq(container)
+      expect(json_response).to eq(service_result_json)
     end
 
     it 'registers a usage of the endpoint' do
       expect(::Gitlab::UsageCounters::PodLogs).to receive(:increment).with(project.id)
 
-      get :k8s, params: environment_params(pod_name: pod_name, format: :json)
+      get endpoint, params: environment_params(pod_name: pod_name, format: :json)
+
+      expect(response).to have_gitlab_http_status(:success)
     end
 
-    context 'when kubernetes API returns error' do
-      let(:service_result) do
-        {
-          status: :error,
-          message: 'Kubernetes API returned status code: 400',
-          pods: [pod_name],
-          pod_name: pod_name,
-          container_name: container
-        }
-      end
+    it 'sets the polling header' do
+      get endpoint, params: environment_params(pod_name: pod_name, format: :json)
 
-      it 'returns bad request' do
-        get :k8s, params: environment_params(pod_name: pod_name, format: :json)
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response["logs"]).to eq(nil)
-        expect(json_response["pods"]).to match_array([pod_name])
-        expect(json_response["message"]).to eq('Kubernetes API returned status code: 400')
-        expect(json_response['pod_name']).to eq(pod_name)
-        expect(json_response['container_name']).to eq(container)
-      end
+      expect(response).to have_gitlab_http_status(:success)
+      expect(response.headers['Poll-Interval']).to eq('3000')
     end
 
-    context 'when pod does not exist' do
-      let(:service_result) do
-        {
-          status: :error,
-          message: 'Pod not found',
-          pods: [pod_name],
-          pod_name: pod_name,
-          container_name: container
-        }
-      end
-
-      it_behaves_like 'resource not found', 'Pod not found'
-    end
-
-    context 'when service returns error without pods, pod_name, container_name' do
-      let(:service_result) do
-        {
-          status: :error,
-          message: 'No deployment platform'
-        }
-      end
-
-      it 'returns the error without pods, pod_name and container_name' do
-        get :k8s, params: environment_params(pod_name: pod_name, format: :json)
-
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['message']).to eq('No deployment platform')
-        expect(json_response.keys).to contain_exactly('message', 'status')
-      end
-    end
-
-    context 'when service is processing (returns nil)' do
+    context 'when service is processing' do
       let(:service_result) { nil }
 
-      it 'renders accepted' do
-        get :k8s, params: environment_params(pod_name: pod_name, format: :json)
+      it 'returns a 202' do
+        get endpoint, params: environment_params(pod_name: pod_name, format: :json)
 
         expect(response).to have_gitlab_http_status(:accepted)
       end
     end
+
+    shared_examples 'unsuccessful execution response' do |message|
+      let(:service_result) do
+        {
+          status: :error,
+          message: message
+        }
+      end
+
+      it 'returns the error' do
+        get endpoint, params: environment_params(pod_name: pod_name, format: :json)
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response).to eq(service_result_json)
+      end
+    end
+
+    context 'when service is failing' do
+      it_behaves_like 'unsuccessful execution response', 'some error'
+    end
+
+    context 'when cluster is nil' do
+      let!(:cluster) { nil }
+
+      it_behaves_like 'unsuccessful execution response', 'Environment does not have deployments'
+    end
+
+    context 'when namespace is empty' do
+      before do
+        allow(environment).to receive(:deployment_namespace).and_return('')
+      end
+
+      it_behaves_like 'unsuccessful execution response', 'Environment does not have deployments'
+    end
+  end
+
+  describe 'GET #k8s' do
+    it_behaves_like 'pod logs service', :k8s, PodLogs::KubernetesService
+  end
+
+  describe 'GET #elasticsearch' do
+    it_behaves_like 'pod logs service', :elasticsearch, PodLogs::ElasticsearchService
   end
 
   def environment_params(opts = {})

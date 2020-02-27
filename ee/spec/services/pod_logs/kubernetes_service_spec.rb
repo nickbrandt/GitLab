@@ -5,7 +5,8 @@ require 'spec_helper'
 describe ::PodLogs::KubernetesService do
   include KubernetesHelpers
 
-  let_it_be(:environment, refind: true) { create(:environment) }
+  let_it_be(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*') }
+  let(:namespace) { 'autodevops-deploy-9-production' }
 
   let(:pod_name) { 'pod-1' }
   let(:container_name) { 'container-1' }
@@ -18,7 +19,7 @@ describe ::PodLogs::KubernetesService do
     ]
   end
 
-  subject { described_class.new(environment, params: params) }
+  subject { described_class.new(cluster, namespace, params: params) }
 
   describe '#pod_logs' do
     let(:result_arg) do
@@ -29,13 +30,8 @@ describe ::PodLogs::KubernetesService do
     end
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
 
-    before do
-      create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project])
-      create(:deployment, :success, environment: environment)
-    end
-
     it 'returns the logs' do
-      stub_kubeclient_logs(pod_name, environment.deployment_namespace, container: container_name)
+      stub_kubeclient_logs(pod_name, namespace, container: container_name)
 
       result = subject.send(:pod_logs, result_arg)
 

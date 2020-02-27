@@ -3930,6 +3930,9 @@ msgstr ""
 msgid "Cluster cache cleared."
 msgstr ""
 
+msgid "Cluster does not exist"
+msgstr ""
+
 msgid "ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}."
 msgstr ""
 
@@ -7394,6 +7397,9 @@ msgid "Enter zen mode"
 msgstr ""
 
 msgid "Environment"
+msgstr ""
+
+msgid "Environment does not have deployments"
 msgstr ""
 
 msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. Additionally, they can be masked so they are hidden in job logs, though they must match certain regexp requirements to do so. You can use environment variables for passwords, secret keys, or whatever you want."
@@ -12640,6 +12646,9 @@ msgstr ""
 msgid "Name:"
 msgstr ""
 
+msgid "Namespace is empty"
+msgstr ""
+
 msgid "Namespace: %{namespace}"
 msgstr ""
 
@@ -12895,9 +12904,6 @@ msgid "No data found"
 msgstr ""
 
 msgid "No data to display"
-msgstr ""
-
-msgid "No deployment platform available"
 msgstr ""
 
 msgid "No deployments found"

@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe ::PodLogs::ElasticsearchService do
-  let_it_be(:environment, refind: true) { create(:environment) }
+  let_it_be(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*') }
+  let(:namespace) { 'autodevops-deploy-9-production' }
 
   let(:pod_name) { 'pod-1' }
   let(:container_name) { 'container-1' }
@@ -19,7 +20,7 @@ describe ::PodLogs::ElasticsearchService do
     ]
   end
 
-  subject { described_class.new(environment, params: params) }
+  subject { described_class.new(cluster, namespace, params: params) }
 
   describe '#check_times' do
     context 'with start and end provided and valid' do
@@ -116,7 +117,6 @@ describe ::PodLogs::ElasticsearchService do
   end
 
   describe '#pod_logs' do
-    let(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project]) }
     let(:result_arg) do
       {
         pod_name: pod_name,
@@ -128,7 +128,6 @@ describe ::PodLogs::ElasticsearchService do
     end
 
     before do
-      create(:deployment, :success, environment: environment)
       create(:clusters_applications_elastic_stack, :installed, cluster: cluster)
     end
 
@@ -138,7 +137,7 @@ describe ::PodLogs::ElasticsearchService do
         .and_return(Elasticsearch::Transport::Client.new)
       allow_any_instance_of(::Gitlab::Elasticsearch::Logs)
         .to receive(:pod_logs)
-        .with(environment.deployment_namespace, pod_name, container_name, search, start_time, end_time)
+        .with(namespace, pod_name, container_name, search, start_time, end_time)
         .and_return(expected_logs)
 
       result = subject.send(:pod_logs, result_arg)
