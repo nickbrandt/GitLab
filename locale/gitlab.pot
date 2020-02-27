@@ -8152,6 +8152,9 @@ msgstr ""
 msgid "EventFilterBy|Filter by team"
 msgstr ""
 
+msgid "EventFilterBy|Filter by wiki"
+msgstr ""
+
 msgid "Events"
 msgstr ""
 
@@ -8159,6 +8162,9 @@ msgid "Events in %{group_name}"
 msgstr ""
 
 msgid "Events in %{project_path}"
+msgstr ""
+
+msgid "Events|in the wiki for"
 msgstr ""
 
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
@@ -24659,6 +24665,9 @@ msgid "vulnerability|Undo dismiss"
 msgstr ""
 
 msgid "vulnerability|dismissed"
+msgstr ""
+
+msgid "wiki page"
 msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."
