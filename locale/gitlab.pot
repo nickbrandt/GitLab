@@ -7013,9 +7013,6 @@ msgstr ""
 msgid "Downvotes"
 msgstr ""
 
-msgid "Drop older active deployments"
-msgstr ""
-
 msgid "Due date"
 msgstr ""
 
@@ -17911,6 +17908,9 @@ msgstr ""
 msgid "Size settings for static websites"
 msgstr ""
 
+msgid "Skip older, pending deployment jobs"
+msgstr ""
+
 msgid "Skip this for now"
 msgstr ""
 
@@ -22046,7 +22046,7 @@ msgstr ""
 msgid "What are you searching for?"
 msgstr ""
 
-msgid "When a deployment is successful, allow older but still pending deployment(s) to be skipped"
+msgid "When a deployment job is successful, skip older deployment jobs that are still pending"
 msgstr ""
 
 msgid "When a runner is locked, it cannot be assigned to other projects"
