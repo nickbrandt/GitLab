@@ -27,6 +27,8 @@ export default () => ({
     isCommentingOnDismissal: false,
     isShowingDeleteButtons: false,
   },
+  isDismissingVulnerabilities: false,
+  selectedVulnerabilities: {},
   isCreatingIssue: false,
   isCreatingMergeRequest: false,
 });

@@ -1,26 +1,34 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlFormCheckbox } from '@gitlab/ui';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
+import SelectionSummary from './selection_summary.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
     GlEmptyState,
+    GlFormCheckbox,
     Pagination,
     SecurityDashboardTableRow,
+    SelectionSummary,
   },
   computed: {
     ...mapState('vulnerabilities', [
       'errorLoadingVulnerabilities',
       'errorLoadingVulnerabilitiesCount',
       'isLoadingVulnerabilities',
+      'isDismissingVulnerabilities',
       'pageInfo',
       'vulnerabilities',
     ]),
     ...mapGetters('filters', ['activeFilters']),
-    ...mapGetters('vulnerabilities', ['dashboardListError']),
+    ...mapGetters('vulnerabilities', [
+      'dashboardListError',
+      'hasSelectedAllVulnerabilities',
+      'isSelectingVulnerabilities',
+    ]),
     showEmptyState() {
       return (
         this.vulnerabilities &&
@@ -34,9 +42,19 @@ export default {
     },
   },
   methods: {
-    ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
+    ...mapActions('vulnerabilities', [
+      'deselectAllVulnerabilities',
+      'fetchVulnerabilities',
+      'openModal',
+      'selectAllVulnerabilities',
+    ]),
     fetchPage(page) {
       this.fetchVulnerabilities({ ...this.activeFilters, page });
+    },
+    handleSelectAll() {
+      return this.hasSelectedAllVulnerabilities
+        ? this.deselectAllVulnerabilities()
+        : this.selectAllVulnerabilities();
     },
   },
 };
@@ -44,10 +62,18 @@ export default {
 
 <template>
   <div class="ci-table js-security-dashboard-table" data-qa-selector="security_report_content">
+    <selection-summary v-if="isSelectingVulnerabilities" />
     <div
       class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
       role="row"
     >
+      <div class="table-section">
+        <gl-form-checkbox
+          :checked="hasSelectedAllVulnerabilities"
+          class="my-0 ml-1 mr-3"
+          @change="handleSelectAll"
+        />
+      </div>
       <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
@@ -67,7 +93,7 @@ export default {
       </div>
     </div>
 
-    <template v-if="isLoadingVulnerabilities">
+    <template v-if="isLoadingVulnerabilities || isDismissingVulnerabilities">
       <security-dashboard-table-row v-for="n in 10" :key="n" :is-loading="true" />
     </template>
 
@@ -106,8 +132,8 @@ export default {
   font-size: 14px;
 }
 
-.vulnerabilities-row .table-section,
-.vulnerabilities-row-header .table-section {
+.vulnerabilities-row .section-10,
+.vulnerabilities-row-header .section-10 {
   min-width: 120px;
 }
 </style>

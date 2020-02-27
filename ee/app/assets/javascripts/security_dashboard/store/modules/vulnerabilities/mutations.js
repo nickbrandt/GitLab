@@ -24,6 +24,7 @@ export default {
     state.isLoadingVulnerabilities = false;
     state.pageInfo = payload.pageInfo;
     state.vulnerabilities = payload.vulnerabilities;
+    state.selectedVulnerabilities = {};
   },
   [types.RECEIVE_VULNERABILITIES_ERROR](state, errorCode = null) {
     state.isLoadingVulnerabilities = false;
@@ -134,6 +135,35 @@ export default {
       'error',
       s__('Security Reports|There was an error dismissing the vulnerability.'),
     );
+  },
+  [types.REQUEST_DISMISS_SELECTED_VULNERABILITIES](state) {
+    state.isDismissingVulnerabilities = true;
+  },
+  [types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS](state) {
+    state.isDismissingVulnerabilities = false;
+    state.selectedVulnerabilities = {};
+  },
+  [types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR](state) {
+    state.isDismissingVulnerabilities = false;
+  },
+  [types.SELECT_VULNERABILITY](state, id) {
+    if (state.selectedVulnerabilities[id]) {
+      return;
+    }
+
+    Vue.set(state.selectedVulnerabilities, id, true);
+  },
+  [types.DESELECT_VULNERABILITY](state, id) {
+    Vue.delete(state.selectedVulnerabilities, id);
+  },
+  [types.SELECT_ALL_VULNERABILITIES](state) {
+    state.selectedVulnerabilities = state.vulnerabilities.reduce(
+      (acc, { id }) => Object.assign(acc, { [id]: true }),
+      {},
+    );
+  },
+  [types.DESELECT_ALL_VULNERABILITIES](state) {
+    state.selectedVulnerabilities = {};
   },
   [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;

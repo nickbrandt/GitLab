@@ -453,6 +453,105 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('REQUEST_DISMISS_SELECTED_VULNERABILITIES', () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_DISMISS_SELECTED_VULNERABILITIES](state);
+    });
+
+    it('should set isDismissingVulnerabilities to true', () => {
+      expect(state.isDismissingVulnerabilities).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS](state);
+    });
+
+    it('should set isDismissingVulnerabilities to false', () => {
+      expect(state.isDismissingVulnerabilities).toBe(false);
+    });
+
+    it('should remove all selected vulnerabilities', () => {
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(0);
+    });
+  });
+
+  describe('RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR](state);
+    });
+
+    it('should set isDismissingVulnerabilties to false', () => {
+      expect(state.isDismissingVulnerabilities).toBe(false);
+    });
+  });
+
+  describe('SELECT_VULNERABILITY', () => {
+    const id = 1234;
+
+    beforeEach(() => {
+      mutations[types.SELECT_VULNERABILITY](state, id);
+    });
+
+    it('should add the vulnerability to selected vulnerabilities', () => {
+      expect(state.selectedVulnerabilities[id]).toBeTruthy();
+    });
+
+    it('should not add a duplicate id to the selected vulnerabilities', () => {
+      expect(state.selectedVulnerabilities).toHaveLength(1);
+      mutations[types.SELECT_VULNERABILITY](state, id);
+
+      expect(state.selectedVulnerabilities).toHaveLength(1);
+    });
+  });
+
+  describe('DESELECT_VULNERABILITY', () => {
+    beforeEach(() => {
+      state.selectedVulnerabilities = { 12: true, 34: true, 56: true };
+    });
+
+    it('should remove the vulnerability from selected vulnerabilities', () => {
+      const vulnerabilityId = 12;
+
+      expect(state.selectedVulnerabilities[vulnerabilityId]).toBeTruthy();
+      mutations[types.DESELECT_VULNERABILITY](state, vulnerabilityId);
+
+      expect(state.selectedVulnerabilities[vulnerabilityId]).toBeFalsy();
+    });
+  });
+
+  describe('SELECT_ALL_VULNERABILITIES', () => {
+    beforeEach(() => {
+      state.vulnerabilities = [{ id: 12 }, { id: 34 }, { id: 56 }];
+      state.selectedVulnerabilites = {};
+    });
+
+    it('should add all the vulnerabilities when none are selected', () => {
+      mutations[types.SELECT_ALL_VULNERABILITIES](state);
+
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(state.vulnerabilities.length);
+    });
+
+    it('should add all the vulnerabilities when some are already selected', () => {
+      state.selectedVulnerabilites = { 12: true, 13: true };
+      mutations[types.SELECT_ALL_VULNERABILITIES](state);
+
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(state.vulnerabilities.length);
+    });
+  });
+
+  describe('DESELECT_ALL_VULNERABILITIES', () => {
+    beforeEach(() => {
+      state.selectedVulnerabilities = { 12: true, 34: true, 56: true };
+      mutations[types.DESELECT_ALL_VULNERABILITIES](state);
+    });
+
+    it('should remove all selected vulnerabilities', () => {
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(0);
+    });
+  });
+
   describe('REQUEST_DELETE_DISMISSAL_COMMENT', () => {
     beforeEach(() => {
       mutations[types.REQUEST_DELETE_DISMISSAL_COMMENT](state);

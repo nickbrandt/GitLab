@@ -1,4 +1,5 @@
 import Vuex from 'vuex';
+import { GlFormCheckbox } from '@gitlab/ui';
 import SecurityDashboardTableRow from 'ee/security_dashboard/components/security_dashboard_table_row.vue';
 import createStore from 'ee/security_dashboard/store';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
@@ -12,8 +13,7 @@ describe('Security Dashboard Table Row', () => {
   let wrapper;
   let store;
 
-  const createComponent = (mountFunc, { props = {}, storeParams = {} } = {}) => {
-    store = createStore(storeParams);
+  const createComponent = (mountFunc, { props = {} } = {}) => {
     wrapper = mountFunc(SecurityDashboardTableRow, {
       localVue,
       store,
@@ -23,6 +23,11 @@ describe('Security Dashboard Table Row', () => {
     });
   };
 
+  beforeEach(() => {
+    store = createStore();
+    jest.spyOn(store, 'dispatch');
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -31,6 +36,8 @@ describe('Security Dashboard Table Row', () => {
   const findLoader = () => wrapper.find('.js-skeleton-loader');
   const findContent = i => wrapper.findAll('.table-mobile-content').at(i);
   const findAllIssueCreated = () => wrapper.findAll('.ic-issue-created');
+  const hasSelectedClass = () => wrapper.classes('gl-bg-blue-50');
+  const findCheckbox = () => wrapper.find(GlFormCheckbox);
 
   describe('when loading', () => {
     beforeEach(() => {
@@ -93,9 +100,10 @@ describe('Security Dashboard Table Row', () => {
 
     describe('Group Security Dashboard', () => {
       beforeEach(() => {
+        store.state.dashboardType = DASHBOARD_TYPES.GROUP;
+
         createComponent(shallowMount, {
           props: { vulnerability },
-          storeParams: { dashboardType: DASHBOARD_TYPES.GROUP },
         });
       });
 
@@ -167,6 +175,47 @@ describe('Security Dashboard Table Row', () => {
 
     it('should not have a `ic-issue-created` class', () => {
       expect(findAllIssueCreated()).toHaveLength(0);
+    });
+
+    it('should be unselected', () => {
+      expect(hasSelectedClass()).toBe(false);
+      expect(findCheckbox().attributes('checked')).toBeFalsy();
+    });
+
+    describe('when checked', () => {
+      beforeEach(() => {
+        findCheckbox().vm.$emit('change');
+      });
+
+      it('should be selected', () => {
+        expect(hasSelectedClass()).toBe(true);
+        expect(findCheckbox().attributes('checked')).toBe('true');
+      });
+
+      it('should update store', () => {
+        expect(store.dispatch).toHaveBeenCalledWith(
+          'vulnerabilities/selectVulnerability',
+          vulnerability,
+        );
+      });
+
+      describe('when unchecked', () => {
+        beforeEach(() => {
+          findCheckbox().vm.$emit('change');
+        });
+
+        it('should be unselected', () => {
+          expect(hasSelectedClass()).toBe(false);
+          expect(findCheckbox().attributes('checked')).toBeFalsy();
+        });
+
+        it('should update store', () => {
+          expect(store.dispatch).toHaveBeenCalledWith(
+            'vulnerabilities/deselectVulnerability',
+            vulnerability,
+          );
+        });
+      });
     });
   });
 });

@@ -1,9 +1,10 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlFormCheckbox } from '@gitlab/ui';
 
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
 import SecurityDashboardTableRow from 'ee/security_dashboard/components/security_dashboard_table_row.vue';
+import SelectionSummary from 'ee/security_dashboard/components/selection_summary.vue';
 import createStore from 'ee/security_dashboard/store';
 
 import {
@@ -35,6 +36,8 @@ describe('Security Dashboard Table', () => {
     wrapper.destroy();
   });
 
+  const findCheckbox = () => wrapper.find(GlFormCheckbox);
+
   describe('while loading', () => {
     beforeEach(() => {
       store.commit(`vulnerabilities/${REQUEST_VULNERABILITIES}`);
@@ -57,6 +60,28 @@ describe('Security Dashboard Table', () => {
       expect(wrapper.findAll(SecurityDashboardTableRow).length).toEqual(
         mockDataVulnerabilities.length,
       );
+    });
+
+    it('should not show the multi select box', () => {
+      expect(wrapper.find(SelectionSummary).exists()).toBe(false);
+    });
+
+    it('should show the select all as unchecked', () => {
+      expect(findCheckbox().attributes('checked')).toBeFalsy();
+    });
+
+    describe('with vulnerabilities selected', () => {
+      beforeEach(() => {
+        findCheckbox().vm.$emit('change');
+      });
+
+      it('should show the multi select box', () => {
+        expect(wrapper.find(SelectionSummary).exists()).toBe(true);
+      });
+
+      it('should show the select all as checked', () => {
+        expect(findCheckbox().attributes('checked')).toBe('true');
+      });
     });
   });
 
