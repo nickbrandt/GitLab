@@ -34,6 +34,30 @@ describe ApplicationSettings::UpdateService do
       end
     end
 
+    context 'index dependent' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:index_exists, :indexing_enabled, :input_value, :result) do
+        false  | false | '1' | false
+        false  | true  | '1' | true
+        true   | false | '1' | true
+        true   | true  | '1' | true
+      end
+
+      with_them do
+        before do
+          allow(Gitlab::Elastic::Helper).to(receive(:index_exists?)).and_return(index_exists)
+          allow(service.application_setting).to(receive(:elasticsearch_indexing)).and_return(indexing_enabled)
+        end
+
+        let(:opts) { { elasticsearch_indexing: input_value } }
+
+        it 'returns correct result' do
+          expect(service.execute).to be(result)
+        end
+      end
+    end
+
     context 'repository_size_limit assignment as Bytes' do
       let(:service) { described_class.new(setting, user, opts) }
 
