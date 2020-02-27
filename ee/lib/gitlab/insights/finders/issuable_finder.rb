@@ -29,6 +29,10 @@ module Gitlab
           @projects = projects
         end
 
+        def issuable_type
+          @issuable_type ||= query[:issuable_type]&.to_s&.singularize&.to_sym
+        end
+
         # Returns an Active Record relation of issuables.
         def find
           return unless entity_args
@@ -59,8 +63,6 @@ module Gitlab
         attr_reader :entity, :current_user, :query, :projects
 
         def finder
-          issuable_type = query[:issuable_type]&.to_sym
-
           FINDERS[issuable_type] ||
             raise(InvalidIssuableTypeError, "Invalid `:issuable_type` option: `#{query[:issuable_type]}`. Allowed values are #{FINDERS.keys}!")
         end
