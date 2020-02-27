@@ -86,6 +86,8 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
             extern_uid: 'test_uid'
           }
         end
+      end
+    end
 
         it 'fails with error' do
           expect(service.execute.status).to eq(:error)
