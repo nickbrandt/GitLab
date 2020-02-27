@@ -6,17 +6,6 @@ module Banzai
     # reference to an alert dashboard.
     class InlineAlertMetricsFilter < ::Banzai::Filter::InlineEmbedsFilter
       include ::Gitlab::Routing
-
-      # Placeholder element for the frontend to use as an
-      # injection point for charts.
-      def create_element(params)
-        doc.document.create_element(
-          'div',
-          class: 'js-render-metrics',
-          'data-dashboard-url': metrics_dashboard_url(params)
-        )
-      end
-
       # Search params for selecting alert metrics links. A few
       # simple checks is enough to boost performance without
       # the cost of doing a full regex match.
