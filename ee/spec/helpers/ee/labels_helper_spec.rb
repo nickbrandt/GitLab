@@ -5,8 +5,7 @@ require 'spec_helper'
 describe LabelsHelper do
   let(:project) { create(:project) }
   let(:label) { build_stubbed(:label, project: project).present(issuable_subject: nil) }
-  let(:scoped_label) { build_stubbed(:label, name: 'key::value', project: project, color: '#D10069').present(issuable_subject: nil) }
-  let(:scoped_label2) { build_stubbed(:label, name: 'key::value', project: project, color: '#FFECDB').present(issuable_subject: nil) }
+  let(:scoped_label) { build_stubbed(:label, name: 'key::value', project: project).present(issuable_subject: nil) }
 
   describe '#render_label' do
     context 'with scoped labels enabled' do
@@ -23,11 +22,15 @@ describe LabelsHelper do
       end
 
       it 'right text span does not have .gl-label-text-dark class if label color is dark' do
-        expect(render_label(scoped_label)).not_to include('gl-label-text-dark')
+        scoped_label.color = '#D10069'
+
+        expect(render_label(scoped_label)).not_to match(%r(<span.*gl-label-text-dark.*>#{scoped_label.scoped_label_value}</span>)m)
       end
 
       it 'right text span has .gl-label-text-dark class if label color is light' do
-        expect(render_label(scoped_label2)).to include('gl-label-text-dark')
+        scoped_label.color = '#FFECDB'
+
+        expect(render_label(scoped_label)).to match(%r(<span.*gl-label-text-dark.*>#{scoped_label.scoped_label_value}</span>)m)
       end
     end
 
