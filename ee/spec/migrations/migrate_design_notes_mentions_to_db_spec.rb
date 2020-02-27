@@ -27,9 +27,5 @@ describe MigrateDesignNotesMentionsToDb, :migration, :sidekiq do
   # this note points to an innexistent noteable record
   let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: designs.maximum(:id) + 10, noteable_type: 'DesignManagement::Design') }
 
-  before do
-    stub_const("#{described_class.name}::BATCH_SIZE", 1)
-  end
-
   it_behaves_like 'schedules resource mentions migration', DesignManagement::Design, true
 end
