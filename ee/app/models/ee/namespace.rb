@@ -67,7 +67,7 @@ module EE
       validate :validate_shared_runner_minutes_support
 
       validates :max_pages_size,
-                numericality: { only_integer: true, greater_than: 0, allow_nil: true,
+                numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true,
                                 less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       delegate :trial?, :trial_ends_on, :trial_starts_on, :upgradable?, to: :gitlab_subscription, allow_nil: true
