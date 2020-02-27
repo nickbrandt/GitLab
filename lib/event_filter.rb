@@ -9,6 +9,7 @@ class EventFilter
   ISSUE = 'issue'
   COMMENTS = 'comments'
   TEAM = 'team'
+  WIKI = 'wiki'
 
   def initialize(filter)
     # Split using comma to maintain backward compatibility Ex/ "filter1,filter2"
@@ -33,6 +34,8 @@ class EventFilter
       events.where(action: [Event::JOINED, Event::LEFT, Event::EXPIRED])
     when ISSUE
       events.where(action: [Event::CREATED, Event::UPDATED, Event::CLOSED, Event::REOPENED], target_type: 'Issue')
+    when WIKI
+      events.for_wiki_page
     else
       events
     end
@@ -42,7 +45,7 @@ class EventFilter
   private
 
   def filters
-    [ALL, PUSH, MERGED, ISSUE, COMMENTS, TEAM]
+    [ALL, PUSH, MERGED, ISSUE, COMMENTS, TEAM, WIKI]
   end
 end
 
