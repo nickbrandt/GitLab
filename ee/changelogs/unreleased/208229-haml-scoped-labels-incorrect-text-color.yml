@@ -1,0 +1,5 @@
+---
+title: Fix scoped label text color when background is light
+merge_request: 26037
+author:
+type: fixed

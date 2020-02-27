@@ -5,7 +5,8 @@ require 'spec_helper'
 describe LabelsHelper do
   let(:project) { create(:project) }
   let(:label) { build_stubbed(:label, project: project).present(issuable_subject: nil) }
-  let(:scoped_label) { build_stubbed(:label, name: 'key::value', project: project).present(issuable_subject: nil) }
+  let(:scoped_label) { build_stubbed(:label, name: 'key::value', project: project, color: '#D10069').present(issuable_subject: nil) }
+  let(:scoped_label2) { build_stubbed(:label, name: 'key::value', project: project, color: '#FFECDB').present(issuable_subject: nil) }
 
   describe '#render_label' do
     context 'with scoped labels enabled' do
@@ -19,6 +20,14 @@ describe LabelsHelper do
 
       it 'does not include link to scoped label documentation for common labels' do
         expect(render_label(label)).to match(%r(<span.+><span.+>#{label.name}</span></span>$)m)
+      end
+
+      it 'right text span does not have .gl-label-text-dark class if label color is dark' do
+        expect(render_label(scoped_label)).not_to include('gl-label-text-dark')
+      end
+
+      it 'right text span has .gl-label-text-dark class if label color is light' do
+        expect(render_label(scoped_label2)).to include('gl-label-text-dark')
       end
     end
 
