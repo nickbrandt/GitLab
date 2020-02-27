@@ -6,6 +6,7 @@ GitLab-Workhorse has the following maintainers:
 
 - Nick Thomas `@nick.thomas`
 - Jacob Vosmaer `@jacobvosmaer-gitlab`
+- Alessio Caiazza `@nolith`
 
 This list is defined at https://about.gitlab.com/team/.
 
