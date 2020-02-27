@@ -674,7 +674,7 @@ module EE
     def expire_caches_before_rename(old_path)
       super
 
-      design = ::Repository.new("#{old_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}", self)
+      design = ::Repository.new("#{old_path}#{::EE::Gitlab::GlRepository::DESIGN.path_suffix}", self, shard: repository_storage, repo_type: ::EE::Gitlab::GlRepository::DESIGN)
 
       if design.exists?
         design.before_delete
