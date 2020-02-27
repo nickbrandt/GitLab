@@ -96,6 +96,62 @@ describe API::Internal::Base do
           expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
         end
       end
+<<<<<<< HEAD
+=======
+
+      context 'with selective sync' do
+        let(:selective_sync_enabled) { nil }
+        let(:redirect_message) do
+          <<~EOS
+          You attempted to access:
+
+          http://secondary.example.com/#{project.full_path}
+
+          but this project is currently not selected for replication. You are being 
+          redirected to the primary:
+
+          http://primary.example.com/#{project.full_path}
+
+          Please contact your systems administrator to ensure all relevant projects are
+          replicated to your closest Geo secondary.
+          EOS
+        end
+
+        before do
+          allow(secondary_node).to receive(:selective_sync?).and_return(selective_sync_enabled)
+        end
+
+        context 'when selective sync is not enabled' do
+          let(:selective_sync_enabled) { false }
+
+          it 'does not include project not yet replicated message in the output' do
+            post api('/internal/post_receive'), params: valid_params
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response['messages']).not_to include({
+              'type' => 'basic',
+              'message' => redirect_message
+            })
+          end
+        end
+
+        context 'when selective sync is enabled' do
+          let(:selective_sync_enabled) { true }
+
+          it 'includes project not yet replicated message in the output' do
+            allow(secondary_node).to receive(:projects_include?).and_return(false)
+
+            post api('/internal/post_receive'), params: valid_params
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response['messages']).to include({
+              'type' => 'basic',
+              'message' => redirect_message
+            })
+          end
+        end
+      end
+>>>>>>> 935831337c5... fixup! Support HTTP git clone/pull for selective sync
     end
 
     context 'when the push was not redirected from a Geo secondary to the primary' do

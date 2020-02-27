@@ -1,0 +1,5 @@
+---
+title: 'Geo: Pass through HTTP Git clone/pull for repos excluded from selective sync'
+merge_request: 24435
+author:
+type: added

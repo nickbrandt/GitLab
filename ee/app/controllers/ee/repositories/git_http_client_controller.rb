@@ -9,7 +9,7 @@ module EE
       # bound HTTP request should be redirected to the Primary.
       #
       # Why?  A secondary is not allowed to perform any write actions, so any
-      # request of this type need to be sent through to the Primary.  By
+      # request of this type needs to be sent through to the Primary.  By
       # redirecting within code, we allow clients to git pull/push using their
       # secondary git remote without needing an additional primary remote.
       #
@@ -20,12 +20,18 @@ module EE
       #
       # Current secondary HTTP requests to redirect: -
       #
+      # * git pull (only when selective sync is enabled and project not sync'd)
+      #   * GET   /namespace/repo.git/info/refs?service=git-upload-pack
+      #
+      # * git lfs pull (only when selective sync is enabled and project not sync'd)
+      #   * GET   /namespace/repo.git/gitlab-lfs/objects/<oid>
+      #
       # * git push
-      #   * GET   /repo.git/info/refs?service=git-receive-pack
-      #   * POST  /repo.git/git-receive-pack
+      #   * GET   /namespace/repo.git/info/refs?service=git-receive-pack
+      #   * POST  /namespace/repo.git/git-receive-pack
       #
       # * git lfs push (usually happens automatically as part of a `git push`)
-      #   * POST  /repo.git/info/lfs/objects/batch (and we examine
+      #   * POST  /namespace/repo.git/info/lfs/objects/batch (and we examine
       #     params[:operation] to ensure we're dealing with an upload request)
       #
       # For more detail, see the following links:
@@ -49,8 +55,8 @@ module EE
           'lfs_locks_api' => %w{create unlock verify}
         }.freeze
 
-        def initialize(project, controller_name, action_name, service)
-          @project = project
+        def initialize(project_id, controller_name, action_name, service)
+          @project_id = project_id
           @controller_name = controller_name
           @action_name = action_name
           @service = service
@@ -62,12 +68,20 @@ module EE
 
         def redirect?
           !!CONTROLLER_AND_ACTIONS_TO_REDIRECT[controller_name]&.include?(action_name) ||
-            git_receive_pack_request?
+            git_receive_pack_request? ||
+            geo_selective_sync_redirect?
+        end
+
+        def geo_selective_sync_redirect?
+          return unless project_id
+
+          git_upload_pack_request? &&
+            ::Gitlab::Geo.selective_sync_but_not_for_project?(project_id)
         end
 
         private
 
-        attr_reader :project, :service
+        attr_reader :project_id, :service
 
         # Examples:
         #
@@ -94,7 +108,7 @@ module EE
         # GET /repo.git/info/refs?service=git-upload-pack
         #
         def git_upload_pack_request?
-          info_refs_request? && service_or_action_name == 'git-upload-pack'
+          service_or_action_name == 'git-upload-pack'
         end
 
         # Matches:
@@ -109,7 +123,8 @@ module EE
       class GeoGitLFSHelper
         MINIMUM_GIT_LFS_VERSION = '2.4.2'.freeze
 
-        def initialize(geo_route_helper, operation, current_version)
+        def initialize(project_id, geo_route_helper, operation, current_version)
+          @project_id = project_id
           @geo_route_helper = geo_route_helper
           @operation = operation
           @current_version = current_version
@@ -124,8 +139,8 @@ module EE
         end
 
         def redirect?
-          return false unless geo_route_helper.match?('lfs_api', 'batch')
-          return true if upload?
+          return true if batch_upload?
+          return true if geo_selective_sync_redirect?
 
           false
         end
@@ -138,15 +153,34 @@ module EE
 
         private
 
-        attr_reader :geo_route_helper, :operation, :current_version
+        attr_reader :project_id, :geo_route_helper, :operation, :current_version
 
         def incorrect_version_message
           translation = _("You need git-lfs version %{min_git_lfs_version} (or greater) to continue. Please visit https://git-lfs.github.com")
           translation % { min_git_lfs_version: MINIMUM_GIT_LFS_VERSION }
         end
 
-        def upload?
-          operation == 'upload'
+        def batch_request?
+          geo_route_helper.match?('lfs_api', 'batch')
+        end
+
+        def batch_upload?
+          batch_request? && operation == 'upload'
+        end
+
+        def batch_download?
+          batch_request? && operation == 'download'
+        end
+
+        def transfer_download?
+          geo_route_helper.match?('lfs_storage', 'download')
+        end
+
+        def geo_selective_sync_redirect?
+          return unless project_id
+
+          (batch_download? || transfer_download?) &&
+            ::Gitlab::Geo.selective_sync_but_not_for_project?(project_id)
         end
 
         def wanted_version
@@ -155,12 +189,12 @@ module EE
       end
 
       def geo_route_helper
-        @geo_route_helper ||= GeoRouteHelper.new(project, controller_name, action_name, params[:service])
+        @geo_route_helper ||= GeoRouteHelper.new(project.id, controller_name, action_name, params[:service])
       end
 
       def geo_git_lfs_helper
         # params[:operation] explained: https://github.com/git-lfs/git-lfs/blob/master/docs/api/batch.md#requests
-        @geo_git_lfs_helper ||= GeoGitLFSHelper.new(geo_route_helper, params[:operation], request.headers['User-Agent'])
+        @geo_git_lfs_helper ||= GeoGitLFSHelper.new(project.id, geo_route_helper, params[:operation], request.headers['User-Agent'])
       end
 
       def geo_request_fullpath_for_primary

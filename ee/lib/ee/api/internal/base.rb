@@ -24,7 +24,16 @@ module EE
               lag = current_replication_lag
               return if lag.to_i <= 0
 
-              "Current replication lag: #{lag} seconds"
+              #{geo_project_secondary_url}
+
+              but this project is currently not selected for replication. You are being
+              redirected to the primary:
+
+              #{geo_project_primary_url}
+
+              Please contact your systems administrator to ensure all relevant projects are
+              replicated to your closest Geo secondary.
+              EOS
             end
 
             def current_replication_lag

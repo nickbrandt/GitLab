@@ -10,8 +10,10 @@ describe "Git HTTP requests (Geo)", :geo do
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:project) { create(:project, :repository, :private) }
-  let_it_be(:primary) { create(:geo_node, :primary) }
-  let_it_be(:secondary) { create(:geo_node) }
+  let_it_be(:primary_url) { 'http://primary.example.com' }
+  let_it_be(:secondary_url) { 'http://secondary.example.com' }
+  let_it_be(:primary) { create(:geo_node, :primary, url: primary_url) }
+  let_it_be(:secondary) { create(:geo_node, url: secondary_url) }
 
   # Ensure the token always comes from the real time of the request
   let(:auth_token) { Gitlab::Geo::BaseRequest.new(scope: project.full_path).authorization }
@@ -36,6 +38,40 @@ describe "Git HTTP requests (Geo)", :geo do
     auth_token
   end
 
+  shared_examples_for 'Geo 200 request' do
+    subject do
+      make_request
+      response
+    end
+
+    context 'valid Geo JWT token' do
+      it 'returns an OK response' do
+        is_expected.to have_gitlab_http_status(:ok)
+
+        expect(response.content_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+        expect(json_response).to include('ShowAllRefs' => true)
+      end
+    end
+  end
+
+  shared_examples_for 'Geo 302 redirect to Primary' do
+    # redirect_url needs to be defined when using this shared example
+
+    subject do
+      make_request
+      response
+    end
+
+    context 'valid Geo JWT token' do
+      it 'returns a redirect response' do
+        is_expected.to have_gitlab_http_status(:redirect)
+
+        expect(response.content_type).to eq('text/html')
+        expect(response.headers['Location']).to eq(redirect_url)
+      end
+    end
+  end
+
   shared_examples_for 'Geo request' do
     subject do
       make_request
@@ -54,15 +90,6 @@ describe "Git HTTP requests (Geo)", :geo do
       let(:env) { geo_env("GL-Geo xxyyzz:12345") }
 
       it { is_expected.to have_gitlab_http_status(:unauthorized) }
-    end
-
-    context 'valid Geo JWT token' do
-      it 'returns an OK response' do
-        is_expected.to have_gitlab_http_status(:ok)
-
-        expect(response.content_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
-        expect(json_response).to include('ShowAllRefs' => true)
-      end
     end
 
     context 'no Geo JWT token' do
@@ -91,14 +118,38 @@ describe "Git HTTP requests (Geo)", :geo do
           get "/#{project.full_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
         end
 
-        it_behaves_like 'Geo request'
+        context 'with selective sync not enabled' do
+          it_behaves_like 'Geo request'
+          it_behaves_like 'Geo 200 request'
 
-        context 'when terms are enforced' do
+          context 'when terms are enforced' do
+            before do
+              enforce_terms
+            end
+
+            it_behaves_like 'Geo request'
+            it_behaves_like 'Geo 200 request'
+          end
+        end
+
+        context 'with selective sync enabled' do
           before do
-            enforce_terms
+            allow(current_node).to receive(:selective_sync?).and_return(true)
+            allow(current_node).to receive(:projects_include?).with(project.id).and_return(false)
           end
 
-          it_behaves_like 'Geo request'
+          let_it_be(:project) { create(:project) } # no repository
+          let(:redirect_url) { "#{primary_url}/#{project.full_path}.git/info/refs?service=git-upload-pack" }
+
+          it_behaves_like 'Geo 302 redirect to Primary'
+
+          context 'when terms are enforced' do
+            before do
+              enforce_terms
+            end
+
+            it_behaves_like 'Geo 302 redirect to Primary'
+          end
         end
       end
 
@@ -128,6 +179,7 @@ describe "Git HTTP requests (Geo)", :geo do
       end
 
       it_behaves_like 'Geo request'
+      it_behaves_like 'Geo 200 request'
 
       context 'when terms are enforced' do
         before do
@@ -135,12 +187,13 @@ describe "Git HTTP requests (Geo)", :geo do
         end
 
         it_behaves_like 'Geo request'
+        it_behaves_like 'Geo 200 request'
       end
     end
 
     context 'git-lfs' do
-      context 'API' do
-        describe 'POST batch' do
+      context 'Batch API' do
+        describe 'POST /namespace/repo.git/info/lfs/objects/batch' do
           def make_request
             post url, params: args, headers: env
           end
@@ -162,7 +215,7 @@ describe "Git HTTP requests (Geo)", :geo do
           context 'operation upload' do
             let(:args) { { 'operation' => 'upload' }.to_json }
 
-            context 'with the correct git-lfs version' do
+            context 'with a valid git-lfs version' do
               before do
                 env['User-Agent'] = 'git-lfs/2.4.2 (GitHub; darwin amd64; go 1.10.2)'
               end
@@ -174,7 +227,7 @@ describe "Git HTTP requests (Geo)", :geo do
               end
             end
 
-            context 'with an incorrect git-lfs version' do
+            context 'with an invalid git-lfs version' do
               where(:description, :version) do
                 'outdated' | 'git-lfs/2.4.1'
                 'unknown'  | 'git-lfs'
@@ -209,10 +262,24 @@ describe "Git HTTP requests (Geo)", :geo do
             before do
               project.add_maintainer(user)
               env['Authorization'] = authorization
+              env['User-Agent'] = "2.4.2 (GitHub; darwin amd64; go 1.10.2)"
             end
 
-            it 'is handled by the secondary' do
-              is_expected.to have_gitlab_http_status(:ok)
+            context 'with selective sync not enabled' do
+              it 'is handled by the secondary' do
+                is_expected.to have_gitlab_http_status(:ok)
+              end
+            end
+
+            context 'with selective sync is enabled' do
+              let(:redirect_url) { redirected_primary_url }
+
+              before do
+                allow(current_node).to receive(:selective_sync?).and_return(true)
+                allow(current_node).to receive(:projects_include?).with(project.id).and_return(false)
+              end
+
+              it_behaves_like 'Geo 302 redirect to Primary'
             end
 
             where(:description, :version) do
@@ -231,6 +298,51 @@ describe "Git HTTP requests (Geo)", :geo do
                 end
               end
             end
+          end
+        end
+      end
+
+      context 'Transfer API' do
+        describe 'GET /namespace/repo.git/gitlab-lfs/objects/<oid>' do
+          def make_request
+            get url, headers: env
+          end
+
+          let(:user) { create(:user) }
+          let(:lfs_object) { create(:lfs_object, :with_file) }
+          let(:url) { "/#{project.full_path}.git/gitlab-lfs/objects/#{lfs_object.oid}" }
+          let(:authorization) { ActionController::HttpAuthentication::Basic.encode_credentials(user.username, user.password) }
+
+          subject do
+            make_request
+            response
+          end
+
+          before do
+            allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
+            project.update_attribute(:lfs_enabled, true)
+            project.lfs_objects << lfs_object
+
+            project.add_maintainer(user)
+            env['Authorization'] = authorization
+            env['User-Agent'] = "2.4.2 (GitHub; darwin amd64; go 1.10.2)"
+          end
+
+          context 'with selective sync not enabled' do
+            it 'is handled by the secondary' do
+              is_expected.to have_gitlab_http_status(:ok)
+            end
+          end
+
+          context 'with selective sync is enabled' do
+            let(:redirect_url) { redirected_primary_url }
+
+            before do
+              allow(current_node).to receive(:selective_sync?).and_return(true)
+              allow(current_node).to receive(:projects_include?).with(project.id).and_return(false)
+            end
+
+            it_behaves_like 'Geo 302 redirect to Primary'
           end
         end
       end
