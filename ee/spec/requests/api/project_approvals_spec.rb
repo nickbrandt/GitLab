@@ -21,7 +21,7 @@ describe API::ProjectApprovals do
       end
 
       it 'returns 200 status' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       it 'matches the response schema' do
@@ -46,7 +46,7 @@ describe API::ProjectApprovals do
         it 'returns 400 status' do
           post api(url, current_user)
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
 
@@ -54,7 +54,7 @@ describe API::ProjectApprovals do
         it 'returns 201 status' do
           post api(url, current_user), params: { approvals_before_merge: 3 }
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
         end
 
         it 'matches the response schema' do
@@ -169,7 +169,7 @@ describe API::ProjectApprovals do
       it 'returns 403' do
         post api(url, user2), params: { approvals_before_merge: 4 }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -185,7 +185,7 @@ describe API::ProjectApprovals do
           put api(url, current_user), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
         end.to change { project.approvers.count }.from(1).to(0)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['approvers']).to be_empty
         expect(json_response['approver_groups']).to be_empty
       end
@@ -198,7 +198,7 @@ describe API::ProjectApprovals do
             put api(url, current_user), params: { approver_ids: '', approver_group_ids: '' }
           end.to change { project.approvers.count }.from(1).to(0)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['approvers']).to be_empty
           expect(json_response['approver_groups']).to be_empty
         end
@@ -215,7 +215,7 @@ describe API::ProjectApprovals do
         expect(project.approvers.first.user_id).to eq(approver.id)
         expect(project.approver_groups.first.group_id).to eq(group.id)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['approvers'][0]['user']['username']).to eq(approver.username)
         expect(json_response['approver_groups'][0]['group']['name']).to eq(group.name)
       end
@@ -255,7 +255,7 @@ describe API::ProjectApprovals do
           put api(url, user2), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
         end.not_to change { project.approvers.count }
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

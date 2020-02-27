@@ -127,7 +127,7 @@ describe API::ProjectPackages do
       it 'returns 403' do
         get api(url, user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -160,20 +160,20 @@ describe API::ProjectPackages do
         it 'returns 200 and the package information' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('public_api/v4/packages/package', dir: 'ee')
         end
 
         it 'returns 404 when the package does not exist' do
           get api(no_package_url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 for the package from a different project' do
           get api(wrong_package_url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it_behaves_like 'no destroy url'
@@ -185,13 +185,13 @@ describe API::ProjectPackages do
         it 'returns 404 for non authenticated user' do
           get api(package_url)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 for a user without access to the project' do
           subject
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         context 'user is a developer' do
@@ -202,7 +202,7 @@ describe API::ProjectPackages do
           it 'returns 200 and the package information' do
             subject
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('public_api/v4/packages/package', dir: 'ee')
           end
 
@@ -225,7 +225,7 @@ describe API::ProjectPackages do
 
             get api(package_url, user)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('public_api/v4/packages/package_with_build', dir: 'ee')
           end
         end
@@ -240,7 +240,7 @@ describe API::ProjectPackages do
       it 'returns 403' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -255,13 +255,13 @@ describe API::ProjectPackages do
         it 'returns 403 for non authenticated user' do
           delete api(package_url)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'returns 403 for a user without access to the project' do
           delete api(package_url, user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
 
@@ -271,13 +271,13 @@ describe API::ProjectPackages do
         it 'returns 404 for non authenticated user' do
           delete api(package_url)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 for a user without access to the project' do
           delete api(package_url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 when the package does not exist' do
@@ -285,7 +285,7 @@ describe API::ProjectPackages do
 
           delete api(no_package_url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 404 for the package from a different project' do
@@ -293,7 +293,7 @@ describe API::ProjectPackages do
 
           delete api(wrong_package_url, user)
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
 
         it 'returns 403 for a user without enough permissions' do
@@ -301,7 +301,7 @@ describe API::ProjectPackages do
 
           delete api(package_url, user)
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
 
         it 'returns 204' do
@@ -309,7 +309,7 @@ describe API::ProjectPackages do
 
           delete api(package_url, user)
 
-          expect(response).to have_gitlab_http_status(204)
+          expect(response).to have_gitlab_http_status(:no_content)
         end
       end
     end
@@ -322,7 +322,7 @@ describe API::ProjectPackages do
       it 'returns 403' do
         delete api(package_url, user)
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end

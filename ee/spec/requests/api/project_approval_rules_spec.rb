@@ -29,7 +29,7 @@ describe API::ProjectApprovalRules do
       it 'matches the response schema' do
         get api(url, developer)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/project_approval_rules', dir: 'ee')
 
         json = json_response

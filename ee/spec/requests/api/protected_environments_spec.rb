@@ -32,7 +32,7 @@ describe API::ProtectedEnvironments do
       it 'returns the protected environments' do
         request
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
 
@@ -57,7 +57,7 @@ describe API::ProtectedEnvironments do
       it 'returns the protected environment' do
         request
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
         expect(json_response['name']).to eq(protected_environment_name)
         expect(json_response['deploy_access_levels'][0]['access_level']).to eq(::Gitlab::Access::MAINTAINER)
@@ -89,7 +89,7 @@ describe API::ProtectedEnvironments do
 
         post api_url, params: { name: 'staging', deploy_access_levels: [{ user_id: deployer.id }] }
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
         expect(json_response['name']).to eq('staging')
         expect(json_response['deploy_access_levels'].first['user_id']).to eq(deployer.id)
@@ -100,7 +100,7 @@ describe API::ProtectedEnvironments do
 
         post api_url, params: { name: 'staging', deploy_access_levels: [{ group_id: group.id }] }
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
         expect(json_response['name']).to eq('staging')
         expect(json_response['deploy_access_levels'].first['group_id']).to eq(group.id)
@@ -109,7 +109,7 @@ describe API::ProtectedEnvironments do
       it 'protects the environment with maintainers allowed to deploy' do
         post api_url, params: { name: 'staging', deploy_access_levels: [{ access_level: Gitlab::Access::MAINTAINER }] }
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/protected_environment', dir: 'ee')
         expect(json_response['name']).to eq('staging')
         expect(json_response['deploy_access_levels'].first['access_level']).to eq(Gitlab::Access::MAINTAINER)
@@ -121,7 +121,7 @@ describe API::ProtectedEnvironments do
 
         post api_url, params: { name: 'production', deploy_access_levels: [{ user_id: deployer.id }] }
 
-        expect(response).to have_gitlab_http_status(409)
+        expect(response).to have_gitlab_http_status(:conflict)
       end
 
       context 'without deploy_access_levels' do
@@ -133,7 +133,7 @@ describe API::ProtectedEnvironments do
       it 'returns error with invalid deploy access level' do
         post api_url, params: { name: 'staging', deploy_access_levels: [{ access_level: nil }] }
 
-        expect(response).to have_gitlab_http_status(422)
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
       end
     end
 
@@ -156,7 +156,7 @@ describe API::ProtectedEnvironments do
           request
         end.to change { project.protected_environments.count }.by(-1)
 
-        expect(response).to have_gitlab_http_status(204)
+        expect(response).to have_gitlab_http_status(:no_content)
       end
     end
 
