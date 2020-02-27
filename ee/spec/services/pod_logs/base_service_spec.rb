@@ -5,7 +5,8 @@ require 'spec_helper'
 describe ::PodLogs::BaseService do
   include KubernetesHelpers
 
-  let_it_be(:environment, refind: true) { create(:environment) }
+  let_it_be(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*') }
+  let(:namespace) { 'autodevops-deploy-9-production' }
 
   let(:pod_name) { 'pod-1' }
   let(:container_name) { 'container-0' }
@@ -16,7 +17,7 @@ describe ::PodLogs::BaseService do
     ].to_json, object_class: OpenStruct)
   end
 
-  subject { described_class.new(environment, params: params) }
+  subject { described_class.new(cluster, namespace, params: params) }
 
   describe '#initialize' do
     let(:params) do
@@ -27,11 +28,55 @@ describe ::PodLogs::BaseService do
     end
 
     it 'filters the parameters' do
-      expect(subject.environment).to eq(environment)
+      expect(subject.cluster).to eq(cluster)
+      expect(subject.namespace).to eq(namespace)
       expect(subject.params).to eq({
         'container_name' => container_name
       })
       expect(subject.params.equal?(params)).to be(false)
+    end
+  end
+
+  describe '#check_arguments' do
+    context 'when cluster and namespace are provided' do
+      it 'returns success' do
+        result = subject.send(:check_arguments, {})
+
+        expect(result[:status]).to eq(:success)
+      end
+    end
+
+    context 'when cluster is nil' do
+      let(:cluster) { nil }
+
+      it 'returns an error' do
+        result = subject.send(:check_arguments, {})
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq('Cluster does not exist')
+      end
+    end
+
+    context 'when namespace is nil' do
+      let(:namespace) { nil }
+
+      it 'returns an error' do
+        result = subject.send(:check_arguments, {})
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq('Namespace is empty')
+      end
+    end
+
+    context 'when namespace is empty' do
+      let(:namespace) { '' }
+
+      it 'returns an error' do
+        result = subject.send(:check_arguments, {})
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq('Namespace is empty')
+      end
     end
   end
 
@@ -84,31 +129,11 @@ describe ::PodLogs::BaseService do
     end
   end
 
-  describe '#check_deployment_platform' do
-    it 'returns success when deployment platform exist' do
-      create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project])
-      create(:deployment, :success, environment: environment)
-
-      result = subject.send(:check_deployment_platform, {})
-
-      expect(result[:status]).to eq(:success)
-    end
-
-    it 'returns error when deployment platform does not exist' do
-      result = subject.send(:check_deployment_platform, {})
-
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('No deployment platform available')
-    end
-  end
-
   describe '#get_raw_pods' do
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
 
     it 'returns success with passthrough k8s response' do
-      create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project])
-      create(:deployment, :success, environment: environment)
-      stub_kubeclient_pods(environment.deployment_namespace)
+      stub_kubeclient_pods(namespace)
 
       result = subject.send(:get_raw_pods, {})
 

@@ -4,6 +4,7 @@ module Projects
   class LogsController < Projects::ApplicationController
     before_action :authorize_read_pod_logs!
     before_action :environment
+    before_action :ensure_deployments, only: %i(k8s elasticsearch)
 
     def index
       if environment.nil?
@@ -27,7 +28,7 @@ module Projects
       ::Gitlab::UsageCounters::PodLogs.increment(project.id)
       ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
-      result = service.new(environment, params: permitted_params).execute
+      result = service.new(cluster, namespace, params: permitted_params).execute
 
       if result.nil?
         head :accepted
@@ -56,6 +57,23 @@ module Projects
                        else
                          project.default_environment
                        end
+    end
+
+    def cluster
+      environment.deployment_platform&.cluster
+    end
+
+    def namespace
+      environment.deployment_namespace
+    end
+
+    def ensure_deployments
+      return if cluster && namespace.present?
+
+      render status: :bad_request, json: {
+        status: :error,
+        message: _('Environment does not have deployments')
+      }
     end
   end
 end
