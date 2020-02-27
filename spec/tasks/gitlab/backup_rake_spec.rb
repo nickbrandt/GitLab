@@ -402,7 +402,9 @@ describe 'gitlab:app namespace rake task' do
         'artifacts.tar.gz',
         'lfs.tar.gz',
         'pages.tar.gz',
-        'registry.tar.gz'
+        'registry.tar.gz',
+        'repositories',
+        'tmp'
       )
     end
 
