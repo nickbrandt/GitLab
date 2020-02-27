@@ -235,7 +235,62 @@ describe EpicsFinder do
             expect(epics(params)).to contain_exactly(epic1)
           end
         end
+
+        context 'when using iid starts with query' do
+          let!(:epic1) { create(:epic, :opened, group: group, iid: '11') }
+          let!(:epic2) { create(:epic, :opened, group: group, iid: '1112') }
+          let!(:epic3) { create(:epic, :closed, group: group, iid: '9978') }
+          let!(:epic4) { create(:epic, :closed, group: another_group, iid: '111') }
+
+          it 'returns the expected epics if just the first two numbers are given' do
+            params = { iid_starts_with: '11' }
+
+            expect(epics(params)).to contain_exactly(epic1, epic2)
+          end
+
+          it 'returns the expected epics if the exact id is given' do
+            params = { iid_starts_with: '1112' }
+
+            expect(epics(params)).to contain_exactly(epic2)
+          end
+
+          it 'is empty if the last number is given' do
+            params = { iid_starts_with: '8' }
+
+            expect(epics(params)).to be_empty
+          end
+
+          it 'fails if iid_starts_with contains a non-numeric string' do
+            expect { epics({ iid_starts_with: 'foo' }) }.to raise_error(ArgumentError)
+          end
+
+          it 'fails if iid_starts_with contains a non-numeric string with line breaks' do
+            expect { epics({ iid_starts_with: "foo\n1" }) }.to raise_error(ArgumentError)
+          end
+
+          it 'fails if iid_starts_with contains a string which contains a negative number' do
+            expect { epics(iid_starts_with: '-1') }.to raise_error(ArgumentError)
+          end
+        end
       end
+    end
+  end
+
+  describe '.valid_iid_query?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:query, :expected_result) do
+      "foo" | false
+      "-1" | false
+      "1\nfoo" | false
+      "foo\n1" | false
+      "1" | true
+    end
+
+    with_them do
+      subject { described_class.valid_iid_query?(query) }
+
+      it { is_expected.to eq(expected_result) }
     end
   end
 

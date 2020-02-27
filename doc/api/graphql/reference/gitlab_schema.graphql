@@ -1891,6 +1891,11 @@ type Epic implements Noteable {
     iid: ID
 
     """
+    Filter epics by iid for autocomplete
+    """
+    iidStartsWith: String
+
+    """
     List of IIDs of epics, e.g., [1, 2]
     """
     iids: [ID!]
@@ -2942,6 +2947,11 @@ type Group {
     iid: ID
 
     """
+    Filter epics by iid for autocomplete
+    """
+    iidStartsWith: String
+
+    """
     List of IIDs of epics, e.g., [1, 2]
     """
     iids: [ID!]
@@ -3007,6 +3017,11 @@ type Group {
     IID of the epic, e.g., "1"
     """
     iid: ID
+
+    """
+    Filter epics by iid for autocomplete
+    """
+    iidStartsWith: String
 
     """
     List of IIDs of epics, e.g., [1, 2]
