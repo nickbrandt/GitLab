@@ -341,7 +341,7 @@ describe Backup::Manager do
       end
     end
 
-    context 'when the is a non-tarred backup in the directory' do
+    context 'when there is a non-tarred backup in the directory' do
       before do
         allow(Dir).to receieve(:glob).and_return(
           [
