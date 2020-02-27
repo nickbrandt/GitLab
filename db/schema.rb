@@ -3725,6 +3725,7 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
   create_table "requirements", force: :cascade do |t|
     t.integer "state", limit: 2, default: 1, null: false
     t.integer "iid", null: false
+    t.integer "cached_markdown_version"
     t.bigint "project_id", null: false
     t.bigint "author_id"
     t.datetime_with_timezone "created_at", null: false

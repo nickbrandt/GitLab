@@ -9,6 +9,7 @@ class CreateRequirements < ActiveRecord::Migration[6.0]
     create_table :requirements do |t|
       t.integer :state, limit: 2, default: 1, null: false
       t.integer :iid, null: false
+      t.integer :cached_markdown_version
       t.references :project, null: false, index: true, foreign_key: { on_delete: :cascade }
       t.references :author, index: true, foreign_key: { to_table: :users, on_delete: :nullify }
       t.timestamps_with_timezone null: false
