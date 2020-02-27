@@ -1,43 +1,16 @@
 # frozen_string_literal: true
 
-class WeightNote < ::Note
+class WeightNote < ::SyntheticNote
   attr_accessor :resource_parent, :event
 
   def self.from_event(event, resource: nil, resource_parent: nil)
-    resource ||= event.issue
-
-    attrs = {
-      system: true,
-      author: event.user,
-      created_at: event.created_at,
-      noteable: resource,
-      event: event,
-      discussion_id: event.discussion_id,
-      system_note_metadata: ::SystemNoteMetadata.new(action: 'weight'),
-      resource_parent: resource_parent
-    }
-
-    if resource_parent.is_a?(Project)
-      attrs[:project_id] = resource_parent.id
-    end
+    attrs = note_attributes('weight', event, resource, resource_parent)
 
     WeightNote.new(attrs)
   end
 
-  def note
-    @note ||= note_text
-  end
-
   def note_html
     @note_html ||= "<p dir=\"auto\">#{note_text(html: true)}</p>"
-  end
-
-  def project
-    resource_parent if resource_parent.is_a?(Project)
-  end
-
-  def group
-    resource_parent if resource_parent.is_a?(Group)
   end
 
   private
