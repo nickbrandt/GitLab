@@ -185,14 +185,19 @@ For a deeper look into them, see [`.gitlab-ci.yml` defined variables](#gitlab-ci
 
 #### Via the UI
 
-From the UI, navigate to your project's **Settings > CI/CD** and
-expand **Variables**. Create a new variable by choosing its **type**, naming
-it in the field **Input variable key**, and defining its value in the
-**Input variable value** field:
+From within the UI, you can add or update custom environment variables:
 
-![CI/CD settings - new variable](img/new_custom_variables_example.png)
+1. Go to your project's **Settings > CI/CD** and expand the **Variables** section.
+1. Click the **Add variable** button. In the **Add variable** modal, fill in the details:
 
-You'll also see the option to mask and/or protect your variables.
+    - **Key**: Must be one line, with no spaces, using only letters, numbers, `-` or `_`.
+    - **Value**: No limitations.
+    - **Type**: `File` or `Variable`.
+    - **Environment scope**: `All`, or specific environments.
+    - **Protect variable** (Optional): If selected, the variable will only be available in pipelines that run on protected branches or tags.
+    - **Mask variable** (Optional): If selected, the variable's **Value** will be masked in job logs. The variable will fail to save if the value does not meet the [masking requirements](#masked-variables).
+
+After a variable is created, you can update any of the details by clicking on the **{pencil}** **Edit** button.
 
 Once you've set the variables, call them from the `.gitlab-ci.yml` file:
 
