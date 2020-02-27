@@ -22,7 +22,7 @@ RSpec.shared_examples 'a GraphQL type with design fields' do
       notes_count
     ] + extra_design_fields
 
-    is_expected.to have_graphql_fields(*expected_fields).only
+    expect(described_class).to have_graphql_fields(*expected_fields).only
   end
 
   describe '#image' do
@@ -41,7 +41,7 @@ RSpec.shared_examples 'a GraphQL type with design fields' do
     end
 
     it 'resolves to the design image URL' do
-      image = field.resolve(instance, args, context)
+      image = field.resolve_field(instance, args, context)
       sha = design.versions.first.sha
       url = ::Gitlab::Routing.url_helpers.project_design_management_designs_raw_image_url(design.project, design, sha)
 
@@ -67,10 +67,10 @@ RSpec.shared_examples 'a GraphQL type with design fields' do
       #   = 10
       expect(instance).not_to eq(instance_b) # preload designs themselves.
       expect do
-        image_a = field.resolve(instance, args, context)
-        image_b = field.resolve(instance, args, context)
-        image_c = field.resolve(instance_b, args, context)
-        image_d = field.resolve(instance_b, args, context)
+        image_a = field.resolve_field(instance, args, context)
+        image_b = field.resolve_field(instance, args, context)
+        image_c = field.resolve_field(instance_b, args, context)
+        image_d = field.resolve_field(instance_b, args, context)
         expect(image_a).to eq(image_b)
         expect(image_c).not_to eq(image_b)
         expect(image_c).to eq(image_d)
