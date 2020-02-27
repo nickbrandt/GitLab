@@ -35,8 +35,6 @@ module Packages
       end
 
       def build_pipeline_info(pipeline_info)
-        return unless pipeline_info
-
         {
           created_at: pipeline_info.created_at,
           id: pipeline_info.id,
