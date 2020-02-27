@@ -240,7 +240,9 @@ describe('RelatedIssuesRoot', () => {
         setTimeout(done);
       });
 
-      it('sets isFetching while fetching', done => {
+      // https://gitlab.com/gitlab-org/gitlab/issues/207376
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('sets isFetching while fetching', done => {
         vm.fetchRelatedIssues();
 
         expect(vm.isFetching).toEqual(true);
