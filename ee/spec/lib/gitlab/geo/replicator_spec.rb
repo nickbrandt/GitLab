@@ -38,6 +38,10 @@ describe Gitlab::Geo::Replicator do
     context 'model DSL' do
       class DummyModel
         include ActiveModel::Model
+
+        def self.after_create_commit(*args)
+        end
+
         include Gitlab::Geo::ReplicableModel
 
         with_replicator DummyReplicator

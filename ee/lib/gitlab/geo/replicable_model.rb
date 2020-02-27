@@ -3,11 +3,14 @@
 module Gitlab
   module Geo
     module ReplicableModel
-      def self.included(klass)
-        klass.extend(ClassMethods)
+      extend ActiveSupport::Concern
+
+      included do
+        # If this hook turns out not to apply to all Models, perhaps we should extract a `ReplicableBlobModel`
+        after_create_commit -> { replicator.handle_after_create_commit if replicator.respond_to?(:handle_after_create_commit) }
       end
 
-      module ClassMethods
+      class_methods do
         def with_replicator(klass)
           raise ArgumentError, 'Must be a class inheriting from Gitlab::Geo::Replicator' unless klass < ::Gitlab::Geo::Replicator
 

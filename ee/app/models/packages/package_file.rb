@@ -35,7 +35,6 @@ class Packages::PackageFile < ApplicationRecord
   with_replicator Geo::PackageFileReplicator
 
   after_save :update_file_metadata, if: :saved_change_to_file?
-  after_create_commit -> { replicator.publish_created_event }
 
   update_project_statistics project_statistics_name: :packages_size
 
