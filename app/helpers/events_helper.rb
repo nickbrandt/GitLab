@@ -70,6 +70,8 @@ module EventsHelper
   def event_preposition(event)
     if event.push_action? || event.commented_action? || event.target
       "at"
+    elsif event.wiki_page?
+      _("Events|in the wiki for")
     elsif event.milestone?
       "in"
     end
@@ -170,6 +172,19 @@ module EventsHelper
                        event.project, event.note_target],
                         anchor: dom_id(event.target))
     end
+  end
+
+  def event_wiki_title_html(event)
+    capture do
+      concat content_tag(:span, _('wiki page'), class: "event-target-type append-right-4")
+      concat link_to(event.wiki_page_title, event_wiki_page_target_url(event),
+                     title: event.target_title,
+                     class: 'has-tooltip event-target-link append-right-4')
+    end
+  end
+
+  def event_wiki_page_target_url(event)
+    project_wiki_url(event.project, event.wiki_page_title)
   end
 
   def event_note_title_html(event)
