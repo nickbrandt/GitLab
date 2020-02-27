@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/prefer-default-export
-export const mergeRequests = [
+const mergeRequests = [
   {
     title:
       'This is just a super long merge request title that does not fit into one line so it needs to be truncated',
@@ -34,3 +33,5 @@ export const mergeRequests = [
     diff_stats: { additions: 504, deletions: 10, total: 514, commits_count: 7 },
   },
 ];
+
+export default mergeRequests;
