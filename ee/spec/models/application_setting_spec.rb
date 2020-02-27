@@ -36,8 +36,8 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_shards) }
 
     it { is_expected.to allow_value(10).for(:elasticsearch_replicas) }
+    it { is_expected.to allow_value(0).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(nil).for(:elasticsearch_replicas) }
-    it { is_expected.not_to allow_value(0).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
 
