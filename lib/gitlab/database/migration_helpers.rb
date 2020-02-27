@@ -750,7 +750,7 @@ module Gitlab
 
         check_trigger_permissions!(table)
 
-        old_col = column_for(table, old_column, raise_if_missing: true)
+        old_col = column_for(table, old_column)
         new_type = type || old_col.type
         max_index = 0
 
@@ -922,11 +922,11 @@ module Gitlab
       end
 
       # Returns the column for the given table and column name.
-      def column_for(table, name, raise_if_missing: false)
+      def column_for(table, name)
         name = name.to_s
 
         column = columns(table).find { |column| column.name == name }
-        raise(missing_schema_object_message(table, "column", name)) if column.nil? && raise_if_missing
+        raise(missing_schema_object_message(table, "column", name)) if column.nil?
 
         column
       end
@@ -1166,7 +1166,7 @@ into similar problems in the future (e.g. when new tables are created).
       end
 
       def create_column_from(table, old, new, type: nil)
-        old_col = column_for(table, old, raise_if_missing: true)
+        old_col = column_for(table, old)
         new_type = type || old_col.type
 
         add_column(table, new, new_type,

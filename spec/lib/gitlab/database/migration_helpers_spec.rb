@@ -588,6 +588,8 @@ describe Gitlab::Database::MigrationHelpers do
   end
 
   describe '#add_column_with_default' do
+    let(:column) { Project.columns.find { |c| c.name == "id" } }
+
     context 'outside of a transaction' do
       context 'when a column limit is not set' do
         before do
@@ -602,6 +604,9 @@ describe Gitlab::Database::MigrationHelpers do
 
           expect(model).to receive(:change_column_default)
             .with(:projects, :foo, 10)
+
+          expect(model).to receive(:column_for)
+            .with(:projects, :foo).and_return(column)
         end
 
         it 'adds the column while allowing NULL values' do
@@ -653,9 +658,12 @@ describe Gitlab::Database::MigrationHelpers do
       end
 
       context 'when a column limit is set' do
+        let(:column) { Project.columns.find { |c| c.name == "id" } }
+
         it 'adds the column with a limit' do
           allow(model).to receive(:transaction_open?).and_return(false)
           allow(model).to receive(:transaction).and_yield
+          allow(model).to receive(:column_for).with(:projects, :foo).and_return(column)
           allow(model).to receive(:update_column_in_batches).with(:projects, :foo, 10)
           allow(model).to receive(:change_column_null).with(:projects, :foo, false)
           allow(model).to receive(:change_column_default).with(:projects, :foo, 10)
@@ -1152,8 +1160,9 @@ describe Gitlab::Database::MigrationHelpers do
       expect(column.name).to eq('id')
     end
 
-    it 'returns nil when a column does not exist' do
-      expect(model.column_for(:users, :kittens)).to be_nil
+    it 'raises an error when a column does not exist' do
+      error_message = /Could not find column "kittens" on table "users"/
+      expect { model.column_for(:users, :kittens) }.to raise_error(error_message)
     end
   end
 
