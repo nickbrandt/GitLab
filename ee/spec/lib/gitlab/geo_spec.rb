@@ -307,4 +307,78 @@ describe Gitlab::Geo, :geo, :request_store do
       end
     end
   end
+
+  describe '.secondary_with_selective_sync_enabled?' do
+    context 'for a Geo Primary' do
+      it 'returns false' do
+        stub_current_geo_node(primary_node)
+
+        expect(described_class.secondary_with_selective_sync_enabled?).to eq(false)
+      end
+    end
+
+    context 'for a Geo Secondary' do
+      before do
+        stub_current_geo_node(secondary_node)
+      end
+
+      context 'where selective sync is not enabled' do
+        it 'returns false' do
+          secondary_node.selective_sync_type = nil
+
+          expect(described_class.secondary_with_selective_sync_enabled?).to eq(false)
+        end
+      end
+
+      context 'where selective sync is enabled' do
+        let(:selective_sync_enabled) { true }
+
+        it 'returns true' do
+          secondary_node.selective_sync_type = 'namespaces'
+
+          expect(described_class.secondary_with_selective_sync_enabled?).to eq(true)
+        end
+      end
+    end
+  end
+
+  describe '.selective_sync_but_not_for_project?' do
+    let(:project) { create(:project) }
+
+    before do
+      allow(GeoNode).to receive(:current_node).and_return(secondary_node)
+    end
+
+    context 'where selective sync not enabled' do
+      it 'returns false' do
+        secondary_node.selective_sync_type = nil
+
+        expect(described_class.selective_sync_but_not_for_project?(project.id)).to eq(false)
+      end
+    end
+
+    context 'where selective sync is enabled' do
+      before do
+        secondary_node.selective_sync_type = 'namespaces'
+      end
+
+      context 'and the project is included in the namespaces to sync' do
+        it 'returns false' do
+          secondary_node.namespaces << project.namespace
+
+          expect(described_class.selective_sync_but_not_for_project?(project.id)).to eq(false)
+        end
+      end
+
+      context 'but the project is not included in the namespaces to sync' do
+        it 'returns true' do
+          some_other_namespace = create(:namespace)
+
+          secondary_node.namespaces << some_other_namespace
+
+          expect(described_class.selective_sync_but_not_for_project?(project.id)).to eq(true)
+        end
+      end
+    end
+  end
 end

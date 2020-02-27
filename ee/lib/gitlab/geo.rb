@@ -67,6 +67,14 @@ module Gitlab
       self.secondary? && self.primary_node_configured?
     end
 
+    def self.secondary_with_selective_sync_enabled?
+      secondary? && current_node.selective_sync?
+    end
+
+    def self.selective_sync_but_not_for_project?(project_id)
+      secondary_with_selective_sync_enabled? && !current_node.projects_include?(project_id)
+    end
+
     def self.license_allows?
       ::License.feature_available?(:geo)
     end
