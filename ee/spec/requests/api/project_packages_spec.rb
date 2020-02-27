@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe API::ProjectPackages do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :public) }
+  let_it_be(:project) { create(:project, :public) }
   let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
   let(:package_url) { "/projects/#{project.id}/packages/#{package1.id}" }
   let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
@@ -92,6 +92,29 @@ describe API::ProjectPackages do
 
         it_behaves_like 'package sorting', 'type' do
           let(:packages) { [package3, package1, package2] }
+        end
+      end
+
+      describe 'filtering on package type' do
+        let_it_be(:package1) { create(:conan_package, project: project) }
+        let_it_be(:package2) { create(:maven_package, project: project) }
+        let_it_be(:package3) { create(:npm_package, project: project) }
+        let_it_be(:package4) { create(:nuget_package, project: project) }
+
+        context 'package types' do
+          %w[conan maven npm nuget].each do |package_type|
+            it "returns #{package_type} packages" do
+              url = package_type_url(package_type)
+              get api(url, user)
+
+              expect(json_response.length).to eq(1)
+              expect(json_response.map { |package| package['package_type'] }).to contain_exactly(package_type)
+            end
+          end
+
+          def package_type_url(package_type)
+            "/projects/#{project.id}/packages?package_type=#{package_type}"
+          end
         end
       end
     end

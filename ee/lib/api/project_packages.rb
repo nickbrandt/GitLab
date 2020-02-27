@@ -24,13 +24,12 @@ module API
                             desc: 'Return packages ordered by `created_at`, `name`, `version` or `type` fields.'
         optional :sort, type: String, values: %w[asc desc], default: 'asc',
                         desc: 'Return packages sorted in `asc` or `desc` order.'
+        optional :package_type, type: String, values: %w[conan maven npm nuget],
+                        desc: 'Return packages of a certain type'
       end
       get ':id/packages' do
-        packages = user_project.packages
-
-        if params[:order_by] && params[:sort]
-          packages = packages.sort_by_attribute("#{params[:order_by]}_#{params[:sort]}")
-        end
+        packages = ::Packages::PackagesFinder
+          .new(user_project, declared(params)).execute
 
         present paginate(packages), with: EE::API::Entities::Package, user: current_user
       end
