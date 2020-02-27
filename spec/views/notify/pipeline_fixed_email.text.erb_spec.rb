@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe 'notify/pipeline_success_email.html.haml' do
+describe 'notify/pipeline_fixed_email.text.erb' do
   it_behaves_like 'pipeline status changes email' do
-    let(:title) { 'Your pipeline has passed' }
+    let(:title) { 'Your pipeline has been fixed!' }
     let(:status) { :success }
   end
 end

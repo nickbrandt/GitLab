@@ -13149,6 +13149,9 @@ msgstr ""
 msgid "NotificationEvent|Failed pipeline"
 msgstr ""
 
+msgid "NotificationEvent|Fixed pipeline"
+msgstr ""
+
 msgid "NotificationEvent|Merge merge request"
 msgstr ""
 

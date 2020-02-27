@@ -878,6 +878,17 @@ ActiveRecord::Schema.define(version: 2020_02_26_162723) do
     t.index ["pipeline_id"], name: "index_ci_pipelines_config_on_pipeline_id"
   end
 
+  create_table "ci_refs", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "lock_version", default: 0
+    t.integer "last_updated_by_pipeline_id"
+    t.boolean "tag", default: false, null: false
+    t.string "ref", limit: 255, null: false
+    t.string "status", limit: 255, null: false
+    t.index ["last_updated_by_pipeline_id"], name: "index_ci_refs_on_last_updated_by_pipeline_id"
+    t.index ["project_id", "ref", "tag"], name: "index_ci_refs_on_project_id_and_ref_and_tag", unique: true
+  end
+
   create_table "ci_resource_groups", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -2845,6 +2856,7 @@ ActiveRecord::Schema.define(version: 2020_02_26_162723) do
     t.boolean "issue_due"
     t.boolean "new_epic"
     t.string "notification_email"
+    t.boolean "fixed_pipeline"
     t.boolean "new_release"
     t.index ["source_id", "source_type"], name: "index_notification_settings_on_source_id_and_source_type"
     t.index ["user_id", "source_id", "source_type"], name: "index_notifications_on_user_id_and_source_id_and_source_type", unique: true
@@ -4650,6 +4662,8 @@ ActiveRecord::Schema.define(version: 2020_02_26_162723) do
   add_foreign_key "ci_pipelines", "merge_requests", name: "fk_a23be95014", on_delete: :cascade
   add_foreign_key "ci_pipelines", "projects", name: "fk_86635dbd80", on_delete: :cascade
   add_foreign_key "ci_pipelines_config", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
+  add_foreign_key "ci_refs", "ci_pipelines", column: "last_updated_by_pipeline_id", on_delete: :nullify
+  add_foreign_key "ci_refs", "projects", on_delete: :cascade
   add_foreign_key "ci_resource_groups", "projects", name: "fk_774722d144", on_delete: :cascade
   add_foreign_key "ci_resources", "ci_builds", column: "build_id", name: "fk_e169a8e3d5", on_delete: :nullify
   add_foreign_key "ci_resources", "ci_resource_groups", column: "resource_group_id", on_delete: :cascade
