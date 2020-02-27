@@ -30,15 +30,15 @@ NOTE: **Note:**
 The `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_HOST_AUTH_METHOD`
 variables can't be set in the GitLab UI. To set them, assign them to a variable
 [in the UI](../variables/README.md#via-the-ui), and then assign that
-variable to the `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` variables in
-your `.gitlab-ci.yml`.
+variable to the `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_HOST_AUTH_METHOD` 
+variables in your `.gitlab-ci.yml`.
 
 And then configure your application to use the database, for example:
 
 ```yaml
 Host: postgres
 User: runner
-Password: runner-password
+Password: ''
 Database: nice_marmot
 ```
 
