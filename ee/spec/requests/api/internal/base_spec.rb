@@ -132,7 +132,7 @@ describe API::Internal::Base do
                protocol: 'ssh'
              })
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -237,7 +237,7 @@ describe API::Internal::Base do
         it "does not allow access" do
           subject
 
-          expect(response).to have_gitlab_http_status(:forbidden)
+          expect(response).to have_gitlab_http_status(:unauthorized)
           expect(json_response['message']).to eql('Project requires smartcard login. Please login to GitLab using a smartcard.')
         end
       end
