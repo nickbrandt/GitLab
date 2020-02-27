@@ -83,6 +83,9 @@ export default {
     };
   },
   computed: {
+    isIssue() {
+      return this.issuableType === issuableTypesMap.ISSUE;
+    },
     isSubmitButtonDisabled() {
       return (
         (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
@@ -123,22 +126,24 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
-    <gl-form-group
-      :label="__('The current issue')"
-      label-for="linked-issue-type-radio"
-      label-class="label-bold"
-      class="mb-2"
-    >
-      <gl-form-radio-group
-        id="linked-issue-type-radio"
-        v-model="linkedIssueType"
-        :options="linkedIssueTypes"
-        :checked="linkedIssueType"
-      />
-    </gl-form-group>
-    <p class="bold">
-      {{ __('the following issue(s)') }}
-    </p>
+    <template v-if="isIssue">
+      <gl-form-group
+        :label="__('The current issue')"
+        label-for="linked-issue-type-radio"
+        label-class="label-bold"
+        class="mb-2"
+      >
+        <gl-form-radio-group
+          id="linked-issue-type-radio"
+          v-model="linkedIssueType"
+          :options="linkedIssueTypes"
+          :checked="linkedIssueType"
+        />
+      </gl-form-group>
+      <p class="bold">
+        {{ __('the following issue(s)') }}
+      </p>
+    </template>
     <related-issuable-input
       ref="relatedIssuableInput"
       :focus-on-mount="true"
