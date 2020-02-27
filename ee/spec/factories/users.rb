@@ -16,6 +16,10 @@ FactoryBot.modify do
         )
       end
     end
+
+    trait :service_user do
+      user_type { :ServiceUser }
+    end
   end
 
   factory :omniauth_user do
