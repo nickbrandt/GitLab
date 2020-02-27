@@ -87,7 +87,8 @@
       "created_at": "2019-11-20T17:27:41.118Z",
       "updated_at": "2019-11-20T17:27:41.118Z",
       "name": "first board",
-      "milestone_id": 7638,
+      "milestone_id": -2,
+      "milestone": {"id": -2, "name":  "#upcoming", "title":  "Upcoming"},
       "group_id": 4351,
       "weight": null,
       "labels": [],
@@ -153,6 +154,31 @@
           }
         }
       ]
+    },
+    {
+      "id": 57,
+      "project_id": null,
+      "created_at": "2019-11-20T17:27:41.118Z",
+      "updated_at": "2019-11-20T17:27:41.118Z",
+      "name": "second board",
+      "milestone_id": 7642,
+      "milestone": {
+        "id": 7642,
+        "title": "v4.0",
+        "project_id": null,
+        "description": "Et laudantium enim omnis ea reprehenderit iure.",
+        "due_date": null,
+        "created_at": "2019-11-20T17:02:14.336Z",
+        "updated_at": "2019-11-20T17:02:14.336Z",
+        "state": "closed",
+        "iid": 5,
+        "start_date": null,
+        "group_id": 4351
+      },
+      "group_id": 4351,
+      "weight": null,
+      "labels": [],
+      "lists": []
     }
   ],
   "members": [
