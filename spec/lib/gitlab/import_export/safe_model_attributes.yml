@@ -40,6 +40,15 @@ Event:
 - updated_at
 - action
 - author_id
+WikiPageMeta:
+- id
+- canonical_slug
+- title
+- project_id
+WikiPageSlug:
+- id
+- wiki_page_meta_id
+- slug
 PushEventPayload:
 - commit_count
 - action
