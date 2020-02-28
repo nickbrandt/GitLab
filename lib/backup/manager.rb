@@ -126,6 +126,7 @@ module Backup
 
     def unpack
       Dir.chdir(backup_path) do
+
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
           tar_file = File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
@@ -151,6 +152,7 @@ module Backup
           progress.puts 'rake gitlab:backup:restore BACKUP=timestamp_of_backup'
           exit 1
         end
+
         tar_file = backup_file_list.first
 
         progress.print 'Unpacking backup ... '
@@ -258,7 +260,7 @@ module Backup
     def create_attributes
       attrs = {
         key: remote_target,
-        body: File.open("#{backup_path}/#{tar_file}"),
+        body: File.open(File.join(backup_path, tar_file)),
         multipart_chunk_size: Gitlab.config.backup.upload.multipart_chunk_size,
         encryption: Gitlab.config.backup.upload.encryption,
         encryption_key: Gitlab.config.backup.upload.encryption_key,
