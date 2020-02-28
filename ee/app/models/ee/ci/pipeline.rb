@@ -25,6 +25,8 @@ module EE
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
         has_many :security_scans, class_name: 'Security::Scan', through: :builds
 
+        has_one :source_project, class_name: 'Ci::Sources::Project', foreign_key: :pipeline_id
+
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })

@@ -9,19 +9,22 @@ describe Ci::TriggerDownstreamSubscriptionService do
     let(:upstream_project) { create(:project, :public) }
     let(:pipeline) { create(:ci_pipeline, project: upstream_project, user: create(:user)) }
 
+    before do
+      stub_ci_pipeline_yaml_file(YAML.dump(job_name: { script: 'echo 1' }))
+    end
+
     context 'when pipeline project has downstream projects' do
       before do
-        create(:project, :repository, upstream_projects: [upstream_project])
+        downstream_project = create(:project, :repository, upstream_projects: [upstream_project])
+        downstream_project.add_developer(pipeline.user)
       end
 
-      it 'calls the create pipeline service' do
-        service_double = instance_double(::Ci::CreatePipelineService)
-        expect(service_double).to receive(:execute)
-        expect(::Ci::CreatePipelineService).to receive(:new).with(
-          an_instance_of(Project), an_instance_of(User), ref: 'master'
-        ).and_return(service_double)
+      it 'creates a pipeline' do
+        expect { execute }.to change { ::Ci::Pipeline.count }.from(1).to(2)
+      end
 
-        execute
+      it 'associates the downstream pipeline with the upstream project' do
+        expect { execute }.to change { pipeline.project.sourced_pipelines.count }.from(0).to(1)
       end
     end
 
