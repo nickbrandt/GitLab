@@ -34,8 +34,6 @@ describe('PackagesApp', () => {
         isLoading: false,
         packageEntity,
         packageFiles,
-        pipelineInfo: {},
-        pipelineError: null,
         canDelete: true,
         destroyPath: 'destroy-package-path',
         emptySvgPath: 'empty-illustration',

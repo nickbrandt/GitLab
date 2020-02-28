@@ -23,5 +23,11 @@ module EE
       package_registry_project_path = "#{project_api_path}/packages/#{registry_type}"
       expose_url(package_registry_project_path)
     end
+
+    def package_from_presenter(package)
+      presenter = ::Packages::Detail::PackagePresenter.new(package)
+
+      presenter.detail_view.to_json
+    end
   end
 end

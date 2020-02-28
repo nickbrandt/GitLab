@@ -1,7 +1,7 @@
 import {
   conanInstallationCommand,
   conanSetupCommand,
-  packageHasPipeline,
+  packagePipeline,
   packageTypeDisplay,
   mavenInstallationXml,
   mavenInstallationCommand,
@@ -30,12 +30,8 @@ import { NpmManager } from 'ee/packages/details/constants';
 describe('Getters PackageDetails Store', () => {
   let state;
 
-  const mockPipelineError = 'mock-pipeline-error';
-
   const defaultState = {
     packageEntity: packageWithoutBuildInfo,
-    pipelineInfo: mockPipelineInfo,
-    pipelineError: mockPipelineError,
     conanPath: registryUrl,
     mavenPath: registryUrl,
     npmPath: registryUrl,
@@ -65,19 +61,22 @@ describe('Getters PackageDetails Store', () => {
   const nugetInstallationCommandStr = `nuget install ${nugetPackage.name} -Source "GitLab"`;
   const nugetSetupCommandStr = `nuget source Add -Name "GitLab" -Source "${registryUrl}" -UserName <your_username> -Password <your_token>`;
 
-  describe('packageHasPipeline', () => {
-    it('should return true when build_info and pipeline_id exist', () => {
+  describe('packagePipeline', () => {
+    it('should return the pipeline info when pipeline exists', () => {
       setupState({
-        packageEntity: npmPackage,
+        packageEntity: {
+          ...npmPackage,
+          pipeline: mockPipelineInfo,
+        },
       });
 
-      expect(packageHasPipeline(state)).toEqual(true);
+      expect(packagePipeline(state)).toEqual(mockPipelineInfo);
     });
 
-    it('should return false when build_info does not exist', () => {
+    it('should return null when build_info does not exist', () => {
       setupState();
 
-      expect(packageHasPipeline(state)).toEqual(false);
+      expect(packagePipeline(state)).toBe(null);
     });
   });
 

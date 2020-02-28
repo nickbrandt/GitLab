@@ -11,6 +11,7 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import Tracking from '~/tracking';
+import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
 import PackageTitle from './package_title.vue';
 import ConanInstallation from './conan_installation.vue';
@@ -34,6 +35,7 @@ export default {
     GlModal,
     GlTable,
     GlIcon,
+    PackageActivity,
     PackageInformation,
     PackageTitle,
     ConanInstallation,
@@ -213,6 +215,8 @@ export default {
         <nuget-installation v-else-if="isNugetPackage" />
       </div>
     </div>
+
+    <package-activity />
 
     <gl-table
       :fields="$options.filesTableHeaderFields"

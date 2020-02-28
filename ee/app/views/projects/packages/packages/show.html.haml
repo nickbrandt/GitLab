@@ -5,8 +5,7 @@
 
 .row
   .col-12
-    #js-vue-packages-detail{ data: { package: @package.to_json(include: [:conan_metadatum, :maven_metadatum, :package_files, :build_info, :tags]),
-      package_files: @package_files.to_json(methods: :download_path),
+    #js-vue-packages-detail{ data: { package: package_from_presenter(@package),
       can_delete: can?(current_user, :destroy_package, @project).to_s,
       destroy_path: project_package_path(@project, @package),
       svg_path: image_path('illustrations/no-packages.svg'),
@@ -17,5 +16,4 @@
       conan_path: package_registry_instance_url(:conan),
       conan_help_path: help_page_path('user/packages/conan_repository/index'),
       nuget_path: nuget_package_registry_url(@project.id),
-      nuget_help_path: help_page_path('user/packages/nuget_repository/index'),
-      package_file_download_path: download_project_package_file_path(@project, @package_files.first) } }
+      nuget_help_path: help_page_path('user/packages/nuget_repository/index') } }

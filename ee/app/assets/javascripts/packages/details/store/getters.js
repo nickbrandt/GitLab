@@ -2,12 +2,8 @@ import { s__ } from '~/locale';
 import { generateConanRecipe } from '../utils';
 import { NpmManager } from '../constants';
 
-export const packageHasPipeline = ({ packageEntity }) => {
-  if (packageEntity?.build_info?.pipeline_id) {
-    return true;
-  }
-
-  return false;
+export const packagePipeline = ({ packageEntity }) => {
+  return packageEntity?.pipeline || null;
 };
 
 export const packageTypeDisplay = ({ packageEntity }) => {
