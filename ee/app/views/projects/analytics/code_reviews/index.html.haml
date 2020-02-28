@@ -6,4 +6,4 @@
     = _('Code Review')
   %span.text-secondary= _('Review time is defined as the time it takes from first comment until merged.')
 = render 'shared/issuable/search_bar', type: :issues_analytics, show_sorting_dropdown: false
-#js-code-review-analytics{ data: { project_id: @project.id } }
+#js-code-review-analytics{ data: { project_id: @project.id, new_merge_request_url: namespace_project_new_merge_request_path(@project.namespace), empty_state_svg_path: image_path('illustrations/merge_requests.svg') } }

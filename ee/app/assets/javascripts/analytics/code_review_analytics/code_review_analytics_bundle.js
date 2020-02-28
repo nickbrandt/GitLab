@@ -5,7 +5,7 @@ import FilteredSearchCodeReviewAnalytics from './filtered_search_code_review_ana
 
 export default () => {
   const container = document.getElementById('js-code-review-analytics');
-  const { projectId } = container.dataset;
+  const { projectId, newMergeRequestUrl, emptyStateSvgPath } = container.dataset;
 
   if (!container) return;
 
@@ -21,6 +21,8 @@ export default () => {
       return h(CodeAnalyticsApp, {
         props: {
           projectId: Number(projectId),
+          newMergeRequestUrl,
+          emptyStateSvgPath,
         },
       });
     },
