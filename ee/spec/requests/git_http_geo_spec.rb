@@ -159,17 +159,14 @@ describe "Git HTTP requests (Geo)", :geo do
         end
 
         let(:url) { "/#{project.full_path}.git/info/refs" }
+        let(:redirect_url) { "#{redirected_primary_url}?service=git-receive-pack" }
 
         subject do
           make_request
           response
         end
 
-        it 'redirects to the primary' do
-          is_expected.to have_gitlab_http_status(:redirect)
-          redirect_location = "#{redirected_primary_url}?service=git-receive-pack"
-          expect(subject.header['Location']).to eq(redirect_location)
-        end
+        it_behaves_like 'Geo 302 redirect to Primary'
       end
     end
 
@@ -214,17 +211,14 @@ describe "Git HTTP requests (Geo)", :geo do
 
           context 'operation upload' do
             let(:args) { { 'operation' => 'upload' }.to_json }
+            let(:redirect_url) { redirected_primary_url }
 
             context 'with a valid git-lfs version' do
               before do
                 env['User-Agent'] = 'git-lfs/2.4.2 (GitHub; darwin amd64; go 1.10.2)'
               end
 
-              it 'redirects to the primary' do
-                is_expected.to have_gitlab_http_status(:redirect)
-                redirect_location = "#{redirected_primary_url}"
-                expect(subject.header['Location']).to eq(redirect_location)
-              end
+              it_behaves_like 'Geo 302 redirect to Primary'
             end
 
             context 'with an invalid git-lfs version' do
@@ -361,17 +355,14 @@ describe "Git HTTP requests (Geo)", :geo do
             end
 
             let(:url) { "/#{project.full_path}.git/#{path}" }
+            let(:redirect_url) { redirected_primary_url }
 
             subject do
               make_request
               response
             end
 
-            it 'redirects to the primary' do
-              is_expected.to have_gitlab_http_status(:redirect)
-              redirect_location = "#{redirected_primary_url}"
-              expect(subject.header['Location']).to eq(redirect_location)
-            end
+            it_behaves_like 'Geo 302 redirect to Primary'
           end
         end
       end
