@@ -7,12 +7,12 @@ module QA
 
       it 'user uploads attachment to the primary node' do
         QA::Flow::Login.while_signed_in(address: :geo_primary) do
-          @project = Resource::Project.fabricate! do |project|
+          @project = Resource::Project.fabricate_via_api! do |project|
             project.name = 'project-for-issues'
             project.description = 'project for adding issues'
           end
 
-          @issue = Resource::Issue.fabricate! do |issue|
+          @issue = Resource::Issue.fabricate_via_api! do |issue|
             issue.title = 'My geo issue'
             issue.project = @project
           end
@@ -52,10 +52,7 @@ module QA
           image_url = find('a[href$="banana_sample.gif"]')[:href]
 
           Page::Project::Issue::Show.perform do |show|
-            # Wait for attachment replication
-            found = show.wait_until(reload: false) do
-              show.asset_exists?(image_url)
-            end
+            found = show.wait_for_attachment_replication(image_url)
 
             expect(found).to be_truthy
           end

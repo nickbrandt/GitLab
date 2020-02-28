@@ -4,21 +4,24 @@ module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
       it 'user renames project' do
+        original_project_name = 'geo-before-rename'
+        original_readme_content = "The original project name was #{original_project_name}"
+        readme_file_name = 'README.md'
+
         # create the project and push code
         QA::Flow::Login.while_signed_in(address: :geo_primary) do
-          project = Resource::Project.fabricate! do |project|
-            project.name = 'geo-before-rename'
+          project = Resource::Project.fabricate_via_api! do |project|
+            project.name = original_project_name
             project.description = 'Geo project to be renamed'
           end
 
           geo_project_name = project.name
-          expect(project.name).to include 'geo-before-rename'
 
           Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
-            push.file_name = 'README.md'
-            push.file_content = '# This is Geo project!'
-            push.commit_message = 'Add README.md'
+            push.file_name = readme_file_name
+            push.file_content = original_readme_content
+            push.commit_message = "Add #{readme_file_name}"
           end
 
           # rename the project
@@ -62,8 +65,8 @@ module QA
           Page::Project::Show.perform do |show|
             show.wait_for_repository_replication
 
-            expect(page).to have_content 'README.md'
-            expect(page).to have_content 'This is Geo project!'
+            expect(page).to have_content readme_file_name
+            expect(page).to have_content original_readme_content
           end
         end
       end

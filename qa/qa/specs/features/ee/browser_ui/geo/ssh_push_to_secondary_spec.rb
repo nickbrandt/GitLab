@@ -20,7 +20,7 @@ module QA
             end
 
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -110,7 +110,7 @@ module QA
             end
 
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end

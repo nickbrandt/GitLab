@@ -78,6 +78,17 @@ module QA
             def weight_no_value_content
               find_element(:weight_no_value_content)
             end
+
+            def wait_for_attachment_replication(image_url, max_wait: Runtime::Geo.max_file_replication_time)
+              QA::Runtime::Logger.debug(%Q[#{self.class.name} - wait_for_attachment_replication])
+              wait_until_geo_max_replication_time(max_wait: max_wait) do
+                asset_exists?(image_url)
+              end
+            end
+
+            def wait_until_geo_max_replication_time(max_wait: Runtime::Geo.max_file_replication_time)
+              wait_until(max_duration: max_wait) { yield }
+            end
           end
         end
       end

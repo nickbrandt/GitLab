@@ -15,7 +15,7 @@ module QA
 
           QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -96,7 +96,7 @@ module QA
 
           QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
