@@ -31,6 +31,7 @@ module API
       end
       params do
         requires :url, type: String, desc: 'The URL for a remote mirror'
+        optional :enabled, type: Boolean, desc: 'Determines if the mirror is enabled'
         optional :only_protected_branches, type: Boolean, desc: 'Determines if only protected branches are mirrored'
       end
       post ':id/remote_mirrors' do
