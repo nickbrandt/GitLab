@@ -565,6 +565,4 @@ describe Epic do
   end
 
   it_behaves_like 'versioned description'
-
-  it_behaves_like 'having health status'
 end
