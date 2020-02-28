@@ -17,31 +17,27 @@ module EE
 
             override :ee_post_receive_response_hook
             def ee_post_receive_response_hook(response)
-              response.add_basic_message(geo_secondary_lag_message) if ::Gitlab::Geo.primary?
+              response.add_basic_message(geo_secondary_lag_message) if geo_display_secondary_lag_message?
+            end
+
+            def geo_display_secondary_lag_message?
+              ::Gitlab::Geo.primary? && geo_current_replication_lag.to_i > 0
             end
 
             def geo_secondary_lag_message
-              lag = current_replication_lag
-              return if lag.to_i <= 0
-
-              #{geo_project_secondary_url}
-
-              but this project is currently not selected for replication. You are being
-              redirected to the primary:
-
-              #{geo_project_primary_url}
-
-              Please contact your systems administrator to ensure all relevant projects are
-              replicated to your closest Geo secondary.
-              EOS
+              "Current replication lag: #{geo_current_replication_lag} seconds"
             end
 
-            def current_replication_lag
-              fetch_geo_node_referrer&.status&.db_replication_lag_seconds
+            def geo_current_node
+              ::Gitlab::Geo.current_node
             end
 
-            def fetch_geo_node_referrer
-              ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
+            def geo_current_replication_lag
+              @geo_current_replication_lag ||= geo_referred_node&.status&.db_replication_lag_seconds
+            end
+
+            def geo_referred_node
+              @geo_referred_node ||= ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
             end
 
             override :check_allowed
