@@ -11,7 +11,6 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
   let wrapper;
   let store;
 
-  const width = 350;
   const fakeComponentName = 'fake-component';
 
   const createComponent = props => {
@@ -21,13 +20,10 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
       propsData: {
         extensionTabs: [],
         side: 'right',
-        width,
         ...props,
       },
       slots: {
-        'header-icon': '<div class=".header-icon-slot">SLOT ICON</div>',
-        header: '<div class=".header-slot"/>',
-        footer: '<div class=".footer-slot"/>',
+        footer: '<div class="footer-slot"/>',
       },
     });
   };
@@ -78,12 +74,13 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
       it('correctly renders side specific attributes', () => {
         createComponent({ extensionTabs, side });
         const button = findTabButton();
+        button.trigger('click');
 
         return wrapper.vm.$nextTick().then(() => {
           expect(wrapper.classes()).toContain('multi-file-commit-panel');
           expect(wrapper.classes()).toContain(`ide-${side}-sidebar`);
-          expect(wrapper.find('.multi-file-commit-panel-inner')).not.toBe(null);
-          expect(wrapper.find(`.ide-${side}-sidebar-${fakeComponentName}`)).not.toBe(null);
+          expect(wrapper.find('.multi-file-commit-panel-inner').exists()).toBeTruthy();
+          expect(wrapper.find(`.ide-${side}-sidebar-${fakeComponentName}`).exists()).toBeTruthy();
           expect(button.attributes('data-placement')).toEqual(side === 'left' ? 'right' : 'left');
           if (side === 'right') {
             // this class is only needed on the right side; there is no 'is-left'
@@ -151,16 +148,8 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
         });
       });
 
-      it('shows header-icon', () => {
-        expect(wrapper.find('.header-icon-slot')).not.toBeNull();
-      });
-
-      it('shows header', () => {
-        expect(wrapper.find('.header-slot')).not.toBeNull();
-      });
-
       it('shows footer', () => {
-        expect(wrapper.find('.footer-slot')).not.toBeNull();
+        expect(wrapper.find('.footer-slot').exists()).toBeTruthy();
       });
     });
   });

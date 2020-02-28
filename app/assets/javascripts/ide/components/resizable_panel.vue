@@ -24,6 +24,11 @@ export default {
       type: String,
       required: true,
     },
+    resizable: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -37,7 +42,7 @@ export default {
       },
     }),
     panelStyle() {
-      if (!this.collapsed) {
+      if (!this.collapsed && this.resizable) {
         return {
           width: `${this.width}px`,
         };
@@ -65,13 +70,15 @@ export default {
   <div
     :class="{
       'is-collapsed': collapsed && collapsible,
+      'w-auto': !resizable,
     }"
     :style="panelStyle"
-    class="multi-file-commit-panel"
+    class="multi-file-commit-panel d-flex flex-column"
     @click="toggleFullbarCollapsed"
   >
     <slot></slot>
     <panel-resizer
+      v-if="resizable"
       :size.sync="width"
       :enabled="!collapsed"
       :start-size="initialWidth"

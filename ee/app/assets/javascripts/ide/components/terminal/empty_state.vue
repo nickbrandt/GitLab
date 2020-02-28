@@ -45,20 +45,18 @@ export default {
     <h4>{{ __('Web Terminal') }}</h4>
     <gl-loading-icon v-if="isLoading" size="lg" class="prepend-top-default" />
     <template v-else>
-      <p>{{ __('Run tests against your code live using the Web Terminal') }}</p>
-      <p>
-        <button
-          :disabled="!isValid"
-          class="btn btn-info"
-          type="button"
-          data-qa-selector="start_web_terminal_button"
-          @click="onStart"
-        >
-          {{ __('Start Web Terminal') }}
-        </button>
-      </p>
-      <div v-if="!isValid && message" class="bs-callout text-left" v-html="message"></div>
-      <p v-else>
+      <p class="my-2">{{ __('Run tests against your code live using the Web Terminal') }}</p>
+      <button
+        :disabled="!isValid"
+        class="btn btn-info"
+        type="button"
+        data-qa-selector="start_web_terminal_button"
+        @click="onStart"
+      >
+        {{ __('Start Web Terminal') }}
+      </button>
+      <p v-if="!isValid && message" class="bs-callout text-left my-2" v-html="message"></p>
+      <p v-else class="my-3">
         <a
           v-if="helpPath"
           :href="helpPath"

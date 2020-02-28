@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { createStore } from '~/ide/stores';
 import RightPane from '~/ide/components/panes/right.vue';
+import ResizablePanel from '~/ide/components/resizable_panel.vue';
 import CollapsibleSidebar from '~/ide/components/panes/collapsible_sidebar.vue';
 import { rightSidebarViews } from '~/ide/constants';
 
@@ -30,6 +31,28 @@ describe('ide/components/panes/right.vue', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+  });
+
+  describe('properly configures ResizeablePanel', () => {
+    let resizeablePanel;
+
+    beforeEach(() => {
+      createComponent();
+      resizeablePanel = wrapper.find(ResizablePanel);
+    });
+
+    it('when isOpen is false', () => {
+      expect(resizeablePanel.props('resizable')).toEqual(false);
+    });
+
+    it('when isOpen is true', () => {
+      store.state.rightPane.isOpen = true;
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(resizeablePanel.props('resizable')).toEqual(true);
+        expect(resizeablePanel.classes()).not.toContain('w-auto');
+      });
+    });
   });
 
   it('allows tabs to be added via extensionTabs prop', () => {
