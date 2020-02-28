@@ -107,7 +107,7 @@ module Backup
       end
     end
 
-    def verify_restore
+    def verify_backup_version
       Dir.chdir(backup_path) do
         ENV["VERSION"] = "#{settings[:db_version]}" if settings[:db_version].to_i > 0
         # restoring mismatching backups can lead to unexpected problems

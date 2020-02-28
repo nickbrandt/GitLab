@@ -214,26 +214,26 @@ describe Backup::Manager do
     end
   end
 
-  describe 'verify_restore' do
-    context 'on Version mismatch' do
+  describe 'verify_backup_version' do
+    context 'on version mismatch' do
       let(:gitlab_version) { Gitlab::VERSION }
 
       it 'stops the process' do
         allow(YAML).to receive(:load_file)
           .and_return({ gitlab_version: "not #{gitlab_version}" })
 
-        expect { subject.verify_restore }.to raise_error SystemExit
+        expect { subject.verify_backup_version }.to raise_error SystemExit
       end
     end
 
-    context 'on Version match' do
+    context 'on version match' do
       let(:gitlab_version) { Gitlab::VERSION }
 
       it 'does nothing' do
         allow(YAML).to receive(:load_file)
           .and_return({ gitlab_version: "#{gitlab_version}" })
 
-        expect { subject.verify_restore }.not_to raise_error
+        expect { subject.verify_backup_version }.not_to raise_error
       end
     end
   end
