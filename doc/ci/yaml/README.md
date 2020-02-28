@@ -598,16 +598,20 @@ Four keys are available:
 If you use multiple keys under `only` or `except`, the keys will be evaluated as a
 single conjoined expression. That is:
 
-- `only:` means "include this job if any of the conditions match".
+- `only:` means "include this job if all of the conditions match".
 - `except:` means "exclude this job if any of the conditions match".
 
-With `only`, individual keys are logically joined by an OR:
+With `only`, individual keys are logically joined by an AND:
 
-> (any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active)
+> (any of refs) AND (any of variables) AND (any of changes) AND (if Kubernetes is active)
 
 `except` is implemented as a negation of this complete expression:
 
-> NOT((any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active))
+> NOT((any of refs) AND (any of variables) AND (any of changes) AND (if Kubernetes is active))
+
+This means the keys are treated as if joined by an OR. This relationship could be described as:
+
+> (any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active)
 
 #### `only:refs`/`except:refs`
 
