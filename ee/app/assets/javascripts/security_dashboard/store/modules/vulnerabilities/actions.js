@@ -83,7 +83,7 @@ export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
       dispatch('receiveVulnerabilitiesSuccess', { headers, data });
     })
     .catch(error => {
-      dispatch('receiveVulnerabilitiesError', error.response.status);
+      dispatch('receiveVulnerabilitiesError', error?.response?.status);
     });
 };
 

@@ -18,7 +18,6 @@ describe Projects::Security::VulnerabilitiesController do
   before do
     group.add_developer(user)
     stub_licensed_features(security_dashboard: true)
-    allow(Kaminari.config).to receive(:default_per_page).and_return(1)
   end
 
   describe 'GET #index' do
@@ -40,28 +39,6 @@ describe Projects::Security::VulnerabilitiesController do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to render_template(:index)
-        expect(response.body).to have_css(".vulnerabilities-list")
-      end
-
-      it 'renders the first vulnerability' do
-        show_vulnerability_list
-
-        expect(response.body).to have_css(".js-vulnerability", count: 1)
-      end
-
-      it 'renders the pagination' do
-        show_vulnerability_list
-
-        expect(response.body).to have_css(".gl-pagination")
-      end
-    end
-
-    context "when we have no vulnerabilities" do
-      it 'renders the empty state' do
-        show_vulnerability_list
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.body).to have_css('.empty-state')
       end
     end
 
