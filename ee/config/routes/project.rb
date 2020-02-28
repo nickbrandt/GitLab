@@ -78,6 +78,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :summary, on: :collection
           end
 
+          resource :network_policies, only: [] do
+            get :summary, on: :collection
+          end
+
           resources :dashboard, only: [:index], controller: :dashboard
           resource :configuration, only: [:show], controller: :configuration
           resource :discover, only: [:show], controller: :discover
