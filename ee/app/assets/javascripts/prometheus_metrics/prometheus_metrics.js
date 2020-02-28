@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import _ from 'underscore';
+import { escape, sortBy } from 'lodash';
 import PrometheusMetrics from '~/prometheus_metrics/prometheus_metrics';
 import PANEL_STATE from './constants';
 import axios from '~/lib/utils/axios_utils';
@@ -61,7 +61,7 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
   }
 
   setVisible(...els) {
-    this.setHidden(_.difference(this.$els, els));
+    this.setHidden(this.$els.filter(el => !els.includes(el)));
     els.forEach(el => el.removeClass('hidden'));
   }
 
@@ -90,12 +90,12 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
   }
 
   populateCustomMetrics() {
-    const sortedMetrics = _(this.customMetrics)
-      .chain()
-      .map(metric => ({ ...metric, group: capitalizeFirstCharacter(metric.group) }))
-      .sortBy('title')
-      .sortBy('group')
-      .value();
+    const capitalizeGroup = metric => ({
+      ...metric,
+      group: capitalizeFirstCharacter(metric.group),
+    });
+
+    const sortedMetrics = sortBy(this.customMetrics.map(capitalizeGroup), ['group', 'title']);
 
     sortedMetrics.forEach(metric => {
       this.$monitoredCustomMetricsList.append(EEPrometheusMetrics.customMetricTemplate(metric));
@@ -146,8 +146,8 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
   static customMetricTemplate(metric) {
     return `
     <li class="custom-metric">
-      <a href="${_.escape(metric.edit_path)}" class="custom-metric-link-bold">
-        ${_.escape(metric.group)} / ${_.escape(metric.title)} (${_.escape(metric.unit)})
+      <a href="${escape(metric.edit_path)}" class="custom-metric-link-bold">
+        ${escape(metric.group)} / ${escape(metric.title)} (${escape(metric.unit)})
       </a>
     </li>
   `;
