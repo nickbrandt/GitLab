@@ -607,7 +607,7 @@ With `only`, individual keys are logically joined by an AND:
 
 In the example below, the `test` job will `only` be created when the pipeline has been [scheduled](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/user/project/pipelines/schedules.md) or runs for `master` *AND* the `variables` keyword matches *AND* when the `kubernetes` service is active on the project.
 
-```
+```yaml
 test:
   script: npm run test
   only:
@@ -629,7 +629,7 @@ This means the keys are treated as if joined by an OR. This relationship could b
 
 In the example below, the `test` job will **not** be created when the pipeline runs for the `master` *OR* if there are changes to the README.md file in the root directory of the repo.
 
-```
+```yaml
 test:
   script: npm run test
   except:
