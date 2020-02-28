@@ -126,7 +126,6 @@ module Backup
 
     def unpack
       Dir.chdir(backup_path) do
-
         if ENV['BACKUP'].present?
           # User has indicated which backup to restore
           tar_file = File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
