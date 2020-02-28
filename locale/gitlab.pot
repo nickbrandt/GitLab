@@ -1293,6 +1293,15 @@ msgstr ""
 msgid "AdminArea|Stopping jobs failed"
 msgstr ""
 
+msgid "AdminArea|Users statistics"
+msgstr ""
+
+msgid "AdminArea|Users total"
+msgstr ""
+
+msgid "AdminArea|Users with highest role"
+msgstr ""
+
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
 msgstr ""
 
