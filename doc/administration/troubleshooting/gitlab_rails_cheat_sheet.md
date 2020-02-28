@@ -798,13 +798,6 @@ build.dependencies.each do |d| { puts "status: #{d.status}, finished at: #{d.fin
   completed: #{d.complete?}, artifacts_expired: #{d.artifacts_expired?}, erased: #{d.erased?}" }
 ```
 
-### Remove CI traces older than 6 months
-
-```ruby
-current_user = User.find_by_email('cindy@gitlap.com')
-Ci::Build.where("finished_at < ?", 6.months.ago.to_date).each {|b| puts b.id; b.erase(erased_by: current_user) if b.erasable?};nil
-```
-
 ### Try CI service
 
 ```ruby
