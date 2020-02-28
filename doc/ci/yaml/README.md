@@ -605,6 +605,20 @@ With `only`, individual keys are logically joined by an AND:
 
 > (any of refs) AND (any of variables) AND (any of changes) AND (if Kubernetes is active)
 
+In the example below, the `test` job will `only` be created when the pipeline has been [scheduled](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/user/project/pipelines/schedules.md) or runs for `master` *AND* the `variables` keyword matches *AND* when the `kubernetes` service is active on the project.
+
+```
+test:
+  script: npm run test
+  only:
+    refs:
+      - master
+      - schedules
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /run-end-to-end-tests/
+    kubernetes: active
+```
+
 `except` is implemented as a negation of this complete expression:
 
 > NOT((any of refs) AND (any of variables) AND (any of changes) AND (if Kubernetes is active))
@@ -612,6 +626,18 @@ With `only`, individual keys are logically joined by an AND:
 This means the keys are treated as if joined by an OR. This relationship could be described as:
 
 > (any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active)
+
+In the example below, the `test` job will **not** be created when the pipeline runs for the `master` *OR* if there are changes to the README.md file in the root directory of the repo.
+
+```
+test:
+  script: npm run test
+  except:
+    refs:
+      - master
+    changes:
+      - "README.md"
+```
 
 #### `only:refs`/`except:refs`
 
