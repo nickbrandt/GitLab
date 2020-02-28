@@ -462,7 +462,7 @@ The chart will deploy 5 Elasticsearch nodes: 2 masters, 2 data and 1 client node
 with resource requests totalling 0.125 CPU and 4.5GB RAM. Each data node requests 1.5GB of memory,
 which makes it incompatible with clusters of `f1-micro` and `g1-small` instance types.
 
-### Future Apps
+### Future apps
 
 Interested in contributing a new GitLab managed app? Visit the
 [development guidelines page](../../development/kubernetes.md#gitlab-managed-apps)
