@@ -15726,10 +15726,7 @@ msgstr ""
 msgid "Pull"
 msgstr ""
 
-msgid "Puma is running with a thread count above 1 and the rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
-msgstr ""
-
-msgid "Puma is running with a thread count above 1. Information on deprecated GitLab features in this configuration is available in the %{link_start}documentation%{link_end}."
+msgid "Puma is running with a thread count above 1 and the Rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
 msgstr ""
 
 msgid "Purchase more minutes"
@@ -22310,9 +22307,6 @@ msgid "You are on a read-only GitLab instance."
 msgstr ""
 
 msgid "You are receiving this message because you are a GitLab administrator for %{url}."
-msgstr ""
-
-msgid "You are running Puma, which is currently experimental. More information is available in our %{link_start}documentation%{link_end}."
 msgstr ""
 
 msgid "You can %{linkStart}view the blob%{linkEnd} instead."
