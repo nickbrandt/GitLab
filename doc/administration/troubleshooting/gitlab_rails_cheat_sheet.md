@@ -942,12 +942,6 @@ end
 
 ## Sidekiq
 
-### Size of a queue
-
-```ruby
-Sidekiq::Queue.new('background_migration').size
-```
-
 ### Kill a worker's Sidekiq jobs
 
 ```ruby
