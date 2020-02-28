@@ -251,9 +251,9 @@ It is OK if a feature is only covered by integration tests.
 
 ## Distributed Tracing
 
-Workhorse supports distributed tracing through [LabKit](https://gitlab.com/gitlab-org/labkit/) using [OpenTracing APIs](https://opentracing.io).
+Workhorse supports distributed tracing through [LabKit][] using [OpenTracing APIs](https://opentracing.io).
 
-By default, no tracing implementation is linked into the binary, but different OpenTracing providers can be linked in using [build tags](https://golang.org/pkg/go/build/#hdr-Build_Constraints)/[build constraints](https://golang.org/pkg/go/build/#hdr-Build_Constraints). This can be done by setting the `BUILD_TAGS` make variable.
+By default, no tracing implementation is linked into the binary, but different OpenTracing providers can be linked in using [build tags][build-tags]/[build constraints][build-tags]. This can be done by setting the `BUILD_TAGS` make variable.
 
 For more details of the supported providers, see LabKit, but as an example, for Jaeger tracing support, include the tags: `BUILD_TAGS="tracer_static tracer_static_jaeger"`.
 
@@ -269,8 +269,34 @@ For example:
 GITLAB_TRACING=opentracing://jaeger ./gitlab-workhorse
 ```
 
+## Continuous Profiling
+
+Workhorse supports continuous profiling through [LabKit][] using [Stackdriver Profiler](https://cloud.google.com/profiler).
+
+By default, the Stackdriver Profiler implementation is linked in the binary using [build tags][build-tags], though it's not
+required and can be skipped.
+
+For example:
+
+```shell
+make BUILD_TAGS=""
+```
+
+Once Workhorse is compiled with Continuous Profiling, the profiler configuration can be set via `GITLAB_CONTINUOUS_PROFILING`
+environment variable.
+
+For example:
+
+```shell
+GITLAB_CONTINUOUS_PROFILING="stackdriver?service=workhorse&service_version=1.0.1&project_id=test-123 ./gitlab-workhorse"
+```
+
+More information about see the [LabKit monitoring docs](https://gitlab.com/gitlab-org/labkit/-/blob/master/monitoring/doc.go).
+
 ## License
 
 This code is distributed under the MIT license, see the LICENSE file.
 
 [brief-history-blog]: https://about.gitlab.com/2016/04/12/a-brief-history-of-gitlab-workhorse/
+[LabKit]: https://gitlab.com/gitlab-org/labkit/
+[build-tags]: https://golang.org/pkg/go/build/#hdr-Build_Constraints

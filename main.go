@@ -121,17 +121,18 @@ func main() {
 		}()
 	}
 
+	monitoringOpts := []monitoring.Option{monitoring.WithBuildInformation(Version, BuildTime)}
+
 	if *prometheusListenAddr != "" {
-		go func() {
-			err := monitoring.Serve(
-				monitoring.WithListenerAddress(*prometheusListenAddr),
-				monitoring.WithBuildInformation(Version, BuildTime),
-			)
-			if err != nil {
-				log.WithError(err).Error("Failed to start prometheus listener")
-			}
-		}()
+		monitoringOpts = append(monitoringOpts, monitoring.WithListenerAddress(*prometheusListenAddr))
 	}
+
+	go func() {
+		err := monitoring.Serve(monitoringOpts...)
+		if err != nil {
+			log.WithError(err).Error("Failed to start monitoring")
+		}
+	}()
 
 	secret.SetPath(*secretPath)
 	cfg := config.Config{

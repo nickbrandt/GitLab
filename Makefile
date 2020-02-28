@@ -13,7 +13,7 @@ BUILD_TIME := $(shell date -u +%Y%m%d.%H%M%S)
 GOBUILD := go build -ldflags "-X main.Version=$(VERSION_STRING) -X main.BuildTime=$(BUILD_TIME)"
 EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 INSTALL := install
-BUILD_TAGS := tracer_static tracer_static_jaeger
+BUILD_TAGS := tracer_static tracer_static_jaeger continuous_profiler_stackdriver
 
 MINIMUM_SUPPORTED_GO_VERSION := 1.11
 
