@@ -12,7 +12,10 @@ module Operations
 
     default_value_for :active, true
 
+    # scopes exists only for the first version
     has_many :scopes, class_name: 'Operations::FeatureFlagScope'
+    # strategies exists only for the second version
+    has_many :strategies, class_name: 'Operations::FeatureFlags::Strategy'
     has_one :default_scope, -> { where(environment_scope: '*') }, class_name: 'Operations::FeatureFlagScope'
 
     validates :project, presence: true
@@ -25,17 +28,23 @@ module Operations
       }
     validates :name, uniqueness: { scope: :project_id }
     validates :description, allow_blank: true, length: 0..255
-    validates :version, inclusion: { in: [1, 2], message: 'must be 1 or 2' }
     validate :first_default_scope, on: :create, if: :has_scopes?
+    validate :version_associations
 
-    before_create :build_default_scope, unless: :has_scopes?
+    before_create :build_default_scope, if: -> { legacy_flag? && scopes.none? }
 
     accepts_nested_attributes_for :scopes, allow_destroy: true
+    accepts_nested_attributes_for :strategies
 
     scope :ordered, -> { order(:name) }
 
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
+
+    enum version: {
+      legacy_flag: 1,
+      new_version_flag: 2
+    }
 
     class << self
       def preload_relations
@@ -44,6 +53,14 @@ module Operations
     end
 
     private
+
+    def version_associations
+      if new_version_flag? && scopes.any?
+        errors.add(:version_associations, 'version 2 feature flags may not have scopes')
+      elsif legacy_flag? && strategies.any?
+        errors.add(:version_associations, 'version 1 feature flags may not have strategies')
+      end
+    end
 
     def first_default_scope
       unless scopes.first.environment_scope == '*'
