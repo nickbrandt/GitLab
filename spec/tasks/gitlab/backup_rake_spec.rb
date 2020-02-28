@@ -14,6 +14,14 @@ describe 'gitlab:app namespace rake task' do
     tars_glob.first
   end
 
+  def backup_files
+    %w(backup_information.yml artifacts.tar.gz builds.tar.gz lfs.tar.gz pages.tar.gz)
+  end
+
+  def backup_directories
+    %w(db repositories)
+  end
+
   before(:all) do
     Rake.application.rake_require 'tasks/gitlab/helpers'
     Rake.application.rake_require 'tasks/gitlab/backup'
@@ -28,26 +36,16 @@ describe 'gitlab:app namespace rake task' do
   before do
     stub_env('force', 'yes')
     FileUtils.rm(tars_glob, force: true)
-    FileUtils.rm('backup_information.yml', force: true)
-    FileUtils.rm('artifacts.tar.gz', force: true)
-    FileUtils.rm('builds.tar.gz', force: true)
-    FileUtils.rm('lfs.tar.gz', force: true)
-    FileUtils.rm('pages.tar.gz', force: true)
-    FileUtils.rm_rf('db', secure: true)
-    FileUtils.rm_rf('repositories', secure: true)
+    FileUtils.rm(backup_files, force: true)
+    FileUtils.rm_rf(backup_directories, secure: true)
     reenable_backup_sub_tasks
     stub_container_registry_config(enabled: enable_registry)
   end
 
   after do
     FileUtils.rm(tars_glob, force: true)
-    FileUtils.rm('backup_information.yml', force: true)
-    FileUtils.rm('artifacts.tar.gz', force: true)
-    FileUtils.rm('builds.tar.gz', force: true)
-    FileUtils.rm('lfs.tar.gz', force: true)
-    FileUtils.rm('pages.tar.gz', force: true)
-    FileUtils.rm_rf('db', secure: true)
-    FileUtils.rm_rf('repositories', secure: true)
+    FileUtils.rm(backup_files, force: true)
+    FileUtils.rm_rf(backup_directories, secure: true)
   end
 
   def run_rake_task(task_name)
