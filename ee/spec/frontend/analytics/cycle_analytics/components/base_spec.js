@@ -22,6 +22,7 @@ import * as mockData from '../mock_data';
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
+const hideGroupDropDown = false;
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -40,6 +41,7 @@ function createComponent({
   scatterplotEnabled = true,
   tasksByTypeChartEnabled = true,
   customizableCycleAnalyticsEnabled = false,
+  props = {},
 } = {}) {
   const func = shallow ? shallowMount : mount;
   const comp = func(Component, {
@@ -50,6 +52,8 @@ function createComponent({
       noDataSvgPath,
       noAccessSvgPath,
       baseStagesEndpoint: mockData.endpoints.baseStagesEndpoint,
+      hideGroupDropDown,
+      ...props,
     },
     provide: {
       glFeatures: {
@@ -164,6 +168,21 @@ describe('Cycle Analytics component', () => {
 
       it('does not display the duration scatter plot', () => {
         displaysDurationScatterPlot(false);
+      });
+
+      describe('hideGroupDropDown = true', () => {
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          wrapper = createComponent({
+            props: {
+              hideGroupDropDown: true,
+            },
+          });
+        });
+
+        it('does not render the group dropdown', () => {
+          expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(false);
+        });
       });
     });
 
