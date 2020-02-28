@@ -79,7 +79,7 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
       toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
       labels_web_url: group_labels_path(group),
       epics_web_url: group_epics_path(group),
-      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
     }
 
     paths[:todo_delete_path] = dashboard_todo_path(epic_pending_todo) if epic_pending_todo.present?

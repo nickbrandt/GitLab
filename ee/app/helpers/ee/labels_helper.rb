@@ -45,7 +45,7 @@ module EE
     def label_dropdown_data(edit_context, opts = {})
       scoped_labels_fields = {
         scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s,
-        scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+        scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
       }
 
       return super.merge(scoped_labels_fields) unless edit_context.is_a?(Group)
@@ -74,7 +74,7 @@ module EE
     private
 
     def scoped_labels_doc_link
-      help_url = ::Gitlab::Routing.url_helpers.help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+      help_url = ::Gitlab::Routing.url_helpers.help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
 
       %(<a href="#{help_url}" class="gl-link gl-label-icon" target="_blank" rel="noopener"><i class="fa fa-question-circle"></i></a>).html_safe
     end
