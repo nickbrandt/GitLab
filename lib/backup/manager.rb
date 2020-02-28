@@ -109,7 +109,6 @@ module Backup
 
     def verify_backup_version
       Dir.chdir(backup_path) do
-        ENV["VERSION"] = "#{settings[:db_version]}" if settings[:db_version].to_i > 0
         # restoring mismatching backups can lead to unexpected problems
         if settings[:gitlab_version] != Gitlab::VERSION
           progress.puts(<<~HEREDOC.color(:red))
