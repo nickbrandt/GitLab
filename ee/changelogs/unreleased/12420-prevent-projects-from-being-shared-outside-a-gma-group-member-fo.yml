@@ -1,0 +1,5 @@
+---
+title: Prevent projects from being shared outside a group with managed accounts for forked projects
+merge_request: 26186
+author:
+type: changed
