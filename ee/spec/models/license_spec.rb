@@ -711,6 +711,32 @@ describe License do
     end
   end
 
+  describe '#promo_feature_available?' do
+    subject { described_class.promo_feature_available?(feature) }
+
+    shared_examples 'CI CD trial features' do |status|
+      before do
+        stub_feature_flags(free_period_for_pull_mirroring: status)
+      end
+
+      License::ANY_PLAN_FEATURES.each do |feature_name|
+        context "with #{feature_name}" do
+          let(:feature) { feature_name }
+
+          it { is_expected.to eq(status) }
+        end
+      end
+    end
+
+    context 'with free_period_for_pull_mirroring enabled' do
+      it_behaves_like 'CI CD trial features', true
+    end
+
+    context 'with free_period_for_pull_mirroring disabled' do
+      it_behaves_like 'CI CD trial features', false
+    end
+  end
+
   def set_restrictions(opts)
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],
