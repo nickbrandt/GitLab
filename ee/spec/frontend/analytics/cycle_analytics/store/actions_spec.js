@@ -6,7 +6,10 @@ import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
+import {
+  TASKS_BY_TYPE_FILTERS,
+  TASKS_BY_TYPE_SUBJECT_ISSUE,
+} from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { toYmd } from 'ee/analytics/shared/utils';
@@ -328,6 +331,72 @@ describe('Cycle analytics actions', () => {
         });
 
         shouldFlashAMessage('There was an error fetching label data for the selected group');
+      });
+    });
+  });
+
+  describe('fetchTopRankedGroupLabels', () => {
+    beforeEach(() => {
+      gon.api_version = 'v4';
+      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE } };
+    });
+
+    describe('succeeds', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.tasksByTypeTopLabelsData).replyOnce(200, groupLabels);
+      });
+
+      it('dispatches receiveTopRankedGroupLabelsSuccess if the request succeeds', () => {
+        const dispatch = jest.fn();
+
+        return actions
+          .fetchTopRankedGroupLabels({
+            dispatch,
+            state,
+            getters,
+          })
+          .then(() => {
+            expect(dispatch).toHaveBeenCalledWith('requestTopRankedGroupLabels');
+            expect(dispatch).toHaveBeenCalledWith(
+              'receiveTopRankedGroupLabelsSuccess',
+              groupLabels,
+            );
+          });
+      });
+    });
+
+    describe('with an error', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.fetchTopRankedGroupLabels).replyOnce(404);
+      });
+
+      it('dispatches receiveTopRankedGroupLabelsError if the request fails', () => {
+        const dispatch = jest.fn();
+
+        return actions
+          .fetchTopRankedGroupLabels({
+            dispatch,
+            state,
+            getters,
+          })
+          .then(() => {
+            expect(dispatch).toHaveBeenCalledWith('requestTopRankedGroupLabels');
+            expect(dispatch).toHaveBeenCalledWith('receiveTopRankedGroupLabelsError', error);
+          });
+      });
+    });
+
+    describe('receiveTopRankedGroupLabelsError', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+      });
+
+      it('flashes an error message if the request fails', () => {
+        actions.receiveTopRankedGroupLabelsError({
+          commit: () => {},
+        });
+
+        shouldFlashAMessage('There was an error fetching the top labels for the selected group');
       });
     });
   });

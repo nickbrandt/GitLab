@@ -113,7 +113,7 @@ export default {
         startDate,
         endDate,
         selectedProjectIds,
-        tasksByType: { subject, labelIds: selectedLabelIds },
+        tasksByType: { subject, selectedLabelIds },
       } = this;
       return {
         selectedGroup,

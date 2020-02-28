@@ -11,6 +11,9 @@ export const currentGroupPath = ({ selectedGroup }) =>
 export const selectedProjectIds = ({ selectedProjects }) =>
   selectedProjects.length ? selectedProjects.map(({ id }) => id) : [];
 
+export const topRankedLabelIds = ({ topRankedLabels }) =>
+  topRankedLabels.length ? topRankedLabels.map(({ id }) => id) : [];
+
 export const cycleAnalyticsRequestParams = ({ startDate = null, endDate = null }, getters) => ({
   project_ids: getters.selectedProjectIds,
   created_after: startDate ? dateFormat(startDate, dateFormats.isoDate) : null,

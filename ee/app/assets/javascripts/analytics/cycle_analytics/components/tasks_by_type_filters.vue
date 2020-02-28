@@ -132,8 +132,8 @@ export default {
           <icon :size="16" name="settings" />
           <icon :size="16" name="chevron-down" />
         </gl-button>
-        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-right min-width-300">
-          <div class="js-tasks-by-type-chart-filters-subject mb-3 mx-3">
+        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-right">
+          <div class="js-tasks-by-type-chart-filters-subject mb-3 px-3">
             <p class="font-weight-bold text-left mb-2">{{ s__('CycleAnalytics|Show') }}</p>
             <gl-segmented-control
               v-model="selectedSubjectFilter"
@@ -145,7 +145,7 @@ export default {
             />
           </div>
           <gl-dropdown-divider />
-          <div class="js-tasks-by-type-chart-filters-labels mb-3 mx-3 w-100">
+          <div class="js-tasks-by-type-chart-filters-labels mb-3 px-3">
             <p class="font-weight-bold text-left my-2">
               {{ s__('CycleAnalytics|Select labels') }}
               <br />
@@ -155,7 +155,7 @@ export default {
               <input class="dropdown-input-field" type="search" />
               <icon name="search" class="dropdown-input-search" data-hidden="true" />
             </div>
-            <div class="dropdown-content px-0 w-100"></div>
+            <div class="dropdown-content px-0"></div>
           </div>
         </div>
       </div>

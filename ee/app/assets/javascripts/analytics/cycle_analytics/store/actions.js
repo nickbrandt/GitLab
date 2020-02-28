@@ -270,7 +270,7 @@ export const receiveTopRankedGroupLabelsSuccess = ({ commit }, data) =>
 
 export const receiveTopRankedGroupLabelsError = ({ commit }, error) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR, error);
-  createFlash(__('There was an error fetching label data for the selected group'));
+  createFlash(__('There was an error fetching the top labels for the selected group'));
 };
 
 export const requestTopRankedGroupLabels = ({ commit }) =>
@@ -409,22 +409,22 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
+    topRankedLabelIds,
   } = getters;
 
-
   const {
-    tasksByType: { labelIds, subject },
+    tasksByType: { subject },
   } = state;
 
   // dont request if we have no labels selected...for now
-  if (labelIds.length) {
+  if (topRankedLabelIds.length) {
     const params = {
       group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
       subject,
-      label_ids: labelIds,
+      label_ids: topRankedLabelIds,
     };
 
     dispatch('requestTasksByTypeData');

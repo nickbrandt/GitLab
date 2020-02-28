@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import Api from 'ee/api';
 import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
 import axios from '~/lib/utils/axios_utils';
+import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';
@@ -353,13 +354,38 @@ describe('Api', () => {
           subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
           label_ids: labelIds,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/type_of_work/tasks_by_type`;
+        const expectedUrl = analyticsMockData.endpoints.tasksByTypeData;
         mock.onGet(expectedUrl).reply(200, tasksByTypeResponse);
 
-        Api.cycleAnalyticsTasksByType({ params })
+        Api.cycleAnalyticsTasksByType(params)
           .then(({ data, config: { params: reqParams } }) => {
             expect(data).toEqual(tasksByTypeResponse);
-            expect(reqParams.params).toEqual(params);
+            expect(reqParams).toEqual(params);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsTopLabels', () => {
+      it('fetches top group level labels', done => {
+        const response = [];
+        const labelIds = [10, 9, 8, 7];
+        const params = {
+          ...defaultParams,
+          project_ids: null,
+          subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
+          label_ids: labelIds,
+        };
+
+        const expectedUrl = analyticsMockData.endpoints.tasksByTypeTopLabelsData;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsTopLabels(params)
+          .then(({ data, config: { url, params: reqParams } }) => {
+            expect(data).toEqual(response);
+            expect(url).toMatch(expectedUrl);
+            expect(reqParams).toEqual(params);
           })
           .then(done)
           .catch(done.fail);

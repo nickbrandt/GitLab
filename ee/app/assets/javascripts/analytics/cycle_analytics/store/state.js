@@ -37,7 +37,7 @@ export default () => ({
 
   tasksByType: {
     subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
-    labelIds: [],
+    selectedLabelIds: [],
     data: [],
   },
 

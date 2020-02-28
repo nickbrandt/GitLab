@@ -6110,6 +6110,9 @@ msgstr ""
 msgid "CycleAnalyticsStage|should be under a group"
 msgstr ""
 
+msgid "CycleAnalytics|%{selectedLabelsCount} selected (%{maxLabels} max)"
+msgstr ""
+
 msgid "CycleAnalytics|%{stageCount} stages selected"
 msgstr ""
 

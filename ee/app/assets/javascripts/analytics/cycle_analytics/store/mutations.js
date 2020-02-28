@@ -69,16 +69,15 @@ export default {
     state.topRankedLabels = [];
     state.tasksByType = {
       ...state.tasksByType,
-      labelIds: [],
+      selectedLabelIds: [],
     };
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
     const { tasksByType } = state;
     state.topRankedLabels = data.length ? data.map(convertObjectPropsToCamelCase) : [];
-    // TODO: Should probably append as many labels from `labels` as we need if we dont get enough returned
     state.tasksByType = {
       ...tasksByType,
-      labelIds: data.length ? data.map(({ id }) => id) : [],
+      selectedLabelIds: data.length ? data.map(({ id }) => id) : [],
     };
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
@@ -86,7 +85,7 @@ export default {
     state.topRankedLabels = [];
     state.tasksByType = {
       ...tasksByType,
-      labelIds: [],
+      selectedLabelIds: [],
     };
   },
   [types.REQUEST_STAGE_MEDIANS](state) {

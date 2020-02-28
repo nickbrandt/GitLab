@@ -53,6 +53,8 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                        | ${true}
     ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                           | ${[]}
     ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                           | ${[]}
+    ${types.REQUEST_TOP_RANKED_GROUP_LABELS}       | ${'topRankedLabels'}                  | ${[]}
+    ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR} | ${'topRankedLabels'}                  | ${[]}
     ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                          | ${[]}
     ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                          | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                           | ${[]}
@@ -147,6 +149,14 @@ describe('Cycle analytics mutations', () => {
   });
 
   describe(`${types.RECEIVE_GROUP_LABELS_SUCCESS}`, () => {
+    it('will set the labels state item with the camelCased group labels', () => {
+      mutations[types.RECEIVE_GROUP_LABELS_SUCCESS](state, groupLabels);
+
+      expect(state.labels).toEqual(groupLabels.map(convertObjectPropsToCamelCase));
+    });
+  });
+
+  describe(`${types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS}`, () => {
     it('will set the labels state item with the camelCased group labels', () => {
       mutations[types.RECEIVE_GROUP_LABELS_SUCCESS](state, groupLabels);
 
