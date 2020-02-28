@@ -4,8 +4,10 @@ require 'spec_helper'
 describe API::Internal::Base do
   include EE::GeoHelpers
 
-  let_it_be(:primary_node, reload: true) { create(:geo_node, :primary) }
-  let_it_be(:secondary_node, reload: true) { create(:geo_node) }
+  let_it_be(:primary_url) { 'http://primary.example.com' }
+  let_it_be(:secondary_url) { 'http://secondary.example.com' }
+  let_it_be(:primary_node, reload: true) { create(:geo_node, :primary, url: primary_url) }
+  let_it_be(:secondary_node, reload: true) { create(:geo_node, url: secondary_url) }
 
   describe 'POST /internal/post_receive', :geo do
     let_it_be(:user) { create(:user) }
@@ -96,8 +98,6 @@ describe API::Internal::Base do
           expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
         end
       end
-<<<<<<< HEAD
-=======
 
       context 'with selective sync' do
         let(:selective_sync_enabled) { nil }
@@ -107,7 +107,7 @@ describe API::Internal::Base do
 
           http://secondary.example.com/#{project.full_path}
 
-          but this project is currently not selected for replication. You are being 
+          but this project is currently not selected for replication. You are being
           redirected to the primary:
 
           http://primary.example.com/#{project.full_path}
@@ -151,7 +151,6 @@ describe API::Internal::Base do
           end
         end
       end
->>>>>>> 935831337c5... fixup! Support HTTP git clone/pull for selective sync
     end
 
     context 'when the push was not redirected from a Geo secondary to the primary' do
