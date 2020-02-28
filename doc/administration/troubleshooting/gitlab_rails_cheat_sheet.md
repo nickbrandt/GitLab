@@ -988,12 +988,6 @@ See <https://github.com/mperham/sidekiq/wiki/Signals#ttin>.
 /opt/gitlab/embedded/bin/redis-cli -s /var/opt/gitlab/redis/redis.socket
 ```
 
-### Connect to Redis (HA)
-
-```shell
-/opt/gitlab/embedded/bin/redis-cli -h <host ip> -a <password>
-```
-
 ## LFS
 
 ### Get info about LFS objects and associated project
