@@ -8,7 +8,6 @@
     = _('Events in %{project_path}') % { project_path: @project.full_path }
 
   = render 'shared/audit_events/event_filter', path: project_audit_events_path(@project)
-  = render 'shared/audit_events/event_sort'
   = render 'shared/audit_events/event_table', events: @events
 - elsif show_promotions?
   = render 'shared/promotions/promote_audit_events'

@@ -1,14 +1,15 @@
-.row-content-block.second-block
-  = form_tag path, method: :get, class: 'filter-form' do
-    .prepend-top-10
-      .form-group
-        = label_tag :created_after, _('Created after'), class: 'label-bold'
-        = date_field_tag :created_after, params[:created_after],
-          class: 'form-control', placeholder: 'YYYY-MM-DD'
+%form.row-content-block.second-block.d-flex.justify-content-lg-end.pb-0
+  .audit-controls.d-flex.align-items-lg-center.flex-column.flex-lg-row.col-lg-auto.px-0
+    .form-group.align-items-lg-center.mr-lg-2.d-flex.flex-column.flex-lg-row
+      = label_tag :created_after, _('From'), class: 'label-bold pr-1 mb-lg-0 mr-lg-1'
+      = date_field_tag :created_after, params[:created_after],
+        class: 'form-control', placeholder: 'YYYY-MM-DD'
 
-      .form-group
-        = label_tag :created_before, _('Created before'), class: 'label-bold'
-        = date_field_tag :created_before, params[:created_before],
-          class: 'form-control', placeholder: 'YYYY-MM-DD'
+    .form-group.align-items-lg-center.mr-lg-2.d-flex.flex-column.flex-lg-row
+      = label_tag :created_before, _('To'), class: 'label-bold pr-1 mb-lg-0 mr-lg-1'
+      = date_field_tag :created_before, params[:created_before],
+        class: 'form-control', placeholder: 'YYYY-MM-DD'
 
-      = submit_tag _('Search'), class: 'btn'
+    = submit_tag _('Search'), class: 'btn mr-lg-2 form-group'
+
+    = render 'shared/audit_events/event_sort'
