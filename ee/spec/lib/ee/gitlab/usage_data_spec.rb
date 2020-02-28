@@ -348,7 +348,13 @@ describe Gitlab::UsageData do
               create(:user, group_view: :security_dashboard)
 
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
-                user_preferences_group_overview_security_dashboard: 1
+                user_preferences_group_overview_security_dashboard: 1,
+                user_container_scanning_jobs: 0,
+                user_dast_jobs: 0,
+                user_dependency_scanning_jobs: 0,
+                user_license_management_jobs: 0,
+                user_license_scanning_jobs: 0,
+                user_sast_jobs: 0
               )
             end
           end

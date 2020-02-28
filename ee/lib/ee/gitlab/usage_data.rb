@@ -5,6 +5,15 @@ module EE
     module UsageData
       extend ActiveSupport::Concern
 
+      SECURE_PRODUCT_TYPES = {
+        container_scanning: :container_scanning_jobs,
+        dast: :dast_jobs,
+        dependency_scanning: :dependency_scanning_jobs,
+        license_management: :license_management_jobs,
+        license_scanning: :license_scanning_jobs,
+        sast: :sast_jobs
+      }.freeze
+
       class_methods do
         extend ::Gitlab::Utils::Override
 
@@ -92,23 +101,14 @@ module EE
 
         # rubocop: disable CodeReuse/ActiveRecord
         def security_products_usage
-          types = {
-            container_scanning: :container_scanning_jobs,
-            dast: :dast_jobs,
-            dependency_scanning: :dependency_scanning_jobs,
-            license_management: :license_management_jobs,
-            license_scanning: :license_scanning_jobs,
-            sast: :sast_jobs
-          }
-
-          results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1), batch: false)
+          results = count(::Ci::Build.where(name: SECURE_PRODUCT_TYPES.keys).group(:name), fallback: Hash.new(-1), batch: false)
 
           license_scan_count = results.delete("license_scanning")
           if license_scan_count && results["license_management"]
             results["license_management"] += license_scan_count
           end
 
-          results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
+          results.each_with_object({}) { |(key, value), response| response[SECURE_PRODUCT_TYPES[key.to_sym]] = value }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -154,7 +154,7 @@ module EE
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects, batch: false),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting, batch: false),
-                                         template_repositories:  count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
+                                         template_repositories: count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
                                        },
                                        service_desk_counts,
                                        security_products_usage,
@@ -314,9 +314,13 @@ module EE
         # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
         # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
         def usage_activity_by_stage_secure(time_period)
-          {
+          results = {
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
+
+          SECURE_PRODUCT_TYPES.each_with_object(results) do |(secure_type, type_with_name), response|
+            response["user_#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+          end
         end
       end
     end
