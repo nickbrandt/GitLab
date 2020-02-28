@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe ::Packages::Detail::PackagePresenter do
   let_it_be(:user) { create(:user) }
-  let!(:project) { create(:project, creator: user) }
-  let!(:package) { create(:npm_package, :with_build, project: project) }
+  let_it_be(:project) { create(:project, creator: user) }
+  let_it_be(:package) { create(:npm_package, :with_build, project: project) }
   let(:presenter) { described_class.new(package) }
 
   let_it_be(:user_info) { { name: user.name, avatar_url: user.avatar_url } }
@@ -70,10 +70,6 @@ describe ::Packages::Detail::PackagePresenter do
   context 'build_pipeline_info' do
     it 'returns correct data when there is pipeline_info' do
       expect(presenter.build_pipeline_info(package.build_info.pipeline)).to eq pipeline_info
-    end
-
-    it 'returns nil when there is no pipeline_info' do
-      expect(presenter.build_pipeline_info(nil)).to eq nil
     end
   end
 
