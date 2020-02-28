@@ -806,14 +806,6 @@ build.dependencies.each do |d| { puts "status: #{d.status}, finished at: #{d.fin
   completed: #{d.complete?}, artifacts_expired: #{d.artifacts_expired?}, erased: #{d.erased?}" }
 ```
 
-### Disable strict artifact checking (Introduced in GitLab 10.3.0)
-
-See [job artifacts documentation](../job_artifacts.md#validation-for-dependencies).
-
-```ruby
-Feature.enable('ci_disable_validates_dependencies')
-```
-
 ### Remove CI traces older than 6 months
 
 ```ruby
