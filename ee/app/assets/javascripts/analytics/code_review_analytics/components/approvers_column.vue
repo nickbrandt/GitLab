@@ -38,6 +38,7 @@ export default {
     },
   },
   avatarSize: 24,
+  badgeTooltipMaxChars: 50,
 };
 </script>
 
@@ -49,6 +50,8 @@ export default {
       :avatars="approvers"
       :max-visible="maxVisible"
       :avatar-size="$options.avatarSize"
+      badge-tooltip-prop="name"
+      :badge-tooltip-max-chars="$options.badgeTooltipMaxChars"
     >
       <template #avatar="{ avatar }">
         <gl-avatar-link v-gl-tooltip target="_blank" :href="avatar.web_url" :title="avatar.name">

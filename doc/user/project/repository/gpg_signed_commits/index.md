@@ -4,7 +4,7 @@ type: concepts, howto
 
 # Signing commits with GPG
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/9546) in GitLab 9.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/9546) in GitLab 9.5.
 > - Subkeys support was added in GitLab 10.1.
 
 You can use a GPG key to sign Git commits made in a GitLab repository. Signed
@@ -54,7 +54,7 @@ started:
    In some cases like Gpg4win on Windows and other macOS versions, the command
    here may be `gpg --gen-key`.
 
-1. The first question is which algorithm can be used.  Select the kind you want
+1. The first question is which algorithm can be used. Select the kind you want
    or press <kbd>Enter</kbd> to choose the default (RSA and RSA):
 
    ```plaintext

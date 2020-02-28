@@ -166,7 +166,7 @@ GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone <repository>
 # A single project
 project = Project.find_by_full_path('PROJECT_PATH')
 
-# All projects in a particular namespace.  Can be a username, a group
+# All projects in a particular namespace. Can be a username, a group
 # ('gitlab-org'), or even include subgroups ('gitlab-org/distribution')
 namespace = Namespace.find_by_full_path('NAMESPACE_PATH')
 projects = namespace.all_projects
@@ -454,7 +454,7 @@ user.skip_reconfirmation!
 ### Get an admin token
 
 ```ruby
-# Get the first admin's first access token (no longer works on 11.9+. see: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22743)
+# Get the first admin's first access token (no longer works on 11.9+. see: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22743)
 User.where(admin:true).first.personal_access_tokens.first.token
 
 # Get the first admin's private token (no longer works on 10.2+)
@@ -838,6 +838,12 @@ Project.all.each do |p|
 end
 ```
 
+### Obtain runners registration token
+
+```ruby
+Gitlab::CurrentSettings.current_application_settings.runners_registration_token
+```
+
 ## License
 
 ### See license plan name (since v9.3.0-ee)
@@ -997,7 +1003,7 @@ gitlab_rails['env'] = {
 }
 ```
 
-Then `gitlab-ctl reconfigure; gitlab-ctl restart sidekiq`.  The Sidekiq logs will now include additional data for troubleshooting.
+Then `gitlab-ctl reconfigure; gitlab-ctl restart sidekiq`. The Sidekiq logs will now include additional data for troubleshooting.
 
 ### Sidekiq kill signals
 

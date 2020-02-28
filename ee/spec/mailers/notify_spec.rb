@@ -11,6 +11,39 @@ describe Notify do
 
   include_context 'gitlab email notification'
 
+  RSpec.shared_examples 'epic notifications with reply' do
+    it_behaves_like 'having group identification headers'
+
+    it_behaves_like 'it should show Gmail Actions View Epic link'
+
+    it_behaves_like 'an unsubscribeable thread'
+
+    it 'has the characteristics of a threaded reply' do
+      host = Gitlab.config.gitlab.host
+      route_key = "#{epic.class.model_name.singular_route_key}_#{epic.id}"
+
+      aggregate_failures do
+        is_expected.to have_header('Message-ID', /\A<.*@#{host}>\Z/)
+        is_expected.to have_header('In-Reply-To', "<#{route_key}@#{host}>")
+        is_expected.to have_header('References',  /\A<reply\-.*@#{host}> <#{route_key}@#{host}>\Z/ )
+        is_expected.to have_subject(/^Re: /)
+      end
+    end
+
+    it 'has a Reply-To header' do
+      is_expected.to have_header 'Reply-To', /<reply+(.*)@#{Gitlab.config.gitlab.host}>\Z/
+    end
+
+    it 'has the correct subject and body' do
+      email_subject = "Re: #{epic.group.name} | #{epic.title} (#{epic.to_reference})"
+
+      aggregate_failures do
+        is_expected.to have_subject(email_subject)
+        is_expected.to have_body_text(email_body)
+      end
+    end
+  end
+
   let_it_be(:user) { create(:user) }
   let_it_be(:current_user) { create(:user, email: "current@email.com") }
   let_it_be(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
@@ -298,6 +331,7 @@ describe Notify do
         end
         it_behaves_like 'it should show Gmail Actions View Epic link'
         it_behaves_like 'an unsubscribeable thread'
+        it_behaves_like 'having group identification headers'
 
         it 'has the correct subject and body' do
           prefix = "#{epic.group.name} | "
@@ -318,46 +352,27 @@ describe Notify do
         end
       end
 
+      context 'that changed status' do
+        let(:status) { 'reopened' }
+
+        subject { described_class.epic_status_changed_email(recipient.id, epic.id, status, current_user.id) }
+
+        it_behaves_like 'epic notifications with reply' do
+          let(:email_body) { "Epic was #{status} by #{current_user.name}" }
+        end
+      end
+
       context 'for epic notes' do
         let_it_be(:note) { create(:note, project: nil, noteable: epic) }
         let(:note_author) { note.author }
-        let(:epic_note_path) { group_epic_path(group, epic, anchor: "note_#{note.id}") }
 
         subject { described_class.note_epic_email(recipient.id, note.id) }
 
+        it_behaves_like 'epic notifications with reply' do
+          let(:email_body) { group_epic_path(group, epic, anchor: "note_#{note.id}") }
+        end
+
         it_behaves_like 'a note email'
-
-        it_behaves_like 'an unsubscribeable thread'
-
-        it 'has the characteristics of a threaded reply' do
-          host = Gitlab.config.gitlab.host
-          route_key = "#{epic.class.model_name.singular_route_key}_#{epic.id}"
-
-          aggregate_failures do
-            is_expected.to have_header('Message-ID', /\A<.*@#{host}>\Z/)
-            is_expected.to have_header('In-Reply-To', "<#{route_key}@#{host}>")
-            is_expected.to have_header('References',  /\A<reply\-.*@#{host}> <#{route_key}@#{host}>\Z/ )
-            is_expected.to have_subject(/^Re: /)
-          end
-        end
-
-        context 'when reply-by-email is enabled with incoming address with %{key}' do
-          it 'has a Reply-To header' do
-            is_expected.to have_header 'Reply-To', /<reply+(.*)@#{Gitlab.config.gitlab.host}>\Z/
-          end
-        end
-
-        it_behaves_like 'it should show Gmail Actions View Epic link'
-
-        it 'has the correct subject and body' do
-          prefix = "Re: #{epic.group.name} | "
-          suffix = "#{epic.title} (#{epic.to_reference})"
-
-          aggregate_failures do
-            is_expected.to have_subject [prefix, suffix].compact.join
-            is_expected.to have_body_text(epic_note_path)
-          end
-        end
       end
     end
   end

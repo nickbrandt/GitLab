@@ -10,7 +10,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
     perform_enqueued_jobs { snippet }
-    Snippet.__elasticsearch__.refresh_index!
+    ensure_elasticsearch_index!
   end
 
   describe '#snippet_titles_count' do

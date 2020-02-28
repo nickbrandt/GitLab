@@ -5,7 +5,7 @@ module IssueLinks
     def relate_issuables(referenced_issue)
       attrs = { source: issuable, target: referenced_issue }
 
-      if ::Feature.enabled?(:issue_link_types, issuable.project) && params[:link_type].present?
+      if params[:link_type].present?
         attrs[:link_type] = params[:link_type]
       end
 

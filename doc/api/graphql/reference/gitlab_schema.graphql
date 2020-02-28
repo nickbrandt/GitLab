@@ -159,11 +159,71 @@ enum BlobViewersType {
   simple
 }
 
+"""
+Represents a project or group board
+"""
+type Board {
+  """
+  ID (global ID) of the board
+  """
+  id: ID!
+
+  """
+  Name of the board
+  """
+  name: String
+
+  """
+  Weight of the board
+  """
+  weight: Int
+}
+
+"""
+The connection type for Board.
+"""
+type BoardConnection {
+  """
+  A list of edges.
+  """
+  edges: [BoardEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Board]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type BoardEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Board
+}
+
 type Commit {
   """
   Author of the commit
   """
   author: User
+
+  """
+  Commit authors gravatar
+  """
+  authorGravatar: String
 
   """
   Commit authors name
@@ -1401,12 +1461,12 @@ input DiffImagePositionInput {
   width: Int!
 
   """
-  X position on which the comment was made
+  X position of the note
   """
   x: Int!
 
   """
-  Y position on which the comment was made
+  Y position of the note
   """
   y: Int!
 }
@@ -1470,12 +1530,12 @@ type DiffPosition {
   width: Int
 
   """
-  X position on which the comment was made
+  X position of the note
   """
   x: Int
 
   """
-  Y position on which the comment was made
+  Y position of the note
   """
   y: Int
 }
@@ -1803,6 +1863,12 @@ type Epic implements Noteable {
   descendantCounts: EpicDescendantCount
 
   """
+  Total weight of open and closed descendant epic's issues. Available only when
+  feature flag unfiltered_epic_aggregates is enabled.
+  """
+  descendantWeightSum: EpicDescendantWeights
+
+  """
   Description of the epic
   """
   description: String
@@ -1871,6 +1937,11 @@ type Epic implements Noteable {
   Indicates if the epic has direct issues
   """
   hasIssues: Boolean!
+
+  """
+  Current health status. Available only when feature flag save_issuable_health_status is enabled.
+  """
+  healthStatus: HealthStatus
 
   """
   ID of the epic
@@ -1986,7 +2057,20 @@ type Epic implements Noteable {
     """
     last: Int
   ): UserConnection
-  reference(full: Boolean = false): String!
+
+  """
+  Internal reference of the epic. Returned in shortened format by default
+  """
+  reference(
+    """
+    Indicates if the reference should be returned in full
+    """
+    full: Boolean = false
+  ): String!
+
+  """
+  URI path of the epic-issue relationship
+  """
   relationPath: String
 
   """
@@ -2043,7 +2127,15 @@ type Epic implements Noteable {
   Permissions for the current user on the resource
   """
   userPermissions: EpicPermissions!
+
+  """
+  Web path of the epic
+  """
   webPath: String!
+
+  """
+  Web URL of the epic
+  """
   webUrl: String!
 }
 
@@ -2088,6 +2180,21 @@ type EpicDescendantCount {
 
   """
   Number of opened epic issues
+  """
+  openedIssues: Int
+}
+
+"""
+Total weight of open and closed descendant issues
+"""
+type EpicDescendantWeights {
+  """
+  Total weight of completed (closed) issues in this epic, including epic descendants
+  """
+  closedIssues: Int
+
+  """
+  Total weight of opened issues in this epic, including epic descendants
   """
   openedIssues: Int
 }
@@ -2225,6 +2332,11 @@ type EpicIssue implements Noteable {
   ID of the epic-issue relation
   """
   epicIssueId: ID!
+
+  """
+  Current health status. Available only when feature flag save_issuable_health_status is enabled.
+  """
+  healthStatus: HealthStatus
 
   """
   Global ID of the epic-issue relation
@@ -2497,12 +2609,12 @@ input EpicSetSubscriptionInput {
   clientMutationId: String
 
   """
-  The group the epic to (un)subscribe is in
+  The group the epic to mutate is in
   """
   groupPath: ID!
 
   """
-  The iid of the epic to (un)subscribe
+  The iid of the epic to mutate
   """
   iid: ID!
 
@@ -2678,6 +2790,46 @@ type Group {
   Avatar URL of the group
   """
   avatarUrl: String
+
+  """
+  A single board of the group
+  """
+  board(
+    """
+    Find a board by its ID
+    """
+    id: ID
+  ): Board
+
+  """
+  Boards of the group
+  """
+  boards(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Find a board by its ID
+    """
+    id: ID
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): BoardConnection
 
   """
   Description of the namespace
@@ -3034,6 +3186,15 @@ type GroupPermissions {
 }
 
 """
+Health status of an issue or epic
+"""
+enum HealthStatus {
+  atRisk
+  needsAttention
+  onTrack
+}
+
+"""
 State of a GitLab issue or merge request
 """
 enum IssuableState {
@@ -3152,6 +3313,11 @@ type Issue implements Noteable {
   Epic to which this issue belongs
   """
   epic: Epic
+
+  """
+  Current health status. Available only when feature flag save_issuable_health_status is enabled.
+  """
+  healthStatus: HealthStatus
 
   """
   Internal ID of the issue
@@ -4634,6 +4800,19 @@ type Mutation {
   todosMarkAllDone(input: TodosMarkAllDoneInput!): TodosMarkAllDonePayload
   toggleAwardEmoji(input: ToggleAwardEmojiInput!): ToggleAwardEmojiPayload
   updateEpic(input: UpdateEpicInput!): UpdateEpicPayload
+
+  """
+  Updates a DiffNote on an image (a `Note` where the `position.positionType` is
+  `"image"`). If the body of the Note contains only quick actions, the Note will
+  be destroyed during the update, and no Note will be returned
+  """
+  updateImageDiffNote(input: UpdateImageDiffNoteInput!): UpdateImageDiffNotePayload
+  updateIssue(input: UpdateIssueInput!): UpdateIssuePayload
+
+  """
+  Updates a Note. If the body of the Note contains only quick actions, the Note
+  will be destroyed during the update, and no Note will be returned
+  """
   updateNote(input: UpdateNoteInput!): UpdateNotePayload
   updateSnippet(input: UpdateSnippetInput!): UpdateSnippetPayload
 }
@@ -5112,6 +5291,46 @@ type Project {
   avatarUrl: String
 
   """
+  A single board of the project
+  """
+  board(
+    """
+    Find a board by its ID
+    """
+    id: ID
+  ): Board
+
+  """
+  Boards of the project
+  """
+  boards(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Find a board by its ID
+    """
+    id: ID
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): BoardConnection
+
+  """
   Indicates if the project stores Docker container images in a container registry
   """
   containerRegistryEnabled: Boolean
@@ -5206,6 +5425,16 @@ type Project {
   """
   issue(
     """
+    ID of a user assigned to the issues, "none" and "any" values supported
+    """
+    assigneeId: String
+
+    """
+    Username of a user assigned to the issues
+    """
+    assigneeUsername: String
+
+    """
     Issues closed after this date
     """
     closedAfter: Time
@@ -5241,6 +5470,11 @@ type Project {
     labelName: [String]
 
     """
+    Milestones applied to this issue
+    """
+    milestoneTitle: [String]
+
+    """
     Search query for finding issues by title or description
     """
     search: String
@@ -5274,6 +5508,16 @@ type Project {
     Returns the elements in the list that come after the specified cursor.
     """
     after: String
+
+    """
+    ID of a user assigned to the issues, "none" and "any" values supported
+    """
+    assigneeId: String
+
+    """
+    Username of a user assigned to the issues
+    """
+    assigneeUsername: String
 
     """
     Returns the elements in the list that come before the specified cursor.
@@ -5324,6 +5568,11 @@ type Project {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Milestones applied to this issue
+    """
+    milestoneTitle: [String]
 
     """
     Search query for finding issues by title or description
@@ -5830,6 +6079,11 @@ type ProjectPermissions {
   Indicates the user can perform `read_design` on this resource
   """
   readDesign: Boolean!
+
+  """
+  Indicates the user can perform `read_merge_request` on this resource
+  """
+  readMergeRequest: Boolean!
 
   """
   Indicates the user can perform `read_pages_content` on this resource
@@ -6727,11 +6981,6 @@ type SnippetBlob {
   binary: Boolean!
 
   """
-  Blob highlighted data
-  """
-  highlightedData: String
-
-  """
   Blob mode
   """
   mode: String
@@ -6747,9 +6996,19 @@ type SnippetBlob {
   path: String
 
   """
+  Blob plain highlighted data
+  """
+  plainData: String
+
+  """
   Blob raw content endpoint path
   """
   rawPath: String!
+
+  """
+  Blob highlighted data
+  """
+  richData: String
 
   """
   Blob content rich viewer
@@ -7497,6 +7756,28 @@ enum TypeEnum {
   project
 }
 
+input UpdateDiffImagePositionInput {
+  """
+  Total height of the image
+  """
+  height: Int
+
+  """
+  Total width of the image
+  """
+  width: Int
+
+  """
+  X position of the note
+  """
+  x: Int
+
+  """
+  Y position of the note
+  """
+  y: Int
+}
+
 """
 Autogenerated input type of UpdateEpic
 """
@@ -7532,9 +7813,14 @@ input UpdateEpicInput {
   groupPath: ID!
 
   """
+  The desired health status
+  """
+  healthStatus: HealthStatus
+
+  """
   The iid of the epic to mutate
   """
-  iid: String!
+  iid: ID!
 
   """
   The IDs of labels to be removed from the epic.
@@ -7580,6 +7866,116 @@ type UpdateEpicPayload {
   Reasons why the mutation failed.
   """
   errors: [String!]!
+}
+
+"""
+Autogenerated input type of UpdateImageDiffNote
+"""
+input UpdateImageDiffNoteInput {
+  """
+  Content of the note
+  """
+  body: String
+
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The global id of the note to update
+  """
+  id: ID!
+
+  """
+  The position of this note on a diff
+  """
+  position: UpdateDiffImagePositionInput
+}
+
+"""
+Autogenerated return type of UpdateImageDiffNote
+"""
+type UpdateImageDiffNotePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The note after mutation
+  """
+  note: Note
+}
+
+"""
+Autogenerated input type of UpdateIssue
+"""
+input UpdateIssueInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Indicates the issue is confidential
+  """
+  confidential: Boolean!
+
+  """
+  Description of the issue
+  """
+  description: String
+
+  """
+  Due date of the issue
+  """
+  dueDate: Time!
+
+  """
+  The desired health status
+  """
+  healthStatus: HealthStatus
+
+  """
+  The iid of the issue to mutate
+  """
+  iid: String!
+
+  """
+  The project the issue to mutate is in
+  """
+  projectPath: ID!
+
+  """
+  Title of the issue
+  """
+  title: String
+}
+
+"""
+Autogenerated return type of UpdateIssue
+"""
+type UpdateIssuePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The issue after mutation
+  """
+  issue: Issue
 }
 
 """
@@ -7688,7 +8084,7 @@ type User {
   """
   URL of the user's avatar
   """
-  avatarUrl: String!
+  avatarUrl: String
 
   """
   Human-readable name of the user

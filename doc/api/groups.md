@@ -21,7 +21,7 @@ Parameters:
 | `owned`                  | boolean           | no       | Limit to groups explicitly owned by the current user |
 | `min_access_level`       | integer           | no       | Limit to groups where current user has at least this [access level](members.md) |
 
-```
+```plaintext
 GET /groups
 ```
 
@@ -55,7 +55,7 @@ GET /groups
 
 When adding the parameter `statistics=true` and the authenticated user is an admin, additional group statistics are returned.
 
-```
+```plaintext
 GET /groups?statistics=true
 ```
 
@@ -99,7 +99,7 @@ You can search for groups by name or path, see below.
 
 You can filter by [custom attributes](custom_attributes.md) with:
 
-```
+```plaintext
 GET /groups?custom_attributes[key]=value&custom_attributes[other_key]=other_value
 ```
 
@@ -127,7 +127,7 @@ Parameters:
 | `owned`                  | boolean           | no       | Limit to groups explicitly owned by the current user |
 | `min_access_level`       | integer           | no       | Limit to groups where current user has at least this [access level](members.md) |
 
-```
+```plaintext
 GET /groups/:id/subgroups
 ```
 
@@ -165,7 +165,7 @@ Get a list of projects in this group. When accessed without authentication, only
 
 By default, this request returns 20 results at a time because the API results [are paginated](README.md#pagination).
 
-```
+```plaintext
 GET /groups/:id/projects
 ```
 
@@ -239,7 +239,7 @@ Example response:
 Get all details of a group. This endpoint can be accessed without authentication
 if the group is publicly accessible. In case the user that requests is admin of the group, it will return the `runners_token` for the group too.
 
-```
+```plaintext
 GET /groups/:id
 ```
 
@@ -470,7 +470,7 @@ Feature.disable(:limit_projects_in_groups_api)
 
 Creates a new project group. Available only for users who can create groups.
 
-```
+```plaintext
 POST /groups
 ```
 
@@ -487,7 +487,7 @@ Parameters:
 | `two_factor_grace_period`            | integer | no       | Time before Two-factor authentication is enforced (in hours). |
 | `project_creation_level`             | string  | no       | Determine if developers can create projects in the group. Can be `noone` (No one), `maintainer` (Maintainers), or `developer` (Developers + Maintainers). |
 | `auto_devops_enabled`                | boolean | no       | Default to Auto DevOps pipeline for all projects within this group. |
-| `subgroup_creation_level`            | integer | no       | Allowed to create subgroups. Can be `owner` (Owners), or `maintainer` (Maintainers). |
+| `subgroup_creation_level`            | string  | no       | Allowed to create subgroups. Can be `owner` (Owners), or `maintainer` (Maintainers). |
 | `emails_disabled`                    | boolean | no       | Disable email notifications |
 | `mentions_disabled`                  | boolean | no       | Disable the capability of a group from getting mentioned |
 | `lfs_enabled`                        | boolean | no       | Enable/disable Large File Storage (LFS) for the projects in this group. |
@@ -498,9 +498,9 @@ Parameters:
 
 ## Transfer project to group
 
-Transfer a project to the Group namespace. Available only for admin
+Transfer a project to the Group namespace. Available only to instance administrators, although an [alternative API endpoint](projects.md#transfer-a-project-to-a-new-namespace) is available which does not require instance administrator access. Transferring projects may fail when tagged packages exist in the project's repository.
 
-```
+```plaintext
 POST  /groups/:id/projects/:project_id
 ```
 
@@ -508,14 +508,18 @@ Parameters:
 
 | Attribute    | Type           | Required | Description |
 | ------------ | -------------- | -------- | ----------- |
-| `id`         | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `id`         | integer/string | yes      | The ID or [URL-encoded path of the target group](README.md#namespaced-path-encoding) |
 | `project_id` | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+
+```shell
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4/projects/56
+```
 
 ## Update group
 
 Updates the project group. Only available to group owners and administrators.
 
-```
+```plaintext
 PUT /groups/:id
 ```
 
@@ -533,7 +537,7 @@ PUT /groups/:id
 | `two_factor_grace_period`            | integer | no       | Time before Two-factor authentication is enforced (in hours). |
 | `project_creation_level`             | string  | no       | Determine if developers can create projects in the group. Can be `noone` (No one), `maintainer` (Maintainers), or `developer` (Developers + Maintainers). |
 | `auto_devops_enabled`                | boolean | no       | Default to Auto DevOps pipeline for all projects within this group. |
-| `subgroup_creation_level`            | integer | no       | Allowed to create subgroups. Can be `owner` (Owners), or `maintainer` (Maintainers). |
+| `subgroup_creation_level`            | string  | no       | Allowed to create subgroups. Can be `owner` (Owners), or `maintainer` (Maintainers). |
 | `emails_disabled`                    | boolean | no       | Disable email notifications |
 | `mentions_disabled`                  | boolean | no       | Disable the capability of a group from getting mentioned |
 | `lfs_enabled` (optional)             | boolean | no       | Enable/disable Large File Storage (LFS) for the projects in this group. |
@@ -544,7 +548,6 @@ PUT /groups/:id
 
 ```shell
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"
-
 ```
 
 This endpoint returns:
@@ -635,7 +638,7 @@ This endpoint either:
 - Removes group, and queues a background job to delete all projects in the group as well.
 - Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
 
-```
+```plaintext
 DELETE /groups/:id
 ```
 
@@ -667,7 +670,7 @@ Parameters:
 
 Get all groups that match your string in their name or path.
 
-```
+```plaintext
 GET /groups?search=foobar
 ```
 
@@ -691,7 +694,7 @@ These are different from [System Hooks](system_hooks.md) that are system wide an
 
 Get a list of group hooks
 
-```
+```plaintext
 GET /groups/:id/hooks
 ```
 
@@ -708,7 +711,7 @@ Get a specific hook for a group.
 | `id`      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
 | `hook_id` | integer        | yes      | The ID of a group hook |
 
-```
+```plaintext
 GET /groups/:id/hooks/:hook_id
 ```
 
@@ -735,7 +738,7 @@ GET /groups/:id/hooks/:hook_id
 
 Adds a hook to a specified group.
 
-```
+```plaintext
 POST /groups/:id/hooks
 ```
 
@@ -759,7 +762,7 @@ POST /groups/:id/hooks
 
 Edits a hook for a specified group.
 
-```
+```plaintext
 PUT /groups/:id/hooks/:hook_id
 ```
 
@@ -785,7 +788,7 @@ PUT /groups/:id/hooks/:hook_id
 Removes a hook from a group. This is an idempotent method and can be called multiple times.
 Either the hook is available or not.
 
-```
+```plaintext
 DELETE /groups/:id/hooks/:hook_id
 ```
 
@@ -798,11 +801,11 @@ DELETE /groups/:id/hooks/:hook_id
 
 Group audit events can be accessed via the [Group Audit Events API](audit_events.md#group-audit-events-starter)
 
-## Sync group with LDAP **(CORE ONLY)**
+## Sync group with LDAP **(STARTER)**
 
 Syncs the group with its linked LDAP group. Only available to group owners and administrators.
 
-```
+```plaintext
 POST /groups/:id/ldap_sync
 ```
 
@@ -814,11 +817,27 @@ Parameters:
 
 Please consult the [Group Members](members.md) documentation.
 
-### Add LDAP group link **(CORE ONLY)**
+## LDAP Group Links
+
+List, add, and delete LDAP group links.
+
+### List LDAP group links **(STARTER)**
+
+Lists LDAP group links.
+
+```plaintext
+GET /groups/:id/ldap_group_links
+```
+
+Parameters:
+
+- `id` (required) - The ID of a group
+
+### Add LDAP group link **(STARTER)**
 
 Adds an LDAP group link.
 
-```
+```plaintext
 POST /groups/:id/ldap_group_links
 ```
 
@@ -829,11 +848,11 @@ Parameters:
 - `group_access` (required) - Minimum access level for members of the LDAP group
 - `provider` (required) - LDAP provider for the LDAP group
 
-### Delete LDAP group link **(CORE ONLY)**
+### Delete LDAP group link **(STARTER)**
 
 Deletes an LDAP group link.
 
-```
+```plaintext
 DELETE /groups/:id/ldap_group_links/:cn
 ```
 
@@ -844,7 +863,7 @@ Parameters:
 
 Deletes a LDAP group link for a specific LDAP provider
 
-```
+```plaintext
 DELETE /groups/:id/ldap_group_links/:provider/:cn
 ```
 
@@ -860,18 +879,22 @@ By default, groups only get 20 namespaces at a time because the API results are 
 
 To get more (up to 100), pass the following as an argument to the API call:
 
-```
+```plaintext
 /groups?per_page=100
 ```
 
 And to switch pages add:
 
-```
+```plaintext
 /groups?per_page=100&page=2
 ```
 
-[ce-15142]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15142
+[ce-15142]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15142
 
 ## Group badges
 
 Read more in the [Group Badges](group_badges.md) documentation.
+
+## Group Import/Export
+
+Read more in the [Group Import/Export](group_import_export.md) documentation.

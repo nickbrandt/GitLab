@@ -24,6 +24,7 @@ const Api = {
   projectMergeRequestChangesPath: '/api/:version/projects/:id/merge_requests/:mrid/changes',
   projectMergeRequestVersionsPath: '/api/:version/projects/:id/merge_requests/:mrid/versions',
   projectRunnersPath: '/api/:version/projects/:id/runners',
+  projectProtectedBranchesPath: '/api/:version/projects/:id/protected_branches',
   mergeRequestsPath: '/api/:version/merge_requests',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
   issuableTemplatePath: '/:namespace_path/:project_path/templates/:type/:key',
@@ -45,6 +46,8 @@ const Api = {
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
   adminStatisticsPath: '/api/:version/application/statistics',
   pipelineSinglePath: '/api/:version/projects/:id/pipelines/:pipeline_id',
+  lsifPath: '/api/:version/projects/:id/commits/:commit_id/lsif/info',
+  environmentsPath: '/api/:version/projects/:id/environments',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -217,6 +220,22 @@ const Api = {
     );
 
     return axios.get(url, config);
+  },
+
+  projectProtectedBranches(id, query = '') {
+    const url = Api.buildUrl(Api.projectProtectedBranchesPath).replace(
+      ':id',
+      encodeURIComponent(id),
+    );
+
+    return axios
+      .get(url, {
+        params: {
+          search: query,
+          per_page: DEFAULT_PER_PAGE,
+        },
+      })
+      .then(({ data }) => data);
   },
 
   mergeRequests(params = {}) {
@@ -454,6 +473,19 @@ const Api = {
       .replace(':id', encodeURIComponent(id))
       .replace(':pipeline_id', encodeURIComponent(pipelineId));
 
+    return axios.get(url);
+  },
+
+  lsifData(projectPath, commitId, path) {
+    const url = Api.buildUrl(this.lsifPath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':commit_id', commitId);
+
+    return axios.get(url, { params: { path } });
+  },
+
+  environments(id) {
+    const url = Api.buildUrl(this.environmentsPath).replace(':id', encodeURIComponent(id));
     return axios.get(url);
   },
 

@@ -9,10 +9,10 @@ package system support with solely backend changes. This guide is superficial an
 not cover the way the code should be written. However, you can find a good example
 by looking at merge requests with Maven and NPM support:
 
-- [NPM registry support](https://gitlab.com/gitlab-org/gitlab/merge_requests/8673).
+- [NPM registry support](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/8673).
 - [Conan repository](https://gitlab.com/gitlab-org/gitlab/issues/8248).
-- [Maven repository](https://gitlab.com/gitlab-org/gitlab/merge_requests/6607).
-- [Instance level endpoint for Maven repository](https://gitlab.com/gitlab-org/gitlab/merge_requests/8757)
+- [Maven repository](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6607).
+- [Instance level endpoint for Maven repository](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/8757)
 
 ## General information
 
@@ -38,7 +38,7 @@ endpoints like:
 Since the packages belong to a project, it's expected to have project-level endpoint (remote)
 for uploading and downloading them. For example:
 
-```
+```plaintext
 GET https://gitlab.com/api/v4/projects/<your_project_id>/packages/npm/
 PUT https://gitlab.com/api/v4/projects/<your_project_id>/packages/npm/
 ```
@@ -92,7 +92,7 @@ and file location rather than the file itself. An overview of this process can b
 
 In terms of code, this means a route will need to be added to the
 [GitLab Workhorse project](https://gitlab.com/gitlab-org/gitlab-workhorse) for each level of remote being added
-(instance, group, project). [This merge request](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/412/diffs)
+(instance, group, project). [This merge request](https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/412/diffs)
 demonstrates adding an instance-level endpoint for Conan to workhorse. You can also see the Maven project level endpoint
 implemented in the same file.
 

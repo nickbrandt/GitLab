@@ -6,8 +6,8 @@ type: index, reference
 
 # GitLab Pages
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/80) in GitLab Enterprise Edition 8.3.
-> - Custom CNAMEs with TLS support were [introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/173) in GitLab Enterprise Edition 8.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/80) in GitLab Enterprise Edition 8.3.
+> - Custom CNAMEs with TLS support were [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173) in GitLab Enterprise Edition 8.5.
 > - [Ported](https://gitlab.com/gitlab-org/gitlab-foss/issues/14605) to GitLab Community Edition in GitLab 8.17.
 > - Support for subgroup project's websites was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/30548) in GitLab 11.8.
 > - Bundled project templates were [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/47857) in GitLab 11.8.
@@ -30,7 +30,7 @@ instances (GitLab Core, Starter, Premium, and Ultimate).
 <div class="col-md-9">
 <p style="margin-top: 18px;">
 To publish a website with Pages, you can use any Static Site Generator (SSG),
-such as Jekyll, Hugo, Middleman, Harp, Hexo, and Brunch, just to name a few. You can also
+such as Gatsby, Jekyll, Hugo, Middleman, Harp, Hexo, and Brunch, just to name a few. You can also
 publish any website written directly in plain HTML, CSS, and JavaScript.</p>
 <p>Pages does <strong>not</strong> support dynamic server-side processing, for instance, as <code>.php</code> and <code>.asp</code> requires. See this article to learn more about
 <a href="https://about.gitlab.com/blog/2016/06/03/ssg-overview-gitlab-pages-part-1-dynamic-x-static/">static websites vs dynamic websites</a>.</p>

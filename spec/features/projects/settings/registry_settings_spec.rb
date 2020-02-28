@@ -10,7 +10,7 @@ describe 'Project > Settings > CI/CD > Container registry tag expiration policy'
   before do
     sign_in(user)
     stub_container_registry_config(enabled: true)
-    stub_feature_flags(registry_retention_policies_settings: true)
+    stub_feature_flags(new_variables_ui: false)
   end
 
   context 'as owner' do
@@ -56,17 +56,6 @@ describe 'Project > Settings > CI/CD > Container registry tag expiration policy'
     let(:container_registry_enabled) { false }
 
     before do
-      visit project_settings_ci_cd_path(project)
-    end
-
-    it 'does not exists' do
-      expect(page).not_to have_selector('#js-registry-policies')
-    end
-  end
-
-  context 'when feature flag is disabled' do
-    before do
-      stub_feature_flags(registry_retention_policies_settings: false)
       visit project_settings_ci_cd_path(project)
     end
 

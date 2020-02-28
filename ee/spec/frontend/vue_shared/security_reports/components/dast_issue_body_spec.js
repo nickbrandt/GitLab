@@ -10,7 +10,6 @@ describe('Dast Issue Body', () => {
         issue: {
           alert: 'X-Content-Type-Options Header Missing',
           severity: 'Low',
-          confidence: 'Medium',
           count: '17',
           cweid: '16',
           desc:

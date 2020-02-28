@@ -321,7 +321,7 @@ Some analyzers can be customized with environment variables.
 
 #### Custom environment variables
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18193) in GitLab Ultimate 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18193) in GitLab Ultimate 12.5.
 
 In addition to the aforementioned SAST configuration variables,
 all [custom environment variables](../../../ci/variables/README.md#creating-a-custom-environment-variable) are propagated
@@ -453,6 +453,12 @@ language of your app, and you don't need to change anything to your
 CI/CD configuration file to turn it on. Results are available in the SAST report.
 
 GitLab currently includes [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) checks.
+
+NOTE: **Note:**
+The secrets analyzer will ignore "Password in URL" vulnerabilities if the password begins
+with a dollar sign (`$`) as this likely indicates the password being used is an environment
+variable. For example, `https://username:$password@example.com/path/to/repo` will not be
+detected, whereas `https://username:password@example.com/path/to/repo` would be detected.
 
 ## Security Dashboard
 

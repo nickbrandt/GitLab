@@ -74,16 +74,6 @@ describe User do
       end
     end
 
-    describe 'bots & humans' do
-      it 'returns corresponding users' do
-        human = create(:user)
-        bot = create(:user, :bot)
-
-        expect(described_class.humans).to match_array([human])
-        expect(described_class.bots).to match_array([bot])
-      end
-    end
-
     describe 'with_invalid_expires_at_tokens' do
       it 'only includes users with invalid tokens' do
         valid_pat = create(:personal_access_token, expires_at: 7.days.from_now)
@@ -148,7 +138,7 @@ describe User do
       end
     end
 
-    context '#auditor?' do
+    describe '#auditor?' do
       it "returns true for an auditor user if the addon is enabled" do
         stub_licensed_features(auditor_user: true)
 
@@ -593,37 +583,6 @@ describe User do
     end
   end
 
-  describe 'internal methods' do
-    let!(:user) { create(:user) }
-    let!(:ghost) { described_class.ghost }
-    let!(:support_bot) { described_class.support_bot }
-    let!(:alert_bot) { described_class.alert_bot }
-    let!(:visual_review_bot) { described_class.visual_review_bot }
-    let!(:non_internal) { [user] }
-    let!(:internal) { [ghost, support_bot, alert_bot, visual_review_bot] }
-
-    it 'returns non internal users' do
-      expect(described_class.internal).to eq(internal)
-      expect(internal.all?(&:internal?)).to eq(true)
-    end
-
-    it 'returns internal users' do
-      expect(described_class.non_internal).to eq(non_internal)
-      expect(non_internal.all?(&:internal?)).to eq(false)
-    end
-
-    describe '#bot?' do
-      it 'marks bot users' do
-        expect(user.bot?).to eq(false)
-        expect(ghost.bot?).to eq(false)
-
-        expect(support_bot.bot?).to eq(true)
-        expect(alert_bot.bot?).to eq(true)
-        expect(visual_review_bot.bot?).to eq(true)
-      end
-    end
-  end
-
   describe '#using_license_seat?' do
     let(:user) { create(:user) }
 
@@ -712,69 +671,102 @@ describe User do
 
   describe '#using_gitlab_com_seat?' do
     let(:user) { create(:user) }
+    let(:namespace) { create(:group) }
+
+    subject { user.using_gitlab_com_seat?(namespace) }
 
     context 'when Gitlab.com? is false' do
       before do
         allow(Gitlab).to receive(:com?).and_return(false)
       end
 
-      it 'returns false' do
-        expect(user.using_gitlab_com_seat?(nil)).to eq(false)
-      end
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when user is not active' do
+      let(:user) { create(:user, :blocked) }
+
+      it { is_expected.to be_falsey }
     end
 
     context 'when Gitlab.com? is true' do
-      let(:namespace) { create(:namespace) }
-
       before do
         allow(Gitlab).to receive(:com?).and_return(true)
-        allow(namespace).to receive(:gold_plan?).and_return(false)
-        allow(namespace).to receive(:free_plan?).and_return(false)
       end
 
       context 'when namespace is nil' do
         let(:namespace) { nil }
 
-        it 'returns false' do
-          expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
-        end
+        it { is_expected.to be_falsey }
       end
 
       context 'when namespace is on a free plan' do
-        before do
-          allow(namespace).to receive(:free_plan?).and_return(true)
-        end
-
-        it 'returns false' do
-          expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
-        end
+        it { is_expected.to be_falsey }
       end
 
       context 'when namespace is on a gold plan' do
         before do
-          allow(namespace).to receive(:gold_plan?).and_return(true)
+          create(:gitlab_subscription, namespace: namespace.root_ancestor, hosted_plan: create(:gold_plan))
+        end
+
+        context 'user is a guest' do
+          before do
+            namespace.add_guest(user)
+          end
+
+          it { is_expected.to be_falsey }
         end
 
         context 'user is not a guest' do
-          let(:user) { create(:project_member, :developer).user }
-
-          it 'returns true' do
-            expect(user.using_gitlab_com_seat?(namespace)).to eq(true)
+          before do
+            namespace.add_developer(user)
           end
+
+          it { is_expected.to be_truthy }
         end
 
-        context 'user is guest' do
-          let(:user) { create(:project_member, :guest).user }
+        context 'when user is within project' do
+          let(:group) { create(:group) }
+          let(:namespace) { create(:project, namespace: group) }
 
-          it 'returns false' do
-            expect(user.using_gitlab_com_seat?(namespace)).to eq(false)
+          before do
+            namespace.add_developer(user)
           end
+
+          it { is_expected.to be_truthy }
+        end
+
+        context 'when user is within subgroup' do
+          let(:group) { create(:group) }
+          let(:namespace) { create(:group, parent: group) }
+
+          before do
+            namespace.add_developer(user)
+          end
+
+          it { is_expected.to be_truthy }
         end
       end
 
       context 'when namespace is on a plan that is not free or gold' do
-        it 'returns true' do
-          expect(user.using_gitlab_com_seat?(namespace)).to eq(true)
+        before do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: create(:silver_plan))
+        end
+
+        context 'user is a guest' do
+          before do
+            namespace.add_guest(user)
+          end
+
+          it { is_expected.to be_truthy }
+        end
+
+        context 'user is not a guest' do
+          before do
+            namespace.add_developer(user)
+          end
+
+          it { is_expected.to be_truthy }
         end
       end
     end
@@ -834,6 +826,170 @@ describe User do
 
         expect(username).to eq('')
       end
+    end
+  end
+
+  describe '#ab_feature_enabled?' do
+    let(:experiment_user) { create(:user) }
+    let(:new_user) { create(:user) }
+    let(:new_fresh_user) { create(:user) }
+    let(:control_user) { create(:user) }
+    let(:users_of_different_groups) { [experiment_user, new_user, new_fresh_user, control_user] }
+
+    before do
+      create(:user_preference, user: experiment_user, feature_filter_type: UserPreference::FEATURE_FILTER_EXPERIMENT)
+      create(:user_preference, user: new_user, feature_filter_type: UserPreference::FEATURE_FILTER_UNKNOWN)
+      create(:user_preference, user: new_fresh_user, feature_filter_type: nil)
+      create(:user_preference, user: control_user, feature_filter_type: UserPreference::FEATURE_FILTER_CONTROL)
+    end
+
+    context 'when not on Gitlab.com' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(false)
+      end
+
+      it 'returns false' do
+        users_of_different_groups.each do |user|
+          expect(user.ab_feature_enabled?(:discover_security, percentage: 100)).to eq(false)
+        end
+      end
+    end
+
+    context 'when on Gitlab.com' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(true)
+      end
+
+      context 'when on a secondary Geo' do
+        before do
+          allow(Gitlab::Geo).to receive(:secondary?).and_return(true)
+        end
+
+        it 'returns false' do
+          users_of_different_groups.each do |user|
+            expect(user.ab_feature_enabled?(:discover_security, percentage: 100)).to eq(false)
+          end
+        end
+      end
+
+      context 'when not on a secondary Geo' do
+        before do
+          allow(Gitlab::Geo).to receive(:secondary?).and_return(false)
+        end
+
+        context 'for any feature except discover_security' do
+          it 'raises runtime error' do
+            users_of_different_groups.each do |user|
+              expect do
+                user.ab_feature_enabled?(:any_other_feature, percentage: 100)
+              end.to raise_error(RuntimeError, 'Currently only discover_security feature is supported')
+            end
+          end
+        end
+
+        context 'when discover_security feature flag is disabled' do
+          before do
+            stub_feature_flags(discover_security: false)
+          end
+
+          it 'returns false' do
+            users_of_different_groups.each do |user|
+              expect(user.ab_feature_enabled?(:discover_security, percentage: 100)).to eq(false)
+            end
+          end
+        end
+
+        context 'when discover_security feature flag is enabled' do
+          it 'returns false when in control group' do
+            expect(control_user.ab_feature_enabled?(:discover_security, percentage: 100)).to eq(false)
+          end
+
+          it 'returns true for experiment group' do
+            expect(experiment_user.ab_feature_enabled?(:discover_security, percentage: 100)).to eq(true)
+          end
+
+          it 'assigns to control or experiment group when feature_filter_type is nil' do
+            new_fresh_user.ab_feature_enabled?(:discover_security, percentage: 100)
+
+            expect(new_fresh_user.user_preference.feature_filter_type).not_to eq(UserPreference::FEATURE_FILTER_UNKNOWN)
+          end
+
+          it 'assigns to control or experiment group when feature_filter_type is zero' do
+            new_user.ab_feature_enabled?(:discover_security, percentage: 100)
+
+            expect(new_user.user_preference.feature_filter_type).not_to eq(UserPreference::FEATURE_FILTER_UNKNOWN)
+          end
+
+          it 'returns false for zero percentage' do
+            expect(experiment_user.ab_feature_enabled?(:discover_security, percentage: 0)).to eq(false)
+          end
+
+          it 'returns false when no percentage is provided' do
+            expect(experiment_user.ab_feature_enabled?(:discover_security)).to eq(false)
+          end
+
+          it 'returns true when 100% control percentage is provided' do
+            Feature.get(:discover_security_control).enable_percentage_of_time(100)
+
+            expect(experiment_user.ab_feature_enabled?(:discover_security)).to eq(true)
+            expect(experiment_user.user_preference.feature_filter_type).to eq(UserPreference::FEATURE_FILTER_EXPERIMENT)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#managed_free_namespaces' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:licensed_group) { create(:group, plan: :bronze_plan) }
+    let_it_be(:free_group_z) { create(:group, plan: :default_plan, name: 'Z') }
+    let_it_be(:free_group_a) { create(:group, plan: :default_plan, name: 'A') }
+
+    subject { user.managed_free_namespaces }
+
+    context 'user with no groups' do
+      it { is_expected.to eq [] }
+    end
+
+    context 'owner of a licensed group' do
+      before do
+        licensed_group.add_owner(user)
+      end
+
+      it { is_expected.not_to include licensed_group }
+    end
+
+    context 'guest of a free group' do
+      before do
+        free_group_a.add_guest(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'developer of a free group' do
+      before do
+        free_group_a.add_developer(user)
+      end
+
+      it { is_expected.not_to include free_group_a }
+    end
+
+    context 'maintainer of a free group' do
+      before do
+        free_group_a.add_maintainer(user)
+      end
+
+      it { is_expected.to include free_group_a }
+    end
+
+    context 'owner of 2 free groups' do
+      before do
+        free_group_a.add_owner(user)
+        free_group_z.add_owner(user)
+      end
+
+      it { is_expected.to eq [free_group_a, free_group_z] }
     end
   end
 end

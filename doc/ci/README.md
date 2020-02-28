@@ -50,6 +50,7 @@ To get started with GitLab CI/CD, we recommend you read through
 the following documents:
 
 - [How GitLab CI/CD works](introduction/index.md#how-gitlab-cicd-works).
+- [Fundamental pipeline architectures](pipelines/pipeline_architectures.md).
 - [GitLab CI/CD basic workflow](introduction/index.md#basic-cicd-workflow).
 - [Step-by-step guide for writing `.gitlab-ci.yml` for the first time](../user/project/pages/getting_started_part_four.md).
 
@@ -184,7 +185,7 @@ been necessary. These are:
 - [Remove
   `FF_K8S_USE_ENTRYPOINT_OVER_COMMAND`](https://gitlab.com/gitlab-org/gitlab-runner/issues/4073).
 - [Remove Linux distributions that reach
-  EOL](https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/1130).
+  EOL](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1130).
 - [Update command line API for helper
   images](https://gitlab.com/gitlab-org/gitlab-runner/issues/4013).
 - [Remove old `git clean`

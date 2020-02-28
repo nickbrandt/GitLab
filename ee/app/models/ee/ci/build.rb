@@ -21,6 +21,8 @@ module EE
         include UsageStatistics
         include FromUnion
 
+        has_many :security_scans, class_name: 'Security::Scan'
+
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 
@@ -155,10 +157,6 @@ module EE
         dep_id = search_scope.max_build_id_by(*args)
 
         ::Ci::Build.id_in(dep_id)
-      end
-
-      def name_in?(names)
-        name.in?(Array(names))
       end
 
       def parse_security_artifact_blob(security_report, blob)

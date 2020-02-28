@@ -17,6 +17,14 @@ module Gitlab
         buckets [100, 1000, 10000, 100000, 1000000, 10000000]
       end
 
+      define_counter :gitlab_redis_diff_caching_hit do
+        docstring 'Redis diff caching hits'
+      end
+
+      define_counter :gitlab_redis_diff_caching_miss do
+        docstring 'Redis diff caching misses'
+      end
+
       def initialize(diff_collection)
         @diff_collection = diff_collection
       end
@@ -93,18 +101,12 @@ module Gitlab
             #
             redis.expire(key, EXPIRATION)
           end
-
-          record_metrics(redis.memory("USAGE", key))
         end
 
         # Subsequent read_file calls would need the latest cache.
         #
         clear_memoization(:cached_content)
         clear_memoization(:cacheable_files)
-      end
-
-      def record_metrics(memory_usage)
-        self.class.gitlab_redis_diff_caching_memory_usage_bytes.observe({}, memory_usage)
       end
 
       def file_paths

@@ -87,13 +87,21 @@ module EE
       params[:epic_id].to_s.downcase == ::IssuesFinder::FILTER_NONE
     end
 
+    def epics
+      if params[:include_subepics]
+        ::Gitlab::ObjectHierarchy.new(::Epic.for_ids(params[:epic_id])).base_and_descendants.select(:id)
+      else
+        params[:epic_id]
+      end
+    end
+
     def by_epic(items)
       return items unless by_epic?
 
       if filter_by_no_epic?
         items.no_epic
       else
-        items.in_epics(params[:epic_id])
+        items.in_epics(epics)
       end
     end
   end

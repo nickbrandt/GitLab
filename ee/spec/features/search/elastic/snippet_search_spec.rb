@@ -24,7 +24,7 @@ describe 'Snippet elastic search', :js, :elastic, :aggregate_failures, :sidekiq_
     create(:personal_snippet, :private, content: 'authorized personal snippet', author: authorized_user)
     create(:project_snippet, :private, content: 'authorized project snippet', project: authorized_project)
 
-    Gitlab::Elastic::Helper.refresh_index
+    ensure_elasticsearch_index!
 
     sign_in(current_user) if current_user
     visit explore_snippets_path

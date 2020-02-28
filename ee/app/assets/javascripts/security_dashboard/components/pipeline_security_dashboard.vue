@@ -38,6 +38,10 @@ export default {
       type: String,
       required: true,
     },
+    loadingErrorIllustrations: {
+      type: Object,
+      required: true,
+    },
   },
   created() {
     this.setSourceBranch(this.sourceBranch);
@@ -54,6 +58,7 @@ export default {
     :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
     :lock-to-project="{ id: projectId }"
     :pipeline-id="pipelineId"
+    :loading-error-illustrations="loadingErrorIllustrations"
   >
     <template #emptyState>
       <gl-empty-state

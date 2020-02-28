@@ -48,8 +48,6 @@ module EE
         super
 
         create_predefined_push_rule
-
-        project.group&.refresh_members_authorized_projects
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

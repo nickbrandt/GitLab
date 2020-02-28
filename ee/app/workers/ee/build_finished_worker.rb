@@ -8,6 +8,8 @@ module EE
       # and `Namespace#namespace_statistics` will return stale data.
       CiMinutesUsageNotifyService.new(build.project.reset).execute
 
+      StoreSecurityScansWorker.perform_async(build.id)
+
       super
     end
   end

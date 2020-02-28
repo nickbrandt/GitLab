@@ -22,7 +22,8 @@ module WorkerAttributes
 
     # EE-specific
     epics: 2,
-    incident_management: 2
+    incident_management: 2,
+    security_scans: 2
   }.stringify_keys.freeze
 
   class_methods do
@@ -86,6 +87,14 @@ module WorkerAttributes
 
     def get_worker_resource_boundary
       worker_attributes[:resource_boundary] || :unknown
+    end
+
+    def idempotent!
+      worker_attributes[:idempotent] = true
+    end
+
+    def idempotent?
+      worker_attributes[:idempotent]
     end
 
     def weight(value)

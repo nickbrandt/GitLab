@@ -15,13 +15,13 @@ module Gitlab
 
     def check_protocol!
       if protocol != 'web'
-        raise ::Gitlab::GitAccess::UnauthorizedError, "Designs are only accessible using the web interface"
+        raise ::Gitlab::GitAccess::ForbiddenError, "Designs are only accessible using the web interface"
       end
     end
 
     def check_can_create_design!
       unless user&.can?(:create_design, project)
-        raise ::Gitlab::GitAccess::UnauthorizedError, "You are not allowed to manage designs of this project"
+        raise ::Gitlab::GitAccess::ForbiddenError, "You are not allowed to manage designs of this project"
       end
     end
   end

@@ -131,7 +131,7 @@ export default {
         .repairNode(targetNode)
         .then(() => {
           this.setNodeActionStatus(targetNode, false);
-          Flash(s__('GeoNodes|Node Authentication was successfully repaired.'), 'notice');
+          this.$toast.show(s__('GeoNodes|Node Authentication was successfully repaired.'));
         })
         .catch(() => {
           this.setNodeActionStatus(targetNode, false);
@@ -160,7 +160,7 @@ export default {
         .removeNode(targetNode)
         .then(() => {
           this.store.removeNode(targetNode);
-          Flash(s__('GeoNodes|Node was successfully removed.'), 'notice');
+          this.$toast.show(s__('GeoNodes|Node was successfully removed.'));
         })
         .catch(() => {
           this.setNodeActionStatus(targetNode, false);

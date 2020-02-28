@@ -23,7 +23,9 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
 
   context "when the note could not be saved" do
     before do
-      allow_any_instance_of(Note).to receive(:persisted?).and_return(false)
+      allow_next_instance_of(Note) do |instance|
+        allow(instance).to receive(:persisted?).and_return(false)
+      end
     end
 
     it "raises an InvalidNoteError" do

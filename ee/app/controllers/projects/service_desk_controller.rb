@@ -22,7 +22,7 @@ class Projects::ServiceDeskController < Projects::ApplicationController
   private
 
   def setting_params
-    params.permit(:issue_template_key, :outgoing_name)
+    params.permit(:issue_template_key, :outgoing_name, :project_key)
   end
 
   def json_response
@@ -35,7 +35,8 @@ class Projects::ServiceDeskController < Projects::ApplicationController
           service_desk_enabled: project.service_desk_enabled,
           issue_template_key: service_desk_settings&.issue_template_key,
           template_file_missing: service_desk_settings&.issue_template_missing?,
-          outgoing_name: service_desk_settings&.outgoing_name
+          outgoing_name: service_desk_settings&.outgoing_name,
+          project_key: service_desk_settings&.project_key
         }
 
       format.json { render json: service_desk_attributes }

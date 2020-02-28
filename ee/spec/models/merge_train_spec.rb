@@ -263,7 +263,7 @@ describe MergeTrain do
         let!(:merge_request_1) { create_merge_request_on_train(status: :merging) }
 
         before do
-          merge_request_1.update_column(:merge_commit_sha, merge_commit_sha_1)
+          merge_request_1.update_column(:in_progress_merge_commit_sha, merge_commit_sha_1)
         end
 
         it { is_expected.to eq(true) }

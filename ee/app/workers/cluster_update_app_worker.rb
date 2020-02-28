@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClusterUpdateAppWorker
+class ClusterUpdateAppWorker # rubocop:disable Scalability/IdempotentWorker
   UpdateAlreadyInProgressError = Class.new(StandardError)
 
   include ApplicationWorker

@@ -53,12 +53,24 @@ describe 'Projects > Audit Events', :js do
 
       expect(page).to have_link('Audit Events')
     end
+
+    it 'does not have Project Audit Events in the header' do
+      visit project_audit_events_path(project)
+
+      expect(page).not_to have_content('Project Audit Events')
+    end
   end
 
   it 'has Audit Events button in head nav bar' do
     visit edit_project_path(project)
 
     expect(page).to have_link('Audit Events')
+  end
+
+  it 'has Project Audit Events in the header' do
+    visit project_audit_events_path(project)
+
+    expect(page).to have_content('Project Audit Events')
   end
 
   describe 'adding an SSH key' do

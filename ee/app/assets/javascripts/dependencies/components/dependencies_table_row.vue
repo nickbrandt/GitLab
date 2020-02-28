@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     toggleArrowName() {
-      return this.isExpanded ? 'arrow-up' : 'arrow-down';
+      return this.isExpanded ? 'chevron-up' : 'chevron-down';
     },
     vulnerabilities() {
       const { vulnerabilities = [] } = this.dependency || {};

@@ -740,16 +740,16 @@ describe Projects::IssuesController do
                   .to log_spam(title: 'Spam title', noteable_type: 'Issue')
               end
 
-              it 'renders recaptcha_html json response' do
-                update_issue
+              context 'renders properly' do
+                render_views
 
-                expect(json_response).to have_key('recaptcha_html')
-              end
+                it 'renders recaptcha_html json response' do
+                  update_issue
 
-              it 'returns 200 status' do
-                update_issue
-
-                expect(response).to have_gitlab_http_status(:ok)
+                  expect(response).to have_gitlab_http_status(:ok)
+                  expect(json_response).to have_key('recaptcha_html')
+                  expect(json_response['recaptcha_html']).not_to be_empty
+                end
               end
             end
 
@@ -1083,12 +1083,6 @@ describe Projects::IssuesController do
 
       it 'creates a sentry issue' do
         expect { subject }.to change(SentryIssue, :count)
-      end
-
-      it 'with existing issue it will not create an issue' do
-        post_new_issue(sentry_issue_attributes: { sentry_issue_identifier: 1234567 })
-
-        expect { subject }.not_to change(Issue, :count)
       end
     end
   end

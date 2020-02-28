@@ -13,7 +13,7 @@ module EE
 
     override :group_overview_nav_link_paths
     def group_overview_nav_link_paths
-      if ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, @group)
+      if ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, @group, default_enabled: true)
         super
       else
         super + %w[
@@ -83,12 +83,14 @@ module EE
     end
 
     def show_discover_group_security?(group)
-      !!::Feature.enabled?(:discover_security) &&
+      security_feature_available_at = DateTime.new(2020, 1, 20)
+
+      !!current_user &&
         ::Gitlab.com? &&
-        !!current_user &&
-        current_user.created_at > DateTime.new(2020, 1, 20) &&
+        current_user.created_at > security_feature_available_at &&
         !@group.feature_available?(:security_dashboard) &&
-        can?(current_user, :admin_group, @group)
+        can?(current_user, :admin_group, @group) &&
+        current_user.ab_feature_enabled?(:discover_security)
     end
 
     private
@@ -110,6 +112,10 @@ module EE
 
       if @group.insights_available?
         links << :group_insights
+      end
+
+      if @group.feature_available?(:productivity_analytics) && can?(current_user, :view_productivity_analytics, @group)
+        links << :productivity_analytics
       end
 
       links

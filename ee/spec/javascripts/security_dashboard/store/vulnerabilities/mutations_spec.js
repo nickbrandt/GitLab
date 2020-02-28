@@ -2,7 +2,7 @@ import createState from 'ee/security_dashboard/store/modules/vulnerabilities/sta
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
-import mockData from './data/mock_data_vulnerabilities.json';
+import mockData from './data/mock_data_vulnerabilities';
 
 describe('vulnerabilities module mutations', () => {
   let state;
@@ -37,7 +37,7 @@ describe('vulnerabilities module mutations', () => {
 
       mutations[types.SET_VULNERABILITIES_ENDPOINT](state, endpoint);
 
-      expect(state.vulnerabilitiesEndpoint).toEqual(endpoint);
+      expect(state.vulnerabilitiesEndpoint).toBe(endpoint);
     });
   });
 
@@ -46,13 +46,14 @@ describe('vulnerabilities module mutations', () => {
     it(`should set pageInfo.page to ${page}`, () => {
       mutations[types.SET_VULNERABILITIES_PAGE](state, page);
 
-      expect(state.pageInfo.page).toEqual(page);
+      expect(state.pageInfo.page).toBe(page);
     });
   });
 
   describe('REQUEST_VULNERABILITIES', () => {
     beforeEach(() => {
       state.errorLoadingVulnerabilities = true;
+      state.loadingVulnerabilitiesErrorCode = 403;
       mutations[types.REQUEST_VULNERABILITIES](state);
     });
 
@@ -62,6 +63,10 @@ describe('vulnerabilities module mutations', () => {
 
     it('should set `errorLoadingVulnerabilities` to `false`', () => {
       expect(state.errorLoadingVulnerabilities).toBeFalsy();
+    });
+
+    it('should reset `loadingVulnerabilitiesErrorCode`', () => {
+      expect(state.loadingVulnerabilitiesErrorCode).toBe(null);
     });
   });
 
@@ -90,10 +95,18 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('RECEIVE_VULNERABILITIES_ERROR', () => {
-    it('should set `isLoadingVulnerabilities` to `false`', () => {
-      mutations[types.RECEIVE_VULNERABILITIES_ERROR](state);
+    const errorCode = 403;
 
+    beforeEach(() => {
+      mutations[types.RECEIVE_VULNERABILITIES_ERROR](state, errorCode);
+    });
+
+    it('should set `isLoadingVulnerabilities` to `false`', () => {
       expect(state.isLoadingVulnerabilities).toBeFalsy();
+    });
+
+    it('should set `loadingVulnerabilitiesErrorCode`', () => {
+      expect(state.loadingVulnerabilitiesErrorCode).toBe(errorCode);
     });
   });
 
@@ -103,7 +116,7 @@ describe('vulnerabilities module mutations', () => {
 
       mutations[types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, endpoint);
 
-      expect(state.vulnerabilitiesCountEndpoint).toEqual(endpoint);
+      expect(state.vulnerabilitiesCountEndpoint).toBe(endpoint);
     });
   });
 
@@ -153,7 +166,7 @@ describe('vulnerabilities module mutations', () => {
 
       mutations[types.SET_VULNERABILITIES_HISTORY_ENDPOINT](state, endpoint);
 
-      expect(state.vulnerabilitiesHistoryEndpoint).toEqual(endpoint);
+      expect(state.vulnerabilitiesHistoryEndpoint).toBe(endpoint);
     });
   });
 
@@ -201,19 +214,19 @@ describe('vulnerabilities module mutations', () => {
     it('should set the vulnerabilitiesHistoryDayRange to number of days', () => {
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
 
-      expect(state.vulnerabilitiesHistoryDayRange).toEqual(DAYS.THIRTY);
+      expect(state.vulnerabilitiesHistoryDayRange).toBe(DAYS.THIRTY);
     });
 
     it('should set the vulnerabilitiesHistoryMaxDayInterval to 7 if days are 60 and under', () => {
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
 
-      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(7);
+      expect(state.vulnerabilitiesHistoryMaxDayInterval).toBe(7);
     });
 
     it('should set the vulnerabilitiesHistoryMaxDayInterval to 14 if over 60', () => {
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.NINETY);
 
-      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(14);
+      expect(state.vulnerabilitiesHistoryMaxDayInterval).toBe(14);
     });
   });
 
@@ -228,71 +241,16 @@ describe('vulnerabilities module mutations', () => {
       });
 
       it('should set the modal title', () => {
-        expect(state.modal.title).toEqual(vulnerability.name);
-      });
-
-      it('should set the modal description', () => {
-        expect(state.modal.data.description.value).toEqual(vulnerability.description);
+        expect(state.modal.title).toBe(vulnerability.name);
       });
 
       it('should set the modal project', () => {
-        expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
-        expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
-      });
-
-      it('should set the modal file', () => {
-        expect(state.modal.data.file.value).toEqual(
-          `${vulnerability.location.file}:${vulnerability.location.start_line}`,
-        );
-      });
-
-      it('should set the modal className', () => {
-        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
-      });
-
-      it('should set the modal image', () => {
-        expect(state.modal.data.image.value).toEqual(vulnerability.location.image);
-      });
-
-      it('should set the modal namespace', () => {
-        expect(state.modal.data.namespace.value).toEqual(vulnerability.location.operating_system);
-      });
-
-      it('should set the modal identifiers', () => {
-        expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
-      });
-
-      it('should set the modal severity', () => {
-        expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
-      });
-
-      it('should set the modal confidence', () => {
-        expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
-      });
-
-      it('should set the modal class', () => {
-        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
-      });
-
-      it('should set the modal links', () => {
-        expect(state.modal.data.links.value).toEqual(vulnerability.links);
-      });
-
-      it('should set the modal instances', () => {
-        expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
+        expect(state.modal.project.value).toBe(vulnerability.project.full_name);
+        expect(state.modal.project.url).toBe(vulnerability.project.full_path);
       });
 
       it('should set the modal vulnerability', () => {
         expect(state.modal.vulnerability).toEqual(vulnerability);
-      });
-
-      it('should set the modal URL', () => {
-        const { url } = state.modal.data;
-        const { hostname, path } = vulnerability.location;
-        const expected = `${hostname}${path}`;
-
-        expect(url.value).toEqual(expected);
-        expect(url.url).toEqual(expected);
       });
     });
 
@@ -304,7 +262,7 @@ describe('vulnerabilities module mutations', () => {
         };
         mutations[types.SET_MODAL_DATA](state, payload);
 
-        expect(state.modal.vulnerability.isDismissed).toEqual(true);
+        expect(state.modal.vulnerability.isDismissed).toBe(true);
       });
 
       it('should set hasIssue when the vulnerabilitiy has a related issue', () => {
@@ -318,7 +276,7 @@ describe('vulnerabilities module mutations', () => {
         };
         mutations[types.SET_MODAL_DATA](state, payload);
 
-        expect(state.modal.vulnerability.hasIssue).toEqual(true);
+        expect(state.modal.vulnerability.hasIssue).toBe(true);
       });
 
       it('should not set hasIssue when the issue_iid in null', () => {
@@ -332,28 +290,7 @@ describe('vulnerabilities module mutations', () => {
         };
         mutations[types.SET_MODAL_DATA](state, payload);
 
-        expect(state.modal.vulnerability.hasIssue).toEqual(false);
-      });
-
-      it('should nullify the modal links', () => {
-        const payload = { vulnerability: { ...vulnerability, links: [] } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.links.value).toEqual(null);
-      });
-
-      it('should nullify the instances', () => {
-        const payload = { vulnerability: { ...vulnerability, instances: [] } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.instances.value).toEqual(null);
-      });
-
-      it('should nullify the file value', () => {
-        const payload = { vulnerability: { ...vulnerability, location: {} } };
-        mutations[types.SET_MODAL_DATA](state, payload);
-
-        expect(state.modal.data.file.value).toEqual(null);
+        expect(state.modal.vulnerability.hasIssue).toBe(false);
       });
     });
   });
@@ -400,7 +337,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error creating the issue');
+      expect(state.modal.error).toBe('There was an error creating the issue');
     });
   });
 
@@ -446,7 +383,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error creating the merge request');
+      expect(state.modal.error).toBe('There was an error creating the merge request');
     });
   });
 
@@ -512,7 +449,106 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error dismissing the vulnerability.');
+      expect(state.modal.error).toBe('There was an error dismissing the vulnerability.');
+    });
+  });
+
+  describe('REQUEST_DISMISS_SELECTED_VULNERABILITIES', () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_DISMISS_SELECTED_VULNERABILITIES](state);
+    });
+
+    it('should set isDismissingVulnerabilities to true', () => {
+      expect(state.isDismissingVulnerabilities).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS](state);
+    });
+
+    it('should set isDismissingVulnerabilities to false', () => {
+      expect(state.isDismissingVulnerabilities).toBe(false);
+    });
+
+    it('should remove all selected vulnerabilities', () => {
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(0);
+    });
+  });
+
+  describe('RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR](state);
+    });
+
+    it('should set isDismissingVulnerabilties to false', () => {
+      expect(state.isDismissingVulnerabilities).toBe(false);
+    });
+  });
+
+  describe('SELECT_VULNERABILITY', () => {
+    const id = 1234;
+
+    beforeEach(() => {
+      mutations[types.SELECT_VULNERABILITY](state, id);
+    });
+
+    it('should add the vulnerability to selected vulnerabilities', () => {
+      expect(state.selectedVulnerabilities[id]).toBeTruthy();
+    });
+
+    it('should not add a duplicate id to the selected vulnerabilities', () => {
+      expect(state.selectedVulnerabilities).toHaveLength(1);
+      mutations[types.SELECT_VULNERABILITY](state, id);
+
+      expect(state.selectedVulnerabilities).toHaveLength(1);
+    });
+  });
+
+  describe('DESELECT_VULNERABILITY', () => {
+    beforeEach(() => {
+      state.selectedVulnerabilities = { 12: true, 34: true, 56: true };
+    });
+
+    it('should remove the vulnerability from selected vulnerabilities', () => {
+      const vulnerabilityId = 12;
+
+      expect(state.selectedVulnerabilities[vulnerabilityId]).toBeTruthy();
+      mutations[types.DESELECT_VULNERABILITY](state, vulnerabilityId);
+
+      expect(state.selectedVulnerabilities[vulnerabilityId]).toBeFalsy();
+    });
+  });
+
+  describe('SELECT_ALL_VULNERABILITIES', () => {
+    beforeEach(() => {
+      state.vulnerabilities = [{ id: 12 }, { id: 34 }, { id: 56 }];
+      state.selectedVulnerabilites = {};
+    });
+
+    it('should add all the vulnerabilities when none are selected', () => {
+      mutations[types.SELECT_ALL_VULNERABILITIES](state);
+
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(state.vulnerabilities.length);
+    });
+
+    it('should add all the vulnerabilities when some are already selected', () => {
+      state.selectedVulnerabilites = { 12: true, 13: true };
+      mutations[types.SELECT_ALL_VULNERABILITIES](state);
+
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(state.vulnerabilities.length);
+    });
+  });
+
+  describe('DESELECT_ALL_VULNERABILITIES', () => {
+    beforeEach(() => {
+      state.selectedVulnerabilities = { 12: true, 34: true, 56: true };
+      mutations[types.DESELECT_ALL_VULNERABILITIES](state);
+    });
+
+    it('should remove all selected vulnerabilities', () => {
+      expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(0);
     });
   });
 
@@ -578,7 +614,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error deleting the comment.');
+      expect(state.modal.error).toBe('There was an error deleting the comment.');
     });
   });
 
@@ -664,7 +700,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error adding the comment.');
+      expect(state.modal.error).toBe('There was an error adding the comment.');
     });
   });
 
@@ -728,7 +764,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error reverting the dismissal.');
+      expect(state.modal.error).toBe('There was an error reverting the dismissal.');
     });
   });
 

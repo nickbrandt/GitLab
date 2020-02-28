@@ -919,12 +919,18 @@ describe('RelatedItemTree', () => {
         it('should set `state.itemAddInProgress` to false', done => {
           testAction(
             actions.receiveAddItemFailure,
-            { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
+            {
+              itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND,
+              itemAddFailureMessage: 'Foobar',
+            },
             {},
             [
               {
                 type: types.RECEIVE_ADD_ITEM_FAILURE,
-                payload: { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
+                payload: {
+                  itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND,
+                  itemAddFailureMessage: 'Foobar',
+                },
               },
             ],
             [],
@@ -940,7 +946,7 @@ describe('RelatedItemTree', () => {
             [
               {
                 type: types.RECEIVE_ADD_ITEM_FAILURE,
-                payload: { itemAddFailureType: undefined },
+                payload: { itemAddFailureType: undefined, itemAddFailureMessage: '' },
               },
             ],
             [],
@@ -1004,7 +1010,9 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'receiveAddItemFailure',
-                payload: { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
+                payload: {
+                  itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND,
+                },
               },
             ],
             done,

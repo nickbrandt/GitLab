@@ -165,7 +165,7 @@ and secondaries are set up a bit differently:
 For replicas, colocating is advantageous because it reduces network hops
 and hence latency. However, for the primary, colocating is
 disadvantageous because PgBouncer would become a single point of failure
-and cause errors.  When a failover occurs, one of two things could
+and cause errors. When a failover occurs, one of two things could
 happen:
 
 - The primary disappears from the network.
@@ -178,7 +178,7 @@ talking to the primary can mitigate this.
 
 In the second case, existing connections to the newly-demoted replica
 may execute a write query, which would fail. During a failover, it may
-be advantegeous to shut down the PgBouncer talking to the primary to
+be advantageous to shut down the PgBouncer talking to the primary to
 ensure no more traffic arrives for it. The alternative would be to make
 the application aware of the failover event and terminate its
 connections gracefully.
@@ -212,7 +212,7 @@ Redis process.
 #### High availability/Risks
 
 Single-core: Like PgBouncer, a single Redis process can only use one
-core.  It does not support multi-threading.
+core. It does not support multi-threading.
 
 Dumb secondaries: Redis secondaries (aka slaves) don't actually
 handle any load. Unlike PostgreSQL secondaries, they don't even serve

@@ -60,7 +60,7 @@ describe MergeRequests::RefreshService do
       end
     end
 
-    context '#update_approvers' do
+    describe '#update_approvers' do
       let(:owner) { create(:user) }
       let(:current_user) { merge_request.author }
       let(:service) { described_class.new(project, current_user) }

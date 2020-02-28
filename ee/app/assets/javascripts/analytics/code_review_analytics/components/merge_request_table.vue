@@ -122,7 +122,7 @@ export default {
     </template>
 
     <template #cell(author)="{ value }">
-      <gl-avatar-link v-gl-tooltip target="blank" :href="value.web_url" :title="value.name">
+      <gl-avatar-link v-gl-tooltip target="_blank" :href="value.web_url" :title="value.name">
         <gl-avatar :size="24" :src="value.avatar_url" :entity-name="value.name" />
       </gl-avatar-link>
     </template>

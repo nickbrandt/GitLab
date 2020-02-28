@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
 import { deployBoardMockData, environment } from './mock_data';
 
-const projectPath = 'gitlab-org/gitlab-test';
+const logsPath = `gitlab-org/gitlab-test/-/logs?environment_name=${environment.name}`;
 
 describe('Deploy Board', () => {
   let wrapper;
@@ -14,8 +14,7 @@ describe('Deploy Board', () => {
         deployBoardData: deployBoardMockData,
         isLoading: false,
         isEmpty: false,
-        projectPath,
-        environmentName: environment.name,
+        logsPath,
         ...props,
       },
     });
@@ -61,8 +60,7 @@ describe('Deploy Board', () => {
         deployBoardData: {},
         isLoading: false,
         isEmpty: true,
-        projectPath,
-        environmentName: environment.name,
+        logsPath,
       });
       wrapper.vm.$nextTick(done);
     });
@@ -81,8 +79,7 @@ describe('Deploy Board', () => {
         deployBoardData: {},
         isLoading: true,
         isEmpty: false,
-        projectPath,
-        environmentName: environment.name,
+        logsPath,
       });
       wrapper.vm.$nextTick(done);
     });
@@ -97,8 +94,7 @@ describe('Deploy Board', () => {
       wrapper = createComponent({
         isLoading: false,
         isEmpty: false,
-        projectPath,
-        environmentName: environment.name,
+        logsPath,
         hasLegacyAppLabel: true,
         deployBoardData: {},
       });

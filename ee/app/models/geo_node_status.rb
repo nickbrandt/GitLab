@@ -127,7 +127,7 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def self.spawn_worker
-    ::Geo::MetricsUpdateWorker.perform_async
+    ::Geo::MetricsUpdateWorker.perform_async # rubocop:disable CodeReuse/Worker
   end
 
   def self.cache_key

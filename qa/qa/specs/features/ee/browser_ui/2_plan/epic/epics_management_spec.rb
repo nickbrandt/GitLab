@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable do
+  context 'Plan' do
     describe 'Epics Management' do
       before do
         Flow::Login.sign_in
       end
 
-      it 'creates an epic' do
+      it 'creates an epic', :reliable do
         epic_title = 'Epic created via GUI'
         EE::Resource::Epic.fabricate_via_browser_ui! do |epic|
           epic.title = epic_title
@@ -25,7 +25,7 @@ module QA
             epic.visit!
           end
 
-          it 'adds/removes issue to/from epic' do
+          it 'adds/removes issue to/from epic', :reliable do
             EE::Page::Group::Epic::Show.perform do |show|
               show.add_issue_to_epic(issue.web_url)
 
@@ -37,7 +37,7 @@ module QA
             end
           end
 
-          it 'comments on epic' do
+          it 'comments on epic', :reliable do
             comment = 'My Epic Comment'
             EE::Page::Group::Epic::Show.perform do |show|
               show.add_comment_to_epic(comment)

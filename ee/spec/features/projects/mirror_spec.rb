@@ -24,8 +24,6 @@ describe 'Project mirror', :js do
 
       context 'when able to force update' do
         it 'forces import' do
-          import_state.update(last_update_at: timestamp - 8.minutes)
-
           expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
 
           Timecop.freeze(timestamp) do
@@ -37,17 +35,32 @@ describe 'Project mirror', :js do
       end
 
       context 'when unable to force update' do
-        it 'does not force import' do
-          import_state.update(last_update_at: timestamp - 3.minutes)
+        before do
+          import_state.update(next_execution_timestamp: timestamp - 1.minute)
+        end
 
-          expect_any_instance_of(EE::ProjectImportState).not_to receive(:force_import_job!)
+        let(:disabled_updating_button) { '[data-qa-selector="updating_button"].disabled' }
 
+        it 'disables Update now button' do
           Timecop.freeze(timestamp) do
             visit project_mirror_path(project)
           end
 
-          expect(page).to have_selector('.js-force-update-mirror')
-          expect(page).to have_selector('.btn.disabled')
+          expect(page).to have_selector(disabled_updating_button)
+        end
+      end
+
+      context 'when the project is archived' do
+        let(:disabled_update_now_button) { '[data-qa-selector="update_now_button"].disabled' }
+
+        before do
+          project.update!(archived: true)
+        end
+
+        it 'disables Update now button' do
+          visit project_mirror_path(project)
+
+          expect(page).to have_selector(disabled_update_now_button)
         end
       end
     end

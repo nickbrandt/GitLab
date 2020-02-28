@@ -140,5 +140,5 @@ export const folder = {
   created_at: '2017-02-01T19:42:18.400Z',
   updated_at: '2017-02-01T19:42:18.400Z',
   rollout_status: {},
-  project_path: '/root/review-app',
+  logs_path: '/root/review-app/-/logs?environment_name=foo',
 };

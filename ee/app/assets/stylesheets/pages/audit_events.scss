@@ -1,0 +1,8 @@
+.audit-controls {
+  @include media-breakpoint-down(md) {
+    .dropdown-menu-toggle,
+    .filter-item {
+      width: 100%;
+    }
+  }
+}

@@ -37,7 +37,9 @@ describe API::ProjectMirror do
 
       context 'when project is mirrored' do
         before do
-          allow_any_instance_of(Projects::UpdateMirrorService).to receive(:execute).and_return(status: :success)
+          allow_next_instance_of(Projects::UpdateMirrorService) do |instance|
+            allow(instance).to receive(:execute).and_return(status: :success)
+          end
         end
 
         context 'when "pull_request" event is received' do

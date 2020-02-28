@@ -13,7 +13,7 @@ We currently distinguish between three different data types:
 - [Blobs](#blobs)
 - [Database](#database)
 
-See the list below of each feature or component we replicate, its corresponding data type, replication and
+See the list below of each feature or component we replicate, its corresponding data type, replication, and
 verification methods:
 
 | Type     | Feature / component                           | Replication method                          | Verification method  |
@@ -97,7 +97,7 @@ as well as permissions and credentials.
 PostgreSQL can also hold some level of cached data like HTML rendered Markdown, cached merge-requests diff (this can
 also be configured to be offloaded to object storage).
 
-We use PostgreSQL's own replication functionality to replicate data from the primary to secondary nodes.
+We use PostgreSQL's own replication functionality to replicate data from the **primary** to **secondary** nodes.
 
 We use Redis both as a cache store and to hold persistent data for our background jobs system. Because both
 use-cases has data that are exclusive to the same Geo node, we don't replicate it between nodes.

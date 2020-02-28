@@ -4,11 +4,13 @@ import { mapActions, mapState } from 'vuex';
 import { s__, sprintf } from '~/locale';
 import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
+
 export default {
   name: 'LicenseDeleteConfirmationModal',
   components: { GlModal: DeprecatedModal2 },
   computed: {
-    ...mapState(['currentLicenseInModal']),
+    ...mapState(LICENSE_MANAGEMENT, ['currentLicenseInModal']),
     confirmationText() {
       const name = `<strong>${_.escape(this.currentLicenseInModal.name)}</strong>`;
 
@@ -20,7 +22,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['resetLicenseInModal', 'deleteLicense']),
+    ...mapActions(LICENSE_MANAGEMENT, ['resetLicenseInModal', 'deleteLicense']),
   },
 };
 </script>

@@ -38,7 +38,7 @@ In addition to having a basic familiarity with [AWS](https://docs.aws.amazon.com
 
 Below is a diagram of the recommended architecture.
 
-![AWS architecture diagram](img/aws_diagram.png)
+![AWS architecture diagram](img/aws_ha_architecture_diagram.png)
 
 ## AWS costs
 
@@ -53,8 +53,8 @@ Here's a list of the AWS services we will use, with links to pricing information
   [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/).
 - **S3**: We will use S3 to store backups, artifacts, LFS objects, etc. See the
   [Amazon S3 pricing](https://aws.amazon.com/s3/pricing/).
-- **ALB**: An Application Load Balancer will be used to route requests to the
-  GitLab instance. See the [Amazon ELB pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
+- **ELB**: A Classic Load Balancer will be used to route requests to the
+  GitLab instances. See the [Amazon ELB pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
 - **RDS**: An Amazon Relational Database Service using PostgreSQL will be used
   to provide a High Availability database configuration. See the
   [Amazon RDS pricing](https://aws.amazon.com/rds/postgresql/pricing/).
@@ -291,27 +291,30 @@ and add a custom TCP rule for port `6379` accessible within itself.
 
 ## Load Balancer
 
-On the EC2 dashboard, look for Load Balancer on the left column:
+On the EC2 dashboard, look for Load Balancer in the left navigation bar:
 
 1. Click the **Create Load Balancer** button.
-   1. Choose the Application Load Balancer.
-   1. Give it a name (`gitlab-loadbalancer`) and set the scheme to "internet-facing".
-   1. In the "Listeners" section, make sure it has HTTP and HTTPS.
-   1. In the "Availability Zones" section, select the `gitlab-vpc` we have created
-      and associate the **public subnets**.
-1. Click **Configure Security Settings** to go to the next section to
-   select the TLS certificate. When done, go to the next step.
-1. In the "Security Groups" section, create a new one by giving it a name
-   (`gitlab-loadbalancer-sec-group`) and allow both HTTP ad HTTPS traffic
+   1. Choose the **Classic Load Balancer**.
+   1. Give it a name (`gitlab-loadbalancer`) and for the **Create LB Inside** option, select `gitlab-vpc` from the dropdown menu.
+   1. In the **Listeners** section, set HTTP port 80, HTTPS port 443, and TCP port 22 for both load balancer and instance protocols and ports.
+   1. In the **Select Subnets** section, select both public subnets from the list.
+1. Click **Assign Security Groups** and select **Create a new security group**, give it a name
+   (`gitlab-loadbalancer-sec-group`) and description, and allow both HTTP and HTTPS traffic
    from anywhere (`0.0.0.0/0, ::/0`).
-1. In the next step, configure the routing and select an existing target group
-   (`gitlab-public`). The Load Balancer Health will allow us to indicate where to
-   ping and what makes up a healthy or unhealthy instance.
-1. Leave the "Register Targets" section as is, and finally review the settings
-   and create the ELB.
+1. Click **Configure Security Settings** and select an SSL/TLS certificate from ACM or upload a certificate to IAM.
+1. Click **Configure Health Check** and set up a health check for your EC2 instances.
+   1. For **Ping Protocol**, select HTTP.
+   1. For **Ping Port**, enter 80.
+   1. For **Ping Path**, enter `/explore`. (We use `/explore` as it's a public endpoint that does
+   not require authorization.)
+   1. Keep the default **Advanced Details** or adjust them according to your needs.
+1. For now, don't click **Add EC2 Instances**, as we don't have any instances to add yet. Come back
+to your load balancer after creating your GitLab instances and add them.
+1. Click **Add Tags** and add any tags you need.
+1. Click **Review and Create**, review all your settings, and click **Create** if you're happy.
 
 After the Load Balancer is up and running, you can revisit your Security
-Groups to refine the access only through the ELB and any other requirement
+Groups to refine the access only through the ELB and any other requirements
 you might have.
 
 ## Deploying GitLab inside an auto scaling group
@@ -357,15 +360,7 @@ In this step we'll configure some details:
 
 ### Add storage
 
-The root volume is 8GB by default and should be enough given that we won't store
-any data there. Let's create a new EBS volume that will host the Git data. Its
-size depends on your needs and you can always migrate to a bigger volume later.
-You will be able to [set up that volume](#setting-up-the-ebs-volume)
-after the instance is created.
-
-CAUTION: **Caution:**
-We **do not** recommend using the AWS Elastic File System (EFS), as it can result
-in [significantly degraded performance](../../administration/high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs).
+The root volume is 8GB by default and should be enough given that we won't store any data there.
 
 ### Configure security group
 
@@ -490,40 +485,36 @@ sudo gitlab-ctl status
 
 If everything looks good, you should be able to reach GitLab in your browser.
 
-### Setting up the EBS volume
-
-The EBS volume will host the Git repositories data:
-
-1. First, format the `/dev/xvdb` volume and then mount it under the directory
-   where the data will be stored. For example, `/mnt/gitlab-data/`.
-1. Tell GitLab to store its data in the new directory by editing
-   `/etc/gitlab/gitlab.rb` with your editor:
-
-   ```ruby
-   git_data_dirs({
-     "default" => { "path" => "/mnt/gitlab-data" }
-   })
-   ```
-
-   where `/mnt/gitlab-data` the location where you will store the Git data.
-
-1. Save the file and reconfigure GitLab:
-
-   ```shell
-   sudo gitlab-ctl reconfigure
-   ```
-
-TIP: **Tip:**
-If you wish to add more than one data volumes to store the Git repositories,
-read the [repository storage paths docs](../../administration/repository_storage_paths.md).
-
 ### Setting up Gitaly
 
-Gitaly is a service that provides high-level RPC access to Git repositories.
-It should be enabled and configured in a separate EC2 instance on the
-[private VPC](#subnets) we configured previously.
+CAUTION: **Caution:** In this architecture, having a single Gitaly server creates a single point of failure. This limitation will be removed once [Gitaly HA](https://gitlab.com/groups/gitlab-org/-/epics/842) is released.  
 
-Follow the [documentation to set up Gitaly](../../administration/gitaly/index.md).
+Gitaly is a service that provides high-level RPC access to Git repositories.
+It should be enabled and configured on a separate EC2 instance in one of the
+[private subnets](#subnets) we configured previously.
+
+Let's create an EC2 instance where we'll install Gitaly:
+
+1. From the EC2 dashboard, click **Launch instance**.
+1. Choose an AMI. In this example, we'll select the **Ubuntu Server 18.04 LTS (HVM), SSD Volume Type**.
+1. Choose an instance type. We'll pick a **c5.xlarge**.
+1. Click **Configure Instance Details**.
+   1. In the **Network** dropdown, select `gitlab-vpc`, the VPC we created earlier.
+   1. In the **Subnet** dropdown, select `gitlab-private-10.0.1.0` from the list of subnets we created earlier.
+   1. Double check that **Auto-assign Public IP** is set to `Use subnet setting (Disable)`.
+   1. Click **Add Storage**.
+1. Increase the Root volume size to `20 GiB` and change the **Volume Type** to `Provisoned IOPS SSD (io1)`. (This is an arbitrary size. Create a volume big enough for your repository storage requirements.)
+   1. For **IOPS** set `1000` (20 GiB x 50 IOPS). You can provision up to 50 IOPS per GiB. If you select a larger volume, increase the IOPS accordingly. Workloads where many small files are written in a serialized manner, like `git`, requires performant storage, hence the choice of `Provisoned IOPS SSD (io1)`.
+1. Click on **Add Tags** and add your tags. In our case, we'll only set `Key: Name` and `Value: Gitaly`.
+1. Click on **Configure Security Group** and let's **Create a new security group**.
+   1. Give your security group a name and description. We'll use `gitlab-gitaly-sec-group` for both.
+   1. Create a **Custom TCP** rule and add port `8075` to the **Port Range**. For the **Source**, select the `gitlab-loadbalancer-sec-group`.
+1. Click **Review and launch** followed by **Launch** if you're happy with your settings.
+1. Finally, acknowledge that you have access to the selected private key file or create a new one. Click **Launch Instances**.
+
+  > **Optional:** Instead of storing configuration _and_ repository data on the root volume, you can also choose to add an additional EBS volume for repository storage. Follow the same guidance as above.
+
+Now that we have our EC2 instance ready, follow the [documentation to install GitLab and set up Gitaly on its own server](../../administration/gitaly/index.md#running-gitaly-on-its-own-server).
 
 ### Using Amazon S3 object storage
 
@@ -651,7 +642,7 @@ And the more complex the solution, the more work is involved in setting up and
 maintaining it.
 
 Have a read through these other resources and feel free to
-[open an issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/new)
+[open an issue](https://gitlab.com/gitlab-org/gitlab/issues/new)
 to request additional material:
 
 - [GitLab High Availability](../../administration/high_availability/README.md):

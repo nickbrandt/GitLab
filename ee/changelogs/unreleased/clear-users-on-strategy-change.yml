@@ -1,0 +1,5 @@
+---
+title: Ensure User IDs are Removed When Moving to All Users Strategy
+merge_request: 25190
+author:
+type: fixed

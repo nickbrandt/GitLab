@@ -8,6 +8,7 @@ module Quality
       migration: %w[
         migrations
         lib/gitlab/background_migration
+        lib/ee/gitlab/background_migration
       ],
       unit: %w[
         bin
@@ -27,11 +28,13 @@ module Quality
         policies
         presenters
         rack_servers
+        replicators
         routing
         rubocop
         serializers
         services
         sidekiq
+        support_specs
         tasks
         uploaders
         validators

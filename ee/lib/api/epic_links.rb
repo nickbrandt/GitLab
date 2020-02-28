@@ -6,7 +6,6 @@ module API
 
     before do
       authenticate!
-      authorize_epics_feature!
     end
 
     helpers ::API::Helpers::EpicsHelpers
@@ -43,6 +42,7 @@ module API
         success EE::API::Entities::Epic
       end
       get ':id/(-/)epics/:epic_iid/epics' do
+        authorize_epics_feature!
         authorize_can_read!
 
         present child_epics, with: EE::API::Entities::Epic
@@ -55,7 +55,8 @@ module API
         use :child_epic_id
       end
       post ':id/(-/)epics/:epic_iid/epics/:child_epic_id' do
-        authorize_can_admin!
+        authorize_subepics_feature!
+        authorize_can_admin_epic_link!
 
         create_params = { target_issuable: child_epic }
 
@@ -75,7 +76,8 @@ module API
         requires :title, type: String, desc: 'The title of a child epic'
       end
       post ':id/(-/)epics/:epic_iid/epics' do
-        authorize_can_admin!
+        authorize_subepics_feature!
+        authorize_can_admin_epic_link!
 
         create_params = { parent_id: epic.id, title: params[:title] }
 
@@ -93,7 +95,8 @@ module API
         use :child_epic_id
       end
       delete ':id/(-/)epics/:epic_iid/epics/:child_epic_id' do
-        authorize_can_admin!
+        authorize_subepics_feature!
+        authorize_can_admin_epic_link!
 
         updated_epic = ::Epics::UpdateService.new(user_group, current_user, { parent: nil }).execute(child_epic)
 
@@ -107,7 +110,8 @@ module API
         optional :move_after_id, type: Integer, desc: 'The id of the epic that should be positioned after the child epic'
       end
       put ':id/(-/)epics/:epic_iid/epics/:child_epic_id' do
-        authorize_can_admin!
+        authorize_subepics_feature!
+        authorize_can_admin_epic_link!
 
         update_params = params.slice(:move_before_id, :move_after_id)
 

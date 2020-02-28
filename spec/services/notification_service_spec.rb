@@ -988,7 +988,7 @@ describe NotificationService, :mailer do
         expect(email).to have_header('X-GitLab-NotificationReason', NotificationReason::ASSIGNED)
       end
 
-      it 'emails previous assignee even if he has the "on mention" notif level' do
+      it 'emails previous assignee even if they have the "on mention" notif level' do
         issue.assignees = [@u_mentioned]
         notification.reassigned_issue(issue, @u_disabled, [@u_watcher])
 
@@ -1005,7 +1005,7 @@ describe NotificationService, :mailer do
         should_not_email(@u_lazy_participant)
       end
 
-      it 'emails new assignee even if he has the "on mention" notif level' do
+      it 'emails new assignee even if they have the "on mention" notif level' do
         issue.assignees = [@u_mentioned]
         notification.reassigned_issue(issue, @u_disabled, [@u_mentioned])
 
@@ -2264,7 +2264,7 @@ describe NotificationService, :mailer do
     end
 
     it 'filters out guests when new note is created' do
-      expect(SentNotification).to receive(:record).with(merge_request, any_args).exactly(1).times
+      expect(SentNotification).to receive(:record).with(merge_request, any_args).once
 
       notification.new_note(note)
 
@@ -2315,6 +2315,7 @@ describe NotificationService, :mailer do
         user = create_user_with_notification(:custom, 'custom_enabled')
         update_custom_notification(:success_pipeline, user, resource: project)
         update_custom_notification(:failed_pipeline, user, resource: project)
+        update_custom_notification(:fixed_pipeline, user, resource: project)
         user
       end
 
@@ -2322,6 +2323,7 @@ describe NotificationService, :mailer do
         user = create_user_with_notification(:custom, 'custom_disabled')
         update_custom_notification(:success_pipeline, user, resource: project, value: false)
         update_custom_notification(:failed_pipeline, user, resource: project, value: false)
+        update_custom_notification(:fixed_pipeline, user, resource: project, value: false)
         user
       end
 
@@ -2511,6 +2513,85 @@ describe NotificationService, :mailer do
 
           it 'does not send emails' do
             should_not_email_anyone
+          end
+        end
+      end
+
+      context 'with a fixed pipeline' do
+        let(:ref_status) { 'fixed' }
+
+        context 'when the creator has no custom notification set' do
+          let(:pipeline) { create_pipeline(u_member, :success) }
+
+          it 'emails only the creator' do
+            notification.pipeline_finished(pipeline, ref_status: ref_status)
+
+            should_only_email(u_member, kind: :bcc)
+          end
+
+          it_behaves_like 'project emails are disabled' do
+            let(:notification_target)  { pipeline }
+            let(:notification_trigger) { notification.pipeline_finished(pipeline, ref_status: ref_status) }
+          end
+
+          context 'when the creator has group notification email set' do
+            let(:group_notification_email) { 'user+group@example.com' }
+
+            before do
+              group = create(:group)
+
+              project.update(group: group)
+              create(:notification_setting, user: u_member, source: group, notification_email: group_notification_email)
+            end
+
+            it 'sends to group notification email' do
+              notification.pipeline_finished(pipeline, ref_status: ref_status)
+
+              expect(email_recipients(kind: :bcc).first).to eq(group_notification_email)
+            end
+          end
+        end
+
+        context 'when the creator has watch set' do
+          before do
+            pipeline = create_pipeline(u_watcher, :success)
+            notification.pipeline_finished(pipeline, ref_status: ref_status)
+          end
+
+          it 'emails only the creator' do
+            should_only_email(u_watcher, kind: :bcc)
+          end
+        end
+
+        context 'when the creator has custom notifications, but without any set' do
+          before do
+            pipeline = create_pipeline(u_custom_notification_unset, :success)
+            notification.pipeline_finished(pipeline, ref_status: ref_status)
+          end
+
+          it 'emails only the creator' do
+            should_only_email(u_custom_notification_unset, kind: :bcc)
+          end
+        end
+
+        context 'when the creator has custom notifications disabled' do
+          before do
+            pipeline = create_pipeline(u_custom_notification_disabled, :success)
+            notification.pipeline_finished(pipeline, ref_status: ref_status)
+          end
+
+          it 'notifies nobody' do
+            should_not_email_anyone
+          end
+        end
+
+        context 'when the creator has custom notifications set' do
+          it 'emails only the creator' do
+            pipeline = create_pipeline(u_custom_notification_enabled, :success)
+
+            notification.pipeline_finished(pipeline, ref_status: ref_status)
+
+            should_only_email(u_custom_notification_enabled, kind: :bcc)
           end
         end
       end

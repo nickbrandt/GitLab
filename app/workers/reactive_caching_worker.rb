@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReactiveCachingWorker
+class ReactiveCachingWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category_not_owned!
@@ -25,5 +25,7 @@ class ReactiveCachingWorker
       .reactive_cache_worker_finder
       .call(id, *args)
       .try(:exclusively_update_reactive_cache!, *args)
+  rescue ReactiveCaching::ExceededReactiveCacheLimit => e
+    Gitlab::ErrorTracking.track_exception(e)
   end
 end

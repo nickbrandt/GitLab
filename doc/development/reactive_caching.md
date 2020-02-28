@@ -3,7 +3,7 @@
 > This doc refers to <https://gitlab.com/gitlab-org/gitlab/blob/master/app/models/concerns/reactive_caching.rb>.
 
 The `ReactiveCaching` concern is used for fetching some data in the background and store it
-in the Rails cache, keeping it up-to-date for as long as it is being requested.  If the
+in the Rails cache, keeping it up-to-date for as long as it is being requested. If the
 data hasn't been requested for `reactive_cache_lifetime`, it will stop being refreshed,
 and then be removed.
 
@@ -47,6 +47,12 @@ of the cache by the `reactive_cache_lifetime` value.
 
 Once the lifetime has expired, no more background jobs will be enqueued and calling
 `#with_reactive_cache` will again return `nil` - starting the process all over again.
+
+### 1 MB hard limit
+
+`ReactiveCaching` has a 1 megabyte default limit. [This value is configurable](#selfreactive_cache_worker_finder).
+
+If the data we're trying to cache has over 1 megabyte, it will not be cached and a handled `ReactiveCaching::ExceededReactiveCacheLimit` will be notified on Sentry.
 
 ## When to use
 
@@ -201,7 +207,7 @@ the default by adding the following to your service:
 - `ReactiveCaching` uses `Gitlab::ExclusiveLease` to ensure that the cache calculation
 is never run concurrently by multiple workers.
 - This attribute is the timeout for the `Gitlab::ExclusiveLease`.
-- It defaults to 2 minutes, but can be overriden if a different timeout is required.
+- It defaults to 2 minutes, but can be overridden if a different timeout is required.
 
 ```ruby
 self.reactive_cache_lease_timeout = 2.minutes
@@ -226,6 +232,16 @@ be reset to `reactive_cache_lifetime`.
 
 ```ruby
 self.reactive_cache_lifetime = 10.minutes
+```
+
+#### `self.reactive_cache_hard_limit`
+
+- This is the maximum data size that `ReactiveCaching` allows to be cached.
+- The default is 1 megabyte. Data that goes over this value will not be cached
+and will silently raise `ReactiveCaching::ExceededReactiveCacheLimit` on Sentry.
+
+```ruby
+self.reactive_cache_hard_limit = 5.megabytes
 ```
 
 #### `self.reactive_cache_worker_finder`

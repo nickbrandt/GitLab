@@ -9,6 +9,7 @@ describe MergeTrains::RefreshMergeRequestService do
   let(:require_recreate) { false }
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_maintainer(maintainer)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.update!(merge_pipelines_enabled: true)

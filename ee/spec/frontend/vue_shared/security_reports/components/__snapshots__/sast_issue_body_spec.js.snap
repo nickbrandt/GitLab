@@ -8,7 +8,7 @@ exports[`Sast Issue Body matches snapshot 1`] = `
     class="report-block-list-issue-description-text"
   >
     
-    Medium (Low):
+    Medium:
     
     <modal-open-name-stub
       issue="[object Object]"

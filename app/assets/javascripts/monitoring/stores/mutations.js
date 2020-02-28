@@ -1,16 +1,10 @@
 import Vue from 'vue';
-import { slugify } from '~/lib/utils/text_utility';
+import pick from 'lodash/pick';
 import * as types from './mutation_types';
-import { normalizeMetric, normalizeQueryResult } from './utils';
+import { mapToDashboardViewModel, normalizeQueryResult } from './utils';
 import { BACKOFF_TIMEOUT } from '../../lib/utils/common_utils';
 import { metricStates } from '../constants';
 import httpStatusCodes from '~/lib/utils/http_status';
-
-const normalizePanelMetrics = (metrics, defaultLabel) =>
-  metrics.map(metric => ({
-    ...normalizeMetric(metric),
-    label: metric.label || defaultLabel,
-  }));
 
 /**
  * Locate and return a metric in the dashboard by its id
@@ -20,10 +14,10 @@ const normalizePanelMetrics = (metrics, defaultLabel) =>
  */
 const findMetricInDashboard = (metricId, dashboard) => {
   let res = null;
-  dashboard.panel_groups.forEach(group => {
+  dashboard.panelGroups.forEach(group => {
     group.panels.forEach(panel => {
       panel.metrics.forEach(metric => {
-        if (metric.metric_id === metricId) {
+        if (metric.metricId === metricId) {
           res = metric;
         }
       });
@@ -85,27 +79,9 @@ export default {
     state.showEmptyState = true;
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, dashboard) {
-    state.dashboard = {
-      ...dashboard,
-      panel_groups: dashboard.panel_groups.map((group, i) => {
-        const key = `${slugify(group.group || 'default')}-${i}`;
-        let { panels = [] } = group;
+    state.dashboard = mapToDashboardViewModel(dashboard);
 
-        // each panel has metric information that needs to be normalized
-        panels = panels.map(panel => ({
-          ...panel,
-          metrics: normalizePanelMetrics(panel.metrics, panel.y_label),
-        }));
-
-        return {
-          ...group,
-          panels,
-          key,
-        };
-      }),
-    };
-
-    if (!state.dashboard.panel_groups.length) {
+    if (!state.dashboard.panelGroups.length) {
       state.emptyState = 'noData';
     }
   },
@@ -174,14 +150,22 @@ export default {
       state: emptyStateFromError(error),
     });
   },
-
-  [types.SET_ENDPOINTS](state, endpoints) {
-    state.metricsEndpoint = endpoints.metricsEndpoint;
-    state.deploymentsEndpoint = endpoints.deploymentsEndpoint;
-    state.dashboardEndpoint = endpoints.dashboardEndpoint;
-    state.dashboardsEndpoint = endpoints.dashboardsEndpoint;
-    state.currentDashboard = endpoints.currentDashboard;
-    state.projectPath = endpoints.projectPath;
+  [types.SET_ENDPOINTS](state, endpoints = {}) {
+    const endpointKeys = [
+      'metricsEndpoint',
+      'deploymentsEndpoint',
+      'dashboardEndpoint',
+      'dashboardsEndpoint',
+      'currentDashboard',
+      'projectPath',
+      'logsPath',
+    ];
+    Object.entries(pick(endpoints, endpointKeys)).forEach(([key, value]) => {
+      state[key] = value;
+    });
+  },
+  [types.SET_TIME_RANGE](state, timeRange) {
+    state.timeRange = timeRange;
   },
   [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
     state.emptyState = 'gettingStarted';
@@ -197,7 +181,7 @@ export default {
     state.showErrorBanner = enabled;
   },
   [types.SET_PANEL_GROUP_METRICS](state, payload) {
-    const panelGroup = state.dashboard.panel_groups.find(pg => payload.key === pg.key);
+    const panelGroup = state.dashboard.panelGroups.find(pg => payload.key === pg.key);
     panelGroup.panels = payload.panels;
   },
   [types.SET_ENVIRONMENTS_FILTER](state, searchTerm) {

@@ -45,7 +45,7 @@ module Packages
 
       def version
         strong_memoize(:version) do
-          params[:versions].keys.first
+          params[:versions].each_key.first
         end
       end
 
@@ -58,7 +58,7 @@ module Packages
       end
 
       def dist_tag
-        params['dist-tags'].keys.first
+        params['dist-tags'].each_key.first
       end
 
       def package_file_name

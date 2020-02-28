@@ -20,6 +20,7 @@ describe 'ProductivityAnalytics' do
   end
 
   before do
+    stub_feature_flags(group_level_productivity_analytics: false)
     stub_licensed_features(productivity_analytics: true)
 
     sign_in(user)

@@ -6,6 +6,7 @@ import * as types from 'ee/roadmap/store/mutation_types';
 import defaultState from 'ee/roadmap/store/state';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import * as epicUtils from 'ee/roadmap/utils/epic_utils';
+import * as roadmapItemUtils from 'ee/roadmap/utils/roadmap_item_utils';
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
 import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
@@ -386,7 +387,11 @@ describe('Roadmap Vuex Actions', () => {
   describe('refreshEpicDates', () => {
     it('should update epics after refreshing epic dates to match with updated timeframe', done => {
       const epics = rawEpics.map(epic =>
-        epicUtils.formatEpicDetails(epic, state.timeframeStartDate, state.timeframeEndDate),
+        roadmapItemUtils.formatRoadmapItemDetails(
+          epic,
+          state.timeframeStartDate,
+          state.timeframeEndDate,
+        ),
       );
 
       testAction(

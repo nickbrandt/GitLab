@@ -29,7 +29,7 @@ describe MergeRequest, :elastic do
       # The merge request you have no access to except as an administrator
       create :merge_request, title: 'also with term3', source_project: create(:project, :private)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }
@@ -51,7 +51,7 @@ describe MergeRequest, :elastic do
       # Issue with the same iid should not be found in MergeRequest search
       create :issue, project: project, iid: merge_request.iid
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }

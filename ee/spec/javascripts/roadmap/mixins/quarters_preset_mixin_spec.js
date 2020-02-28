@@ -102,7 +102,7 @@ describe('QuartersPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForQuarters(vm.epic)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -113,7 +113,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('');
+        expect(vm.getTimelineBarStartOffsetForQuarters(vm.epic)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the quarter', () => {
@@ -123,7 +123,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('left: 0;');
+        expect(vm.getTimelineBarStartOffsetForQuarters(vm.epic)).toBe('left: 0;');
       });
 
       it('returns proportional `left` value based on Epic startDate and days in the quarter', () => {
@@ -133,7 +133,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForQuarters()).toContain('left: 34');
+        expect(vm.getTimelineBarStartOffsetForQuarters(vm.epic)).toContain('left: 34');
       });
     });
 
@@ -147,7 +147,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(180);
+        expect(Math.floor(vm.getTimelineBarWidthForQuarters(vm.epic))).toBe(180);
       });
     });
   });

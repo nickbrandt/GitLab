@@ -25,15 +25,9 @@ describe 'Prometheus custom metrics', :js do
 
     stub_request(:get, prometheus_query_with_time_url('avg(metric)', Time.now.utc))
 
-    fill_in_prometheus_integration
+    create(:prometheus_service, project: project, api_url: 'http://prometheus.example.com', manual_configuration: '1', active: true)
 
     click_link('Prometheus')
-  end
-
-  def fill_in_prometheus_integration
-    check('Active')
-    fill_in('API URL', with: 'https://prometheus.example.com')
-    click_button('Save changes')
   end
 
   it 'Deletes a custom metric' do

@@ -36,6 +36,7 @@ import initSearchAutocomplete from './search_autocomplete';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
 import initBroadcastNotifications from './broadcast_notification';
+import PersistentUserCallout from './persistent_user_callout';
 import { initUserTracking } from './tracking';
 import { __ } from './locale';
 
@@ -68,7 +69,7 @@ if (gon && gon.disable_animations) {
 // inject test utilities if necessary
 if (process.env.NODE_ENV !== 'production' && gon && gon.test_env) {
   disableJQueryAnimations();
-  import(/* webpackMode: "eager" */ './test_utils/');
+  import(/* webpackMode: "eager" */ './test_utils/'); // eslint-disable-line no-unused-expressions
 }
 
 document.addEventListener('beforeunload', () => {
@@ -107,6 +108,9 @@ function deferredInitialisation() {
   initUserPopovers();
   initUserTracking();
   initBroadcastNotifications();
+
+  const recoverySettingsCallout = document.querySelector('.js-recovery-settings-callout');
+  PersistentUserCallout.factory(recoverySettingsCallout);
 
   if (document.querySelector('.search')) initSearchAutocomplete();
 
@@ -196,10 +200,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  if (bootstrapBreakpoint === 'sm' || bootstrapBreakpoint === 'xs') {
-    const $rightSidebar = $('aside.right-sidebar, .layout-page');
+  const isBoardsPage = /(projects|groups):boards:show/.test(document.body.dataset.page);
+  if (!isBoardsPage && (bootstrapBreakpoint === 'sm' || bootstrapBreakpoint === 'xs')) {
+    const $rightSidebar = $('aside.right-sidebar');
+    const $layoutPage = $('.layout-page');
 
-    $rightSidebar.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+    if ($rightSidebar.length > 0) {
+      $rightSidebar.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+      $layoutPage.removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+    } else {
+      $layoutPage.removeClass('right-sidebar-expanded right-sidebar-collapsed');
+    }
   }
 
   // prevent default action for disabled buttons

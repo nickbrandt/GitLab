@@ -118,11 +118,9 @@ describe('Report issue', () => {
       });
     });
 
-    it('renders severity (confidence) and title', () => {
+    it('renders severity and title', () => {
       expect(vm.$el.textContent).toContain(parsedDast[0].title);
-      expect(vm.$el.textContent).toContain(
-        `${parsedDast[0].severity} (${parsedDast[0].confidence})`,
-      );
+      expect(vm.$el.textContent).toContain(`${parsedDast[0].severity}`);
     });
   });
 

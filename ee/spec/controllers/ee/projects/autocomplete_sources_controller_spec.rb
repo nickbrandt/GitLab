@@ -17,7 +17,7 @@ describe Projects::AutocompleteSourcesController do
     it 'returns 404 status' do
       get :epics, params: { namespace_id: project.namespace, project_id: project }
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -26,11 +26,11 @@ describe Projects::AutocompleteSourcesController do
       stub_licensed_features(epics: true)
     end
 
-    context '#epics' do
+    describe '#epics' do
       it 'returns the correct response' do
         get :epics, params: { namespace_id: project.namespace, project_id: project }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.count).to eq(1)
         expect(json_response.first).to include(

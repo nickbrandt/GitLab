@@ -24,7 +24,7 @@ describe Geo::FileRegistryFinder, :geo, :geo_fdw do
     end
   end
 
-  context '#local_storage_only?' do
+  describe '#local_storage_only?' do
     subject { described_class.new(current_node_id: geo_node.id) }
 
     context 'sync_object_storage is enabled' do

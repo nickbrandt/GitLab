@@ -4,7 +4,7 @@ RSpec.shared_examples 'a read-only GitLab instance' do
   it 'denies push access' do
     project.add_maintainer(user)
 
-    expect { push_changes }.to raise_unauthorized("You can't push code to a read-only GitLab instance.")
+    expect { push_changes }.to raise_forbidden("You can't push code to a read-only GitLab instance.")
   end
 
   context 'for a Geo setup' do
@@ -22,7 +22,7 @@ RSpec.shared_examples 'a read-only GitLab instance' do
       it 'denies push access with primary present' do
         project.add_maintainer(user)
 
-        expect { push_changes }.to raise_unauthorized(error_message)
+        expect { push_changes }.to raise_forbidden(error_message)
       end
     end
 

@@ -28,6 +28,13 @@
   }
 }
 
+@for $i from 1 through 12 {
+  #{'.tab-width-#{$i}'} {
+    -moz-tab-size: $i;
+    tab-size: $i;
+  }
+}
+
 .border-width-1px { border-width: 1px; }
 .border-bottom-width-1px { border-bottom-width: 1px; }
 .border-style-dashed { border-style: dashed; }
@@ -38,10 +45,16 @@
 .border-bottom-color-default { border-bottom-color: $border-color; }
 .box-shadow-default { box-shadow: 0 2px 4px 0 $black-transparent; }
 
+.gl-children-ml-sm-3 > * {
+  @include media-breakpoint-up(sm) {
+    @include gl-ml-3;
+  }
+}
+
 .mh-50vh { max-height: 50vh; }
 
 .font-size-inherit { font-size: inherit; }
-
+.gl-w-16 { width: px-to-rem($grid-size * 2); }
 .gl-w-64 { width: px-to-rem($grid-size * 8); }
 .gl-h-32 { height: px-to-rem($grid-size * 4); }
 .gl-h-64 { height: px-to-rem($grid-size * 8); }
@@ -52,6 +65,7 @@
 
 // Classes using mixins coming from @gitlab-ui
 // can be removed once https://gitlab.com/gitlab-org/gitlab/merge_requests/19021 has been merged
+.gl-bg-blue-50 { @include gl-bg-blue-50; }
 .gl-bg-red-100 { @include gl-bg-red-100; }
 .gl-bg-orange-100 { @include gl-bg-orange-100; }
 .gl-bg-gray-100 { @include gl-bg-gray-100; }

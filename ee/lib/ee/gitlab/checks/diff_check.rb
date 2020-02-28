@@ -80,7 +80,7 @@ module EE
               "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."
             end
           rescue ::PushRule::MatchError => e
-            raise ::Gitlab::GitAccess::UnauthorizedError, e.message
+            raise ::Gitlab::GitAccess::ForbiddenError, e.message
           end
         end
       end

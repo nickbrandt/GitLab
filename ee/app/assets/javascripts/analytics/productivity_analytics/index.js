@@ -5,12 +5,9 @@ import FilterDropdowns from './components/filter_dropdowns.vue';
 import DateRange from '../shared/components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
-import {
-  getLabelsEndpoint,
-  getMilestonesEndpoint,
-  buildGroupFromDataset,
-  buildProjectFromDataset,
-} from './utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
+import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
+import { buildGroupFromDataset, buildProjectFromDataset } from '../shared/utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -39,6 +36,8 @@ export default () => {
     : null;
 
   const group = buildGroupFromDataset(container.dataset);
+  const hideGroupDropDown = parseBoolean(container.dataset.hideGroupDropDown);
+
   let project = null;
 
   let initialData = {
@@ -126,6 +125,7 @@ export default () => {
         props: {
           group,
           project,
+          hideGroupDropDown,
         },
         on: {
           groupSelected: this.onGroupSelected,

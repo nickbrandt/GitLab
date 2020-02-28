@@ -219,7 +219,7 @@ class GeoNode < ApplicationRecord
   end
 
   def job_artifacts
-    Ci::JobArtifact.all unless selective_sync?
+    return Ci::JobArtifact.all unless selective_sync?
 
     Ci::JobArtifact.project_id_in(projects)
   end
@@ -233,7 +233,20 @@ class GeoNode < ApplicationRecord
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
-    LfsObject.project_id_in(projects)
+    query = LfsObjectsProject.project_id_in(projects).select(:lfs_object_id)
+    cte = Gitlab::SQL::CTE.new(:restricted_lfs_objects, query)
+    lfs_object_table = LfsObject.arel_table
+
+    inner_join_restricted_lfs_objects =
+      cte.table
+        .join(lfs_object_table, Arel::Nodes::InnerJoin)
+        .on(cte.table[:lfs_object_id].eq(lfs_object_table[:id]))
+        .join_sources
+
+    LfsObject
+      .with(cte.to_arel)
+      .from(cte.table)
+      .joins(inner_join_restricted_lfs_objects)
   end
 
   def projects
@@ -305,7 +318,9 @@ class GeoNode < ApplicationRecord
 
   def update_dependents_attributes
     if self.primary?
+      self.oauth_application&.destroy
       self.oauth_application = nil
+
       update_clone_url
     else
       update_oauth_application!

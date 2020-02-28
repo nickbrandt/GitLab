@@ -118,11 +118,6 @@ module EE
         end
       end
 
-      class ProtectedEnvironment < Grape::Entity
-        expose :name
-        expose :deploy_access_levels, using: ::API::Entities::ProtectedRefAccess
-      end
-
       module IssueBasic
         extend ActiveSupport::Concern
 
@@ -170,6 +165,9 @@ module EE
           expose :trial_ends_on, if: can_admin_namespace do |namespace, _|
             namespace.trial_ends_on
           end
+          expose :trial, if: can_admin_namespace do |namespace, _|
+            namespace.trial?
+          end
         end
       end
 
@@ -214,11 +212,15 @@ module EE
           expose(*EE::ApplicationSettingsHelper.repository_mirror_attributes, if: ->(_instance, _options) do
             ::License.feature_available?(:repository_mirrors)
           end)
+          expose(*EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes, if: ->(_instance, _options) do
+            ::License.feature_available?(:admin_merge_request_approvers_rules)
+          end)
           expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
           expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
           expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
           expose :deletion_adjourned_period, if: ->(_instance, _opts) { ::License.feature_available?(:adjourned_deletion_for_projects_and_groups) }
           expose :updating_name_disabled_for_users, if: ->(_instance, _opts) { ::License.feature_available?(:disable_name_update_for_users) }
+          expose :npm_package_requests_forwarding, if: ->(_instance, _opts) { ::License.feature_available?(:packages) }
         end
       end
 
@@ -261,173 +263,6 @@ module EE
             ::Gitlab::UrlBuilder.build(design)
           end
         end
-      end
-
-      class ProjectPushRule < Grape::Entity
-        extend EntityHelpers
-        expose :id, :project_id, :created_at
-        expose :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :deny_delete_tag
-        expose :member_check, :prevent_secrets, :author_email_regex
-        expose :file_name_regex, :max_file_size
-        expose_restricted :commit_committer_check, &:project
-        expose_restricted :reject_unsigned_commits, &:project
-      end
-
-      class LdapGroupLink < Grape::Entity
-        expose :cn, :group_access, :provider
-      end
-
-      class RelatedIssue < ::API::Entities::Issue
-        expose :issue_link_id
-        expose :issue_link_type, as: :link_type
-      end
-
-      class LinkedEpic < Grape::Entity
-        expose :id
-        expose :iid
-        expose :title
-        expose :group_id
-        expose :parent_id
-        expose :has_children?, as: :has_children
-        expose :has_issues?, as: :has_issues
-        expose :reference do |epic|
-          epic.to_reference(epic.parent.group)
-        end
-
-        expose :url do |epic|
-          ::Gitlab::Routing.url_helpers.group_epic_url(epic.group, epic)
-        end
-
-        expose :relation_url do |epic|
-          ::Gitlab::Routing.url_helpers.group_epic_link_url(epic.parent.group, epic.parent.iid, epic.id)
-        end
-      end
-
-      class AuditEvent < Grape::Entity
-        expose :id
-        expose :author_id
-        expose :entity_id
-        expose :entity_type
-        expose :details do |audit_event|
-          audit_event.formatted_details
-        end
-        expose :created_at
-      end
-
-      class Epic < Grape::Entity
-        can_admin_epic = ->(epic, opts) { Ability.allowed?(opts[:user], :admin_epic, epic) }
-
-        expose :id
-        expose :iid
-        expose :group_id
-        expose :parent_id
-        expose :title
-        expose :description
-        expose :author, using: ::API::Entities::UserBasic
-        expose :start_date
-        expose :start_date_is_fixed?, as: :start_date_is_fixed, if: can_admin_epic
-        expose :start_date_fixed, :start_date_from_inherited_source, if: can_admin_epic
-        expose :start_date_from_milestones, if: can_admin_epic # @deprecated in favor of start_date_from_inherited_source
-        expose :end_date # @deprecated in favor of due_date
-        expose :end_date, as: :due_date
-        expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
-        expose :due_date_fixed, :due_date_from_inherited_source, if: can_admin_epic
-        expose :due_date_from_milestones, if: can_admin_epic # @deprecated in favor of due_date_from_inherited_source
-        expose :state
-        expose :web_edit_url, if: can_admin_epic # @deprecated
-        expose :web_url
-        expose :references, with: ::API::Entities::IssuableReferences do |epic|
-          epic
-        end
-        # reference is deprecated in favour of references
-        # Introduced [Gitlab 12.6](https://gitlab.com/gitlab-org/gitlab/merge_requests/20354)
-        expose :reference, if: { with_reference: true } do |epic|
-          epic.to_reference(full: true)
-        end
-        expose :created_at
-        expose :updated_at
-        expose :closed_at
-        expose :labels do |epic, options|
-          if options[:with_labels_details]
-            ::API::Entities::LabelBasic.represent(epic.labels.sort_by(&:title))
-          else
-            epic.labels.map(&:title).sort
-          end
-        end
-        expose :upvotes do |epic, options|
-          if options[:issuable_metadata]
-            # Avoids an N+1 query when metadata is included
-            options[:issuable_metadata][epic.id].upvotes
-          else
-            epic.upvotes
-          end
-        end
-        expose :downvotes do |epic, options|
-          if options[:issuable_metadata]
-            # Avoids an N+1 query when metadata is included
-            options[:issuable_metadata][epic.id].downvotes
-          else
-            epic.downvotes
-          end
-        end
-
-        # Calculating the value of subscribed field triggers Markdown
-        # processing. We can't do that for multiple epics
-        # requests in a single API request.
-        expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, false) } do |epic, options|
-          user = options[:user]
-
-          user.present? ? epic.subscribed?(user) : false
-        end
-
-        def web_url
-          ::Gitlab::Routing.url_helpers.group_epic_url(object.group, object)
-        end
-
-        def web_edit_url
-          ::Gitlab::Routing.url_helpers.group_epic_path(object.group, object)
-        end
-      end
-
-      class EpicIssue < ::API::Entities::Issue
-        expose :epic_issue_id
-        expose :relative_position
-      end
-
-      class EpicIssueLink < Grape::Entity
-        expose :id
-        expose :relative_position
-        expose :epic do |epic_issue_link, _options|
-          ::EE::API::Entities::Epic.represent(epic_issue_link.epic, with_reference: true)
-        end
-        expose :issue, using: ::API::Entities::IssueBasic
-      end
-
-      class IssueLink < Grape::Entity
-        expose :source, as: :source_issue, using: ::API::Entities::IssueBasic
-        expose :target, as: :target_issue, using: ::API::Entities::IssueBasic
-        expose :link_type
-      end
-
-      class SpecialBoardFilter < Grape::Entity
-        expose :title
-      end
-
-      class ApprovalRuleShort < Grape::Entity
-        expose :id, :name, :rule_type
-      end
-
-      class ApprovalRule < ApprovalRuleShort
-        def initialize(object, options = {})
-          presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
-          super(presenter, options)
-        end
-
-        expose :approvers, as: :eligible_approvers, using: ::API::Entities::UserBasic
-        expose :approvals_required
-        expose :users, using: ::API::Entities::UserBasic
-        expose :groups, using: ::API::Entities::Group
-        expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
       class ProjectApprovalRule < ApprovalRule
@@ -834,6 +669,7 @@ module EE
           expose :plan_name, as: :code
           expose :plan_title, as: :name
           expose :trial
+          expose :auto_renew
           expose :upgradable?, as: :upgradable
         end
 
@@ -906,6 +742,33 @@ module EE
         class PackagesMetadata < Grape::Entity
           expose :count
           expose :items, using: EE::API::Entities::Nuget::PackagesMetadataItem
+        end
+
+        class PackagesVersions < Grape::Entity
+          expose :versions
+        end
+
+        class SearchResultVersion < Grape::Entity
+          expose :json_url, as: :@id
+          expose :version
+          expose :downloads
+        end
+
+        class SearchResult < Grape::Entity
+          expose :type, as: :@type
+          expose :authors
+          expose :name, as: :id
+          expose :name, as: :title
+          expose :summary
+          expose :total_downloads, as: :totalDownloads
+          expose :verified
+          expose :version
+          expose :versions, using: EE::API::Entities::Nuget::SearchResultVersion
+        end
+
+        class SearchResults < Grape::Entity
+          expose :total_count, as: :totalHits
+          expose :data, using: EE::API::Entities::Nuget::SearchResult
         end
       end
 
@@ -1027,7 +890,7 @@ module EE
         expose :updated_by_id
         expose :last_edited_by_id
         expose :resolved_by_id
-        expose :closed_by_id
+        expose :dismissed_by_id
 
         expose :start_date
         expose :due_date
@@ -1036,7 +899,7 @@ module EE
         expose :updated_at
         expose :last_edited_at
         expose :resolved_at
-        expose :closed_at
+        expose :dismissed_at
       end
 
       class VulnerabilityRelatedIssue < ::API::Entities::IssueBasic

@@ -5,14 +5,15 @@ require 'spec_helper'
 describe Gitlab::Geo::Replication::LfsDownloader, :geo do
   let(:lfs_object) { create(:lfs_object) }
 
-  context '#execute' do
+  describe '#execute' do
     context 'with LFS object' do
       it 'returns a FileDownloader::Result object' do
         downloader = described_class.new(:lfs, lfs_object.id)
         result = Gitlab::Geo::Replication::BaseTransfer::Result.new(success: true, bytes_downloaded: 1)
 
-        allow_any_instance_of(Gitlab::Geo::Replication::LfsTransfer)
-          .to receive(:download_from_primary).and_return(result)
+        allow_next_instance_of(Gitlab::Geo::Replication::LfsTransfer) do |instance|
+          allow(instance).to receive(:download_from_primary).and_return(result)
+        end
 
         expect(downloader.execute).to be_a(Gitlab::Geo::Replication::FileDownloader::Result)
       end

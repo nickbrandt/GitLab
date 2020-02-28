@@ -73,15 +73,12 @@ module EE
         approver_ids
         issues_template
         merge_requests_template
-        disable_overriding_approvers_per_merge_request
         repository_size_limit
         reset_approvals_on_push
         service_desk_enabled
         ci_cd_only
         use_custom_template
         packages_enabled
-        merge_requests_author_approval
-        merge_requests_disable_committers_approval
         require_password_to_approve
         group_with_project_templates_id
       ]
@@ -89,6 +86,8 @@ module EE
       if allow_merge_pipelines_params?
         attrs << %i[merge_pipelines_enabled]
       end
+
+      attrs += merge_request_rules_params
 
       if allow_mirror_params?
         attrs + mirror_params
@@ -111,6 +110,24 @@ module EE
       else
         ::Gitlab::CurrentSettings.current_application_settings.mirror_available || current_user&.admin?
       end
+    end
+
+    def merge_request_rules_params
+      attrs = []
+
+      if can?(current_user, :modify_merge_request_committer_setting, project)
+        attrs << :merge_requests_disable_committers_approval
+      end
+
+      if can?(current_user, :modify_approvers_rules, project)
+        attrs << :disable_overriding_approvers_per_merge_request
+      end
+
+      if can?(current_user, :modify_merge_request_author_setting, project)
+        attrs << :merge_requests_author_approval
+      end
+
+      attrs
     end
 
     def allow_merge_pipelines_params?

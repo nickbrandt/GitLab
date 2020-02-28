@@ -76,7 +76,7 @@ describe Gitlab::Elastic::Indexer do
         current_commit = project.wiki.repository.commit('master').sha
 
         described_class.new(project, wiki: true).run(current_commit)
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
       end
 
       def indexed_wiki_paths_for(term)
@@ -209,7 +209,7 @@ describe Gitlab::Elastic::Indexer do
       current_commit = project.repository.commit('master').sha
 
       described_class.new(project).run(current_commit)
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     def indexed_file_paths_for(term)
@@ -269,6 +269,32 @@ describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'when SSL env vars are not set' do
+    subject { envvars }
+
+    it 'they will not be passed down to child process' do
+      is_expected.not_to include('SSL_CERT_FILE', 'SSL_CERT_DIR')
+    end
+  end
+
+  context 'when SSL env vars are set' do
+    let(:cert_file) { '/fake/cert.pem' }
+    let(:cert_dir) { '/fake/cert/dir' }
+
+    before do
+      stub_env('SSL_CERT_FILE', cert_file)
+      stub_env('SSL_CERT_DIR', cert_dir)
+    end
+
+    context 'when building env vars for child process' do
+      subject { envvars }
+
+      it 'SSL env vars will be included' do
+        is_expected.to include('SSL_CERT_FILE' => cert_file, 'SSL_CERT_DIR' => cert_dir)
+      end
+    end
+  end
+
   def expect_popen
     expect(Gitlab::Popen).to receive(:popen)
   end
@@ -285,5 +311,11 @@ describe Gitlab::Elastic::Indexer do
     Gitlab::CurrentSettings.elasticsearch_config.merge(
       index_name: 'gitlab-test'
     )
+  end
+
+  def envvars
+    indexer.send(:build_envvars,
+      Gitlab::Git::BLANK_SHA,
+      project.repository.__elasticsearch__.elastic_writing_targets.first)
   end
 end

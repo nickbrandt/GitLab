@@ -101,13 +101,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
       let(:paths) { merge_request.diffs.raw_diff_files.select(&:text?).map(&:file_path) }
     end
 
-    it 'updates memory usage metrics' do
-      expect(described_class.gitlab_redis_diff_caching_memory_usage_bytes)
-        .to receive(:observe).and_call_original
-
-      cache.send(:write_to_redis_hash, diff_hash)
-    end
-
     context 'different diff_collections for the same diffable' do
       before do
         cache.write_if_empty
@@ -155,6 +148,14 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   describe 'metrics' do
     it 'defines :gitlab_redis_diff_caching_memory_usage_bytes histogram' do
       expect(described_class).to respond_to(:gitlab_redis_diff_caching_memory_usage_bytes)
+    end
+
+    it 'defines :gitlab_redis_diff_caching_hit' do
+      expect(described_class).to respond_to(:gitlab_redis_diff_caching_hit)
+    end
+
+    it 'defines :gitlab_redis_diff_caching_miss' do
+      expect(described_class).to respond_to(:gitlab_redis_diff_caching_miss)
     end
   end
 end

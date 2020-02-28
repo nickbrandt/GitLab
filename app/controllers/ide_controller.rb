@@ -3,9 +3,7 @@
 class IdeController < ApplicationController
   layout 'fullscreen'
 
-  before_action do
-    push_frontend_feature_flag(:stage_all_by_default, default_enabled: true)
-  end
+  include StaticObjectExternalStorageCSP
 
   def index
     Gitlab::UsageDataCounters::WebIdeCounter.increment_views_count

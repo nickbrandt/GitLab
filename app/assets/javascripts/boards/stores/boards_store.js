@@ -12,6 +12,10 @@ import axios from '~/lib/utils/axios_utils';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
 import eventHub from '../eventhub';
 import { ListType } from '../constants';
+import IssueProject from '../models/project';
+import ListLabel from '../models/label';
+import ListAssignee from '../models/assignee';
+import ListMilestone from '../models/milestone';
 
 const boardsStore = {
   disabled: false,
@@ -30,7 +34,6 @@ const boardsStore = {
       labels: [],
     },
     currentPage: '',
-    reload: false,
     endpoints: {},
   },
   detail: {
@@ -61,7 +64,6 @@ const boardsStore = {
     };
   },
   showPage(page) {
-    this.state.reload = false;
     this.state.currentPage = page;
   },
   addList(listObj, defaultAvatar) {
@@ -129,6 +131,53 @@ const boardsStore = {
       list.position = i;
     });
     listFrom.update();
+  },
+
+  addMultipleListIssues(list, issues, listFrom, newIndex) {
+    let moveBeforeId = null;
+    let moveAfterId = null;
+
+    const listHasIssues = issues.every(issue => list.findIssue(issue.id));
+
+    if (!listHasIssues) {
+      if (newIndex !== undefined) {
+        if (list.issues[newIndex - 1]) {
+          moveBeforeId = list.issues[newIndex - 1].id;
+        }
+
+        if (list.issues[newIndex]) {
+          moveAfterId = list.issues[newIndex].id;
+        }
+
+        list.issues.splice(newIndex, 0, ...issues);
+      } else {
+        list.issues.push(...issues);
+      }
+
+      if (list.label) {
+        issues.forEach(issue => issue.addLabel(list.label));
+      }
+
+      if (list.assignee) {
+        if (listFrom && listFrom.type === 'assignee') {
+          issues.forEach(issue => issue.removeAssignee(listFrom.assignee));
+        }
+        issues.forEach(issue => issue.addAssignee(list.assignee));
+      }
+
+      if (IS_EE && list.milestone) {
+        if (listFrom && listFrom.type === 'milestone') {
+          issues.forEach(issue => issue.removeMilestone(listFrom.milestone));
+        }
+        issues.forEach(issue => issue.addMilestone(list.milestone));
+      }
+
+      if (listFrom) {
+        list.issuesSize += issues.length;
+
+        list.updateMultipleIssues(issues, listFrom, moveBeforeId, moveAfterId);
+      }
+    }
   },
 
   startMoving(list, issue) {
@@ -288,7 +337,8 @@ const boardsStore = {
     return (
       (listTo.type !== 'label' && listFrom.type === 'assignee') ||
       (listTo.type !== 'assignee' && listFrom.type === 'label') ||
-      listFrom.type === 'backlog'
+      listFrom.type === 'backlog' ||
+      listFrom.type === 'closed'
     );
   },
   moveIssueInList(list, issue, oldIndex, newIndex, idArray) {
@@ -547,6 +597,38 @@ const boardsStore = {
 
   clearMultiSelect() {
     this.multiSelect.list = [];
+  },
+  refreshIssueData(issue, obj, defaultAvatar) {
+    issue.id = obj.id;
+    issue.iid = obj.iid;
+    issue.title = obj.title;
+    issue.confidential = obj.confidential;
+    issue.dueDate = obj.due_date;
+    issue.sidebarInfoEndpoint = obj.issue_sidebar_endpoint;
+    issue.referencePath = obj.reference_path;
+    issue.path = obj.real_path;
+    issue.toggleSubscriptionEndpoint = obj.toggle_subscription_endpoint;
+    issue.project_id = obj.project_id;
+    issue.timeEstimate = obj.time_estimate;
+    issue.assignableLabelsEndpoint = obj.assignable_labels_endpoint;
+    issue.blocked = obj.blocked;
+
+    if (obj.project) {
+      issue.project = new IssueProject(obj.project);
+    }
+
+    if (obj.milestone) {
+      issue.milestone = new ListMilestone(obj.milestone);
+      issue.milestone_id = obj.milestone.id;
+    }
+
+    if (obj.labels) {
+      issue.labels = obj.labels.map(label => new ListLabel(label));
+    }
+
+    if (obj.assignees) {
+      issue.assignees = obj.assignees.map(a => new ListAssignee(a, defaultAvatar));
+    }
   },
 };
 

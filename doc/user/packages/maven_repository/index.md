@@ -60,7 +60,7 @@ published to the GitLab Package Registry.
 
 Start by opening your terminal and creating a directory where you would like to
 store the project in your environment. From inside the directory, you can run
-the following Maven command to initalize a new package:
+the following Maven command to initialize a new package:
 
 ```shell
 mvn archetype:generate -DgroupId=com.mycompany.mydepartment -DartifactId=my-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
@@ -71,7 +71,7 @@ The arguments are as follows:
 - `DgroupId`: A unique string that identifies your package. You should follow
 the [Maven naming conventions](https://maven.apache.org/guides/mini/guide-naming-conventions.html).
 - `DartifactId`: The name of the JAR, appended to the end of the `DgroupId`.
-- `DarchetypeArtifactId`: The archetype used to create the intial structure of
+- `DarchetypeArtifactId`: The archetype used to create the initial structure of
 the project.
 - `DinteractiveMode`: Create the project using batch mode (optional).
 
@@ -218,7 +218,7 @@ project's ID can be used for uploading.
 
 ### Group level Maven endpoint
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/8798) in GitLab Premium 11.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/8798) in GitLab Premium 11.7.
 
 If you rely on many packages, it might be inefficient to include the `repository` section
 with a unique URL for each package. Instead, you can use the group level endpoint for
@@ -270,7 +270,7 @@ For retrieving artifacts, you can use either the
 
 ### Instance level Maven endpoint
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/8274) in GitLab Premium 11.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/8274) in GitLab Premium 11.7.
 
 If you rely on many packages, it might be inefficient to include the `repository` section
 with a unique URL for each package. Instead, you can use the instance level endpoint for

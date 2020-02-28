@@ -55,6 +55,17 @@ will help you to quickly create a deployment:
 1. Navigate to your project's **CI/CD > Pipelines** page, and run a pipeline on any branch.
 1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
+![Monitoring Dashboard](img/prometheus_monitoring_dashboard_v12_8.png)
+
+#### Using the Metrics Dashboard
+
+##### Select an environment
+
+The **Environment** dropdown box above the dashboard displays the list of all [environments](#monitoring-cicd-environments).
+It enables you to search as you type through all environments and select the one you're looking for.
+
+![Monitoring Dashboard Environments](img/prometheus_dashboard_environments_v12_8.png)
+
 #### About managed Prometheus deployments
 
 Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [official Helm chart](https://github.com/helm/charts/tree/master/stable/prometheus). Prometheus is only accessible within the cluster, with GitLab communicating through the [Kubernetes API](https://kubernetes.io/docs/concepts/overview/kubernetes-api/).
@@ -112,7 +123,7 @@ You can view the performance dashboard for an environment by [clicking on the mo
 
 ### Adding additional metrics **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/3799) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/3799) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.6.
 
 Custom metrics can be monitored by adding them on the monitoring dashboard page. Once saved, they will be displayed on the environment performance dashboard provided that either:
 
@@ -140,7 +151,7 @@ GitLab supports a limited set of [CI variables](../../../ci/variables/README.md)
 
 There are 2 methods to specify a variable in a query or dashboard:
 
-1. Variables can be specified using the [Liquid template format](https://help.shopify.com/en/themes/liquid/basics), for example `{{ci_environment_slug}}` ([added](https://gitlab.com/gitlab-org/gitlab/merge_requests/20793) in GitLab 12.6).
+1. Variables can be specified using the [Liquid template format](https://help.shopify.com/en/themes/liquid/basics), for example `{{ci_environment_slug}}` ([added](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20793) in GitLab 12.6).
 1. You can also enclose it in quotation marks with curly braces with a leading percent, for example `"%{ci_environment_slug}"`. This method is deprecated  though and support will be [removed in the next major release](https://gitlab.com/gitlab-org/gitlab/issues/37990).
 
 ### Defining custom dashboards per project
@@ -180,7 +191,7 @@ For example:
            metrics:
              - id: metric_of_ages
                query_range: 'http_requests_total'
-               label: "Metric of Ages"
+               label: "Instance: {{instance}}, method: {{method}}"
                unit: "count"
    ```
 
@@ -198,18 +209,23 @@ supported and will not be available in the UI.
 
 #### Duplicating a GitLab-defined dashboard
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/37238) in GitLab 12.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/37238) in GitLab 12.7.
+> - From [GitLab 12.8 onwards](https://gitlab.com/gitlab-org/gitlab/issues/39505), custom metrics are also duplicated when you duplicate a dashboard.
 
-You can save a copy of a GitLab defined dashboard that can be customized and adapted to your project. You can decide to save the dashboard new `.yml` file in the project's **default** branch or in a newly created branch with a name of your choosing.
+You can save a complete copy of a GitLab defined dashboard along with all custom metrics added to it.
+Resulting `.yml` file can be customized and adapted to your project.
+You can decide to save the dashboard `.yml` file in the project's **default** branch or in a
+new branch.
 
-1. Click on the "Duplicate dashboard" in the dashboard dropdown.
+1. Click **Duplicate dashboard** in the dashboard dropdown.
 
-   NOTE:**Note:**
-   Only GitLab-defined dashboards can be duplicated.
+   NOTE: **Note:**
+   You can duplicate only GitLab-defined dashboards.
 
-1. Input the file name and other information, such as a new commit message, and click on "Duplicate".
+1. Enter the file name and other information, such as the new commit's message, and click **Duplicate**.
 
-If you select your **default** branch, the new dashboard will become immediately available. If you select another branch, this branch should be merged to your **default** branch first.
+If you select your **default** branch, the new dashboard becomes immediately available.
+If you select another branch, this branch should be merged to your **default** branch first.
 
 #### Dashboard YAML properties
 
@@ -251,9 +267,55 @@ The following tables outline the details of expected properties.
 | ------ | ------ | ------ | ------ |
 | `id` | string | no | Used for associating dashboard metrics with database records. Must be unique across dashboard configuration files. Required for [alerting](#setting-up-alerts-for-prometheus-metrics-ultimate) (support not yet enabled, see [relevant issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/60319)). |
 | `unit` | string | yes | Defines the unit of the query's return data. |
-| `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. |
+| `label` | string | no, but highly encouraged | Defines the legend-label for the query. Should be unique within the panel's metrics. Can contain time series labels as interpolated variables. |
 | `query` | string | yes if `query_range` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
 | `query_range` | string | yes if `query` is not defined | Defines the Prometheus query to be used to populate the chart/panel. If defined, the `query_range` endpoint of the [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) will be utilized. |
+
+##### Dynamic labels
+
+Dynamic labels are useful when multiple time series are returned from a Prometheus query.
+
+When a static label is used and a query returns multiple time series, then all the legend items will be labeled the same, which makes identifying each time series difficult:
+
+```yaml
+metrics:
+  - id: metric_of_ages
+    query_range: 'http_requests_total'
+    label: "Time Series"
+    unit: "count"
+```
+
+This may render a legend like this:
+
+![repeated legend label chart](img/prometheus_dashboard_repeated_label.png)
+
+For labels to be more explicit, using variables that reflect time series labels is a good practice. The variables will be replaced by the values of the time series labels when the legend is rendered:
+
+```yaml
+metrics:
+  - id: metric_of_ages
+    query_range: 'http_requests_total'
+    label: "Instance: {{instance}}, method: {{method}}"
+    unit: "count"
+```
+
+The resulting rendered legend will look like this:
+
+![legend with label variables](img/prometheus_dashboard_label_variables.png)
+
+There is also a shorthand value for dynamic dashboard labels that make use of only one time series label:
+
+```yaml
+metrics:
+  - id: metric_of_ages
+    query_range: 'http_requests_total'
+    label: "Method"
+    unit: "count"
+```
+
+This will render into:
+
+![legend with label shorthand variable](img/prometheus_dashboard_label_variable_shorthand.png)
 
 #### Panel types for dashboards
 
@@ -274,7 +336,7 @@ panel_groups:
         metrics:
           - id: area_http_requests_total
             query_range: 'http_requests_total'
-            label: "Metric of Ages"
+            label: "Instance: {{instance}}, Method: {{method}}"
             unit: "count"
 ```
 
@@ -285,11 +347,13 @@ Note the following properties:
 | type | string | no | Type of panel to be rendered. Optional for area panel types |
 | query_range | string | required | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
-![area panel type](img/prometheus_dashboard_area_panel_type.png)
+![area panel chart](img/prometheus_dashboard_area_panel_type_v12_8.png)
+
+Starting in [version 12.8](https://gitlab.com/gitlab-org/gitlab/issues/202696), the y-axis values will automatically scale according to the data. Previously, it always started from 0.
 
 ##### Anomaly chart
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16530) in GitLab 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16530) in GitLab 12.5.
 
 To add an anomaly chart panel type to a dashboard, add add a panel with *exactly* 3 metrics.
 
@@ -329,7 +393,7 @@ Note the following properties:
 
 ![anomaly panel type](img/prometheus_dashboard_anomaly_panel_type.png)
 
-#### Column
+##### Column chart
 
 To add a column panel type to a dashboard, look at the following sample dashboard file:
 
@@ -355,6 +419,44 @@ Note the following properties:
 | query_range | yes | yes | For column panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
 ![anomaly panel type](img/prometheus_dashboard_column_panel_type.png)
+
+##### Stacked column
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/30583) in GitLab 12.8.
+
+To add a stacked column panel type to a dashboard, look at the following sample dashboard file:
+
+```yaml
+dashboard: 'Dashboard title'
+priority: 1
+panel_groups:
+- group: 'Group Title'
+  priority: 5
+  panels:
+  - type: 'stacked-column'
+    title: "Stacked column"
+    y_label: "y label"
+    x_label: 'x label'
+    metrics:
+      - id: memory_1
+        query_range: 'memory_query'
+        label: "memory query 1"
+        unit: "count"
+        series_name: 'group 1'
+      - id: memory_2
+        query_range: 'memory_query_2'
+        label: "memory query 2"
+        unit: "count"
+        series_name: 'group 2'
+
+```
+
+![stacked column panel type](img/prometheus_dashboard_stacked_column_panel_type_v12_8.png)
+
+| Property | Type | Required | Description |
+| ------ | ------ | ------ | ------ |
+| `type` | string | yes | Type of panel to be rendered. For stacked column panel types, set to `stacked-column` |
+| `query_range` | yes | yes | For stacked column panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
 ##### Single Stat
 
@@ -382,6 +484,29 @@ Note the following properties:
 | query | string | yes | For single stat panel types, you must use an [instant query](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries) |
 
 ![single stat panel type](img/prometheus_dashboard_single_stat_panel_type.png)
+
+###### Percentile based results
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/201946) in GitLab 12.8.
+
+Query results sometimes need to be represented as a percentage value out of 100. You can use the `max_value` property at the root of the panel definition:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group Title'
+    panels:
+      - title: "Single Stat"
+        type: "single-stat"
+        max_value: 100
+        metrics:
+        - id: 10
+          query: 'max(go_memstats_alloc_bytes{job="prometheus"})'
+          unit: '%'
+          label: "Total"
+```
+
+For example, if you have a query value of `53.6`, adding `%` as the unit results in a single stat value of `53.6%`, but if the maximum expected value of the query is `120`, the value would be `44.6%`. Adding the `max_value` causes the correct percentage value to display.
 
 ##### Heatmaps
 
@@ -419,17 +544,36 @@ Note the following properties:
 When viewing a custom dashboard of a project, you can view the original
 `.yml` file by clicking on **Edit dashboard** button.
 
+### Chart Context Menu
+
+From each of the panels in the dashboard, you can access the context menu by clicking the **{ellipsis_v}** **More actions** dropdown box above the upper right corner of the panel to take actions related to the chart's data.
+
+![Context Menu](img/panel_context_menu_v12_8.png)
+
+The options are:
+
+- [View logs](#view-pod-logs-ultimate)
+- [Download CSV](#downloading-data-as-csv)
+- [Generate link to chart](#embedding-gitlab-managed-kubernetes-metrics)
+- [Alerts](#setting-up-alerts-for-prometheus-metrics-ultimate)
+
+### View Pod Logs **(ULTIMATE)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/122013) in GitLab 12.8.
+
+If you have [Kubernetes Pod Logs](../clusters/kubernetes_pod_logs.md) enabled, you can navigate from the charts in the dashboard to view Pod Logs by clicking on the context menu in the upper-right corner.
+
+If you use the **Timeline zoom** function at the bottom of the chart, logs will narrow down to the time range you selected.
+
 ### Downloading data as CSV
 
 Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
-
-![Downloading as CSV](img/download_as_csv.png)
 
 ### Setting up alerts for Prometheus metrics **(ULTIMATE)**
 
 #### Managed Prometheus instances
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics-premium), and 11.3 for [library metrics](prometheus_library/metrics.md).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics-premium), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
 For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-additional-metrics-premium) directly in the performance dashboard.
 
@@ -573,7 +717,7 @@ The sharing dialog within Grafana provides the link, as highlighted below.
 ![Grafana Direct Linked Rendered Image](img/grafana_live_embed.png)
 
 NOTE: **Note:**
-For this embed to display correctly, the Grafana instance must be available to the target user, either as a public dashboard or on the same network.
+For this embed to display correctly, the Grafana instance must be available to the target user, either as a public dashboard, or on the same network.
 
 Copy the link and add an image tag as [inline HTML](../../markdown.md#inline-html) in your Markdown. You may tweak the query parameters as required. For instance, removing the `&from=` and `&to=` parameters will give you a live chart. Here is example markup for a live chart from GitLab's public dashboard:
 
@@ -641,7 +785,7 @@ If the "No data found" screen continues to appear, it could be due to:
 [prometheus-yml]:samples/prometheus.yml
 [gitlab.com-ip-range]: https://gitlab.com/gitlab-com/infrastructure/issues/434
 [ci-environment-slug]: ../../../ci/variables/#predefined-environment-variables
-[ce-8935]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/8935
-[ce-10408]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/10408
-[ce-29691]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/29691
+[ce-8935]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8935
+[ce-10408]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/10408
+[ce-29691]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/29691
 [promgldocs]: ../../../administration/monitoring/prometheus/index.md

@@ -94,6 +94,13 @@ IP based firewall can be configured by looking up all
 
 [Static endpoints](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/97) are being considered.
 
+## Maximum number of webhooks
+
+A limit of:
+
+- 100 webhooks applies to projects.
+- 50 webhooks applies to groups. **(BRONZE ONLY)**
+
 ## Shared Runners
 
 GitLab offers Linux and Windows shared runners hosted on GitLab.com for executing your pipelines.
@@ -104,7 +111,7 @@ Linux Shared Runners on GitLab.com run in [autoscale mode] and are powered by Go
 Autoscaling means reduced waiting times to spin up CI/CD jobs, and isolated VMs for each project,
 thus maximizing security. They're free to use for public open source projects and limited
 to 2000 CI minutes per month per group for private projects. More minutes
-[can be purchased](../../subscriptions/index.md#extra-shared-runners-pipeline-minutes), if
+[can be purchased](../../subscriptions/index.md#purchasing-additional-ci-minutes), if
 needed. Read about all [GitLab.com plans](https://about.gitlab.com/pricing/).
 
 All your CI/CD jobs run on [n1-standard-1 instances](https://cloud.google.com/compute/docs/machine-types) with 3.75GB of RAM, CoreOS and the latest Docker Engine
@@ -130,6 +137,9 @@ Below are the shared Runners settings.
 #### `config.toml`
 
 The full contents of our `config.toml` are:
+
+NOTE: **Note:**
+Settings that are not public are shown as `X`.
 
 **Google Cloud Platform**
 
@@ -195,11 +205,11 @@ The Windows Shared Runners are currently in
 [beta](https://about.gitlab.com/handbook/product/#beta) and should not be used
 for production workloads.
 
-During the beta period for groups and private projects the use of
-Windows Shared Runners will count towards the [shared runner pipeline
-quota](https://docs.gitlab.com/ee/user/admin_area/settings/continuous_integration.html#shared-runners-pipeline-minutes-quota-starter-only)
-as if they are Linux Runners, we do have plans to change this in
-[#30835](https://gitlab.com/gitlab-org/gitlab/issues/30834).
+During the beta period, the
+[shared runner pipeline quota](../admin_area/settings/continuous_integration.md#shared-runners-pipeline-minutes-quota-starter-only)
+will apply for groups and projects in the same way as Linux Runners.
+This may change when the beta period ends, as discussed in this
+[related issue](https://gitlab.com/gitlab-org/gitlab/issues/30834).
 
 Windows Shared Runners on GitLab.com automatically autoscale by
 launching virtual machines on the Google Cloud Platform. This solution uses
@@ -218,8 +228,11 @@ You can follow our work towards this goal in the
 
 The full contents of our `config.toml` are:
 
+NOTE: **Note:**
+Settings that are not public are shown as `X`.
+
 ```toml
-concurrent = 10
+concurrent = X
 check_interval = 3
 
 [[runners]]
@@ -291,8 +304,8 @@ stages:
   - test
 
 before_script:
- - date +"%H"
- - echo ${HOUR}
+ - Set-Variable -Name "time" -Value (date -Format "%H:%m")
+ - echo ${time}
  - echo "started by ${GITLAB_USER_NAME}"
 
 build:
@@ -315,18 +328,17 @@ test:
 - All the limitations mentioned in our [beta
   definition](https://about.gitlab.com/handbook/product/#beta).
 - The average provisioning time for a new Windows VM is 5 minutes.
-  This means that for the beta you will notice slower build start times
-  on the Windows Shared Runner fleet compared to Linux. In a future
-  release we will add the ability to the autoscaler which will enable
-  the pre-warming of virtual machines. This will significantly reduce
+  This means that you may notice slower build start times
+  on the Windows Shared Runner fleet during the beta. In a future
+  release we will update the autoscaler to enable
+  the pre-provisioning of virtual machines. This will significantly reduce
   the time it takes to provision a VM on the Windows fleet. You can
-  follow along in this
-  [issue](https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/autoscaler/issues/32).
+  follow along in the [related issue](https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/autoscaler/issues/32).
 - The Windows Shared Runner fleet may be unavailable occasionally
   for maintenance or updates.
 - The Windows Shared Runner virtual machine instances do not use the
-  GitLab Docker executor. This means that unlike the Linux Shared
-  Runners, you will not be able to specify `image` and `services` in
+  GitLab Docker executor. This means that you will not be able to specify
+  [`image`](../../ci/yaml/README.md#image) or [`services`](../../ci/yaml/README.md#services) in
   your pipeline configuration.
 - For the beta release, we have included a set of software packages in
   the base VM image. If your CI job requires additional software that's

@@ -7,7 +7,6 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
-      has_many :prometheus_alerts, inverse_of: :environment
       has_many :self_managed_prometheus_alert_events, inverse_of: :environment
 
       # Returns environments where its latest deployment is to a cluster
@@ -62,28 +61,6 @@ module EE
       end
     end
 
-    def pod_names
-      return [] unless rollout_status_available?
-
-      rollout_status = rollout_status_with_reactive_cache
-
-      # If cache has not been populated yet, rollout_status will be nil and the
-      # caller should try again later.
-      return unless rollout_status
-
-      rollout_status.instances.map do |instance|
-        instance[:pod_name]
-      end
-    end
-
-    def clear_prometheus_reactive_cache!(query_name)
-      cluster_prometheus_adapter&.clear_prometheus_reactive_cache!(query_name, self)
-    end
-
-    def cluster_prometheus_adapter
-      @cluster_prometheus_adapter ||= ::Gitlab::Prometheus::Adapter.new(project, deployment_platform&.cluster).cluster_prometheus_adapter
-    end
-
     def protected?
       project.protected_environment_by_name(name).present?
     end
@@ -98,6 +75,10 @@ module EE
       result = rollout_status_with_reactive_cache
 
       result || ::Gitlab::Kubernetes::RolloutStatus.loading
+    end
+
+    def elastic_stack_available?
+      !!deployment_platform&.cluster&.application_elastic_stack&.available?
     end
 
     private

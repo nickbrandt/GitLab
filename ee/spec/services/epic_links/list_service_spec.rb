@@ -54,7 +54,7 @@ describe EpicLinks::ListService do
 
     context 'when epics feature is enabled' do
       before do
-        stub_licensed_features(epics: true)
+        stub_licensed_features(epics: true, subepics: true)
       end
 
       context 'group member can see all child epics' do

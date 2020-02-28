@@ -1,14 +1,19 @@
 export default {
   data() {
     return {
-      isLoadingDescriptionVersion: false,
       isDescriptionVersionExpanded: false,
-      descriptionVersion: '',
     };
   },
   computed: {
     canSeeDescriptionVersion() {
-      return Boolean(this.note.description_diff_path && this.note.description_version_id);
+      return Boolean(
+        this.note.description_diff_path &&
+          this.note.description_version_id &&
+          !this.note.description_version_deleted,
+      );
+    },
+    canDeleteDescriptionVersion() {
+      return this.note.can_delete_description_version;
     },
     shouldShowDescriptionVersion() {
       return this.canSeeDescriptionVersion && this.isDescriptionVersionExpanded;
@@ -25,14 +30,16 @@ export default {
         return false;
       }
 
-      this.isLoadingDescriptionVersion = true;
       const endpoint = this.note.description_diff_path;
       const startingVersion = this.note.start_description_version_id;
 
-      return this.fetchDescriptionVersion({ endpoint, startingVersion }).then(diff => {
-        this.isLoadingDescriptionVersion = false;
-        this.descriptionVersion = diff;
-      });
+      return this.fetchDescriptionVersion({ endpoint, startingVersion });
+    },
+    deleteDescriptionVersion() {
+      const endpoint = this.note.delete_description_version_path;
+      const startingVersion = this.note.start_description_version_id;
+
+      return this.softDeleteDescriptionVersion({ endpoint, startingVersion });
     },
   },
 };

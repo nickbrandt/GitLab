@@ -1,6 +1,6 @@
 # GitLab Container Registry administration
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/4040) in GitLab 8.8.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/4040) in GitLab 8.8.
 > - Container Registry manifest `v1` support was added in GitLab 8.9 to support
 >   Docker versions earlier than 1.10.
 
@@ -619,7 +619,7 @@ provided by `gitlab-ctl`.
 
 Consider the following example, where you first build the image:
 
-```bash
+```shell
 # This builds a image with content of sha256:111111
 docker build -t my.registry.com/my.group/my.project:latest .
 docker push my.registry.com/my.group/my.project:latest
@@ -627,7 +627,7 @@ docker push my.registry.com/my.group/my.project:latest
 
 Now, you do overwrite `:latest` with a new version:
 
-```bash
+```shell
 # This builds a image with content of sha256:222222
 docker build -t my.registry.com/my.group/my.project:latest .
 docker push my.registry.com/my.group/my.project:latest
@@ -678,7 +678,7 @@ understand the implications.
 
 ### Removing unused layers not referenced by manifests
 
-> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/merge_requests/3097) in Omnibus GitLab 11.10.
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/3097) in Omnibus GitLab 11.10.
 
 DANGER: **Danger:**
 This is a destructive operation.
@@ -774,7 +774,7 @@ once a week.
 
 Create a file under `/etc/cron.d/registry-garbage-collect`:
 
-```bash
+```shell
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 

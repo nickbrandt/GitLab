@@ -16,6 +16,7 @@ describe ProjectPolicy do
   subject { described_class.new(current_user, project) }
 
   before do
+    stub_licensed_features(group_saml: true)
     project.add_maintainer(maintainer)
     project.add_developer(developer)
     project.add_reporter(reporter)
@@ -36,7 +37,7 @@ describe ProjectPolicy do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
         read_vulnerability create_vulnerability admin_vulnerability
-        admin_vulnerability_issue_link
+        admin_vulnerability_issue_link read_merge_train
       ]
     end
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
@@ -51,7 +52,7 @@ describe ProjectPolicy do
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
         read_vulnerability_feedback read_security_findings read_software_license_policy
-        read_threat_monitoring
+        read_threat_monitoring read_merge_train
       ]
     end
 
@@ -1021,18 +1022,6 @@ describe ProjectPolicy do
     end
   end
 
-  context 'alert bot' do
-    let(:current_user) { User.alert_bot }
-
-    it { is_expected.to be_allowed(:reporter_access) }
-
-    context 'within a private project' do
-      let(:project) { create(:project, :private) }
-
-      it { is_expected.to be_allowed(:admin_issue) }
-    end
-  end
-
   context 'support bot' do
     let(:current_user) { User.support_bot }
 
@@ -1223,6 +1212,147 @@ describe ProjectPolicy do
       end
 
       it { is_expected.to be_disallowed(:read_code_review_analytics) }
+    end
+  end
+
+  shared_examples 'merge request rules' do
+    let(:project) { create(:project, namespace: owner.namespace) }
+
+    using RSpec::Parameterized::TableSyntax
+    context 'with merge request approvers rules available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | false
+        :owner | false | true
+        :owner | true | false
+        :admin | false | true
+        :admin | true | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
+    end
+
+    context 'with merge request approvers not available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | true
+        :owner | false | true
+        :owner | true | true
+        :admin | true | true
+        :admin | false | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: false)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
+    end
+  end
+
+  describe ':modify_approvers_rules' do
+    it_behaves_like 'merge request rules' do
+      let(:setting_name) { :disable_overriding_approvers_per_merge_request }
+      let(:policy) { :modify_approvers_rules }
+    end
+  end
+
+  describe ':modify_merge_request_author_setting' do
+    it_behaves_like 'merge request rules' do
+      let(:setting_name) { :prevent_merge_requests_author_approval }
+      let(:policy) { :modify_merge_request_author_setting }
+    end
+  end
+
+  describe ':modify_merge_request_committer_setting' do
+    it_behaves_like 'merge request rules' do
+      let(:setting_name) { :prevent_merge_requests_committers_approval }
+      let(:policy) { :modify_merge_request_committer_setting }
+    end
+  end
+
+  describe ':modify_approvers_list' do
+    let(:setting_name) { :disable_overriding_approvers_per_merge_request }
+    let(:policy) { :modify_approvers_list }
+    let(:project) { create(:project, namespace: owner.namespace) }
+
+    using RSpec::Parameterized::TableSyntax
+    context 'with merge request approvers rules available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | false
+        :owner | false | true
+        :owner | true | false
+        :admin | false | true
+        :admin | true | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: true)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
+    end
+
+    context 'with merge request approvers not available in license' do
+      where(:role, :setting, :allowed) do
+        :guest | true | false
+        :reporter | true | false
+        :developer | true | false
+        :maintainer | false | true
+        :maintainer | true | true
+        :owner | false | true
+        :owner | true | true
+        :admin | true | true
+        :admin | false | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_licensed_features(admin_merge_request_approvers_rules: false)
+          stub_application_setting(setting_name => setting)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+      end
     end
   end
 end

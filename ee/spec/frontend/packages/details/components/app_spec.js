@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import { GlModal } from '@gitlab/ui';
+import { GlEmptyState, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageTitle from 'ee/packages/details/components/package_title.vue';
@@ -10,7 +10,16 @@ import MavenInstallation from 'ee/packages/details/components/maven_installation
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import ConanInstallation from 'ee/packages/details/components/conan_installation.vue';
-import { conanPackage, mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
+import NugetInstallation from 'ee/packages/details/components/nuget_installation.vue';
+import {
+  conanPackage,
+  mavenPackage,
+  mavenFiles,
+  npmPackage,
+  npmFiles,
+  nugetPackage,
+} from '../../mock_data';
+import stubChildren from 'helpers/stub_children';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -19,51 +28,41 @@ describe('PackagesApp', () => {
   let wrapper;
   let store;
 
-  const defaultProps = {
-    canDelete: true,
-    destroyPath: 'destroy-package-path',
-    emptySvgPath: 'empty-illustration',
-    npmPath: 'foo',
-    npmHelpPath: 'foo',
-    mavenPath: 'foo',
-    mavenHelpPath: 'foo',
-    conanPath: 'foo',
-    conanHelpPath: 'foo',
-  };
-
   function createComponent(packageEntity = mavenPackage, packageFiles = mavenFiles) {
-    const propsData = {
-      ...defaultProps,
-    };
-
     store = new Vuex.Store({
       state: {
         isLoading: false,
         packageEntity,
         packageFiles,
-        pipelineInfo: {},
-        pipelineError: null,
-      },
-      getters: {
-        packageHasPipeline: () => packageEntity.build_info && packageEntity.build_info.pipeline_id,
-        packageTypeDisplay: () => {},
+        canDelete: true,
+        destroyPath: 'destroy-package-path',
+        emptySvgPath: 'empty-illustration',
+        npmPath: 'foo',
+        npmHelpPath: 'foo',
       },
     });
 
     wrapper = mount(PackagesApp, {
       localVue,
-      propsData,
       store,
+      stubs: {
+        ...stubChildren(PackagesApp),
+        GlButton: false,
+        GlLink: false,
+        GlModal: false,
+        GlTable: false,
+      },
     });
   }
 
   const packageTitle = () => wrapper.find(PackageTitle);
-  const emptyState = () => wrapper.find('.js-package-empty-state');
+  const emptyState = () => wrapper.find(GlEmptyState);
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
   const npmInstallation = () => wrapper.find(NpmInstallation);
   const mavenInstallation = () => wrapper.find(MavenInstallation);
   const conanInstallation = () => wrapper.find(ConanInstallation);
+  const nugetInstallation = () => wrapper.find(NugetInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -198,5 +197,13 @@ describe('PackagesApp', () => {
     });
 
     expect(conanInstallation()).toExist();
+  });
+
+  it('renders package installation instructions for nuget packages', () => {
+    createComponent({
+      packageEntity: nugetPackage,
+    });
+
+    expect(nugetInstallation()).toExist();
   });
 });

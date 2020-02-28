@@ -7,11 +7,14 @@ FactoryBot.modify do
     end
 
     trait :group_managed do
-      association :managing_group, factory: :group
-    end
+      association :managing_group, factory: :group_with_managed_accounts
 
-    trait :bot do
-      bot_type { User.bot_types[:support_bot] }
+      after(:create) do |user, evaluator|
+        create(:group_saml_identity,
+          user: user,
+          saml_provider: user.managing_group.saml_provider
+        )
+      end
     end
   end
 

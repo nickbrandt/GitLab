@@ -7,6 +7,24 @@ module API
 
     ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }
 
+    helpers do
+      def filter_params(params)
+        unless can?(current_user, :modify_merge_request_committer_setting, user_project)
+          params.delete(:merge_requests_disable_committers_approval)
+        end
+
+        unless can?(current_user, :modify_approvers_rules, user_project)
+          params.delete(:disable_overriding_approvers_per_merge_request)
+        end
+
+        unless can?(current_user, :modify_merge_request_author_setting, user_project)
+          params.delete(:merge_requests_author_approval)
+        end
+
+        params
+      end
+    end
+
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
@@ -34,8 +52,8 @@ module API
           at_least_one_of :approvals_before_merge, :reset_approvals_on_push, :disable_overriding_approvers_per_merge_request, :merge_requests_author_approval, :merge_requests_disable_committers_approval, :require_password_to_approve
         end
         post '/' do
-          project_params = declared(params, include_missing: false, include_parent_namespaces: false)
-
+          declared_params = declared(params, include_missing: false, include_parent_namespaces: false)
+          project_params = filter_params(declared_params)
           result = ::Projects::UpdateService.new(user_project, current_user, project_params).execute
 
           if result[:status] == :success

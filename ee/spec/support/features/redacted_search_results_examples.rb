@@ -25,7 +25,7 @@ RSpec.shared_examples 'a redacted search results page' do
       create(:note_on_project_snippet, noteable: merge_request, project: public_restricted_project, note: 'A note on project snippet')
 
       # Add to the index while the data is still public
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     # Then restrict access to that project but don't reindex so there is

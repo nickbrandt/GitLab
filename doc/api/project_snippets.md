@@ -23,7 +23,7 @@ visibility setting keep this setting. You can read more about the change in the
 
 Get a list of project snippets.
 
-```
+```plaintext
 GET /projects/:id/snippets
 ```
 
@@ -35,7 +35,7 @@ Parameters:
 
 Get a single project snippet.
 
-```
+```plaintext
 GET /projects/:id/snippets/:snippet_id
 ```
 
@@ -68,7 +68,7 @@ Parameters:
 
 Creates a new project snippet. The user must have permission to create new snippets.
 
-```
+```plaintext
 POST /projects/:id/snippets
 ```
 
@@ -106,7 +106,7 @@ curl --request POST https://gitlab.com/api/v4/projects/:id/snippets \
 
 Updates an existing project snippet. The user must have permission to change an existing snippet.
 
-```
+```plaintext
 PUT /projects/:id/snippets/:snippet_id
 ```
 
@@ -123,7 +123,7 @@ Parameters:
 Example request:
 
 ```shell
-curl --request PUT https://gitlab.com/api/v4/projects/:id/snippets \
+curl --request PUT https://gitlab.com/api/v4/projects/:id/snippets/:snippet_id \
      --header "PRIVATE-TOKEN: <your_access_token>" \
      --header "Content-Type: application/json" \
      -d @snippet.json
@@ -145,7 +145,7 @@ curl --request PUT https://gitlab.com/api/v4/projects/:id/snippets \
 
 Deletes an existing project snippet. This returns a `204 No Content` status code if the operation was successfully or `404` if the resource was not found.
 
-```
+```plaintext
 DELETE /projects/:id/snippets/:snippet_id
 ```
 
@@ -157,7 +157,7 @@ Parameters:
 Example request:
 
 ```shell
-curl --request DELETE https://gitlab.com/api/v4/projects/:id/snippets \
+curl --request DELETE https://gitlab.com/api/v4/projects/:id/snippets/:snippet_id \
      --header "PRIVATE-TOKEN: <your_access_token>"
 ```
 
@@ -165,7 +165,7 @@ curl --request DELETE https://gitlab.com/api/v4/projects/:id/snippets \
 
 Returns the raw project snippet as plain text.
 
-```
+```plaintext
 GET /projects/:id/snippets/:snippet_id/raw
 ```
 
@@ -177,7 +177,7 @@ Parameters:
 Example request:
 
 ```shell
-curl --request GET https://gitlab.com/api/v4/projects/:id/snippets/:snippet_id/raw \
+curl https://gitlab.com/api/v4/projects/:id/snippets/:snippet_id/raw \
      --header "PRIVATE-TOKEN: <your_access_token>"
 ```
 
@@ -187,7 +187,7 @@ curl --request GET https://gitlab.com/api/v4/projects/:id/snippets/:snippet_id/r
 
 Available only for admins.
 
-```
+```plaintext
 GET /projects/:id/snippets/:snippet_id/user_agent_detail
 ```
 
@@ -199,7 +199,7 @@ GET /projects/:id/snippets/:snippet_id/user_agent_detail
 Example request:
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/snippets/2/user_agent_detail
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/snippets/2/user_agent_detail
 ```
 
 Example response:

@@ -41,13 +41,13 @@ describe Admin::Geo::UploadsController, :geo do
       end
 
       it 'renders the index template' do
-        expect(subject).to have_gitlab_http_status(200)
+        expect(subject).to have_gitlab_http_status(:ok)
         expect(subject).to render_template(:index)
       end
 
       context 'without sync_status specified' do
         it 'renders all registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).to have_css(css_id(synced_registry))
           expect(response.body).to have_css(css_id(failed_registry))
           expect(response.body).to have_css(css_id(never_registry))
@@ -58,7 +58,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'synced' } }
 
         it 'renders only synced registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).to have_css(css_id(synced_registry))
           expect(response.body).not_to have_css(css_id(failed_registry))
           expect(response.body).not_to have_css(css_id(never_registry))
@@ -69,7 +69,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'failed' } }
 
         it 'renders only failed registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).not_to have_css(css_id(synced_registry))
           expect(response.body).to have_css(css_id(failed_registry))
           expect(response.body).not_to have_css(css_id(never_registry))
@@ -80,7 +80,7 @@ describe Admin::Geo::UploadsController, :geo do
         subject { get :index, params: { sync_status: 'never' } }
 
         it 'renders only never synced registries' do
-          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to have_gitlab_http_status(:ok)
           expect(response.body).not_to have_css(css_id(synced_registry))
           expect(response.body).not_to have_css(css_id(failed_registry))
           expect(response.body).to have_css(css_id(never_registry))
@@ -108,7 +108,7 @@ describe Admin::Geo::UploadsController, :geo do
           registry.update_column(:file_id, -1)
 
           expect(subject).to redirect_to(admin_geo_uploads_path)
-          expect(flash[:notice]).to include('was successfully removed')
+          expect(flash[:toast]).to include('was successfully removed')
           expect { Geo::UploadRegistry.find(registry.id) }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end

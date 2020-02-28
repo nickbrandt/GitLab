@@ -54,6 +54,14 @@ module Vulnerabilities
       end
     end
 
+    def self.with_category(category)
+      where(category: category)
+    end
+
+    def self.with_feedback_type(feedback_type)
+      where(feedback_type: feedback_type)
+    end
+
     # A hard delete of the comment_author will cause the comment_author to be nil, but the comment
     # will still exist.
     def has_comment?

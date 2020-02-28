@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class AdjournedProjectsDeletionCronWorker
+class AdjournedProjectsDeletionCronWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
-  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
+  include CronjobQueue
 
   INTERVAL = 5.minutes.to_i
 
@@ -11,10 +11,12 @@ class AdjournedProjectsDeletionCronWorker
   def perform
     deletion_cutoff = Gitlab::CurrentSettings.deletion_adjourned_period.days.ago.to_date
 
-    Project.aimed_for_deletion(deletion_cutoff).find_each(batch_size: 100).with_index do |project, index| # rubocop: disable CodeReuse/ActiveRecord
+    Project.with_route.with_deleting_user.aimed_for_deletion(deletion_cutoff).find_each(batch_size: 100).with_index do |project, index| # rubocop: disable CodeReuse/ActiveRecord
       delay = index * INTERVAL
 
-      AdjournedProjectDeletionWorker.perform_in(delay, project.id)
+      with_context(project: project, user: project.deleting_user) do
+        AdjournedProjectDeletionWorker.perform_in(delay, project.id)
+      end
     end
   end
 end

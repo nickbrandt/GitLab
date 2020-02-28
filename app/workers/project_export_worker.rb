@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class ProjectExportWorker
+class ProjectExportWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include ExceptionBacktrace
 
   sidekiq_options retry: 3
-  feature_category :source_code_management
+  feature_category :importers
   worker_resource_boundary :memory
 
   def perform(current_user_id, project_id, after_export_strategy = {}, params = {})

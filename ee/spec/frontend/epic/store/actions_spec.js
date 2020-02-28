@@ -43,6 +43,120 @@ describe('Epic Store Actions', () => {
     });
   });
 
+  describe('fetchEpicDetails', () => {
+    let mock;
+
+    const payload = {
+      fullPath: 'gitlab-org',
+      iid: 8,
+    };
+
+    const gqlQueryResponse = {
+      group: {
+        epic: {
+          participants: {
+            edges: [
+              {
+                node: {
+                  name: 'Jane Doe',
+                  avatarUrl: 'https://example.com/avatar/jane-doe.jpg',
+                  webUrl: 'https://example.com/user/jane-doe.jpg',
+                },
+              },
+              {
+                node: {
+                  name: 'John Doe',
+                  avatarUrl: 'https://example.com/avatar/john-doe.jpg',
+                  webUrl: 'https://example.com/user/john-doe.jpg',
+                },
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    const formattedParticipants = [
+      {
+        name: 'Jane Doe',
+        avatar_url: 'https://example.com/avatar/jane-doe.jpg',
+        web_url: 'https://example.com/user/jane-doe.jpg',
+      },
+      {
+        name: 'John Doe',
+        avatar_url: 'https://example.com/avatar/john-doe.jpg',
+        web_url: 'https://example.com/user/john-doe.jpg',
+      },
+    ];
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('dispatches setEpicData when request is successful', done => {
+      mock.onPut(/(.*)/).replyOnce(200, {});
+      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
+        Promise.resolve({
+          data: gqlQueryResponse,
+        }),
+      );
+
+      testAction(
+        actions.fetchEpicDetails,
+        payload,
+        state,
+        [],
+        [
+          {
+            type: 'setEpicData',
+            payload: { participants: formattedParticipants },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches requestEpicParticipantsFailure when request fails', done => {
+      mock.onPut(/(.*)/).replyOnce(500, {});
+      jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(Promise.resolve({}));
+
+      testAction(
+        actions.fetchEpicDetails,
+        payload,
+        state,
+        [],
+        [
+          {
+            type: 'requestEpicParticipantsFailure',
+          },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicParticipantsFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('does not invoke any mutations or actions', done => {
+      testAction(actions.requestEpicParticipantsFailure, {}, state, [], [], done);
+    });
+
+    it('shows flash error', () => {
+      actions.requestEpicParticipantsFailure({ commit: () => {} });
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'There was an error getting the epic participants.',
+      );
+    });
+  });
+
   describe('requestEpicStatusChange', () => {
     it('should set status change flag', done => {
       testAction(

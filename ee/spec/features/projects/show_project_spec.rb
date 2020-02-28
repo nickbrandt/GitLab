@@ -24,7 +24,7 @@ describe 'Project show page', :feature do
           visit project_path(project)
 
           page.within('.project-buttons') do
-            expect(page).to have_link('Kubernetes configured', href: project_clusters_path(project))
+            expect(page).to have_link('Kubernetes', href: project_clusters_path(project))
           end
         end
       end

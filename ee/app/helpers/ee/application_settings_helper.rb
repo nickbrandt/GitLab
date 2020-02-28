@@ -26,7 +26,10 @@ module EE
         :elasticsearch_aws_region,
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_indexing,
+        :elasticsearch_max_bulk_concurrency,
+        :elasticsearch_max_bulk_size_mb,
         :elasticsearch_replicas,
+        :elasticsearch_indexed_field_length_limit,
         :elasticsearch_search,
         :elasticsearch_shards,
         :elasticsearch_url,
@@ -84,12 +87,22 @@ module EE
     end
 
     def self.possible_licensed_attributes
-      repository_mirror_attributes + %i[
+      repository_mirror_attributes + merge_request_appovers_rules_attributes +
+       %i[
         email_additional_text
         file_template_project_id
         default_project_deletion_protection
         deletion_adjourned_period
         updating_name_disabled_for_users
+        npm_package_requests_forwarding
+      ]
+    end
+
+    def self.merge_request_appovers_rules_attributes
+      %i[
+        disable_overriding_approvers_per_merge_request
+        prevent_merge_requests_author_approval
+        prevent_merge_requests_committers_approval
       ]
     end
   end

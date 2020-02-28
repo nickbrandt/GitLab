@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::Replication::LfsRetriever, :geo do
-  context '#execute' do
+  describe '#execute' do
     subject { retriever.execute }
 
     context 'when the LFS object exists' do

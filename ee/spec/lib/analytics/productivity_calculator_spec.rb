@@ -46,4 +46,13 @@ describe Analytics::ProductivityCalculator do
       expect(subject.first_comment_at).to be_like_time(merge_request_note.created_at)
     end
   end
+
+  describe '#first_approved_at' do
+    it 'returns first approval creation timestamp' do
+      create :approval, merge_request: merge_request, created_at: 1.day.ago
+      create :approval, merge_request: merge_request, created_at: 1.minute.ago
+
+      expect(subject.first_approved_at).to be_like_time(1.day.ago)
+    end
+  end
 end

@@ -37,7 +37,7 @@ the [next section](#authenticating-to-the-gitlab-npm-registry).
 
 ### Installing NPM
 
-Follow the instructions at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) to download and install Node.JS and
+Follow the instructions at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) to download and install Node.js and
 NPM to your local development environment.
 
 Once installation is complete, verify you can use NPM in your terminal by
@@ -280,7 +280,7 @@ page.
 To work with NPM commands within [GitLab CI](./../../../ci/README.md), you can use
 `CI_JOB_TOKEN` in place of the personal access token in your commands.
 
-A simple example `gitlab-ci.yml` file for publishing NPM packages:
+A simple example `.gitlab-ci.yml` file for publishing NPM packages:
 
 ```yml
 image: node:latest
@@ -373,14 +373,12 @@ Starting from GitLab 12.6, new packages published to the GitLab NPM Registry exp
 
 ## NPM distribution tags
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9425) in GitLab Premium 12.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9425) in GitLab Premium 12.8.
 
-Dist Tags for newly published packages are supported, and they follow NPM's convention where they are optional, and each tag can only be assigned to 1 package at
-You can add [distribution tags](https://docs.npmjs.com/cli/dist-tag) for newly
-published packages. They follow NPM's convention where they are optional, and
-each tag can only be assigned to one package at a time. The latest tag is added
-by default when a package is published without a tag. The same goes to installing
-a package without specifying the tag or version.
+You can add [distribution tags](https://docs.npmjs.com/cli/dist-tag) for newly published packages.
+They follow NPM's convention where they are optional, and each tag can only be assigned to one
+package at a time. The `latest` tag is added by default when a package is published without a tag.
+The same applies to installing a package without specifying the tag or version.
 
 Examples of the supported `dist-tag` commands and using tags in general:
 

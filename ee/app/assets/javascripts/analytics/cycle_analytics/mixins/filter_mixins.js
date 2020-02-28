@@ -14,7 +14,7 @@ export default {
     },
     setSelectedGroup(selectedGroup) {
       this.selectedGroup = selectedGroup;
-      this.renderSelectedGroup(`/groups/${selectedGroup.path}/-/cycle_analytics`);
+      this.renderSelectedGroup(`/groups/${selectedGroup.path}/-/value_stream_analytics`);
     },
     setSelectedProjects(selectedProjects) {
       this.selectedProjectIds = selectedProjects.map(value => value.id);

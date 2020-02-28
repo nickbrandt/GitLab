@@ -13,6 +13,7 @@
  * Mockup is https://gitlab.com/gitlab-org/gitlab/issues/35570
  */
 import { GlLink, GlTooltipDirective } from '@gitlab/ui';
+import { mergeUrlParams } from '~/lib/utils/url_utility';
 
 export default {
   components: {
@@ -47,19 +48,13 @@ export default {
       default: true,
     },
 
-    environmentName: {
-      type: String,
-      required: false,
-      default: '',
-    },
-
     podName: {
       type: String,
       required: false,
       default: '',
     },
 
-    projectPath: {
+    logsPath: {
       type: String,
       required: false,
       default: '',
@@ -68,7 +63,7 @@ export default {
 
   computed: {
     isLink() {
-      return Boolean(this.logsPath || this.podName);
+      return this.logsPath !== '' && this.podName !== '';
     },
 
     cssClass() {
@@ -80,9 +75,7 @@ export default {
     },
 
     computedLogPath() {
-      return this.isLink
-        ? `${this.projectPath}/-/logs?environment_name=${this.environmentName}&pod_name=${this.podName}`
-        : null;
+      return this.isLink ? mergeUrlParams({ pod_name: this.podName }, this.logsPath) : null;
     },
   },
 };

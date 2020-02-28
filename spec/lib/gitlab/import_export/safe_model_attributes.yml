@@ -30,6 +30,7 @@ Issue:
 - last_edited_at
 - last_edited_by_id
 - discussion_locked
+- health_status
 Event:
 - id
 - target_type
@@ -71,6 +72,7 @@ Note:
 - resolved_by_push
 - discussion_id
 - original_discussion_id
+- confidential
 LabelLink:
 - id
 - target_type
@@ -132,6 +134,7 @@ Releases::Link:
 - id
 - url
 - name
+- filepath
 - created_at
 - updated_at
 ProjectMember:
@@ -269,6 +272,7 @@ MergeRequest::Metrics:
 - diff_size
 - modified_paths_size
 - commits_count
+- first_approved_at
 Ci::Pipeline:
 - id
 - project_id
@@ -359,6 +363,7 @@ CommitStatus:
 - upstream_pipeline_id
 - interruptible
 - processed
+- scheduling_type
 Ci::Variable:
 - id
 - project_id
@@ -767,7 +772,9 @@ DesignManagement::Design:
 - project_id
 - filename
 DesignManagement::Action:
+- id
 - event
+- image_v432x230
 DesignManagement::Version:
 - id
 - created_at
@@ -783,6 +790,7 @@ ZoomMeeting:
 ServiceDeskSetting:
 - project_id
 - issue_template_key
+- project_key
 ContainerExpirationPolicy:
 - created_at
 - updated_at
@@ -823,3 +831,4 @@ Epic:
   - state_id
   - start_date_sourcing_epic_id
   - due_date_sourcing_epic_id
+  - health_status

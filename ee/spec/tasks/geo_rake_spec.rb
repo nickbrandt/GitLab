@@ -283,17 +283,41 @@ describe 'geo rake tasks', :geo do
   end
 
   describe 'geo:update_primary_node_url' do
-    let(:primary_node) { create(:geo_node, :primary, url: 'https://secondary.geo.example.com') }
-
     before do
       allow(GeoNode).to receive(:current_node_url).and_return('https://primary.geo.example.com')
       stub_current_geo_node(primary_node)
     end
 
-    it 'updates Geo primary node URL' do
-      run_rake_task('geo:update_primary_node_url')
+    context 'when the machine Geo node name is not explicitly configured' do
+      let(:primary_node) { create(:geo_node, :primary, url: 'https://secondary.geo.example.com', name: 'https://secondary.geo.example.com') }
 
-      expect(primary_node.reload.url).to eq 'https://primary.geo.example.com/'
+      before do
+        # As if Gitlab.config.geo.node_name is defaulting to external_url (this happens in an initializer)
+        allow(GeoNode).to receive(:current_node_name).and_return('https://primary.geo.example.com')
+      end
+
+      it 'updates Geo primary node URL and name' do
+        run_rake_task('geo:update_primary_node_url')
+
+        expect(primary_node.reload.url).to eq 'https://primary.geo.example.com/'
+        expect(primary_node.name).to eq 'https://primary.geo.example.com/'
+      end
+    end
+
+    context 'when the machine Geo node name is explicitly configured' do
+      let(:node_name) { 'Brazil DC' }
+      let(:primary_node) { create(:geo_node, :primary, url: 'https://secondary.geo.example.com', name: node_name) }
+
+      before do
+        allow(GeoNode).to receive(:current_node_name).and_return(node_name)
+      end
+
+      it 'updates Geo primary node URL only' do
+        run_rake_task('geo:update_primary_node_url')
+
+        expect(primary_node.reload.url).to eq 'https://primary.geo.example.com/'
+        expect(primary_node.name).to eq node_name
+      end
     end
   end
 

@@ -18,13 +18,13 @@ describe Groups::SsoController do
     it 'has status 200' do
       get :saml, params: { group_id: group }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
     end
 
     it 'malicious redirect parameter falls back to group_path' do
       get :saml, params: { group_id: group, redirect: '///malicious-url' }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(assigns[:redirect_path]).to eq(group_path(group))
     end
 
@@ -50,7 +50,7 @@ describe Groups::SsoController do
       it 'renders 404' do
         get :saml, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'still allows account unlinking' do
@@ -88,7 +88,7 @@ describe Groups::SsoController do
       it 'renders 404' do
         get :saml, params: { group_id: group }
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -115,7 +115,7 @@ describe Groups::SsoController do
     it 'renders 404' do
       get :saml, params: { group_id: 'not-a-group' }
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
 
     context 'when user is not signed in' do
@@ -147,7 +147,7 @@ describe Groups::SsoController do
           let(:oauth_data) { { "info" => { name: 'Test', email: 'testuser@email.com' } } }
 
           it 'has status 200' do
-            expect(subject).to have_gitlab_http_status(200)
+            expect(subject).to have_gitlab_http_status(:ok)
           end
 
           it 'suggests first available username automatically' do
@@ -162,13 +162,13 @@ describe Groups::SsoController do
             let(:oauth_group_id) { group.id + 1 }
 
             it 'renders 404' do
-              expect(subject).to have_gitlab_http_status(404)
+              expect(subject).to have_gitlab_http_status(:not_found)
             end
           end
         end
 
         it 'renders 404' do
-          expect(subject).to have_gitlab_http_status(404)
+          expect(subject).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -178,7 +178,7 @@ describe Groups::SsoController do
         end
 
         it 'renders 404' do
-          expect(subject).to have_gitlab_http_status(404)
+          expect(subject).to have_gitlab_http_status(:not_found)
         end
       end
     end

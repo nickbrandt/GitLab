@@ -17,7 +17,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -32,7 +32,7 @@ describe API::MergeRequestApprovalRules do
         let(:current_user) { other_user }
 
         it 'responds with 403' do
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -43,7 +43,7 @@ describe API::MergeRequestApprovalRules do
       let(:approval_rule) { create(:code_owner_rule, merge_request: merge_request) }
 
       it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
   end
@@ -60,7 +60,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -89,7 +89,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       it 'matches the response schema' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/merge_request_approval_rules', dir: 'ee')
 
         rules = json_response
@@ -172,7 +172,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       it 'matches the response schema' do
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
 
         rule = json_response
@@ -286,7 +286,7 @@ describe API::MergeRequestApprovalRules do
       it_behaves_like 'a protected API endpoint that only allows action on regular merge request approval rule'
 
       it 'matches the response schema' do
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
 
         rule = json_response
@@ -363,7 +363,7 @@ describe API::MergeRequestApprovalRules do
       it_behaves_like 'a protected API endpoint that only allows action on regular merge request approval rule'
 
       it 'responds with 204' do
-        expect(response).to have_gitlab_http_status(204)
+        expect(response).to have_gitlab_http_status(:no_content)
       end
     end
   end

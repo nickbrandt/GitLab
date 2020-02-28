@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import createStore from './store';
 import GeoNodeFormApp from './components/app.vue';
 
 Vue.use(Translate);
@@ -10,12 +11,13 @@ export default () => {
 
   return new Vue({
     el,
+    store: createStore(),
     components: {
       GeoNodeFormApp,
     },
     render(createElement) {
       const {
-        dataset: { nodeData },
+        dataset: { selectiveSyncTypes, syncShardsOptions, nodeData },
       } = this.$options.el;
 
       let node;
@@ -26,6 +28,8 @@ export default () => {
 
       return createElement('geo-node-form-app', {
         props: {
+          selectiveSyncTypes: JSON.parse(selectiveSyncTypes),
+          syncShardsOptions: JSON.parse(syncShardsOptions),
           node,
         },
       });

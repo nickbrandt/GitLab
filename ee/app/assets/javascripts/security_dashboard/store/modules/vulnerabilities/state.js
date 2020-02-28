@@ -1,8 +1,7 @@
-import { __, s__ } from '~/locale';
-
 export default () => ({
   isLoadingVulnerabilities: true,
   errorLoadingVulnerabilities: false,
+  loadingVulnerabilitiesErrorCode: null,
   vulnerabilities: [],
   isLoadingVulnerabilitiesCount: true,
   errorLoadingVulnerabilitiesCount: false,
@@ -20,31 +19,16 @@ export default () => ({
   activeVulnerability: null,
   sourceBranch: null,
   modal: {
-    data: {
-      description: { text: s__('Vulnerability|Description') },
-      project: {
-        text: s__('Vulnerability|Project'),
-        isLink: true,
-      },
-      url: { text: __('URL'), isLink: true },
-      file: { text: s__('Vulnerability|File') },
-      identifiers: { text: s__('Vulnerability|Identifiers') },
-      severity: { text: s__('Vulnerability|Severity') },
-      confidence: { text: s__('Vulnerability|Confidence') },
-      reportType: { text: s__('Vulnerability|Report Type') },
-      className: { text: s__('Vulnerability|Class') },
-      image: { text: s__('Vulnerability|Image') },
-      namespace: { text: s__('Vulnerability|Namespace') },
-      links: { text: s__('Vulnerability|Links') },
-      instances: { text: s__('Vulnerability|Instances') },
-    },
     vulnerability: {},
+    project: {},
     isCreatingNewIssue: false,
     isCreatingMergeRequest: false,
     isDismissingVulnerability: false,
     isCommentingOnDismissal: false,
     isShowingDeleteButtons: false,
   },
+  isDismissingVulnerabilities: false,
+  selectedVulnerabilities: {},
   isCreatingIssue: false,
   isCreatingMergeRequest: false,
 });

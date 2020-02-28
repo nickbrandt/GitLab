@@ -91,7 +91,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is null when isAnnotating is true but annotation coordinates are falsey', () => {
+    it('currentCommentForm is null when isAnnotating is true but annotation position is falsey', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -107,7 +107,7 @@ describe('Design management design presentation component', () => {
       });
     });
 
-    it('currentCommentForm is equal to current annotation coordinates when isAnnotating is true', () => {
+    it('currentCommentForm is equal to current annotation position when isAnnotating is true', () => {
       createComponent(
         {
           image: 'test.jpg',
@@ -116,7 +116,7 @@ describe('Design management design presentation component', () => {
         },
         {
           ...mockOverlayData,
-          currentAnnotationCoordinates: {
+          currentAnnotationPosition: {
             x: 1,
             y: 1,
             width: 100,

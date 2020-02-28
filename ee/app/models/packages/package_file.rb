@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
+  include ::Gitlab::Geo::ReplicableModel
+  include IgnorableColumns
+
+  ignore_column :file_type, remove_with: '12.10', remove_after: '2019-03-22'
 
   delegate :project, :project_id, to: :package
   delegate :conan_file_type, to: :conan_file_metadatum
-
-  update_project_statistics project_statistics_name: :packages_size
 
   belongs_to :package
 
@@ -18,6 +20,8 @@ class Packages::PackageFile < ApplicationRecord
   validates :file_name, presence: true
 
   scope :recent, -> { order(id: :desc) }
+  scope :with_file_name, ->(file_name) { where(file_name: file_name) }
+  scope :with_file_name_like, ->(file_name) { where(arel_table[:file_name].matches(file_name)) }
   scope :with_files_stored_locally, -> { where(file_store: ::Packages::PackageFileUploader::Store::LOCAL) }
   scope :with_conan_file_metadata, -> { includes(:conan_file_metadatum) }
 
@@ -28,12 +32,18 @@ class Packages::PackageFile < ApplicationRecord
 
   mount_uploader :file, Packages::PackageFileUploader
 
-  after_save :update_file_store, if: :saved_change_to_file?
+  with_replicator Geo::PackageFileReplicator
 
-  def update_file_store
+  after_save :update_file_metadata, if: :saved_change_to_file?
+  after_create_commit -> { replicator.publish_created_event }
+
+  update_project_statistics project_statistics_name: :packages_size
+
+  def update_file_metadata
     # The file.object_store is set during `uploader.store!`
     # which happens after object is inserted/updated
     self.update_column(:file_store, file.object_store)
+    self.update_column(:size, file.size) unless file.size == self.size
   end
 
   def log_geo_deleted_event

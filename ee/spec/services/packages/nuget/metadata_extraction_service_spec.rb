@@ -21,7 +21,7 @@ describe Packages::Nuget::MetadataExtractionService do
 
     context 'linked to a non nuget package' do
       before do
-        package_file.package.conan!
+        package_file.package.maven!
       end
 
       it { expect { subject }.to raise_error(::Packages::Nuget::MetadataExtractionService::ExtractionError, 'invalid package file') }

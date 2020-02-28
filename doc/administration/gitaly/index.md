@@ -390,7 +390,7 @@ To disable Gitaly on a client node:
 
 ## TLS support
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22602) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22602) in GitLab 11.8.
 
 Gitaly supports TLS encryption. To be able to communicate
 with a Gitaly instance that listens for secure connections you will need to use `tls://` URL
@@ -584,6 +584,7 @@ a few things that you need to do:
 1. Configure [object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
 1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature).
 1. Configure [object storage for dependency proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature).
+1. Configure [object storage for Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage) (optional feature).
 
 NOTE: **Note:**
 One current feature of GitLab that still requires a shared directory (NFS) is

@@ -47,10 +47,15 @@ class SubscriptionsController < ApplicationController
 
   def create
     current_user.update(setup_for_company: true) if params[:setup_for_company]
-    group_name = params[:setup_for_company] ? customer_params[:company] : "#{current_user.name}'s Group"
-    path = Namespace.clean_path(group_name)
-    group = Groups::CreateService.new(current_user, name: group_name, path: path).execute
-    return render json: group.errors.to_json unless group.persisted?
+
+    if params[:selected_group]
+      group = current_user.managed_free_namespaces.find(params[:selected_group])
+    else
+      group_name = params[:setup_for_company] ? customer_params[:company] : "#{current_user.name}'s Group"
+      path = Namespace.clean_path(group_name)
+      group = Groups::CreateService.new(current_user, name: group_name, path: path).execute
+      return render json: group.errors.to_json unless group.persisted?
+    end
 
     response = Subscriptions::CreateService.new(
       current_user,
@@ -60,9 +65,14 @@ class SubscriptionsController < ApplicationController
     ).execute
 
     if response[:success]
-      plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
+      redirect_location = if params[:selected_group]
+                            group_path(group)
+                          else
+                            plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
+                            edit_subscriptions_group_path(group.path, plan_id: plan_id, quantity: quantity, new_user: params[:new_user])
+                          end
 
-      response[:data] = { location: edit_subscriptions_group_path(group.path, plan_id: plan_id, quantity: quantity) }
+      response[:data] = { location: redirect_location }
 
       track_paid_signup_flow_event('end', label: plan_id, value: quantity)
     end

@@ -8,7 +8,7 @@ exports[`Dast Issue Body matches the snaphot 1`] = `
     class="report-block-list-issue-description-text"
   >
     
-    Low (Medium):
+    Low:
 
     
     <modal-open-name-stub

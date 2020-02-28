@@ -1,9 +1,6 @@
 import * as getters from 'ee/related_items_tree/store/getters';
-
 import createDefaultState from 'ee/related_items_tree/store/state';
-
 import { issuableTypesMap } from 'ee/related_issues/constants';
-import { ChildType } from 'ee/related_items_tree/constants';
 
 import { mockEpic1, mockEpic2 } from '../../../javascripts/related_items_tree/mock_data';
 
@@ -57,36 +54,6 @@ describe('RelatedItemsTree', () => {
           };
 
           expect(getters.anyParentHasChildren(state, mockGetter)).toBe(false);
-        });
-      });
-
-      describe('headerItems', () => {
-        it('returns an item within array containing Epic iconName, count, qaClass & type props', () => {
-          state.epicsCount = 2;
-          const epicHeaderItem = getters.headerItems(state)[0];
-
-          expect(epicHeaderItem).toEqual(
-            expect.objectContaining({
-              iconName: 'epic',
-              count: 2,
-              qaClass: 'qa-add-epics-button',
-              type: ChildType.Epic,
-            }),
-          );
-        });
-
-        it('returns an item within array containing Issue iconName, count, qaClass & type props', () => {
-          state.issuesCount = 2;
-          const epicHeaderItem = getters.headerItems(state)[1];
-
-          expect(epicHeaderItem).toEqual(
-            expect.objectContaining({
-              iconName: 'issues',
-              count: 2,
-              qaClass: 'qa-add-issues-button',
-              type: ChildType.Issue,
-            }),
-          );
         });
       });
 

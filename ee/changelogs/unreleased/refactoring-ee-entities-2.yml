@@ -1,0 +1,5 @@
+---
+title: Separate epic, epic_issue, linked epic ee entities into own class file
+merge_request: 25592
+author: Rajendra Kadam
+type: added

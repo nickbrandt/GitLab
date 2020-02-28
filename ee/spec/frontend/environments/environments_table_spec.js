@@ -49,7 +49,7 @@ describe('Environment table', () => {
       name: 'review',
       size: 1,
       environment_path: 'url',
-      project_path: 'url',
+      logs_path: 'url',
       id: 1,
       hasDeployBoard: true,
       deployBoardData: deployBoardMockData,

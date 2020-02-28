@@ -8,6 +8,8 @@ import GeoNodesService from 'ee/geo_nodes/service/geo_nodes_service';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { NODE_ACTIONS } from 'ee/geo_nodes/constants';
 import axios from '~/lib/utils/axios_utils';
+import '~/vue_shared/plugins/global_toast';
+
 import {
   PRIMARY_VERSION,
   NODE_DETAILS_PATH,
@@ -33,6 +35,9 @@ const createComponent = () => {
   });
 };
 
+const getToastMessage = () => document.querySelector('.gl-toast').innerText.trim();
+const cleanupToastMessage = () => document.querySelector('.gl-toast').remove();
+
 describe('AppComponent', () => {
   let vm;
   let mock;
@@ -46,6 +51,7 @@ describe('AppComponent', () => {
     mock = new MockAdapter(axios);
 
     document.body.innerHTML += '<div class="flash-container"></div>';
+
     mock.onGet(/(.*)\/geo_nodes$/).reply(() => [statusCode, response]);
     vm = createComponent();
   });
@@ -193,7 +199,7 @@ describe('AppComponent', () => {
     });
 
     describe('repairNode', () => {
-      it('calls service.repairNode and shows success Flash message on request success', done => {
+      it('calls service.repairNode and shows success Toast message on request success', done => {
         const node = { ...mockNode };
         mock.onPost(node.repairPath).reply(() => {
           expect(node.nodeActionActive).toBe(true);
@@ -204,9 +210,8 @@ describe('AppComponent', () => {
         vm.repairNode(node)
           .then(() => {
             expect(vm.service.repairNode).toHaveBeenCalledWith(node);
-            expect(document.querySelector('.flash-text').innerText.trim()).toBe(
-              'Node Authentication was successfully repaired.',
-            );
+            expect(getToastMessage()).toBe('Node Authentication was successfully repaired.');
+            cleanupToastMessage();
 
             expect(node.nodeActionActive).toBe(false);
           })
@@ -285,7 +290,7 @@ describe('AppComponent', () => {
     });
 
     describe('removeNode', () => {
-      it('calls service.removeNode for removing node and shows Flash message on request success', done => {
+      it('calls service.removeNode for removing node and shows Toast message on request success', done => {
         const node = { ...mockNode };
         mock.onDelete(node.basePath).reply(() => {
           expect(node.nodeActionActive).toBe(true);
@@ -298,9 +303,8 @@ describe('AppComponent', () => {
           .then(() => {
             expect(vm.service.removeNode).toHaveBeenCalledWith(node);
             expect(vm.store.removeNode).toHaveBeenCalledWith(node);
-            expect(document.querySelector('.flash-text').innerText.trim()).toBe(
-              'Node was successfully removed.',
-            );
+            expect(getToastMessage()).toBe('Node was successfully removed.');
+            cleanupToastMessage();
           })
           .then(done)
           .catch(done.fail);

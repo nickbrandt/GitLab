@@ -76,13 +76,13 @@ module EE
 
       def check_geo_license!
         if ::Gitlab::Geo.secondary? && !::Gitlab::Geo.license_allows?
-          raise ::Gitlab::GitAccess::UnauthorizedError, 'Your current license does not have GitLab Geo add-on enabled.'
+          raise ::Gitlab::GitAccess::ForbiddenError, 'Your current license does not have GitLab Geo add-on enabled.'
         end
       end
 
       def check_smartcard_access!
         unless can_access_without_new_smartcard_login?
-          raise ::Gitlab::GitAccess::UnauthorizedError, 'Project requires smartcard login. Please login to GitLab using a smartcard.'
+          raise ::Gitlab::GitAccess::ForbiddenError, 'Project requires smartcard login. Please login to GitLab using a smartcard.'
         end
       end
 
@@ -98,14 +98,14 @@ module EE
 
       def check_size_before_push!
         if check_size_limit? && project.above_size_limit?
-          raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).push_error
+          raise ::Gitlab::GitAccess::ForbiddenError, ::Gitlab::RepositorySizeError.new(project).push_error
         end
       end
 
       def check_if_license_blocks_changes!
         if ::License.block_changes?
           message = ::LicenseHelper.license_message(signed_in: true, is_admin: (user && user.admin?))
-          raise ::Gitlab::GitAccess::UnauthorizedError, strip_tags(message)
+          raise ::Gitlab::GitAccess::ForbiddenError, strip_tags(message)
         end
       end
 
@@ -154,7 +154,7 @@ module EE
 
       def check_size_against_limit(size)
         if project.changes_will_exceed_size_limit?(size)
-          raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+          raise ::Gitlab::GitAccess::ForbiddenError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
         end
       end
 

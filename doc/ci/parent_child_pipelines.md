@@ -45,7 +45,7 @@ the child pipeline configuration.
 
 ## Examples
 
-The simplest case is [triggering a child pipeline](yaml/README.md#trigger-premium) using a
+The simplest case is [triggering a child pipeline](yaml/README.md#trigger) using a
 local YAML file to define the pipeline configuration. In this case, the parent pipeline will
 trigger the child pipeline, and continue without waiting:
 
@@ -79,6 +79,52 @@ microservice_a:
       - template: SAST.gitlab-ci.yml
     strategy: depend
 ```
+
+## Merge Request child pipelines
+
+To trigger a child pipeline as a [Merge Request Pipeline](merge_request_pipelines/index.md) we need to:
+
+- Set the trigger job to run on merge requests:
+
+```yaml
+# parent .gitlab-ci.yml
+microservice_a:
+  trigger:
+    include: path/to/microservice_a.yml
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+```
+
+- Configure the child pipeline by either:
+
+  - Setting all jobs in the child pipeline to evaluate in the context of a merge request:
+
+    ```yaml
+    # child path/to/microservice_a.yml
+    workflow:
+      rules:
+        - if: $CI_MERGE_REQUEST_ID
+
+    job1:
+      script: ...
+
+    job2:
+      script: ...
+    ```
+
+  - Alternatively, setting the rule per job. For example, to create only `job1` in
+    the context of merge request pipelines:
+
+    ```yaml
+    # child path/to/microservice_a.yml
+    job1:
+      script: ...
+      rules:
+        - if: $CI_MERGE_REQUEST_ID
+
+    job2:
+      script: ...
+    ```
 
 ## Limitations
 

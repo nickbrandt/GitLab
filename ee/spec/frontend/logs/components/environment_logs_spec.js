@@ -46,6 +46,7 @@ describe('EnvironmentLogs', () => {
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
   const findSearchBar = () => wrapper.find('.js-logs-search');
   const findTimeRangePicker = () => wrapper.find({ ref: 'dateTimePicker' });
+  const findInfoAlert = () => wrapper.find('.js-elasticsearch-alert');
 
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
@@ -131,6 +132,9 @@ describe('EnvironmentLogs', () => {
 
     expect(actionMocks.setInitData).toHaveBeenCalledTimes(1);
     expect(actionMocks.setInitData).toHaveBeenLastCalledWith({
+      timeRange: expect.objectContaining({
+        default: true,
+      }),
       environmentName: mockEnvName,
       podName: null,
     });
@@ -212,14 +216,11 @@ describe('EnvironmentLogs', () => {
     });
 
     it('displays a disabled search bar', () => {
-      expect(findSearchBar().exists()).toBe(true);
       expect(findSearchBar().attributes('disabled')).toBe('true');
+    });
 
-      // input a query and click `search`
-      findSearchBar().vm.$emit('input', mockSearch);
-      findSearchBar().vm.$emit('submit');
-
-      expect(actionMocks.setSearch).not.toHaveBeenCalled();
+    it('displays an alert to upgrade to ES', () => {
+      expect(findInfoAlert().exists()).toBe(true);
     });
   });
 
@@ -254,6 +255,10 @@ describe('EnvironmentLogs', () => {
 
     it('displays an enabled time window dropdown', () => {
       expect(findTimeRangePicker().attributes('disabled')).toBeFalsy();
+    });
+
+    it('does not display an alert to upgrade to ES', () => {
+      expect(findInfoAlert().exists()).toBe(false);
     });
 
     it('populates environments dropdown', () => {

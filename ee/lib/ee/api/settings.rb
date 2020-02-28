@@ -35,6 +35,14 @@ module EE
               attrs = attrs.except(:updating_name_disabled_for_users)
             end
 
+            unless License.feature_available?(:admin_merge_request_approvers_rules)
+              attrs = attrs.except(*EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes)
+            end
+
+            unless License.feature_available?(:packages)
+              attrs = attrs.except(:npm_package_requests_forwarding)
+            end
+
             attrs
           end
         end

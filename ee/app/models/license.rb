@@ -66,6 +66,7 @@ class License < ApplicationRecord
     design_management
     disable_name_update_for_users
     email_additional_text
+    epics
     extended_audit_events
     external_authorization_service_api_management
     feature_flags
@@ -80,6 +81,7 @@ class License < ApplicationRecord
     ldap_group_sync_filter
     merge_pipelines
     merge_request_performance_metrics
+    admin_merge_request_approvers_rules
     merge_trains
     metrics_reports
     multiple_approval_rules
@@ -110,12 +112,13 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
-    epics
     group_ip_restriction
     group_level_compliance_dashboard
     incident_management
     insights
+    issuable_health_status
     license_management
+    license_scanning
     personal_access_token_expiration_policy
     pod_logs
     prometheus_alerts
@@ -123,6 +126,7 @@ class License < ApplicationRecord
     report_approver_rules
     sast
     security_dashboard
+    subepics
     threat_monitoring
     tracing
     web_ide_terminal
@@ -281,7 +285,7 @@ class License < ApplicationRecord
   end
 
   def data_filename
-    company_name = self.licensee["Company"] || self.licensee.values.first
+    company_name = self.licensee["Company"] || self.licensee.each_value.first
     clean_company_name = company_name.gsub(/[^A-Za-z0-9]/, "")
     "#{clean_company_name}.gitlab-license"
   end

@@ -1,11 +1,13 @@
+import * as Sentry from '@sentry/browser';
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
+import { convertToFixedRange } from '~/lib/utils/datetime_range';
 import { gqClient, parseEnvironmentsResponse, removeLeadingSlash } from './utils';
 import trackDashboardLoad from '../monitoring_tracking_helper';
 import getEnvironments from '../queries/getEnvironments.query.graphql';
 import statusCodes from '../../lib/utils/http_status';
-import { backOff } from '../../lib/utils/common_utils';
+import { backOff, convertObjectPropsToCamelCase } from '../../lib/utils/common_utils';
 import { s__, sprintf } from '../../locale';
 
 import { PROMETHEUS_TIMEOUT } from '../constants';
@@ -32,6 +34,10 @@ export const setEndpoints = ({ commit }, endpoints) => {
   commit(types.SET_ENDPOINTS, endpoints);
 };
 
+export const setTimeRange = ({ commit }, timeRange) => {
+  commit(types.SET_TIME_RANGE, timeRange);
+};
+
 export const filterEnvironments = ({ commit, dispatch }, searchTerm) => {
   commit(types.SET_ENVIRONMENTS_FILTER, searchTerm);
   dispatch('fetchEnvironmentsData');
@@ -45,8 +51,12 @@ export const requestMetricsDashboard = ({ commit }) => {
   commit(types.REQUEST_METRICS_DATA);
 };
 export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response, params }) => {
-  commit(types.SET_ALL_DASHBOARDS, response.all_dashboards);
-  commit(types.RECEIVE_METRICS_DATA_SUCCESS, response.dashboard);
+  const { all_dashboards, dashboard, metrics_data } = response;
+
+  commit(types.SET_ALL_DASHBOARDS, all_dashboards);
+  commit(types.RECEIVE_METRICS_DATA_SUCCESS, dashboard);
+  commit(types.SET_ENDPOINTS, convertObjectPropsToCamelCase(metrics_data));
+
   return dispatch('fetchPrometheusMetrics', params);
 };
 export const receiveMetricsDashboardFailure = ({ commit }, error) => {
@@ -63,30 +73,38 @@ export const receiveEnvironmentsDataSuccess = ({ commit }, data) =>
 export const receiveEnvironmentsDataFailure = ({ commit }) =>
   commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
 
-export const fetchData = ({ dispatch }, params) => {
-  dispatch('fetchMetricsData', params);
+export const fetchData = ({ dispatch }) => {
+  dispatch('fetchDashboard');
   dispatch('fetchDeploymentsData');
   dispatch('fetchEnvironmentsData');
 };
 
-export const fetchMetricsData = ({ dispatch }, params) => dispatch('fetchDashboard', params);
-
-export const fetchDashboard = ({ state, dispatch }, params) => {
+export const fetchDashboard = ({ state, dispatch }) => {
   dispatch('requestMetricsDashboard');
 
+  const params = {};
+
+  if (state.timeRange) {
+    const { start, end } = convertToFixedRange(state.timeRange);
+    params.start = start;
+    params.end = end;
+  }
+
   if (state.currentDashboard) {
-    // eslint-disable-next-line no-param-reassign
     params.dashboard = state.currentDashboard;
   }
 
   return backOffRequest(() => axios.get(state.dashboardEndpoint, { params }))
     .then(resp => resp.data)
     .then(response => dispatch('receiveMetricsDashboardSuccess', { response, params }))
-    .catch(e => {
-      dispatch('receiveMetricsDashboardFailure', e);
+    .catch(error => {
+      Sentry.captureException(error);
+
+      dispatch('receiveMetricsDashboardFailure', error);
+
       if (state.showErrorBanner) {
-        if (e.response.data && e.response.data.message) {
-          const { message } = e.response.data;
+        if (error.response.data && error.response.data.message) {
+          const { message } = error.response.data;
           createFlash(
             sprintf(
               s__('Metrics|There was an error while retrieving metrics. %{message}'),
@@ -133,14 +151,16 @@ export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
     step,
   };
 
-  commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metric_id });
+  commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metricId });
 
-  return fetchPrometheusResult(metric.prometheus_endpoint_path, queryParams)
+  return fetchPrometheusResult(metric.prometheusEndpointPath, queryParams)
     .then(result => {
-      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metric_id, result });
+      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metricId, result });
     })
     .catch(error => {
-      commit(types.RECEIVE_METRIC_RESULT_FAILURE, { metricId: metric.metric_id, error });
+      Sentry.captureException(error);
+
+      commit(types.RECEIVE_METRIC_RESULT_FAILURE, { metricId: metric.metricId, error });
       // Continue to throw error so the dashboard can notify using createFlash
       throw error;
     });
@@ -150,7 +170,7 @@ export const fetchPrometheusMetrics = ({ state, commit, dispatch, getters }, par
   commit(types.REQUEST_METRICS_DATA);
 
   const promises = [];
-  state.dashboard.panel_groups.forEach(group => {
+  state.dashboard.panelGroups.forEach(group => {
     group.panels.forEach(panel => {
       panel.metrics.forEach(metric => {
         promises.push(dispatch('fetchPrometheusMetric', { metric, params }));
@@ -185,7 +205,8 @@ export const fetchDeploymentsData = ({ state, dispatch }) => {
 
       dispatch('receiveDeploymentsDataSuccess', response.deployments);
     })
-    .catch(() => {
+    .catch(error => {
+      Sentry.captureException(error);
       dispatch('receiveDeploymentsDataFailure');
       createFlash(s__('Metrics|There was an error getting deployment information.'));
     });
@@ -213,7 +234,8 @@ export const fetchEnvironmentsData = ({ state, dispatch }) => {
 
       dispatch('receiveEnvironmentsDataSuccess', environments);
     })
-    .catch(() => {
+    .catch(err => {
+      Sentry.captureException(err);
       dispatch('receiveEnvironmentsDataFailure');
       createFlash(s__('Metrics|There was an error getting environments information.'));
     });
@@ -242,7 +264,10 @@ export const duplicateSystemDashboard = ({ state }, payload) => {
     .then(response => response.data)
     .then(data => data.dashboard)
     .catch(error => {
+      Sentry.captureException(error);
+
       const { response } = error;
+
       if (response && response.data && response.data.error) {
         throw sprintf(s__('Metrics|There was an error creating the dashboard. %{error}'), {
           error: response.data.error,

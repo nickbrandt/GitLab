@@ -38,7 +38,9 @@ describe Gitlab::Auth::GroupSaml::FailureHandler do
     callback_path = callback_group_saml_providers_path(group)
     env = failure_env(callback_path, strategy)
 
-    expect_any_instance_of(Groups::OmniauthCallbacksController).to receive(:failure).and_call_original
+    expect_next_instance_of(Groups::OmniauthCallbacksController) do |instance|
+      expect(instance).to receive(:failure).and_call_original
+    end
 
     subject.call(env)
   end

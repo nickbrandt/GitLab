@@ -5,6 +5,7 @@ module EE
     module Notes
       def note_epic_email(recipient_id, note_id, reason = nil)
         setup_note_mail(note_id, recipient_id)
+        add_group_headers
 
         @epic = @note.noteable
         @target_url = group_epic_url(*note_target_url_options)

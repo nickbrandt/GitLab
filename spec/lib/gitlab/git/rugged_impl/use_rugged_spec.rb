@@ -31,7 +31,7 @@ describe Gitlab::Git::RuggedImpl::UseRugged, :seed_helper do
     Gitlab::GitalyClient.instance_variable_set(:@can_use_disk, {})
   end
 
-  context '#execute_rugged_call', :request_store do
+  describe '#execute_rugged_call', :request_store do
     let(:args) { ['refs/heads/master', 1] }
 
     before do
@@ -149,6 +149,43 @@ describe Gitlab::Git::RuggedImpl::UseRugged, :seed_helper do
       it 'returns false' do
         expect(subject.running_puma_with_multiple_threads?).to be false
       end
+    end
+  end
+
+  describe '#rugged_enabled_through_feature_flag?' do
+    subject { wrapper.send(:rugged_enabled_through_feature_flag?) }
+
+    before do
+      allow(Feature).to receive(:enabled?).with(:feature_key_1).and_return(true)
+      allow(Feature).to receive(:enabled?).with(:feature_key_2).and_return(true)
+      allow(Feature).to receive(:enabled?).with(:feature_key_3).and_return(false)
+      allow(Feature).to receive(:enabled?).with(:feature_key_4).and_return(false)
+
+      stub_const('Gitlab::Git::RuggedImpl::Repository::FEATURE_FLAGS', feature_keys)
+    end
+
+    context 'no feature keys given' do
+      let(:feature_keys) { [] }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'all features are enabled' do
+      let(:feature_keys) { [:feature_key_1, :feature_key_2] }
+
+      it { is_expected.to be_truthy}
+    end
+
+    context 'all features are not enabled' do
+      let(:feature_keys) { [:feature_key_3, :feature_key_4] }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'some feature is enabled' do
+      let(:feature_keys) { [:feature_key_4, :feature_key_2] }
+
+      it { is_expected.to be_truthy }
     end
   end
 

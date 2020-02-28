@@ -7,8 +7,9 @@ describe IssueBoardEntity do
   let_it_be(:issue) { create(:issue, project: project) }
   let_it_be(:user) { create(:user) }
   let(:request) { double('request', current_user: user) }
+  let(:blocked_ids) { [] }
 
-  subject { described_class.new(issue.reload, request: request).as_json }
+  subject { described_class.new(issue.reload, request: request, blocked_issue_ids: blocked_ids).as_json }
 
   describe '#weight' do
     it 'has `weight` attribute' do
@@ -27,44 +28,23 @@ describe IssueBoardEntity do
   end
 
   describe '#blocked' do
-    it 'is not blocked by default' do
+    it 'the issue is not blocked by default' do
       expect(subject[:blocked]).to be_falsey
     end
 
-    context 'when the issue is referenced by other issue' do
-      let_it_be(:project2) { create(:project) }
-      let_it_be(:related_issue) { create(:issue, project: project2) }
+    context 'when blocked_issue_ids contains the issue id' do
+      let(:blocked_ids) { [issue.id] }
 
-      context 'when the issue is blocking' do
-        let_it_be(:issue_link) { create(:issue_link, source: related_issue, target: issue, link_type: IssueLink::TYPE_BLOCKS) }
-
-        context 'when the referencing issue is not visible to the user' do
-          it 'is not blocked' do
-            expect(subject[:blocked]).to be_falsey
-          end
-        end
-
-        context 'when the referencing issue is visible to the user' do
-          before do
-            project2.add_developer(user)
-          end
-
-          it 'is blocked' do
-            expect(subject[:blocked]).to be_truthy
-          end
-        end
+      it 'the issue is blocked' do
+        expect(subject[:blocked]).to be_truthy
       end
+    end
 
-      context 'when the issue is not blocking' do
-        let_it_be(:issue_link) { create(:issue_link, source: related_issue, target: issue, link_type: IssueLink::TYPE_RELATES_TO) }
+    context 'when blocked_issue_ids is not set' do
+      let(:blocked_ids) { nil }
 
-        before do
-          project2.add_developer(user)
-        end
-
-        it 'is not blocked' do
-          expect(subject[:blocked]).to be_falsey
-        end
+      it 'the issue is not blocked' do
+        expect(subject[:blocked]).to be_falsey
       end
     end
   end

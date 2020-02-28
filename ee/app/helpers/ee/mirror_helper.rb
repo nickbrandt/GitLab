@@ -8,7 +8,7 @@ module EE
 
       return message if raw_message
 
-      message.insert(0, "#{icon('warning triangle')} ")
+      message = icon('warning triangle') + ' ' + message
 
       if can?(current_user, :admin_project, @project)
         link_to message, project_mirror_path(@project)

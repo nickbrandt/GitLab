@@ -439,7 +439,7 @@
          "override":false,
          "user":{
             "id":2,
-            "email":"user_2@example.com",
+            "email":"user_2@gitlabexample.com",
             "username":"user_2"
          }
       }

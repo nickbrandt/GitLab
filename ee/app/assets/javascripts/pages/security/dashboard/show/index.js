@@ -5,7 +5,7 @@ import syncWithRouter from 'ee/security_dashboard/store/plugins/sync_with_router
 import createStore from 'ee/security_dashboard/store';
 import InstanceSecurityDashboard from 'ee/security_dashboard/components/instance_security_dashboard.vue';
 
-if (gon.features && gon.features.securityDashboard) {
+if (gon.features && gon.features.instanceSecurityDashboard) {
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.querySelector('#js-security');
     const {
@@ -14,10 +14,10 @@ if (gon.features && gon.features.securityDashboard) {
       emptyDashboardStateSvgPath,
       projectAddEndpoint,
       projectListEndpoint,
-      vulnerabilitiesCountEndpoint,
       vulnerabilitiesEndpoint,
       vulnerabilitiesHistoryEndpoint,
       vulnerabilityFeedbackHelpPath,
+      vulnerableProjectsEndpoint,
     } = el.dataset;
     const router = createRouter();
     const store = createStore({ plugins: [projectSelector, syncWithRouter(router)] });
@@ -37,10 +37,10 @@ if (gon.features && gon.features.securityDashboard) {
             emptyDashboardStateSvgPath,
             projectAddEndpoint,
             projectListEndpoint,
-            vulnerabilitiesCountEndpoint,
             vulnerabilitiesEndpoint,
             vulnerabilitiesHistoryEndpoint,
             vulnerabilityFeedbackHelpPath,
+            vulnerableProjectsEndpoint,
           },
         });
       },

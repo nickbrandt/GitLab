@@ -17,7 +17,6 @@ module EE
       end
 
       def stats
-        @admin_count = ::User.admins.count
         @roles_count = ::ProjectAuthorization.roles_stats
       end
 

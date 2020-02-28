@@ -14,7 +14,7 @@ describe SearchService do
         before do
           stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
           Gitlab::Elastic::Indexer.new(project).run
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
 
           # disable permission to test redaction
           allow(Ability).to receive(:allowed?).and_call_original
@@ -69,7 +69,7 @@ describe SearchService do
           before do
             create(:wiki_page, wiki: project.wiki)
             Gitlab::Elastic::Indexer.new(project, wiki: true).run
-            Gitlab::Elastic::Helper.refresh_index
+            ensure_elasticsearch_index!
           end
         end
       end

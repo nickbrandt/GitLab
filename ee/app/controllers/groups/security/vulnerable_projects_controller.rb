@@ -6,12 +6,18 @@ class Groups::Security::VulnerableProjectsController < Groups::ApplicationContro
   alias_method :vulnerable, :group
 
   def index
-    projects = group.vulnerable_projects.non_archived.without_deleted.with_route
+    vulnerable_projects = ::Security::VulnerableProjectsFinder.new(projects).execute
 
-    vulnerable_projects = projects.map do |project|
+    presented_projects = vulnerable_projects.map do |project|
       ::Security::VulnerableProjectPresenter.new(project)
     end
 
-    render json: VulnerableProjectSerializer.new.represent(vulnerable_projects)
+    render json: VulnerableProjectSerializer.new.represent(presented_projects)
+  end
+
+  private
+
+  def projects
+    ::Project.for_group_and_its_subgroups(group).non_archived.without_deleted.with_route
   end
 end

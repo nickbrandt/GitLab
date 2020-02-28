@@ -11,11 +11,13 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import Tracking from '~/tracking';
+import PackageActivity from './activity.vue';
 import PackageInformation from './information.vue';
-import NpmInstallation from './npm_installation.vue';
-import MavenInstallation from './maven_installation.vue';
-import ConanInstallation from './conan_installation.vue';
 import PackageTitle from './package_title.vue';
+import ConanInstallation from './conan_installation.vue';
+import MavenInstallation from './maven_installation.vue';
+import NpmInstallation from './npm_installation.vue';
+import NugetInstallation from './nuget_installation.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { generatePackageInfo } from '../utils';
@@ -33,11 +35,13 @@ export default {
     GlModal,
     GlTable,
     GlIcon,
+    PackageActivity,
     PackageInformation,
-    NpmInstallation,
-    MavenInstallation,
-    ConanInstallation,
     PackageTitle,
+    ConanInstallation,
+    MavenInstallation,
+    NpmInstallation,
+    NugetInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -45,48 +49,16 @@ export default {
   },
   mixins: [timeagoMixin, Tracking.mixin()],
   trackingActions: { ...TrackingActions },
-  props: {
-    canDelete: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
-    destroyPath: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    emptySvgPath: {
-      type: String,
-      required: true,
-    },
-    npmPath: {
-      type: String,
-      required: true,
-    },
-    npmHelpPath: {
-      type: String,
-      required: true,
-    },
-    mavenPath: {
-      type: String,
-      required: true,
-    },
-    mavenHelpPath: {
-      type: String,
-      required: true,
-    },
-    conanPath: {
-      type: String,
-      required: true,
-    },
-    conanHelpPath: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
-    ...mapState(['packageEntity', 'packageFiles']),
+    ...mapState([
+      'packageEntity',
+      'packageFiles',
+      'canDelete',
+      'destroyPath',
+      'svgPath',
+      'npmPath',
+      'npmHelpPath',
+    ]),
     isNpmPackage() {
       return this.packageEntity.package_type === PackageType.NPM;
     },
@@ -95,6 +67,9 @@ export default {
     },
     isConanPackage() {
       return this.packageEntity.package_type === PackageType.CONAN;
+    },
+    isNugetPackage() {
+      return this.packageEntity.package_type === PackageType.NUGET;
     },
     isValidPackage() {
       return Boolean(this.packageEntity.name);
@@ -197,8 +172,7 @@ export default {
     v-if="!isValidPackage"
     :title="s__('PackageRegistry|Unable to load package')"
     :description="s__('PackageRegistry|There was a problem fetching the details for this package.')"
-    :svg-path="emptySvgPath"
-    class="js-package-empty-state"
+    :svg-path="svgPath"
   />
 
   <div v-else class="packages-app">
@@ -236,21 +210,13 @@ export default {
           :help-url="npmHelpPath"
         />
 
-        <maven-installation
-          v-else-if="isMavenPackage"
-          :maven-metadata="packageEntity.maven_metadatum"
-          :registry-url="mavenPath"
-          :help-url="mavenHelpPath"
-        />
-
-        <conan-installation
-          v-else-if="isConanPackage"
-          :package-entity="packageEntity"
-          :registry-url="conanPath"
-          :help-url="conanHelpPath"
-        />
+        <maven-installation v-else-if="isMavenPackage" />
+        <conan-installation v-else-if="isConanPackage" />
+        <nuget-installation v-else-if="isNugetPackage" />
       </div>
     </div>
+
+    <package-activity />
 
     <gl-table
       :fields="$options.filesTableHeaderFields"

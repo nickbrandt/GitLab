@@ -28,7 +28,7 @@ describe Gitlab::Geo::Replication::FileTransfer do
     end
   end
 
-  context '#download_from_primary' do
+  describe '#download_from_primary' do
     before do
       stub_current_geo_node(secondary_node)
     end

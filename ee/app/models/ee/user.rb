@@ -62,16 +62,13 @@ module EE
         scope
       }
 
-      scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
+      scope :excluding_guests, -> { joins(:members).merge(::Member.non_guests).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
       scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
       scope :with_provider, ->(provider) do
         joins(:identities).where(identities: { provider: provider })
       end
-
-      scope :bots, -> { where.not(bot_type: nil) }
-      scope :humans, -> { where(bot_type: nil) }
 
       scope :with_invalid_expires_at_tokens, ->(expiration_date) do
         where(id: ::PersonalAccessToken.with_invalid_expires_at(expiration_date).select(:user_id))
@@ -85,12 +82,6 @@ module EE
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
-
-      enum bot_type: {
-        support_bot: 1,
-        alert_bot: 2,
-        visual_review_bot: 3
-      }
     end
 
     class_methods do
@@ -105,15 +96,6 @@ module EE
         end
       end
 
-      def alert_bot
-        email_pattern = "alert%s@#{Settings.gitlab.host}"
-
-        unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
-          u.bio = 'The GitLab alert bot'
-          u.name = 'GitLab Alert Bot'
-        end
-      end
-
       def visual_review_bot
         email_pattern = "visual_review%s@#{Settings.gitlab.host}"
 
@@ -121,16 +103,6 @@ module EE
           u.bio = 'The Gitlab Visual Review feedback bot'
           u.name = 'Gitlab Visual Review Bot'
         end
-      end
-
-      override :internal
-      def internal
-        super.or(bots)
-      end
-
-      override :non_internal
-      def non_internal
-        super.humans
       end
 
       def non_ldap
@@ -268,6 +240,10 @@ module EE
         .any?
     end
 
+    def managed_free_namespaces
+      manageable_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
+    end
+
     override :has_current_license?
     def has_current_license?
       License.current.present?
@@ -286,15 +262,11 @@ module EE
     end
 
     def using_gitlab_com_seat?(namespace)
-      return false unless ::Gitlab.com?
-      return false unless namespace.present?
-      return false if namespace.free_plan?
-
-      if namespace.gold_plan?
-        highest_role > ::Gitlab::Access::GUEST
-      else
-        true
-      end
+      ::Gitlab.com? &&
+      namespace.present? &&
+      active? &&
+      !namespace.root_ancestor.free_plan? &&
+      namespace.root_ancestor.billed_user_ids.include?(self.id)
     end
 
     def group_sso?(group)
@@ -334,16 +306,27 @@ module EE
       super
     end
 
-    override :internal?
-    def internal?
-      super || bot?
-    end
+    def ab_feature_enabled?(feature, percentage: nil)
+      return false unless ::Gitlab.com?
+      return false if ::Gitlab::Geo.secondary?
 
-    def bot?
-      return bot_type.present? if has_attribute?(:bot_type)
+      raise "Currently only discover_security feature is supported" unless feature == :discover_security
 
-      # Some older *migration* specs utilize this removed column
-      read_attribute(:support_bot)
+      return false unless ::Feature.enabled?(feature)
+
+      filter = user_preference.feature_filter_type.presence || 0
+
+      # We use a 2nd feature flag for control as enabled and percentage_of_time for chatops
+      flipper_feature = ::Feature.get((feature.to_s + '_control').to_sym)
+      percentage ||= flipper_feature.gate_values[:percentage_of_time] || 0 if flipper_feature
+      return false if percentage <= 0
+
+      if filter == UserPreference::FEATURE_FILTER_UNKNOWN
+        filter = SecureRandom.rand * 100 <= percentage ? UserPreference::FEATURE_FILTER_EXPERIMENT : UserPreference::FEATURE_FILTER_CONTROL
+        user_preference.update_column :feature_filter_type, filter
+      end
+
+      filter == UserPreference::FEATURE_FILTER_EXPERIMENT
     end
 
     protected

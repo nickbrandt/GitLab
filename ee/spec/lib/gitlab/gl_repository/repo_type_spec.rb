@@ -17,6 +17,7 @@ describe Gitlab::GlRepository::RepoType do
       expect(described_class).to be_design
       expect(described_class).not_to be_project
       expect(described_class).not_to be_wiki
+      expect(described_class).not_to be_snippet
     end
 
     it 'checks if repository path is valid' do

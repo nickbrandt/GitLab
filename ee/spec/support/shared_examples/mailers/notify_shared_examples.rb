@@ -23,4 +23,11 @@ RSpec.shared_examples 'an epic email starting a new thread with reply-by-email e
       is_expected.to have_header 'Reply-To', /<reply@#{Gitlab.config.gitlab.host}>\Z/
     end
   end
+
+  RSpec.shared_examples 'having group identification headers' do
+    it 'has specific group headers' do
+      is_expected.to have_header 'X-GitLab-Group-Id', /#{group.id}/
+      is_expected.to have_header 'X-GitLab-Group-Path', /#{group.full_path}/
+    end
+  end
 end

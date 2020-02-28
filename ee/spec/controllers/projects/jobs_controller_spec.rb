@@ -25,7 +25,9 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           project.add_developer(user)
           sign_in(user)
 
-          allow_any_instance_of(Ci::Build).to receive(:merge_request).and_return(merge_request)
+          allow_next_instance_of(Ci::Build) do |instance|
+            allow(instance).to receive(:merge_request).and_return(merge_request)
+          end
 
           stub_application_setting(shared_runners_minutes: 2)
 
@@ -73,7 +75,9 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           project.add_developer(user)
           sign_in(user)
 
-          allow_any_instance_of(Ci::Build).to receive(:merge_request).and_return(merge_request)
+          allow_next_instance_of(Ci::Build) do |instance|
+            allow(instance).to receive(:merge_request).and_return(merge_request)
+          end
 
           stub_application_setting(shared_runners_minutes: 0)
 
@@ -98,7 +102,9 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           project.add_developer(user)
           sign_in(user)
 
-          allow_any_instance_of(Ci::Build).to receive(:merge_request).and_return(merge_request)
+          allow_next_instance_of(Ci::Build) do |instance|
+            allow(instance).to receive(:merge_request).and_return(merge_request)
+          end
 
           stub_application_setting(shared_runners_minutes: 2)
 

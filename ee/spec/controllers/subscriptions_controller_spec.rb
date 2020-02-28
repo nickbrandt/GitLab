@@ -212,6 +212,43 @@ describe SubscriptionsController do
           expect(response.body).to eq('{"errors":"error message"}')
         end
       end
+
+      context 'when selecting an existing group' do
+        let_it_be(:selected_group) { create(:group) }
+        let(:params) do
+          {
+            selected_group: selected_group.id,
+            customer: { country: 'NL' },
+            subscription: { plan_id: 'x', quantity: 1 }
+          }
+        end
+
+        before do
+          selected_group.add_owner(user)
+        end
+
+        it 'does not create a group' do
+          expect { subject }.to not_change { Group.count }
+        end
+
+        it 'returns the selected group location in JSON format' do
+          subject
+
+          expect(response.body).to eq({ location: "/#{selected_group.path}" }.to_json)
+        end
+      end
+
+      context 'when selecting a non existing group' do
+        let(:params) do
+          {
+            selected_group: 999,
+            customer: { country: 'NL' },
+            subscription: { plan_id: 'x', quantity: 1 }
+          }
+        end
+
+        it { is_expected.to have_gitlab_http_status(:not_found) }
+      end
     end
   end
 end

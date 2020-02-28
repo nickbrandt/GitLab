@@ -40,8 +40,9 @@ describe ApprovalRuleLike do
           subject.group_users
         end
 
-        it 'does not perform any queries when all users are loaded already' do
-          expect { subject.approvers }.not_to exceed_query_limit(0)
+        it 'does not perform any new queries when all users are loaded already' do
+          # single query is triggered for license check
+          expect { subject.approvers }.not_to exceed_query_limit(1)
         end
 
         it_behaves_like 'approvers contains the right users'
@@ -91,7 +92,7 @@ describe ApprovalRuleLike do
     it_behaves_like 'approval rule like'
   end
 
-  context '.group_users' do
+  describe '.group_users' do
     subject { create(:approval_project_rule) }
 
     it 'returns distinct users' do

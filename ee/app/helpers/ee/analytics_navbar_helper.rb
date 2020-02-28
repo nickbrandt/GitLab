@@ -8,7 +8,8 @@ module EE
     def project_analytics_navbar_links(project, current_user)
       super + [
         insights_navbar_link(project, current_user),
-        code_review_analytics_navbar_link(project, current_user)
+        code_review_analytics_navbar_link(project, current_user),
+        project_issues_analytics_navbar_link(project, current_user)
       ].compact
     end
 
@@ -17,14 +18,38 @@ module EE
       super + [
         contribution_analytics_navbar_link(group, current_user),
         group_insights_navbar_link(group, current_user),
-        issues_analytics_navbar_link(group, current_user)
+        issues_analytics_navbar_link(group, current_user),
+        productivity_analytics_navbar_link(group, current_user)
       ].compact
     end
 
     private
 
+    def project_issues_analytics_navbar_link(project, current_user)
+      return unless ::Feature.enabled?(:project_level_issues_analytics, project, default_enabled: true)
+      return unless project_nav_tab?(:issues_analytics)
+
+      navbar_sub_item(
+        title: _('Issues Analytics'),
+        path: 'issues_analytics#show',
+        link: project_analytics_issues_analytics_path(project)
+      )
+    end
+
+    def productivity_analytics_navbar_link(group, current_user)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
+      return unless ::Feature.enabled?(:group_level_productivity_analytics, default_enabled: true)
+      return unless group_sidebar_link?(:productivity_analytics)
+
+      navbar_sub_item(
+        title: _('Productivity Analytics'),
+        path: 'groups/analytics/productivity_analytics#show',
+        link: group_analytics_productivity_analytics_path(@group)
+      )
+    end
+
     def contribution_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:contribution_analytics)
 
       navbar_sub_item(
@@ -36,7 +61,7 @@ module EE
     end
 
     def group_insights_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:group_insights)
 
       navbar_sub_item(
@@ -48,7 +73,7 @@ module EE
     end
 
     def issues_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group)
+      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:analytics)
 
       navbar_sub_item(
@@ -59,7 +84,7 @@ module EE
     end
 
     def insights_navbar_link(project, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, project)
+      return unless ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, project, default_enabled: true)
       return unless project_nav_tab?(:project_insights)
 
       navbar_sub_item(

@@ -3,6 +3,8 @@
 module Projects
   module Prometheus
     class AlertsController < Projects::ApplicationController
+      include MetricsDashboard
+
       respond_to :json
 
       protect_from_forgery except: [:notify]
@@ -12,7 +14,7 @@ module Projects
       prepend_before_action :repository, :project_without_auth, only: [:notify]
 
       before_action :authorize_read_prometheus_alerts!, except: [:notify]
-      before_action :alert, only: [:update, :show, :destroy]
+      before_action :alert, only: [:update, :show, :destroy, :metrics_dashboard]
 
       def index
         render json: serialize_as_json(alerts)
@@ -133,6 +135,13 @@ module Projects
 
       def prometheus_alerts
         project.prometheus_alerts.for_environment(params[:environment_id])
+      end
+
+      def metrics_dashboard_params
+        {
+          embedded: true,
+          prometheus_alert_id: alert.id
+        }
       end
     end
   end

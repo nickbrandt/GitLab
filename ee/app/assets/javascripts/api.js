@@ -11,18 +11,18 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  k8sPodLogsPath: ':project_path/-/logs/k8s.json',
-  elasticsearchPodLogsPath: ':project_path/-/logs/elasticsearch.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
-  cycleAnalyticsSummaryDataPath: '/-/analytics/cycle_analytics/summary',
-  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
-  cycleAnalyticsStageEventsPath: '/-/analytics/cycle_analytics/stages/:stage_id/records',
-  cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
-  cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
-  cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
+  cycleAnalyticsSummaryDataPath: '/-/analytics/value_stream_analytics/summary',
+  cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/value_stream_analytics/stages',
+  cycleAnalyticsStageEventsPath: '/-/analytics/value_stream_analytics/stages/:stage_id/records',
+  cycleAnalyticsStageMedianPath: '/-/analytics/value_stream_analytics/stages/:stage_id/median',
+  cycleAnalyticsStagePath: '/-/analytics/value_stream_analytics/stages/:stage_id',
+  cycleAnalyticsDurationChartPath:
+    '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
+  cycleAnalyticsGroupLabelsPath: '/api/:version/groups/:namespace_path/labels',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
   countriesPath: '/-/countries',
   countryStatesPath: '/-/country_states',
@@ -102,17 +102,9 @@ export default {
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
   getPodLogs({ environment, podName, containerName, search, start, end }) {
-    let baseUrl;
-    if (environment.enable_advanced_logs_querying) {
-      baseUrl = this.elasticsearchPodLogsPath;
-    } else {
-      baseUrl = this.k8sPodLogsPath;
-    }
-    const url = this.buildUrl(baseUrl.replace(':project_path', environment.project_path));
+    const url = this.buildUrl(environment.logs_api_path);
 
-    const params = {
-      environment_name: environment.name,
-    };
+    const params = {};
 
     if (podName) {
       params.pod_name = podName;
@@ -217,6 +209,19 @@ export default {
 
   cycleAnalyticsDurationChart(stageSlug, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsDurationChartPath).replace(':stage_id', stageSlug);
+
+    return axios.get(url, {
+      params,
+    });
+  },
+
+  cycleAnalyticsGroupLabels(groupId, params = {}) {
+    // TODO: This can be removed when we resolve the labels endpoint
+    // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/25746
+    const url = Api.buildUrl(this.cycleAnalyticsGroupLabelsPath).replace(
+      ':namespace_path',
+      groupId,
+    );
 
     return axios.get(url, {
       params,

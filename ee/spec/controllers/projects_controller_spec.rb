@@ -317,6 +317,63 @@ describe ProjectsController do
         end
       end
     end
+
+    context 'merge request approvers settings' do
+      shared_examples 'merge request approvers rules' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:license_value, :setting_value, :param_value, :final_value) do
+          false | false | false | false
+          false | true  | false | false
+          false | false | true  | true
+          false | true  | true  | true
+          true  | false | false | false
+          true  | true  | false | nil
+          true  | false | true  | true
+          true  | true  | true  | nil
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(admin_merge_request_approvers_rules: license_value)
+            stub_application_setting(app_setting => setting_value)
+          end
+
+          it 'updates project if needed' do
+            put :update,
+              params: {
+                namespace_id: project.namespace,
+                id: project,
+                project: { setting => param_value }
+              }
+            project.reload
+
+            expect(project[setting]).to eq(final_value)
+          end
+        end
+      end
+
+      describe ':disable_overriding_approvers_per_merge_request' do
+        it_behaves_like 'merge request approvers rules' do
+          let(:app_setting) { :disable_overriding_approvers_per_merge_request }
+          let(:setting) { :disable_overriding_approvers_per_merge_request }
+        end
+      end
+
+      describe ':merge_requests_author_approval' do
+        it_behaves_like 'merge request approvers rules' do
+          let(:app_setting) { :prevent_merge_requests_author_approval }
+          let(:setting) { :merge_requests_author_approval }
+        end
+      end
+
+      describe ':merge_requests_disable_committers_approval' do
+        it_behaves_like 'merge request approvers rules' do
+          let(:app_setting) { :prevent_merge_requests_committers_approval }
+          let(:setting) { :merge_requests_disable_committers_approval }
+        end
+      end
+    end
   end
 
   describe '#download_export' do

@@ -323,9 +323,9 @@ describe Geo::RepositorySyncService do
         create(:geo_project_registry, project: project, repository_retry_count: Geo::ProjectRegistry::RETRIES_BEFORE_REDOWNLOAD + 1)
 
         expect(subject).to receive(:sync_repository).and_call_original
-        expect(subject.gitlab_shell).to receive(:mv_repository).exactly(2).times.and_call_original
+        expect(subject.gitlab_shell).to receive(:mv_repository).twice.and_call_original
 
-        expect(subject.gitlab_shell).to receive(:remove_repository).exactly(2).times.and_call_original
+        expect(subject.gitlab_shell).to receive(:remove_repository).twice.and_call_original
 
         subject.execute
 

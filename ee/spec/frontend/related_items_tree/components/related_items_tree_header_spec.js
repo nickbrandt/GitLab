@@ -9,6 +9,7 @@ import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_action
 import Icon from '~/vue_shared/components/icon.vue';
 
 import {
+  mockInitialConfig,
   mockParentItem,
   mockQueryResponse,
 } from '../../../javascripts/related_items_tree/mock_data';
@@ -17,6 +18,7 @@ const createComponent = ({ slots } = {}) => {
   const store = createDefaultStore();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
+  store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setInitialParentItem', mockParentItem);
   store.dispatch('setItemChildren', {
     parentItem: mockParentItem,
@@ -167,13 +169,42 @@ describe('RelatedItemsTree', () => {
         expect(badgesContainerEl.isVisible()).toBe(true);
       });
 
-      it('renders epics count and icon', () => {
-        const epicsEl = wrapper.findAll('.issue-count-badge > span').at(0);
-        const epicIcon = epicsEl.find(Icon);
+      describe('when sub-epics feature is available', () => {
+        it('renders epics count and icon', () => {
+          const epicsEl = wrapper.findAll('.issue-count-badge > span').at(0);
+          const epicIcon = epicsEl.find(Icon);
 
-        expect(epicsEl.text().trim()).toBe('2');
-        expect(epicIcon.isVisible()).toBe(true);
-        expect(epicIcon.props('name')).toBe('epic');
+          expect(epicsEl.text().trim()).toBe('2');
+          expect(epicIcon.isVisible()).toBe(true);
+          expect(epicIcon.props('name')).toBe('epic');
+        });
+
+        it('renders `Add an epic` dropdown button', () => {
+          expect(findEpicsSplitButton().isVisible()).toBe(true);
+        });
+      });
+
+      describe('when sub-epics feature is not available', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.commit('SET_INITIAL_CONFIG', {
+            ...mockInitialConfig,
+            allowSubEpics: false,
+          });
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('does not render epics count and icon', () => {
+          const countBadgesEl = wrapper.findAll('.issue-count-badge > span');
+          const badgeIcon = countBadgesEl.at(0).find(Icon);
+
+          expect(countBadgesEl.length).toBe(1);
+          expect(badgeIcon.props('name')).toBe('issues');
+        });
+
+        it('does not render `Add an epic` dropdown button', () => {
+          expect(findEpicsSplitButton().exists()).toBe(false);
+        });
       });
 
       it('renders issues count and icon', () => {
@@ -183,10 +214,6 @@ describe('RelatedItemsTree', () => {
         expect(issuesEl.text().trim()).toBe('2');
         expect(issueIcon.isVisible()).toBe(true);
         expect(issueIcon.props('name')).toBe('issues');
-      });
-
-      it('renders `Add an epic` dropdown button', () => {
-        expect(findEpicsSplitButton().isVisible()).toBe(true);
       });
 
       it('renders `Add an issue` dropdown button', () => {

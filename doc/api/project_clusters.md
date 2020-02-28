@@ -1,6 +1,6 @@
 # Project clusters API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/23922) in GitLab 11.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/23922) in GitLab 11.7.
 
 NOTE: **Note:**
 User will need at least maintainer access to use these endpoints.
@@ -9,7 +9,7 @@ User will need at least maintainer access to use these endpoints.
 
 Returns a list of project clusters.
 
-```
+```plaintext
 GET /projects/:id/clusters
 ```
 
@@ -368,7 +368,7 @@ Example response:
 
 Deletes an existing project cluster.
 
-```
+```plaintext
 DELETE /projects/:id/clusters/:cluster_id
 ```
 

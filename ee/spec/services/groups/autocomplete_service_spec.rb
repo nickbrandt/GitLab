@@ -101,17 +101,33 @@ describe Groups::AutocompleteService do
       let(:parent_epic) { create(:epic, group: group, author: user) }
       let(:epic)        { create(:epic, group: group, author: user, parent: parent_epic) }
 
-      before do
-        stub_licensed_features(epics: true)
+      context 'with subepics feature enabled' do
+        before do
+          stub_licensed_features(epics: true, subepics: true)
+        end
+
+        it 'returns available commands' do
+          available_commands = [
+            :todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close,
+            :child_epic, :remove_child_epic, :parent_epic, :remove_parent_epic
+          ]
+
+          expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
+        end
       end
 
-      it 'returns available commands' do
-        available_commands = [
-          :todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close,
-          :child_epic, :remove_child_epic, :parent_epic, :remove_parent_epic
-        ]
+      context 'with subepics feature disabled' do
+        before do
+          stub_licensed_features(epics: true, subepics: false)
+        end
 
-        expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
+        it 'returns available commands' do
+          available_commands = [
+            :todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close
+          ]
+
+          expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
+        end
       end
     end
   end

@@ -16,7 +16,15 @@ export default () => {
     return false;
   }
 
-  const { id, iid, fullPath, autoCompleteEpics, autoCompleteIssues, userSignedIn } = el.dataset;
+  const {
+    id,
+    iid,
+    fullPath,
+    autoCompleteEpics,
+    autoCompleteIssues,
+    userSignedIn,
+    allowSubEpics,
+  } = el.dataset;
   const initialData = JSON.parse(el.dataset.initial);
 
   Vue.component('tree-root', TreeRoot);
@@ -46,6 +54,7 @@ export default () => {
         autoCompleteEpics: parseBoolean(autoCompleteEpics),
         autoCompleteIssues: parseBoolean(autoCompleteIssues),
         userSignedIn: parseBoolean(userSignedIn),
+        allowSubEpics: parseBoolean(allowSubEpics),
       });
     },
     methods: {

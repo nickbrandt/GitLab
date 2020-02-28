@@ -150,11 +150,25 @@
     right: 8px;
   }
 
+  .spinner {
+    position: absolute;
+    top: 9px;
+    right: 8px;
+  }
+
   .ic-chevron-down {
     position: absolute;
     top: $gl-padding-8;
     right: $gl-padding-8;
     color: $gray-darkest;
+  }
+}
+
+.gl-dropdown .dropdown-menu-toggle {
+  padding-right: $gl-padding-8;
+
+  .gl-dropdown-toggle-text {
+    min-height: $gl-line-height-20;
   }
 }
 
@@ -380,6 +394,15 @@
 
       &.btn .fa:not(:last-child) {
         margin-left: 5px;
+      }
+    }
+
+    > button.dropdown-epic-button {
+      flex-direction: column;
+
+      .reference {
+        color: $gl-gray-400;
+        margin-top: $gl-padding-4;
       }
     }
 

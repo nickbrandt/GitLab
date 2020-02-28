@@ -65,15 +65,21 @@ module Gitlab
             false
           end
 
-          def build_mention_values
+          def build_mention_values(resource_foreign_key)
             refs = all_references(author)
 
+            mentioned_users_ids = array_to_sql(refs.mentioned_users.pluck(:id))
+            mentioned_projects_ids = array_to_sql(refs.mentioned_projects.pluck(:id))
+            mentioned_groups_ids = array_to_sql(refs.mentioned_groups.pluck(:id))
+
+            return if mentioned_users_ids.blank? && mentioned_projects_ids.blank? && mentioned_groups_ids.blank?
+
             {
-              "#{self.user_mention_model.resource_foreign_key}": user_mention_resource_id,
+              "#{resource_foreign_key}": user_mention_resource_id,
               note_id: user_mention_note_id,
-              mentioned_users_ids: array_to_sql(refs.mentioned_users.pluck(:id)),
-              mentioned_projects_ids: array_to_sql(refs.mentioned_projects.pluck(:id)),
-              mentioned_groups_ids: array_to_sql(refs.mentioned_groups.pluck(:id))
+              mentioned_users_ids: mentioned_users_ids,
+              mentioned_projects_ids: mentioned_projects_ids,
+              mentioned_groups_ids: mentioned_groups_ids
             }
           end
 

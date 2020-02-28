@@ -18,6 +18,8 @@ class Deployment < ApplicationRecord
   has_many :merge_requests,
     through: :deployment_merge_requests
 
+  has_one :deployment_cluster
+
   has_internal_id :iid, scope: :project, track_if: -> { !importing? }, init: ->(s) do
     Deployment.where(project: s.project).maximum(:iid) if s&.project
   end
@@ -28,6 +30,7 @@ class Deployment < ApplicationRecord
   validate :valid_ref, on: :create
 
   delegate :name, to: :environment, prefix: true
+  delegate :kubernetes_namespace, to: :deployment_cluster, allow_nil: true
 
   scope :for_environment, -> (environment) { where(environment_id: environment) }
   scope :for_environment_name, -> (name) do
@@ -37,6 +40,10 @@ class Deployment < ApplicationRecord
   scope :for_status, -> (status) { where(status: status) }
 
   scope :visible, -> { where(status: %i[running success failed canceled]) }
+  scope :stoppable, -> { where.not(on_stop: nil).where.not(deployable_id: nil).success }
+  scope :active, -> { where(status: %i[created running]) }
+  scope :older_than, -> (deployment) { where('id < ?', deployment.id) }
+  scope :with_deployable, -> { includes(:deployable).where('deployable_id IS NOT NULL') }
 
   state_machine :status, initial: :created do
     event :run do
@@ -68,6 +75,14 @@ class Deployment < ApplicationRecord
     after_transition any => [:success, :failed, :canceled] do |deployment|
       deployment.run_after_commit do
         Deployments::FinishedWorker.perform_async(id)
+      end
+    end
+
+    after_transition any => :running do |deployment|
+      next unless deployment.project.forward_deployment_enabled?
+
+      deployment.run_after_commit do
+        Deployments::ForwardDeploymentWorker.perform_async(id)
       end
     end
   end
@@ -214,7 +229,14 @@ class Deployment < ApplicationRecord
   end
 
   def link_merge_requests(relation)
-    select = relation.select(['merge_requests.id', id]).to_sql
+    # NOTE: relation.select will perform column deduplication,
+    # when id == environment_id it will outputs 2 columns instead of 3
+    # i.e.:
+    # MergeRequest.select(1, 2).to_sql #=> SELECT 1, 2 FROM "merge_requests"
+    # MergeRequest.select(1, 1).to_sql #=> SELECT 1 FROM "merge_requests"
+    select = relation.select('merge_requests.id',
+                             "#{id} as deployment_id",
+                             "#{environment_id} as environment_id").to_sql
 
     # We don't use `Gitlab::Database.bulk_insert` here so that we don't need to
     # first pluck lots of IDs into memory.
@@ -223,7 +245,7 @@ class Deployment < ApplicationRecord
     # for the same deployment, only inserting any missing merge requests.
     DeploymentMergeRequest.connection.execute(<<~SQL)
       INSERT INTO #{DeploymentMergeRequest.table_name}
-      (merge_request_id, deployment_id)
+      (merge_request_id, deployment_id, environment_id)
       #{select}
       ON CONFLICT DO NOTHING
     SQL

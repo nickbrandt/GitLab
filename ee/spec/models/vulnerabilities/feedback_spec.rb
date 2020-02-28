@@ -41,6 +41,36 @@ describe Vulnerabilities::Feedback do
     end
   end
 
+  describe '.with_category' do
+    it 'filters by category' do
+      described_class.categories.each do |category, _|
+        create(:vulnerability_feedback, category: category)
+      end
+
+      expect(described_class.count).to eq described_class.categories.length
+
+      expected, _ = described_class.categories.first
+
+      feedback = described_class.with_category(expected)
+
+      expect(feedback.length).to eq 1
+      expect(feedback.first.category).to eq expected
+    end
+  end
+
+  describe '.with_feedback_type' do
+    it 'filters by feedback_type' do
+      create(:vulnerability_feedback, :dismissal)
+      create(:vulnerability_feedback, :issue)
+      create(:vulnerability_feedback, :merge_request)
+
+      feedback = described_class.with_feedback_type('issue')
+
+      expect(feedback.length).to eq 1
+      expect(feedback.first.feedback_type).to eq 'issue'
+    end
+  end
+
   describe '#has_comment?' do
     let(:feedback) { build(:vulnerability_feedback, comment: comment, comment_author: comment_author) }
     let(:comment) { 'a comment' }

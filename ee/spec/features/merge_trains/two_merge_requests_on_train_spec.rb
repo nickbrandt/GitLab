@@ -28,6 +28,7 @@ describe 'Two merge requests on a merge train' do
   end
 
   before do
+    stub_feature_flags(disable_merge_trains: false)
     project.add_maintainer(maintainer_1)
     project.add_maintainer(maintainer_2)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)

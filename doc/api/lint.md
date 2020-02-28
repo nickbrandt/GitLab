@@ -4,7 +4,7 @@
 
 Checks if your `.gitlab-ci.yml` file is valid.
 
-```
+```plaintext
 POST /ci/lint
 ```
 
@@ -48,4 +48,4 @@ Example responses:
   }
   ```
 
-[ce-5953]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5953
+[ce-5953]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5953

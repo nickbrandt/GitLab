@@ -3,7 +3,13 @@
 class Milestone < ApplicationRecord
   # Represents a "No Milestone" state used for filtering Issues and Merge
   # Requests that have no milestone assigned.
-  MilestoneStruct = Struct.new(:title, :name, :id)
+  MilestoneStruct = Struct.new(:title, :name, :id) do
+    # Ensure these models match the interface required for exporting
+    def serializable_hash(_opts = {})
+      { title: title, name: name, id: id }
+    end
+  end
+
   None = MilestoneStruct.new('No Milestone', 'No Milestone', 0)
   Any = MilestoneStruct.new('Any Milestone', '', -1)
   Upcoming = MilestoneStruct.new('Upcoming', '#upcoming', -2)
@@ -38,9 +44,6 @@ class Milestone < ApplicationRecord
   has_many :labels, -> { distinct.reorder('labels.title') }, through: :issues
   has_many :merge_requests
   has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
-
-  has_many :issue_milestones
-  has_many :merge_request_milestones
 
   scope :of_projects, ->(ids) { where(project_id: ids) }
   scope :of_groups, ->(ids) { where(group_id: ids) }
@@ -131,11 +134,12 @@ class Milestone < ApplicationRecord
       reorder(nil).group(:state).count
     end
 
+    def predefined_id?(id)
+      [Any.id, None.id, Upcoming.id, Started.id].include?(id)
+    end
+
     def predefined?(milestone)
-      milestone == Any ||
-        milestone == None ||
-        milestone == Upcoming ||
-        milestone == Started
+      predefined_id?(milestone&.id)
     end
   end
 

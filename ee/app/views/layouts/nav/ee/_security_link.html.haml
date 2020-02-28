@@ -1,23 +1,27 @@
-- compliance_dashboard_available = @group.feature_available?(:group_level_compliance_dashboard)
-- security_dashboard_available = @group.feature_available?(:security_dashboard)
-- if compliance_dashboard_available || security_dashboard_available
-  - main_path = compliance_dashboard_available ? group_security_compliance_dashboard_path(@group) : group_security_dashboard_path(@group)
-  = nav_link(path: %w[groups/security/compliance_dashboards#show groups/security/dashboard#show]) do
+- main_path = primary_group_level_security_feature_path(@group)
+- if main_path.present?
+  = nav_link(path: %w[dashboard#show compliance_dashboards#show credentials#index]) do
     = link_to main_path, data: { qa_selector: 'security_compliance_link' } do
       .nav-icon-container
         = sprite_icon('shield')
       %span.nav-item-name
         = _('Security & Compliance')
     %ul.sidebar-sub-level-items{ data: { qa_selector: 'group_secure_submenu' } }
-      - if security_dashboard_available
-        = nav_link(path: 'groups/security/dashboard#show') do
+      - if group_level_security_dashboard_available?(@group)
+        = nav_link(path: 'dashboard#show') do
           = link_to group_security_dashboard_path(@group), title: _('Security'), data: { qa_selector: 'security_dashboard_link' } do
             %span= _('Security')
 
-      - if compliance_dashboard_available
-        = nav_link(path: 'groups/security/compliance_dashboards#show') do
+      - if group_level_compliance_dashboard_available?(@group)
+        = nav_link(path: 'compliance_dashboards#show') do
           = link_to group_security_compliance_dashboard_path(@group), title: _('Compliance') do
             %span= _('Compliance')
+
+      - if group_level_credentials_inventory_available?(@group)
+        = nav_link(path: 'credentials#index') do
+          = link_to group_security_credentials_path(@group), title: _('Credentials') do
+            %span= _('Credentials')
+
 - elsif show_discover_group_security?(@group)
   = nav_link(path: group_security_discover_path(@group)) do
     = link_to group_security_discover_path(@group) do

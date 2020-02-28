@@ -19,6 +19,7 @@ describe('RelatedItemsTree', () => {
             issuesEndpoint: '/bar',
             autoCompleteEpics: true,
             autoCompleteIssues: false,
+            allowSubEpics: true,
           };
 
           mutations[types.SET_INITIAL_CONFIG](state, data);
@@ -27,6 +28,7 @@ describe('RelatedItemsTree', () => {
           expect(state).toHaveProperty('issuesEndpoint', '/bar');
           expect(state).toHaveProperty('autoCompleteEpics', true);
           expect(state).toHaveProperty('autoCompleteIssues', false);
+          expect(state).toHaveProperty('allowSubEpics', true);
         });
       });
 
@@ -479,10 +481,14 @@ describe('RelatedItemsTree', () => {
 
       describe(types.RECEIVE_ADD_ITEM_FAILURE, () => {
         it('should set `itemAddInProgress` to false, `itemAddFailure` to true and `itemAddFailureType` value within state', () => {
-          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType: 'bar' });
+          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, {
+            itemAddFailureMessage: 'foo',
+            itemAddFailureType: 'bar',
+          });
 
           expect(state.itemAddInProgress).toBe(false);
           expect(state.itemAddFailure).toBe(true);
+          expect(state.itemAddFailureMessage).toEqual('foo');
           expect(state.itemAddFailureType).toEqual('bar');
         });
       });

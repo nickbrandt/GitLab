@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class Packages::Package < ApplicationRecord
   include Sortable
+  include Gitlab::SQL::Pattern
 
   belongs_to :project
   # package_files must be destroyed by ruby code in order to properly remove carrierwave uploads and update project statistics
@@ -23,8 +24,9 @@ class Packages::Package < ApplicationRecord
     format: { with: Gitlab::Regex.package_name_regex }
 
   validates :name,
-    uniqueness: { scope: %i[project_id version package_type] }
+    uniqueness: { scope: %i[project_id version package_type] }, unless: :conan?
 
+  validate :valid_conan_package_recipe, if: :conan?
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
 
@@ -32,12 +34,19 @@ class Packages::Package < ApplicationRecord
 
   scope :with_name, ->(name) { where(name: name) }
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }
+  scope :search_by_name, ->(query) { fuzzy_search(query, [:name], use_minimum_char_limit: false) }
   scope :with_version, ->(version) { where(version: version) }
+  scope :without_version_like, -> (version) { where.not(arel_table[:version].matches(version)) }
   scope :with_package_type, ->(package_type) { where(package_type: package_type) }
 
   scope :with_conan_channel, ->(package_channel) do
     joins(:conan_metadatum).where(packages_conan_metadata: { package_channel: package_channel })
   end
+  scope :with_conan_username, ->(package_username) do
+    joins(:conan_metadatum).where(packages_conan_metadata: { package_username: package_username })
+  end
+
+  scope :without_nuget_temporary_name, -> { where.not(name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
 
   scope :has_version, -> { where.not(version: nil) }
   scope :processed, -> do
@@ -48,6 +57,7 @@ class Packages::Package < ApplicationRecord
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
   scope :limit_recent, ->(limit) { order_created_desc.limit(limit) }
+  scope :select_distinct_name, -> { select(:name).distinct }
 
   # Sorting
   scope :order_created, -> { reorder('created_at ASC') }
@@ -81,6 +91,10 @@ class Packages::Package < ApplicationRecord
     pluck(:name)
   end
 
+  def self.pluck_versions
+    pluck(:version)
+  end
+
   def self.sort_by_attribute(method)
     case method.to_s
     when 'created_asc' then order_created
@@ -99,6 +113,20 @@ class Packages::Package < ApplicationRecord
   end
 
   private
+
+  def valid_conan_package_recipe
+    recipe_exists = project.packages
+                           .conan
+                           .includes(:conan_metadatum)
+                           .with_name(name)
+                           .with_version(version)
+                           .with_conan_channel(conan_metadatum.package_channel)
+                           .with_conan_username(conan_metadatum.package_username)
+                           .id_not_in(id)
+                           .exists?
+
+    errors.add(:base, 'Package recipe already exists') if recipe_exists
+  end
 
   def valid_npm_package_name
     return unless project&.root_namespace

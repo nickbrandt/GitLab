@@ -6,7 +6,7 @@ type: tutorial
 
 > **Notes**:
 >
-> - [Introduced](https://about.gitlab.com/blog/2015/08/22/gitlab-7-14-released/) in GitLab 7.14.
+> - [Introduced](https://about.gitlab.com/releases/2015/08/22/gitlab-7-14-released/) in GitLab 7.14.
 > - GitLab 8.12 has a completely redesigned job permissions system. Read all
 >   about the [new model and its implications](../../user/project/new_ci_build_permissions_model.md#pipeline-triggers).
 
@@ -167,7 +167,7 @@ build_docs:
   - tags
 ```
 
-Now, whenever a new tag is pushed on project A, the job will run and the
+This means that whenever a new tag is pushed on project A, the job will run and the
 `build_docs` job will be executed, triggering a rebuild of project B. The
 `stage: deploy` ensures that this job will run only after all jobs with
 `stage: test` complete successfully.
@@ -249,6 +249,9 @@ curl --request POST \
   https://gitlab.example.com/api/v4/projects/9/trigger/pipeline
 ```
 
+Trigger variables have the [highest priority](../variables/README.md#priority-of-environment-variables)
+of all types of variables.
+
 ## Using cron to trigger nightly pipelines
 
 >**Note:**
@@ -271,8 +274,8 @@ Triggers with the legacy label do not have an associated user and only have
 access to the current project. They are considered deprecated and will be
 removed with one of the future versions of GitLab.
 
-[ee-2017]: https://gitlab.com/gitlab-org/gitlab/merge_requests/2017
-[ee-2346]: https://gitlab.com/gitlab-org/gitlab/merge_requests/2346
+[ee-2017]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2017
+[ee-2346]: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/2346
 [ee]: https://about.gitlab.com/pricing/
 [variables]: ../variables/README.md
 [predef]: ../variables/README.md#predefined-environment-variables

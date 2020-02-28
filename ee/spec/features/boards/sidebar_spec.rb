@@ -281,9 +281,10 @@ describe 'Issue Boards', :js do
         find('.dropdown-menu-close-icon').click
 
         page.within('.value') do
-          expect(page).to have_selector('.scoped-label-wrapper', count: 1)
-          expect(page).not_to have_content(scoped_label_1.title)
-          expect(page).to have_content(scoped_label_2.title)
+          expect(page).to have_selector('.gl-label-scoped', count: 1)
+          expect(page).not_to have_content(scoped_label_1.scoped_label_value)
+          expect(page).to have_content(scoped_label_2.scoped_label_key)
+          expect(page).to have_content(scoped_label_2.scoped_label_value)
         end
       end
 

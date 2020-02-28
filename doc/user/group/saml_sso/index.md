@@ -64,7 +64,7 @@ We intend to add a similar SSO requirement for [Git and API activity](https://gi
 
 #### Group-managed accounts
 
-[Introduced in GitLab 12.1](https://gitlab.com/groups/gitlab-org/-/epics/709).
+> [Introduced in GitLab 12.1](https://gitlab.com/groups/gitlab-org/-/epics/709).
 
 When SSO is being enforced, groups can enable an additional level of protection by enforcing the creation of dedicated user accounts to access the group.
 
@@ -80,6 +80,28 @@ Since use of the group-managed account requires the use of SSO, users of group-m
 
 - The user will be unable to access the group (their credentials will no longer work on the identity provider when prompted to SSO).
 - Contributions in the group (e.g. issues, merge requests) will remain intact.
+
+##### Credentials inventory for Group-managed accounts **(ULTIMATE)**
+
+> [Introduced in GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/issues/38133)
+
+Owners who manage user accounts in a group can view the following details of personal access tokens and SSH keys:
+
+- Owners
+- Scopes
+- Usage patterns
+
+To access the Credentials inventory of a group, navigate to **{shield}** **Security & Compliance > Credentials** in your group's sidebar.
+
+This feature is similar to the [Credentials inventory for self-managed instances](../../admin_area/credentials_inventory.md).
+
+##### Outer forks restriction for Group-managed accounts
+
+> [Introduced in GitLab 12.9](https://gitlab.com/gitlab-org/gitlab/issues/34648)
+
+Groups with enabled group-managed accounts can allow or disallow forking of projects outside of root group
+by using separate toggle. If forking is disallowed any project of given root group or its subgroups can be forked to
+a subgroup of the same root group only.
 
 #### Assertions
 
@@ -265,9 +287,15 @@ Specific attention should be paid to:
 - The presence of a `X509Certificate`, which we require to verify the response signature.
 - The `SubjectConfirmation` and `Conditions`, which can cause errors if misconfigured.
 
+### Verifying configuration
+
+For convenience, we've included some [example resources](../../../administration/troubleshooting/group_saml_scim.md) used by our Support Team. While they may help you verify the SAML app configuration, they are not guaranteed to reflect the current state of third-party products.
+
 ### Verifying NameID
 
 In troubleshooting the Group SAML setup, any authenticated user can use the API to verify the NameID GitLab already has linked to the user by visiting [https://gitlab.com/api/v4/user](https://gitlab.com/api/v4/user) and checking the `extern_uid` under identities.
+
+Similarly, group members of a role with the appropriate permissions can make use of the [members API](../../../api/members.md) to view group SAML identity information for members of the group.
 
 This can then be compared to the [NameID](#nameid) being sent by the Identity Provider by decoding the message with a [SAML debugging tool](#saml-debugging-tools). We require that these match in order to identify users.
 

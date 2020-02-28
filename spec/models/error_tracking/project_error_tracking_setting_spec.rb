@@ -8,7 +8,7 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
 
   let_it_be(:project) { create(:project) }
 
-  subject { create(:project_error_tracking_setting, project: project) }
+  subject(:setting) { create(:project_error_tracking_setting, project: project) }
 
   describe 'Associations' do
     it { is_expected.to belong_to(:project) }
@@ -18,6 +18,19 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
     it { is_expected.to validate_length_of(:api_url).is_at_most(255) }
     it { is_expected.to allow_value("http://gitlab.com/api/0/projects/project1/something").for(:api_url) }
     it { is_expected.not_to allow_values("http://gitlab.com/api/0/projects/project1/something€").for(:api_url) }
+
+    it 'disallows non-booleans in enabled column' do
+      is_expected.not_to allow_value(
+        nil
+      ).for(:enabled)
+    end
+
+    it 'allows booleans in enabled column' do
+      is_expected.to allow_value(
+        true,
+        false
+      ).for(:enabled)
+    end
 
     it 'rejects invalid api_urls' do
       is_expected.not_to allow_values(
@@ -438,6 +451,25 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
       it 'returns nil' do
         expect(subject.api_url).to eq(nil)
       end
+    end
+  end
+
+  describe '#expire_issues_cache', :use_clean_rails_redis_caching do
+    let(:issues) { [:some, :issues] }
+    let(:opt) { 'list_issues' }
+    let(:params) { { issue_status: 'unresolved', limit: 20, sort: 'last_seen' } }
+
+    before do
+      start_reactive_cache_lifetime(subject, opt, params.stringify_keys)
+      stub_reactive_cache(subject, issues, opt, params.stringify_keys)
+    end
+
+    it 'clears the cache' do
+      expect(subject.list_sentry_issues(params)).to eq(issues)
+
+      subject.expire_issues_cache
+
+      expect(subject.list_sentry_issues(params)).to eq(nil)
     end
   end
 end

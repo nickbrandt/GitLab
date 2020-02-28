@@ -20,7 +20,7 @@ module QA
             end
 
             # Create a new project and wiki
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = project_name
               project.description = 'Geo project for wiki ssh spec'
             end
@@ -46,6 +46,8 @@ module QA
             Page::Project::Menu.perform(&:click_wiki)
             validate_content(push_content)
           end
+
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|

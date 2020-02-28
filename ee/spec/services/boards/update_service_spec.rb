@@ -66,7 +66,7 @@ describe Boards::UpdateService, services: true do
       end
     end
 
-    context '#set_labels' do
+    describe '#set_labels' do
       def expect_label_assigned(user, board, input_labels, expected_labels)
         service = described_class.new(board.resource_parent, user, labels: input_labels.join(','))
         service.execute(board)

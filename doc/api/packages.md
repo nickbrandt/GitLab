@@ -6,18 +6,21 @@ This is the API docs of [GitLab Packages](../administration/packages/index.md).
 
 ### Within a project
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9259) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9259) in GitLab 11.8.
 
-Get a list of project packages. Both Maven and NPM packages are included in results.
-When accessed without authentication, only packages of public projects are returned.
+Get a list of project packages. All package types are included in results. When
+accessed without authentication, only packages of public projects are returned.
 
-```
+```plaintext
 GET /projects/:id/packages
 ```
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+| `order_by`| string | no | The field to use as order. One of `created_at` (default), `name`, `version`, or `type`. |
+| `sort`    | string | no | The direction of the order, either `asc` (default) for ascending order or `desc` for descending order. |
+| `package_type` | string | no | Filter the returned packages by type. One of `conan`, `maven`, `npm` or `nuget`. (_Introduced in GitLab 12.9_)
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages
@@ -48,12 +51,12 @@ By default, the `GET` request will return 20 results, since the API is [paginate
 
 ### Within a group
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18871) in GitLab 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18871) in GitLab 12.5.
 
 Get a list of project packages at the group level.
 When accessed without authentication, only packages of public projects are returned.
 
-```
+```plaintext
 GET /groups/:id/packages
 ```
 
@@ -61,6 +64,8 @@ GET /groups/:id/packages
 | --------- | ---- | -------- | ----------- |
 | `id`      | integer/string | yes | ID or [URL-encoded path of the group](README.md#namespaced-path-encoding). |
 | `exclude_subgroups` | boolean | false | If the param is included as true, packages from projects from subgroups are not listed. Default is `false`. |
+| `order_by`| string | no | The field to use as order. One of `created_at` (default), `name`, `version`, `type`, or `project_path`. |
+| `sort`    | string | no | The direction of the order, either `asc` (default) for ascending order or `desc` for descending order. |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/:id/packages?exclude_subgroups=true
@@ -126,11 +131,11 @@ The `_links` object contains the following properties:
 
 ## Get a project package
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9667) in GitLab 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9667) in GitLab 11.9.
 
 Get a single project package.
 
-```
+```plaintext
 GET /projects/:id/packages/:package_id
 ```
 
@@ -177,11 +182,11 @@ The `_links` object contains the following properties:
 
 ## List package files
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9305) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9305) in GitLab 11.8.
 
 Get a list of package files of a single package.
 
-```
+```plaintext
 GET /projects/:id/packages/:package_id/package_files
 ```
 
@@ -232,11 +237,11 @@ By default, the `GET` request will return 20 results, since the API is [paginate
 
 ## Delete a project package
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9623) in GitLab 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/9623) in GitLab 11.9.
 
 Deletes a project package.
 
-```
+```plaintext
 DELETE /projects/:id/packages/:package_id
 ```
 

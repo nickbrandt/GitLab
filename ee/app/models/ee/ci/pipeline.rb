@@ -6,8 +6,6 @@ module EE
       extend ActiveSupport::Concern
       extend ::Gitlab::Utils::Override
 
-      BridgeStatusError = Class.new(StandardError)
-
       EE_FAILURE_REASONS = {
         activity_limit_exceeded: 20,
         size_limit_exceeded: 21
@@ -23,9 +21,9 @@ module EE
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
+        # Subscriptions to this pipeline
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
-
-        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
+        has_many :security_scans, class_name: 'Security::Scan', through: :builds
 
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
@@ -67,42 +65,11 @@ module EE
               ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
             end
           end
-
-          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
-            next unless pipeline.bridge_triggered?
-            next unless pipeline.bridge_waiting?
-
-            pipeline.run_after_commit do
-              ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
-            end
-          end
-
-          after_transition created: :pending do |pipeline|
-            next unless pipeline.bridge_triggered?
-            next if pipeline.bridge_waiting?
-
-            pipeline.update_bridge_status!
-          end
         end
-      end
-
-      def bridge_triggered?
-        source_bridge.present?
-      end
-
-      def bridge_waiting?
-        source_bridge&.dependent?
       end
 
       def retryable?
         !merge_train_pipeline? && super
-      end
-
-      def update_bridge_status!
-        raise ArgumentError unless bridge_triggered?
-        raise BridgeStatusError unless source_bridge.active?
-
-        source_bridge.success!
       end
 
       def batch_lookup_report_artifact_for_file_type(file_type)
@@ -115,15 +82,7 @@ module EE
           .last
       end
 
-      def any_report_artifact_for_type(file_type)
-        return unless available_licensed_report_type?(file_type)
-
-        job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
-      end
-
       def expose_license_scanning_data?
-        return unless available_licensed_report_type?(:license_management)
-
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
 
@@ -173,7 +132,7 @@ module EE
 
       override :merge_request_event_type
       def merge_request_event_type
-        return unless merge_request_event?
+        return unless merge_request?
 
         strong_memoize(:merge_request_event_type) do
           merge_train_pipeline? ? :merge_train : super

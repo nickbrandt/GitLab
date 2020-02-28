@@ -24,6 +24,7 @@ describe('ee/subscriptions/new/store/mutation', () => {
     mutation                                  | value                                 | stateProp
     ${types.UPDATE_CURRENT_STEP}              | ${'secondStep'}                       | ${'currentStep'}
     ${types.UPDATE_SELECTED_PLAN}             | ${'secondPlan'}                       | ${'selectedPlan'}
+    ${types.UPDATE_SELECTED_GROUP}            | ${'selectedGroup'}                    | ${'selectedGroup'}
     ${types.UPDATE_IS_SETUP_FOR_COMPANY}      | ${false}                              | ${'isSetupForCompany'}
     ${types.UPDATE_NUMBER_OF_USERS}           | ${2}                                  | ${'numberOfUsers'}
     ${types.UPDATE_ORGANIZATION_NAME}         | ${'new name'}                         | ${'organizationName'}

@@ -118,7 +118,6 @@ export const parsedDast = [
     riskcode: '1',
     riskdesc: 'Low (Medium)',
     severity: 'Low',
-    confidence: 'Medium',
     cweid: '3',
     desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
     pluginid: '123',
@@ -161,7 +160,6 @@ export const parsedDast = [
       },
     ],
     severity: 'Low',
-    confidence: 'Medium',
     cweid: '4',
     desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
     pluginid: '3456',
@@ -258,7 +256,6 @@ export const mockFindings = [
     report_type: 'dependency_scanning',
     name: 'Cross-site Scripting in serialize-javascript',
     severity: 'unknown',
-    confidence: 'undefined',
     scanner: { external_id: 'gemnasium', name: 'Gemnasium' },
     identifiers: [
       {
@@ -306,7 +303,6 @@ export const mockFindings = [
     report_type: 'dependency_scanning',
     name: '3rd party CORS request may execute in jquery',
     severity: 'medium',
-    confidence: 'undefined',
     scanner: { external_id: 'retire.js', name: 'Retire.js' },
     identifiers: [
       {
@@ -390,7 +386,6 @@ export const mockFindings = [
     name:
       'jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution in jquery',
     severity: 'low',
-    confidence: 'undefined',
     scanner: { external_id: 'retire.js', name: 'Retire.js' },
     identifiers: [
       {
@@ -473,7 +468,6 @@ export const mockFindings = [
     name:
       'jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution in jquery',
     severity: 'low',
-    confidence: 'undefined',
     scanner: { external_id: 'retire.js', name: 'Retire.js' },
     identifiers: [
       {

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Design management design presentation component currentCommentForm currentCommentForm is equal to current annotation coordinates when isAnnotating is true 1`] = `
+exports[`Design management design presentation component currentCommentForm currentCommentForm is equal to current annotation position when isAnnotating is true 1`] = `
 <div
   class="h-100 w-100 p-3 overflow-auto position-relative"
 >
@@ -45,7 +45,7 @@ exports[`Design management design presentation component currentCommentForm curr
 </div>
 `;
 
-exports[`Design management design presentation component currentCommentForm currentCommentForm is null when isAnnotating is true but annotation coordinates are falsey 1`] = `
+exports[`Design management design presentation component currentCommentForm currentCommentForm is null when isAnnotating is true but annotation position is falsey 1`] = `
 <div
   class="h-100 w-100 p-3 overflow-auto position-relative"
 >

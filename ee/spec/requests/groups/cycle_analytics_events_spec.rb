@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'cycle analytics events' do
+describe 'value stream analytics events' do
   let(:user) { create(:user) }
   let(:group) { create(:group)}
   let(:project) { create(:project, :repository, namespace: group, public_builds: false) }
   let(:issue) { create(:issue, project: project, created_at: 2.days.ago) }
 
-  describe 'GET /:namespace/-/cycle_analytics/events/:stage' do
+  describe 'GET /:namespace/-/value_stream_analytics/events/:stage' do
     before do
       stub_licensed_features(cycle_analytics_for_groups: true)
       group.add_developer(user)

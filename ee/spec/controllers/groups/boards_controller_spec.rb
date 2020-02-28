@@ -37,7 +37,7 @@ describe Groups::BoardsController do
         it 'returns a not found 404 response' do
           list_boards format: :json
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
           expect(response.content_type).to eq 'application/json'
         end
       end
@@ -68,7 +68,7 @@ describe Groups::BoardsController do
 
         list_boards(recent: true)
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end

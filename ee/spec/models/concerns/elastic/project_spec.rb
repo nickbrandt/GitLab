@@ -15,13 +15,13 @@ describe Project, :elastic do
     end
 
     context 'when the project is not enabled specifically' do
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns false' do
           expect(project.searchable?).to be_falsey
         end
       end
 
-      context '#use_elasticsearch?' do
+      describe '#use_elasticsearch?' do
         it 'returns false' do
           expect(project.use_elasticsearch?).to be_falsey
         end
@@ -33,13 +33,13 @@ describe Project, :elastic do
         create :elasticsearch_indexed_project, project: project
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           expect(project.searchable?).to be_truthy
         end
       end
 
-      context '#use_elasticsearch?' do
+      describe '#use_elasticsearch?' do
         it 'returns true' do
           expect(project.use_elasticsearch?).to be_truthy
         end
@@ -53,7 +53,7 @@ describe Project, :elastic do
           create :project, path: 'test2', description: 'awesome project'
           create :project
 
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end
 
         expect(described_class.elastic_search('test*', options: { project_ids: :any }).total_count).to eq(1)
@@ -68,7 +68,7 @@ describe Project, :elastic do
         create :elasticsearch_indexed_namespace, namespace: group
       end
 
-      context '#searchable?' do
+      describe '#searchable?' do
         it 'returns true' do
           project = create :project, name: 'test1', group: group
 
@@ -83,7 +83,7 @@ describe Project, :elastic do
           create :project, name: 'test3', group: group
           create :project, path: 'someone_elses_project', name: 'test4'
 
-          Gitlab::Elastic::Helper.refresh_index
+          ensure_elasticsearch_index!
         end
 
         expect(described_class.elastic_search('test*', options: { project_ids: :any }).total_count).to eq(2)
@@ -103,7 +103,7 @@ describe Project, :elastic do
 
     context 'when searching with a wildcard' do
       it 'only returns projects', :sidekiq_inline do
-        Gitlab::Elastic::Helper.refresh_index
+        ensure_elasticsearch_index!
         response = described_class.elastic_search('*')
 
         expect(response.total_count).to eq(1)
@@ -125,7 +125,7 @@ describe Project, :elastic do
       # The project you have no access to except as an administrator
       create :project, :private, name: 'test3'
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(described_class.elastic_search('test1', options: { project_ids: project_ids }).total_count).to eq(1)
@@ -144,7 +144,7 @@ describe Project, :elastic do
       project1 = create :project, name: 'tesla_model_s'
       project_ids += [project.id, project1.id]
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     expect(described_class.elastic_search('tesla', options: { project_ids: project_ids }).total_count).to eq(2)

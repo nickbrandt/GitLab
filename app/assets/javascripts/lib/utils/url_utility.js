@@ -166,7 +166,7 @@ export const setUrlFragment = (url, fragment) => {
 
 export function visitUrl(url, external = false) {
   if (external) {
-    // Simulate `target="blank" rel="noopener noreferrer"`
+    // Simulate `target="_blank" rel="noopener noreferrer"`
     // See https://mathiasbynens.github.io/rel-noopener/
     const otherWindow = window.open();
     otherWindow.opener = null;
@@ -194,12 +194,14 @@ export function redirectTo(url) {
   return window.location.assign(url);
 }
 
+export const escapeFileUrl = fileUrl => encodeURIComponent(fileUrl).replace(/%2F/g, '/');
+
 export function webIDEUrl(route = undefined) {
   let returnUrl = `${gon.relative_url_root || ''}/-/ide/`;
   if (route) {
     returnUrl += `project${route.replace(new RegExp(`^${gon.relative_url_root || ''}`), '')}`;
   }
-  return returnUrl;
+  return escapeFileUrl(returnUrl);
 }
 
 /**
@@ -312,8 +314,6 @@ export const setUrlParams = (params, url = window.location.href, clearParams = f
 
   return urlObj.toString();
 };
-
-export const escapeFileUrl = fileUrl => encodeURIComponent(fileUrl).replace(/%2F/g, '/');
 
 export function urlIsDifferent(url, compare = String(window.location)) {
   return url !== compare;

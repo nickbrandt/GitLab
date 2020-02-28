@@ -7,9 +7,12 @@ describe Gitlab::Vulnerabilities::HistoryCache do
     shared_examples 'the history cache when given an expected Vulnerable' do
       let(:project) { create(:project, :public, namespace: group) }
       let(:project_cache_key) { described_class.new(vulnerable, project.id).send(:cache_key) }
+      let(:today) { '1980-10-31' }
 
       before do
-        create_vulnerabilities(1, project)
+        Timecop.freeze(today) do
+          create_vulnerabilities(1, project)
+        end
       end
 
       it 'reads from cache when records are cached' do
@@ -23,7 +26,7 @@ describe Gitlab::Vulnerabilities::HistoryCache do
       end
 
       it 'returns the proper format for uncached history' do
-        Timecop.freeze do
+        Timecop.freeze(today) do
           fetched_history = described_class.new(vulnerable, project.id).fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE)
 
           expect(fetched_history[:total]).to eq( Date.today => 1 )
@@ -32,7 +35,7 @@ describe Gitlab::Vulnerabilities::HistoryCache do
       end
 
       it 'returns the proper format for cached history' do
-        Timecop.freeze do
+        Timecop.freeze(today) do
           described_class.new(vulnerable, project.id).fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE)
           fetched_history = described_class.new(vulnerable, project.id).fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE)
 

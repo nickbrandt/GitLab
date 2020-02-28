@@ -17,7 +17,7 @@ describe Admin::CredentialsController do
         it 'responds with 200' do
           get :index
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
         end
 
         describe 'filtering by type of credential' do
@@ -69,7 +69,7 @@ describe Admin::CredentialsController do
         it 'returns 404' do
           get :index
 
-          expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
@@ -82,7 +82,7 @@ describe Admin::CredentialsController do
       it 'returns 404' do
         get :index
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

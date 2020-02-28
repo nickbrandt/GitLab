@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:user) { create(:user) }
-  set(:group) { create(:group) }
-  set(:project) { create(:project, :repository, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group, reload: true) { create(:group) }
+  let_it_be(:project, reload: true) { create(:project, :repository, group: group) }
 
-  set(:pipeline) do
+  let_it_be(:pipeline, reload: true) do
     create(:ci_pipeline, project: project,
                          sha: project.commit.id,
                          ref: project.default_branch,
@@ -33,7 +33,7 @@ describe Ci::Build do
   it { is_expected.to respond_to(:has_trace?) }
   it { is_expected.to respond_to(:trace) }
 
-  it { is_expected.to delegate_method(:merge_request_event?).to(:pipeline) }
+  it { is_expected.to delegate_method(:merge_request?).to(:pipeline) }
   it { is_expected.to delegate_method(:merge_request_ref?).to(:pipeline) }
   it { is_expected.to delegate_method(:legacy_detached_merge_request_pipeline?).to(:pipeline) }
 
@@ -762,8 +762,10 @@ describe Ci::Build do
       let(:needs) { }
 
       let!(:final) do
+        scheduling_type = needs.present? ? :dag : :stage
+
         create(:ci_build,
-          pipeline: pipeline, name: 'final',
+          pipeline: pipeline, name: 'final', scheduling_type: scheduling_type,
           stage_idx: 3, stage: 'deploy', options: {
             dependencies: dependencies
           }
@@ -2507,6 +2509,64 @@ describe Ci::Build do
       end
     end
 
+    describe 'CHANGED_PAGES variables' do
+      let(:route_map_yaml) do
+        <<~ROUTEMAP
+        - source: 'bar/branch-test.txt'
+          public: '/bar/branches'
+        ROUTEMAP
+      end
+
+      before do
+        allow_any_instance_of(Project)
+          .to receive(:route_map_for).with(/.+/)
+          .and_return(Gitlab::RouteMap.new(route_map_yaml))
+      end
+
+      context 'with a deployment environment and a merge request' do
+        let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+        let(:environment)   { create(:environment, project: merge_request.project, name: "foo-#{project.default_branch}") }
+        let(:build)         { create(:ci_build, pipeline: pipeline, environment: environment.name) }
+
+        it 'populates CI_MERGE_REQUEST_CHANGED_PAGES_* variables' do
+          expect(subject).to include(
+            { key: 'CI_MERGE_REQUEST_CHANGED_PAGE_PATHS', value: '/bar/branches', public: true, masked: false },
+            { key: 'CI_MERGE_REQUEST_CHANGED_PAGE_URLS', value: File.join(environment.external_url, '/bar/branches'), public: true, masked: false }
+          )
+        end
+
+        context 'with a deployment environment and no merge request' do
+          let(:environment)   { create(:environment, project: project, name: "foo-#{project.default_branch}") }
+          let(:build)         { create(:ci_build, pipeline: pipeline, environment: environment.name) }
+
+          it 'does not append CHANGED_PAGES variables' do
+            ci_variables = subject.select { |var| var[:key] =~ /MERGE_REQUEST_CHANGED_PAGES/ }
+
+            expect(ci_variables).to be_empty
+          end
+        end
+
+        context 'with no deployment environment and a present merge request' do
+          let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline, source_project: project, target_project: project) }
+          let(:build)         { create(:ci_build, pipeline: merge_request.all_pipelines.take) }
+
+          it 'does not append CHANGED_PAGES variables' do
+            ci_variables = subject.select { |var| var[:key] =~ /MERGE_REQUEST_CHANGED_PAGES/ }
+
+            expect(ci_variables).to be_empty
+          end
+        end
+
+        context 'with no deployment environment and no merge request' do
+          it 'does not append CHANGED_PAGES variables' do
+            ci_variables = subject.select { |var| var[:key] =~ /MERGE_REQUEST_CHANGED_PAGES/ }
+
+            expect(ci_variables).to be_empty
+          end
+        end
+      end
+    end
+
     context 'when build has user' do
       let(:user_variables) do
         [
@@ -3007,7 +3067,8 @@ describe Ci::Build do
           stage: 'test',
           ref: 'feature',
           project: project,
-          pipeline: pipeline
+          pipeline: pipeline,
+          scheduling_type: :stage
         )
       end
 
@@ -3611,7 +3672,7 @@ describe Ci::Build do
   end
 
   describe '.matches_tag_ids' do
-    set(:build) { create(:ci_build, project: project, user: user) }
+    let_it_be(:build, reload: true) { create(:ci_build, project: project, user: user) }
     let(:tag_ids) { ::ActsAsTaggableOn::Tag.named_any(tag_list).ids }
 
     subject { described_class.where(id: build).matches_tag_ids(tag_ids) }
@@ -3658,7 +3719,7 @@ describe Ci::Build do
   end
 
   describe '.matches_tags' do
-    set(:build) { create(:ci_build, project: project, user: user) }
+    let_it_be(:build, reload: true) { create(:ci_build, project: project, user: user) }
 
     subject { described_class.where(id: build).with_any_tags }
 
@@ -3684,7 +3745,7 @@ describe Ci::Build do
   end
 
   describe 'pages deployments' do
-    set(:build) { create(:ci_build, project: project, user: user) }
+    let_it_be(:build, reload: true) { create(:ci_build, project: project, user: user) }
 
     context 'when job is "pages"' do
       before do
@@ -3851,8 +3912,12 @@ describe Ci::Build do
   end
 
   describe '#artifacts_metadata_entry' do
-    set(:build) { create(:ci_build, project: project) }
+    let_it_be(:build) { create(:ci_build, project: project) }
     let(:path) { 'other_artifacts_0.1.2/another-subdirectory/banana_sample.gif' }
+
+    around do |example|
+      Timecop.freeze { example.run }
+    end
 
     before do
       stub_artifacts_object_storage
@@ -3947,7 +4012,7 @@ describe Ci::Build do
   end
 
   describe '#supported_runner?' do
-    set(:build) { create(:ci_build) }
+    let_it_be(:build) { create(:ci_build) }
 
     subject { build.supported_runner?(runner_features) }
 

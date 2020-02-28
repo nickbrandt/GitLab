@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '6.0.2'
 
-gem 'bootsnap', '~> 1.4'
+gem 'bootsnap', '~> 1.4.6'
 
 # Improves copy-on-write performance for MRI
 gem 'nakayoshi_fork', '~> 0.0.4'
@@ -26,14 +26,14 @@ gem 'marginalia', '~> 1.8.0'
 
 # Authentication libraries
 gem 'devise', '~> 4.6'
-gem 'doorkeeper', '~> 4.4.3'
-gem 'doorkeeper-openid_connect', '~> 1.5'
+gem 'doorkeeper', '~> 5.0.2'
+gem 'doorkeeper-openid_connect', '~> 1.6.3'
 gem 'omniauth', '~> 1.8'
 gem 'omniauth-auth0', '~> 2.0.0'
 gem 'omniauth-azure-oauth2', '~> 0.0.9'
 gem 'omniauth-cas3', '~> 1.1.4'
 gem 'omniauth-facebook', '~> 4.0.0'
-gem 'omniauth-github', '~> 1.3'
+gem 'omniauth-github', '~> 1.4'
 gem 'omniauth-gitlab', '~> 1.0.2'
 gem 'omniauth-google-oauth2', '~> 0.6.0'
 gem 'omniauth-kerberos', '~> 0.3.0', group: :kerberos
@@ -58,7 +58,7 @@ gem 'akismet', '~> 3.0'
 gem 'invisible_captcha', '~> 0.12.1'
 
 # Two-factor authentication
-gem 'devise-two-factor', '~> 3.0.0'
+gem 'devise-two-factor', '~> 3.1.0'
 gem 'rqrcode-rails3', '~> 0.1.7'
 gem 'attr_encrypted', '~> 3.1.0'
 gem 'u2f', '~> 0.2.1'
@@ -87,7 +87,7 @@ gem 'grape-entity', '~> 0.7.1'
 gem 'rack-cors', '~> 1.0.6', require: 'rack/cors'
 
 # GraphQL API
-gem 'graphql', '~> 1.9.11'
+gem 'graphql', '~> 1.9.12'
 # NOTE: graphiql-rails v1.5+ doesn't work: https://gitlab.com/gitlab-org/gitlab/issues/31771
 # TODO: remove app/views/graphiql/rails/editors/show.html.erb when https://github.com/rmosolgo/graphiql-rails/pull/71 is released:
 # https://gitlab.com/gitlab-org/gitlab/issues/31747
@@ -149,7 +149,7 @@ gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '0.0.10'
-gem 'rouge', '~> 3.15.0'
+gem 'rouge', '~> 3.16.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
 gem 'nokogiri', '~> 1.10.5'
@@ -159,7 +159,7 @@ gem 'escape_utils', '~> 1.1'
 gem 'icalendar'
 
 # Diffs
-gem 'diffy', '~> 3.1.0'
+gem 'diffy', '~> 3.3'
 gem 'diff_match_patch', '~> 0.1.0'
 
 # Application server
@@ -237,7 +237,7 @@ gem 'atlassian-jwt', '~> 0.2.0'
 gem 'flowdock', '~> 0.7'
 
 # Slack integration
-gem 'slack-notifier', '~> 1.5.1'
+gem 'slack-messenger', '~> 2.3.3'
 
 # Hangouts Chat integration
 gem 'hangouts-chat', '~> 0.0.5'
@@ -301,7 +301,7 @@ gem 'sentry-raven', '~> 2.9'
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '0.9.1'
+gem 'gitlab-labkit', '0.10.0'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false
@@ -355,7 +355,7 @@ group :development, :test do
 
   gem 'database_cleaner', '~> 1.7.0'
   gem 'factory_bot_rails', '~> 5.1.0'
-  gem 'rspec-rails', '~> 4.0.0.beta3'
+  gem 'rspec-rails', '~> 4.0.0.beta4'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest', '~> 5.11.0'
@@ -375,13 +375,11 @@ group :development, :test do
   gem 'scss_lint', '~> 0.56.0', require: false
   gem 'haml_lint', '~> 0.34.0', require: false
   gem 'simplecov', '~> 0.16.1', require: false
-  gem 'bundler-audit', '~> 0.5.0', require: false
+  gem 'bundler-audit', '~> 0.6.1', require: false
 
   gem 'benchmark-ips', '~> 2.3.0', require: false
 
   gem 'knapsack', '~> 1.17'
-
-  gem 'stackprof', '~> 0.2.13', require: false
 
   gem 'simple_po_parser', '~> 1.1.2', require: false
 
@@ -427,6 +425,7 @@ gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
 
 gem 'ruby-prof', '~> 1.0.0'
+gem 'stackprof', '~> 0.2.15', require: false
 gem 'rbtrace', '~> 0.4', require: false
 gem 'memory_profiler', '~> 0.9', require: false
 gem 'benchmark-memory', '~> 0.1', require: false
@@ -456,7 +455,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 1.85.0'
+gem 'gitaly', '~> 1.86.0'
 
 gem 'grpc', '~> 1.24.0'
 
@@ -488,3 +487,8 @@ gem 'liquid', '~> 4.0'
 gem 'lru_redux'
 
 gem 'erubi', '~> 1.9.0'
+
+# Locked as long as quoted-printable encoding issues are not resolved
+# Monkey-patched in `config/initializers/mail_encoding_patch.rb`
+# See https://gitlab.com/gitlab-org/gitlab/issues/197386
+gem 'mail', '= 2.7.1'

@@ -82,6 +82,10 @@ describe Packages::Conan::CreatePackageFileService do
         UploadedFile.new(file_path, filename: File.basename(file_path))
       end
 
+      before do
+        allow_any_instance_of(Packages::PackageFileUploader).to receive(:size).and_return(128)
+      end
+
       it_behaves_like 'a valid package_file'
       it_behaves_like 'a valid recipe_file'
     end
@@ -89,6 +93,10 @@ describe Packages::Conan::CreatePackageFileService do
     context 'with remote file' do
       let!(:fog_connection) do
         stub_package_file_object_storage(direct_upload: true)
+      end
+
+      before do
+        allow_any_instance_of(Packages::PackageFileUploader).to receive(:size).and_return(128)
       end
 
       let(:tmp_object) do

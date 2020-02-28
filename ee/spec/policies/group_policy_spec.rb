@@ -141,6 +141,10 @@ describe GroupPolicy do
 
       let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
 
+      before do
+        stub_licensed_features(group_saml: true)
+      end
+
       context 'when the session has been set globally' do
         around do |example|
           Gitlab::Session.with_session({}) do
@@ -368,6 +372,64 @@ describe GroupPolicy do
       let(:current_user) { nil }
 
       it { is_expected.to be_disallowed(:create_jira_connect_subscription) }
+    end
+  end
+
+  describe 'read_group_credentials_inventory' do
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+
+      context 'when security dashboard features is not available' do
+        before do
+          stub_licensed_features(security_dashboard: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+      end
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_group_credentials_inventory) }
     end
   end
 

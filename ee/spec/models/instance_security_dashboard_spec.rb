@@ -17,16 +17,6 @@ describe InstanceSecurityDashboard do
 
   subject { described_class.new(user, project_ids: project_ids) }
 
-  it_behaves_like Vulnerable do
-    let(:vulnerable) { described_class.new(user, project_ids: project_ids) }
-  end
-
-  describe '.name' do
-    it 'is programmatically named Instance' do
-      expect(described_class.name).to eq('Instance')
-    end
-  end
-
   describe '#all_pipelines' do
     it 'returns pipelines for the projects with security reports' do
       expect(subject.all_pipelines).to contain_exactly(pipeline1)
@@ -86,6 +76,23 @@ describe InstanceSecurityDashboard do
 
       it 'returns false' do
         is_expected.to be_falsy
+      end
+    end
+  end
+
+  describe '#projects' do
+    context 'when the user cannot read all resources' do
+      it 'returns only projects on their dashboard that they can read' do
+        expect(subject.projects).to contain_exactly(project1)
+      end
+    end
+
+    context 'when the user can read all resources' do
+      let(:project_ids) { [project1.id, project2.id] }
+      let(:user) { create(:auditor) }
+
+      it "returns all projects on the user's dashboard" do
+        expect(subject.projects).to contain_exactly(project1, project2)
       end
     end
   end

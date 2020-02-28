@@ -11,7 +11,6 @@ const dashboardDocumentation = '/help/docs';
 const emptyStateSvgPath = '/svgs/empty/svg';
 const projectsEndpoint = '/projects';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
-const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
 const vulnerableProjectsEndpoint = '/vulnerable_projects';
@@ -42,7 +41,6 @@ describe('Group Security Dashboard component', () => {
         emptyStateSvgPath,
         projectsEndpoint,
         vulnerabilitiesEndpoint,
-        vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
         vulnerableProjectsEndpoint,
@@ -73,7 +71,6 @@ describe('Group Security Dashboard component', () => {
       expect(dashboard.props()).toEqual(
         expect.objectContaining({
           vulnerabilitiesEndpoint,
-          vulnerabilitiesCountEndpoint,
           vulnerabilitiesHistoryEndpoint,
           vulnerabilityFeedbackHelpPath,
           vulnerableProjectsEndpoint,

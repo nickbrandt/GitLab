@@ -7,6 +7,14 @@ export default {
     GeoNodeForm,
   },
   props: {
+    selectiveSyncTypes: {
+      type: Object,
+      required: true,
+    },
+    syncShardsOptions: {
+      type: Array,
+      required: true,
+    },
     node: {
       type: Object,
       required: false,
@@ -19,6 +27,6 @@ export default {
 <template>
   <article class="geo-node-form-container">
     <h3 class="page-title">{{ node ? __('Edit Geo Node') : __('New Geo Node') }}</h3>
-    <geo-node-form :node="node" />
+    <geo-node-form v-bind="$props" />
   </article>
 </template>

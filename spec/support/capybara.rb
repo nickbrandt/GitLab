@@ -17,7 +17,8 @@ JS_CONSOLE_FILTER = Regexp.union([
   '"[HMR] Waiting for update signal from WDS..."',
   '"[WDS] Hot Module Replacement enabled."',
   '"[WDS] Live Reloading enabled."',
-  "Download the Vue Devtools extension"
+  'Download the Vue Devtools extension',
+  'Download the Apollo DevTools'
 ])
 
 CAPYBARA_WINDOW_SIZE = [1366, 768].freeze
@@ -59,7 +60,7 @@ Capybara.register_driver :chrome do |app|
   )
 end
 
-Capybara.server = :webrick
+Capybara.server = :puma
 Capybara.javascript_driver = :chrome
 Capybara.default_max_wait_time = timeout
 Capybara.ignore_hidden_elements = true

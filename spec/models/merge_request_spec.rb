@@ -662,13 +662,12 @@ describe MergeRequest do
   end
 
   describe '#raw_diffs' do
-    let(:merge_request) { build(:merge_request) }
     let(:options) { { paths: ['a/b', 'b/a', 'c/*'] } }
 
     context 'when there are MR diffs' do
-      it 'delegates to the MR diffs' do
-        merge_request.merge_request_diff = MergeRequestDiff.new
+      let(:merge_request) { create(:merge_request, :with_diffs) }
 
+      it 'delegates to the MR diffs' do
         expect(merge_request.merge_request_diff).to receive(:raw_diffs).with(options)
 
         merge_request.raw_diffs(options)
@@ -676,6 +675,8 @@ describe MergeRequest do
     end
 
     context 'when there are no MR diffs' do
+      let(:merge_request) { build(:merge_request) }
+
       it 'delegates to the compare object' do
         merge_request.compare = double(:compare)
 
@@ -3574,6 +3575,46 @@ describe MergeRequest do
       end
 
       expect(merge_request.recent_visible_deployments.count).to eq(10)
+    end
+  end
+
+  describe '#diffable_merge_ref?' do
+    context 'diff_compare_with_head enabled' do
+      context 'merge request can be merged' do
+        context 'merge_to_ref is not calculated' do
+          it 'returns true' do
+            expect(subject.diffable_merge_ref?).to eq(false)
+          end
+        end
+
+        context 'merge_to_ref is calculated' do
+          before do
+            MergeRequests::MergeToRefService.new(subject.project, subject.author).execute(subject)
+          end
+
+          it 'returns true' do
+            expect(subject.diffable_merge_ref?).to eq(true)
+          end
+        end
+      end
+
+      context 'merge request cannot be merged' do
+        it 'returns false' do
+          subject.mark_as_unchecked!
+
+          expect(subject.diffable_merge_ref?).to eq(false)
+        end
+      end
+    end
+
+    context 'diff_compare_with_head disabled' do
+      before do
+        stub_feature_flags(diff_compare_with_head: { enabled: false, thing: subject.target_project })
+      end
+
+      it 'returns false' do
+        expect(subject.diffable_merge_ref?).to eq(false)
+      end
     end
   end
 end

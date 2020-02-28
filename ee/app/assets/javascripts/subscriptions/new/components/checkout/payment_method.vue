@@ -2,8 +2,8 @@
 import { GlSprintf } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import { mapState } from 'vuex';
-import Step from './components/step.vue';
-import Zuora from './components/zuora.vue';
+import Step from './step.vue';
+import Zuora from './zuora.vue';
 
 export default {
   components: {

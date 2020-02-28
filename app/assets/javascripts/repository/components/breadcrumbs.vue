@@ -1,5 +1,6 @@
 <script>
 import { GlDropdown, GlDropdownDivider, GlDropdownHeader, GlDropdownItem } from '@gitlab/ui';
+import { joinPaths } from '~/lib/utils/url_utility';
 import { __ } from '../../locale';
 import Icon from '../../vue_shared/components/icon.vue';
 import getRefMixin from '../mixins/get_ref';
@@ -45,7 +46,7 @@ export default {
     currentPath: {
       type: String,
       required: false,
-      default: '/',
+      default: '',
     },
     canCollaborate: {
       type: Boolean,
@@ -102,12 +103,12 @@ export default {
         .filter(p => p !== '')
         .reduce(
           (acc, name, i) => {
-            const path = `${i > 0 ? acc[i].path : ''}/${name}`;
+            const path = joinPaths(i > 0 ? acc[i].path : '', encodeURIComponent(name));
 
             return acc.concat({
               name,
               path,
-              to: `/-/tree/${escape(this.ref)}${path}`,
+              to: `/-/tree/${joinPaths(escape(this.ref), path)}`,
             });
           },
           [
@@ -133,7 +134,7 @@ export default {
           },
           {
             attrs: {
-              href: `${this.newBlobPath}${this.currentPath}`,
+              href: `${this.newBlobPath}/${this.currentPath ? escape(this.currentPath) : ''}`,
               class: 'qa-new-file-option',
             },
             text: __('New file'),
@@ -242,7 +243,7 @@ export default {
           <template slot="button-content">
             <span class="sr-only">{{ __('Add to tree') }}</span>
             <icon name="plus" :size="16" class="float-left" />
-            <icon name="arrow-down" :size="16" class="float-left" />
+            <icon name="chevron-down" :size="16" class="float-left" />
           </template>
           <template v-for="(item, i) in dropdownItems">
             <component :is="getComponent(item.type)" :key="i" v-bind="item.attrs">

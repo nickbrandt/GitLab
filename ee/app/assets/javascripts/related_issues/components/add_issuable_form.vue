@@ -1,7 +1,6 @@
 <script>
 import { GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import RelatedIssuableInput from './related_issuable_input.vue';
 import {
   issuableTypesMap,
@@ -19,7 +18,6 @@ export default {
     GlLoadingIcon,
     RelatedIssuableInput,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     inputValue: {
       type: String,
@@ -59,6 +57,11 @@ export default {
       required: false,
       default: itemAddFailureTypesMap.NOT_FOUND,
     },
+    itemAddFailureMessage: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -80,13 +83,18 @@ export default {
     };
   },
   computed: {
+    isIssue() {
+      return this.issuableType === issuableTypesMap.ISSUE;
+    },
     isSubmitButtonDisabled() {
       return (
         (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
       );
     },
     addRelatedErrorMessage() {
-      if (this.itemAddFailureType === itemAddFailureTypesMap.NOT_FOUND) {
+      if (this.itemAddFailureMessage) {
+        return this.itemAddFailureMessage;
+      } else if (this.itemAddFailureType === itemAddFailureTypesMap.NOT_FOUND) {
         return addRelatedIssueErrorMap[this.issuableType];
       }
       // Only other failure is MAX_NUMBER_OF_CHILD_EPICS at the moment
@@ -118,7 +126,7 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
-    <template v-if="glFeatures.issueLinkTypes">
+    <template v-if="isIssue">
       <gl-form-group
         :label="__('The current issue')"
         label-for="linked-issue-type-radio"

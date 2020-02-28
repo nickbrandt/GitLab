@@ -20,12 +20,13 @@ module Banzai
       # the cost of doing a full regex match.
       def xpath_search
         "descendant-or-self::a[contains(@href,'metrics') and \
+          contains(@href,'environments') and \
           starts-with(@href, '#{Gitlab.config.gitlab.url}')]"
       end
 
       # Regular expression matching metrics urls
       def link_pattern
-        Gitlab::Metrics::Dashboard::Url.regex
+        Gitlab::Metrics::Dashboard::Url.metrics_regex
       end
 
       private
@@ -40,14 +41,6 @@ module Banzai
           embedded: true,
           **query_params(params['url'])
         )
-      end
-
-      # Parses query params out from full url string into hash.
-      #
-      # Ex) 'https://<root>/<project>/<environment>/metrics?title=Title&group=Group'
-      #       --> { title: 'Title', group: 'Group' }
-      def query_params(url)
-        Gitlab::Metrics::Dashboard::Url.parse_query(url)
       end
     end
   end

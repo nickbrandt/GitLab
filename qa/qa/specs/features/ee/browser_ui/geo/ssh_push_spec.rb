@@ -19,7 +19,7 @@ module QA
             end
 
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -41,6 +41,8 @@ module QA
               expect(page).to have_content(file_content)
             end
           end
+
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
@@ -86,7 +88,7 @@ module QA
             end
 
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -112,6 +114,8 @@ module QA
               expect(page).to have_content(file_content)
             end
           end
+
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|

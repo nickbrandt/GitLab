@@ -20,7 +20,6 @@ module EE
       include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
-      include Vulnerable
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
 
@@ -44,12 +43,10 @@ module EE
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
-      has_one :alerts_service
 
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
-      has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
 
       has_many :reviews, inverse_of: :project
@@ -83,7 +80,6 @@ module EE
 
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
 
-      has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
       has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
@@ -145,6 +141,7 @@ module EE
       scope :with_repos_templates, -> { where(namespace_id: ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id) }
       scope :with_groups_level_repos_templates, -> { joins("INNER JOIN namespaces ON projects.namespace_id = namespaces.custom_project_templates_group_id") }
       scope :with_designs, -> { where(id: DesignManagement::Design.select(:project_id)) }
+      scope :with_deleting_user, -> { includes(:deleting_user) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -165,7 +162,7 @@ module EE
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
       validates :max_pages_size,
-        numericality: { only_integer: true, greater_than: 0, allow_nil: true,
+        numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true,
                         less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
@@ -182,7 +179,6 @@ module EE
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :alerting_setting, update_only: true
-      accepts_nested_attributes_for :incident_management_setting, update_only: true
 
       alias_attribute :fallback_approvals_required, :approvals_before_merge
     end
@@ -195,6 +191,12 @@ module EE
       def with_slack_application_disabled
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
+      end
+
+      def find_by_service_desk_project_key(key)
+        # project_key is not indexed for now
+        # see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24063#note_282435524 for details
+        joins(:service_desk_setting).find_by('service_desk_settings.project_key' => key)
       end
     end
 
@@ -255,7 +257,7 @@ module EE
     end
 
     def can_override_approvers?
-      !disable_overriding_approvers_per_merge_request?
+      !disable_overriding_approvers_per_merge_request
     end
 
     def shared_runners_available?
@@ -353,7 +355,7 @@ module EE
     def has_group_hooks?(hooks_scope = :push_hooks)
       return unless group && feature_available?(:group_webhooks)
 
-      group.hooks.hooks_for(hooks_scope).any?
+      group_hooks.hooks_for(hooks_scope).any?
     end
 
     def execute_hooks(data, hooks_scope = :push_hooks)
@@ -361,7 +363,7 @@ module EE
 
       if group && feature_available?(:group_webhooks)
         run_after_commit_or_now do
-          group.hooks.hooks_for(hooks_scope).each do |hook|
+          group_hooks.hooks_for(hooks_scope).each do |hook|
             hook.async_execute(data, hooks_scope.to_s)
           end
         end
@@ -546,7 +548,6 @@ module EE
         [].tap do |services|
           services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
           services.push('github') unless feature_available?(:github_project_service_integration)
-          services.push('alerts') unless alerts_service_available?
         end
       end
     end
@@ -673,19 +674,11 @@ module EE
     def expire_caches_before_rename(old_path)
       super
 
-      design = ::Repository.new("#{old_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}", self)
+      design = ::Repository.new("#{old_path}#{::EE::Gitlab::GlRepository::DESIGN.path_suffix}", self, shard: repository_storage, repo_type: ::EE::Gitlab::GlRepository::DESIGN)
 
       if design.exists?
         design.before_delete
       end
-    end
-
-    def alerts_service_available?
-      feature_available?(:incident_management)
-    end
-
-    def alerts_service_activated?
-      alerts_service_available? && alerts_service&.active?
     end
 
     def package_already_taken?(package_name)
@@ -719,6 +712,31 @@ module EE
       packages.where(package_type: package_type).exists?
     end
 
+    def disable_overriding_approvers_per_merge_request
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? ||
+        super
+    end
+    alias_method :disable_overriding_approvers_per_merge_request?, :disable_overriding_approvers_per_merge_request
+
+    def merge_requests_author_approval
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      return false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+
+      super
+    end
+    alias_method :merge_requests_author_approval?, :merge_requests_author_approval
+
+    def merge_requests_disable_committers_approval
+      return super unless License.feature_available?(:admin_merge_request_approvers_rules)
+
+      ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? ||
+        super
+    end
+    alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
+
     def license_compliance
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
     end
@@ -730,7 +748,17 @@ module EE
       ::Project.with_groups_level_repos_templates.exists?(id)
     end
 
+    def jira_subscription_exists?
+      feature_available?(:jira_dev_panel_integration) && JiraConnectSubscription.for_project(self).exists?
+    end
+
     private
+
+    def group_hooks
+      return group.hooks unless ::Feature.enabled?(:sub_group_webhooks, self)
+
+      GroupHook.where(group_id: group.self_and_ancestors)
+    end
 
     def set_override_pull_mirror_available
       self.pull_mirror_available_overridden = read_attribute(:mirror)

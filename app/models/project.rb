@@ -9,7 +9,6 @@ class Project < ApplicationRecord
   include AccessRequestable
   include Avatarable
   include CacheMarkdownField
-  include Referable
   include Sortable
   include AfterCommitQueue
   include CaseSensitivity
@@ -138,6 +137,7 @@ class Project < ApplicationRecord
   has_many :boards
 
   # Project services
+  has_one :alerts_service
   has_one :campfire_service
   has_one :discord_service
   has_one :drone_ci_service
@@ -187,9 +187,11 @@ class Project < ApplicationRecord
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_one :project_repository, inverse_of: :project
+  has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
   has_one :error_tracking_setting, inverse_of: :project, class_name: 'ErrorTracking::ProjectErrorTrackingSetting'
   has_one :metrics_setting, inverse_of: :project, class_name: 'ProjectMetricsSetting'
   has_one :grafana_integration, inverse_of: :project
+  has_one :project_setting, ->(project) { where_or_create_by(project: project) }, inverse_of: :project
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -244,6 +246,7 @@ class Project < ApplicationRecord
   has_many :management_clusters, class_name: 'Clusters::Cluster', foreign_key: :management_project_id, inverse_of: :management_project
 
   has_many :prometheus_metrics
+  has_many :prometheus_alerts, inverse_of: :project
 
   # Container repositories need to remove data from the container registry,
   # which is not managed by the DB. Hence we're still using dependent: :destroy
@@ -264,6 +267,7 @@ class Project < ApplicationRecord
           class_name: 'Ci::Pipeline',
           inverse_of: :project
   has_many :stages, class_name: 'Ci::Stage', inverse_of: :project
+  has_many :ci_refs, class_name: 'Ci::Ref'
 
   # Ci::Build objects store data on the file system such as artifact files and
   # build traces. Currently there's no efficient way of removing this data in
@@ -314,9 +318,11 @@ class Project < ApplicationRecord
                                 allow_destroy: true,
                                 reject_if: ->(attrs) { attrs[:id].blank? && attrs[:url].blank? }
 
+  accepts_nested_attributes_for :incident_management_setting, update_only: true
   accepts_nested_attributes_for :error_tracking_setting, update_only: true
   accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
   accepts_nested_attributes_for :grafana_integration, update_only: true, allow_destroy: true
+  accepts_nested_attributes_for :prometheus_service, update_only: true
 
   delegate :feature_available?, :builds_enabled?, :wiki_enabled?,
     :merge_requests_enabled?, :forking_enabled?, :issues_enabled?,
@@ -338,6 +344,7 @@ class Project < ApplicationRecord
   delegate :last_pipeline, to: :commit, allow_nil: true
   delegate :external_dashboard_url, to: :metrics_setting, allow_nil: true, prefix: true
   delegate :default_git_depth, :default_git_depth=, to: :ci_cd_settings, prefix: :ci
+  delegate :forward_deployment_enabled, :forward_deployment_enabled=, :forward_deployment_enabled?, to: :ci_cd_settings
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -356,6 +363,8 @@ class Project < ApplicationRecord
     presence: true,
     project_path: true,
     length: { maximum: 255 }
+
+  validates :project_feature, presence: true
 
   validates :namespace, presence: true
   validates :name, uniqueness: { scope: :namespace_id }
@@ -394,11 +403,11 @@ class Project < ApplicationRecord
 
   # last_activity_at is throttled every minute, but last_repository_updated_at is updated with every push
   scope :sorted_by_activity, -> { reorder(Arel.sql("GREATEST(COALESCE(last_activity_at, '1970-01-01'), COALESCE(last_repository_updated_at, '1970-01-01')) DESC")) }
-  scope :sorted_by_stars_desc, -> { reorder(star_count: :desc) }
-  scope :sorted_by_stars_asc, -> { reorder(star_count: :asc) }
+  scope :sorted_by_stars_desc, -> { reorder(self.arel_table['star_count'].desc) }
+  scope :sorted_by_stars_asc, -> { reorder(self.arel_table['star_count'].asc) }
   scope :sorted_by_name_asc_limited, ->(limit) { reorder(name: :asc).limit(limit) }
   # Sometimes queries (e.g. using CTEs) require explicit disambiguation with table name
-  scope :projects_order_id_desc, -> { reorder("#{table_name}.id DESC") }
+  scope :projects_order_id_desc, -> { reorder(self.arel_table['id'].desc) }
 
   scope :in_namespace, ->(namespace_ids) { where(namespace_id: namespace_ids) }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
@@ -548,8 +557,8 @@ class Project < ApplicationRecord
       )
   end
 
-  def self.wrap_authorized_projects_with_cte(collection)
-    cte = Gitlab::SQL::CTE.new(:authorized_projects, collection)
+  def self.wrap_with_cte(collection)
+    cte = Gitlab::SQL::CTE.new(:projects_cte, collection)
     Project.with(cte.to_arel).from(cte.alias_to(Project.arel_table))
   end
 
@@ -594,9 +603,9 @@ class Project < ApplicationRecord
         # pass a string to avoid AR adding the table name
         reorder('project_statistics.storage_size DESC, projects.id DESC')
       when 'latest_activity_desc'
-        reorder(last_activity_at: :desc)
+        reorder(self.arel_table['last_activity_at'].desc)
       when 'latest_activity_asc'
-        reorder(last_activity_at: :asc)
+        reorder(self.arel_table['last_activity_at'].asc)
       when 'stars_desc'
         sorted_by_stars_desc
       when 'stars_asc'
@@ -772,7 +781,7 @@ class Project < ApplicationRecord
   end
 
   def repository
-    @repository ||= Repository.new(full_path, self, disk_path: disk_path)
+    @repository ||= Repository.new(full_path, self, shard: repository_storage, disk_path: disk_path)
   end
 
   def cleanup
@@ -894,7 +903,9 @@ class Project < ApplicationRecord
     if Gitlab::UrlSanitizer.valid?(value)
       import_url = Gitlab::UrlSanitizer.new(value)
       super(import_url.sanitized_url)
-      create_or_update_import_data(credentials: import_url.credentials)
+
+      credentials = import_url.credentials.to_h.transform_values { |value| CGI.unescape(value.to_s) }
+      create_or_update_import_data(credentials: credentials)
     else
       super(value)
     end
@@ -1356,11 +1367,15 @@ class Project < ApplicationRecord
     forked_from_project || fork_network&.root_project
   end
 
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def lfs_storage_project
     @lfs_storage_project ||= begin
       result = self
 
-      # TODO: Make this go to the fork_network root immeadiatly
+      # TODO: Make this go to the fork_network root immediately
       # dependant on the discussion in: https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
       result = result.fork_source while result&.forked?
 
@@ -1368,14 +1383,27 @@ class Project < ApplicationRecord
     end
   end
 
-  # This will return all `lfs_objects` that are accessible to the project.
-  # So this might be `self.lfs_objects` if the project is not part of a fork
-  # network, or it is the base of the fork network.
+  # This will return all `lfs_objects` that are accessible to the project and
+  # the fork source. This is needed since older forks won't have access to some
+  # LFS objects directly and have to get it from the fork source.
   #
-  # TODO: refactor this to get the correct lfs objects when implementing
-  #       https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
+  # TODO: Remove this method once all LfsObjectsProject records are backfilled
+  # for forks. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
   def all_lfs_objects
-    lfs_storage_project.lfs_objects
+    LfsObject
+      .distinct
+      .joins(:lfs_objects_projects)
+      .where(lfs_objects_projects: { project_id: [self, lfs_storage_project] })
+  end
+
+  # TODO: Call `#lfs_objects` instead once all LfsObjectsProject records are
+  # backfilled. At that point, projects can look at their own `lfs_objects`.
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/122002 for more info.
+  def lfs_objects_oids
+    all_lfs_objects.pluck(:oid)
   end
 
   def personal?
@@ -1384,8 +1412,8 @@ class Project < ApplicationRecord
 
   # Expires various caches before a project is renamed.
   def expire_caches_before_rename(old_path)
-    repo = Repository.new(old_path, self)
-    wiki = Repository.new("#{old_path}.wiki", self)
+    repo = Repository.new(old_path, self, shard: repository_storage)
+    wiki = Repository.new("#{old_path}.wiki", self, shard: repository_storage, repo_type: Gitlab::GlRepository::WIKI)
 
     if repo.exists?
       repo.before_delete
@@ -2301,6 +2329,26 @@ class Project < ApplicationRecord
 
   def uses_default_ci_config?
     ci_config_path.blank? || ci_config_path == Gitlab::FileDetector::PATTERNS[:gitlab_ci]
+  end
+
+  def limited_protected_branches(limit)
+    protected_branches.limit(limit)
+  end
+
+  def alerts_service_activated?
+    alerts_service&.active?
+  end
+
+  def self_monitoring?
+    Gitlab::CurrentSettings.self_monitoring_project_id == id
+  end
+
+  def deploy_token_create_url(opts = {})
+    Gitlab::Routing.url_helpers.create_deploy_token_project_settings_ci_cd_path(self, opts)
+  end
+
+  def deploy_token_revoke_url_for(token)
+    Gitlab::Routing.url_helpers.revoke_project_deploy_token_path(self, token)
   end
 
   private

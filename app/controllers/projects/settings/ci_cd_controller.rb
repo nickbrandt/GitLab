@@ -5,6 +5,9 @@ module Projects
     class CiCdController < Projects::ApplicationController
       before_action :authorize_admin_pipeline!
       before_action :define_variables
+      before_action do
+        push_frontend_feature_flag(:new_variables_ui, @project)
+      end
 
       def show
       end
@@ -43,6 +46,16 @@ module Projects
         redirect_to namespace_project_settings_ci_cd_path
       end
 
+      def create_deploy_token
+        @new_deploy_token = Projects::DeployTokens::CreateService.new(@project, current_user, deploy_token_params).execute
+
+        if @new_deploy_token.persisted?
+          flash.now[:notice] = s_('DeployTokens|Your new project deploy token has been created.')
+        end
+
+        render 'show'
+      end
+
       private
 
       def update_params
@@ -61,6 +74,10 @@ module Projects
         end
       end
 
+      def deploy_token_params
+        params.require(:deploy_token).permit(:name, :expires_at, :read_repository, :read_registry, :username)
+      end
+
       def run_autodevops_pipeline(service)
         return unless service.run_auto_devops_pipeline?
 
@@ -69,7 +86,9 @@ module Projects
           return
         end
 
+        # rubocop:disable CodeReuse/Worker
         CreatePipelineWorker.perform_async(project.id, current_user.id, project.default_branch, :web, ignore_skip_ci: true, save_on_errors: false)
+        # rubocop:enable CodeReuse/Worker
 
         pipelines_link_start = '<a href="%{url}">'.html_safe % { url: project_pipelines_path(@project) }
         flash[:toast] = _("A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details") % { pipelines_link_start: pipelines_link_start, pipelines_link_end: "</a>".html_safe }
@@ -78,6 +97,7 @@ module Projects
       def define_variables
         define_runners_variables
         define_ci_variables
+        define_deploy_token_variables
         define_triggers_variables
         define_badges_variables
         define_auto_devops_variables
@@ -126,6 +146,12 @@ module Projects
 
       def define_auto_devops_variables
         @auto_devops = @project.auto_devops || ProjectAutoDevops.new
+      end
+
+      def define_deploy_token_variables
+        @deploy_tokens = @project.deploy_tokens.active
+
+        @new_deploy_token = DeployToken.new
       end
     end
   end

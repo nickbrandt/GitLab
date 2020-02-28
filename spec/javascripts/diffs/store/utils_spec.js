@@ -1,3 +1,4 @@
+import { clone } from 'lodash';
 import * as utils from '~/diffs/store/utils';
 import {
   LINE_POSITION_LEFT,
@@ -8,6 +9,7 @@ import {
   NEW_LINE_TYPE,
   OLD_LINE_TYPE,
   MATCH_LINE_TYPE,
+  INLINE_DIFF_VIEW_TYPE,
   PARALLEL_DIFF_VIEW_TYPE,
 } from '~/diffs/constants';
 import { MERGE_REQUEST_NOTEABLE_TYPE } from '~/notes/constants';
@@ -47,7 +49,38 @@ describe('DiffsStoreUtils', () => {
 
     describe('findIndexInParallelLines', () => {
       it('should return correct index for given line numbers', () => {
-        expectSet(utils.findIndexInParallelLines, getDiffFileMock().parallel_diff_lines, {});
+        expectSet(utils.findIndexInParallelLines, getDiffFileMock().parallel_diff_lines, []);
+      });
+    });
+  });
+
+  describe('getPreviousLineIndex', () => {
+    [
+      { diffViewType: INLINE_DIFF_VIEW_TYPE, file: { parallel_diff_lines: [] } },
+      { diffViewType: PARALLEL_DIFF_VIEW_TYPE, file: { highlighted_diff_lines: [] } },
+    ].forEach(({ diffViewType, file }) => {
+      describe(`with diffViewType (${diffViewType}) in split diffs`, () => {
+        let diffFile;
+
+        beforeEach(() => {
+          diffFile = { ...clone(diffFileMockData), ...file };
+        });
+
+        it('should return the correct previous line number', () => {
+          const emptyLines =
+            diffViewType === INLINE_DIFF_VIEW_TYPE
+              ? diffFile.parallel_diff_lines
+              : diffFile.highlighted_diff_lines;
+
+          // This expectation asserts that we cannot possibly be using the opposite view type lines in the next expectation
+          expect(emptyLines.length).toBe(0);
+          expect(
+            utils.getPreviousLineIndex(diffViewType, diffFile, {
+              oldLineNumber: 3,
+              newLineNumber: 5,
+            }),
+          ).toBe(4);
+        });
       });
     });
   });
@@ -80,44 +113,59 @@ describe('DiffsStoreUtils', () => {
   });
 
   describe('addContextLines', () => {
-    it('should add context lines', () => {
-      const diffFile = getDiffFileMock();
-      const inlineLines = diffFile.highlighted_diff_lines;
-      const parallelLines = diffFile.parallel_diff_lines;
-      const lineNumbers = { oldLineNumber: 3, newLineNumber: 5 };
-      const contextLines = [{ lineNumber: 42, line_code: '123' }];
-      const options = { inlineLines, parallelLines, contextLines, lineNumbers };
-      const inlineIndex = utils.findIndexInInlineLines(inlineLines, lineNumbers);
-      const parallelIndex = utils.findIndexInParallelLines(parallelLines, lineNumbers);
-      const normalizedParallelLine = {
-        left: options.contextLines[0],
-        right: options.contextLines[0],
-        line_code: '123',
-      };
+    [INLINE_DIFF_VIEW_TYPE, PARALLEL_DIFF_VIEW_TYPE].forEach(diffViewType => {
+      it(`should add context lines for ${diffViewType}`, () => {
+        const diffFile = getDiffFileMock();
+        const inlineLines = diffFile.highlighted_diff_lines;
+        const parallelLines = diffFile.parallel_diff_lines;
+        const lineNumbers = { oldLineNumber: 3, newLineNumber: 5 };
+        const contextLines = [{ lineNumber: 42, line_code: '123' }];
+        const options = { inlineLines, parallelLines, contextLines, lineNumbers, diffViewType };
+        const inlineIndex = utils.findIndexInInlineLines(inlineLines, lineNumbers);
+        const parallelIndex = utils.findIndexInParallelLines(parallelLines, lineNumbers);
+        const normalizedParallelLine = {
+          left: options.contextLines[0],
+          right: options.contextLines[0],
+          line_code: '123',
+        };
 
-      utils.addContextLines(options);
+        utils.addContextLines(options);
 
-      expect(inlineLines[inlineIndex]).toEqual(contextLines[0]);
-      expect(parallelLines[parallelIndex]).toEqual(normalizedParallelLine);
-    });
+        if (diffViewType === INLINE_DIFF_VIEW_TYPE) {
+          expect(inlineLines[inlineIndex]).toEqual(contextLines[0]);
+        } else {
+          expect(parallelLines[parallelIndex]).toEqual(normalizedParallelLine);
+        }
+      });
 
-    it('should add context lines properly with bottom parameter', () => {
-      const diffFile = getDiffFileMock();
-      const inlineLines = diffFile.highlighted_diff_lines;
-      const parallelLines = diffFile.parallel_diff_lines;
-      const lineNumbers = { oldLineNumber: 3, newLineNumber: 5 };
-      const contextLines = [{ lineNumber: 42, line_code: '123' }];
-      const options = { inlineLines, parallelLines, contextLines, lineNumbers, bottom: true };
-      const normalizedParallelLine = {
-        left: options.contextLines[0],
-        right: options.contextLines[0],
-        line_code: '123',
-      };
+      it(`should add context lines properly with bottom parameter for ${diffViewType}`, () => {
+        const diffFile = getDiffFileMock();
+        const inlineLines = diffFile.highlighted_diff_lines;
+        const parallelLines = diffFile.parallel_diff_lines;
+        const lineNumbers = { oldLineNumber: 3, newLineNumber: 5 };
+        const contextLines = [{ lineNumber: 42, line_code: '123' }];
+        const options = {
+          inlineLines,
+          parallelLines,
+          contextLines,
+          lineNumbers,
+          bottom: true,
+          diffViewType,
+        };
+        const normalizedParallelLine = {
+          left: options.contextLines[0],
+          right: options.contextLines[0],
+          line_code: '123',
+        };
 
-      utils.addContextLines(options);
+        utils.addContextLines(options);
 
-      expect(inlineLines[inlineLines.length - 1]).toEqual(contextLines[0]);
-      expect(parallelLines[parallelLines.length - 1]).toEqual(normalizedParallelLine);
+        if (diffViewType === INLINE_DIFF_VIEW_TYPE) {
+          expect(inlineLines[inlineLines.length - 1]).toEqual(contextLines[0]);
+        } else {
+          expect(parallelLines[parallelLines.length - 1]).toEqual(normalizedParallelLine);
+        }
+      });
     });
   });
 
@@ -333,10 +381,10 @@ describe('DiffsStoreUtils', () => {
         diff_files: [Object.assign({}, mock, { highlighted_diff_lines: undefined })],
       };
 
-      utils.prepareDiffData(preparedDiff);
-      utils.prepareDiffData(splitInlineDiff);
-      utils.prepareDiffData(splitParallelDiff);
-      utils.prepareDiffData(completedDiff, [mock]);
+      preparedDiff.diff_files = utils.prepareDiffData(preparedDiff);
+      splitInlineDiff.diff_files = utils.prepareDiffData(splitInlineDiff);
+      splitParallelDiff.diff_files = utils.prepareDiffData(splitParallelDiff);
+      completedDiff.diff_files = utils.prepareDiffData(completedDiff, [mock]);
     });
 
     it('sets the renderIt and collapsed attribute on files', () => {
@@ -389,6 +437,37 @@ describe('DiffsStoreUtils', () => {
       expect(completedDiff.diff_files.length).toEqual(1);
       expect(completedDiff.diff_files[0].parallel_diff_lines.length).toBeGreaterThan(0);
       expect(completedDiff.diff_files[0].highlighted_diff_lines.length).toBeGreaterThan(0);
+    });
+
+    it('leaves files in the existing state', () => {
+      const priorFiles = [mock];
+      const fakeNewFile = {
+        ...mock,
+        content_sha: 'ABC',
+        file_hash: 'DEF',
+      };
+      const updatedFilesList = utils.prepareDiffData({ diff_files: [fakeNewFile] }, priorFiles);
+
+      expect(updatedFilesList).toEqual([mock, fakeNewFile]);
+    });
+
+    it('completes an existing split diff without overwriting existing diffs', () => {
+      // The current state has a file that has only loaded inline lines
+      const priorFiles = [{ ...mock, parallel_diff_lines: [] }];
+      // The next (batch) load loads two files: the other half of that file, and a new file
+      const fakeBatch = [
+        { ...mock, highlighted_diff_lines: undefined },
+        { ...mock, highlighted_diff_lines: undefined, content_sha: 'ABC', file_hash: 'DEF' },
+      ];
+      const updatedFilesList = utils.prepareDiffData({ diff_files: fakeBatch }, priorFiles);
+
+      expect(updatedFilesList).toEqual([
+        mock,
+        jasmine.objectContaining({
+          content_sha: 'ABC',
+          file_hash: 'DEF',
+        }),
+      ]);
     });
   });
 

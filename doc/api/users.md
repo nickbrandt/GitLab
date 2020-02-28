@@ -160,7 +160,7 @@ Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) 
     ...
     "shared_runners_minutes_limit": 133,
     "extra_shared_runners_minutes_limit": 133,
-    "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123"
+    "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123",
     ...
   }
 ]
@@ -313,7 +313,7 @@ the `shared_runners_minutes_limit`, `extra_shared_runners_minutes_limit`, and `n
   "username": "john_smith",
   "shared_runners_minutes_limit": 133,
   "extra_shared_runners_minutes_limit": 133,
-  "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123"
+  "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123",
   ...
 }
 ```
@@ -327,7 +327,7 @@ see the `group_saml` option:
   "username": "john_smith",
   "shared_runners_minutes_limit": 133,
   "extra_shared_runners_minutes_limit": 133,
-  "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123"
+  "note": "DMCA Request: 2018-11-05 | DMCA Violation | Abuse | https://gitlab.zendesk.com/agent/tickets/123",
   "identities": [
     {"provider": "github", "extern_uid": "2435223452345"},
     {"provider": "bitbucket", "extern_uid": "john.smith"},
@@ -356,7 +356,7 @@ over `password`. In addition, `reset_password` and
 `force_random_password` can be used together.
 
 NOTE: **Note:**
-From [GitLab 12.1](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/29888/), `private_profile` will default to `false`.
+From [GitLab 12.1](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/29888/), `private_profile` will default to `false`.
 
 ```
 POST /users
@@ -364,30 +364,36 @@ POST /users
 
 Parameters:
 
-- `email` (required)             - Email
-- `password` (optional)          - Password
-- `reset_password` (optional)    - Send user password reset link - true or false(default)
-- `username` (required)          - Username
-- `name` (required)              - Name
-- `skype` (optional)             - Skype ID
-- `linkedin` (optional)          - LinkedIn
-- `twitter` (optional)           - Twitter account
-- `website_url` (optional)       - Website URL
-- `organization` (optional)      - Organization name
-- `projects_limit` (optional)    - Number of projects user can create
-- `extern_uid` (optional)        - External UID
-- `provider` (optional)          - External provider name
-- `bio` (optional)               - User's biography
-- `location` (optional)          - User's location
-- `public_email` (optional)      - The public email of the user
-- `admin` (optional)             - User is admin - true or false (default)
-- `can_create_group` (optional)  - User can create groups - true or false
-- `skip_confirmation` (optional) - Skip confirmation - true or false (default)
-- `external` (optional)          - Flags the user as external - true or false (default)
-- `avatar` (optional)            - Image file for user's avatar
-- `private_profile` (optional)   - User's profile is private - true or false (default)
-- `shared_runners_minutes_limit` (optional)       - Pipeline minutes quota for this user **(STARTER)**
-- `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user **(STARTER)**
+| Attribute                            | Required | Description                                                                                                                                             |
+|:-------------------------------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `admin`                              | No       | User is admin - true or false (default)                                                                                                                 |
+| `avatar`                             | No       | Image file for user's avatar                                                                                                                            |
+| `bio`                                | No       | User's biography                                                                                                                                        |
+| `can_create_group`                   | No       | User can create groups - true or false                                                                                                                  |
+| `color_scheme_id`                    | No       | User's color scheme for the file viewer (see [the user preference docs](../user/profile/preferences.md#syntax-highlighting-theme) for more information) |
+| `email`                              | Yes      | Email                                                                                                                                                   |
+| `extern_uid`                         | No       | External UID                                                                                                                                            |
+| `external`                           | No       | Flags the user as external - true or false (default)                                                                                                    |
+| `extra_shared_runners_minutes_limit` | No       | Extra pipeline minutes quota for this user **(STARTER)**                                                                                                |
+| `force_random_password`              | No       | Set user password to a random value - true or false (default)                                                                                           |
+| `group_id_for_saml`                  | No       | ID of group where SAML has been configured                                                                                                              |
+| `linkedin`                           | No       | LinkedIn                                                                                                                                                |
+| `location`                           | No       | User's location                                                                                                                                         |
+| `name`                               | No       | Name                                                                                                                                                    |
+| `organization`                       | No       | Organization name                                                                                                                                       |
+| `password`                           | No       | Password                                                                                                                                                |
+| `private_profile`                    | No       | User's profile is private - true, false (default), or null (will be converted to false)                                                                 |
+| `projects_limit`                     | No       | Number of projects user can create                                                                                                                      |
+| `provider`                           | No       | External provider name                                                                                                                                  |
+| `public_email`                       | No       | The public email of the user                                                                                                                            |
+| `reset_password`                     | No       | Send user password reset link - true or false(default)                                                                                                  |
+| `shared_runners_minutes_limit`       | No       | Pipeline minutes quota for this user **(STARTER)**                                                                                                      |
+| `skip_confirmation`                  | No       | Skip confirmation - true or false (default)                                                                                                             |
+| `skype`                              | No       | Skype ID                                                                                                                                                |
+| `theme_id`                           | No       | The GitLab theme for the user (see [the user preference docs](../user/profile/preferences.md#navigation-theme) for more information)                    |
+| `twitter`                            | No       | Twitter account                                                                                                                                         |
+| `username`                           | Yes      | Username                                                                                                                                                |
+| `website_url`                        | No       | Website URL                                                                                                                                             |
 
 ## User modification
 
@@ -399,39 +405,54 @@ PUT /users/:id
 
 Parameters:
 
-- `id` (required)                  - The ID of the user
-- `email` (optional)               - Email
-- `username` (optional)            - Username
-- `name` (optional)                - Name
-- `password` (optional)            - Password
-- `skype` (optional)               - Skype ID
-- `linkedin` (optional)            - LinkedIn
-- `twitter` (optional)             - Twitter account
-- `website_url` (optional)         - Website URL
-- `organization` (optional)        - Organization name
-- `projects_limit` (optional)      - Limit projects each user can create
-- `extern_uid` (optional)          - External UID
-- `provider` (optional)            - External provider name
-- `group_id_for_saml` (optional)   - ID of group where SAML has been configured
-- `bio` (optional)                 - User's biography
-- `location` (optional)            - User's location
-- `public_email` (optional)        - The public email of the user
-- `admin` (optional)               - User is admin - true or false (default)
-- `can_create_group` (optional)    - User can create groups - true or false
-- `skip_reconfirmation` (optional) - Skip reconfirmation - true or false (default)
-- `external` (optional)            - Flags the user as external - true or false (default)
-- `shared_runners_minutes_limit` (optional) - Pipeline minutes quota for this user
-- `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user
-- `avatar` (optional)              - Image file for user's avatar
-- `private_profile` (optional)     - User's profile is private - true or false (default)
-- `shared_runners_minutes_limit` (optional)       - Pipeline minutes quota for this user **(STARTER)**
-- `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user **(STARTER)**
-- `note` (optional)                - Admin notes for this user **(STARTER)**
+| Attribute                            | Required | Description                                                                                                                                             |
+|:-------------------------------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `admin`                              | No       | User is admin - true or false (default)                                                                                                                 |
+| `avatar`                             | No       | Image file for user's avatar                                                                                                                            |
+| `bio`                                | No       | User's biography                                                                                                                                        |
+| `can_create_group`                   | No       | User can create groups - true or false                                                                                                                  |
+| `color_scheme_id`                    | No       | User's color scheme for the file viewer (see [the user preference docs](../user/profile/preferences.md#syntax-highlighting-theme) for more information) |
+| `email`                              | No       | Email                                                                                                                                                   |
+| `extern_uid`                         | No       | External UID                                                                                                                                            |
+| `external`                           | No       | Flags the user as external - true or false (default)                                                                                                    |
+| `extra_shared_runners_minutes_limit` | No       | Extra pipeline minutes quota for this user **(STARTER)**                                                                                                |
+| `group_id_for_saml`                  | No       | ID of group where SAML has been configured                                                                                                              |
+| `id`                                 | Yes      | The ID of the user                                                                                                                                      |
+| `linkedin`                           | No       | LinkedIn                                                                                                                                                |
+| `location`                           | No       | User's location                                                                                                                                         |
+| `name`                               | No       | Name                                                                                                                                                    |
+| `note`                               | No       | Admin notes for this user **(STARTER)**                                                                                                                 |
+| `organization`                       | No       | Organization name                                                                                                                                       |
+| `password`                           | No       | Password                                                                                                                                                |
+| `private_profile`                    | No       | User's profile is private - true, false (default), or null (will be converted to false)                                                                 |
+| `projects_limit`                     | No       | Limit projects each user can create                                                                                                                     |
+| `provider`                           | No       | External provider name                                                                                                                                  |
+| `public_email`                       | No       | The public email of the user                                                                                                                            |
+| `shared_runners_minutes_limit`       | No       | Pipeline minutes quota for this user **(STARTER)**                                                                                                      |
+| `skip_reconfirmation`                | No       | Skip reconfirmation - true or false (default)                                                                                                           |
+| `skype`                              | No       | Skype ID                                                                                                                                                |
+| `theme_id`                           | No       | The GitLab theme for the user (see [the user preference docs](../user/profile/preferences.md#navigation-theme) for more information)                    |
+| `twitter`                            | No       | Twitter account                                                                                                                                         |
+| `username`                           | No       | Username                                                                                                                                                |
+| `website_url`                        | No       | Website URL                                                                                                                                             |
 
 On password update, user will be forced to change it upon next login.
 Note, at the moment this method does only return a `404` error,
-even in cases where a `409` (Conflict) would be more appropriate,
-e.g. when renaming the email address to some existing one.
+even in cases where a `409` (Conflict) would be more appropriate.
+For example, when renaming the email address to some existing one.
+
+## Delete authentication identity from user
+
+Deletes a user's authentication identity using the provider name associated with that identity. Available only for administrators.
+
+```
+DELETE /users/:id/identities/:provider
+```
+
+Parameters:
+
+- `id` (required) - The ID of the user
+- `provider` (required) - External provider name
 
 ## User deletion
 
@@ -1162,9 +1183,9 @@ Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 
 ## Deactivate user
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/22257) in GitLab 12.4.
 
-Deactivates the specified user.  Available only for admin.
+Deactivates the specified user. Available only for admin.
 
 ```
 POST /users/:id/deactivate
@@ -1184,9 +1205,9 @@ Returns:
 
 ## Activate user
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/22257) in GitLab 12.4.
 
-Activates the specified user.  Available only for admin.
+Activates the specified user. Available only for admin.
 
 ```
 POST /users/:id/activate
@@ -1371,7 +1392,8 @@ The activities that update the timestamp are:
 
 - Git HTTP/SSH activities (such as clone, push)
 - User logging in into GitLab
-- User visiting pages related to Dashboards, Projects, Issues and Merge Requests ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/54947) in GitLab 11.8)
+- User visiting pages related to Dashboards, Projects, Issues, and Merge Requests ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/54947) in GitLab 11.8)
+- User using the API
 
 By default, it shows the activity for all users in the last 6 months, but this can be
 amended by using the `from` parameter.
@@ -1384,7 +1406,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `from` | string | no | Date string in the format YEAR-MONTH-DAY, e.g. `2016-03-11`. Defaults to 6 months ago. |
+| `from` | string | no | Date string in the format YEAR-MONTH-DAY. For example, `2016-03-11`. Defaults to 6 months ago. |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/activities
@@ -1416,14 +1438,14 @@ Please note that `last_activity_at` is deprecated, please use `last_activity_on`
 
 ## User memberships (admin only)
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/22518) in GitLab 12.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/20532) in GitLab 12.8.
 
 Lists all projects and groups a user is a member of. This endpoint is available for admins only.
 It returns the `source_id`, `source_name`, `source_type` and `access_level` of a membership.
-Source can be of type `Namespace` (representing a group) or `Project`. The response represents only direct memberships. Inherited memberships, for example in subgroups, will not be included.
-Access levels will be represented by an integer value. Read more about the meaning of access level values [here](access_requests.md#valid-access-levels).
+Source can be of type `Namespace` (representing a group) or `Project`. The response represents only direct memberships. Inherited memberships, for example in subgroups, are not included.
+Access levels are represented by an integer value. For more details, read about the meaning of [access level values](access_requests.md#valid-access-levels).
 
-```
+```plaintext
 GET /users/:id/memberships
 ```
 
@@ -1437,7 +1459,7 @@ Parameters:
 Returns:
 
 - `200 OK` on success.
-- `404 User Not Found` if user cannot be found.
+- `404 User Not Found` if user can't be found.
 - `403 Forbidden` when not requested by an admin.
 - `400 Bad Request` when requested type is not supported.
 

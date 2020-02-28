@@ -5,7 +5,7 @@
 Get a list of related issues of a given issue, sorted by the relationship creation datetime (ascending).
 Issues will be filtered according to the user authorizations.
 
-```
+```plaintext
 GET /projects/:id/issues/:issue_iid/links
 ```
 
@@ -57,7 +57,7 @@ Parameters:
 
 Creates a two-way relation between two issues. User must be allowed to update both issues in order to succeed.
 
-```
+```plaintext
 POST /projects/:id/issues/:issue_iid/links
 ```
 
@@ -67,7 +67,7 @@ POST /projects/:id/issues/:issue_iid/links
 | `issue_iid` | integer | yes      | The internal ID of a project's issue |
 | `target_project_id` | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) of a target project  |
 | `target_issue_iid` | integer/string | yes      | The internal ID of a target project's issue |
-| `link_type` | string  | no | The type of the relation ("relates_to", "blocks", "is_blocked_by"), defaults to "relates_to"). Ignored unless `issue_link_types` feature flag is enabled. |
+| `link_type` | string  | no | The type of the relation ("relates_to", "blocks", "is_blocked_by"), defaults to "relates_to"). |
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/4/issues/1/links?target_project_id=5&target_issue_iid=1"
@@ -145,7 +145,7 @@ Example response:
 
 Deletes an issue link, thus removes the two-way relationship.
 
-```
+```plaintext
 DELETE /projects/:id/issues/:issue_iid/links/:issue_link_id
 ```
 

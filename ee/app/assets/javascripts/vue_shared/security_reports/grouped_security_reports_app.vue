@@ -279,118 +279,120 @@ export default {
     class="mr-widget-border-top grouped-security-reports mr-report"
     data-qa-selector="vulnerability_report_grouped"
   >
-    <div v-if="pipelinePath" slot="actionButtons">
-      <a
-        :href="securityTab"
-        target="_blank"
-        class="btn btn-default btn-sm float-right append-right-default"
-      >
-        <span>{{ s__('ciReport|View full report') }}</span>
-        <icon :size="16" name="external-link" />
-      </a>
-    </div>
+    <template v-if="pipelinePath" #actionButtons>
+      <div>
+        <a
+          :href="securityTab"
+          target="_blank"
+          class="btn btn-default btn-sm float-right append-right-default"
+        >
+          <span>{{ s__('ciReport|View full report') }}</span>
+          <icon :size="16" name="external-link" />
+        </a>
+      </div>
+    </template>
 
-    <div
-      v-if="isMRActive && isBaseSecurityReportOutOfDate"
-      slot="subHeading"
-      class="text-secondary-700 text-1"
-    >
-      <span>{{ subHeadingText }}</span>
-    </div>
+    <template v-if="isMRActive && isBaseSecurityReportOutOfDate" #subHeading>
+      <div class="text-secondary-700 text-1">
+        <span>{{ subHeadingText }}</span>
+      </div>
+    </template>
 
-    <div slot="body" class="mr-widget-grouped-section report-block">
-      <template v-if="hasSastReports">
-        <summary-row
-          :summary="groupedSastText"
-          :status-icon="sastStatusIcon"
-          :popover-options="sastPopover"
-          class="js-sast-widget"
-          data-qa-selector="sast_scan_report"
+    <template #body>
+      <div class="mr-widget-grouped-section report-block">
+        <template v-if="hasSastReports">
+          <summary-row
+            :summary="groupedSastText"
+            :status-icon="sastStatusIcon"
+            :popover-options="sastPopover"
+            class="js-sast-widget"
+            data-qa-selector="sast_scan_report"
+          />
+
+          <issues-list
+            v-if="sast.newIssues.length || sast.resolvedIssues.length"
+            :unresolved-issues="sast.newIssues"
+            :resolved-issues="sast.resolvedIssues"
+            :all-issues="sast.allIssues"
+            :component="$options.componentNames.SastIssueBody"
+            class="js-sast-issue-list report-block-group-list"
+          />
+        </template>
+
+        <template v-if="hasDependencyScanningReports">
+          <summary-row
+            :summary="groupedDependencyText"
+            :status-icon="dependencyScanningStatusIcon"
+            :popover-options="dependencyScanningPopover"
+            class="js-dependency-scanning-widget"
+            data-qa-selector="dependency_scan_report"
+          />
+
+          <issues-list
+            v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
+            :unresolved-issues="dependencyScanning.newIssues"
+            :resolved-issues="dependencyScanning.resolvedIssues"
+            :component="$options.componentNames.SastIssueBody"
+            class="js-dss-issue-list report-block-group-list"
+          />
+        </template>
+
+        <template v-if="hasContainerScanningReports">
+          <summary-row
+            :summary="groupedContainerScanningText"
+            :status-icon="containerScanningStatusIcon"
+            :popover-options="containerScanningPopover"
+            class="js-container-scanning"
+            data-qa-selector="container_scan_report"
+          />
+
+          <issues-list
+            v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
+            :unresolved-issues="containerScanning.newIssues"
+            :resolved-issues="containerScanning.resolvedIssues"
+            :component="$options.componentNames.ContainerScanningIssueBody"
+            class="report-block-group-list"
+          />
+        </template>
+
+        <template v-if="hasDastReports">
+          <summary-row
+            :summary="groupedDastText"
+            :status-icon="dastStatusIcon"
+            :popover-options="dastPopover"
+            class="js-dast-widget"
+            data-qa-selector="dast_scan_report"
+          />
+
+          <issues-list
+            v-if="dast.newIssues.length || dast.resolvedIssues.length"
+            :unresolved-issues="dast.newIssues"
+            :resolved-issues="dast.resolvedIssues"
+            :component="$options.componentNames.DastIssueBody"
+            class="report-block-group-list"
+          />
+        </template>
+
+        <issue-modal
+          :modal="modal"
+          :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+          :can-create-issue="canCreateIssue"
+          :can-create-merge-request="canCreateMergeRequest"
+          :can-dismiss-vulnerability="canDismissVulnerability"
+          @closeDismissalCommentBox="closeDismissalCommentBox()"
+          @createMergeRequest="createMergeRequest"
+          @createNewIssue="createNewIssue"
+          @dismissVulnerability="dismissVulnerability"
+          @openDismissalCommentBox="openDismissalCommentBox()"
+          @editVulnerabilityDismissalComment="openDismissalCommentBox()"
+          @revertDismissVulnerability="revertDismissVulnerability"
+          @downloadPatch="downloadPatch"
+          @addDismissalComment="addDismissalComment({ comment: $event })"
+          @deleteDismissalComment="deleteDismissalComment"
+          @showDismissalDeleteButtons="showDismissalDeleteButtons"
+          @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
         />
-
-        <issues-list
-          v-if="sast.newIssues.length || sast.resolvedIssues.length"
-          :unresolved-issues="sast.newIssues"
-          :resolved-issues="sast.resolvedIssues"
-          :all-issues="sast.allIssues"
-          :component="$options.componentNames.SastIssueBody"
-          class="js-sast-issue-list report-block-group-list"
-        />
-      </template>
-
-      <template v-if="hasDependencyScanningReports">
-        <summary-row
-          :summary="groupedDependencyText"
-          :status-icon="dependencyScanningStatusIcon"
-          :popover-options="dependencyScanningPopover"
-          class="js-dependency-scanning-widget"
-          data-qa-selector="dependency_scan_report"
-        />
-
-        <issues-list
-          v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
-          :unresolved-issues="dependencyScanning.newIssues"
-          :resolved-issues="dependencyScanning.resolvedIssues"
-          :component="$options.componentNames.SastIssueBody"
-          class="js-dss-issue-list report-block-group-list"
-        />
-      </template>
-
-      <template v-if="hasContainerScanningReports">
-        <summary-row
-          :summary="groupedContainerScanningText"
-          :status-icon="containerScanningStatusIcon"
-          :popover-options="containerScanningPopover"
-          class="js-container-scanning"
-          data-qa-selector="container_scan_report"
-        />
-
-        <issues-list
-          v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
-          :unresolved-issues="containerScanning.newIssues"
-          :resolved-issues="containerScanning.resolvedIssues"
-          :component="$options.componentNames.ContainerScanningIssueBody"
-          class="report-block-group-list"
-        />
-      </template>
-
-      <template v-if="hasDastReports">
-        <summary-row
-          :summary="groupedDastText"
-          :status-icon="dastStatusIcon"
-          :popover-options="dastPopover"
-          class="js-dast-widget"
-          data-qa-selector="dast_scan_report"
-        />
-
-        <issues-list
-          v-if="dast.newIssues.length || dast.resolvedIssues.length"
-          :unresolved-issues="dast.newIssues"
-          :resolved-issues="dast.resolvedIssues"
-          :component="$options.componentNames.DastIssueBody"
-          class="report-block-group-list"
-        />
-      </template>
-
-      <issue-modal
-        :modal="modal"
-        :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-        :can-create-issue="canCreateIssue"
-        :can-create-merge-request="canCreateMergeRequest"
-        :can-dismiss-vulnerability="canDismissVulnerability"
-        @closeDismissalCommentBox="closeDismissalCommentBox()"
-        @createMergeRequest="createMergeRequest"
-        @createNewIssue="createNewIssue"
-        @dismissVulnerability="dismissVulnerability"
-        @openDismissalCommentBox="openDismissalCommentBox()"
-        @editVulnerabilityDismissalComment="openDismissalCommentBox()"
-        @revertDismissVulnerability="revertDismissVulnerability"
-        @downloadPatch="downloadPatch"
-        @addDismissalComment="addDismissalComment({ comment: $event })"
-        @deleteDismissalComment="deleteDismissalComment"
-        @showDismissalDeleteButtons="showDismissalDeleteButtons"
-        @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
-      />
-    </div>
+      </div>
+    </template>
   </report-section>
 </template>

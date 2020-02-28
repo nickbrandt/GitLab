@@ -10,7 +10,6 @@ module Ci
     include ObjectStorage::BackgroundMove
     include Presentable
     include Importable
-    include Gitlab::Utils::StrongMemoize
     include HasRef
     include IgnorableColumns
 
@@ -23,6 +22,7 @@ module Ci
     belongs_to :trigger_request
     belongs_to :erased_by, class_name: 'User'
     belongs_to :resource_group, class_name: 'Ci::ResourceGroup', inverse_of: :builds
+    belongs_to :pipeline, class_name: 'Ci::Pipeline', foreign_key: :commit_id
 
     RUNNER_FEATURES = {
       upload_multiple_artifacts: -> (build) { build.publishes_artifacts_reports? },
@@ -114,6 +114,7 @@ module Ci
     end
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
+    scope :eager_load_job_artifacts_archive, -> { includes(:job_artifacts_archive) }
 
     scope :eager_load_everything, -> do
       includes(
@@ -172,8 +173,10 @@ module Ci
     scope :queued_before, ->(time) { where(arel_table[:queued_at].lt(time)) }
     scope :order_id_desc, -> { order('ci_builds.id DESC') }
 
-    PROJECT_ROUTE_AND_NAMESPACE_ROUTE = { project: [:project_feature, :route, { namespace: :route }] }.freeze
-    scope :preload_project_and_pipeline_project, -> { preload(PROJECT_ROUTE_AND_NAMESPACE_ROUTE, pipeline: PROJECT_ROUTE_AND_NAMESPACE_ROUTE) }
+    scope :preload_project_and_pipeline_project, -> do
+      preload(Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE,
+              pipeline: Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE)
+    end
 
     acts_as_taggable
 
@@ -528,6 +531,7 @@ module Ci
           .concat(persisted_variables)
           .concat(scoped_variables)
           .concat(job_variables)
+          .concat(environment_changed_page_variables)
           .concat(persisted_environment_variables)
           .to_runner_variables
       end
@@ -563,6 +567,15 @@ module Ci
         # and we need to make sure that CI_ENVIRONMENT_NAME and
         # CI_ENVIRONMENT_SLUG so on are available for the URL be expanded.
         variables.append(key: 'CI_ENVIRONMENT_URL', value: environment_url) if environment_url
+      end
+    end
+
+    def environment_changed_page_variables
+      Gitlab::Ci::Variables::Collection.new.tap do |variables|
+        break variables unless environment_status
+
+        variables.append(key: 'CI_MERGE_REQUEST_CHANGED_PAGE_PATHS', value: environment_status.changed_paths.join(','))
+        variables.append(key: 'CI_MERGE_REQUEST_CHANGED_PAGE_URLS', value: environment_status.changed_urls.join(','))
       end
     end
 
@@ -818,7 +831,7 @@ module Ci
       depended_jobs = depends_on_builds
 
       # find all jobs that are needed
-      if Feature.enabled?(:ci_dag_support, project, default_enabled: true) && needs.exists?
+      if Feature.enabled?(:ci_dag_support, project, default_enabled: true) && scheduling_type_dag?
         depended_jobs = depended_jobs.where(name: needs.artifacts.select(:name))
       end
 
@@ -965,6 +978,14 @@ module Ci
 
     def environment_url
       options&.dig(:environment, :url) || persisted_environment&.external_url
+    end
+
+    def environment_status
+      strong_memoize(:environment_status) do
+        if has_environment? && merge_request
+          EnvironmentStatus.new(project, persisted_environment, merge_request, pipeline.sha)
+        end
+      end
     end
 
     # The format of the retry option changed in GitLab 11.5: Before it was

@@ -1,8 +1,9 @@
 import $ from 'jquery';
+import _ from 'lodash';
 import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
 import axios from '~/lib/utils/axios_utils';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { s__, sprintf } from '~/locale';
+import { s__, n__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import toast from '~/vue_shared/plugins/global_toast';
 import * as types from './mutation_types';
@@ -81,8 +82,8 @@ export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
       const { headers, data } = response;
       dispatch('receiveVulnerabilitiesSuccess', { headers, data });
     })
-    .catch(() => {
-      dispatch('receiveVulnerabilitiesError');
+    .catch(error => {
+      dispatch('receiveVulnerabilitiesError', error?.response?.status);
     });
 };
 
@@ -93,13 +94,18 @@ export const requestVulnerabilities = ({ commit }) => {
 export const receiveVulnerabilitiesSuccess = ({ commit }, { headers, data }) => {
   const normalizedHeaders = normalizeHeaders(headers);
   const pageInfo = parseIntPagination(normalizedHeaders);
-  const vulnerabilities = data;
+  // Vulnerabilities on pipelines don't have IDs.
+  // We need to add dummy IDs here to avoid rendering issues.
+  const vulnerabilities = data.map(vulnerability => ({
+    ...vulnerability,
+    id: vulnerability.id || _.uniqueId('client_'),
+  }));
 
   commit(types.RECEIVE_VULNERABILITIES_SUCCESS, { pageInfo, vulnerabilities });
 };
 
-export const receiveVulnerabilitiesError = ({ commit }) => {
-  commit(types.RECEIVE_VULNERABILITIES_ERROR);
+export const receiveVulnerabilitiesError = ({ commit }, errorCode) => {
+  commit(types.RECEIVE_VULNERABILITIES_ERROR, errorCode);
 };
 
 export const openModal = ({ commit }, payload = {}) => {
@@ -115,7 +121,6 @@ export const createIssue = ({ dispatch }, { vulnerability, flashError }) => {
       vulnerability_feedback: {
         feedback_type: 'issue',
         category: vulnerability.report_type,
-        project_fingerprint: vulnerability.project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
           category: vulnerability.report_type,
@@ -144,6 +149,77 @@ export const receiveCreateIssueError = ({ commit }, { flashError }) => {
   if (flashError) {
     createFlash(
       s__('Security Reports|There was an error creating the issue.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
+  }
+};
+
+export const selectAllVulnerabilities = ({ commit }) => {
+  commit(types.SELECT_ALL_VULNERABILITIES);
+};
+
+export const deselectAllVulnerabilities = ({ commit }) => {
+  commit(types.DESELECT_ALL_VULNERABILITIES);
+};
+
+export const selectVulnerability = ({ commit }, { id }) => {
+  commit(types.SELECT_VULNERABILITY, id);
+};
+
+export const deselectVulnerability = ({ commit }, { id }) => {
+  commit(types.DESELECT_VULNERABILITY, id);
+};
+
+export const dismissSelectedVulnerabilities = ({ dispatch, state }, { comment } = {}) => {
+  const { vulnerabilities, selectedVulnerabilities } = state;
+  const dismissableVulnerabilties = vulnerabilities.filter(({ id }) => selectedVulnerabilities[id]);
+
+  dispatch('requestDismissSelectedVulnerabilities');
+
+  const promises = dismissableVulnerabilties.map(vulnerability =>
+    axios.post(vulnerability.create_vulnerability_feedback_dismissal_path, {
+      vulnerability_feedback: {
+        category: vulnerability.report_type,
+        comment,
+        feedback_type: 'dismissal',
+        project_fingerprint: vulnerability.project_fingerprint,
+        vulnerability_data: {
+          id: vulnerability.id,
+        },
+      },
+    }),
+  );
+
+  Promise.all(promises)
+    .then(() => {
+      dispatch('receiveDismissSelectedVulnerabilitiesSuccess');
+    })
+    .catch(() => {
+      dispatch('receiveDismissSelectedVulnerabilitiesError', { flashError: true });
+    });
+};
+
+export const requestDismissSelectedVulnerabilities = ({ commit }) => {
+  commit(types.REQUEST_DISMISS_SELECTED_VULNERABILITIES);
+};
+
+export const receiveDismissSelectedVulnerabilitiesSuccess = ({ commit, getters }) => {
+  toast(
+    n__(
+      '%d vulnerability dismissed',
+      '%d vulnerabilities dismissed',
+      getters.selectedVulnerabilitiesCount,
+    ),
+  );
+  commit(types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS);
+};
+
+export const receiveDismissSelectedVulnerabilitiesError = ({ commit }, { flashError }) => {
+  commit(types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR);
+  if (flashError) {
+    createFlash(
+      s__('Security Reports|There was an error dismissing the vulnerabilities.'),
       'alert',
       document.querySelector('.ci-table'),
     );
@@ -480,5 +556,4 @@ export const closeDismissalCommentBox = ({ commit }) => {
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
-// This is no longer needed after gitlab-foss#52179 is merged
 export default () => {};

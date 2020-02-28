@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe SnippetBlobPresenter do
-  describe '#highlighted_data' do
+  describe '#rich_data' do
     let(:snippet) { build(:personal_snippet) }
 
-    subject { described_class.new(snippet.blob).highlighted_data }
+    subject { described_class.new(snippet.blob).rich_data }
 
     it 'returns nil when the snippet blob is binary' do
       allow(snippet.blob).to receive(:binary?).and_return(true)
@@ -33,7 +33,41 @@ describe SnippetBlobPresenter do
       snippet.file_name = 'test'
       snippet.content = 'foo'
 
-      expect(described_class.new(snippet.blob).highlighted_data).to eq '<span id="LC1" class="line" lang="plaintext">foo</span>'
+      expect(subject).to eq '<span id="LC1" class="line" lang="plaintext">foo</span>'
+    end
+  end
+
+  describe '#plain_data' do
+    let(:snippet) { build(:personal_snippet) }
+
+    subject { described_class.new(snippet.blob).plain_data }
+
+    it 'returns nil when the snippet blob is binary' do
+      allow(snippet.blob).to receive(:binary?).and_return(true)
+
+      expect(subject).to be_nil
+    end
+
+    it 'returns plain content when snippet file is markup' do
+      snippet.file_name = 'test.md'
+      snippet.content = '*foo*'
+
+      expect(subject).to eq '<span id="LC1" class="line" lang="markdown"><span class="ge">*foo*</span></span>'
+    end
+
+    it 'returns plain syntax content' do
+      snippet.file_name = 'test.rb'
+      snippet.content = 'class Foo;end'
+
+      expect(subject)
+        .to eq '<span id="LC1" class="line" lang="">class Foo;end</span>'
+    end
+
+    it 'returns plain text highlighted content' do
+      snippet.file_name = 'test'
+      snippet.content = 'foo'
+
+      expect(subject).to eq '<span id="LC1" class="line" lang="">foo</span>'
     end
   end
 
@@ -42,18 +76,18 @@ describe SnippetBlobPresenter do
 
     context 'with ProjectSnippet' do
       let!(:project) { create(:project) }
-      let(:snippet) { build(:project_snippet, project: project, id: 1) }
+      let(:snippet) { create(:project_snippet, project: project) }
 
       it 'returns the raw path' do
-        expect(subject).to eq "/#{snippet.project.full_path}/snippets/1/raw"
+        expect(subject).to eq "/#{snippet.project.full_path}/snippets/#{snippet.id}/raw"
       end
     end
 
     context 'with PersonalSnippet' do
-      let(:snippet) { build(:personal_snippet, id: 1) }
+      let(:snippet) { create(:personal_snippet) }
 
       it 'returns the raw path' do
-        expect(subject).to eq "/snippets/1/raw"
+        expect(subject).to eq "/snippets/#{snippet.id}/raw"
       end
     end
   end

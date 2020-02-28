@@ -128,16 +128,6 @@ version and rotates the old one:
    - `online`: The 3 latest stable versions.
    - `offline`: All the previous versions offered as an offline archive.
 
-1. **Add the new offline version in the 404 page redirect script:**
-
-   Since we're deprecating the oldest version each month, we need to redirect
-   those URLs in order not to create [404 entries](https://gitlab.com/gitlab-org/gitlab-docs/issues/221).
-   There's a temporary hack for now:
-
-   1. Edit `content/404.html`, making sure all offline versions under
-      `content/_data/versions.yaml` are in the JavaScript snippet at the end of
-      the document.
-
 1. **Update the `:latest` and `:archives` Docker images:**
 
    The following two Dockerfiles need to be updated:
@@ -176,7 +166,7 @@ versions:
    ./bin/rake release:dropdowns
    ```
 
-1. [Visit the merge requests page](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests?label_name%5B%5D=release>)
+1. [Visit the merge requests page](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests?label_name%5B%5D=release)
    to check that their pipelines pass, and once all are merged, proceed to the
    following and final step.
 
@@ -240,7 +230,7 @@ dropdown MRs are created have a caveat, and that is that the tests run by
 pulling the master branches of all products, instead of the respective stable
 ones.
 
-In a real world scenario, the [Update 12.2 dropdown to match that of 12.4](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/604)
+In a real world scenario, the [Update 12.2 dropdown to match that of 12.4](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/604)
 merge request failed because of the [`test_internal_links_and_anchors` test](https://gitlab.com/gitlab-org/gitlab-docs/-/jobs/328042431).
 
 This happened because there has been a rename of a product (`gitlab-monitor` to `gitlab-exporter`)

@@ -1,26 +1,42 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'audit event logging' do
-  before do
-    stub_licensed_features(extended_audit_events: true)
-  end
-
-  context 'if operation succeed' do
-    it 'logs an audit event if operation succeed' do
-      expect { operation }.to change(AuditEvent, :count).by(1)
+  context 'when licensed' do
+    before do
+      stub_licensed_features(extended_audit_events: true)
     end
 
-    it 'logs the project info' do
-      @resource = operation
+    context 'when operation succeeds' do
+      it 'logs an audit event' do
+        expect { operation }.to change(AuditEvent, :count).by(1)
+      end
 
-      expect(AuditEvent.last).to have_attributes(attributes)
+      it 'logs the audit event info' do
+        @resource = operation
+
+        expect(AuditEvent.last).to have_attributes(attributes)
+      end
+    end
+
+    it 'does not log audit event if operation fails' do
+      fail_condition!
+
+      expect { operation }.not_to change(AuditEvent, :count)
     end
   end
 
-  it 'does not log audit event if project operation fails' do
-    fail_condition!
+  context 'when not licensed' do
+    before do
+      stub_licensed_features(
+        admin_audit_log: false,
+        audit_events: false,
+        extended_audit_events: false
+      )
+    end
 
-    expect { operation }.not_to change(AuditEvent, :count)
+    it 'does not log audit event' do
+      expect { operation }.not_to change(AuditEvent, :count)
+    end
   end
 end
 

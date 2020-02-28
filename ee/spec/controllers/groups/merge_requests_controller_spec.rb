@@ -35,7 +35,7 @@ describe Groups::MergeRequestsController do
       it 'returns 404 status' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 

@@ -56,5 +56,4 @@ export const receiveProjectsError = ({ commit }) => {
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
-// This is no longer needed after gitlab-foss#52179 is merged
 export default () => {};

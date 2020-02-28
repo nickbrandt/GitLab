@@ -240,13 +240,13 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Create a package scoped flag name:
 
-   ```go
+   ```golang
    var findAllTagsFeatureFlag = "go-find-all-tags"
    ```
 
 1. Create a switch in the code using the `featureflag` package:
 
-   ```go
+   ```golang
    if featureflag.IsEnabled(ctx, findAllTagsFeatureFlag) {
      // go implementation
    } else {
@@ -256,7 +256,7 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Create Prometheus metrics:
 
-   ```go
+   ```golang
    var findAllTagsRequests = prometheus.NewCounterVec(
      prometheus.CounterOpts{
        Name: "gitaly_find_all_tags_requests_total",
@@ -280,7 +280,7 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 1. Set headers in tests:
 
-   ```go
+   ```golang
    import (
      "google.golang.org/grpc/metadata"
 
@@ -298,27 +298,12 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
 
 ### GitLab Rails
 
-1. In GitLab Rails:
-
-   1. Add the feature flag to `SERVER_FEATURE_FLAGS` in `lib/feature/gitaly.rb`:
-
-      ```ruby
-      SERVER_FEATURE_FLAGS = %w[go-find-all-tags].freeze
-      ```
-
-   1. Search for `["gitaly"]["features"]` (currently in `spec/requests/api/internal/base_spec.rb`)
-      and fix the expected results for the tests by adding the new feature flag into it:
-
-      ```ruby
-      expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-get-all-lfs-pointers-go' => 'true', 'gitaly-feature-go-find-all-tags' => 'true')
-      ```
-
 1. Test in a Rails console by setting the feature flag:
 
    NOTE: **Note:**
    Pay attention to the name of the flag and the one used in the Rails console.
    There is a difference between them (dashes replaced by underscores and name
-   prefix is changed).
+   prefix is changed). Make sure to prefix all flags with `gitaly_`.
 
    ```ruby
    Feature.enable('gitaly_go_find_all_tags')

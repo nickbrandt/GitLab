@@ -2,6 +2,7 @@ import Vue from 'vue';
 import createDashboardStore from 'ee/security_dashboard/store';
 import PipelineSecurityDashboard from 'ee/security_dashboard/components/pipeline_security_dashboard.vue';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
+import { LOADING_VULNERABILITIES_ERROR_CODES } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 const initSecurityDashboardApp = el => {
   const {
@@ -12,7 +13,14 @@ const initSecurityDashboardApp = el => {
     sourceBranch,
     vulnerabilitiesEndpoint,
     vulnerabilityFeedbackHelpPath,
+    emptyStateUnauthorizedSvgPath,
+    emptyStateForbiddenSvgPath,
   } = el.dataset;
+
+  const loadingErrorIllustrations = {
+    [LOADING_VULNERABILITIES_ERROR_CODES.UNAUTHORIZED]: emptyStateUnauthorizedSvgPath,
+    [LOADING_VULNERABILITIES_ERROR_CODES.FORBIDDEN]: emptyStateForbiddenSvgPath,
+  };
 
   return new Vue({
     el,
@@ -29,6 +37,7 @@ const initSecurityDashboardApp = el => {
           sourceBranch,
           dashboardDocumentation,
           emptyStateSvgPath,
+          loadingErrorIllustrations,
         },
       });
     },

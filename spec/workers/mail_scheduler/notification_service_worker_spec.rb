@@ -6,7 +6,7 @@ describe MailScheduler::NotificationServiceWorker do
   let(:worker) { described_class.new }
   let(:method) { 'new_key' }
 
-  set(:key) { create(:personal_key) }
+  let_it_be(:key) { create(:personal_key) }
 
   def serialize(*args)
     ActiveJob::Arguments.serialize(args)
@@ -49,7 +49,7 @@ describe MailScheduler::NotificationServiceWorker do
     end
   end
 
-  describe '.perform_async', :sidekiq do
+  describe '.perform_async' do
     around do |example|
       Sidekiq::Testing.fake! { example.run }
     end

@@ -58,7 +58,7 @@ describe "Admin uploads license" do
         attach_and_upload(path)
 
         expect(page).to have_content("The license was successfully uploaded and is now active.")
-                   .and have_content(license.licensee.values.first)
+                   .and have_content(license.licensee.each_value.first)
       end
     end
 

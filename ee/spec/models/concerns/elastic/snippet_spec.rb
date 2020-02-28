@@ -30,7 +30,7 @@ describe Snippet, :elastic do
     let!(:project_private_snippet)  { create(:snippet, :private, project: project, content: 'password: 789') }
 
     before do
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     it 'returns only public snippets when user is blank', :sidekiq_might_not_need_inline do
@@ -113,7 +113,7 @@ describe Snippet, :elastic do
       create(:snippet, :public, file_name: 'index.php')
       create(:snippet)
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { current_user: user }

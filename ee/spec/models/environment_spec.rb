@@ -57,31 +57,6 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
-  describe '#pod_names' do
-    context 'when environment does not have a rollout status' do
-      it 'returns an empty array' do
-        expect(environment.pod_names).to eq([])
-      end
-    end
-
-    context 'when environment has a rollout status' do
-      let(:pod_name) { 'pod_1' }
-      let(:rollout_status) { instance_double(::Gitlab::Kubernetes::RolloutStatus, instances: [{ pod_name: pod_name }]) }
-
-      before do
-        create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
-        create(:deployment, :success, environment: environment)
-      end
-
-      it 'returns the pod_names' do
-        allow(environment).to receive(:rollout_status_with_reactive_cache)
-          .and_return(rollout_status)
-
-        expect(environment.pod_names).to eq([pod_name])
-      end
-    end
-  end
-
   describe '#protected?' do
     subject { environment.protected? }
 
@@ -251,6 +226,41 @@ describe Environment, :use_clean_rails_memory_store_caching do
         expect(::Gitlab::Kubernetes::RolloutStatus).to receive(:loading).and_return(:mock_loading_status)
 
         is_expected.to eq(:mock_loading_status)
+      end
+    end
+  end
+
+  describe '#elastic_stack_available?' do
+    let!(:cluster) { create(:cluster, :project, :provided_by_user, projects: [project]) }
+    let!(:deployment) { create(:deployment, :success, environment: environment, project: project) }
+
+    context 'when app does not exist' do
+      it 'returns false' do
+        expect(environment.elastic_stack_available?).to be(false)
+      end
+    end
+
+    context 'when app exists' do
+      let!(:application) { create(:clusters_applications_elastic_stack, cluster: cluster) }
+
+      it 'returns false' do
+        expect(environment.elastic_stack_available?).to be(false)
+      end
+    end
+
+    context 'when app is installed' do
+      let!(:application) { create(:clusters_applications_elastic_stack, :installed, cluster: cluster) }
+
+      it 'returns true' do
+        expect(environment.elastic_stack_available?).to be(true)
+      end
+    end
+
+    context 'when app is updated' do
+      let!(:application) { create(:clusters_applications_elastic_stack, :updated, cluster: cluster) }
+
+      it 'returns true' do
+        expect(environment.elastic_stack_available?).to be(true)
       end
     end
   end

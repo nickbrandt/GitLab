@@ -46,7 +46,7 @@ module Gitlab
       end
 
       def found_vulnerabilities
-        ::Security::VulnerabilityFindingsFinder.new(vulnerable, params: filters).execute
+        ::Security::VulnerabilityFindingsFinder.new(pipeline_ids, params: filters).execute
       end
 
       def use_vulnerability_cache?
@@ -67,6 +67,10 @@ module Gitlab
         else
           vulnerable.project_ids_with_security_reports
         end
+      end
+
+      def pipeline_ids
+        vulnerable.all_pipelines.with_vulnerabilities.latest_successful_ids_per_project
       end
     end
   end

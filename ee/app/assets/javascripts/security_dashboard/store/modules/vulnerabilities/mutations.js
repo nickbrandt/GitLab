@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
@@ -19,15 +18,18 @@ export default {
   [types.REQUEST_VULNERABILITIES](state) {
     state.isLoadingVulnerabilities = true;
     state.errorLoadingVulnerabilities = false;
+    state.loadingVulnerabilitiesErrorCode = null;
   },
   [types.RECEIVE_VULNERABILITIES_SUCCESS](state, payload) {
     state.isLoadingVulnerabilities = false;
     state.pageInfo = payload.pageInfo;
     state.vulnerabilities = payload.vulnerabilities;
+    state.selectedVulnerabilities = {};
   },
-  [types.RECEIVE_VULNERABILITIES_ERROR](state) {
+  [types.RECEIVE_VULNERABILITIES_ERROR](state, errorCode = null) {
     state.isLoadingVulnerabilities = false;
     state.errorLoadingVulnerabilities = true;
+    state.loadingVulnerabilitiesErrorCode = errorCode;
   },
   [types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, payload) {
     state.vulnerabilitiesCountEndpoint = payload;
@@ -73,58 +75,12 @@ export default {
   },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
-    const { location } = vulnerability;
 
     Vue.set(state.modal, 'title', vulnerability.name);
-    Vue.set(state.modal.data.description, 'value', vulnerability.description);
-    Vue.set(
-      state.modal.data.project,
-      'value',
-      vulnerability.project && vulnerability.project.full_name,
-    );
-    Vue.set(
-      state.modal.data.project,
-      'url',
-      vulnerability.project && vulnerability.project.full_path,
-    );
 
-    Vue.set(
-      state.modal.data.identifiers,
-      'value',
-      vulnerability.identifiers.length && vulnerability.identifiers,
-    );
+    Vue.set(state.modal.project, 'value', vulnerability.project?.full_name);
+    Vue.set(state.modal.project, 'url', vulnerability.project?.full_path);
 
-    if (location) {
-      const {
-        file,
-        start_line: startLine,
-        end_line: endLine,
-        image,
-        operating_system: namespace,
-        class: className,
-      } = location;
-      const fileLocation = getFileLocation(location);
-
-      let lineSuffix = '';
-
-      if (startLine) {
-        lineSuffix += `:${startLine}`;
-        if (endLine && startLine !== endLine) {
-          lineSuffix += `-${endLine}`;
-        }
-      }
-
-      Vue.set(state.modal.data.className, 'value', className);
-      Vue.set(state.modal.data.file, 'value', file ? `${file}${lineSuffix}` : null);
-      Vue.set(state.modal.data.image, 'value', image);
-      Vue.set(state.modal.data.namespace, 'value', namespace);
-      Vue.set(state.modal.data.url, 'value', fileLocation);
-      Vue.set(state.modal.data.url, 'url', fileLocation);
-    }
-
-    Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
-    Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
-    Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(
       state.modal.vulnerability,
@@ -142,18 +98,6 @@ export default {
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
     Vue.set(state.modal, 'isCommentingOnDismissal', false);
-
-    if (vulnerability.instances && vulnerability.instances.length) {
-      Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
-    } else {
-      Vue.set(state.modal.data.instances, 'value', null);
-    }
-
-    if (vulnerability.links && vulnerability.links.length) {
-      Vue.set(state.modal.data.links, 'value', vulnerability.links);
-    } else {
-      Vue.set(state.modal.data.links, 'value', null);
-    }
   },
   [types.REQUEST_CREATE_ISSUE](state) {
     state.isCreatingIssue = true;
@@ -191,6 +135,35 @@ export default {
       'error',
       s__('Security Reports|There was an error dismissing the vulnerability.'),
     );
+  },
+  [types.REQUEST_DISMISS_SELECTED_VULNERABILITIES](state) {
+    state.isDismissingVulnerabilities = true;
+  },
+  [types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_SUCCESS](state) {
+    state.isDismissingVulnerabilities = false;
+    state.selectedVulnerabilities = {};
+  },
+  [types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR](state) {
+    state.isDismissingVulnerabilities = false;
+  },
+  [types.SELECT_VULNERABILITY](state, id) {
+    if (state.selectedVulnerabilities[id]) {
+      return;
+    }
+
+    Vue.set(state.selectedVulnerabilities, id, true);
+  },
+  [types.DESELECT_VULNERABILITY](state, id) {
+    Vue.delete(state.selectedVulnerabilities, id);
+  },
+  [types.SELECT_ALL_VULNERABILITIES](state) {
+    state.selectedVulnerabilities = state.vulnerabilities.reduce(
+      (acc, { id }) => Object.assign(acc, { [id]: true }),
+      {},
+    );
+  },
+  [types.DESELECT_ALL_VULNERABILITIES](state) {
+    state.selectedVulnerabilities = {};
   },
   [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
     state.isDismissingVulnerability = true;

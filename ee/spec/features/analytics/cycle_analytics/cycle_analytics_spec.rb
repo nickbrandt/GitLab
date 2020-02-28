@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'Group Cycle Analytics', :js do
+describe 'Group Value Stream Analytics', :js do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, name: "CA-test-group") }
+  let!(:group2) { create(:group, name: "CA-bad-test-group") }
   let!(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
+  let!(:label) { create(:group_label, group: group) }
+  let!(:label2) { create(:group_label, group: group) }
+  let!(:label3) { create(:group_label, group: group2) }
 
   let(:milestone) { create(:milestone, project: project) }
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
-  let(:label) { create(:group_label, group: group) }
-  let(:label2) { create(:group_label, group: group) }
 
   stage_nav_selector = '.stage-nav'
 
@@ -18,8 +20,20 @@ describe 'Group Cycle Analytics', :js do
     let!("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
 
+  shared_examples 'empty state' do
+    it 'displays an empty state before a group is selected' do
+      element = page.find('.row.empty-state')
+
+      expect(element).to have_content(_("Value Stream Analytics can help you determine your team’s velocity"))
+      expect(element.find('.svg-content img')['src']).to have_content('illustrations/analytics/cycle-analytics-empty-chart')
+    end
+  end
+
   before do
     stub_licensed_features(cycle_analytics_for_groups: true)
+
+    # chart returns an error since theres no data
+    stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => false)
 
     group.add_owner(user)
     project.add_maintainer(user)
@@ -29,11 +43,94 @@ describe 'Group Cycle Analytics', :js do
     visit analytics_cycle_analytics_path
   end
 
-  it 'displays an empty state before a group is selected' do
-    element = page.find('.row.empty-state')
+  it_behaves_like "empty state"
 
-    expect(element).to have_content("Cycle Analytics can help you determine your team’s velocity")
-    expect(element.find('.svg-content img')['src']).to have_content('illustrations/analytics/cycle-analytics-empty-chart')
+  context 'deep linked url parameters' do
+    group_dropdown = '.js-groups-dropdown-filter'
+    projects_dropdown = '.js-projects-dropdown-filter'
+
+    before do
+      stub_licensed_features(cycle_analytics_for_groups: true)
+
+      group.add_owner(user)
+
+      sign_in(user)
+    end
+
+    shared_examples "group dropdown set" do
+      it "has the group dropdown prepopulated" do
+        element = page.find(group_dropdown)
+
+        expect(element).to have_content group.name
+      end
+    end
+
+    context 'without valid query parameters set' do
+      context 'with no group_id set' do
+        before do
+          visit analytics_cycle_analytics_path
+        end
+
+        it_behaves_like "empty state"
+      end
+
+      context 'with created_after date > created_before date' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?created_after=2019-12-31&created_before=2019-11-01"
+        end
+
+        it_behaves_like "empty state"
+      end
+
+      context 'with fake parameters' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?beans=not-cool"
+        end
+
+        it_behaves_like "empty state"
+      end
+    end
+
+    context 'with valid query parameters set' do
+      context 'with group_id set' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}"
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+
+      context 'with project_ids set' do
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}&project_ids[]=#{project.id}"
+        end
+
+        it "has the projects dropdown prepopulated" do
+          element = page.find(projects_dropdown)
+
+          expect(element).to have_content project.name
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+
+      context 'with created_before and created_after set' do
+        date_range = '.js-daterange-picker'
+
+        before do
+          visit "#{analytics_cycle_analytics_path}?group_id=#{group.full_path}&created_before=2019-12-31&created_after=2019-11-01"
+        end
+
+        it "has the date range prepopulated" do
+          element = page.find(date_range)
+
+          expect(element.find('.js-daterange-picker-from input').value).to eq "2019-11-01"
+          expect(element.find('.js-daterange-picker-to input').value).to eq "2019-12-31"
+        end
+
+        it_behaves_like "group dropdown set"
+      end
+    end
   end
 
   context 'displays correct fields after group selection' do
@@ -78,7 +175,7 @@ describe 'Group Cycle Analytics', :js do
 
   it 'displays empty text' do
     [
-      'Cycle Analytics can help you determine your team’s velocity',
+      'Value Stream Analytics can help you determine your team’s velocity',
       'Start by choosing a group to see how your team is spending time. You can then drill down to the project level.'
     ].each do |content|
       expect(page).to have_content(content)
@@ -224,6 +321,7 @@ describe 'Group Cycle Analytics', :js do
     context 'enabled' do
       before do
         stub_licensed_features(cycle_analytics_for_groups: true, type_of_work_analytics: true)
+        stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
 
         sign_in(user)
       end
@@ -287,10 +385,13 @@ describe 'Group Cycle Analytics', :js do
 
   describe 'Customizable cycle analytics', :js do
     custom_stage_name = "Cool beans"
+    custom_stage_with_labels_name = "Cool beans - now with labels"
     start_event_identifier = :merge_request_created
     end_event_identifier = :merge_request_merged
+    start_label_event = :issue_label_added
+    stop_label_event = :issue_label_removed
 
-    let(:button_class) { '.js-add-stage-button' }
+    let(:add_stage_button) { '.js-add-stage-button' }
     let(:params) { { name: custom_stage_name, start_event_identifier: start_event_identifier, end_event_identifier: end_event_identifier } }
     let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
     let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage_name).ancestor(".stage-nav-item") }
@@ -309,6 +410,15 @@ describe 'Group Cycle Analytics', :js do
       page.find("select[name='#{name}']").all(elem)[index].select_option
     end
 
+    def select_dropdown_option_by_value(name, value, elem = "option")
+      page.find("select[name='#{name}']").find("#{elem}[value=#{value}]").select_option
+    end
+
+    def select_dropdown_label(field, index = 2)
+      page.find("[name=#{field}] .dropdown-toggle").click
+      page.find("[name=#{field}] .dropdown-menu").all('.dropdown-item')[index].click
+    end
+
     context 'enabled' do
       before do
         select_group
@@ -316,43 +426,71 @@ describe 'Group Cycle Analytics', :js do
 
       context 'Add a stage button' do
         it 'is visible' do
-          expect(page).to have_selector(button_class, visible: true)
+          expect(page).to have_selector(add_stage_button, visible: true)
           expect(page).to have_text('Add a stage')
         end
 
         it 'becomes active when clicked' do
-          expect(page).not_to have_selector("#{button_class}.active")
+          expect(page).not_to have_selector("#{add_stage_button}.active")
 
-          find(button_class).click
+          find(add_stage_button).click
 
-          expect(page).to have_selector("#{button_class}.active")
+          expect(page).to have_selector("#{add_stage_button}.active")
         end
 
         it 'displays the custom stage form when clicked' do
           expect(page).not_to have_text('New stage')
 
-          page.find(button_class).click
+          page.find(add_stage_button).click
 
           expect(page).to have_text('New stage')
         end
       end
 
       context 'Custom stage form' do
-        let(:show_form_button_class) { '.js-add-stage-button' }
-
-        def select_dropdown_option(name, elem = "option", index = 1)
-          page.find("select[name='#{name}']").all(elem)[index].select_option
-        end
+        let(:show_form_add_stage_button) { '.js-add-stage-button' }
 
         before do
           select_group
 
-          page.find(show_form_button_class).click
+          page.find(show_form_add_stage_button).click
           wait_for_requests
         end
 
         context 'with empty fields' do
           it 'submit button is disabled by default' do
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+        end
+
+        shared_examples 'submits the form successfully' do |stage_name|
+          it 'submit button is enabled' do
+            expect(page).to have_button('Add stage', disabled: false)
+          end
+
+          it 'submit button is disabled if the start event changes' do
+            select_dropdown_option 'custom-stage-start-event', 'option', 2
+
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+
+          it 'the custom stage is saved' do
+            click_button 'Add stage'
+
+            expect(page).to have_selector('.stage-nav-item', text: stage_name)
+          end
+
+          it 'a confirmation message is displayed' do
+            fill_in 'custom-stage-name', with: stage_name
+            click_button 'Add stage'
+
+            expect(page.find('.flash-notice')).to have_text("Your custom stage '#{stage_name}' was created")
+          end
+
+          it 'with a default name' do
+            fill_in 'custom-stage-name', with: 'issue'
+            click_button 'Add stage'
+
             expect(page).to have_button('Add stage', disabled: true)
           end
         end
@@ -364,44 +502,48 @@ describe 'Group Cycle Analytics', :js do
             select_dropdown_option 'custom-stage-stop-event'
           end
 
-          it 'submit button is enabled' do
-            expect(page).to have_button('Add stage', disabled: false)
+          it 'does not have label dropdowns' do
+            expect(page).not_to have_content('Start event label')
+            expect(page).not_to have_content('Stop event label')
           end
 
-          it 'submit button is disabled if the start event changes' do
-            select_dropdown_option 'custom-stage-start-event', 'option', 2
+          it_behaves_like 'submits the form successfully', custom_stage_name
+        end
 
+        context 'with label based stages selected' do
+          before do
+            fill_in 'custom-stage-name', with: custom_stage_with_labels_name
+            select_dropdown_option_by_value 'custom-stage-start-event', start_label_event
+            select_dropdown_option_by_value 'custom-stage-stop-event', stop_label_event
+          end
+
+          it 'has label dropdowns' do
+            expect(page).to have_content('Start event label')
+            expect(page).to have_content('Stop event label')
+          end
+
+          it 'submit button is disabled' do
             expect(page).to have_button('Add stage', disabled: true)
           end
 
-          it 'an error message is displayed if the start event is changed' do
-            select_dropdown_option 'custom-stage-start-event', 'option', 2
+          it 'does not contain labels from outside the group' do
+            field = 'custom-stage-start-event-label'
+            page.find("[name=#{field}] .dropdown-toggle").click
 
-            expect(page).to have_text 'Start event changed, please select a valid stop event'
+            menu = page.find("[name=#{field}] .dropdown-menu")
+
+            expect(menu).not_to have_content(label3.name)
+            expect(menu).to have_content(label.name)
+            expect(menu).to have_content(label2.name)
           end
 
-          context 'submit button is clicked' do
-            it 'the custom stage is saved' do
-              click_button 'Add stage'
-
-              expect(page).to have_selector('.stage-nav-item', text: custom_stage_name)
+          context 'with all required fields set' do
+            before do
+              select_dropdown_label 'custom-stage-start-event-label', 1
+              select_dropdown_label 'custom-stage-stop-event-label', 2
             end
 
-            it 'a confirmation message is displayed' do
-              name = 'cool beans number 2'
-              fill_in 'custom-stage-name', with: name
-              click_button 'Add stage'
-
-              expect(page.find('.flash-notice')).to have_text("Your custom stage '#{name}' was created")
-            end
-
-            it 'with a default name' do
-              name = 'issue'
-              fill_in 'custom-stage-name', with: name
-              click_button 'Add stage'
-
-              expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
-            end
+            it_behaves_like 'submits the form successfully', custom_stage_with_labels_name
           end
         end
       end
@@ -473,17 +615,35 @@ describe 'Group Cycle Analytics', :js do
           end
 
           it 'with a default name' do
-            name = 'issue'
-            fill_in name_field, with: name
+            fill_in name_field, with: 'issue'
             page.find(stage_save_button).click
 
-            expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+            expect(page.find(stage_form_class)).to have_text("Stage name already exists")
           end
         end
       end
 
       context 'Stage table' do
         context 'default stages' do
+          let(:nav) { page.find(stage_nav_selector) }
+
+          def open_recover_stage_dropdown
+            find(add_stage_button).click
+
+            expect(page).to have_content('New stage')
+            expect(page).to have_content('Recover hidden stage')
+
+            click_button "Recover hidden stage"
+
+            within(:css, '.js-recover-hidden-stage-dropdown') do
+              expect(find(".dropdown-menu")).to have_content('Default stages')
+            end
+          end
+
+          def active_stages
+            page.all(".stage-nav .stage-name").collect(&:text)
+          end
+
           before do
             select_group
 
@@ -502,14 +662,43 @@ describe 'Group Cycle Analytics', :js do
             expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
           end
 
-          it 'will not appear in the stage table after being hidden' do
-            nav = page.find(stage_nav_selector)
-            expect(nav).to have_text("Issue")
+          context 'hidden' do
+            before do
+              click_button "Hide stage"
 
-            click_button "Hide stage"
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+            end
 
-            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
-            expect(nav).not_to have_text("Issue")
+            it 'will not appear in the stage table' do
+              expect(active_stages).not_to include("Issue")
+            end
+
+            it 'can be recovered' do
+              open_recover_stage_dropdown
+
+              expect(page.find('.js-recover-hidden-stage-dropdown')).to have_text('Issue')
+            end
+          end
+
+          context 'recovered' do
+            before do
+              click_button "Hide stage"
+
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+            end
+
+            it 'will appear in the stage table' do
+              open_recover_stage_dropdown
+
+              click_button("Issue")
+              # wait for the stage list to laod
+              expect(nav).to have_content("Plan")
+
+              expect(page.find('.flash-notice')).to have_content 'Stage data updated'
+              expect(active_stages).to include("Issue")
+            end
           end
         end
 

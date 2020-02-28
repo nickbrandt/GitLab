@@ -28,6 +28,8 @@
   - 1
 - - admin_emails
   - 1
+- - analytics_code_review_metrics
+  - 1
 - - authorized_projects
   - 2
 - - auto_devops
@@ -42,11 +44,11 @@
   - 2
 - - container_repository
   - 1
+- - create_commit_signature
+  - 2
 - - create_evidence
   - 2
 - - create_github_webhook
-  - 2
-- - create_gpg_signature
   - 2
 - - create_note_diff_file
   - 1
@@ -220,6 +222,8 @@
   - 1
 - - repository_update_remote_mirror
   - 1
+- - security_scans
+  - 2
 - - self_monitoring_project_create
   - 2
 - - self_monitoring_project_delete

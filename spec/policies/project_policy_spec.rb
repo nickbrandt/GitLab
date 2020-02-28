@@ -5,12 +5,12 @@ require 'spec_helper'
 describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
   include_context 'ProjectPolicy context'
-  set(:guest) { create(:user) }
-  set(:reporter) { create(:user) }
-  set(:developer) { create(:user) }
-  set(:maintainer) { create(:user) }
-  set(:owner) { create(:user) }
-  set(:admin) { create(:admin) }
+  let_it_be(:guest) { create(:user) }
+  let_it_be(:reporter) { create(:user) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:owner) { create(:user) }
+  let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
   let(:base_guest_permissions) do
@@ -52,7 +52,7 @@ describe ProjectPolicy do
       admin_snippet admin_project_member admin_note admin_wiki admin_project
       admin_commit_status admin_build admin_container_image
       admin_pipeline admin_environment admin_deployment destroy_release add_cluster
-      daily_statistics
+      daily_statistics read_deploy_token
     ]
   end
 
@@ -557,6 +557,20 @@ describe ProjectPolicy do
 
         it { expect_disallowed(:update_max_artifacts_size) }
       end
+    end
+  end
+
+  context 'alert bot' do
+    let(:current_user) { User.alert_bot }
+
+    subject { described_class.new(current_user, project) }
+
+    it { is_expected.to be_allowed(:reporter_access) }
+
+    context 'within a private project' do
+      let(:project) { create(:project, :private) }
+
+      it { is_expected.to be_allowed(:admin_issue) }
     end
   end
 end

@@ -55,6 +55,8 @@ module Gitlab
         memo << ee_path.to_s
       end
 
+      ee_paths << "#{config.root}/ee/app/replicators"
+
       # Eager load should load CE first
       config.eager_load_paths.push(*ee_paths)
       config.helpers_paths.push "#{config.root}/ee/app/helpers"
@@ -281,6 +283,13 @@ module Gitlab
 
     config.generators do |g|
       g.factory_bot false
+    end
+
+    # This empty initializer forces the :let_zeitwerk_take_over initializer to run before we load
+    # initializers in config/initializers. This is done because autoloading before Zeitwerk takes
+    # over is deprecated but our initializers do a lot of autoloading.
+    # See https://gitlab.com/gitlab-org/gitlab/issues/197346 for more details
+    initializer :move_initializers, before: :load_config_initializers, after: :let_zeitwerk_take_over do
     end
 
     config.after_initialize do

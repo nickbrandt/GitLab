@@ -10,6 +10,7 @@ import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
 import TestReports from './components/test_reports/test_reports.vue';
 import testReportsStore from './stores/test_reports';
+import axios from '~/lib/utils/axios_utils';
 
 Vue.use(Translate);
 
@@ -94,12 +95,30 @@ export default () => {
     },
   });
 
+  const tabsElement = document.querySelector('.pipelines-tabs');
   const testReportsEnabled =
     window.gon && window.gon.features && window.gon.features.junitPipelineView;
 
-  if (testReportsEnabled) {
+  if (tabsElement && testReportsEnabled) {
+    const fetchReportsAction = 'fetchReports';
     testReportsStore.dispatch('setEndpoint', dataset.testReportEndpoint);
-    testReportsStore.dispatch('fetchReports');
+
+    const isTestTabActive = Boolean(
+      document.querySelector('.pipelines-tabs > li > a.test-tab.active'),
+    );
+
+    if (isTestTabActive) {
+      testReportsStore.dispatch(fetchReportsAction);
+    } else {
+      const tabClickHandler = e => {
+        if (e.target.className === 'test-tab') {
+          testReportsStore.dispatch(fetchReportsAction);
+          tabsElement.removeEventListener('click', tabClickHandler);
+        }
+      };
+
+      tabsElement.addEventListener('click', tabClickHandler);
+    }
 
     // eslint-disable-next-line no-new
     new Vue({
@@ -111,5 +130,16 @@ export default () => {
         return createElement('test-reports');
       },
     });
+
+    axios
+      .get(dataset.testReportsCountEndpoint)
+      .then(({ data }) => {
+        if (!data.total_count) {
+          return;
+        }
+
+        document.querySelector('.js-test-report-badge-counter').innerHTML = data.total_count;
+      })
+      .catch(() => {});
   }
 };

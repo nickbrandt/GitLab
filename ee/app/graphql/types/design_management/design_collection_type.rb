@@ -17,7 +17,8 @@ module Types
             Types::DesignManagement::DesignType.connection_type,
             null: false,
             resolver: Resolvers::DesignManagement::DesignsResolver,
-            description: 'All designs for the design collection'
+            description: 'All designs for the design collection',
+            complexity: 5
 
       field :versions,
             Types::DesignManagement::VersionType.connection_type,

@@ -52,7 +52,9 @@ module API
           optional :external, type: Boolean, desc: 'Flag indicating the user is an external user'
           # TODO: remove rubocop disable - https://gitlab.com/gitlab-org/gitlab/issues/14960
           optional :avatar, type: File, desc: 'Avatar image for user' # rubocop:disable Scalability/FileUploads
-          optional :private_profile, type: Boolean, default: false, desc: 'Flag indicating the user has a private profile'
+          optional :theme_id, type: Integer, default: 1, desc: 'The GitLab theme for the user'
+          optional :color_scheme_id, type: Integer, default: 1, desc: 'The color scheme for the file viewer'
+          optional :private_profile, type: Boolean, desc: 'Flag indicating the user has a private profile'
           all_or_none_of :extern_uid, :provider
 
           use :optional_params_ee
@@ -220,6 +222,27 @@ module API
         else
           render_validation_error!(user)
         end
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
+      desc "Delete a user's identity. Available only for admins" do
+        success Entities::UserWithAdmin
+      end
+      params do
+        requires :id, type: Integer, desc: 'The ID of the user'
+        requires :provider, type: String, desc: 'The external provider'
+      end
+      # rubocop: disable CodeReuse/ActiveRecord
+      delete ":id/identities/:provider" do
+        authenticated_as_admin!
+
+        user = User.find_by(id: params[:id])
+        not_found!('User') unless user
+
+        identity = user.identities.find_by(provider: params[:provider])
+        not_found!('Identity') unless identity
+
+        destroy_conditionally!(identity)
       end
       # rubocop: enable CodeReuse/ActiveRecord
 

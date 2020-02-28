@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 module Geo
-  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker
+  class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker # rubocop:disable Scalability/IdempotentWorker
     include ::CronjobQueue
 
     MAX_CAPACITY = 1000
 
     def perform
+      # No need to run when objects stored in Object Storage should be synced too
+      return if sync_object_storage_enabled?
       # No need to run when nothing is configured to be in Object Storage
-      return unless attachments_object_store_enabled? ||
-          lfs_objects_object_store_enabled? ||
-          job_artifacts_object_store_enabled?
+      return unless object_store_enabled?
 
       super
     end
@@ -91,6 +91,16 @@ module Geo
 
     def job_artifacts_object_store_enabled?
       JobArtifactUploader.object_store_enabled?
+    end
+
+    def object_store_enabled?
+      attachments_object_store_enabled? ||
+        lfs_objects_object_store_enabled? ||
+        job_artifacts_object_store_enabled?
+    end
+
+    def sync_object_storage_enabled?
+      current_node.sync_object_storage
     end
 
     def attachments_finder

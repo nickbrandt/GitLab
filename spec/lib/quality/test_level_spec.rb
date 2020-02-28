@@ -21,14 +21,14 @@ RSpec.describe Quality::TestLevel do
     context 'when level is unit' do
       it 'returns a pattern' do
         expect(subject.pattern(:unit))
-          .to eq("spec/{bin,config,db,dependencies,factories,finders,frontend,graphql,haml_lint,helpers,initializers,javascripts,lib,models,policies,presenters,rack_servers,routing,rubocop,serializers,services,sidekiq,tasks,uploaders,validators,views,workers,elastic_integration}{,/**/}*_spec.rb")
+          .to eq("spec/{bin,config,db,dependencies,factories,finders,frontend,graphql,haml_lint,helpers,initializers,javascripts,lib,models,policies,presenters,rack_servers,replicators,routing,rubocop,serializers,services,sidekiq,support_specs,tasks,uploaders,validators,views,workers,elastic_integration}{,/**/}*_spec.rb")
       end
     end
 
     context 'when level is migration' do
       it 'returns a pattern' do
         expect(subject.pattern(:migration))
-          .to eq("spec/{migrations,lib/gitlab/background_migration}{,/**/}*_spec.rb")
+          .to eq("spec/{migrations,lib/gitlab/background_migration,lib/ee/gitlab/background_migration}{,/**/}*_spec.rb")
       end
     end
 
@@ -82,14 +82,14 @@ RSpec.describe Quality::TestLevel do
     context 'when level is unit' do
       it 'returns a regexp' do
         expect(subject.regexp(:unit))
-          .to eq(%r{spec/(bin|config|db|dependencies|factories|finders|frontend|graphql|haml_lint|helpers|initializers|javascripts|lib|models|policies|presenters|rack_servers|routing|rubocop|serializers|services|sidekiq|tasks|uploaders|validators|views|workers|elastic_integration)})
+          .to eq(%r{spec/(bin|config|db|dependencies|factories|finders|frontend|graphql|haml_lint|helpers|initializers|javascripts|lib|models|policies|presenters|rack_servers|replicators|routing|rubocop|serializers|services|sidekiq|support_specs|tasks|uploaders|validators|views|workers|elastic_integration)})
       end
     end
 
     context 'when level is migration' do
       it 'returns a regexp' do
         expect(subject.regexp(:migration))
-          .to eq(%r{spec/(migrations|lib/gitlab/background_migration)})
+          .to eq(%r{spec/(migrations|lib/gitlab/background_migration|lib/ee/gitlab/background_migration)})
       end
     end
 
@@ -134,12 +134,16 @@ RSpec.describe Quality::TestLevel do
       expect(subject.level_for('spec/migrations/add_default_and_free_plans_spec.rb')).to eq(:migration)
     end
 
-    it 'returns the correct level for a background_migration test' do
+    it 'returns the correct level for a background migration test' do
       expect(subject.level_for('spec/lib/gitlab/background_migration/archive_legacy_traces_spec.rb')).to eq(:migration)
     end
 
     it 'returns the correct level for a geo migration test' do
       expect(described_class.new('ee/').level_for('ee/spec/migrations/geo/migrate_ci_job_artifacts_to_separate_registry_spec.rb')).to eq(:migration)
+    end
+
+    it 'returns the correct level for a EE-namespaced background migration test' do
+      expect(described_class.new('ee/').level_for('ee/spec/lib/ee/gitlab/background_migration/prune_orphaned_geo_events_spec.rb')).to eq(:migration)
     end
 
     it 'returns the correct level for an integration test' do

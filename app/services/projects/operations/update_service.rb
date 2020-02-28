@@ -15,6 +15,8 @@ module Projects
         error_tracking_params
           .merge(metrics_setting_params)
           .merge(grafana_integration_params)
+          .merge(prometheus_integration_params)
+          .merge(incident_management_setting_params)
       end
 
       def metrics_setting_params
@@ -76,6 +78,19 @@ module Projects
         destroy = attrs[:grafana_url].blank? && attrs[:token].blank?
 
         { grafana_integration_attributes: attrs.merge(_destroy: destroy) }
+      end
+
+      def prometheus_integration_params
+        return {} unless attrs = params[:prometheus_integration_attributes]
+
+        service = project.find_or_initialize_service(::PrometheusService.to_param)
+        service.assign_attributes(attrs)
+
+        { prometheus_service_attributes: service.attributes.except(*%w(id project_id created_at updated_at)) }
+      end
+
+      def incident_management_setting_params
+        params.slice(:incident_management_setting_attributes)
       end
     end
   end

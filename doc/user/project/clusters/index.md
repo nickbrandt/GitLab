@@ -121,8 +121,8 @@ applications running on the cluster.
 
 ### GitLab-managed clusters
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22011) in GitLab 11.5.
-> - Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/26565) in GitLab 11.11.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22011) in GitLab 11.5.
+> - Became [optional](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/26565) in GitLab 11.11.
 
 You can choose to allow GitLab to manage your cluster for you. If your cluster is
 managed by GitLab, resources for your projects will be automatically created. See the
@@ -162,7 +162,7 @@ To clear the cache:
 
 ### Base domain
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/24580) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/24580) in GitLab 11.8.
 
 NOTE: **Note:**
 You do not need to specify a base domain on cluster settings when using GitLab Serverless. The domain in that case
@@ -281,22 +281,28 @@ GitLab CI/CD build environment.
 | `KUBECONFIG` | Path to a file containing `kubeconfig` for this deployment. CA bundle would be embedded if specified. This config also embeds the same token defined in `KUBE_TOKEN` so you likely will only need this variable. This variable name is also automatically picked up by `kubectl` so you won't actually need to reference it explicitly if using `kubectl`. |
 | `KUBE_INGRESS_BASE_DOMAIN` | From GitLab 11.8, this variable can be used to set a domain per cluster. See [cluster domains](#base-domain) for more information. |
 
-NOTE: **NOTE:**
+NOTE: **Note:**
 Prior to GitLab 11.5, `KUBE_TOKEN` was the Kubernetes token of the main
 service account of the cluster integration.
 
 NOTE: **Note:**
 If your cluster was created before GitLab 12.2, default `KUBE_NAMESPACE` will be set to `<project_name>-<project_id>`.
 
-When deploying a custom namespace:
+### Custom namespace
 
-- The custom namespace must exist in your cluster.
-- The project's deployment service account must have permission to deploy to the namespace.
-- `KUBECONFIG` must be updated to use the custom namespace instead of the GitLab-provided default (this is [not automatic](https://gitlab.com/gitlab-org/gitlab/issues/31519)).
-- If deploying with Auto DevOps, you must *also* override `KUBE_NAMESPACE` with the custom namespace.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27630) in GitLab 12.6.
 
-CAUTION: **Caution:**
-GitLab does not save custom namespaces in the database. So while deployments work with custom namespaces, GitLab's integration for already-deployed environments will not pick up the customized values. For example, [Deploy Boards](../deploy_boards.md) will not work as intended for those deployments. For more information, see the [related issue](https://gitlab.com/gitlab-org/gitlab/issues/27630).
+The Kubernetes integration defaults to project-environment-specific namespaces
+of the form `<project_name>-<project_id>-<environment>` (see [Deployment
+variables](#deployment-variables)).
+
+For **non**-GitLab-managed clusters, the namespace can be customized using
+[`environment:kubernetes:namespace`](../../../ci/environments.md#configuring-kubernetes-deployments)
+in `.gitlab-ci.yml`.
+
+NOTE: **Note:** When using a [GitLab-managed cluster](#gitlab-managed-clusters), the
+namespaces are created automatically prior to deployment and [can not be
+customized](https://gitlab.com/gitlab-org/gitlab/issues/38054).
 
 ### Troubleshooting
 
@@ -330,7 +336,7 @@ namespaces and service accounts yourself.
 
 ## Monitoring your Kubernetes cluster **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/4701) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/4701) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
 
 When [Prometheus is deployed](#installing-applications), GitLab will automatically monitor the cluster's health. At the top of the cluster settings page, CPU and Memory utilization is displayed, along with the total amount available. Keeping an eye on cluster resources can be important, if the cluster runs out of memory pods may be shutdown or fail to start.
 

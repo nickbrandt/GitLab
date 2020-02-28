@@ -32,7 +32,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
   shared_examples 'processes incident issues' do |amount|
     let(:create_incident_service) { spy }
 
-    it 'processes issues', :sidekiq do
+    it 'processes issues' do
       expect(IncidentManagement::ProcessPrometheusAlertWorker)
         .to receive(:perform_async)
         .with(project.id, kind_of(Hash))
@@ -308,14 +308,6 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
           it_behaves_like 'does not process incident issues'
         end
-      end
-
-      context 'without license' do
-        before do
-          stub_licensed_features(incident_management: false)
-        end
-
-        it_behaves_like 'does not process incident issues'
       end
     end
   end

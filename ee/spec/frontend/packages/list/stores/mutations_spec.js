@@ -65,4 +65,16 @@ describe('Mutations Registry Store', () => {
       expect(mockState.pagination).toEqual(mockPagination);
     });
   });
+
+  describe('SET_SORTING', () => {
+    it('should merge the sorting object with sort value', () => {
+      mutations[types.SET_SORTING](mockState, { sort: 'desc' });
+      expect(mockState.sorting).toEqual({ ...mockState.sorting, sort: 'desc' });
+    });
+
+    it('should merge the sorting object with order_by value', () => {
+      mutations[types.SET_SORTING](mockState, { orderBy: 'foo' });
+      expect(mockState.sorting).toEqual({ ...mockState.sorting, orderBy: 'foo' });
+    });
+  });
 });

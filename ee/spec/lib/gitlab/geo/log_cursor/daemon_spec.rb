@@ -136,6 +136,15 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
 
         daemon.find_and_handle_events!
       end
+
+      it 'exits when told to stop' do
+        allow_any_instance_of(::Gitlab::Geo::LogCursor::EventLogs).to receive(:fetch_in_batches)
+        allow(daemon).to receive(:exit?).and_return(true)
+
+        expect(daemon).not_to receive(:handle_events)
+
+        daemon.find_and_handle_events!
+      end
     end
 
     context 'when node has namespace restrictions' do

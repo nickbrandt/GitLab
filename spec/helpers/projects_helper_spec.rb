@@ -5,6 +5,37 @@ require 'spec_helper'
 describe ProjectsHelper do
   include ProjectForksHelper
 
+  describe '#project_incident_management_setting' do
+    let(:project) { create(:project) }
+
+    before do
+      helper.instance_variable_set(:@project, project)
+    end
+
+    context 'when incident_management_setting exists' do
+      let(:project_incident_management_setting) do
+        create(:project_incident_management_setting, project: project)
+      end
+
+      it 'return project_incident_management_setting' do
+        expect(helper.project_incident_management_setting).to(
+          eq(project_incident_management_setting)
+        )
+      end
+    end
+
+    context 'when incident_management_setting does not exist' do
+      it 'builds incident_management_setting' do
+        setting = helper.project_incident_management_setting
+
+        expect(setting).not_to be_persisted
+        expect(setting.send_email).to be_falsey
+        expect(setting.create_issue).to be_truthy
+        expect(setting.issue_template_key).to be_nil
+      end
+    end
+  end
+
   describe '#error_tracking_setting_project_json' do
     let(:project) { create(:project) }
 
@@ -194,7 +225,7 @@ describe ProjectsHelper do
       expect(helper.project_list_cache_key(project).last).to start_with('v')
     end
 
-    it 'includes wether or not the user can read cross project' do
+    it 'includes whether or not the user can read cross project' do
       expect(helper.project_list_cache_key(project)).to include('cross-project:true')
     end
 
@@ -961,6 +992,58 @@ describe ProjectsHelper do
       let!(:grafana_integration) { create(:grafana_integration, project: project) }
 
       it { is_expected.to eq(grafana_integration.enabled) }
+    end
+  end
+
+  describe '#project_license_name(project)' do
+    let_it_be(:project) { create(:project) }
+    let_it_be(:repository) { project.repository }
+
+    subject { project_license_name(project) }
+
+    context 'gitaly is working appropriately' do
+      it 'returns the license name' do
+        license = Licensee::License.new('mit')
+        allow(repository).to receive(:license).and_return(license)
+
+        expect(subject).to eq(license.name)
+      end
+    end
+
+    context 'gitaly is unreachable' do
+      shared_examples 'returns nil and tracks exception' do
+        it { is_expected.to be_nil }
+
+        it 'tracks the exception' do
+          expect(Gitlab::ErrorTracking).to receive(:track_exception).with(
+            an_instance_of(exception)
+          )
+
+          subject
+        end
+      end
+
+      before do
+        allow(repository).to receive(:license).and_raise(exception)
+      end
+
+      context "Gitlab::Git::CommandError" do
+        let(:exception) { Gitlab::Git::CommandError }
+
+        it_behaves_like 'returns nil and tracks exception'
+      end
+
+      context "GRPC::Unavailable" do
+        let(:exception) { GRPC::Unavailable }
+
+        it_behaves_like 'returns nil and tracks exception'
+      end
+
+      context "GRPC::DeadlineExceeded" do
+        let(:exception) { GRPC::DeadlineExceeded }
+
+        it_behaves_like 'returns nil and tracks exception'
+      end
     end
   end
 end

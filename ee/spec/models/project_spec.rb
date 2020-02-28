@@ -9,10 +9,6 @@ describe Project do
 
   let(:project) { create(:project) }
 
-  it_behaves_like Vulnerable do
-    let(:vulnerable) { project }
-  end
-
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }
@@ -170,6 +166,20 @@ describe Project do
         expect(described_class.with_active_prometheus_service).not_to include(project_without_active_prometheus_service)
       end
     end
+
+    describe '.find_by_service_desk_project_key' do
+      it 'returns the correct project' do
+        project2 = create(:project)
+        create(:service_desk_setting, project: project, project_key: 'key1')
+        create(:service_desk_setting, project: project2, project_key: 'key2')
+
+        expect(Project.find_by_service_desk_project_key('key2')).to eq(project2)
+      end
+
+      it 'returns nil if there is no project with the key' do
+        expect(Project.find_by_service_desk_project_key('some_key')).to be_nil
+      end
+    end
   end
 
   describe 'validations' do
@@ -196,8 +206,8 @@ describe Project do
         it { expect(project).to be_valid }
       end
 
-      it do
-        is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+      it "ensures max_pages_size is an integer greater than 0 (or equal to 0 to indicate unlimited/maximum)" do
+        is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than_or_equal_to(0)
                          .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
       end
     end
@@ -468,6 +478,87 @@ describe Project do
     end
   end
 
+  context 'merge requests related settings' do
+    shared_examples 'setting modified by application setting' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
+        true     | true      | true   | true
+        false    | true      | true   | true
+        true     | false     | true   | true
+        false    | false     | true   | false
+        true     | true      | false  | true
+        false    | true      | false  | true
+        true     | false     | false  | false
+        false    | false     | false  | false
+      end
+
+      with_them do
+        let(:project) { create(:project) }
+
+        before do
+          stub_licensed_features(feature => feature_enabled)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
+        end
+
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
+        end
+      end
+    end
+
+    describe '#disable_overriding_approvers_per_merge_request' do
+      it_behaves_like 'setting modified by application setting' do
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :disable_overriding_approvers_per_merge_request }
+        let(:application_setting) { :disable_overriding_approvers_per_merge_request }
+      end
+    end
+
+    describe '#merge_requests_disable_committers_approval' do
+      it_behaves_like 'setting modified by application setting' do
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :merge_requests_disable_committers_approval }
+        let(:application_setting) { :prevent_merge_requests_committers_approval }
+      end
+    end
+
+    describe '#merge_requests_author_approval' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:app_setting, :project_setting, :feature_enabled, :final_setting) do
+        true     | true      | true   | false
+        false    | true      | true   | true
+        true     | false     | true   | false
+        false    | false     | true   | false
+        true     | true      | false  | true
+        false    | true      | false  | true
+        true     | false     | false  | false
+        false    | false     | false  | false
+      end
+
+      with_them do
+        let(:project) { create(:project) }
+        let(:feature) { :admin_merge_request_approvers_rules }
+        let(:setting) { :merge_requests_author_approval }
+        let(:application_setting) { :prevent_merge_requests_author_approval }
+
+        before do
+          stub_licensed_features(feature => feature_enabled)
+          stub_application_setting(application_setting => app_setting)
+          project.update(setting => project_setting)
+        end
+
+        it 'shows proper setting' do
+          expect(project.send(setting)).to eq(final_setting)
+          expect(project.send("#{setting}?")).to eq(final_setting)
+        end
+      end
+    end
+  end
+
   describe '#has_active_hooks?' do
     context "with group hooks" do
       let(:group) { create(:group) }
@@ -492,22 +583,70 @@ describe Project do
     end
   end
 
+  describe '#has_group_hooks?' do
+    subject { project.has_group_hooks? }
+
+    let(:project) { create(:project) }
+
+    it { is_expected.to eq(nil) }
+
+    context 'project is in a group' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, namespace: group) }
+
+      shared_examples 'returns nil when the feature is not available' do
+        specify do
+          stub_licensed_features(group_webhooks: false)
+
+          expect(subject).to eq(nil)
+        end
+      end
+
+      it_behaves_like 'returns nil when the feature is not available'
+
+      it { is_expected.to eq(false) }
+
+      context 'the group has hooks' do
+        let!(:group_hook) { create(:group_hook, group: group, push_events: true) }
+
+        it { is_expected.to eq(true) }
+
+        it_behaves_like 'returns nil when the feature is not available'
+
+        context 'but the hook is not in scope' do
+          subject { project.has_group_hooks?(:issue_hooks) }
+
+          it_behaves_like 'returns nil when the feature is not available'
+
+          it { is_expected.to eq(false) }
+        end
+      end
+
+      context 'the group inherits a hook' do
+        let(:parent_group) { create(:group) }
+        let!(:group_hook) { create(:group_hook, group: parent_group) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        it_behaves_like 'returns nil when the feature is not available'
+
+        it { is_expected.to eq(true) }
+
+        context 'when sub_group_webhooks feature flag is disabled' do
+          before do
+            stub_feature_flags(sub_group_webhooks: false)
+          end
+
+          it { is_expected.to eq(false) }
+        end
+      end
+    end
+  end
+
   describe "#execute_hooks" do
     context "group hooks" do
       let(:group) { create(:group) }
       let(:project) { create(:project, namespace: group) }
       let(:group_hook) { create(:group_hook, group: group, push_events: true) }
-
-      it 'executes the hook when the feature is enabled' do
-        stub_licensed_features(group_webhooks: true)
-
-        fake_service = double
-        expect(WebHookService).to receive(:new)
-                                    .with(group_hook, { some: 'info' }, 'push_hooks') { fake_service }
-        expect(fake_service).to receive(:async_execute)
-
-        project.execute_hooks(some: 'info')
-      end
 
       it 'does not execute the hook when the feature is disabled' do
         stub_licensed_features(group_webhooks: false)
@@ -517,23 +656,54 @@ describe Project do
 
         project.execute_hooks(some: 'info')
       end
-    end
-  end
 
-  describe '#execute_hooks' do
-    it "triggers project and group hooks" do
-      group = create :group, name: 'gitlab'
-      project = create(:project, name: 'gitlabhq', namespace: group)
-      project_hook = create(:project_hook, push_events: true, project: project)
-      group_hook = create(:group_hook, push_events: true, group: group)
+      context 'when group_webhooks frature is enabled' do
+        before do
+          stub_licensed_features(group_webhooks: true)
+        end
+        let(:fake_service) { double }
 
-      stub_request(:post, project_hook.url)
-      stub_request(:post, group_hook.url)
+        shared_examples 'triggering group webhook' do
+          it 'executes the hook' do
+            expect(fake_service).to receive(:async_execute).once
 
-      expect_any_instance_of(GroupHook).to receive(:async_execute).and_return(true)
-      expect_any_instance_of(ProjectHook).to receive(:async_execute).and_return(true)
+            expect(WebHookService).to receive(:new)
+                                        .with(group_hook, { some: 'info' }, 'push_hooks') { fake_service }
 
-      project.execute_hooks({}, :push_hooks)
+            project.execute_hooks(some: 'info')
+          end
+        end
+
+        it_behaves_like 'triggering group webhook'
+
+        context 'when sub_group_webhooks feature flag is disabled' do
+          before do
+            stub_feature_flags(sub_group_webhooks: false)
+          end
+
+          it_behaves_like 'triggering group webhook'
+        end
+
+        context 'in sub group' do
+          let(:sub_group) { create :group, parent: group }
+          let(:sub_sub_group) { create :group, parent: sub_group }
+          let(:project) { create(:project, namespace: sub_sub_group) }
+
+          it_behaves_like 'triggering group webhook'
+
+          context 'when sub_group_webhooks feature flag is disabled' do
+            before do
+              stub_feature_flags(sub_group_webhooks: false)
+            end
+
+            it 'does not execute the hook' do
+              expect(WebHookService).not_to receive(:new).with(group_hook, { some: 'info' }, 'push_hooks')
+
+              project.execute_hooks(some: 'info')
+            end
+          end
+        end
+      end
     end
   end
 
@@ -1114,42 +1284,6 @@ describe Project do
     end
   end
 
-  describe '#alerts_service_activated?' do
-    let!(:project) { create(:project) }
-
-    subject { project.alerts_service_activated? }
-
-    context 'when incident management feature available' do
-      before do
-        stub_licensed_features(incident_management: true)
-      end
-
-      context 'when project has an activated alerts service' do
-        before do
-          create(:alerts_service, project: project)
-        end
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'when project has an inactive alerts service' do
-        before do
-          create(:alerts_service, :inactive, project: project)
-        end
-
-        it { is_expected.to be_falsey }
-      end
-    end
-
-    context 'when incident feature is not available' do
-      before do
-        stub_licensed_features(incident_management: false)
-      end
-
-      it { is_expected.to be_falsey }
-    end
-  end
-
   describe '#disabled_services' do
     let(:project) { build(:project) }
 
@@ -1158,7 +1292,6 @@ describe Project do
     where(:license_feature, :disabled_services) do
       :jenkins_integration                | %w(jenkins jenkins_deprecated)
       :github_project_service_integration | %w(github)
-      :incident_management                | %w(alerts)
     end
 
     with_them do
@@ -1279,7 +1412,8 @@ describe Project do
     before do
       allow(License).to receive(:current).and_return(global_license)
       allow(global_license).to receive(:features).and_return([
-        :epics, # Gold only
+        :subepics, # Gold only
+        :epics, # Silver and up
         :service_desk, # Silver and up
         :audit_events, # Bronze and up
         :geo # Global feature, should not be checked at namespace level
@@ -1305,7 +1439,7 @@ describe Project do
         let(:plan_license) { :silver }
 
         it 'filters for silver features' do
-          is_expected.to contain_exactly(:service_desk, :audit_events, :geo)
+          is_expected.to contain_exactly(:service_desk, :audit_events, :geo, :epics)
         end
       end
 
@@ -1313,7 +1447,7 @@ describe Project do
         let(:plan_license) { :gold }
 
         it 'filters for gold features' do
-          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+          is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
         end
       end
 
@@ -1330,7 +1464,7 @@ describe Project do
           let(:project) { create(:project, :public, group: group) }
 
           it 'includes all features in global license' do
-            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+            is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
           end
         end
       end
@@ -1338,7 +1472,7 @@ describe Project do
 
     context 'when namespace should not be checked' do
       it 'includes all features in global license' do
-        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
+        is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo, :subepics)
       end
     end
 
@@ -2458,15 +2592,15 @@ describe Project do
 
     it 'expires the caches of the design repository' do
       allow(Repository).to receive(:new)
-        .with('foo', project)
+        .with('foo', project, shard: project.repository_storage)
         .and_return(repo)
 
       allow(Repository).to receive(:new)
-        .with('foo.wiki', project)
+        .with('foo.wiki', project, shard: project.repository_storage, repo_type: Gitlab::GlRepository::WIKI)
         .and_return(wiki)
 
       allow(Repository).to receive(:new)
-        .with('foo.design', project)
+        .with('foo.design', project, shard: project.repository_storage, repo_type: ::EE::Gitlab::GlRepository::DESIGN)
         .and_return(design)
 
       expect(design).to receive(:before_delete)
@@ -2503,6 +2637,24 @@ describe Project do
 
       it 'returns true' do
         expect(project_template.template_source?).to be_truthy
+      end
+    end
+  end
+
+  describe '#jira_subscription_exists?' do
+    subject { project.jira_subscription_exists? }
+
+    context 'jira connect subscription exists' do
+      let!(:jira_connect_subscription) { create(:jira_connect_subscription, namespace: project.namespace) }
+
+      it { is_expected.to eq(false) }
+
+      context 'dev panel integration is available' do
+        before do
+          stub_licensed_features(jira_dev_panel_integration: true)
+        end
+
+        it { is_expected.to eq(true) }
       end
     end
   end

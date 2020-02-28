@@ -13,9 +13,9 @@ module API
     AUTHENTICATE_REALM_HEADER = 'Www-Authenticate: Basic realm'
     AUTHENTICATE_REALM_NAME = 'GitLab Nuget Package Registry'
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
+    NON_NEGATIVE_INTEGER_REGEX = %r{\A0|[1-9]\d*\z}.freeze
 
     PACKAGE_FILENAME = 'package.nupkg'
-    PACKAGE_FILETYPE = 'application/octet-stream'
 
     default_format :json
 
@@ -56,6 +56,30 @@ module API
         header(AUTHENTICATE_REALM_HEADER, AUTHENTICATE_REALM_NAME)
         unauthorized!
       end
+
+      def find_packages
+        packages = package_finder.execute
+
+        not_found!('Packages') unless packages.exists?
+
+        packages
+      end
+
+      def find_package
+        package = package_finder(package_version: params[:package_version]).execute
+                                                                           .first
+
+        not_found!('Package') unless package
+
+        package
+      end
+
+      def package_finder(finder_params = {})
+        ::Packages::Nuget::PackageFinder.new(
+          authorized_user_project,
+          finder_params.merge(package_name: params[:package_name])
+        )
+      end
     end
 
     before do
@@ -67,7 +91,6 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        not_found! if Feature.disabled?(:nuget_package_registry, authorized_user_project)
         authorize_packages_feature!(authorized_user_project)
       end
 
@@ -95,8 +118,7 @@ module API
 
           file_params = params.merge(
             file: uploaded_package_file(:package),
-            file_name: PACKAGE_FILENAME,
-            file_type: PACKAGE_FILETYPE
+            file_name: PACKAGE_FILENAME
           )
 
           package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user)
@@ -107,7 +129,7 @@ module API
 
           track_event('push_package')
 
-          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id)
+          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id) # rubocop:disable CodeReuse/Worker
 
           created!
         rescue ObjectStorage::RemoteStoreError => e
@@ -132,12 +154,7 @@ module API
             detail 'This feature was introduced in GitLab 12.8'
           end
           get 'index', format: :json do
-            packages = ::Packages::Nuget::PackageFinder.new(authorized_user_project, package_name: params[:package_name])
-                                                       .execute
-
-            not_found!('Packages') unless packages.exists?
-
-            present ::Packages::Nuget::PackagesMetadataPresenter.new(packages),
+            present ::Packages::Nuget::PackagesMetadataPresenter.new(find_packages),
                     with: EE::API::Entities::Nuget::PackagesMetadata
           end
 
@@ -148,32 +165,74 @@ module API
             requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
           end
           get '*package_version', format: :json do
-            package = ::Packages::Nuget::PackageFinder
-              .new(authorized_user_project, package_name: params[:package_name], package_version: params[:package_version])
-              .execute
-              .first
-
-            not_found!('Package') unless package
-
-            present ::Packages::Nuget::PackageMetadataPresenter.new(package),
+            present ::Packages::Nuget::PackageMetadataPresenter.new(find_package),
                     with: EE::API::Entities::Nuget::PackageMetadata
           end
         end
 
         # https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
-        desc 'The NuGet Content Service' do
-          detail 'This feature was introduced in GitLab 12.8'
-        end
         params do
           requires :package_name, type: String, desc: 'The NuGet package name', regexp: API::NO_SLASH_URL_PART_REGEX
-          requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
         end
-        namespace '/download/*package_name/*package_version' do
+        namespace '/download/*package_name' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          desc 'The NuGet Content Service - index request' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get 'index', format: :json do
+            present ::Packages::Nuget::PackagesVersionsPresenter.new(find_packages),
+                    with: EE::API::Entities::Nuget::PackagesVersions
+          end
+
+          desc 'The NuGet Content Service - content request' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
           params do
+            requires :package_version, type: String, desc: 'The NuGet package version', regexp: API::NO_SLASH_URL_PART_REGEX
             requires :package_filename, type: String, desc: 'The NuGet package filename', regexp: API::NO_SLASH_URL_PART_REGEX
           end
-          get '*package_filename' do
-            not_found!('package not found') # TODO NUGET API: not implemented yet.
+          get '*package_version/*package_filename', format: :nupkg do
+            filename = "#{params[:package_filename]}.#{params[:format]}"
+            package_file = ::Packages::PackageFileFinder.new(find_package, filename, with_file_name_like: true)
+                                                        .execute
+
+            not_found!('Package') unless package_file
+
+            # nuget and dotnet don't support 302 Moved status codes, supports_direct_download has to be set to false
+            present_carrierwave_file!(package_file.file, supports_direct_download: false)
+          end
+        end
+
+        params do
+          requires :q, type: String, desc: 'The search term'
+          optional :skip, type: Integer, desc: 'The number of results to skip', default: 0, regexp: NON_NEGATIVE_INTEGER_REGEX
+          optional :take, type: Integer, desc: 'The number of results to return', default: Kaminari.config.default_per_page, regexp: POSITIVE_INTEGER_REGEX
+          optional :prerelease, type: Boolean, desc: 'Include prerelease versions', default: true
+        end
+        namespace '/query' do
+          before do
+            authorize_read_package!(authorized_user_project)
+          end
+
+          # https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
+          desc 'The NuGet Search Service' do
+            detail 'This feature was introduced in GitLab 12.8'
+          end
+          get format: :json do
+            search_options = {
+              include_prerelease_versions: params[:prerelease],
+              per_page: params[:take],
+              padding: params[:skip]
+            }
+            search = Packages::Nuget::SearchService
+              .new(authorized_user_project, params[:q], search_options)
+              .execute
+
+            present ::Packages::Nuget::SearchResultsPresenter.new(search),
+              with: EE::API::Entities::Nuget::SearchResults
           end
         end
       end

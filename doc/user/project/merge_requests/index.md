@@ -48,7 +48,7 @@ about CI/CD pipelines, when present), followed by the discussion threads of the 
 collaborating with that MR.
 
 MRs also contain navigation tabs from which you can see the discussion happening on the thread,
-the list of commits, the list of pipelines and jobs, the code changes and inline code reviews.
+the list of commits, the list of pipelines and jobs, the code changes, and inline code reviews.
 
 To get started, read the [introduction to merge requests](getting_started.md).
 
@@ -91,6 +91,7 @@ or link to useful information directly in the merge request page:
 
 | Feature                                                                                                | Description                                                                                                                                                                                               |
 |--------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Accessibility Testing](accessibility_testing.md)                                                      | Automatically report A11y violations for changed pages in merge requests                                                                                                                                  |
 | [Browser Performance Testing](browser_performance_testing.md) **(PREMIUM)**                            | Quickly determine the performance impact of pending code changes.                                                                                                                                         |
 | [Code Quality](code_quality.md) **(STARTER)**                                                          | Analyze your source code quality using the [Code Climate](https://codeclimate.com/) analyzer and show the Code Climate report right in the merge request widget area.                                     |
 | [Display arbitrary job artifacts](../../../ci/yaml/README.md#artifactsexpose_as)                       | Configure CI pipelines with the `artifacts:expose_as` parameter to directly link to selected [artifacts](../pipelines/job_artifacts.md) in merge requests.                                                |

@@ -3,6 +3,9 @@
 class Groups::EpicLinksController < Groups::ApplicationController
   include EpicRelations
 
+  before_action :check_epics_available!, only: [:index, :destroy]
+  before_action :check_subepics_available!, only: [:create, :update]
+
   def update
     result = EpicLinks::UpdateService.new(child_epic, current_user, params[:epic]).execute
 
@@ -27,5 +30,9 @@ class Groups::EpicLinksController < Groups::ApplicationController
 
   def child_epic
     @child_epic ||= Epic.find(params[:id])
+  end
+
+  def authorized_object
+    'epic_link'
   end
 end

@@ -28,7 +28,11 @@ class Packages::PackageFileFinder
   end
 
   def by_file_name(files)
-    files.where(file_name: file_name) # rubocop: disable CodeReuse/ActiveRecord
+    if params[:with_file_name_like]
+      files.with_file_name_like(file_name)
+    else
+      files.with_file_name(file_name)
+    end
   end
 
   def by_conan_file_type(files)

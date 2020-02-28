@@ -31,7 +31,7 @@ module API
         requires :target_project_id, type: String, desc: 'The ID of the target project'
         requires :target_issue_iid, type: Integer, desc: 'The IID of the target issue'
         optional :link_type, type: String, values: IssueLink.link_types.keys,
-          desc: 'The type of the relation. Ignored unless `issue_link_types` feature flag is enabled.'
+          desc: 'The type of the relation'
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/issues/:issue_iid/links' do

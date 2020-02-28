@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 class Packages::MavenMetadatum < ApplicationRecord
-  belongs_to :package
+  belongs_to :package, -> { where(package_type: :maven) }
 
   validates :package, presence: true
 
@@ -15,4 +15,14 @@ class Packages::MavenMetadatum < ApplicationRecord
   validates :app_name,
     presence: true,
     format: { with: Gitlab::Regex.maven_app_name_regex }
+
+  validate :maven_package_type
+
+  private
+
+  def maven_package_type
+    unless package && package.maven?
+      errors.add(:base, 'Package type must be Maven')
+    end
+  end
 end

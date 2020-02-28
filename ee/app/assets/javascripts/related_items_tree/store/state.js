@@ -23,6 +23,7 @@ export default () => ({
   pendingReferences: [],
   itemAutoCompleteSources: {},
   itemAddFailureType: null,
+  itemAddFailureMessage: '',
 
   // UI Flags
   itemsFetchInProgress: false,
@@ -35,6 +36,7 @@ export default () => ({
   showCreateEpicForm: false,
   autoCompleteEpics: false,
   autoCompleteIssues: false,
+  allowSubEpics: false,
   removeItemModalProps: {
     parentItem: {},
     item: {},

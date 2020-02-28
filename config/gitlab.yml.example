@@ -111,7 +111,7 @@ production: &base
     # Email server smtp settings are in config/initializers/smtp_settings.rb.sample
 
     # default_can_create_group: false  # default: true
-    # username_changing_enabled: false # default: true - User can change her username/namespace
+    # username_changing_enabled: false # default: true - User can change their username/namespace
     ## Default theme ID
     ##   1 - Indigo
     ##   2 - Dark
@@ -373,6 +373,9 @@ production: &base
     # Remove expired build artifacts
     expire_build_artifacts_worker:
       cron: "50 * * * *"
+    # Stop expired environments
+    environments_auto_stop_cron_worker:
+      cron: "24 * * * *"
     # Periodically run 'git fsck' on all repositories. If started more than
     # once per hour you will have concurrent 'git fsck' jobs.
     repository_check_worker:
@@ -431,6 +434,11 @@ production: &base
     # NOTE: This will only take effect if Geo is enabled (secondary nodes only)
     geo_repository_sync_worker:
       cron: "*/1 * * * *"
+
+    # GitLab Geo registry backfill worker
+    # NOTE: This will only take effect if Geo is enabled (secondary nodes only)
+    geo_secondary_registry_consistency_worker:
+      cron: "* * * * *"
 
     # GitLab Geo file download dispatch worker
     # NOTE: This will only take effect if Geo is enabled (secondary nodes only)

@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlLoadingIcon, GlBadge, GlPagination } from '@gitlab/ui';
+import { GlLoadingIcon, GlEmptyState, GlBadge, GlPagination } from '@gitlab/ui';
 import CodeReviewAnalyticsApp from 'ee/analytics/code_review_analytics/components/app.vue';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
 import createState from 'ee/analytics/code_review_analytics/store/state';
@@ -44,6 +44,8 @@ describe('CodeReviewAnalyticsApp component', () => {
       store,
       propsData: {
         projectId: 1,
+        newMergeRequestUrl: 'new_merge_request',
+        emptyStateSvgPath: 'svg',
       },
     });
 
@@ -56,6 +58,7 @@ describe('CodeReviewAnalyticsApp component', () => {
     wrapper.destroy();
   });
 
+  const findEmptyState = () => wrapper.find(GlEmptyState);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findBadge = () => wrapper.find(GlBadge);
   const findMrTable = () => wrapper.find(MergeRequestTable);
@@ -73,7 +76,7 @@ describe('CodeReviewAnalyticsApp component', () => {
       });
 
       it('should not show the badge containing the MR count', () => {
-        expect(findBadge().isVisible()).toBe(false);
+        expect(findBadge().exists()).toBe(false);
       });
 
       it('should not render the merge requests table', () => {
@@ -86,26 +89,62 @@ describe('CodeReviewAnalyticsApp component', () => {
     });
 
     describe('when finished loading', () => {
-      beforeEach(() => {
-        vuexStore = createStore({ isLoading: false, pageInfo }, { showMrCount: () => true });
-        wrapper = createComponent(vuexStore);
+      describe('and there are no merge requests', () => {
+        beforeEach(() => {
+          vuexStore = createStore(
+            { isLoading: false, pageInfo: { page: 0, perPage: 0, total: 0 } },
+            { showMrCount: () => true },
+          );
+          wrapper = createComponent(vuexStore);
+        });
+
+        it('should hide the loading indicator', () => {
+          expect(findLoadingIcon().isVisible()).toBe(false);
+        });
+
+        it('should show the empty state screen', () => {
+          expect(findEmptyState().exists()).toBe(true);
+        });
+
+        it('should not show the badge containing the MR count', () => {
+          expect(findBadge().exists()).toBe(false);
+        });
+
+        it('should not render the merge requests table', () => {
+          expect(findMrTable().exists()).toBe(false);
+        });
+
+        it('should not render the pagination', () => {
+          expect(findPagination().exists()).toBe(false);
+        });
       });
 
-      it('should hide the loading indicator', () => {
-        expect(findLoadingIcon().isVisible()).toBe(false);
-      });
+      describe('and there are merge requests', () => {
+        beforeEach(() => {
+          vuexStore = createStore({ isLoading: false, pageInfo }, { showMrCount: () => true });
+          wrapper = createComponent(vuexStore);
+        });
 
-      it('should show the badge containing the MR count', () => {
-        expect(findBadge().isVisible()).toBe(true);
-        expect(findBadge().text()).toEqual(`${50}`);
-      });
+        it('should hide the loading indicator', () => {
+          expect(findLoadingIcon().isVisible()).toBe(false);
+        });
 
-      it('should render the merge requests table', () => {
-        expect(findMrTable().exists()).toBe(true);
-      });
+        it('should show the badge containing the MR count', () => {
+          expect(findBadge().exists()).toBe(true);
+          expect(findBadge().text()).toBe('50');
+        });
 
-      it('should render the pagination', () => {
-        expect(findPagination().exists()).toBe(true);
+        it('should not render the empty state screen', () => {
+          expect(findEmptyState().exists()).toBe(false);
+        });
+
+        it('should render the merge requests table', () => {
+          expect(findMrTable().exists()).toBe(true);
+        });
+
+        it('should render the pagination', () => {
+          expect(findPagination().exists()).toBe(true);
+        });
       });
     });
   });

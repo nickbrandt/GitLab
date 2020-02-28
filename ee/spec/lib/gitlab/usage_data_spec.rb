@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
+  before do
+    allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
+  end
+
   describe '#data' do
     # using Array.new to create a different creator User for each of the projects
     let_it_be(:projects) { Array.new(3) { create(:project, :repository, creator: create(:user, group_view: :security_dashboard)) } }
@@ -25,8 +29,6 @@ describe Gitlab::UsageData do
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[1])
 
-      create(:alerts_service, project: projects[0])
-      create(:alerts_service, :inactive, project: projects[1])
       create(:service, project: projects[1], type: 'JenkinsService', active: true)
 
       create(:package, project: projects[0])
@@ -90,7 +92,6 @@ describe Gitlab::UsageData do
         projects_with_packages
         projects_with_prometheus_alerts
         projects_with_tracing_enabled
-        projects_with_alerts_service_enabled
         sast_jobs
         design_management_designs_create
         design_management_designs_update
@@ -104,7 +105,6 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
       expect(count_data[:feature_flags]).to eq(1)
-      expect(count_data[:projects_with_alerts_service_enabled]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do
@@ -246,47 +246,6 @@ describe Gitlab::UsageData do
     it 'bases counts on active users', :aggregate_failures do
       expect(subject[:operations_dashboard_default_dashboard]).to eq(1)
       expect(subject[:operations_dashboard_users_with_projects_added]).to eq(2)
-    end
-  end
-
-  describe 'count incident_issues' do
-    let(:project) { create(:project) }
-
-    subject { described_class.data.dig(:counts, :incident_issues) }
-
-    before do
-      ::User.support_bot # create the support bot user beforehand, because otherwise it is created when gathering usage data.
-      create(:issue, project: project) # non incident issue
-    end
-
-    context 'when incident_management feature is available' do
-      before do
-        stub_licensed_features(incident_management: true)
-      end
-
-      context 'with incident issues' do
-        before do
-          create_list(:issue, 2, project: project, author: User.alert_bot)
-        end
-
-        it { is_expected.to eq(2) }
-      end
-
-      context 'without incident_issues' do
-        it { is_expected.to eq(0) }
-
-        it { expect { subject }.to change(User, :count).by(1) }
-      end
-    end
-
-    context 'when incident_management feature is not available' do
-      before do
-        stub_licensed_features(incident_management: false)
-      end
-
-      it { is_expected.to eq(0) }
-
-      it { expect { subject }.not_to change(User, :count) }
     end
   end
 end

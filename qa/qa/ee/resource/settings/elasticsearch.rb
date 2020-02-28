@@ -12,7 +12,7 @@ module QA
           def initialize
             @es_enabled = true
             @es_indexing = true
-            @es_url = 'http://elastic68:9200'
+            @es_url = QA::Runtime::Env.elasticsearch_url
           end
 
           def fabricate!

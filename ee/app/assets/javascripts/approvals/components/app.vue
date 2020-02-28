@@ -11,6 +11,12 @@ export default {
     GlButton,
     GlLoadingIcon,
   },
+  props: {
+    isMrEdit: {
+      type: Boolean,
+      default: true,
+    },
+  },
   computed: {
     ...mapState({
       settings: 'settings',
@@ -53,7 +59,7 @@ export default {
       </div>
       <slot name="footer"></slot>
     </template>
-    <modal-rule-create :modal-id="createModalId" />
+    <modal-rule-create :modal-id="createModalId" :is-mr-edit="isMrEdit" />
     <modal-rule-remove :modal-id="removeModalId" />
   </div>
 </template>

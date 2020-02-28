@@ -9,6 +9,7 @@ module EE
       with_scope :subject
       condition(:ldap_synced) { @subject.ldap_synced? }
       condition(:epics_available) { @subject.feature_available?(:epics) }
+      condition(:subepics_available) { @subject.feature_available?(:subepics) }
       condition(:contribution_analytics_available) do
         @subject.feature_available?(:contribution_analytics)
       end
@@ -95,6 +96,10 @@ module EE
         enable :update_epic
       end
 
+      rule { reporter & subepics_available }.policy do
+        enable :admin_epic_link
+      end
+
       rule { owner & epics_available }.enable :destroy_epic
 
       rule { ~can?(:read_cross_project) }.policy do
@@ -135,6 +140,7 @@ module EE
 
       rule { admin | owner }.policy do
         enable :read_group_compliance_dashboard
+        enable :read_group_credentials_inventory
       end
 
       rule { needs_new_sso_session }.policy do

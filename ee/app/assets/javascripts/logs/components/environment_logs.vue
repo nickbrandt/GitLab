@@ -6,6 +6,7 @@ import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
 import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
+import { timeRangeFromUrl } from '~/monitoring/utils';
 
 export default {
   components: {
@@ -41,7 +42,6 @@ export default {
   data() {
     return {
       searchQuery: '',
-      selectedTimeRange: defaultTimeRange,
       timeRanges,
       isElasticStackCalloutDismissed: false,
     };
@@ -72,11 +72,7 @@ export default {
       return this.environments.isLoading || !this.advancedFeaturesEnabled;
     },
     shouldShowElasticStackCallout() {
-      return (
-        !this.isElasticStackCalloutDismissed &&
-        !this.logs.isLoading &&
-        !this.disableAdvancedControls
-      );
+      return !this.isElasticStackCalloutDismissed && this.disableAdvancedControls;
     },
   },
   watch: {
@@ -91,6 +87,7 @@ export default {
   },
   mounted() {
     this.setInitData({
+      timeRange: timeRangeFromUrl() || defaultTimeRange,
       environmentName: this.environmentName,
       podName: this.currentPodName,
     });
@@ -113,7 +110,7 @@ export default {
   <div class="build-page-pod-logs mt-3">
     <gl-alert
       v-if="shouldShowElasticStackCallout"
-      class="mb-3"
+      class="mb-3 js-elasticsearch-alert"
       @dismiss="isElasticStackCalloutDismissed = true"
     >
       {{
@@ -204,7 +201,7 @@ export default {
             class="js-logs-search"
             type="search"
             autofocus
-            @submit="!disableAdvancedControls && setSearch(searchQuery)"
+            @submit="setSearch(searchQuery)"
           />
         </gl-form-group>
       </div>

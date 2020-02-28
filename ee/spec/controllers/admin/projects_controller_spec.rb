@@ -18,7 +18,7 @@ describe Admin::ProjectsController, :geo do
     render_views
 
     it 'includes Geo Status widget partial' do
-      expect(subject).to have_gitlab_http_status(200)
+      expect(subject).to have_gitlab_http_status(:ok)
       expect(subject.body).to match(project.name)
       expect(subject).to render_template(partial: 'admin/projects/_geo_status_widget')
     end

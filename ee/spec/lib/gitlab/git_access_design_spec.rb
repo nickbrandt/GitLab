@@ -28,7 +28,7 @@ describe Gitlab::GitAccessDesign do
       let_it_be(:user) { create(:user) }
 
       it "raises an error " do
-        expect { subject }.to raise_error(::Gitlab::GitAccess::UnauthorizedError)
+        expect { subject }.to raise_error(::Gitlab::GitAccess::ForbiddenError)
       end
     end
 
@@ -36,7 +36,7 @@ describe Gitlab::GitAccessDesign do
       let(:protocol) { 'https' }
 
       it "raises an error " do
-        expect { subject }.to raise_error(::Gitlab::GitAccess::UnauthorizedError)
+        expect { subject }.to raise_error(::Gitlab::GitAccess::ForbiddenError)
       end
     end
 

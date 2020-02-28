@@ -16,7 +16,6 @@ module Packages
           file:      file,
           size:      params['file.size'],
           file_name: params[:file_name],
-          file_type: params['file.type'],
           file_sha1: params['file.sha1'],
           file_md5:  params['file.md5'],
           conan_file_metadatum_attributes: {

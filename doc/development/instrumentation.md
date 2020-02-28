@@ -1,9 +1,11 @@
-# Instrumenting Ruby Code
+# Instrumenting Ruby code
 
 [GitLab Performance Monitoring](../administration/monitoring/performance/index.md) allows instrumenting of both methods and custom
 blocks of Ruby code. Method instrumentation is the primary form of
 instrumentation with block-based instrumentation only being used when we want to
 drill down to specific regions of code within a method.
+
+Please refer to [Event tracking](event_tracking/index.md) if you are tracking product usage patterns.
 
 ## Instrumenting Methods
 

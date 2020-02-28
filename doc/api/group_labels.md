@@ -1,24 +1,24 @@
 # Group Labels API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/21368) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/21368) in GitLab 11.8.
 
 This API supports managing of [group labels](../user/project/labels.md#project-labels-and-group-labels). It allows to list, create, update, and delete group labels. Furthermore, users can subscribe and unsubscribe to and from group labels.
 
 NOTE: **Note:**
-The `description_html` - was added to response JSON in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/merge_requests/21413).
+The `description_html` - was added to response JSON in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413).
 
 ## List group labels
 
 Get all labels for a given group.
 
-```
+```plaintext
 GET /groups/:id/labels
 ```
 
 | Attribute     | Type           | Required | Description                                                                                                                                                                  |
 | ---------     | ----           | -------- | -----------                                                                                                                                                                  |
 | `id`          | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user.                                                               |
-| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/31543))_ |
+| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/31543))_ |
 | `include_ancestor_groups` | boolean | no | Include ancestor groups. Defaults to `true`. |
 
 ```shell
@@ -60,7 +60,7 @@ Example response:
 
 Get a single label for a given group.
 
-```
+```plaintext
 GET /groups/:id/labels/:label_id
 ```
 
@@ -95,7 +95,7 @@ Example response:
 
 Create a new group label for a given group.
 
-```
+```plaintext
 POST /groups/:id/labels
 ```
 
@@ -131,7 +131,7 @@ Example response:
 
 Updates an existing group label. At least one parameter is required, to update the group label.
 
-```
+```plaintext
 PUT /groups/:id/labels/:label_id
 ```
 
@@ -170,7 +170,7 @@ NOTE: **Note:** An older endpoint `PUT /groups/:id/labels` with `name` in the pa
 
 Deletes a group label with a given name.
 
-```
+```plaintext
 DELETE /groups/:id/labels/:label_id
 ```
 
@@ -190,7 +190,7 @@ NOTE: **Note:** An older endpoint `DELETE /groups/:id/labels` with `name` in the
 Subscribes the authenticated user to a group label to receive notifications. If
 the user is already subscribed to the label, the status code `304` is returned.
 
-```
+```plaintext
 POST /groups/:id/labels/:label_id/subscribe
 ```
 
@@ -226,7 +226,7 @@ Unsubscribes the authenticated user from a group label to not receive
 notifications from it. If the user is not subscribed to the label, the status
 code `304` is returned.
 
-```
+```plaintext
 POST /groups/:id/labels/:label_id/unsubscribe
 ```
 

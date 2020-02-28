@@ -20,6 +20,7 @@ describe AutoMerge::MergeTrainService do
 
     allow(AutoMergeProcessWorker).to receive(:perform_async) { }
 
+    stub_feature_flags(disable_merge_trains: false)
     stub_licensed_features(merge_trains: true, merge_pipelines: true)
     project.update!(merge_pipelines_enabled: true)
   end
@@ -263,7 +264,7 @@ describe AutoMerge::MergeTrainService do
 
     context 'when merge trains project option is disabled' do
       before do
-        stub_feature_flags(merge_trains_enabled: false)
+        stub_feature_flags(disable_merge_trains: true)
       end
 
       it { is_expected.to be_falsy }

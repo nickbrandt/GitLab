@@ -78,8 +78,8 @@ module Geo
       raise NotImplementedError
     end
 
-    def local_storage_only?
-      !current_node&.sync_object_storage
+    def local_storage_only?(fdw: true)
+      !current_node(fdw: fdw)&.sync_object_storage
     end
   end
 end

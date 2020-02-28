@@ -3,6 +3,12 @@ const _links = {
   delete_api_path: 'bar',
 };
 
+export const mockPipelineInfo = {
+  id: 1,
+  ref: 'branch-name',
+  sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+};
+
 export const mavenPackage = {
   created_at: '2015-12-10',
   id: 1,
@@ -13,6 +19,7 @@ export const mavenPackage = {
   },
   name: 'Test package',
   package_type: 'maven',
+  project_path: 'foo/bar/baz',
   project_id: 1,
   updated_at: '2015-12-10',
   version: '1.0.0',
@@ -41,12 +48,14 @@ export const npmPackage = {
   id: 2,
   name: '@Test/package',
   package_type: 'npm',
+  project_path: 'foo/bar/baz',
   project_id: 1,
   updated_at: '2015-12-10',
   version: '',
   _links,
   build_info: {
     pipeline_id: 1,
+    pipeline: mockPipelineInfo,
   },
 };
 
@@ -68,6 +77,7 @@ export const conanPackage = {
   created_at: '2015-12-10',
   id: 3,
   name: 'conan-package',
+  project_path: 'foo/bar/baz',
   package_files: [],
   package_type: 'conan',
   project_id: 1,
@@ -105,10 +115,3 @@ export const mockTags = [
 ];
 
 export const packageList = [mavenPackage, { ...npmPackage, tags: mockTags }, conanPackage];
-
-export const mockPipelineInfo = {
-  id: 1,
-  ref: 'branch-name',
-  sha: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-  web_url: 'foo',
-};

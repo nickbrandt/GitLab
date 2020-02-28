@@ -7,7 +7,7 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :r
   include ExclusiveLeaseHelpers
 
   let!(:secondary) { create(:geo_node) }
-  let(:shard_name) { Gitlab.config.repositories.storages.keys.first }
+  let(:shard_name) { Gitlab.config.repositories.storages.each_key.first }
   let(:secondary_single_worker) { Geo::RepositoryVerification::Secondary::SingleWorker }
   let!(:project) { create(:project) }
 

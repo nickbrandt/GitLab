@@ -2,11 +2,6 @@
 
 class InstanceSecurityDashboard
   extend ActiveModel::Naming
-  include ::Vulnerable
-
-  def self.name
-    'Instance'
-  end
 
   def initialize(user, project_ids: [])
     @project_ids = project_ids
@@ -23,6 +18,10 @@ class InstanceSecurityDashboard
 
   def feature_available?(feature)
     License.feature_available?(feature)
+  end
+
+  def projects
+    Project.where(id: visible_users_security_dashboard_projects)
   end
 
   private

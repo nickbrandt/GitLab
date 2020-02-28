@@ -6,14 +6,14 @@ module QA
     describe 'Project templates' do
       before(:all) do
         @files = [
-            {
-                name: 'file.txt',
-                content: 'foo'
-            },
-            {
-                name: 'README.md',
-                content: 'bar'
-            }
+          {
+            name: 'file.txt',
+            content: 'foo'
+          },
+          {
+            name: 'README.md',
+            content: 'bar'
+          }
         ]
 
         @template_container_group_name = "instance-template-container-group-#{SecureRandom.hex(8)}"
@@ -54,8 +54,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using built-in project template',
-                                        namespace: Runtime::Namespace.name,
-                                        template_name: built_in)
+            namespace: Runtime::Namespace.name,
+            template_name: built_in)
 
           Page::Project::Show.perform(&:wait_for_import_success)
 
@@ -96,8 +96,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using instance level project template',
-                                        namespace: Runtime::Namespace.path,
-                                        template_name: @template_project.name)
+            namespace: Runtime::Namespace.path,
+            template_name: @template_project.name)
 
           Page::Project::Show.perform(&:wait_for_import_success)
           @files.each do |file|
@@ -112,13 +112,14 @@ module QA
 
           Page::Main::Menu.perform(&:go_to_groups)
           Page::Dashboard::Groups.perform { |groups| groups.click_group(Runtime::Namespace.sandbox_name) }
-          Page::Project::Menu.perform(&:click_settings)
+
+          Page::Group::Menu.perform(&:click_settings)
 
           Page::Group::Settings::General.perform do |settings|
             settings.choose_custom_project_template("#{@template_container_group_name}")
           end
 
-          Page::Project::Menu.perform(&:click_settings)
+          Page::Group::Menu.perform(&:click_settings)
 
           Page::Group::Settings::General.perform do |settings|
             expect(settings.current_custom_project_template).to include @template_container_group_name
@@ -140,8 +141,8 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using group level project template',
-                                        namespace: Runtime::Namespace.sandbox_name,
-                                        template_name: @template_project.name)
+            namespace: Runtime::Namespace.sandbox_name,
+            template_name: @template_project.name)
 
           Page::Project::Show.perform(&:wait_for_import_success)
           @files.each do |file|

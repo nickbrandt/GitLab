@@ -5,14 +5,16 @@ import { getDateInPast } from '~/lib/utils/datetime_utility';
 
 describe('Dependencies getters', () => {
   describe.each`
-    getterName         | reportStatus                    | outcome
-    ${'isJobNotSetUp'} | ${REPORT_STATUS.jobNotSetUp}    | ${true}
-    ${'isJobNotSetUp'} | ${REPORT_STATUS.ok}             | ${false}
-    ${'isJobFailed'}   | ${REPORT_STATUS.jobFailed}      | ${true}
-    ${'isJobFailed'}   | ${REPORT_STATUS.noDependencies} | ${true}
-    ${'isJobFailed'}   | ${REPORT_STATUS.ok}             | ${false}
-    ${'isIncomplete'}  | ${REPORT_STATUS.incomplete}     | ${true}
-    ${'isIncomplete'}  | ${REPORT_STATUS.ok}             | ${false}
+    getterName             | reportStatus                    | outcome
+    ${'isJobNotSetUp'}     | ${REPORT_STATUS.jobNotSetUp}    | ${true}
+    ${'isJobNotSetUp'}     | ${REPORT_STATUS.ok}             | ${false}
+    ${'isJobFailed'}       | ${REPORT_STATUS.jobFailed}      | ${true}
+    ${'isJobFailed'}       | ${REPORT_STATUS.noDependencies} | ${false}
+    ${'isJobFailed'}       | ${REPORT_STATUS.ok}             | ${false}
+    ${'hasNoDependencies'} | ${REPORT_STATUS.ok}             | ${false}
+    ${'hasNoDependencies'} | ${REPORT_STATUS.noDependencies} | ${true}
+    ${'isIncomplete'}      | ${REPORT_STATUS.incomplete}     | ${true}
+    ${'isIncomplete'}      | ${REPORT_STATUS.ok}             | ${false}
   `('$getterName when report status is $reportStatus', ({ getterName, reportStatus, outcome }) => {
     it(`returns ${outcome}`, () => {
       expect(

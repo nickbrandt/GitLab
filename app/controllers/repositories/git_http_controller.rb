@@ -7,7 +7,7 @@ module Repositories
     before_action :access_check
     prepend_before_action :deny_head_requests, only: [:info_refs]
 
-    rescue_from Gitlab::GitAccess::UnauthorizedError, with: :render_403_with_exception
+    rescue_from Gitlab::GitAccess::ForbiddenError, with: :render_403_with_exception
     rescue_from Gitlab::GitAccess::NotFoundError, with: :render_404_with_exception
     rescue_from Gitlab::GitAccess::ProjectCreationError, with: :render_422_with_exception
     rescue_from Gitlab::GitAccess::TimeoutError, with: :render_503_with_exception
@@ -80,7 +80,7 @@ module Repositories
       return unless repo_type.project?
       return unless project&.daily_statistics_enabled?
 
-      ProjectDailyStatisticsWorker.perform_async(project.id)
+      ProjectDailyStatisticsWorker.perform_async(project.id) # rubocop:disable CodeReuse/Worker
     end
 
     def access

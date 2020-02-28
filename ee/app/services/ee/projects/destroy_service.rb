@@ -50,7 +50,7 @@ module EE
         # Git data (e.g. a list of branch names).
         flush_caches(project)
 
-        trash_repositories!
+        trash_project_repositories!
 
         log_info("Project \"#{project.name}\" was removed")
       end

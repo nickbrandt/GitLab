@@ -59,6 +59,8 @@ class User < ApplicationRecord
 
   MINIMUM_INACTIVE_DAYS = 180
 
+  enum bot_type: ::UserBotTypeEnums.bots
+
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
   # rubocop: disable CodeReuse/ServiceClass
@@ -187,6 +189,13 @@ class User < ApplicationRecord
   validate :owns_public_email, if: :public_email_changed?
   validate :owns_commit_email, if: :commit_email_changed?
   validate :signup_domain_valid?, on: :create, if: ->(user) { !user.created_by_id }
+  validate :check_email_restrictions, on: :create, if: ->(user) { !user.created_by_id }
+
+  validates :theme_id, allow_nil: true, inclusion: { in: Gitlab::Themes.valid_ids,
+    message: _("%{placeholder} is not a valid theme") % { placeholder: '%{value}' } }
+
+  validates :color_scheme_id, allow_nil: true, inclusion: { in: Gitlab::ColorSchemes.valid_ids,
+    message: _("%{placeholder} is not a valid color scheme") % { placeholder: '%{value}' } }
 
   before_validation :sanitize_attrs
   before_validation :set_notification_email, if: :new_record?
@@ -246,6 +255,7 @@ class User < ApplicationRecord
   delegate :time_display_relative, :time_display_relative=, to: :user_preference
   delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
   delegate :show_whitespace_in_diffs, :show_whitespace_in_diffs=, to: :user_preference
+  delegate :tab_width, :tab_width=, to: :user_preference
   delegate :sourcegraph_enabled, :sourcegraph_enabled=, to: :user_preference
   delegate :setup_for_company, :setup_for_company=, to: :user_preference
   delegate :render_whitespace_in_code, :render_whitespace_in_code=, to: :user_preference
@@ -322,6 +332,8 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
+  scope :bots, -> { where.not(bot_type: nil) }
+  scope :humans, -> { where(bot_type: nil) }
 
   scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
     where('EXISTS (?)',
@@ -598,6 +610,15 @@ class User < ApplicationRecord
       end
     end
 
+    def alert_bot
+      email_pattern = "alert%s@#{Settings.gitlab.host}"
+
+      unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+        u.bio = 'The GitLab alert bot'
+        u.name = 'GitLab Alert Bot'
+      end
+    end
+
     # Return true if there is only single non-internal user in the deployment,
     # ghost user is ignored.
     def single_user?
@@ -613,16 +634,20 @@ class User < ApplicationRecord
     username
   end
 
+  def bot?
+    bot_type.present?
+  end
+
   def internal?
-    ghost?
+    ghost? || bot?
   end
 
   def self.internal
-    where(ghost: true)
+    where(ghost: true).or(bots)
   end
 
   def self.non_internal
-    without_ghosts
+    without_ghosts.humans
   end
 
   #
@@ -1162,12 +1187,16 @@ class User < ApplicationRecord
     Member.where(invite_email: verified_emails).invite
   end
 
-  def all_emails
+  def all_emails(include_private_email: true)
     all_emails = []
     all_emails << email unless temp_oauth_email?
-    all_emails << private_commit_email
+    all_emails << private_commit_email if include_private_email
     all_emails.concat(emails.map(&:email))
     all_emails
+  end
+
+  def all_public_emails
+    all_emails(include_private_email: false)
   end
 
   def verified_emails
@@ -1202,7 +1231,8 @@ class User < ApplicationRecord
     {
       name: name,
       username: username,
-      avatar_url: avatar_url(only_path: false)
+      avatar_url: avatar_url(only_path: false),
+      email: email
     }
   end
 
@@ -1626,6 +1656,13 @@ class User < ApplicationRecord
   end
   # End of signup_flow experiment methods
 
+  def dismissed_callout?(feature_name:, ignore_dismissal_earlier_than: nil)
+    callouts = self.callouts.with_feature_name(feature_name)
+    callouts = callouts.with_dismissed_after(ignore_dismissal_earlier_than) if ignore_dismissal_earlier_than
+
+    callouts.any?
+  end
+
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
 
@@ -1712,6 +1749,18 @@ class User < ApplicationRecord
       escaped = Regexp.escape(domain).gsub('\*', '.*?')
       regexp = Regexp.new "^#{escaped}$", Regexp::IGNORECASE
       signup_domain =~ regexp
+    end
+  end
+
+  def check_email_restrictions
+    return unless Feature.enabled?(:email_restrictions)
+    return unless Gitlab::CurrentSettings.email_restrictions_enabled?
+
+    restrictions = Gitlab::CurrentSettings.email_restrictions
+    return if restrictions.blank?
+
+    if Gitlab::UntrustedRegexp.new(restrictions).match?(email)
+      errors.add(:email, _('is not allowed for sign-up'))
     end
   end
 

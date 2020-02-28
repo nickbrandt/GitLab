@@ -19,8 +19,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     get '/analytics', to: redirect('groups/%{group_id}/-/contribution_analytics')
     resource :contribution_analytics, only: [:show]
-    resource :cycle_analytics, only: [:show]
-    namespace :cycle_analytics do
+    resource :cycle_analytics, only: [:show], path: 'value_stream_analytics'
+    scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
       scope :events, controller: 'events' do
         get :issue
         get :plan
@@ -30,6 +30,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         get :staging
         get :production
       end
+    end
+    namespace :analytics do
+      resource :productivity_analytics, only: :show, constraints: -> (req) { Feature.enabled?(:group_level_productivity_analytics, default_enabled: true) && Gitlab::Analytics.productivity_analytics_enabled? }
     end
 
     resource :ldap, only: [] do
@@ -116,6 +119,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resource :compliance_dashboard, only: [:show]
       resources :vulnerable_projects, only: [:index]
       resource :discover, only: [:show], controller: :discover
+      resources :credentials, only: [:index]
 
       resources :vulnerability_findings, only: [:index] do
         collection do

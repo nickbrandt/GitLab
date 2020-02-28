@@ -55,7 +55,8 @@ class MergeRequestWidgetEntity < Grape::Entity
       merge_request.source_project,
       merge_request.source_branch,
       file_name: '.gitlab-ci.yml',
-      commit_message: s_("CommitMessage|Add %{file_name}") % { file_name: Gitlab::FileDetector::PATTERNS[:gitlab_ci] }
+      commit_message: s_("CommitMessage|Add %{file_name}") % { file_name: Gitlab::FileDetector::PATTERNS[:gitlab_ci] },
+      suggest_gitlab_ci_yml: true
     )
   end
 
@@ -93,7 +94,8 @@ class MergeRequestWidgetEntity < Grape::Entity
     merge_request.source_project&.uses_default_ci_config? &&
       merge_request.all_pipelines.none? &&
       merge_request.commits_count.positive? &&
-      can?(current_user, :push_code, merge_request.source_project)
+      can?(current_user, :read_build, merge_request.source_project) &&
+      can?(current_user, :create_pipeline, merge_request.source_project)
   end
 end
 

@@ -1,9 +1,11 @@
 # SAML OmniAuth Provider
 
-> This topic is for SAML on self-managed GitLab instances. For SAML on GitLab.com, see [SAML SSO for GitLab.com Groups](../user/group/saml_sso/index.md).
+Note that:
 
-NOTE: **Note:**
-You need to [enable OmniAuth](omniauth.md) in order to use this.
+- SAML OmniAuth Provider is for SAML on self-managed GitLab instances. For SAML on
+  GitLab.com, see [SAML SSO for GitLab.com Groups](../user/group/saml_sso/index.md).
+- Starting from GitLab 11.4, OmniAuth is enabled by default. If you're using an
+  earlier version, you'll need to explicitly enable it.
 
 GitLab can be configured to act as a SAML 2.0 Service Provider (SP). This allows
 GitLab to consume assertions from a SAML 2.0 Identity Provider (IdP) such as
@@ -37,7 +39,6 @@ in your SAML IdP:
    For Omnibus package:
 
    ```ruby
-   gitlab_rails['omniauth_enabled'] = true
    gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
    gitlab_rails['omniauth_block_auto_created_users'] = false
    ```
@@ -243,7 +244,7 @@ considered `admin groups`.
 >**Note:**
 This setting is only available on GitLab 11.4 EE and above.
 
-This setting also follows the requirements documented for the `External Groups` setting.  GitLab uses the Group information provided by your IdP to determine if a user should be assigned the `auditor` role.
+This setting also follows the requirements documented for the `External Groups` setting. GitLab uses the Group information provided by your IdP to determine if a user should be assigned the `auditor` role.
 
 ```yaml
 { name: 'saml',
@@ -374,7 +375,7 @@ in the OmniAuth [info hash](https://github.com/omniauth/omniauth/wiki/Auth-Hash-
 
 For example, if your SAMLResponse contains an Attribute called 'EmailAddress',
 specify `{ email: ['EmailAddress'] }` to map the Attribute to the
-corresponding key in the info hash.  URI-named Attributes are also supported, e.g.
+corresponding key in the info hash. URI-named Attributes are also supported, e.g.
 `{ email: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] }`.
 
 This setting allows you tell GitLab where to look for certain attributes required
@@ -414,7 +415,7 @@ args: {
 
 ### `uid_attribute`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17734) in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17734) in GitLab 10.7.
 
 By default, the `uid` is set as the `name_id` in the SAML response. If you'd like to designate a unique attribute for the `uid`, you can set the `uid_attribute`. In the example below, the value of `uid` attribute in the SAML response is set as the `uid_attribute`.
 

@@ -79,7 +79,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resource :integrations, only: [:show]
 
           resource :repository, only: [:show], controller: :repository do
-            post :create_deploy_token, path: 'deploy_token/create'
+            # TODO: Move 'create_deploy_token' here to the ':ci_cd' resource above during 12.9.
+            # More details here: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24102#note_287572556
+            post :create_deploy_token, path: 'deploy_token/create', to: 'ci_cd#create_deploy_token'
             post :cleanup
           end
         end
@@ -195,9 +197,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resource :cycle_analytics, only: [:show]
-
-        namespace :cycle_analytics do
+        resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
+        scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
           scope :events, controller: 'events' do
             get :issue
             get :plan
@@ -208,6 +209,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :production
           end
         end
+        get '/cycle_analytics', to: redirect('%{namespace_id}/%{project_id}/-/value_stream_analytics')
 
         concerns :clusterable
 
@@ -252,7 +254,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :performance_monitoring do
-          resources :dashboards, only: [:create]
+          resources :dashboards, only: [:create] do
+            collection do
+              put '/:file_name', to: 'dashboards#update', constraints: { file_name: /.+\.yml/ }
+            end
+          end
         end
 
         namespace :error_tracking do
@@ -323,6 +329,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      post 'alerts/notify', to: 'alerting/notifications#create'
+
       resources :pipelines, only: [:index, :new, :create, :show, :destroy] do
         collection do
           resource :pipelines_settings, path: 'settings', only: [:show, :update]
@@ -341,6 +349,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :failures
           get :status
           get :test_report
+          get :test_reports_count
         end
 
         member do
@@ -371,7 +380,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :container_registry, only: [:index, :destroy],
+      resources :container_registry, only: [:index, :destroy, :show],
                                      controller: 'registry/repositories'
 
       namespace :registry do
@@ -468,7 +477,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                                             :forks, :group_links, :import, :avatar, :mirror,
                                             :cycle_analytics, :mattermost, :variables, :triggers,
                                             :environments, :protected_environments, :error_tracking,
-                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests)
+                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests,
+                                            :vulnerability_feedback, :security, :dependencies)
     end
 
     # rubocop: disable Cop/PutProjectRoutesUnderScope

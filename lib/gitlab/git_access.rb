@@ -6,7 +6,7 @@ module Gitlab
   class GitAccess
     include Gitlab::Utils::StrongMemoize
 
-    UnauthorizedError = Class.new(StandardError)
+    ForbiddenError = Class.new(StandardError)
     NotFoundError = Class.new(StandardError)
     ProjectCreationError = Class.new(StandardError)
     TimeoutError = Class.new(StandardError)
@@ -60,7 +60,6 @@ module Gitlab
       @logger = Checks::TimedLogger.new(timeout: INTERNAL_TIMEOUT, header: LOG_HEADER)
       @changes = changes
 
-      check_namespace!
       check_protocol!
       check_valid_actor!
       check_active_user!
@@ -72,11 +71,7 @@ module Gitlab
       return custom_action if custom_action
 
       check_db_accessibility!(cmd)
-
-      ensure_project_on_push!(cmd, changes)
-
-      check_project_accessibility!
-      add_project_moved_message!
+      check_project!(changes, cmd)
       check_repository_existence!
 
       case cmd
@@ -113,6 +108,13 @@ module Gitlab
 
     private
 
+    def check_project!(changes, cmd)
+      check_namespace!
+      ensure_project_on_push!(cmd, changes)
+      check_project_accessibility!
+      add_project_moved_message!
+    end
+
     def check_custom_action(cmd)
       nil
     end
@@ -125,7 +127,7 @@ module Gitlab
       return unless actor.is_a?(Key)
 
       unless actor.valid?
-        raise UnauthorizedError, "Your SSH key #{actor.errors[:key].first}."
+        raise ForbiddenError, "Your SSH key #{actor.errors[:key].first}."
       end
     end
 
@@ -133,7 +135,7 @@ module Gitlab
       return if request_from_ci_build?
 
       unless protocol_allowed?
-        raise UnauthorizedError, "Git access over #{protocol.upcase} is not allowed"
+        raise ForbiddenError, "Git access over #{protocol.upcase} is not allowed"
       end
     end
 
@@ -148,7 +150,7 @@ module Gitlab
 
       unless user_access.allowed?
         message = Gitlab::Auth::UserAccessDeniedReason.new(user).rejection_message
-        raise UnauthorizedError, message
+        raise ForbiddenError, message
       end
     end
 
@@ -156,11 +158,11 @@ module Gitlab
       case cmd
       when *DOWNLOAD_COMMANDS
         unless authentication_abilities.include?(:download_code) || authentication_abilities.include?(:build_download_code)
-          raise UnauthorizedError, ERROR_MESSAGES[:auth_download]
+          raise ForbiddenError, ERROR_MESSAGES[:auth_download]
         end
       when *PUSH_COMMANDS
         unless authentication_abilities.include?(:push_code)
-          raise UnauthorizedError, ERROR_MESSAGES[:auth_upload]
+          raise ForbiddenError, ERROR_MESSAGES[:auth_upload]
         end
       end
     end
@@ -189,19 +191,19 @@ module Gitlab
 
     def check_upload_pack_disabled!
       if http? && upload_pack_disabled_over_http?
-        raise UnauthorizedError, ERROR_MESSAGES[:upload_pack_disabled_over_http]
+        raise ForbiddenError, ERROR_MESSAGES[:upload_pack_disabled_over_http]
       end
     end
 
     def check_receive_pack_disabled!
       if http? && receive_pack_disabled_over_http?
-        raise UnauthorizedError, ERROR_MESSAGES[:receive_pack_disabled_over_http]
+        raise ForbiddenError, ERROR_MESSAGES[:receive_pack_disabled_over_http]
       end
     end
 
     def check_command_existence!(cmd)
       unless ALL_COMMANDS.include?(cmd)
-        raise UnauthorizedError, ERROR_MESSAGES[:command_not_allowed]
+        raise ForbiddenError, ERROR_MESSAGES[:command_not_allowed]
       end
     end
 
@@ -209,7 +211,7 @@ module Gitlab
       return unless receive_pack?(cmd)
 
       if Gitlab::Database.read_only?
-        raise UnauthorizedError, push_to_read_only_message
+        raise ForbiddenError, push_to_read_only_message
       end
     end
 
@@ -253,23 +255,23 @@ module Gitlab
         guest_can_download_code?
 
       unless passed
-        raise UnauthorizedError, ERROR_MESSAGES[:download]
+        raise ForbiddenError, ERROR_MESSAGES[:download]
       end
     end
 
     def check_push_access!
       if project.repository_read_only?
-        raise UnauthorizedError, ERROR_MESSAGES[:read_only]
+        raise ForbiddenError, ERROR_MESSAGES[:read_only]
       end
 
       if deploy_key?
         unless deploy_key.can_push_to?(project)
-          raise UnauthorizedError, ERROR_MESSAGES[:deploy_key_upload]
+          raise ForbiddenError, ERROR_MESSAGES[:deploy_key_upload]
         end
       elsif user
         # User access is verified in check_change_access!
       else
-        raise UnauthorizedError, ERROR_MESSAGES[:upload]
+        raise ForbiddenError, ERROR_MESSAGES[:upload]
       end
 
       check_change_access!
@@ -284,7 +286,7 @@ module Gitlab
           project.any_branch_allows_collaboration?(user_access.user)
 
         unless can_push
-          raise GitAccess::UnauthorizedError, ERROR_MESSAGES[:push_code]
+          raise ForbiddenError, ERROR_MESSAGES[:push_code]
         end
       else
         # If there are worktrees with a HEAD pointing to a non-existent object,

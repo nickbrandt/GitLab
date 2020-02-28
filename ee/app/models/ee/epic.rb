@@ -15,6 +15,7 @@ module EE
       include UsageStatistics
       include FromUnion
       include EpicTreeSorting
+      include HealthStatus
 
       enum state_id: {
         opened: ::Epic.available_states[:opened],
@@ -51,7 +52,7 @@ module EE
 
       has_many :epic_issues
       has_many :issues, through: :epic_issues
-      has_many :user_mentions, class_name: "EpicUserMention"
+      has_many :user_mentions, class_name: "EpicUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
       validates :group, presence: true
       validate :validate_parent, on: :create
@@ -202,12 +203,15 @@ module EE
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
 
-      def related_issues(ids:, preload: nil)
-        ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
+      def related_issues(ids: nil, preload: nil)
+        items = ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
           .joins(:epic_issue)
           .preload(preload)
-          .where("epic_issues.epic_id": ids)
           .order('epic_issues.relative_position, epic_issues.id')
+
+        return items unless ids
+
+        items.where("epic_issues.epic_id": ids)
       end
     end
 
@@ -271,12 +275,12 @@ module EE
     def to_reference(from = nil, full: false)
       reference = "#{self.class.reference_prefix}#{iid}"
 
-      return reference unless (cross_reference?(from) && !group.projects.include?(from)) || full
+      return reference unless (cross_referenced?(from) && !group.projects.include?(from)) || full
 
       "#{group.full_path}#{reference}"
     end
 
-    def cross_reference?(from)
+    def cross_referenced?(from)
       from && from != group
     end
 
@@ -322,24 +326,30 @@ module EE
     def update_project_counter_caches
     end
 
-    # we call this when creating a new epic (Epics::CreateService) or linking an existing one (EpicLinks::CreateService)
-    # when called from EpicLinks::CreateService we pass
-    #   parent_epic - because we don't have parent attribute set on epic
-    #   parent_group_descendants - we have preloaded them in the service and we want to prevent performance problems
-    #     when linking a lot of issues
     def valid_parent?(parent_epic: nil, parent_group_descendants: nil)
-      parent_epic ||= parent
+      self.parent = parent_epic if parent_epic
 
-      return true unless parent_epic
+      validate_parent(parent_group_descendants)
 
-      parent_group_descendants ||= parent_epic.group.self_and_descendants
+      errors.empty?
+    end
 
-      return false if self == parent_epic
-      return false if level_depth_exceeded?(parent_epic)
-      return false if parent_epic.has_ancestor?(self)
-      return false if parent_epic.children.to_a.include?(self)
+    def validate_parent(preloaded_parent_group_and_descendants = nil)
+      return unless parent
 
-      parent_group_descendants.include?(group)
+      preloaded_parent_group_and_descendants ||= parent.group.self_and_descendants
+
+      if self == parent
+        errors.add :parent, 'Cannot add an epic as a child of itself'
+      elsif parent.children.to_a.include?(self)
+        errors.add :parent, "This epic can't be added as it is already assigned to the parent"
+      elsif parent.has_ancestor?(self)
+        errors.add :parent, "This epic can't be added as it is already assigned to this epic's ancestor"
+      elsif !preloaded_parent_group_and_descendants.include?(group)
+        errors.add :parent, "This epic can't be added because it must belong to the same group as the parent, or subgroup of the parent epic’s group"
+      elsif level_depth_exceeded?(parent)
+        errors.add :parent, "This epic can't be added as the maximum depth of nested epics would be exceeded"
+      end
     end
 
     def issues_readable_by(current_user, preload: nil)
@@ -359,13 +369,6 @@ module EE
     def banzai_render_context(field)
       super.merge(label_url_method: :group_epics_url)
     end
-
-    def validate_parent
-      return true if valid_parent?
-
-      errors.add :parent, 'The parent is not valid'
-    end
-    private :validate_parent
 
     def level_depth_exceeded?(parent_epic)
       hierarchy.max_descendants_depth.to_i + parent_epic.base_and_ancestors.count >= MAX_HIERARCHY_DEPTH

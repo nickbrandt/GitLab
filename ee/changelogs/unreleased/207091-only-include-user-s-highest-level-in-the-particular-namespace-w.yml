@@ -1,0 +1,5 @@
+---
+title: Check user role for each of namespaces while deciding if it is using a paid seat in it.
+merge_request: 25437
+author:
+type: fixed

@@ -48,7 +48,9 @@ class Groups::SamlProvidersController < Groups::ApplicationController
     allowed_params = %i[sso_url certificate_fingerprint enabled]
 
     allowed_params += [:enforced_sso] if Feature.enabled?(:enforced_sso, group)
-    allowed_params += [:enforced_group_managed_accounts] if Feature.enabled?(:group_managed_accounts, group)
+    if Feature.enabled?(:group_managed_accounts, group)
+      allowed_params += [:enforced_group_managed_accounts, :prohibited_outer_forks]
+    end
 
     params.require(:saml_provider).permit(allowed_params)
   end

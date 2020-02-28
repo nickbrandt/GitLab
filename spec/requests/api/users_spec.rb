@@ -461,7 +461,7 @@ describe API::Users do
     end
 
     it "creates user with optional attributes" do
-      optional_attributes = { confirm: true }
+      optional_attributes = { confirm: true, theme_id: 2, color_scheme_id: 4 }
       attributes = attributes_for(:user).merge(optional_attributes)
 
       post api('/users', admin), params: attributes
@@ -573,6 +573,15 @@ describe API::Users do
 
     it 'returns 400 error if username not given' do
       post api('/users', admin), params: attributes_for(:user).except(:username)
+      expect(response).to have_gitlab_http_status(400)
+    end
+
+    it "doesn't create user with invalid optional attributes" do
+      optional_attributes = { theme_id: 50, color_scheme_id: 50 }
+      attributes = attributes_for(:user).merge(optional_attributes)
+
+      post api('/users', admin), params: attributes
+
       expect(response).to have_gitlab_http_status(400)
     end
 
@@ -740,7 +749,7 @@ describe API::Users do
       expect(user.email).to eq('new@email.com')
     end
 
-    it 'updates user with his own username' do
+    it 'updates user with their own username' do
       put api("/users/#{user.id}", admin), params: { username: user.username }
 
       expect(response).to have_gitlab_http_status(200)
@@ -778,6 +787,12 @@ describe API::Users do
       expect(user.reload.external?).to be_truthy
     end
 
+    it "private profile is false by default" do
+      put api("/users/#{user.id}", admin), params: {}
+
+      expect(user.reload.private_profile).to eq(false)
+    end
+
     it "updates private profile" do
       put api("/users/#{user.id}", admin), params: { private_profile: true }
 
@@ -785,12 +800,22 @@ describe API::Users do
       expect(user.reload.private_profile).to eq(true)
     end
 
-    it "updates private profile when nil is given to false" do
-      admin.update(private_profile: true)
+    it "updates private profile to false when nil is given" do
+      user.update(private_profile: true)
 
       put api("/users/#{user.id}", admin), params: { private_profile: nil }
 
+      expect(response).to have_gitlab_http_status(200)
       expect(user.reload.private_profile).to eq(false)
+    end
+
+    it "does not modify private profile when field is not provided" do
+      user.update(private_profile: true)
+
+      put api("/users/#{user.id}", admin), params: {}
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(user.reload.private_profile).to eq(true)
     end
 
     it "does not update admin status" do
@@ -806,6 +831,34 @@ describe API::Users do
 
       expect(response).to have_gitlab_http_status(400)
       expect(user.reload.email).not_to eq('invalid email')
+    end
+
+    it "updates theme id" do
+      put api("/users/#{user.id}", admin), params: { theme_id: 5 }
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(user.reload.theme_id).to eq(5)
+    end
+
+    it "does not update invalid theme id" do
+      put api("/users/#{user.id}", admin), params: { theme_id: 50 }
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(user.reload.theme_id).not_to eq(50)
+    end
+
+    it "updates color scheme id" do
+      put api("/users/#{user.id}", admin), params: { color_scheme_id: 5 }
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(user.reload.color_scheme_id).to eq(5)
+    end
+
+    it "does not update invalid color scheme id" do
+      put api("/users/#{user.id}", admin), params: { color_scheme_id: 50 }
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(user.reload.color_scheme_id).not_to eq(50)
     end
 
     context 'when the current user is not an admin' do
@@ -892,6 +945,45 @@ describe API::Users do
 
         expect(response).to have_gitlab_http_status(409)
         expect(@user.reload.username).to eq(@user.username)
+      end
+    end
+  end
+
+  describe "DELETE /users/:id/identities/:provider" do
+    let(:test_user) { create(:omniauth_user, provider: 'ldapmain') }
+
+    context 'when unauthenticated' do
+      it 'returns authentication error' do
+        delete api("/users/#{test_user.id}/identities/ldapmain")
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+    end
+
+    context 'when authenticated' do
+      it 'deletes identity of given provider' do
+        expect do
+          delete api("/users/#{test_user.id}/identities/ldapmain", admin)
+        end.to change { test_user.identities.count }.by(-1)
+        expect(response).to have_gitlab_http_status(:no_content)
+      end
+
+      it_behaves_like '412 response' do
+        let(:request) { api("/users/#{test_user.id}/identities/ldapmain", admin) }
+      end
+
+      it 'returns 404 error if user not found' do
+        delete api("/users/0/identities/ldapmain", admin)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message']).to eq('404 User Not Found')
+      end
+
+      it 'returns 404 error if identity not found' do
+        delete api("/users/#{test_user.id}/identities/saml", admin)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message']).to eq('404 Identity Not Found')
       end
     end
   end

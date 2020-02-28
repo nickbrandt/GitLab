@@ -35,49 +35,35 @@ describe MergeRequests::BaseService do
       end
     end
 
-    context 'when feature is enabled' do
+    context 'has Jira dev panel integration license' do
       before do
-        stub_feature_flags(jira_connect_app: true)
+        stub_licensed_features(jira_dev_panel_integration: true)
       end
 
-      context 'has Jira dev panel integration license' do
+      context 'with a Jira subscription' do
         before do
-          stub_licensed_features(jira_dev_panel_integration: true)
+          create(:jira_connect_subscription, namespace: project.namespace)
         end
 
-        context 'with a Jira subscription' do
-          before do
-            create(:jira_connect_subscription, namespace: project.namespace)
-          end
+        context 'MR contains Jira issue key' do
+          let(:title) { 'Awesome merge_request with issue JIRA-123' }
 
-          context 'MR contains Jira issue key' do
-            let(:title) { 'Awesome merge_request with issue JIRA-123' }
-
-            it_behaves_like 'enqueues Jira sync worker'
-          end
-
-          context 'MR does not contain Jira issue key' do
-            it_behaves_like 'does not enqueue Jira sync worker'
-          end
+          it_behaves_like 'enqueues Jira sync worker'
         end
 
-        context 'without a Jira subscription' do
+        context 'MR does not contain Jira issue key' do
           it_behaves_like 'does not enqueue Jira sync worker'
         end
       end
 
-      context 'does not have Jira dev panel integration license' do
-        before do
-          stub_licensed_features(jira_dev_panel_integration: false)
-        end
-
+      context 'without a Jira subscription' do
         it_behaves_like 'does not enqueue Jira sync worker'
       end
     end
 
-    context 'when feature is disabled' do
+    context 'does not have Jira dev panel integration license' do
       before do
-        stub_feature_flags(jira_connect_app: false)
+        stub_licensed_features(jira_dev_panel_integration: false)
       end
 
       it_behaves_like 'does not enqueue Jira sync worker'

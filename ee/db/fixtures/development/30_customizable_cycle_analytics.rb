@@ -160,7 +160,7 @@ class Gitlab::Seeder::CustomizableCycleAnalytics
   def merge_requests
     @merge_requests ||= Array.new(MERGE_REQUEST_COUNT).map do |i|
       opts = {
-        title: 'Customized Cycle Analytics merge_request',
+        title: 'Customized Value Stream Analytics merge_request',
         description: "some description",
         source_branch: "#{FFaker::Lorem.word}-#{i}-#{SecureRandom.hex(5)}",
         target_branch: 'master'

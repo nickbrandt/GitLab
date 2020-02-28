@@ -288,7 +288,7 @@ describe Gitlab::Geo, :geo, :request_store do
     end
   end
 
-  context '.allowed_ip?' do
+  describe '.allowed_ip?' do
     where(:allowed_ips, :ip, :allowed) do
       "192.1.1.1"                  | "192.1.1.1"     | true
       "192.1.1.1, 192.1.2.1"       | "192.1.2.1"     | true

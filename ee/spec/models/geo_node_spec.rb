@@ -186,12 +186,12 @@ describe GeoNode, :request_store, :geo, type: :model do
         end
 
         context 'when it has an oauth_application' do
-          # TODO Should it instead be destroyed?
-          # https://gitlab.com/gitlab-org/gitlab/issues/10225
-          it 'disassociates the oauth_application' do
+          it 'destroys the oauth_application' do
             primary_node.oauth_application = create(:oauth_application)
 
-            expect(primary_node).to be_valid
+            expect do
+              expect(primary_node).to be_valid
+            end.to change(Doorkeeper::Application, :count).by(-1)
 
             expect(primary_node.oauth_application).to be_nil
           end
@@ -741,6 +741,28 @@ describe GeoNode, :request_store, :geo, type: :model do
         node.valid?
 
         expect(node.name).to eq('foo')
+      end
+    end
+  end
+
+  describe '#job_artifacts' do
+    context 'when selective sync is enabled' do
+      it 'applies project restriction' do
+        node.update!(selective_sync_type: 'namespaces')
+
+        expect(Ci::JobArtifact).to receive(:project_id_in).once.and_call_original
+
+        node.job_artifacts
+      end
+    end
+
+    context 'when selective sync is disabled' do
+      it 'does not apply project restriction' do
+        node.update!(selective_sync_type: nil)
+
+        expect(Ci::JobArtifact).not_to receive(:project_id_in)
+
+        node.job_artifacts
       end
     end
   end

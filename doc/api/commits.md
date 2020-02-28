@@ -4,7 +4,7 @@
 
 Get a list of repository commits in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits
 ```
 
@@ -18,6 +18,7 @@ GET /projects/:id/repository/commits
 | `all` | boolean | no | Retrieve every commit from the repository |
 | `with_stats` | boolean | no | Stats about each commit will be added to the response |
 | `first_parent` | boolean | no | Follow only the first parent commit upon seeing a merge commit |
+| `order` | string | no | List commits in order. Possible values: `default`, [`topo`](https://git-scm.com/docs/git-log#Documentation/git-log.txt---topo-order). Defaults to `default`, the commits are shown in reverse chronological order. |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/commits"
@@ -66,7 +67,7 @@ Example response:
 
 Create a commit by posting a JSON payload
 
-```
+```plaintext
 POST /projects/:id/repository/commits
 ```
 
@@ -189,7 +190,7 @@ curl --request POST \
 
 Get a specific commit identified by the commit hash or name of a branch or tag.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha
 ```
 
@@ -245,7 +246,7 @@ Example response:
 Get all references (from branches or tags) a commit is pushed to.
 The pagination parameters `page` and `per_page` can be used to restrict the list of references.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/refs
 ```
 
@@ -279,7 +280,7 @@ Example response:
 
 Cherry picks a commit to a given branch.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/cherry_pick
 ```
 
@@ -338,7 +339,7 @@ conflict.
 
 Reverts a commit in a given branch.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/revert
 ```
 
@@ -390,7 +391,7 @@ changeset was empty, likely due to the change having already been reverted.
 
 Get the diff of a commit in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/diff
 ```
 
@@ -426,7 +427,7 @@ Example response:
 
 Get the comments of a commit in a project.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/comments
 ```
 
@@ -477,7 +478,7 @@ cases below is valid:
 In any of the above cases, the response of `line`, `line_type` and `path` is
 set to `null`.
 
-```
+```plaintext
 POST /projects/:id/repository/commits/:sha/comments
 ```
 
@@ -523,7 +524,7 @@ Since GitLab 8.1, this is the new commit status API.
 List the statuses of a commit in a project.
 The pagination parameters `page` and `per_page` can be used to restrict the list of references.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/statuses
 ```
 
@@ -597,7 +598,7 @@ Example response:
 
 Adds or updates a build status of a commit.
 
-```
+```plaintext
 POST /projects/:id/statuses/:sha
 ```
 
@@ -650,7 +651,7 @@ Example response:
 
 Get a list of Merge Requests related to the specified commit.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/merge_requests
 ```
 
@@ -719,7 +720,7 @@ Example response:
 Get the [GPG signature from a commit](../user/project/repository/gpg_signed_commits/index.md),
 if it is signed. For unsigned commits, it results in a 404 response.
 
-```
+```plaintext
 GET /projects/:id/repository/commits/:sha/signature
 ```
 
@@ -755,8 +756,8 @@ Example response if commit is unsigned:
 }
 ```
 
-[ce-6096]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/6096 "Multi-file commit"
-[ce-8047]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/8047
-[ce-15026]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15026
-[ce-18004]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/18004
-[ce-22919]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22919
+[ce-6096]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/6096 "Multi-file commit"
+[ce-8047]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/8047
+[ce-15026]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/15026
+[ce-18004]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/18004
+[ce-22919]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22919

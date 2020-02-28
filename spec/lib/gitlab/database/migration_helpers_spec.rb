@@ -1158,7 +1158,7 @@ describe Gitlab::Database::MigrationHelpers do
     end
   end
 
-  describe 'sidekiq migration helpers', :sidekiq, :redis do
+  describe 'sidekiq migration helpers', :redis do
     let(:worker) do
       Class.new do
         include Sidekiq::Worker
@@ -1221,7 +1221,7 @@ describe Gitlab::Database::MigrationHelpers do
     end
   end
 
-  describe '#bulk_queue_background_migration_jobs_by_range', :sidekiq do
+  describe '#bulk_queue_background_migration_jobs_by_range' do
     context 'when the model has an ID column' do
       let!(:id1) { create(:user).id }
       let!(:id2) { create(:user).id }
@@ -1293,7 +1293,7 @@ describe Gitlab::Database::MigrationHelpers do
     end
   end
 
-  describe '#queue_background_migration_jobs_by_range_at_intervals', :sidekiq do
+  describe '#queue_background_migration_jobs_by_range_at_intervals' do
     context 'when the model has an ID column' do
       let!(:id1) { create(:user).id }
       let!(:id2) { create(:user).id }
@@ -1330,6 +1330,15 @@ describe Gitlab::Database::MigrationHelpers do
             expect(BackgroundMigrationWorker.jobs[0]['args']).to eq(['FooJob', [id1, id3]])
             expect(BackgroundMigrationWorker.jobs[0]['at']).to eq(10.minutes.from_now.to_f)
           end
+        end
+      end
+
+      context 'with other_arguments option' do
+        it 'queues jobs correctly' do
+          model.queue_background_migration_jobs_by_range_at_intervals(User, 'FooJob', 10.minutes, other_arguments: [1, 2])
+
+          expect(BackgroundMigrationWorker.jobs[0]['args']).to eq(['FooJob', [id1, id3, 1, 2]])
+          expect(BackgroundMigrationWorker.jobs[0]['at']).to eq(10.minutes.from_now.to_f)
         end
       end
     end
@@ -1891,6 +1900,62 @@ describe Gitlab::Database::MigrationHelpers do
         expect(issue_b.reload.iid).to eq(1)
         expect(issue_c.reload.iid).to eq(2)
       end
+    end
+  end
+
+  describe '#migrate_async' do
+    it 'calls BackgroundMigrationWorker.perform_async' do
+      expect(BackgroundMigrationWorker).to receive(:perform_async).with("Class", "hello", "world")
+
+      model.migrate_async("Class", "hello", "world")
+    end
+
+    it 'pushes a context with the current class name as caller_id' do
+      expect(Gitlab::ApplicationContext).to receive(:with_context).with(caller_id: model.class.to_s)
+
+      model.migrate_async('Class', 'hello', 'world')
+    end
+  end
+
+  describe '#migrate_in' do
+    it 'calls BackgroundMigrationWorker.perform_in' do
+      expect(BackgroundMigrationWorker).to receive(:perform_in).with(10.minutes, 'Class', 'Hello', 'World')
+
+      model.migrate_in(10.minutes, 'Class', 'Hello', 'World')
+    end
+
+    it 'pushes a context with the current class name as caller_id' do
+      expect(Gitlab::ApplicationContext).to receive(:with_context).with(caller_id: model.class.to_s)
+
+      model.migrate_in(10.minutes, 'Class', 'Hello', 'World')
+    end
+  end
+
+  describe '#bulk_migrate_async' do
+    it 'calls BackgroundMigrationWorker.bulk_perform_async' do
+      expect(BackgroundMigrationWorker).to receive(:bulk_perform_async).with([%w(Class hello world)])
+
+      model.bulk_migrate_async([%w(Class hello world)])
+    end
+
+    it 'pushes a context with the current class name as caller_id' do
+      expect(Gitlab::ApplicationContext).to receive(:with_context).with(caller_id: model.class.to_s)
+
+      model.bulk_migrate_async([%w(Class hello world)])
+    end
+  end
+
+  describe '#bulk_migrate_in' do
+    it 'calls BackgroundMigrationWorker.bulk_perform_in_' do
+      expect(BackgroundMigrationWorker).to receive(:bulk_perform_in).with(10.minutes, [%w(Class hello world)])
+
+      model.bulk_migrate_in(10.minutes, [%w(Class hello world)])
+    end
+
+    it 'pushes a context with the current class name as caller_id' do
+      expect(Gitlab::ApplicationContext).to receive(:with_context).with(caller_id: model.class.to_s)
+
+      model.bulk_migrate_in(10.minutes, [%w(Class hello world)])
     end
   end
 end

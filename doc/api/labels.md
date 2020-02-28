@@ -1,20 +1,20 @@
 # Labels API
 
 NOTE: **Note:**
-The `description_html` - was added to response JSON in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/merge_requests/21413).
+The `description_html` - was added to response JSON in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413).
 
 ## List labels
 
 Get all labels for a given project.
 
-```
+```plaintext
 GET /projects/:id/labels
 ```
 
 | Attribute     | Type           | Required | Description                                                                                                                                                                  |
 | ---------     | -------        | -------- | ---------------------                                                                                                                                                        |
 | `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user                                                              |
-| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/31543))_ |
+| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/31543))_ |
 | `include_ancestor_groups` | boolean | no | Include ancestor groups. Defaults to `true`. |
 
 ```shell
@@ -102,7 +102,7 @@ Example response:
 
 Get a single label for a given project.
 
-```
+```plaintext
 GET /projects/:id/labels/:label_id
 ```
 
@@ -139,7 +139,7 @@ Example response:
 
 Creates a new label for the given repository with the given name and color.
 
-```
+```plaintext
 POST /projects/:id/labels
 ```
 
@@ -178,7 +178,7 @@ Example response:
 
 Deletes a label with a given name.
 
-```
+```plaintext
 DELETE /projects/:id/labels/:label_id
 ```
 
@@ -198,7 +198,7 @@ NOTE: **Note:** An older endpoint `DELETE /projects/:id/labels` with `name` in t
 Updates an existing label with new name or new color. At least one parameter
 is required, to update the label.
 
-```
+```plaintext
 PUT /projects/:id/labels/:label_id
 ```
 
@@ -238,11 +238,11 @@ NOTE: **Note:** An older endpoint `PUT /projects/:id/labels` with `name` or `lab
 
 ## Promote a project label to a group label
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25218) in GitLab 12.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25218) in GitLab 12.3.
 
 Promotes a project label to a group label.
 
-```
+```plaintext
 PUT /projects/:id/labels/:label_id/promote
 ```
 
@@ -279,7 +279,7 @@ Subscribes the authenticated user to a label to receive notifications.
 If the user is already subscribed to the label, the status code `304`
 is returned.
 
-```
+```plaintext
 POST /projects/:id/labels/:label_id/subscribe
 ```
 
@@ -317,7 +317,7 @@ Unsubscribes the authenticated user from a label to not receive notifications
 from it. If the user is not subscribed to the label, the
 status code `304` is returned.
 
-```
+```plaintext
 POST /projects/:id/labels/:label_id/unsubscribe
 ```
 

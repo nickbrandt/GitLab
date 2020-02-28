@@ -22,7 +22,7 @@ RSpec.shared_examples 'returns package tags' do |user_type|
   it 'returns a valid json response' do
     subject
 
-    expect(response.content_type.to_s).to eq('application/json')
+    expect(response.media_type).to eq('application/json')
     expect(json_response).to be_a(Hash)
   end
 

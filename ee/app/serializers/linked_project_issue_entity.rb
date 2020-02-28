@@ -11,7 +11,7 @@ class LinkedProjectIssueEntity < LinkedIssueEntity
     end
   end
 
-  expose :link_type, if: -> (*) { Feature.enabled?(:issue_link_types, issuable.project) } do |issue|
+  expose :link_type do |issue|
     issue.issue_link_type
   end
 

@@ -7,7 +7,7 @@ describe Elastic::Latest::SnippetInstanceProxy do
 
   subject { described_class.new(snippet) }
 
-  context '#as_indexed_json' do
+  describe '#as_indexed_json' do
     it 'serializes snippet as hash' do
       expect(subject.as_indexed_json.with_indifferent_access).to include(
         id: snippet.id,

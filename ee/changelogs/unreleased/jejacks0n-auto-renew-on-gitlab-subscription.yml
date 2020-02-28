@@ -1,0 +1,5 @@
+---
+title: Add auto_renew attribute to gitlab_subscriptions and expose via api
+merge_request: 24896
+author: jejacks0n
+type: changed

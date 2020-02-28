@@ -6,7 +6,7 @@ Issues are the fundamental medium for collaborating on ideas and planning work i
 
 The GitLab issue tracker is an advanced tool for collaboratively developing ideas, solving problems, and planning work.
 
-Issues can allow you, your team, and your collaborators to share and discuss proposals
+Issues can allow you and your team to share and discuss proposals
 before, and during, their implementation. However, they can be used for a variety of
 other purposes, customized to your needs and workflow.
 
@@ -146,7 +146,7 @@ message in the Activity stream about the reference, with a link to the other iss
 
 ### Similar issues
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22866) in GitLab 11.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/22866) in GitLab 11.6.
 
 To prevent duplication of issues for the same topic, GitLab searches for similar issues
 when new issues are being created.

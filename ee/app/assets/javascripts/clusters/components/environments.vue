@@ -71,14 +71,14 @@ export default {
   },
   created() {
     this.$options.fields = [
-      { key: 'project', label: __('Project'), class: 'pl-0 pr-5 text-nowrap' },
-      { key: 'name', label: __('Environment'), class: 'pl-0 pr-5' },
-      { key: 'lastDeployment', label: __('Job'), class: 'pl-0 pr-5 text-nowrap' },
-      { key: 'rolloutStatus', label: __('Pods in use'), class: 'pl-0 pr-5' },
+      { key: 'project', label: __('Project'), class: 'pl-md-0 pr-md-5 text-nowrap' },
+      { key: 'name', label: __('Environment'), class: 'pl-md-0 pr-md-5' },
+      { key: 'lastDeployment', label: __('Job'), class: 'pl-md-0 pr-md-5 text-nowrap' },
+      { key: 'rolloutStatus', label: __('Pods in use'), class: 'pl-md-0 pr-md-5' },
       {
         key: 'updatedAt',
         label: __('Last updated'),
-        class: 'pl-0 pr-0 text-md-right text-nowrap',
+        class: 'pl-md-0 pr-md-0 text-md-right text-nowrap',
       },
     ];
   },
@@ -105,6 +105,7 @@ export default {
       :fields="$options.fields"
       :items="environments"
       head-variant="white"
+      stacked="md"
     >
       <!-- column: Project -->
       <template #cell(project)="data">
@@ -134,7 +135,10 @@ export default {
         />
 
         <!-- Rollout Instances -->
-        <div v-else-if="hasInstances(row.item.rolloutStatus)" class="d-flex flex-wrap flex-row">
+        <div
+          v-else-if="hasInstances(row.item.rolloutStatus)"
+          class="d-flex flex-wrap flex-row justify-content-end justify-content-md-start"
+        >
           <template v-for="(instance, i) in row.item.rolloutStatus.instances">
             <deployment-instance
               :key="i"
@@ -142,8 +146,7 @@ export default {
               :tooltip-text="instance.tooltip"
               :pod-name="instance.pod_name"
               :stable="instance.stable"
-              :project-path="`/${row.item.project.path_with_namespace}`"
-              :environment-name="row.item.name"
+              :logs-path="row.item.logsPath"
             />
           </template>
         </div>

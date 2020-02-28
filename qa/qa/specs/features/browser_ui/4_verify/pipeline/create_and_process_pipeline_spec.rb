@@ -4,6 +4,7 @@ module QA
   context 'Verify', :docker do
     describe 'Pipeline creation and processing' do
       let(:executor) { "qa-runner-#{Time.now.to_i}" }
+      let(:max_wait) { 30 }
 
       let(:project) do
         Resource::Project.fabricate_via_api! do |project|
@@ -67,12 +68,20 @@ module QA
         Page::Project::Menu.perform(&:click_ci_cd_pipelines)
         Page::Project::Pipeline::Index.perform(&:click_on_latest_pipeline)
 
-        Page::Project::Pipeline::Show.perform do |pipeline|
-          expect(pipeline).to be_running(wait: 30)
-          expect(pipeline).to have_build('test-success', status: :success)
-          expect(pipeline).to have_build('test-failure', status: :failed)
-          expect(pipeline).to have_build('test-tags', status: :pending)
-          expect(pipeline).to have_build('test-artifacts', status: :success)
+        {
+          'test-success': :passed,
+          'test-failure': :failed,
+          'test-tags': :pending,
+          'test-artifacts': :passed
+        }.each do |job, status|
+          Page::Project::Pipeline::Show.perform do |pipeline|
+            pipeline.click_job(job)
+          end
+
+          Page::Project::Job::Show.perform do |show|
+            expect(show).to public_send("be_#{status}")
+            show.click_element(:pipeline_path, Page::Project::Pipeline::Show)
+          end
         end
       end
     end

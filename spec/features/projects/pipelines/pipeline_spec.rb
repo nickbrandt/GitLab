@@ -356,6 +356,42 @@ describe 'Pipeline', :js do
       end
     end
 
+    describe 'test tabs' do
+      let(:pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
+
+      before do
+        visit_pipeline
+        wait_for_requests
+      end
+
+      context 'with test reports' do
+        it 'shows badge counter in Tests tab' do
+          expect(pipeline.test_reports.total_count).to eq(4)
+          expect(page.find('.js-test-report-badge-counter').text).to eq(pipeline.test_reports.total_count.to_s)
+        end
+
+        it 'does not call test_report.json endpoint by default', :js do
+          expect(page).to have_selector('.js-no-tests-to-show', visible: :all)
+        end
+
+        it 'does call test_report.json endpoint when tab is selected', :js do
+          find('.js-tests-tab-link').click
+          wait_for_requests
+
+          expect(page).to have_content('Test suites')
+          expect(page).to have_selector('.js-tests-detail', visible: :all)
+        end
+      end
+
+      context 'without test reports' do
+        let(:pipeline) { create(:ci_pipeline, project: project) }
+
+        it 'shows nothing' do
+          expect(page.find('.js-test-report-badge-counter', visible: :all).text).to eq("")
+        end
+      end
+    end
+
     context 'retrying jobs' do
       before do
         visit_pipeline
@@ -1051,8 +1087,6 @@ describe 'Pipeline', :js do
     end
 
     context 'when pipeline has configuration errors' do
-      include_context 'pipeline builds'
-
       let(:pipeline) do
         create(:ci_pipeline,
                :invalid,
@@ -1092,6 +1126,10 @@ describe 'Pipeline', :js do
           expect(page).to have_selector(
             %Q{span[title="#{pipeline.present.failure_reason}"]})
         end
+      end
+
+      it 'contains a pipeline header with title' do
+        expect(page).to have_content "Pipeline ##{pipeline.id}"
       end
     end
 

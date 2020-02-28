@@ -907,7 +907,7 @@ describe 'Git LFS API and storage' do
               it_behaves_like 'LFS http 200 response'
 
               it 'uses the gitlab-workhorse content type' do
-                expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+                expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
               end
             end
 
@@ -1193,8 +1193,8 @@ describe 'Git LFS API and storage' do
 
             it_behaves_like 'LFS http 200 response'
 
-            it 'LFS object is linked to the source project' do
-              expect(lfs_object.projects.pluck(:id)).to include(upstream_project.id)
+            it 'LFS object is linked to the forked project' do
+              expect(lfs_object.projects.pluck(:id)).to include(project.id)
             end
           end
         end

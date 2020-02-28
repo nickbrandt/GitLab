@@ -1,15 +1,19 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlButton } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import RuleInput from './rule_input.vue';
 import EmptyRuleName from '../empty_rule_name.vue';
+import RuleBranches from '../rule_branches.vue';
 
 export default {
   components: {
     RuleInput,
     EmptyRuleName,
+    RuleBranches,
     GlButton,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     rule: {
       type: Object,
@@ -33,6 +37,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    showProtectedBranch() {
+      return this.glFeatures.scopedApprovalRules && !this.isMrEdit && this.allowMultiRule;
+    },
+  },
   methods: {
     ...mapActions({ openCreateModal: 'createModal/open' }),
   },
@@ -43,6 +52,9 @@ export default {
   <tr>
     <td colspan="2">
       <empty-rule-name :eligible-approvers-docs-path="eligibleApproversDocsPath" />
+    </td>
+    <td v-if="showProtectedBranch">
+      <rule-branches :rule="rule" />
     </td>
     <td class="js-approvals-required">
       <rule-input :rule="rule" :is-mr-edit="isMrEdit" />

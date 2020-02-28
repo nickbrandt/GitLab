@@ -17,7 +17,8 @@ module Geo
                        Geo::LfsObjectDeletedEvent
                        Geo::JobArtifactDeletedEvent
                        Geo::UploadDeletedEvent
-                       Geo::ContainerRepositoryUpdatedEvent].freeze
+                       Geo::ContainerRepositoryUpdatedEvent
+                       Geo::Event].freeze
 
     belongs_to :cache_invalidation_event,
       class_name: 'Geo::CacheInvalidationEvent',
@@ -70,6 +71,10 @@ module Geo
     belongs_to :container_repository_updated_event,
       class_name: 'Geo::ContainerRepositoryUpdatedEvent',
       foreign_key: :container_repository_updated_event_id
+
+    belongs_to :event,
+      class_name: 'Geo::Event',
+      foreign_key: :geo_event_id
 
     def self.latest_event
       order(id: :desc).first

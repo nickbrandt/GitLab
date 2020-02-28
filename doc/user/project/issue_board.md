@@ -147,7 +147,7 @@ Create lists for each of your team members and quickly drag-and-drop issues onto
 ## Permissions
 
 [Reporters and up](../permissions.md) can use all the functionality of the
-Issue Board, that is, create or delete lists and drag issues from one list to another.
+Issue Board to create or delete lists, and drag issues from one list to another.
 
 ## GitLab Enterprise features for Issue Boards
 
@@ -303,6 +303,14 @@ Different issue board features are available in different [GitLab tiers](https:/
 | Premium / Silver | Multiple                       | Multiple                     | Yes                       | Yes            |
 | Ultimate / Gold | Multiple                       | Multiple                     | Yes                       | Yes            |
 
+## Blocked issues
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34723) in GitLab 12.8.
+
+If an issue is blocked by another issue, an icon will display next to its title to differentiate it from unblocked issues.
+
+![Blocked issues](img/issue_boards_blocked_icon_v12_8.png)
+
 ## Actions you can take on an Issue Board
 
 - [Create a new list](#creating-a-new-list).
@@ -365,7 +373,7 @@ window where you can see all the issues that do not belong to any list.
 
 Select one or more issues by clicking on the cards and then click **Add issues**
 to add them to the selected list. You can limit the issues you want to add to
-the list by filtering by author, assignee, milestone and label.
+the list by filtering by author, assignee, milestone, and label.
 
 ![Bulk adding issues to lists](img/issue_boards_add_issues_modal.png)
 
@@ -411,7 +419,7 @@ You should be able to use the filters on top of your Issue Board to show only
 the results you want. This is similar to the filtering used in the issue tracker
 since the metadata from the issues and labels are re-used in the Issue Board.
 
-You can filter by author, assignee, milestone and label.
+You can filter by author, assignee, milestone, and label.
 
 ### Creating workflows
 
@@ -474,6 +482,6 @@ A few things to remember:
   by default. If you have more than 20 issues start scrolling down and the next
   20 will appear.
 
-[ce-5554]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5554
+[ce-5554]: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5554
 [scrum]: https://en.wikipedia.org/wiki/Scrum_(software_development)
 [kanban]: https://en.wikipedia.org/wiki/Kanban_(development)

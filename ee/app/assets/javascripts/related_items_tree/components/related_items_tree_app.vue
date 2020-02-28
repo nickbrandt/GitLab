@@ -50,6 +50,7 @@ export default {
       'itemAddInProgress',
       'itemAddFailure',
       'itemAddFailureType',
+      'itemAddFailureMessage',
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
@@ -65,9 +66,6 @@ export default {
     ...mapGetters(['itemAutoCompleteSources', 'itemPathIdSeparator', 'directChildren']),
     disableContents() {
       return this.itemAddInProgress || this.itemCreateInProgress;
-    },
-    createIssueEnabled() {
-      return gon.features && gon.features.epicNewIssue;
     },
     visibleForm() {
       if (this.showAddItemForm) {
@@ -168,7 +166,6 @@ export default {
     >
       <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
         <issue-actions-split-button
-          v-if="createIssueEnabled"
           slot="issueActions"
           class="ml-1"
           @showAddIssueForm="showAddIssueForm"
@@ -194,6 +191,7 @@ export default {
           :path-id-separator="itemPathIdSeparator"
           :has-error="itemAddFailure"
           :item-add-failure-type="itemAddFailureType"
+          :item-add-failure-message="itemAddFailureMessage"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"

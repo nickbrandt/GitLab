@@ -3,6 +3,14 @@
 require 'spec_helper'
 
 describe SamlProvider do
+  let(:group) { create(:group) }
+
+  subject(:saml_provider) { create(:saml_provider, group: group) }
+
+  before do
+    stub_licensed_features(group_saml: true)
+  end
+
   describe "Associations" do
     it { is_expected.to belong_to :group }
     it { is_expected.to have_many :identities }
@@ -55,8 +63,6 @@ describe SamlProvider do
   end
 
   describe 'Default values' do
-    subject(:saml_provider) { described_class.new }
-
     it 'defaults enabled to true' do
       expect(subject).to be_enabled
     end
@@ -65,8 +71,6 @@ describe SamlProvider do
   describe '#settings' do
     let(:group) { create(:group, path: 'foo-group') }
     let(:settings) { subject.settings }
-
-    subject(:saml_provider) { create(:saml_provider, group: group) }
 
     before do
       stub_default_url_options(protocol: "https")
@@ -116,6 +120,13 @@ describe SamlProvider do
 
           expect(subject).not_to be_enforced_sso
         end
+      end
+
+      it 'does not enforce SSO when the feature is unavailable' do
+        stub_licensed_features(group_saml: false)
+        subject.enforced_sso = true
+
+        expect(subject).not_to be_enforced_sso
       end
     end
 
@@ -175,6 +186,42 @@ describe SamlProvider do
         expect(subject).not_to be_enforced_group_managed_accounts
         subject.enforced_group_managed_accounts = false
         expect(subject).not_to be_enforced_group_managed_accounts
+      end
+    end
+  end
+
+  describe '#prohibited_outer_forks?' do
+    context 'without enforced GMA' do
+      it 'is false when prohibited_outer_forks flag value is true' do
+        subject.prohibited_outer_forks = true
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
+      end
+
+      it 'is false when prohibited_outer_forks flag value is false' do
+        subject.prohibited_outer_forks = false
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
+      end
+    end
+
+    context 'when enforced GMA is enabled' do
+      before do
+        subject.enabled = true
+        subject.enforced_sso = true
+        subject.enforced_group_managed_accounts = true
+      end
+
+      it 'is true when prohibited_outer_forks flag value is true' do
+        subject.prohibited_outer_forks = true
+
+        expect(subject.prohibited_outer_forks?).to be_truthy
+      end
+
+      it 'is false when prohibited_outer_forks flag value is false' do
+        subject.prohibited_outer_forks = false
+
+        expect(subject.prohibited_outer_forks?).to be_falsey
       end
     end
   end

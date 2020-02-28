@@ -14,12 +14,33 @@ describe 'Trial Select Namespace', :js do
   end
 
   context 'when user' do
+    let(:setup_for_company) { nil }
+
+    before do
+      user.update! setup_for_company: setup_for_company
+
+      visit select_trials_path
+      wait_for_all_requests
+
+      choose :trial_entity_company if setup_for_company.nil?
+    end
+
+    context 'when setup_for_company is not chosen' do
+      it 'shows company/individual duplicate question' do
+        expect(page).to have_content('Is this GitLab trial for your company?')
+      end
+    end
+
+    context 'when setup_for_company is already chosen' do
+      let(:setup_for_company) { true }
+
+      it 'hides company/individual duplicate question' do
+        expect(page).not_to have_content('Is this GitLab trial for your company?')
+      end
+    end
+
     context 'selects create a new group' do
       before do
-        visit select_trials_path
-        wait_for_all_requests
-
-        choose :trial_entity_company
         select2 '0', from: '#namespace_id'
       end
 
@@ -98,10 +119,6 @@ describe 'Trial Select Namespace', :js do
 
     context 'selects an existing group' do
       before do
-        visit select_trials_path
-        wait_for_all_requests
-
-        choose :trial_entity_company
         select2 user.namespace.id, from: '#namespace_id'
       end
 
@@ -136,11 +153,14 @@ describe 'Trial Select Namespace', :js do
 
           expect(find('.flash-text')).to have_text(error_message)
           expect(current_path).to eq(apply_trials_path)
+          expect(find('#namespace_id', visible: false).value).to eq(user.namespace.id.to_s)
 
           # new group name should be functional
           select2 '0', from: '#namespace_id'
 
           expect(page).to have_field('New Group Name')
+          expect(find('#trial_entity_individual').checked?).to be(false)
+          expect(find('#trial_entity_company').checked?).to be(true)
         end
       end
     end

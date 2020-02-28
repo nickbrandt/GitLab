@@ -29,36 +29,14 @@ describe Projects::IssueLinksController do
       project.add_developer(user)
     end
 
-    context 'when issue_link_types is enabled' do
-      before do
-        stub_feature_flags(issue_link_types: true)
-      end
+    it 'returns success response' do
+      get_link(user, issue1)
 
-      it 'returns success response' do
-        get_link(user, issue1)
+      expect(response).to have_gitlab_http_status(:ok)
 
-        expect(response).to have_gitlab_http_status(:ok)
-
-        link = json_response.first
-        expect(link['id']).to eq(issue2.id)
-        expect(link['link_type']).to eq('is_blocked_by')
-      end
-    end
-
-    context 'when issue_link_types is disabled' do
-      before do
-        stub_feature_flags(issue_link_types: false)
-      end
-
-      it 'does not return issue_link_type' do
-        get_link(user, issue1)
-
-        expect(response).to have_gitlab_http_status(:ok)
-
-        link = json_response.first
-        expect(link['id']).to eq(issue2.id)
-        expect(link).not_to include('link_type')
-      end
+      link = json_response.first
+      expect(link['id']).to eq(issue2.id)
+      expect(link['link_type']).to eq('is_blocked_by')
     end
   end
 

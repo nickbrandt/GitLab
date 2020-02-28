@@ -509,6 +509,11 @@ that need to be taken care of:
 - Health Check. If we can perform some pre-cheсks and make node unhealthy if something is wrong, we should do that.
   The `rake gitlab:geo:check` command has to be updated too.
 
+### Geo self-service framework (alpha)
+
+We started developing a new [Geo self-service framework (alpha)](geo/framework.md)
+which makes it a lot easier to add a new data type.
+
 ## History of communication channel
 
 The communication channel has changed since first iteration, you can
@@ -546,3 +551,8 @@ old method:
 - Replication is synchronous and we preserve the order of events.
 - Replication of the events happen at the same time as the changes in the
   database.
+
+## Self-service framework
+
+If you want to add easy Geo replication of a resource you're working
+on, check out our [self-service framework](geo/framework.md).

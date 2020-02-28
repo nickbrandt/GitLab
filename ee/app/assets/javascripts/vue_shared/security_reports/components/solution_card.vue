@@ -36,6 +36,11 @@ export default {
       default: '',
       required: false,
     },
+    isStandaloneVulnerability: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     solutionText() {
@@ -68,11 +73,16 @@ export default {
 <template>
   <div class="card my-4">
     <div v-if="solutionText" class="card-body d-flex align-items-center">
-      <div class="col-2 d-flex align-items-center pl-0">
-        <div class="circle-icon-container" aria-hidden="true"><icon name="bulb" /></div>
+      <div
+        class="col-auto d-flex align-items-center pl-0"
+        :class="{ 'col-md-2': !isStandaloneVulnerability }"
+      >
+        <div class="circle-icon-container pr-3" aria-hidden="true"><icon name="bulb" /></div>
         <strong class="text-right flex-grow-1">{{ s__('ciReport|Solution') }}:</strong>
       </div>
-      <span class="col-10 flex-shrink-1 pl-0">{{ solutionText }}</span>
+      <span class="flex-shrink-1 pl-0" :class="{ 'col-md-10': !isStandaloneVulnerability }">{{
+        solutionText
+      }}</span>
     </div>
     <template v-if="showMsg">
       <div class="card-footer" :class="{ 'border-0': !solutionText }">

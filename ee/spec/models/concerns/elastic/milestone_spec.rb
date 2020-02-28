@@ -27,7 +27,7 @@ describe Milestone, :elastic do
       # The milestone you have no access to except as an administrator
       create :milestone, title: 'bla-bla term3'
 
-      Gitlab::Elastic::Helper.refresh_index
+      ensure_elasticsearch_index!
     end
 
     options = { project_ids: [project.id] }

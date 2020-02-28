@@ -5,8 +5,6 @@ module Packages
     class ServiceIndexPresenter
       include API::Helpers::RelatedResourcesHelpers
 
-      attr_reader :project
-
       SERVICE_VERSIONS = {
         download: %w[PackageBaseAddress/3.0.0],
         search: %w[SearchQueryService SearchQueryService/3.0.0-beta SearchQueryService/3.0.0-rc],
@@ -52,13 +50,13 @@ module Packages
       end
 
       def build_service_url(service_type)
-        base_path = api_v4_projects_packages_nuget_path(id: project.id)
+        base_path = api_v4_projects_packages_nuget_path(id: @project.id)
 
         full_path = case service_type
                     when :download
                       api_v4_projects_packages_nuget_download_package_name_package_version_package_filename_path(
                         {
-                          id: project.id,
+                          id: @project.id,
                           package_name: nil,
                           package_version: nil,
                           package_filename: nil
@@ -70,7 +68,7 @@ module Packages
                     when :metadata
                       api_v4_projects_packages_nuget_metadata_package_name_package_version_path(
                         {
-                          id: project.id,
+                          id: @project.id,
                           package_name: nil,
                           package_version: nil
                         },

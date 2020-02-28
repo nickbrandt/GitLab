@@ -9,23 +9,33 @@
     - if Feature.enabled?(:enforced_sso, group)
       .form-group
         %label.toggle-wrapper.mb-0.js-group-saml-enforced-sso-toggle-area
-          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enabled?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-sso-toggle project-feature-toggle d-inline", data: { qa_selector: 'enforced_sso_toggle_button' } do
+          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enforced_sso, disabled: !saml_provider.enabled?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-sso-toggle project-feature-toggle d-inline", data: { qa_selector: 'enforced_sso_toggle_button' } do
             = f.hidden_field :enforced_sso, { class: 'js-group-saml-enforced-sso-input js-project-feature-toggle-input'}
           %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= Feature.enabled?(:enforced_sso_requires_session, group) ? s_('GroupSAML|Enforce SSO-only authentication for this group.') : s_('GroupSAML|Enforce SSO-only membership for this group.')
-        .form-text.text-muted.js-group-saml-enforced-sso-helper-text{ style: "display: #{'none' if saml_provider.enabled?} #{'block' unless saml_provider.enabled?}" }
+        .form-text.text-muted.js-helper-text{ style: "display: #{'none' if saml_provider.enabled?} #{'block' unless saml_provider.enabled?}" }
           %span
             = s_('GroupSAML|To be able to enable enforced SSO, you first need to enable SAML authentication.')
     - if Feature.enabled?(:group_managed_accounts, group)
       .form-group
         %label.toggle-wrapper.mb-0.js-group-saml-enforced-group-managed-accounts-toggle-area
-          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enabled?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-group-managed-accounts-toggle project-feature-toggle d-inline", data: { qa_selector: 'group_managed_accounts_toggle_button' } do
+          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enforced_group_managed_accounts, disabled: !saml_provider.enforced_sso?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-group-managed-accounts-toggle project-feature-toggle d-inline", data: { qa_selector: 'group_managed_accounts_toggle_button' } do
             = f.hidden_field :enforced_group_managed_accounts, { class: 'js-group-saml-enforced-group-managed-accounts-input js-project-feature-toggle-input'}
           %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= s_('GroupSAML|Enforce users to have dedicated group managed accounts for this group.')
-        .form-text.text-muted.js-group-saml-enforced-group-managed-accounts-helper-text{ style: "display: #{'none' if saml_provider.enforced_sso?} #{'block' unless saml_provider.enforced_sso?}" }
+        .form-text.text-muted.js-helper-text{ style: "display: #{'none' if saml_provider.enforced_sso?} #{'block' unless saml_provider.enforced_sso?}" }
           %span
             = s_('GroupSAML|To be able to enable group managed accounts, you first need to enable enforced SSO.')
-        .bs-callout.bs-callout-info.js-group-saml-enforced-group-managed-accounts-callout{ style: "display: #{'block' if saml_provider.enforced_sso?} #{'none' unless saml_provider.enforced_sso?}" }
+        .bs-callout.bs-callout-info.js-callout{ style: "display: #{'block' if saml_provider.enforced_sso?} #{'none' unless saml_provider.enforced_sso?}" }
           = s_('GroupSAML|With group managed accounts enabled, all the users without a group managed account will be excluded from the group.')
+      .form-group
+        %label.toggle-wrapper.mb-0.js-group-saml-prohibited-outer-forks-toggle-area
+          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.prohibited_outer_forks, disabled: !saml_provider.enforced_group_managed_accounts?, label: s_("GroupSAML|Prohibit outer forks"), class_list: "js-project-feature-toggle js-group-saml-prohibited-outer-forks-toggle project-feature-toggle d-inline", data: { qa_selector: 'prohibited_outer_forks_toggle_button' } do
+            = f.hidden_field :prohibited_outer_forks, { class: 'js-group-saml-prohibited-outer-forks-input js-project-feature-toggle-input'}
+          %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= s_('GroupSAML|Prohibit outer forks for this group.')
+        .form-text.text-muted.js-helper-text{ style: "display: #{'none' if saml_provider.enforced_group_managed_accounts?} #{'block' unless saml_provider.enforced_group_managed_accounts?}" }
+          %span
+            = s_('GroupSAML|To be able to prohibit outer forks, you first need to enforce dedicate group managed accounts.')
+        .bs-callout.bs-callout-info.js-callout{ style: "display: #{'block' if saml_provider.enforced_group_managed_accounts?} #{'none' unless saml_provider.enforced_group_managed_accounts?}" }
+          = s_('GroupSAML|With prohibit outer forks flag enabled group members will be able to fork project only inside your group.')
     .well-segment.borderless.mb-3.col-12.col-lg-9.p-0
       = f.label :sso_url, class: 'label-bold' do
         = s_('GroupSAML|Identity provider single sign on URL')

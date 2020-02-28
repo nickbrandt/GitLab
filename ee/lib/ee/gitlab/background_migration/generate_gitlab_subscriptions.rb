@@ -42,6 +42,7 @@ module EE
                       hosted_plan_id: namespace.plan_id,
                       trial: namespace.trial_active?,
                       start_date: namespace.created_at.to_date,
+                      auto_renew: false,
                       seats: 0,
                       created_at: now,
                       updated_at: now

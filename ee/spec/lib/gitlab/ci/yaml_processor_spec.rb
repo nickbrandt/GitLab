@@ -28,7 +28,8 @@ describe Gitlab::Ci::YamlProcessor do
           },
           when: "on_success",
           allow_failure: false,
-          yaml_variables: []
+          yaml_variables: [],
+          scheduling_type: :stage
         )
         expect(subject.builds[1]).to eq(
           stage: "test",
@@ -40,7 +41,8 @@ describe Gitlab::Ci::YamlProcessor do
           },
           when: "on_success",
           allow_failure: false,
-          yaml_variables: []
+          yaml_variables: [],
+          scheduling_type: :stage
         )
       end
     end
@@ -60,7 +62,8 @@ describe Gitlab::Ci::YamlProcessor do
           },
           when: "on_success",
           allow_failure: false,
-          yaml_variables: []
+          yaml_variables: [],
+          scheduling_type: :stage
         )
         expect(subject.builds[1]).to eq(
           stage: "test",
@@ -75,7 +78,8 @@ describe Gitlab::Ci::YamlProcessor do
           ],
           when: "on_success",
           allow_failure: false,
-          yaml_variables: []
+          yaml_variables: [],
+          scheduling_type: :stage
         )
       end
     end
@@ -148,7 +152,8 @@ describe Gitlab::Ci::YamlProcessor do
           only: { refs: %w[branches tags] },
           when: 'on_success',
           allow_failure: false,
-          yaml_variables: []
+          yaml_variables: [],
+          scheduling_type: :dag
         )
       end
     end

@@ -3,9 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
+  let_it_be(:project) { create(:project) }
   let(:gl_auth) { described_class }
-
-  set(:project) { create(:project) }
 
   describe 'constants' do
     it 'API_SCOPES contains all scopes for API access' do
@@ -460,6 +459,20 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
         end
       end
 
+      context 'when the deploy token is of group type' do
+        let(:project_with_group) { create(:project, group: create(:group)) }
+        let(:deploy_token) { create(:deploy_token, :group, read_repository: true, groups: [project_with_group.group]) }
+        let(:login) { deploy_token.username }
+
+        subject { gl_auth.find_for_git_client(login, deploy_token.token, project: project_with_group, ip: 'ip') }
+
+        it 'succeeds when login and a group deploy token are valid' do
+          auth_success = Gitlab::Auth::Result.new(deploy_token, project_with_group, :deploy_token, [:download_code, :read_container_image])
+
+          expect(subject).to eq(auth_success)
+        end
+      end
+
       context 'when the deploy token has read_registry as a scope' do
         let(:deploy_token) { create(:deploy_token, read_repository: false, projects: [project]) }
         let(:login) { deploy_token.username }
@@ -469,10 +482,10 @@ describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
             stub_container_registry_config(enabled: true)
           end
 
-          it 'succeeds when login and token are valid' do
+          it 'succeeds when login and a project token are valid' do
             auth_success = Gitlab::Auth::Result.new(deploy_token, project, :deploy_token, [:read_container_image])
 
-            expect(gl_auth.find_for_git_client(login, deploy_token.token, project: nil, ip: 'ip'))
+            expect(gl_auth.find_for_git_client(login, deploy_token.token, project: project, ip: 'ip'))
               .to eq(auth_success)
           end
 

@@ -26,17 +26,17 @@ describe Resolvers::EpicIssuesResolver do
 
   describe '#resolve' do
     it 'finds all epic issues' do
-      result = batch_sync(max_queries: 4) { resolve_epic_issues(epic1) }
+      result = batch_sync(max_queries: 6) { resolve_epic_issues(epic1) }
 
       expect(result).to contain_exactly(issue1, issue2)
     end
 
     it 'can batch-resolve epic issues from different epics' do
-      result = batch_sync(max_queries: 4) do
+      result = batch_sync(max_queries: 6) do
         [resolve_epic_issues(epic1), resolve_epic_issues(epic2)]
       end
 
-      expect(result).to contain_exactly([issue1, issue2], [issue3])
+      expect(result).to contain_exactly([issue2, issue1], [issue3])
     end
   end
 

@@ -49,7 +49,7 @@ require Rails.root.join('db', 'post_migrate', '20170526185842_migrate_pipeline_s
 #### `table`
 
 Use the `table` helper to create a temporary `ActiveRecord::Base`-derived model
-for a table. [FactoryBot](https://docs.gitlab.com/ee/development/testing_guide/best_practices.html#factories)
+for a table. [FactoryBot](best_practices.md#factories)
 **should not** be used to create data for migration specs. For example, to
 create a record in the `projects` table:
 
@@ -59,7 +59,7 @@ project = table(:projects).create!(id: 1, name: 'gitlab1', path: 'gitlab1')
 
 #### `migrate!`
 
-Use the `migrate!` helper to run the migration that is under test.  It will not only
+Use the `migrate!` helper to run the migration that is under test. It will not only
 run the migration, but will also bump the schema version in the `schema_migrations`
 table. It is necessary because in the `after` hook we trigger the rest of
 the migrations, and we need to know where to start. Example:

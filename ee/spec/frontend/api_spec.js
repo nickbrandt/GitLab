@@ -166,14 +166,14 @@ describe('Api', () => {
 
   describe('getPodLogs', () => {
     const projectPath = '/root/test-project';
-    const environmentName = 'production';
     const podName = 'pod';
     const containerName = 'container';
     const search = 'foo +bar';
+    const expectedUrl = '/gitlab/dummy_api_path.json';
     const environment = {
-      name: environmentName,
       enable_advanced_logs_querying: false,
       project_path: projectPath,
+      logs_api_path: '/dummy_api_path.json',
     };
 
     const getRequest = () => mock.history.get[0];
@@ -187,13 +187,10 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
-
       Api.getPodLogs({ environment, podName, containerName })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
-            environment_name: environmentName,
             pod_name: podName,
             container_name: containerName,
           });
@@ -203,27 +200,20 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
-
       Api.getPodLogs({ environment })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
-          expect(getRequest().params).toEqual({
-            environment_name: environmentName,
-          });
+          expect(getRequest().params).toEqual({});
         })
         .then(done)
         .catch(done.fail);
     });
 
     it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
-
       Api.getPodLogs({ environment, podName })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
-            environment_name: environmentName,
             pod_name: podName,
           });
         })
@@ -232,13 +222,10 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and search', done => {
-      const expectedUrl = `${dummyUrlRoot}${projectPath}/-/logs/k8s.json`;
-
       Api.getPodLogs({ environment, podName, search })
         .then(() => {
           expect(getRequest().url).toBe(expectedUrl);
           expect(getRequest().params).toEqual({
-            environment_name: environmentName,
             pod_name: podName,
             search,
           });
@@ -380,13 +367,13 @@ describe('Api', () => {
     });
 
     describe('cycleAnalyticsSummaryData', () => {
-      it('fetches cycle analytics summary data', done => {
+      it('fetches value stream analytics summary data', done => {
         const response = [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }];
         const params = {
           ...defaultParams,
         };
 
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/summary`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/summary`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsSummaryData(params)
@@ -410,7 +397,7 @@ describe('Api', () => {
           'cycle_analytics[created_after]': createdAfter,
           'cycle_analytics[created_before]': createdBefore,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsGroupStagesAndEvents(groupId, params)
@@ -432,7 +419,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/records`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/records`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageEvents(groupId, stageId, params)
@@ -454,7 +441,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/median`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}/median`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageMedian(groupId, stageId, params)
@@ -480,7 +467,7 @@ describe('Api', () => {
           end_event_identifier: 'issue_closed',
           end_event_label_id: null,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages`;
         mock.onPost(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsCreateStage(groupId, customStage)
@@ -502,7 +489,7 @@ describe('Api', () => {
           name: 'nice-stage',
           hidden: true,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
         mock.onPut(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsUpdateStage(stageId, groupId, stageData)
@@ -520,7 +507,7 @@ describe('Api', () => {
     describe('cycleAnalyticsRemoveStage', () => {
       it('deletes the specified data', done => {
         const response = { id: stageId, hidden: true, custom: true };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/${stageId}`;
         mock.onDelete(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsRemoveStage(stageId, groupId)
@@ -541,7 +528,7 @@ describe('Api', () => {
         const params = {
           ...defaultParams,
         };
-        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/thursday/duration_chart`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/value_stream_analytics/stages/thursday/duration_chart`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsDurationChart(stageId, params)
@@ -552,6 +539,22 @@ describe('Api', () => {
               expectedUrl,
             }),
           )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsGroupLabels', () => {
+      it('fetches group level labels', done => {
+        const response = [];
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/labels`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsGroupLabels(groupId)
+          .then(({ data, config: { url } }) => {
+            expect(data).toEqual(response);
+            expect(url).toEqual(expectedUrl);
+          })
           .then(done)
           .catch(done.fail);
       });

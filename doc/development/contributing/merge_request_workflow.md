@@ -15,9 +15,9 @@ to be marked as `Accepting Merge Requests`. Please include screenshots or
 wireframes of the proposed feature if it will also change the UI.
 
 Merge requests should be submitted to the appropriate project at GitLab.com, for example
-[GitLab](https://gitlab.com/gitlab-org/gitlab/merge_requests),
-[GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/merge_requests),
-[GitLab Omnibus](https://gitlab.com/gitlab-org/omnibus-gitlab/merge_requests), etc.
+[GitLab](https://gitlab.com/gitlab-org/gitlab/-/merge_requests),
+[GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests),
+[GitLab Omnibus](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests), etc.
 
 If you are new to GitLab development (or web development in general), see the
 [I want to contribute!](index.md#i-want-to-contribute) section to get started with
@@ -222,6 +222,7 @@ requirements.
 1. Regressions and bugs are covered with tests that reduce the risk of the issue happening
    again.
 1. [Performance guidelines](../merge_request_performance_guidelines.md) have been followed.
+1. [Secure coding guidelines](https://gitlab.com/gitlab-com/gl-security/security-guidelines) have been followed.
 1. [Documented](../documentation/index.md) in the `/doc` directory.
 1. [Changelog entry added](../changelog.md), if necessary.
 1. Reviewed by relevant (UX/FE/BE/tech writing) reviewers and all concerns are addressed.
@@ -255,7 +256,7 @@ We allow engineering time to fix small problems (with or without an
 issue) that are incremental improvements, such as:
 
 1. Unprioritized bug fixes (e.g. [Banner alerting of project move is
-showing up everywhere](https://gitlab.com/gitlab-org/gitlab/merge_requests/18985))
+showing up everywhere](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/18985))
 1. Documentation improvements
 1. Rubocop or Code Quality improvements
 

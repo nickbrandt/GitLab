@@ -1,6 +1,6 @@
 # Project badges API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17082)
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17082)
 in GitLab 10.6.
 
 ## Placeholder tokens
@@ -16,7 +16,7 @@ Badges support placeholders that will be replaced in real time in both the link 
 
 Gets a list of a project's badges and its group badges.
 
-```
+```plaintext
 GET /projects/:id/badges
 ```
 
@@ -58,7 +58,7 @@ Example response:
 
 Gets a badge of a project.
 
-```
+```plaintext
 GET /projects/:id/badges/:badge_id
 ```
 
@@ -88,7 +88,7 @@ Example response:
 
 Adds a badge to a project.
 
-```
+```plaintext
 POST /projects/:id/badges
 ```
 
@@ -119,7 +119,7 @@ Example response:
 
 Updates a badge of a project.
 
-```
+```plaintext
 PUT /projects/:id/badges/:badge_id
 ```
 
@@ -151,7 +151,7 @@ Example response:
 
 Removes a badge from a project. Only project's badges will be removed by using this endpoint.
 
-```
+```plaintext
 DELETE /projects/:id/badges/:badge_id
 ```
 
@@ -168,7 +168,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitl
 
 Returns how the `link_url` and `image_url` final URLs would be after resolving the placeholder interpolation.
 
-```
+```plaintext
 GET /projects/:id/badges/render
 ```
 

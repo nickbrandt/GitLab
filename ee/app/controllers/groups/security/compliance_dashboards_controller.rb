@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 class Groups::Security::ComplianceDashboardsController < Groups::ApplicationController
+  include Groups::SecurityFeaturesHelper
+
   layout 'group'
 
   before_action :authorize_compliance_dashboard!
@@ -13,7 +15,6 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
   private
 
   def authorize_compliance_dashboard!
-    render_404 unless group.feature_available?(:group_level_compliance_dashboard) &&
-      can?(current_user, :read_group_compliance_dashboard, group)
+    render_404 unless group_level_compliance_dashboard_available?(group)
   end
 end

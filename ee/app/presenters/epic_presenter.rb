@@ -44,7 +44,6 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
   def initial_data
     {
       labels: epic.labels,
-      participants: participants,
       subscribed: subscribed?
     }
   end
@@ -80,7 +79,7 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
       toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
       labels_web_url: group_labels_path(group),
       epics_web_url: group_epics_path(group),
-      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels-premium')
     }
 
     paths[:todo_delete_path] = dashboard_todo_path(epic_pending_todo) if epic_pending_todo.present?
@@ -120,10 +119,6 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
         due_date: epic.due_date_from_inherited_source
       }
     }
-  end
-
-  def participants
-    UserEntity.represent(epic.participants)
   end
 
   def epic_pending_todo

@@ -9,6 +9,7 @@ import eventHub from '../event_hub';
 import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, EPIC_ITEM_HEIGHT } from '../constants';
 
 import EpicItem from './epic_item.vue';
+import CurrentDayIndicator from './current_day_indicator.vue';
 
 export default {
   EpicItem,
@@ -16,6 +17,7 @@ export default {
   components: {
     VirtualList,
     EpicItem,
+    CurrentDayIndicator,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -143,6 +145,7 @@ export default {
         v-for="(epic, index) in epics"
         ref="epicItems"
         :key="index"
+        :first-epic="index === 0"
         :preset-type="presetType"
         :epic="epic"
         :timeframe="timeframe"
@@ -155,11 +158,9 @@ export default {
       class="epics-list-item epics-list-item-empty clearfix"
     >
       <span class="epic-details-cell"></span>
-      <span
-        v-for="(timeframeItem, index) in timeframe"
-        :key="index"
-        class="epic-timeline-cell"
-      ></span>
+      <span v-for="(timeframeItem, index) in timeframe" :key="index" class="epic-timeline-cell">
+        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+      </span>
     </div>
     <div v-show="showBottomShadow" :style="shadowCellStyles" class="scroll-bottom-shadow"></div>
   </div>

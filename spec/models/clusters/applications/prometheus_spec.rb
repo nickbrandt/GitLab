@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Clusters::Applications::Prometheus do
   include KubernetesHelpers
+  include StubRequests
 
   include_examples 'cluster application core specs', :clusters_applications_prometheus
   include_examples 'cluster application status specs', :clusters_applications_prometheus
@@ -273,7 +274,8 @@ describe Clusters::Applications::Prometheus do
     subject { application.files_with_replaced_values({ hello: :world }) }
 
     it 'does not modify #files' do
-      expect(subject[:'values.yaml']).not_to eq(files)
+      expect(subject[:'values.yaml']).not_to eq(files[:'values.yaml'])
+
       expect(files[:'values.yaml']).to eq(application.values)
     end
 
@@ -281,27 +283,17 @@ describe Clusters::Applications::Prometheus do
       expect(subject[:'values.yaml']).to eq({ hello: :world })
     end
 
-    it 'includes cert files' do
-      expect(subject[:'ca.pem']).to be_present
-      expect(subject[:'ca.pem']).to eq(application.cluster.application_helm.ca_cert)
+    it 'uses values from #files, except for values.yaml' do
+      allow(application).to receive(:files).and_return({
+        'values.yaml': 'some value specific to files',
+        'file_a.txt': 'file_a',
+        'file_b.txt': 'file_b'
+      })
 
-      expect(subject[:'cert.pem']).to be_present
-      expect(subject[:'key.pem']).to be_present
-
-      cert = OpenSSL::X509::Certificate.new(subject[:'cert.pem'])
-      expect(cert.not_after).to be < 60.minutes.from_now
-    end
-
-    context 'when the helm application does not have a ca_cert' do
-      before do
-        application.cluster.application_helm.ca_cert = nil
-      end
-
-      it 'does not include cert files' do
-        expect(subject[:'ca.pem']).not_to be_present
-        expect(subject[:'cert.pem']).not_to be_present
-        expect(subject[:'key.pem']).not_to be_present
-      end
+      expect(subject.except(:'values.yaml')).to eq({
+        'file_a.txt': 'file_a',
+        'file_b.txt': 'file_b'
+      })
     end
   end
 
@@ -317,6 +309,16 @@ describe Clusters::Applications::Prometheus do
 
       context 'when it is not availalble' do
         let(:prometheus) { create(:clusters_applications_prometheus, cluster: cluster) }
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when the kubernetes URL is blocked' do
+        before do
+          blocked_ip = '127.0.0.1' # localhost addresses are blocked by default
+
+          stub_all_dns(cluster.platform.api_url, ip_address: blocked_ip)
+        end
 
         it { is_expected.to be_falsey }
       end

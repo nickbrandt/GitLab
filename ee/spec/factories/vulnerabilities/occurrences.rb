@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   sequence :vulnerability_occurrence_uuid do |n|
-    Digest::SHA1.hexdigest("uuid-#{n}")[0..35]
+    SecureRandom.uuid
   end
 
   factory :vulnerabilities_occurrence, class: 'Vulnerabilities::Occurrence', aliases: [:vulnerabilities_finding] do
@@ -64,6 +64,12 @@ FactoryBot.define do
                :issue,
                project: finding.project,
                project_fingerprint: finding.project_fingerprint)
+      end
+    end
+
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |security_report_type|
+      trait security_report_type do
+        report_type { security_report_type }
       end
     end
   end

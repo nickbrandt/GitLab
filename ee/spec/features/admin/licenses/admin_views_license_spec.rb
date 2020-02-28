@@ -57,7 +57,7 @@ describe "Admin views license" do
     end
 
     it "shows only expiration duration" do
-      expect(page).to have_content(license.licensee.values.first)
+      expect(page).to have_content(license.licensee.each_value.first)
 
       page.within(".js-license-info-panel") do
         expect(page).not_to have_content("Expires: Free trial will expire in")
@@ -83,7 +83,7 @@ describe "Admin views license" do
         license_history = page.find("#license_history")
 
         License.previous.each do |license|
-          expect(license_history).to have_content(license.licensee.values.first)
+          expect(license_history).to have_content(license.licensee.each_value.first)
         end
       end
     end

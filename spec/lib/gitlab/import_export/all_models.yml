@@ -6,11 +6,11 @@ issues:
 - assignees
 - updated_by
 - milestone
-- issue_milestones
-- milestones
 - notes
 - resource_label_events
 - resource_weight_events
+- resource_milestone_events
+- sent_notifications
 - sentry_issue
 - label_links
 - labels
@@ -38,8 +38,6 @@ issues:
 - vulnerability_links
 - related_vulnerabilities
 - user_mentions
-- blocked_by_issue_links
-- blocked_by_issues
 events:
 - author
 - project
@@ -82,8 +80,6 @@ milestone:
 - boards
 - milestone_releases
 - releases
-- issue_milestones
-- merge_request_milestones
 snippets:
 - author
 - project
@@ -91,6 +87,7 @@ snippets:
 - award_emoji
 - user_agent_detail
 - user_mentions
+- snippet_repository
 releases:
 - author
 - project
@@ -112,10 +109,9 @@ merge_requests:
 - assignee
 - updated_by
 - milestone
-- merge_request_milestones
-- milestones
 - notes
 - resource_label_events
+- resource_milestone_events
 - label_links
 - labels
 - last_edited_by
@@ -156,12 +152,6 @@ merge_requests:
 - deployment_merge_requests
 - deployments
 - user_mentions
-issue_milestones:
-- milestone
-- issue
-merge_request_milestones:
-- milestone
-- merge_request
 external_pull_requests:
 - project
 merge_request_diff:
@@ -203,6 +193,7 @@ ci_pipelines:
 - environments
 - chat_data
 - source_pipeline
+- ref_status
 - source_bridge
 - source_job
 - sourced_pipelines
@@ -215,6 +206,7 @@ ci_pipelines:
 - vulnerabilities_occurrence_pipelines
 - vulnerability_findings
 - pipeline_config
+- security_scans
 pipeline_variables:
 - pipeline
 stages:
@@ -369,6 +361,7 @@ project:
 - ci_pipelines
 - all_pipelines
 - stages
+- ci_refs
 - builds
 - runner_projects
 - runners
@@ -451,6 +444,7 @@ project:
 - package_files
 - tracing_setting
 - alerting_setting
+- project_setting
 - webide_pipelines
 - reviews
 - incident_management_setting
@@ -576,6 +570,8 @@ designs: *design
 actions:
 - design
 - version
+- uploads
+- file_uploads
 versions: &version
 - author
 - issue

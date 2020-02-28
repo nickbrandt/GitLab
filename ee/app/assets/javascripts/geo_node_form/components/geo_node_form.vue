@@ -2,6 +2,7 @@
 import { GlFormGroup, GlFormInput, GlFormCheckbox, GlButton } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
 import GeoNodeFormCore from './geo_node_form_core.vue';
+import GeoNodeFormSelectiveSync from './geo_node_form_selective_sync.vue';
 import GeoNodeFormCapacities from './geo_node_form_capacities.vue';
 
 export default {
@@ -12,6 +13,7 @@ export default {
     GlFormCheckbox,
     GlButton,
     GeoNodeFormCore,
+    GeoNodeFormSelectiveSync,
     GeoNodeFormCapacities,
   },
   props: {
@@ -19,6 +21,14 @@ export default {
       type: Object,
       required: false,
       default: null,
+    },
+    selectiveSyncTypes: {
+      type: Object,
+      required: true,
+    },
+    syncShardsOptions: {
+      type: Array,
+      required: true,
     },
   },
   data() {
@@ -49,6 +59,12 @@ export default {
     redirect() {
       visitUrl('/admin/geo/nodes');
     },
+    addSyncOption({ key, value }) {
+      this.nodeData[key].push(value);
+    },
+    removeSyncOption({ key, index }) {
+      this.nodeData[key].splice(index, 1);
+    },
   },
 };
 </script>
@@ -74,6 +90,14 @@ export default {
       >
         <gl-form-input id="node-internal-url-field" v-model="nodeData.internalUrl" type="text" />
       </gl-form-group>
+      <geo-node-form-selective-sync
+        v-if="!nodeData.primary"
+        :node-data="nodeData"
+        :selective-sync-types="selectiveSyncTypes"
+        :sync-shards-options="syncShardsOptions"
+        @addSyncOption="addSyncOption"
+        @removeSyncOption="removeSyncOption"
+      />
       <geo-node-form-capacities :node-data="nodeData" />
       <gl-form-group
         v-if="!nodeData.primary"

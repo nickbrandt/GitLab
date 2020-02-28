@@ -15,9 +15,6 @@ module Clusters
       include ::Clusters::Concerns::ApplicationData
       include ::Gitlab::Utils::StrongMemoize
 
-      include IgnorableColumns
-      ignore_column :kibana_hostname, remove_with: '12.9', remove_after: '2020-02-22'
-
       default_value_for :version, VERSION
 
       def chart
@@ -30,7 +27,8 @@ module Clusters
           version: VERSION,
           rbac: cluster.platform_kubernetes_rbac?,
           chart: chart,
-          files: files
+          files: files,
+          postinstall: post_install_script
         )
       end
 
@@ -41,6 +39,10 @@ module Clusters
           files: files,
           postdelete: post_delete_script
         )
+      end
+
+      def files
+        super.merge('wait-for-elasticsearch.sh': File.read("#{Rails.root}/vendor/elastic_stack/wait-for-elasticsearch.sh"))
       end
 
       def elasticsearch_client
@@ -69,10 +71,16 @@ module Clusters
 
       private
 
+      def post_install_script
+        [
+          "timeout -t60 sh /data/helm/elastic-stack/config/wait-for-elasticsearch.sh http://elastic-stack-elasticsearch-client:9200"
+        ]
+      end
+
       def post_delete_script
         [
           Gitlab::Kubernetes::KubectlCmd.delete("pvc", "--selector", "release=elastic-stack")
-        ].compact
+        ]
       end
 
       def kube_client

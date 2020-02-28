@@ -154,12 +154,11 @@ describe('Logs Store actions', () => {
       state.environments.current = mockEnvName;
       state.pods.current = mockPodName;
 
-      const endpoint = `/${mockProjectPath}/-/logs/elasticsearch.json`;
+      const endpoint = '/dummy_logs_path.json';
 
       mock
         .onGet(endpoint, {
           params: {
-            environment_name: mockEnvName,
             pod_name: mockPodName,
             ...mockDefaultRange,
           },
@@ -194,12 +193,11 @@ describe('Logs Store actions', () => {
       state.pods.current = mockPodName;
       state.timeRange.current = mockFixedRange;
 
-      const endpoint = `/${mockProjectPath}/-/logs/elasticsearch.json`;
+      const endpoint = '/dummy_logs_path.json';
 
       mock
         .onGet(endpoint, {
           params: {
-            environment_name: mockEnvName,
             pod_name: mockPodName,
             start: mockFixedRange.start,
             end: mockFixedRange.end,
@@ -233,12 +231,11 @@ describe('Logs Store actions', () => {
       state.search = mockSearch;
       state.timeRange.current = 'INVALID_TIME_RANGE';
 
-      const endpoint = `/${mockProjectPath}/-/logs/elasticsearch.json`;
+      const endpoint = '/dummy_logs_path.json';
 
       mock
         .onGet(endpoint, {
           params: {
-            environment_name: mockEnvName,
             pod_name: mockPodName,
             search: mockSearch,
           },
@@ -275,15 +272,13 @@ describe('Logs Store actions', () => {
       state.environments.options = mockEnvironments;
       state.environments.current = mockEnvName;
 
-      const endpoint = `/${mockProjectPath}/-/logs/elasticsearch.json`;
+      const endpoint = '/dummy_logs_path.json';
 
-      mock
-        .onGet(endpoint, { params: { environment_name: mockEnvName, ...mockDefaultRange } })
-        .reply(200, {
-          pod_name: mockPodName,
-          pods: mockPods,
-          logs: mockLogsResult,
-        });
+      mock.onGet(endpoint, { params: { ...mockDefaultRange } }).reply(200, {
+        pod_name: mockPodName,
+        pods: mockPods,
+        logs: mockLogsResult,
+      });
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
       testAction(

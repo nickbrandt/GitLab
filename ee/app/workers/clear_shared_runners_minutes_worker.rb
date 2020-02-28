@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-class ClearSharedRunnersMinutesWorker
+class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWorker
   LEASE_TIMEOUT = 3600
 
   include ApplicationWorker
-  include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
-
+  # rubocop:disable Scalability/CronWorkerContext
+  # This worker does not perform work scoped to a context
+  # all queries are scoped across multiple namespaces
+  include CronjobQueue
+  # rubocop:enable Scalability/CronWorkerContext
   feature_category :continuous_integration
 
   def perform

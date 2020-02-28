@@ -13,6 +13,7 @@ class RegistrationsController < Devise::RegistrationsController
   before_action :whitelist_query_limiting, only: [:destroy]
   before_action :ensure_terms_accepted,
     if: -> { action_name == 'create' && Gitlab::CurrentSettings.current_application_settings.enforce_terms? }
+  before_action :load_recaptcha, only: :new
 
   def new
     if experiment_enabled?(:signup_flow)
@@ -54,8 +55,6 @@ class RegistrationsController < Devise::RegistrationsController
   def welcome
     return redirect_to new_user_registration_path unless current_user
     return redirect_to stored_location_or_dashboard(current_user) if current_user.role.present? && !current_user.setup_for_company.nil?
-
-    current_user.name = nil if current_user.name == current_user.username
   end
 
   def update_registration
@@ -116,8 +115,10 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def after_inactive_sign_up_path_for(resource)
+    # With the current `allow_unconfirmed_access_for` Devise setting in config/initializers/8_devise.rb,
+    # this method is never called. Leaving this here in case that value is set to 0.
     Gitlab::AppLogger.info(user_created_message)
-    dashboard_projects_path
+    users_almost_there_path
   end
 
   private
@@ -181,6 +182,10 @@ class RegistrationsController < Devise::RegistrationsController
 
   def stored_location_or_dashboard(user)
     stored_location_for(user) || dashboard_projects_path
+  end
+
+  def load_recaptcha
+    Gitlab::Recaptcha.load_configurations!
   end
 
   # Part of an experiment to build a new sign up flow. Will be resolved

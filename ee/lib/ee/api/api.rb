@@ -35,6 +35,7 @@ module EE
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
+        mount ::API::MergeTrains
         mount ::API::ProjectPackages
         mount ::API::GroupPackages
         mount ::API::GroupHooks

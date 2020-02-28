@@ -6,7 +6,6 @@ module Elastic
 
     ImportError = Class.new(StandardError)
 
-    ISSUE_TRACKED_FIELDS = %w(assignee_ids author_id confidential).freeze
     IMPORT_RETRY_COUNT = 3
 
     # @param indexing [Boolean] determines whether operation is "indexing" or "updating"
@@ -18,8 +17,6 @@ module Elastic
       import(record, indexing)
 
       initial_index_project(record) if record.class == Project && indexing
-
-      update_issue_notes(record, options["changed_fields"]) if record.class == Issue
 
       true
     rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound => e
@@ -36,14 +33,6 @@ module Elastic
     end
 
     private
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def update_issue_notes(record, changed_fields)
-      if changed_fields && (changed_fields & ISSUE_TRACKED_FIELDS).any?
-        import_association(Note, query: -> { searchable.where(noteable: record) })
-      end
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def initial_index_project(project)
       # Enqueue the repository indexing jobs immediately so they run in parallel

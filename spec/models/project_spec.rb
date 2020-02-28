@@ -69,8 +69,10 @@ describe Project do
     it { is_expected.to have_one(:forked_from_project).through(:fork_network_member) }
     it { is_expected.to have_one(:auto_devops).class_name('ProjectAutoDevops') }
     it { is_expected.to have_one(:error_tracking_setting).class_name('ErrorTracking::ProjectErrorTrackingSetting') }
+    it { is_expected.to have_one(:project_setting) }
     it { is_expected.to have_many(:commit_statuses) }
     it { is_expected.to have_many(:ci_pipelines) }
+    it { is_expected.to have_many(:ci_refs) }
     it { is_expected.to have_many(:builds) }
     it { is_expected.to have_many(:build_trace_section_names)}
     it { is_expected.to have_many(:runner_projects) }
@@ -112,6 +114,7 @@ describe Project do
       let(:expected_full_path) { "#{container.namespace.full_path}/somewhere" }
       let(:expected_repository_klass) { Repository }
       let(:expected_storage_klass) { Storage::Hashed }
+      let(:expected_web_url_path) { "#{container.namespace.full_path}/somewhere" }
     end
 
     it 'has an inverse relationship with merge requests' do
@@ -151,9 +154,24 @@ describe Project do
         expect(project.container_expiration_policy).to be_persisted
       end
 
+      it 'does not create another container expiration policy if there is already one' do
+        project = build(:project)
+
+        expect do
+          container_expiration_policy = create(:container_expiration_policy, project: project)
+
+          expect(project.container_expiration_policy).to eq(container_expiration_policy)
+        end.to change { ContainerExpirationPolicy.count }.by(1)
+      end
+
       it 'automatically creates a Pages metadata row' do
         expect(project.pages_metadatum).to be_an_instance_of(ProjectPagesMetadatum)
         expect(project.pages_metadatum).to be_persisted
+      end
+
+      it 'automatically creates a project setting row' do
+        expect(project.project_setting).to be_an_instance_of(ProjectSetting)
+        expect(project.project_setting).to be_persisted
       end
     end
 
@@ -277,6 +295,12 @@ describe Project do
         expect(project2).not_to be_valid
         expect(project2.errors[:repository_storage].first).to match(/is not included in the list/)
       end
+    end
+
+    it 'validates presence of project_feature' do
+      project = build(:project, project_feature: nil)
+
+      expect(project).not_to be_valid
     end
 
     describe 'import_url' do
@@ -1286,8 +1310,8 @@ describe Project do
 
   describe '.trending' do
     let(:group)    { create(:group, :public) }
-    let(:project1) { create(:project, :public, group: group) }
-    let(:project2) { create(:project, :public, group: group) }
+    let(:project1) { create(:project, :public, :repository, group: group) }
+    let(:project2) { create(:project, :public, :repository, group: group) }
 
     before do
       create_list(:note_on_commit, 2, project: project1)
@@ -1768,20 +1792,18 @@ describe Project do
     let(:project) { create(:project, :repository) }
     let(:repo)    { double(:repo, exists?: true) }
     let(:wiki)    { double(:wiki, exists?: true) }
-    let(:design)  { double(:wiki, exists?: false) }
 
     it 'expires the caches of the repository and wiki' do
+      # In EE, there are design repositories as well
+      allow(Repository).to receive(:new).and_call_original
+
       allow(Repository).to receive(:new)
-        .with('foo', project)
+        .with('foo', project, shard: project.repository_storage)
         .and_return(repo)
 
       allow(Repository).to receive(:new)
-        .with('foo.wiki', project)
+        .with('foo.wiki', project, shard: project.repository_storage, repo_type: Gitlab::GlRepository::WIKI)
         .and_return(wiki)
-
-      allow(Repository).to receive(:new)
-        .with('foo.design', project)
-        .and_return(design)
 
       expect(repo).to receive(:before_delete)
       expect(wiki).to receive(:before_delete)
@@ -1966,6 +1988,23 @@ describe Project do
       project.import_state.finish
 
       expect(project.reload.import_url).to eq('http://test.com')
+    end
+
+    it 'saves the url credentials percent decoded' do
+      url = 'http://user:pass%21%3F%40@github.com/t.git'
+      project = build(:project, import_url: url)
+
+      # When the credentials are not decoded this expectation fails
+      expect(project.import_url).to eq(url)
+      expect(project.import_data.credentials).to eq(user: 'user', password: 'pass!?@')
+    end
+
+    it 'saves url with no credentials' do
+      url = 'http://github.com/t.git'
+      project = build(:project, import_url: url)
+
+      expect(project.import_url).to eq(url)
+      expect(project.import_data.credentials).to eq(user: nil, password: nil)
     end
   end
 
@@ -2694,16 +2733,44 @@ describe Project do
     describe '#all_lfs_objects' do
       let(:lfs_object) { create(:lfs_object) }
 
-      before do
-        project.lfs_objects << lfs_object
+      context 'when LFS object is only associated to the source' do
+        before do
+          project.lfs_objects << lfs_object
+        end
+
+        it 'returns the lfs object for a project' do
+          expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
+
+        it 'returns the lfs object for a fork' do
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
 
-      it 'returns the lfs object for a project' do
-        expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+      context 'when LFS object is only associated to the fork' do
+        before do
+          forked_project.lfs_objects << lfs_object
+        end
+
+        it 'returns nothing' do
+          expect(project.all_lfs_objects).to be_empty
+        end
+
+        it 'returns the lfs object for a fork' do
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
 
-      it 'returns the lfs object for a fork' do
-        expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+      context 'when LFS object is associated to both source and fork' do
+        before do
+          project.lfs_objects << lfs_object
+          forked_project.lfs_objects << lfs_object
+        end
+
+        it 'returns the lfs object for the source and fork' do
+          expect(project.all_lfs_objects).to contain_exactly(lfs_object)
+          expect(forked_project.all_lfs_objects).to contain_exactly(lfs_object)
+        end
       end
     end
   end
@@ -3691,7 +3758,7 @@ describe Project do
     end
   end
 
-  describe '.wrap_authorized_projects_with_cte' do
+  describe '.wrap_with_cte' do
     let!(:user) { create(:user) }
 
     let!(:private_project) do
@@ -3702,10 +3769,10 @@ describe Project do
 
     let(:projects) { described_class.all.public_or_visible_to_user(user) }
 
-    subject { described_class.wrap_authorized_projects_with_cte(projects) }
+    subject { described_class.wrap_with_cte(projects) }
 
     it 'wrapped query matches original' do
-      expect(subject.to_sql).to match(/^WITH "authorized_projects" AS/)
+      expect(subject.to_sql).to match(/^WITH "projects_cte" AS/)
       expect(subject).to match_array(projects)
     end
   end
@@ -3861,7 +3928,7 @@ describe Project do
   end
 
   context 'legacy storage' do
-    set(:project) { create(:project, :repository, :legacy_storage) }
+    let_it_be(:project) { create(:project, :repository, :legacy_storage) }
     let(:gitlab_shell) { Gitlab::Shell.new }
     let(:project_storage) { project.send(:storage) }
 
@@ -3960,7 +4027,7 @@ describe Project do
   end
 
   context 'hashed storage' do
-    set(:project) { create(:project, :repository, skip_disk_validation: true) }
+    let_it_be(:project) { create(:project, :repository, skip_disk_validation: true) }
     let(:gitlab_shell) { Gitlab::Shell.new }
     let(:hash) { Digest::SHA2.hexdigest(project.id.to_s) }
     let(:hashed_prefix) { File.join('@hashed', hash[0..1], hash[2..3]) }
@@ -4050,7 +4117,7 @@ describe Project do
   end
 
   describe '#has_ci?' do
-    set(:project) { create(:project) }
+    let_it_be(:project, reload: true) { create(:project) }
     let(:repository) { double }
 
     before do
@@ -4094,7 +4161,7 @@ describe Project do
       Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
     end
 
-    set(:project) { create(:project) }
+    let_it_be(:project, reload: true) { create(:project) }
 
     subject { project.auto_devops_enabled? }
 
@@ -4229,7 +4296,7 @@ describe Project do
   end
 
   describe '#has_auto_devops_implicitly_enabled?' do
-    set(:project) { create(:project) }
+    let_it_be(:project, reload: true) { create(:project) }
 
     context 'when disabled in settings' do
       before do
@@ -4290,7 +4357,7 @@ describe Project do
   end
 
   describe '#has_auto_devops_implicitly_disabled?' do
-    set(:project) { create(:project) }
+    let_it_be(:project, reload: true) { create(:project) }
 
     before do
       allow(Feature).to receive(:enabled?).and_call_original
@@ -4368,7 +4435,7 @@ describe Project do
   end
 
   describe '#api_variables' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     it 'exposes API v4 URL' do
       expect(project.api_variables.first[:key]).to eq 'CI_API_V4_URL'
@@ -4565,7 +4632,7 @@ describe Project do
   end
 
   describe '#write_repository_config' do
-    set(:project) { create(:project, :repository) }
+    let_it_be(:project) { create(:project, :repository) }
 
     it 'writes full path in .git/config when key is missing' do
       project.write_repository_config
@@ -4656,7 +4723,7 @@ describe Project do
   end
 
   describe '#has_active_hooks?' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     it { expect(project.has_active_hooks?).to be_falsey }
 
@@ -4683,7 +4750,7 @@ describe Project do
   end
 
   describe '#has_active_services?' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     it { expect(project.has_active_services?).to be_falsey }
 
@@ -4966,11 +5033,11 @@ describe Project do
     end
   end
 
-  context '#members_among' do
+  describe '#members_among' do
     let(:users) { create_list(:user, 3) }
 
-    set(:group) { create(:group) }
-    set(:project) { create(:project, namespace: group) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project) { create(:project, namespace: group) }
 
     before do
       project.add_guest(users.first)
@@ -5504,6 +5571,83 @@ describe Project do
 
       expect(described_class.with_issues_or_mrs_available_for_user(user))
         .to contain_exactly(project1, project3, project4)
+    end
+  end
+
+  describe '#limited_protected_branches' do
+    let(:project) { create(:project) }
+    let!(:protected_branch) { create(:protected_branch, project: project) }
+    let!(:another_protected_branch) { create(:protected_branch, project: project) }
+
+    subject { project.limited_protected_branches(1) }
+
+    it 'returns limited number of protected branches based on specified limit' do
+      expect(subject).to eq([another_protected_branch])
+    end
+  end
+
+  describe '#lfs_objects_oids' do
+    let(:project) { create(:project) }
+    let(:lfs_object) { create(:lfs_object) }
+    let(:another_lfs_object) { create(:lfs_object) }
+
+    subject { project.lfs_objects_oids }
+
+    context 'when project has associated LFS objects' do
+      before do
+        create(:lfs_objects_project, lfs_object: lfs_object, project: project)
+        create(:lfs_objects_project, lfs_object: another_lfs_object, project: project)
+      end
+
+      it 'returns OIDs of LFS objects' do
+        expect(subject).to match_array([lfs_object.oid, another_lfs_object.oid])
+      end
+    end
+
+    context 'when project has no associated LFS objects' do
+      it 'returns empty array' do
+        expect(subject).to be_empty
+      end
+    end
+  end
+
+  describe '#alerts_service_activated?' do
+    let!(:project) { create(:project) }
+
+    subject { project.alerts_service_activated? }
+
+    context 'when project has an activated alerts service' do
+      before do
+        create(:alerts_service, project: project)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when project has an inactive alerts service' do
+      before do
+        create(:alerts_service, :inactive, project: project)
+      end
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#self_monitoring?' do
+    let_it_be(:project) { create(:project) }
+
+    subject { project.self_monitoring? }
+
+    context 'when the project is instance self monitoring' do
+      before do
+        stub_application_setting(self_monitoring_project_id: project.id)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'when the project is not self monitoring' do
+      it { is_expected.to be false }
     end
   end
 

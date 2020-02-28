@@ -1,5 +1,5 @@
 import { isSameVulnerability } from 'ee/security_dashboard/store/modules/vulnerabilities/utils';
-import mockData from '../../../../javascripts/security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities.json';
+import mockData from '../../../security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities';
 
 describe('Vulnerabilities utils', () => {
   const clone = serializable => JSON.parse(JSON.stringify(serializable));

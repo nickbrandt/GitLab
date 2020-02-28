@@ -1,6 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { RULE_TYPE_ANY_APPROVER } from '../../constants';
+import { debounce } from 'lodash';
 
 const ANY_RULE_NAME = 'All Members';
 
@@ -21,17 +22,20 @@ export default {
   },
   methods: {
     ...mapActions(['putRule', 'postRule']),
-    onInputChange(event) {
+    onInputChange: debounce(function debounceSearch(event) {
+      const { value } = event.target;
+      const approvalsRequired = parseInt(value, 10);
+
       if (this.rule.id) {
-        this.putRule({ id: this.rule.id, approvalsRequired: Number(event.target.value) });
+        this.putRule({ id: this.rule.id, approvalsRequired });
       } else {
         this.postRule({
           name: ANY_RULE_NAME,
           ruleType: RULE_TYPE_ANY_APPROVER,
-          approvalsRequired: Number(event.target.value),
+          approvalsRequired,
         });
       }
-    },
+    }, 1000),
   },
 };
 </script>

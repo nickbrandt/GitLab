@@ -12,7 +12,7 @@ module QA
 
           QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -33,6 +33,8 @@ module QA
               expect(page).to have_content(file_content)
             end
           end
+
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
           QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
@@ -63,12 +65,8 @@ module QA
           lfs_file_display_message = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
 
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            # Visit the primary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
-            # Create a new Project
-            project = Resource::Project.fabricate! do |project|
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
+            project = Resource::Project.fabricate_via_api! do |project|
               project.name = 'geo-project'
               project.description = 'Geo test project'
             end
@@ -94,10 +92,9 @@ module QA
             end
           end
 
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            # Visit the secondary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
+          QA::Runtime::Logger.debug('Visiting the secondary geo node')
 
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end

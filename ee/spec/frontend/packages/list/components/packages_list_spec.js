@@ -1,7 +1,8 @@
-import Vue from 'vue';
-import _ from 'underscore';
+import Vuex from 'vuex';
+import { last } from 'lodash';
+import { GlTable, GlSorting, GlPagination, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
-import { mount } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
 import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
@@ -9,55 +10,76 @@ import { TrackingActions } from 'ee/packages/shared/constants';
 import stubChildren from 'helpers/stub_children';
 import { packageList } from '../../mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('packages_list', () => {
   let wrapper;
+  let store;
+  let state;
+  let getListSpy;
+
+  const GlSortingItem = { name: 'sorting-item-stub', template: '<div><slot></slot></div>' };
+  const EmptySlotStub = { name: 'empty-slot-stub', template: '<div>bar</div>' };
 
   const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
-  const findPackageListTable = () => wrapper.find({ ref: 'packageListTable' });
-  const findPackageListSorting = () => wrapper.find({ ref: 'packageListSorting' });
-  const findPackageListPagination = () => wrapper.find({ ref: 'packageListPagination' });
-  const findPackageListDeleteModal = () => wrapper.find({ ref: 'packageListDeleteModal' });
-  const findSortingItems = () => wrapper.findAll({ name: 'sorting-item-stub' });
+  const findPackageListTable = () => wrapper.find(GlTable);
+  const findPackageListSorting = () => wrapper.find(GlSorting);
+  const findPackageListPagination = () => wrapper.find(GlPagination);
+  const findPackageListDeleteModal = () => wrapper.find(GlModal);
+  const findSortingItems = () => wrapper.findAll(GlSortingItem);
   const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
   const findPackageTags = () => wrapper.findAll(PackageTags);
+  const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
-  const mountOptions = {
-    stubs: {
-      ...stubChildren(PackagesList),
-      GlTable: false,
-      GlSortingItem: { name: 'sorting-item-stub', template: '<div><slot></slot></div>' },
-    },
-    computed: {
-      list: () => [...packageList],
-      perPage: () => 1,
-      totalItems: () => 1,
-      page: () => 1,
-      canDestroyPackage: () => true,
-      isGroupPage: () => false,
-    },
+  const mountComponent = options => {
+    wrapper = mount(PackagesList, {
+      localVue,
+      store,
+      stubs: {
+        ...stubChildren(PackagesList),
+        GlTable,
+        GlSortingItem,
+      },
+      ...options,
+    });
   };
 
   beforeEach(() => {
-    // This is needed due to  console.error called by vue to emit a warning that stop the tests
-    // see  https://github.com/vuejs/vue-test-utils/issues/532
-    Vue.config.silent = true;
-    wrapper = mount(PackagesList, mountOptions);
+    getListSpy = jest.fn();
+    getListSpy.mockReturnValue(packageList);
+    state = {
+      packages: [...packageList],
+      pagination: {
+        perPage: 1,
+        total: 1,
+        page: 1,
+      },
+      config: {
+        isGroupPage: false,
+      },
+      sorting: {
+        orderBy: 'version',
+        sort: 'desc',
+      },
+    };
+    store = new Vuex.Store({
+      state,
+      getters: {
+        getList: getListSpy,
+      },
+    });
+    store.dispatch = jest.fn();
   });
 
   afterEach(() => {
-    Vue.config.silent = false;
     wrapper.destroy();
   });
 
   describe('when is isGroupPage', () => {
     beforeEach(() => {
-      wrapper = mount(PackagesList, {
-        ...mountOptions,
-        computed: {
-          ...mountOptions.computed,
-          isGroupPage: () => true,
-        },
-      });
+      state.config.isGroupPage = true;
+      mountComponent();
     });
 
     it('has project field', () => {
@@ -71,31 +93,41 @@ describe('packages_list', () => {
     });
   });
 
-  it('contains a sorting component', () => {
-    const sorting = findPackageListSorting();
-    expect(sorting.exists()).toBe(true);
-  });
+  describe('layout', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
 
-  it('contains a table component', () => {
-    const sorting = findPackageListTable();
-    expect(sorting.exists()).toBe(true);
-  });
+    it('contains a sorting component', () => {
+      const sorting = findPackageListSorting();
+      expect(sorting.exists()).toBe(true);
+    });
 
-  it('contains a pagination component', () => {
-    const sorting = findPackageListPagination();
-    expect(sorting.exists()).toBe(true);
-  });
+    it('contains a table component', () => {
+      const sorting = findPackageListTable();
+      expect(sorting.exists()).toBe(true);
+    });
 
-  it('contains a modal component', () => {
-    const sorting = findPackageListDeleteModal();
-    expect(sorting.exists()).toBe(true);
-  });
+    it('contains a pagination component', () => {
+      const sorting = findPackageListPagination();
+      expect(sorting.exists()).toBe(true);
+    });
 
-  it('renders package tags when a package has tags', () => {
-    expect(findPackageTags()).toHaveLength(1);
+    it('contains a modal component', () => {
+      const sorting = findPackageListDeleteModal();
+      expect(sorting.exists()).toBe(true);
+    });
+
+    it('renders package tags when a package has tags', () => {
+      expect(findPackageTags()).toHaveLength(1);
+    });
   });
 
   describe('when the user can destroy the package', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
+
     it('show the action column', () => {
       const action = findFirstActionColumn();
       expect(action.exists()).toBe(true);
@@ -112,10 +144,10 @@ describe('packages_list', () => {
 
     it('delete button set itemToBeDeleted and open the modal', () => {
       wrapper.vm.$refs.packageListDeleteModal.show = jest.fn();
-      const item = _.last(packageList);
+      const item = last(wrapper.vm.list);
       const action = findFirstActionColumn();
       action.vm.$emit('click');
-      return Vue.nextTick().then(() => {
+      return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.itemToBeDeleted).toEqual(item);
         expect(wrapper.vm.$refs.packageListDeleteModal.show).toHaveBeenCalled();
       });
@@ -144,14 +176,11 @@ describe('packages_list', () => {
   });
 
   describe('when the list is empty', () => {
-    const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
-
     beforeEach(() => {
-      wrapper = mount(PackagesList, {
-        ...mountOptions,
-        computed: { list: () => [] },
+      getListSpy.mockReturnValue([]);
+      mountComponent({
         slots: {
-          'empty-state': { name: 'empty-slot-stub', template: '<div>bar</div>' },
+          'empty-state': EmptySlotStub,
         },
       });
     });
@@ -165,17 +194,56 @@ describe('packages_list', () => {
   });
 
   describe('sorting component', () => {
+    let sorting;
+    let sortingItems;
+
+    beforeEach(() => {
+      mountComponent();
+      sorting = findPackageListSorting();
+      sortingItems = findSortingItems();
+    });
+
     it('has all the sortable items', () => {
-      const sortingItems = findSortingItems();
       expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
     });
+
+    it('on sort change set sorting in vuex and emit event', () => {
+      sorting.vm.$emit('sortDirectionChange');
+      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { sort: 'asc' });
+      expect(wrapper.emitted('sort:changed')).toBeTruthy();
+    });
+
+    it('on sort item click set sorting and emit event', () => {
+      const item = sortingItems.at(0);
+      const { orderBy } = wrapper.vm.sortableFields[0];
+      item.vm.$emit('click');
+      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { orderBy });
+      expect(wrapper.emitted('sort:changed')).toBeTruthy();
+    });
+  });
+
+  describe('pagination component', () => {
+    let pagination;
+    let modelEvent;
+
+    beforeEach(() => {
+      mountComponent();
+      pagination = findPackageListPagination();
+      // retrieve the event used by v-model, a more sturdy approach than hardcoding it
+      modelEvent = pagination.vm.$options.model.event;
+    });
+
     it('emits page:changed events when the page changes', () => {
-      wrapper.vm.currentPage = 2;
+      pagination.vm.$emit(modelEvent, 2);
       expect(wrapper.emitted('page:changed')).toEqual([[2]]);
     });
   });
 
   describe('table component', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
+
     it('has stacked-md class', () => {
       const table = findPackageListTable();
       expect(table.classes()).toContain('b-table-stacked-md');
@@ -188,6 +256,7 @@ describe('packages_list', () => {
     const category = 'foo';
 
     beforeEach(() => {
+      mountComponent();
       eventSpy = jest.spyOn(Tracking, 'event');
       utilSpy = jest.spyOn(SharedUtils, 'packageTypeToTrackCategory').mockReturnValue(category);
       wrapper.setData({ itemToBeDeleted: { package_type: 'conan' } });

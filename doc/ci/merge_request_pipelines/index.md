@@ -24,7 +24,7 @@ Pipelines for merge requests have the following requirements and limitations:
 
 - As of GitLab 11.10, pipelines for merge requests require GitLab Runner 11.9
   or higher due to the
-  [recent refspecs changes](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25504).
+  [recent refspecs changes](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25504).
 - Pipelines for merge requests are incompatible with
   [CI/CD for external repositories](../ci_cd_for_external_repos/index.md).
 
@@ -89,7 +89,7 @@ Read the [documentation on Merge Trains](pipelines_for_merged_results/merge_trai
 The behavior of the `only: [merge_requests]` parameter is such that _only_ jobs with
 that parameter are run in the context of a merge request; no other jobs will be run.
 
-However, you may want to reverse this behavior, having all of your jobs to run _except_
+However, you can invert this behavior and have all of your jobs run _except_
 for one or two.
 
 Consider the following pipeline, with jobs `A`, `B`, and `C`. Imagine you want:

@@ -175,7 +175,7 @@ The table below shows what kind of documentation goes where.
 | `doc/update/`         | Contains instructions for updating GitLab. |
 | `doc/topics/`         | Indexes per topic (`doc/topics/topic-name/index.md`): all resources for that topic. |
 
-### Working with directories and files
+### Work with directories and files
 
 1. When you create a new directory, always start with an `index.md` file.
    Do not use another file name and **do not** create `README.md` files.
@@ -201,7 +201,7 @@ The table below shows what kind of documentation goes where.
       describing what can be achieved by accessing GitLab's admin interface
       (_not to be confused with `doc/administration` where server access is
       required_).
-      1. Every category under `/admin/application_settings` should have its
+      1. Every category under `/admin/application_settings/` should have its
          own document located at `doc/user/admin_area/settings/`. For example,
          the **Visibility and Access Controls** category should have a document
          located at `doc/user/admin_area/settings/visibility_and_access_controls.md`.
@@ -530,6 +530,20 @@ For other punctuation rules, please refer to the
   document. For example, `## Examples` is a bad heading; `## GitLab Pages examples`
   is a better one. It's not an exact science, but please consider this carefully.
 
+### Heading titles
+
+Keep heading titles clear and direct. Make every word count. To accommodate search engine optimization (SEO), use the imperative, where possible.
+
+| Do   | Don't   |
+|:-----|:--------|
+| Configure GDK | Configuring GDK |
+| GitLab Release and Maintenance Policy | This section covers GitLab's Release and Maintenance Policy |
+| Backport to older releases | Backporting to older releases |
+
+NOTE: **Note:**
+If you change an existing title, be careful. Any such changes may affect not only [links](#anchor-links)
+within the page, but may also affect links from GitLab itself, as well as external links, to GitLab documentation.
+
 ### Anchor links
 
 Headings generate anchor links automatically when rendered. `## This is an example`
@@ -566,21 +580,15 @@ do not use this option until further notice.
 
 ### Links to internal documentation
 
-- To link to internal documentation, use relative links, not full URLs.
+- To link to internal documentation, use relative links, not absolute URLs.
   Use `../` to navigate to high-level directories. Links should not refer to root.
 
   Don't:
 
-  ```md
-  [Geo Troubleshooting](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html)
-  [Geo Troubleshooting](/ee/administration/geo/replication/troubleshooting.md)
-  ```
+  - `https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html`
+  - `/ee/administration/geo/replication/troubleshooting.md`
 
-  Do:
-
-  ```md
-  [Geo Troubleshooting](../../geo/replication/troubleshooting.md)
-  ```
+  Do: `../../geo/replication/troubleshooting.md`
 
 - Always add the file name `file.md` at the end of the link with the `.md` extension, not `.html`.
 
@@ -707,7 +715,7 @@ You can link any up-to-date video that is useful to the GitLab user.
 
 ### Embed videos
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/472) in GitLab 12.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/472) in GitLab 12.1.
 
 The [GitLab Docs site](https://docs.gitlab.com) supports embedded videos.
 
@@ -773,33 +781,64 @@ nicely on different mobile devices.
 - When providing a shell command and its output, prefix the shell command with `$` and
   leave a blank line between the command and the output.
 - When providing a command without output, don't prefix the shell command with `$`.
+- If you need to include triple backticks inside a code block, use four backticks
+  for the codeblock fences instead of three.
 - For regular code blocks, always use a highlighting class corresponding to the
   language for better readability. Examples:
 
-  ~~~md
+  ````markdown
   ```ruby
   Ruby code
   ```
 
-  ```js
+  ```javascript
   JavaScript code
   ```
 
-  ```md
+  ```markdown
   [Markdown code example](example.md)
   ```
 
-  ```text
+  ```plaintext
   Code or text for which no specific highlighting class is available.
   ```
-  ~~~
+  ````
 
-- To display raw Markdown instead of rendered Markdown, you can use triple backticks
-  with `md`, like the `Markdown code` example above, unless you want to include triple
-  backticks in the code block as well. In that case, use triple tildes (`~~~`) instead.
-- [Syntax highlighting for code blocks](https://github.com/rouge-ruby/rouge/wiki/List-of-supported-languages-and-lexers)
-  is available for many languages. Use `shell` instead of `bash` or `sh` for shell output.
-- For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/#code-blocks).
+Syntax highlighting is required for code blocks added to the GitLab documentation.
+Refer to the table below for the most common language classes, or check the
+[complete list](https://github.com/rouge-ruby/rouge/wiki/List-of-supported-languages-and-lexers)
+of language classes available.
+
+| Preferred language tags | Language aliases and notes                                                   |
+|-------------------------|------------------------------------------------------------------------------|
+| `asciidoc`              |                                                                              |
+| `dockerfile`            | Alias: `docker`.                                                             |
+| `elixir`                |                                                                              |
+| `erb`                   |                                                                              |
+| `golang`                | Alias: `go`.                                                                 |
+| `graphql`               |                                                                              |
+| `haml`                  |                                                                              |
+| `html`                  |                                                                              |
+| `ini`                   | For some simple config files that are not in TOML format.                    |
+| `javascript`            | Alias `js`.                                                                  |
+| `json`                  |                                                                              |
+| `markdown`              | Alias: `md`.                                                                 |
+| `mermaid`               |                                                                              |
+| `nginx`                 |                                                                              |
+| `perl`                  |                                                                              |
+| `php`                   |                                                                              |
+| `plaintext`             | Examples with no defined language, such as output from shell commands or API calls. If a codeblock has no language, it defaults to `plaintext`. Alias: `text`. |
+| `prometheus`            | Prometheus configuration examples.                                           |
+| `python`                |                                                                              |
+| `ruby`                  | Alias: `rb`.                                                                 |
+| `shell`                 | Aliases: `bash` or `sh`.                                                     |
+| `sql`                   |                                                                              |
+| `toml`                  | Runner configuration examples, and other toml formatted configuration files. |
+| `typescript`            | Alias: `ts`.                                                                 |
+| `xml`                   |                                                                              |
+| `yaml`                  | Alias: `yml`.                                                                |
+
+For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/#code-blocks).
 
 ## GitLab SVG icons
 
@@ -828,7 +867,7 @@ Usage examples:
   [Bootstrap utility class](https://getbootstrap.com/docs/4.4/utilities/float/):
   `**{tanuki, 32, float-right}**` renders as: **{tanuki, 32, float-right}**
 
-### Using GitLab SVGs to describe UI elements
+### Use GitLab SVGs to describe UI elements
 
 When using GitLab SVGs to describe screen elements, also include the name or tooltip of the element as text.
 
@@ -1003,7 +1042,7 @@ Examples:
 - "Open a merge request to fix a broken link".
 - "After you open a merge request (MR), submit your MR for review and approval".
 
-### Describing UI elements
+### Describe UI elements
 
 The following are styles to follow when describing UI elements on a screen:
 
@@ -1134,7 +1173,7 @@ GitLab.com Free, and all higher tiers.
 
 ### How it works
 
-Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/244),
+Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/-/merge_requests/244),
 the special markup `**(STARTER)**` will generate a `span` element to trigger the
 badges and tooltips (`<span class="badge-trigger starter">`). When the keyword
 "only" is added, the corresponding GitLab.com badge will not be displayed.

@@ -22,7 +22,7 @@ Read more on [pagination](README.md#pagination).
 
 Gets a list of all discussion items for a single issue.
 
-```
+```plaintext
 GET /projects/:id/issues/:issue_iid/discussions
 ```
 
@@ -111,14 +111,14 @@ GET /projects/:id/issues/:issue_iid/discussions
 ```
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions
 ```
 
 ### Get single issue discussion item
 
 Returns a single discussion item for a specific project issue
 
-```
+```plaintext
 GET /projects/:id/issues/:issue_iid/discussions/:discussion_id
 ```
 
@@ -131,14 +131,14 @@ Parameters:
 | `discussion_id` | integer        | yes      | The ID of a discussion item |
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new issue thread
 
 Creates a new thread to a single project issue. This is similar to creating a note but other comments (replies) can be added to it later.
 
-```
+```plaintext
 POST /projects/:id/issues/:issue_iid/discussions
 ```
 
@@ -162,7 +162,7 @@ Adds a new note to the thread. This can also [create a thread from a single comm
 **WARNING**
 Notes can be added to other items than comments (system notes, etc.) making them threads.
 
-```
+```plaintext
 POST /projects/:id/issues/:issue_iid/discussions/:discussion_id/notes
 ```
 
@@ -185,7 +185,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Modify existing thread note of an issue.
 
-```
+```plaintext
 PUT /projects/:id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -207,7 +207,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 
 Deletes an existing thread note of an issue.
 
-```
+```plaintext
 DELETE /projects/:id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -230,7 +230,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitl
 
 Gets a list of all discussion items for a single snippet.
 
-```
+```plaintext
 GET /projects/:id/snippets/:snippet_id/discussions
 ```
 
@@ -319,14 +319,14 @@ GET /projects/:id/snippets/:snippet_id/discussions
 ```
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions
 ```
 
 ### Get single snippet discussion item
 
 Returns a single discussion item for a specific project snippet
 
-```
+```plaintext
 GET /projects/:id/snippets/:snippet_id/discussions/:discussion_id
 ```
 
@@ -347,7 +347,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 Creates a new thread to a single project snippet. This is similar to creating
 a note but other comments (replies) can be added to it later.
 
-```
+```plaintext
 POST /projects/:id/snippets/:snippet_id/discussions
 ```
 
@@ -368,7 +368,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Adds a new note to the thread.
 
-```
+```plaintext
 POST /projects/:id/snippets/:snippet_id/discussions/:discussion_id/notes
 ```
 
@@ -391,7 +391,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Modify existing thread note of a snippet.
 
-```
+```plaintext
 PUT /projects/:id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -413,7 +413,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 
 Deletes an existing thread note of a snippet.
 
-```
+```plaintext
 DELETE /projects/:id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -436,7 +436,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitl
 
 Gets a list of all discussion items for a single epic.
 
-```
+```plaintext
 GET /groups/:id/epics/:epic_id/discussions
 ```
 
@@ -526,14 +526,14 @@ GET /groups/:id/epics/:epic_id/discussions
 ```
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions
 ```
 
 ### Get single epic discussion item
 
 Returns a single discussion item for a specific group epic
 
-```
+```plaintext
 GET /groups/:id/epics/:epic_id/discussions/:discussion_id
 ```
 
@@ -554,7 +554,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 Creates a new thread to a single group epic. This is similar to creating
 a note but but other comments (replies) can be added to it later.
 
-```
+```plaintext
 POST /groups/:id/epics/:epic_id/discussions
 ```
 
@@ -576,7 +576,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 Adds a new note to the thread. This can also
 [create a thread from a single comment](../user/discussions/#start-a-thread-by-replying-to-a-standard-comment).
 
-```
+```plaintext
 POST /groups/:id/epics/:epic_id/discussions/:discussion_id/notes
 ```
 
@@ -599,7 +599,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Modify existing thread note of an epic.
 
-```
+```plaintext
 PUT /groups/:id/epics/:epic_id/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -621,7 +621,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 
 Deletes an existing thread note of an epic.
 
-```
+```plaintext
 DELETE /groups/:id/epics/:epic_id/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -644,7 +644,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitl
 
 Gets a list of all discussion items for a single merge request.
 
-```
+```plaintext
 GET /projects/:id/merge_requests/:merge_request_iid/discussions
 ```
 
@@ -786,14 +786,14 @@ Diff comments contain also position:
 ```
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions
 ```
 
 ### Get single merge request discussion item
 
 Returns a single discussion item for a specific project merge request
 
-```
+```plaintext
 GET /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id
 ```
 
@@ -806,7 +806,7 @@ Parameters:
 | `discussion_id`     | integer        | yes      | The ID of a discussion item |
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new merge request thread
@@ -814,7 +814,7 @@ curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 Creates a new thread to a single project merge request. This is similar to creating
 a note but other comments (replies) can be added to it later.
 
-```
+```plaintext
 POST /projects/:id/merge_requests/:merge_request_iid/discussions
 ```
 
@@ -848,7 +848,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Resolve/unresolve whole thread of a merge request.
 
-```
+```plaintext
 PUT /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id
 ```
 
@@ -870,7 +870,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 Adds a new note to the thread. This can also
 [create a thread from a single comment](../user/discussions/#start-a-thread-by-replying-to-a-standard-comment).
 
-```
+```plaintext
 POST /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes
 ```
 
@@ -893,7 +893,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Modify or resolve an existing thread note of a merge request.
 
-```
+```plaintext
 PUT /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -922,7 +922,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 
 Deletes an existing thread note of a merge request.
 
-```
+```plaintext
 DELETE /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -945,7 +945,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitl
 
 Gets a list of all discussion items for a single commit.
 
-```
+```plaintext
 GET /projects/:id/commits/:commit_id/discussions
 ```
 
@@ -1079,14 +1079,14 @@ Diff comments contain also position:
 ```
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions
 ```
 
 ### Get single commit discussion item
 
 Returns a single discussion item for a specific project commit
 
-```
+```plaintext
 GET /projects/:id/commits/:commit_id/discussions/:discussion_id
 ```
 
@@ -1099,7 +1099,7 @@ Parameters:
 | `discussion_id`     | integer        | yes      | The ID of a discussion item |
 
 ```shell
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new commit thread
@@ -1107,7 +1107,7 @@ curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 Creates a new thread to a single project commit. This is similar to creating
 a note but other comments (replies) can be added to it later.
 
-```
+```plaintext
 POST /projects/:id/commits/:commit_id/discussions
 ```
 
@@ -1141,7 +1141,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Adds a new note to the thread.
 
-```
+```plaintext
 POST /projects/:id/commits/:commit_id/discussions/:discussion_id/notes
 ```
 
@@ -1164,7 +1164,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab
 
 Modify or resolve an existing thread note of a commit.
 
-```
+```plaintext
 PUT /projects/:id/commits/:commit_id/discussions/:discussion_id/notes/:note_id
 ```
 
@@ -1192,7 +1192,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 
 Deletes an existing thread note of a commit.
 
-```
+```plaintext
 DELETE /projects/:id/commits/:commit_id/discussions/:discussion_id/notes/:note_id
 ```
 

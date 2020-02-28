@@ -25,7 +25,7 @@ class Commit
   attr_accessor :redacted_description_html
   attr_accessor :redacted_title_html
   attr_accessor :redacted_full_title_html
-  attr_reader :gpg_commit, :container
+  attr_reader :container
 
   delegate :repository, to: :container
   delegate :project, to: :repository, allow_nil: true
@@ -123,7 +123,6 @@ class Commit
 
     @raw = raw_commit
     @container = container
-    @gpg_commit = Gitlab::Gpg::Commit.new(self) if container
   end
 
   delegate \
@@ -227,6 +226,7 @@ class Commit
     data = {
       id: id,
       message: safe_message,
+      title: title,
       timestamp: committed_date.xmlschema,
       url: Gitlab::UrlBuilder.build(self),
       author: {
@@ -245,6 +245,8 @@ class Commit
   # Discover issues should be closed when this commit is pushed to a project's
   # default branch.
   def closes_issues(current_user = self.committer)
+    return unless repository.repo_type.project?
+
     Gitlab::ClosingIssueExtractor.new(project, current_user).closed_by_message(safe_message)
   end
 
@@ -298,7 +300,11 @@ class Commit
   end
 
   def merge_requests
-    @merge_requests ||= project&.merge_requests&.by_commit_sha(sha)
+    strong_memoize(:merge_requests) do
+      next MergeRequest.none unless repository.repo_type.project? && project
+
+      project.merge_requests.by_commit_sha(sha)
+    end
   end
 
   def method_missing(method, *args, &block)
@@ -320,13 +326,34 @@ class Commit
     )
   end
 
-  def signature
-    return @signature if defined?(@signature)
-
-    @signature = gpg_commit.signature
+  def has_signature?
+    signature_type && signature_type != :NONE
   end
 
-  delegate :has_signature?, to: :gpg_commit
+  def raw_signature_type
+    strong_memoize(:raw_signature_type) do
+      next unless @raw.instance_of?(Gitlab::Git::Commit)
+
+      @raw.raw_commit.signature_type if defined? @raw.raw_commit.signature_type
+    end
+  end
+
+  def signature_type
+    @signature_type ||= raw_signature_type || :NONE
+  end
+
+  def signature
+    strong_memoize(:signature) do
+      case signature_type
+      when :PGP
+        Gitlab::Gpg::Commit.new(self).signature
+      when :X509
+        Gitlab::X509::Commit.new(self).signature
+      else
+        nil
+      end
+    end
+  end
 
   def revert_branch_name
     "revert-#{short_id}"
@@ -487,7 +514,7 @@ class Commit
   end
 
   def commit_reference(from, referable_commit_id, full: false)
-    base = project&.to_reference_base(from, full: full)
+    base = container.to_reference_base(from, full: full)
 
     if base.present?
       "#{base}#{self.class.reference_prefix}#{referable_commit_id}"

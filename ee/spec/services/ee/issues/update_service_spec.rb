@@ -58,6 +58,11 @@ describe Issues::UpdateService do
         end
       end
 
+      it_behaves_like 'updating issuable health status' do
+        let(:issuable) { issue }
+        let(:parent) { project }
+      end
+
       context 'updating other fields' do
         it 'does not call UpdateDatesService' do
           expect(Epics::UpdateDatesService).not_to receive(:new)

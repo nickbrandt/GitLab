@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ExpirePipelineCacheWorker
+class ExpirePipelineCacheWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include PipelineQueue
 
@@ -11,7 +11,7 @@ class ExpirePipelineCacheWorker
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(pipeline_id)
     pipeline = Ci::Pipeline.find_by(id: pipeline_id)
-    return unless pipeline
+    return unless pipeline&.cacheable?
 
     Ci::ExpirePipelineCacheService.new.execute(pipeline)
   end

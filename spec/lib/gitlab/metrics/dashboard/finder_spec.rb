@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store_caching do
   include MetricsDashboardHelpers
 
-  set(:project) { create(:project) }
-  set(:user) { create(:user) }
-  set(:environment) { create(:environment, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:environment) { create(:environment, project: project) }
 
   before do
     project.add_maintainer(user)
@@ -40,6 +40,12 @@ describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store_cachi
 
     context 'when the system dashboard is specified' do
       let(:dashboard_path) { system_dashboard_path }
+
+      it_behaves_like 'valid dashboard service response'
+    end
+
+    context 'when the self monitoring dashboard is specified' do
+      let(:dashboard_path) { self_monitoring_dashboard_path }
 
       it_behaves_like 'valid dashboard service response'
     end
@@ -150,6 +156,34 @@ describe Gitlab::Metrics::Dashboard::Finder, :use_clean_rails_memory_store_cachi
         project_dashboard = { path: dashboard_path, display_name: 'test.yml', default: false, system_dashboard: false }
 
         expect(all_dashboard_paths).to contain_exactly(system_dashboard, project_dashboard)
+      end
+    end
+
+    context 'when the project is self monitoring' do
+      let(:self_monitoring_dashboard) do
+        {
+          path: self_monitoring_dashboard_path,
+          display_name: 'Default',
+          default: true,
+          system_dashboard: false
+        }
+      end
+      let(:dashboard_path) { '.gitlab/dashboards/test.yml' }
+      let(:project) { project_with_dashboard(dashboard_path) }
+
+      before do
+        stub_application_setting(self_monitoring_project_id: project.id)
+      end
+
+      it 'includes self monitoring and project dashboards' do
+        project_dashboard = {
+          path: dashboard_path,
+          display_name: 'test.yml',
+          default: false,
+          system_dashboard: false
+        }
+
+        expect(all_dashboard_paths).to contain_exactly(self_monitoring_dashboard, project_dashboard)
       end
     end
   end

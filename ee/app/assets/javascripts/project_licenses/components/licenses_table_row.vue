@@ -32,7 +32,11 @@ export default {
       class="d-flex flex-column justify-content-center h-auto"
     />
 
-    <div v-else class="d-md-flex align-items-baseline js-license-row">
+    <div
+      v-else
+      class="d-md-flex align-items-baseline js-license-row"
+      :data-spdx-id="license.spdx_identifier"
+    >
       <!-- Name-->
       <div class="table-section section-30 section-wrap pr-md-3">
         <div class="table-mobile-header" role="rowheader">

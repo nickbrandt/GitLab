@@ -9,30 +9,6 @@ describe ProjectsHelper do
     helper.instance_variable_set(:@project, project)
   end
 
-  describe '#project_incident_management_setting' do
-    context 'when incident_management_setting exists' do
-      let(:project_incident_management_setting) do
-        create(:project_incident_management_setting, project: project)
-      end
-
-      it 'return project_incident_management_setting' do
-        expect(helper.project_incident_management_setting).to(
-          eq(project_incident_management_setting)
-        )
-      end
-    end
-
-    context 'when incident_management_setting does not exist' do
-      it 'builds incident_management_setting' do
-        expect(helper.project_incident_management_setting.persisted?).to be(false)
-
-        expect(helper.project_incident_management_setting.send_email).to be(false)
-        expect(helper.project_incident_management_setting.create_issue).to be(true)
-        expect(helper.project_incident_management_setting.issue_template_key).to be(nil)
-      end
-    end
-  end
-
   describe 'default_clone_protocol' do
     context 'when gitlab.config.kerberos is enabled and user is logged in' do
       it 'returns krb5 as default protocol' do
@@ -193,10 +169,10 @@ describe ProjectsHelper do
     let(:user) { create(:user) }
 
     where(
+      ab_feature_enabled?: [true, false],
       gitlab_com?: [true, false],
-      user?: [true, false],
+       user?: [true, false],
       created_at: [Time.mktime(2010, 1, 20), Time.mktime(2030, 1, 20)],
-      discover_security_feature_enabled?: [true, false],
       security_dashboard_feature_available?: [true, false],
       can_admin_namespace?: [true, false]
     )
@@ -204,14 +180,14 @@ describe ProjectsHelper do
     with_them do
       it 'returns the expected value' do
         allow(::Gitlab).to receive(:com?) { gitlab_com? }
+        allow(user).to receive(:ab_feature_enabled?) { ab_feature_enabled? }
         allow(helper).to receive(:current_user) { user? ? user : nil }
         allow(user).to receive(:created_at) { created_at }
-        allow(::Feature).to receive(:enabled?).with(:discover_security) { discover_security_feature_enabled? }
         allow(project).to receive(:feature_available?) { security_dashboard_feature_available? }
         allow(helper).to receive(:can?) { can_admin_namespace? }
 
-        expected_value = gitlab_com? && user? && created_at > DateTime.new(2020, 1, 20) &&
-                         discover_security_feature_enabled? && !security_dashboard_feature_available? && can_admin_namespace?
+        expected_value = user? && created_at > DateTime.new(2020, 1, 20) && gitlab_com? &&
+                         ab_feature_enabled? && !security_dashboard_feature_available? && can_admin_namespace?
 
         expect(helper.show_discover_project_security?(project)).to eq(expected_value)
       end

@@ -12,6 +12,10 @@ RSpec.shared_examples 'base SamlProvider service' do
 
   let(:fingerprint) { '11:22:33:44:55:66:77:88:99:11:22:33:44:55:66:77:88:99' }
 
+  before do
+    stub_licensed_features(group_saml: true)
+  end
+
   it 'updates SAML provider with given params' do
     expect do
       service.execute

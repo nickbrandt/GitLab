@@ -5,7 +5,8 @@ module Ci
     CLONE_ACCESSORS = %i[pipeline project ref tag options name
                          allow_failure stage stage_id stage_idx trigger_request
                          yaml_variables when environment coverage_regex
-                         description tag_list protected needs resource_group].freeze
+                         description tag_list protected needs_attributes
+                         resource_group scheduling_type].freeze
 
     def execute(build)
       reprocess!(build).tap do |new_build|
@@ -27,9 +28,10 @@ module Ci
 
       attributes = CLONE_ACCESSORS.map do |attribute|
         [attribute, build.public_send(attribute)] # rubocop:disable GitlabSecurity/PublicSend
-      end
+      end.to_h
 
-      attributes.push([:user, current_user])
+      attributes[:user] = current_user
+      attributes[:scheduling_type] ||= build.find_legacy_scheduling_type
 
       Ci::Build.transaction do
         # mark all other builds of that name as retried
@@ -49,7 +51,7 @@ module Ci
     private
 
     def create_build!(attributes)
-      build = project.builds.new(Hash[attributes])
+      build = project.builds.new(attributes)
       build.deployment = ::Gitlab::Ci::Pipeline::Seed::Deployment.new(build).to_resource
       build.retried = false
       build.save!

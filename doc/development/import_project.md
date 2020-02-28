@@ -53,8 +53,18 @@ As part of this script we also disable direct and background upload to avoid sit
 
 We can simply run this script from the terminal:
 
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `username`      | string | yes | User name |
+| `namespace_path` | string | yes | Namespace path |
+| `project_path` | string | yes | Project name |
+| `archive_path` | string | yes | Path to the exported project tarball you want to import |
+| `measurement_enabled` | boolean | no | Measure execution time, number of SQL calls and GC count |
+
 ```shell
-bundle exec rake "gitlab:import_export:import[root, root, testingprojectimport, /path/to/file.tar.gz]"
+bundle exec rake "gitlab:import_export:import[root, root, testingprojectimport, /path/to/file.tar.gz, true]"
 ```
 
 ### Importing via the Rails console
@@ -71,7 +81,7 @@ The last option is to import a project using a Rails console:
    sudo -u git -H bundle exec rails console RAILS_ENV=production
    ```
 
-1. Create a project and run `ProjectTreeRestorer`:
+1. Create a project and run `Project::TreeRestorer`:
 
    ```ruby
    shared_class = Struct.new(:export_path) do
@@ -88,7 +98,7 @@ The last option is to import a project using a Rails console:
    begin
      #Enable Request store
      RequestStore.begin!
-     Gitlab::ImportExport::ProjectTreeRestorer.new(user: user, shared: shared, project: project).restore
+     Gitlab::ImportExport::Project::TreeRestorer.new(user: user, shared: shared, project: project).restore
    ensure
      RequestStore.end!
      RequestStore.clear!
@@ -118,11 +128,11 @@ The last option is to import a project using a Rails console:
 For Performance testing, we should:
 
 - Import a quite large project, [`gitlabhq`](https://gitlab.com/gitlab-org/quality/performance-data#gitlab-performance-test-framework-data) should be a good example.
-- Measure the execution time of `ProjectTreeRestorer`.
+- Measure the execution time of `Project::TreeRestorer`.
 - Count the number of executed SQL queries during the restore.
 - Observe the number of GC cycles happening.
 
-You can use this [snippet](https://gitlab.com/gitlab-org/gitlab/snippets/1924954), which will restore the project, and measure the execution time of `ProjectTreeRestorer`, number of SQL queries and number of GC cycles happening.
+You can use this [snippet](https://gitlab.com/gitlab-org/gitlab/snippets/1924954), which will restore the project, and measure the execution time of `Project::TreeRestorer`, number of SQL queries and number of GC cycles happening.
 
 You can execute the script from the `gdk/gitlab` directory like this:
 
