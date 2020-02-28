@@ -42,10 +42,14 @@ describe 'User uploads new design', :js do
   context 'when the feature is not available' do
     before do
       visit project_issue_path(project, issue)
+
+      click_link 'Designs'
+
+      wait_for_requests
     end
 
-    it 'does not show the designs link' do
-      expect(page).not_to have_link('Designs')
+    it 'shows the message about requirements' do
+      expect(page).to have_content("To enable design management, you'll need to meet the requirements.")
     end
   end
 
