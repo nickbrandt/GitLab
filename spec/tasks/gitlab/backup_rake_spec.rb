@@ -382,7 +382,7 @@ describe 'gitlab:app namespace rake task' do
     end
   end
 
-  describe 'Skipping tar archive creation' do
+  describe 'skipping tar archive creation' do
     before do
       stub_env('SKIP', 'tar')
     end
