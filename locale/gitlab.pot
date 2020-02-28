@@ -2970,6 +2970,9 @@ msgstr ""
 msgid "Assign to"
 msgstr ""
 
+msgid "Assign to commenting user"
+msgstr ""
+
 msgid "Assign yourself to these issues"
 msgstr ""
 
@@ -20950,6 +20953,9 @@ msgstr ""
 msgid "Something went wrong while updating a requirement."
 msgstr ""
 
+msgid "Something went wrong while updating assignees"
+msgstr ""
+
 msgid "Something went wrong while updating your list settings"
 msgstr ""
 
@@ -24057,6 +24063,9 @@ msgid "Unarchive project"
 msgstr ""
 
 msgid "Unarchiving the project will restore people's ability to make changes to it. The repository can be committed to, and issues, comments, and other entities can be created. %{strong_start}Once active, this project shows up in the search and on the dashboard.%{strong_end}"
+msgstr ""
+
+msgid "Unassign from commenting user"
 msgstr ""
 
 msgid "Unblock"
