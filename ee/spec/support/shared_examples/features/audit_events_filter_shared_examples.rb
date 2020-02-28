@@ -3,8 +3,8 @@
 RSpec.shared_examples_for 'audit events filter' do
   it 'shows only 2 days old events' do
     page.within '.content' do
-      fill_in 'Created after', with: 4.days.ago
-      fill_in 'Created before', with: 2.days.ago
+      fill_in 'From', with: 4.days.ago
+      fill_in 'To', with: 2.days.ago
       click_button 'Search'
     end
 
@@ -15,7 +15,7 @@ RSpec.shared_examples_for 'audit events filter' do
 
   it 'shows only yesterday events' do
     page.within '.content' do
-      fill_in 'Created after', with: 2.days.ago
+      fill_in 'From', with: 2.days.ago
       click_button 'Search'
     end
 
@@ -26,7 +26,7 @@ RSpec.shared_examples_for 'audit events filter' do
 
   it 'shows a message if provided date is invalid' do
     page.within '.content' do
-      fill_in 'Created after', with: '12-345-6789'
+      fill_in 'From', with: '12-345-6789'
       click_button 'Search'
     end
 
