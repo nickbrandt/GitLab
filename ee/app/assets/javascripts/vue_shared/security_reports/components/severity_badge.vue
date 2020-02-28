@@ -1,8 +1,21 @@
 <script>
 import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
+import { GlIcon } from '@gitlab/ui';
+
+export const CLASS_NAME_MAP = {
+  critical: 'text-danger-800',
+  high: 'text-danger-600',
+  medium: 'text-warning-400',
+  low: 'text-warning-300',
+  info: 'text-primary-400',
+  unknown: 'text-secondary-400',
+};
 
 export default {
   name: 'SeverityBadge',
+  components: {
+    GlIcon,
+  },
   props: {
     severity: {
       type: String,
@@ -10,51 +23,28 @@ export default {
     },
   },
   computed: {
+    hasSeverityBadge() {
+      return Object.keys(CLASS_NAME_MAP).includes(this.severityKey);
+    },
+    severityKey() {
+      return this.severity.toLowerCase();
+    },
     className() {
-      return `severity-badge-${this.severity.toLowerCase()}`;
+      return CLASS_NAME_MAP[this.severityKey];
+    },
+    iconName() {
+      return `severity-${this.severityKey}`;
     },
     severityTitle() {
-      return SEVERITY_LEVELS[this.severity] || this.severity;
+      return SEVERITY_LEVELS[this.severityKey] || this.severity;
     },
   },
 };
 </script>
 
 <template>
-  <div class="severity-badge" :class="className">{{ severityTitle }}</div>
+  <div v-if="hasSeverityBadge" class="severity-badge text-left text-nowrap gl-text-gray-900">
+    <span :class="className"><gl-icon :name="iconName" :size="12" class="append-right-8"/></span
+    >{{ severityTitle }}
+  </div>
 </template>
-
-<style>
-.severity-badge {
-  background-color: #f2f2f2;
-  border-radius: 0.3em;
-  color: #505050;
-  display: inline-block;
-  font-size: 0.9em;
-  font-weight: bold;
-  line-height: 1em;
-  padding: 0.6em 0.4em 0.4em;
-  text-transform: uppercase;
-}
-
-.severity-badge-critical {
-  background-color: #fae5e1;
-  color: #c0341e;
-}
-
-.severity-badge-high {
-  background-color: #fff1de;
-  color: #de7e00;
-}
-
-.severity-badge-medium {
-  background-color: #ede8fb;
-  color: #6d49cb;
-}
-
-.severity-badge-unknown {
-  background-color: #ffffff;
-  border: 1px solid;
-  color: #707070;
-}
-</style>
