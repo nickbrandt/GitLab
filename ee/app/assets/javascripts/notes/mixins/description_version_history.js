@@ -25,15 +25,16 @@ export default {
   methods: {
     toggleDescriptionVersion() {
       this.isDescriptionVersionExpanded = !this.isDescriptionVersionExpanded;
+      const versionId = this.note.description_version_id;
 
-      if (this.descriptionVersion) {
+      if (this.descriptionVersions?.[versionId]) {
         return false;
       }
 
       const endpoint = this.note.description_diff_path;
       const startingVersion = this.note.start_description_version_id;
 
-      return this.fetchDescriptionVersion({ endpoint, startingVersion });
+      return this.fetchDescriptionVersion({ endpoint, startingVersion, versionId });
     },
     deleteDescriptionVersion() {
       const endpoint = this.note.delete_description_version_path;

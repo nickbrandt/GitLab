@@ -54,7 +54,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['targetNoteHash', 'descriptionVersion']),
+    ...mapGetters(['targetNoteHash', 'descriptionVersions']),
     ...mapState(['isLoadingDescriptionVersion']),
     noteAnchorId() {
       return `note_${this.note.id}`;
@@ -81,6 +81,9 @@ export default {
           .children().length > MAX_VISIBLE_COMMIT_LIST_COUNT
       );
     },
+    descriptionVersion() {
+      return this.descriptionVersions[this.note.description_version_id];
+    },
   },
   mounted() {
     initMRPopovers(this.$el.querySelectorAll('.gfm-merge_request'));
@@ -104,7 +107,11 @@ export default {
           <span v-html="actionTextHtml"></span>
           <template v-if="canSeeDescriptionVersion" slot="extra-controls">
             &middot;
-            <button type="button" class="btn-blank btn-link" @click="toggleDescriptionVersion">
+            <button
+              type="button"
+              class="btn-blank btn-link"
+              @click="toggleDescriptionVersion(note.description_version_id)"
+            >
               {{ __('Compare with previous version') }}
               <icon :name="descriptionVersionToggleIcon" :size="12" class="append-left-5" />
             </button>

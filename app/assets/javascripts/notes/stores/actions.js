@@ -515,7 +515,7 @@ export const removeConvertedDiscussion = ({ commit }, noteId) =>
 export const setCurrentDiscussionId = ({ commit }, discussionId) =>
   commit(types.SET_CURRENT_DISCUSSION_ID, discussionId);
 
-export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersion }) => {
+export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersion, versionId }) => {
   let requestUrl = endpoint;
 
   if (startingVersion) {
@@ -526,7 +526,7 @@ export const fetchDescriptionVersion = ({ dispatch }, { endpoint, startingVersio
   return axios
     .get(requestUrl)
     .then(res => {
-      dispatch('receiveDescriptionVersion', res.data);
+      dispatch('receiveDescriptionVersion', { descriptionVersion: res.data, versionId });
     })
     .catch(error => {
       dispatch('receiveDescriptionVersionError', error);
