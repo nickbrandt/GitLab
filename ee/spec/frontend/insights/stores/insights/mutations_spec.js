@@ -10,6 +10,7 @@ describe('Insights mutations', () => {
   const chart = {
     title: 'Bugs Per Team',
     type: CHART_TYPES.STACKED_BAR,
+    description: 'Chart Description',
     query: {
       name: 'filter_issues_by_label_category',
       filter_label: 'bug',
@@ -135,6 +136,14 @@ describe('Insights mutations', () => {
       const { chartData } = state;
 
       expect(chartData[chart.title].type).toBe(chart.type);
+    });
+
+    it('sets charts description to incoming type on success', () => {
+      mutations[types.RECEIVE_CHART_SUCCESS](state, { chart, data: incomingData });
+
+      const { chartData } = state;
+
+      expect(chartData[chart.title].description).toBe(chart.description);
     });
   });
 

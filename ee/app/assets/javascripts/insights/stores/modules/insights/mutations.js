@@ -21,10 +21,11 @@ export default {
   },
 
   [types.RECEIVE_CHART_SUCCESS](state, { chart, data }) {
-    const { type } = chart;
+    const { type, description } = chart;
 
     state.chartData[chart.title] = {
       type,
+      description,
       data: transformChartDataForGlCharts(chart, data),
       loaded: true,
     };

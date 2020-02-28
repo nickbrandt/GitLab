@@ -76,11 +76,12 @@ export default {
       <h4 class="text-center">{{ pageConfig.title }}</h4>
       <div v-if="!pageLoading" class="insights-charts" data-qa-selector="insights_charts">
         <insights-chart
-          v-for="({ loaded, type, data, error }, key, index) in chartData"
+          v-for="({ loaded, type, description, data, error }, key, index) in chartData"
           :key="index"
           :loaded="loaded"
           :type="type"
           :title="key"
+          :description="description"
           :data="data"
           :error="error"
         />

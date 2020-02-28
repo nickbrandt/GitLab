@@ -31,6 +31,11 @@ export default {
       required: false,
       default: '',
     },
+    description: {
+      type: String,
+      required: false,
+      default: '',
+    },
     data: {
       type: Object,
       required: true,
@@ -111,6 +116,7 @@ export default {
 <template>
   <resizable-chart-container v-if="loaded" class="insights-chart">
     <h5 class="text-center">{{ title }}</h5>
+    <p v-if="description" class="text-center">{{ description }}</p>
     <gl-column-chart
       v-if="isColumnChart"
       v-bind="$attrs"
