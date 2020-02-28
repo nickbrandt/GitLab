@@ -262,14 +262,6 @@ p.each do |project|
 end
 ```
 
-### Identify un-indexed projects
-
-```ruby
-Project.find_each do |project|
-  puts "id #{project.id}: #{project.namespace.name.to_s}/#{project.name.to_s}" if project.index_status.nil?
-end
-```
-
 ## Wikis
 
 ### Recreate
