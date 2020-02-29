@@ -22,7 +22,7 @@ describe API::Groups do
   end
 
   shared_examples 'group avatar upload' do
-    context 'when valid file is used' do
+    context 'when valid' do
       let(:file_path) { 'spec/fixtures/banana_sample.gif' }
 
       it 'returns avatar url in response' do
@@ -34,16 +34,30 @@ describe API::Groups do
                                                   "#{group_id}/banana_sample.gif")
       end
     end
-  end
 
-  shared_examples 'invalid file upload request' do
     context 'when invalid' do
-      it 'returns 400' do
-        make_upload_request
+      shared_examples 'invalid file upload request' do
+        it 'returns 400' do
+          make_upload_request
 
-        expect(response).to have_gitlab_http_status(:bad_request)
-        expect(response.message).to eq('Bad Request')
-        expect(json_response['message'].to_s).to match(/#{message}/)
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(response.message).to eq('Bad Request')
+          expect(json_response['message'].to_s).to match(/#{message}/)
+        end
+      end
+
+      context 'when file format is not supported' do
+        let(:file_path) { 'spec/fixtures/doc_sample.txt' }
+        let(:message)   { 'file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico' }
+
+        it_behaves_like 'invalid file upload request'
+      end
+
+      context 'when file format is not supported' do
+        let(:file_path) { 'spec/fixtures/big-image.png' }
+        let(:message)   { 'is too big' }
+
+        it_behaves_like 'invalid file upload request'
       end
     end
   end
@@ -575,22 +589,6 @@ describe API::Groups do
 
     it_behaves_like 'group avatar upload'
 
-    context 'group avatar update' do
-      context 'when file format is not supported' do
-        let(:file_path) { 'spec/fixtures/doc_sample.txt' }
-        let(:message)   { 'file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico' }
-
-        it_behaves_like 'invalid file upload request'
-      end
-
-      context 'when file size is large' do
-        let(:file_path) { 'spec/fixtures/big-image.png' }
-        let(:message)   { "is too big" }
-
-        it_behaves_like 'invalid file upload request'
-      end
-    end
-
     context 'when authenticated as the group owner' do
       it 'updates the group' do
         put api("/groups/#{group1.id}", user1), params: {
@@ -999,22 +997,6 @@ describe API::Groups do
     end
 
     it_behaves_like 'group avatar upload'
-
-    context 'group avatar upload' do
-      context 'when file format is not supported' do
-        let(:file_path) { 'spec/fixtures/doc_sample.txt' }
-        let(:message)   { 'file format is not supported. Please try one of the following supported formats: png, jpg, jpeg, gif, bmp, tiff, ico' }
-
-        it_behaves_like 'invalid file upload request'
-      end
-
-      context 'when file size is large' do
-        let(:file_path) { 'spec/fixtures/big-image.png' }
-        let(:message)   { "is too big" }
-
-        it_behaves_like 'invalid file upload request'
-      end
-    end
 
     context "when authenticated as user without group permissions" do
       it "does not create group" do
