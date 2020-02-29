@@ -1159,7 +1159,7 @@ test:
         aws_secret_access_key: AWS_SECRET_ACCESS_KEY
         region: us-east-1
   artifacts:
-    path: tmp/tests/artifacts
+    path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/artifacts
     enabled: true
     # The location where build artifacts are stored (default: shared/artifacts).
     # path: shared/artifacts
@@ -1173,7 +1173,7 @@ test:
         aws_secret_access_key: AWS_SECRET_ACCESS_KEY
         region: us-east-1
   uploads:
-    storage_path: tmp/tests/public
+    storage_path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/public
     object_store:
       enabled: false
       connection:
@@ -1211,18 +1211,18 @@ test:
     # your system username you use to run GitLab
     # user: YOUR_USERNAME
   pages:
-    path: tmp/tests/pages
+    path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/pages
   repositories:
     storages:
       default:
-        path: tmp/tests/repositories/
-        gitaly_address: unix:tmp/tests/gitaly/gitaly.socket
+        path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/repositories/
+        gitaly_address: unix:tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/gitaly/gitaly.socket
 
   gitaly:
-    client_path: tmp/tests/gitaly
+    client_path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/gitaly
     token: secret
   backup:
-    path: tmp/tests/backups
+    path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/backups
   pseudonymizer:
     manifest: config/pseudonymizer.yml
     upload:
@@ -1235,8 +1235,8 @@ test:
         aws_secret_access_key: AWS_SECRET_ACCESS_KEY
         region: us-east-1
   gitlab_shell:
-    path: tmp/tests/gitlab-shell/
-    authorized_keys_file: tmp/tests/authorized_keys
+    path: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/gitlab-shell/
+    authorized_keys_file: tmp/tests<%= ENV['TEST_ENV_NUMBER'] %>/authorized_keys
   issues_tracker:
     redmine:
       title: "Redmine"

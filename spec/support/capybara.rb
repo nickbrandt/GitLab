@@ -66,6 +66,7 @@ Capybara.default_max_wait_time = timeout
 Capybara.ignore_hidden_elements = true
 Capybara.default_normalize_ws = true
 Capybara.enable_aria_label = true
+Capybara.server_port = 9887 + ENV['TEST_ENV_NUMBER'].to_i
 
 # Keep only the screenshots generated from the last failing test suite
 Capybara::Screenshot.prune_strategy = :keep_last_run

@@ -90,3 +90,4 @@ jsdoc/
 webpack-dev-server.json
 /.nvimrc
 .solargraph.yml
+/tmp

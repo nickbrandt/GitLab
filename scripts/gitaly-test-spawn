@@ -16,7 +16,7 @@ class GitalyTestSpawn
     pid = start_gitaly
 
     # In local development this pid file is used by rspec.
-    IO.write(File.expand_path('../tmp/tests/gitaly.pid', __dir__), pid)
+    IO.write(File.expand_path("../tmp/#{tests_folder_name}/gitaly.pid", __dir__), pid)
   end
 end
 

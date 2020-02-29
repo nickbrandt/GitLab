@@ -7,8 +7,12 @@
 require 'socket'
 
 module GitalyTest
+  def tests_folder_name
+    "tests#{ENV['TEST_ENV_NUMBER']}"
+  end
+
   def tmp_tests_gitaly_dir
-    File.expand_path('../tmp/tests/gitaly', __dir__)
+    File.expand_path("../tmp/#{tests_folder_name}/gitaly", __dir__)
   end
 
   def gemfile
@@ -17,7 +21,7 @@ module GitalyTest
 
   def env
     env_hash = {
-      'HOME' => File.expand_path('tmp/tests'),
+      'HOME' => File.expand_path("tmp/#{tests_folder_name}"),
       'GEM_PATH' => Gem.path.join(':'),
       'BUNDLE_APP_CONFIG' => File.join(File.dirname(gemfile), '.bundle/config'),
       'BUNDLE_FLAGS' => "--jobs=4 --retry=3",

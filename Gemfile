@@ -388,6 +388,7 @@ group :development, :test do
   gem 'png_quantizator', '~> 0.2.1', require: false
 
   gem 'parallel', '~> 1.19', require: false
+  gem 'parallel_tests', '~> 2.31'
 end
 
 # Gems required in omnibus-gitlab pipeline

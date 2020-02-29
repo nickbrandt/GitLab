@@ -272,7 +272,7 @@ Shoulda::Matchers.configure do |config|
 end
 
 # Prevent Rugged from picking up local developer gitconfig.
-Rugged::Settings['search_path_global'] = Rails.root.join('tmp/tests').to_s
+Rugged::Settings['search_path_global'] = Rails.root.join("tmp/tests#{ENV['TEST_ENV_NUMBER']}").to_s
 
 # Disable timestamp checks for invisible_captcha
 InvisibleCaptcha.timestamp_enabled = false

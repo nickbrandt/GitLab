@@ -82,7 +82,9 @@ module TestEnv
     'conflict-resolvable-fork'   => '404fa3f'
   }.freeze
 
-  TMP_TEST_PATH = Rails.root.join('tmp', 'tests', '**')
+  TMP_TESTS = "tests#{ENV['TEST_ENV_NUMBER']}"
+  TMP_TEST_DIR = Rails.root.join('tmp', TMP_TESTS)
+  TMP_TEST_PATH = TMP_TEST_DIR.join('**')
   REPOS_STORAGE = 'default'.freeze
 
   # Test environment
@@ -173,7 +175,7 @@ module TestEnv
       return
     end
 
-    FileUtils.mkdir_p("tmp/tests/second_storage") unless File.exist?("tmp/tests/second_storage")
+    FileUtils.mkdir_p("tmp/tests#{ENV['TEST_ENV_NUMBER']}/second_storage") unless File.exist?("tmp/tests#{ENV['TEST_ENV_NUMBER']}/second_storage")
 
     spawn_script = Rails.root.join('scripts/gitaly-test-spawn').to_s
     Bundler.with_original_env do
@@ -184,7 +186,7 @@ module TestEnv
       end
     end
 
-    @gitaly_pid = Integer(File.read('tmp/tests/gitaly.pid'))
+    @gitaly_pid = Integer(File.read("tmp/tests#{ENV['TEST_ENV_NUMBER']}/gitaly.pid"))
 
     Kernel.at_exit { stop_gitaly }
 
@@ -313,7 +315,7 @@ module TestEnv
   end
 
   def with_empty_bare_repository(name = nil)
-    path = Rails.root.join('tmp/tests', name || 'empty-bare-repository').to_s
+    path = Rails.root.join("tmp/#{TMP_TESTS}", name || 'empty-bare-repository').to_s
 
     yield(Rugged::Repository.init_at(path, :bare))
   ensure
@@ -351,7 +353,7 @@ module TestEnv
   end
 
   def factory_repo_path
-    @factory_repo_path ||= Rails.root.join('tmp', 'tests', factory_repo_name)
+    @factory_repo_path ||= Rails.root.join('tmp', TMP_TESTS, factory_repo_name)
   end
 
   def factory_repo_name
@@ -359,7 +361,7 @@ module TestEnv
   end
 
   def forked_repo_path
-    @forked_repo_path ||= Rails.root.join('tmp', 'tests', forked_repo_name)
+    @forked_repo_path ||= Rails.root.join('tmp', TMP_TESTS, forked_repo_name)
   end
 
   def forked_repo_name
