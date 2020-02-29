@@ -132,6 +132,15 @@ class IssuableBaseService < BaseService
     new_label_ids.uniq
   end
 
+  def process_assignee_ids(attributes, existing_assignee_ids: nil, extra_assignee_ids: [])
+    process = Issuable::ProcessAssignees.new(assignee_ids: attributes.delete(:assignee_ids),
+                                             add_assignee_ids: attributes.delete(:add_assignee_ids),
+                                             remove_assignee_ids: attributes.delete(:remove_assignee_ids),
+                                             existing_assignee_ids: existing_assignee_ids,
+                                             extra_assignee_ids: extra_assignee_ids)
+    process.execute
+  end
+
   def handle_quick_actions(issuable)
     merge_quick_actions_into_params!(issuable)
   end
@@ -160,6 +169,10 @@ class IssuableBaseService < BaseService
     params.delete(:state_event)
     params[:author] ||= current_user
     params[:label_ids] = process_label_ids(params, extra_label_ids: issuable.label_ids.to_a)
+
+    if issuable.respond_to?(:assignee_ids)
+      params[:assignee_ids] = process_assignee_ids(params, extra_assignee_ids: issuable.assignee_ids.to_a)
+    end
 
     issuable.assign_attributes(params)
 
@@ -207,6 +220,7 @@ class IssuableBaseService < BaseService
     old_associations = associations_before_update(issuable)
 
     assign_requested_labels(issuable)
+    assign_requested_assignees(issuable)
 
     if issuable.changed? || params.present?
       issuable.assign_attributes(params)
@@ -368,6 +382,16 @@ class IssuableBaseService < BaseService
 
     params[:label_ids] = label_ids
     issuable.touch
+  end
+
+  def assign_requested_assignees(issuable)
+    return if issuable.is_a?(Epic)
+
+    assignee_ids = process_assignee_ids(params, existing_assignee_ids: issuable.assignee_ids)
+    if ids_changing?(issuable.assignee_ids, assignee_ids)
+      params[:assignee_ids] = assignee_ids
+      issuable.touch
+    end
   end
 
   # Arrays of ids are used, but we should really use sets of ids, so
