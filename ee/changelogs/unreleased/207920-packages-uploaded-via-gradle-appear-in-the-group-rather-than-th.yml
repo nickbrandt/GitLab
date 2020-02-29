@@ -1,0 +1,5 @@
+---
+title: Resolve Packages uploaded via Gradle appear in the Group rather than the Project
+merge_request: 26213
+author:
+type: fixed
