@@ -6,9 +6,9 @@ components can read or write Git data. GitLab components that access Git
 repositories (GitLab Rails, GitLab Shell, GitLab Workhorse, etc.) act as clients
 to Gitaly. End users do not have direct access to Gitaly.
 
-In the rest of this page, Gitaly server is referred to the standalone node that
-only runs Gitaly, and Gitaly client to the GitLab Rails node that runs all other
-processes except Gitaly.
+On this page, *Gitaly server* refers to a standalone node that only runs Gitaly
+and *Gitaly client* is a GitLab Rails app node that runs all other processes
+except Gitaly.
 
 ## Architecture
 
@@ -20,7 +20,7 @@ Here's a high-level architecture overview of how Gitaly is used.
 
 The Gitaly service itself is configured via a [TOML configuration file](reference.md).
 
-In case you want to change some of its settings:
+If you want to change any of its settings:
 
 **For Omnibus GitLab**
 
