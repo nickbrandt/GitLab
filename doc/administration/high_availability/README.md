@@ -4,12 +4,12 @@ type: reference, concepts
 
 # Scaling and High Availability
 
-GitLab supports a number of options for larger self-managed instance setups that
-are scalable and highly available. While either of these needs can be tackled
-individually they typically go hand in hand - A performant scalable environment
-will have availability by default as it's components are separated and pooled.
+GitLab supports a number of options for larger self-managed instances to
+ensure that they are scalable and highly available. While these needs can be tackled
+individually, they typically go hand in hand: a performant scalable environment
+will have availability by default, as its components are separated and pooled.
 
-On this page we present recommendations for setups based on the number
+On this page, we present recommendations for setups based on the number
 of users you expect. For larger setups we give several recommended
 architectures based on experience with GitLab.com and internal scale
 testing that aim to achieve the right balance between both scalability
