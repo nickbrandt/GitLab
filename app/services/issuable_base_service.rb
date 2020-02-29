@@ -29,32 +29,48 @@ class IssuableBaseService < BaseService
       params.delete(:label_ids)
       params.delete(:assignee_ids)
       params.delete(:assignee_id)
+      params.delete(:add_assignee_ids)
+      params.delete(:remove_assignee_ids)
       params.delete(:due_date)
       params.delete(:canonical_issue_id)
       params.delete(:project)
       params.delete(:discussion_locked)
     end
 
-    filter_assignee(issuable)
+    filter_assignees(issuable)
     filter_milestone
     filter_labels
   end
 
-  def filter_assignee(issuable)
-    return if params[:assignee_ids].blank?
+  def filter_assignees(issuable)
+    filter_assignees_with_key(issuable, :assignee_ids, :assignees)
+    filter_assignees_with_key(issuable, :add_assignee_ids, :add_assignees)
+    filter_assignees_with_key(issuable, :remove_assignee_ids, :remove_assignees)
+  end
 
-    unless issuable.allows_multiple_assignees?
-      params[:assignee_ids] = params[:assignee_ids].first(1)
+  def filter_assignees_with_key(issuable, id_key, key)
+    if params[key] && params[id_key].blank?
+      params[id_key] = params[key].map(&:id)
     end
 
-    assignee_ids = params[:assignee_ids].select { |assignee_id| user_can_read?(issuable, assignee_id) }
+    return if params[id_key].blank?
 
-    if params[:assignee_ids].map(&:to_s) == [IssuableFinder::Params::NONE]
-      params[:assignee_ids] = []
+    filter_assignees_using_checks(issuable, id_key)
+  end
+
+  def filter_assignees_using_checks(issuable, id_key)
+    unless issuable.allows_multiple_assignees?
+      params[id_key] = params[id_key].first(1)
+    end
+
+    assignee_ids = params[id_key].select { |assignee_id| user_can_read?(issuable, assignee_id) }
+
+    if params[id_key].map(&:to_s) == [IssuableFinder::Params::NONE]
+      params[id_key] = []
     elsif assignee_ids.any?
-      params[:assignee_ids] = assignee_ids
+      params[id_key] = assignee_ids
     else
-      params.delete(:assignee_ids)
+      params.delete(id_key)
     end
   end
 
