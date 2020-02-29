@@ -131,26 +131,26 @@ Supported formats (named colors are not supported):
 Color written inside backticks will be followed by a color "chip":
 
 ```markdown
-`#F00`  
-`#F00A`  
-`#FF0000`  
-`#FF0000AA`  
-`RGB(0,255,0)`  
-`RGB(0%,100%,0%)`  
-`RGBA(0,255,0,0.3)`  
-`HSL(540,70%,50%)`  
-`HSLA(540,70%,50%,0.3)`  
+- `#F00`
+- `#F00A`
+- `#FF0000`
+- `#FF0000AA`
+- `RGB(0,255,0)`
+- `RGB(0%,100%,0%)`
+- `RGBA(0,255,0,0.3)`
+- `HSL(540,70%,50%)`
+- `HSLA(540,70%,50%,0.3)`
 ```
 
-`#F00`  
-`#F00A`  
-`#FF0000`  
-`#FF0000AA`  
-`RGB(0,255,0)`  
-`RGB(0%,100%,0%)`  
-`RGBA(0,255,0,0.3)`  
-`HSL(540,70%,50%)`  
-`HSLA(540,70%,50%,0.3)`  
+- `#F00`
+- `#F00A`
+- `#FF0000`
+- `#FF0000AA`
+- `RGB(0,255,0)`
+- `RGB(0%,100%,0%)`
+- `RGBA(0,255,0,0.3)`
+- `HSL(540,70%,50%)`
+- `HSLA(540,70%,50%,0.3)`
 
 ### Diagrams and flowcharts
 
@@ -973,7 +973,7 @@ class for the list of allowed HTML tags and attributes. In addition to the defau
   <dd>Is something people use sometimes.</dd>
 
   <dt>Markdown in HTML</dt>
-  <dd>Does *not* work **very** well. HTML <em>tags</em> will <b>always</b> work.</dd>
+  <dd>Does *not* work **very** well. HTML <em>tags</em> will <b>work</b>, in most cases.</dd>
 </dl>
 ```
 
@@ -982,7 +982,7 @@ class for the list of allowed HTML tags and attributes. In addition to the defau
   <dd>Is something people use sometimes.</dd>
 
   <dt>Markdown in HTML</dt>
-  <dd>Does *not* work **very** well. HTML <em>tags</em> will <b>always</b> work.</dd>
+  <dd>Does *not* work **very** well. HTML <em>tags</em> will <b>work</b>, in most cases.</dd>
 </dl>
 
 ---
@@ -993,12 +993,12 @@ are separated into their own lines:
 ```html
 <dl>
   <dt>Markdown in HTML</dt>
-  <dd>Does *not* work **very** well. HTML tags will always work.</dd>
+  <dd>Does *not* work **very** well. HTML tags will work, in most cases.</dd>
 
   <dt>Markdown in HTML</dt>
   <dd>
 
-  Does *not* work **very** well. HTML tags will always work.
+  Does *not* work **very** well. HTML tags will work, in most cases.
 
   </dd>
 </dl>
@@ -1008,12 +1008,12 @@ are separated into their own lines:
 
 <dl>
   <dt>Markdown in HTML</dt>
-  <dd>Does *not* work **very** well. HTML tags will always work.</dd>
+  <dd>Does *not* work **very** well. HTML tags will work, in most cases.</dd>
 
   <dt>Markdown in HTML</dt>
   <dd>
 
-  Does <em>not</em> work <b>very</b> well. HTML tags will always work.
+  Does <em>not</em> work <b>very</b> well. HTML tags will work, in most cases.
 
   </dd>
 </dl>
