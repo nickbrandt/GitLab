@@ -119,16 +119,15 @@ export default {
                 <div class="text-2 gl-text-gray-900">
                   {{ feature.name }}
                 </div>
-                <gl-link
-                  class="d-inline-flex ml-1"
-                  target="_blank"
-                  :href="feature.link"
-                  :aria-label="s__('SecurityConfiguration|Feature documentation')"
-                  ><icon name="external-link"
-                /></gl-link>
               </div>
               <div class="text-secondary">
                 {{ feature.description }}
+                <gl-link
+                  target="_blank"
+                  :href="feature.link"
+                  :aria-label="s__('SecurityConfiguration|Feature documentation')"
+                  >{{ __('More information') }}</gl-link
+                >
               </div>
             </div>
           </div>
