@@ -57,26 +57,16 @@ module EE
     end
 
     def diverged_from_upstream?(branch_name)
-      upstream_branch = upstream_branch_name(branch_name)
-      return false unless upstream_branch
-
-      diverged?(branch_name, MIRROR_REMOTE, upstream_branch_name: upstream_branch) do |branch_commit, upstream_commit|
-        !raw_repository.ancestor?(branch_commit.id, upstream_commit.id)
-      end
-    end
-
-    def upstream_has_diverged?(branch_name, remote_ref)
-      diverged?(branch_name, remote_ref) do |branch_commit, upstream_commit|
-        !raw_repository.ancestor?(upstream_commit.id, branch_commit.id)
+      with_branch_and_upstream_commit_refs(branch_name, MIRROR_REMOTE) do |branch_commit_ref, upstream_commit_ref|
+        branch_exists?(branch_commit_ref) &&
+          branch_exists?(upstream_commit_ref) &&
+          !raw_repository.ancestor?(branch_commit_ref, upstream_commit_ref)
       end
     end
 
     def up_to_date_with_upstream?(branch_name)
-      upstream_branch = upstream_branch_name(branch_name)
-      return false unless upstream_branch
-
-      diverged?(branch_name, MIRROR_REMOTE, upstream_branch_name: upstream_branch) do |branch_commit, upstream_commit|
-        ancestor?(branch_commit.id, upstream_commit.id)
+      with_branch_and_upstream_commit_refs(branch_name, MIRROR_REMOTE) do |branch_commit_ref, upstream_commit_ref|
+        ancestor?(branch_commit_ref, upstream_commit_ref)
       end
     end
 
@@ -111,15 +101,18 @@ module EE
 
     private
 
-    def diverged?(branch_name, remote_ref, upstream_branch_name: branch_name)
-      branch_commit = commit("refs/heads/#{branch_name}")
-      upstream_commit = commit("refs/remotes/#{remote_ref}/#{upstream_branch_name}")
+    def with_branch_and_upstream_commit_refs(branch_name, remote_name)
+      upstream_branch = upstream_branch_name(branch_name)
+      return false unless upstream_branch
 
-      if branch_commit && upstream_commit
-        yield branch_commit, upstream_commit
-      else
-        false
-      end
+      branch_name = ::Gitlab::Git::BRANCH_REF_PREFIX + branch_name
+      upstream_name = "refs/remotes/#{remote_name}/#{upstream_branch}"
+
+      #if branch_exists?(branch_name) && branch_exists?(upstream_name)
+        yield branch_name, upstream_name
+      #else
+      #  return false
+      #end
     end
   end
 end

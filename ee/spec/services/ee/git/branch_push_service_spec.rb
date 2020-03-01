@@ -27,16 +27,6 @@ RSpec.describe Git::BranchPushService do
       allow(project.repository).to receive(:commit).with("master").and_return(nil)
     end
 
-    context 'deleted branch' do
-      let(:newrev) { blankrev }
-
-      it 'handles when remote branch exists' do
-        expect(project.repository).to receive(:commit).with("refs/remotes/upstream/master").and_return(sample_commit)
-
-        subject.execute
-      end
-    end
-
     context 'ElasticSearch indexing', :elastic do
       before do
         stub_ee_application_setting(elasticsearch_indexing?: true)

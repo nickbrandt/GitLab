@@ -1,0 +1,5 @@
+---
+title: Remove find_commit calls from branch#index
+merge_request: 26230
+author: Takuya Noguchi
+type: performance
