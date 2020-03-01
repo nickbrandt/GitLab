@@ -118,7 +118,7 @@ export default {
           description: __(
             'The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6.',
           ),
-          classes: 'median-header',
+          classes: 'median-header pl-4',
         },
         {
           title: this.stageName,

@@ -56,6 +56,12 @@ export default {
     editable() {
       return this.canEdit;
     },
+    menuOpen() {
+      return this.canEdit && this.isHover;
+    },
+    openMenuClasses() {
+      return this.menuOpen ? 'd-flex flex-row justify-content-end' : '';
+    },
   },
   mounted() {
     this.checkIfTitleOverflows();
@@ -86,60 +92,66 @@ export default {
 
 <template>
   <li @click="handleSelectStage" @mouseover="handleHover(true)" @mouseleave="handleHover()">
-    <stage-card-list-item :is-active="isActive" :can-edit="editable">
+    <stage-card-list-item
+      :is-active="isActive"
+      :can-edit="editable"
+      class="d-flex justify-space-between"
+    >
       <div
         ref="title"
-        class="stage-nav-item-cell stage-name p-0 pr-2 text-truncate"
+        class="stage-nav-item-cell text-truncate w-50 pr-2"
         :class="{ 'font-weight-bold': isActive }"
       >
         <span v-if="isTitleOverflowing" v-gl-tooltip.hover :title="title">{{ title }}</span>
         <span v-else>{{ title }}</span>
       </div>
-      <div class="stage-nav-item-cell stage-median mr-4">
-        <span v-if="hasValue">{{ median }}</span>
-        <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
-      </div>
-      <div v-show="canEdit && isHover" ref="dropdown" class="dropdown">
-        <gl-button
-          :title="__('More actions')"
-          class="more-actions-toggle btn btn-transparent p-0"
-          data-toggle="dropdown"
-        >
-          <icon class="icon" name="ellipsis_v" />
-        </gl-button>
-        <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
-          <template v-if="isDefaultStage">
-            <li>
-              <button
-                type="button"
-                class="btn-default btn-transparent"
-                @click="handleDropdownAction('hide', $event)"
-              >
-                {{ __('Hide stage') }}
-              </button>
-            </li>
-          </template>
-          <template v-else>
-            <li>
-              <button
-                type="button"
-                class="btn-default btn-transparent"
-                @click="handleDropdownAction('edit', $event)"
-              >
-                {{ __('Edit stage') }}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                class="btn-danger danger"
-                @click="handleDropdownAction('remove', $event)"
-              >
-                {{ __('Remove stage') }}
-              </button>
-            </li>
-          </template>
-        </ul>
+      <div class="stage-nav-item-cell w-50 d-flex justify-content-between">
+        <div ref="median" class="w-75 align-items-start">
+          <span v-if="hasValue">{{ median }}</span>
+          <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
+        </div>
+        <div v-show="menuOpen" ref="dropdown" :class="[openMenuClasses]" class="dropdown w-25">
+          <gl-button
+            :title="__('More actions')"
+            class="more-actions-toggle btn btn-transparent p-0"
+            data-toggle="dropdown"
+          >
+            <icon class="icon" name="ellipsis_v" />
+          </gl-button>
+          <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
+            <template v-if="isDefaultStage">
+              <li>
+                <button
+                  type="button"
+                  class="btn-default btn-transparent"
+                  @click="handleDropdownAction('hide', $event)"
+                >
+                  {{ __('Hide stage') }}
+                </button>
+              </li>
+            </template>
+            <template v-else>
+              <li>
+                <button
+                  type="button"
+                  class="btn-default btn-transparent"
+                  @click="handleDropdownAction('edit', $event)"
+                >
+                  {{ __('Edit stage') }}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="btn-danger danger"
+                  @click="handleDropdownAction('remove', $event)"
+                >
+                  {{ __('Remove stage') }}
+                </button>
+              </li>
+            </template>
+          </ul>
+        </div>
       </div>
     </stage-card-list-item>
   </li>

@@ -7,11 +7,6 @@ describe('StageNavItem', () => {
   const title = 'Rad stage';
   const median = 50;
 
-  const $sel = {
-    title: '.stage-name',
-    median: '.stage-median',
-  };
-
   function createComponent(props) {
     return shallowMount(StageNavItem, {
       propsData: {
@@ -23,8 +18,8 @@ describe('StageNavItem', () => {
   }
 
   let wrapper = null;
-  const findStageTitle = () => wrapper.find($sel.title);
-  const findStageMedian = () => wrapper.find($sel.median);
+  const findStageTitle = () => wrapper.find({ref: 'title'});
+  const findStageMedian = () => wrapper.find({ref: 'median'});
 
   afterEach(() => {
     wrapper.destroy();
