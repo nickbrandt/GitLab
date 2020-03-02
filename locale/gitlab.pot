@@ -23245,10 +23245,10 @@ msgstr ""
 msgid "estimateCommand|%{slash_command} will update the estimated time with the latest command."
 msgstr ""
 
-msgid "exceeds the limit of %{bytes} bytes for directory names"
+msgid "exceeds the limit of %{bytes} bytes"
 msgstr ""
 
-msgid "exceeds the limit of %{bytes} bytes for page titles"
+msgid "exceeds the limit of %{bytes} bytes for directory name \"%{dirname}\""
 msgstr ""
 
 msgid "expired on %{milestone_due_date}"
