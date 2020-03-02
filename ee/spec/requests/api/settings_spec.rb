@@ -23,7 +23,7 @@ describe API::Settings, 'EE Settings' do
           file_template_project_id: project.id
         }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['help_text']).to eq('Help text')
       expect(json_response['file_template_project_id']).to eq(project.id)
     end
@@ -40,7 +40,7 @@ describe API::Settings, 'EE Settings' do
               elasticsearch_namespace_ids: namespace_ids.join(',')
             }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['elasticsearch_limit_indexing']).to eq(true)
         expect(json_response['elasticsearch_project_ids']).to eq(project_ids)
         expect(json_response['elasticsearch_namespace_ids']).to eq(namespace_ids)
@@ -61,7 +61,7 @@ describe API::Settings, 'EE Settings' do
               'CONTENT_TYPE' => 'application/json'
             }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['elasticsearch_namespace_ids']).to eq([])
         expect(ElasticsearchIndexedNamespace.count).to eq(0)
         expect(ElasticsearchIndexedProject.count).to eq(1)
@@ -85,7 +85,7 @@ describe API::Settings, 'EE Settings' do
       it 'hides the attributes in the API' do
         get api("/application/settings", admin)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         attribute_names.each do |attribute|
           expect(json_response.keys).not_to include(attribute)
         end
@@ -105,7 +105,7 @@ describe API::Settings, 'EE Settings' do
       it 'includes the attributes in the API' do
         get api("/application/settings", admin)
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         attribute_names.each do |attribute|
           expect(json_response.keys).to include(attribute)
         end
@@ -113,7 +113,7 @@ describe API::Settings, 'EE Settings' do
 
       it 'allows updating the settings' do
         put api("/application/settings", admin), params: settings
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
 
         settings.each do |attribute, value|
           expect(ApplicationSetting.current.public_send(attribute)).to eq(value)
