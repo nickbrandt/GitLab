@@ -4984,9 +4984,6 @@ msgstr ""
 msgid "Commits|An error occurred while fetching merge requests data."
 msgstr ""
 
-msgid "Commits|Commit: %{commitText}"
-msgstr ""
-
 msgid "Commits|History"
 msgstr ""
 
@@ -13966,6 +13963,9 @@ msgid "PipelineStatusTooltip|Pipeline: %{ciStatus}"
 msgstr ""
 
 msgid "PipelineStatusTooltip|Pipeline: %{ci_status}"
+msgstr ""
+
+msgid "PipelineStatusTooltip|Pipeline: %{commitText}"
 msgstr ""
 
 msgid "Pipelines"
