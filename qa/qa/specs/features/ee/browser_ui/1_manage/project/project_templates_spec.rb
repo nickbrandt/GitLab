@@ -81,8 +81,7 @@ module QA
             expect(templates.current_custom_project_template).to include @template_container_group_name
           end
 
-          group = Resource::Group.fabricate_via_api!
-          group.visit!
+          Resource::Group.fabricate_via_api!.visit!
 
           Page::Group::Show.perform(&:go_to_new_project)
 
