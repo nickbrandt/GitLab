@@ -1949,7 +1949,7 @@ type Epic implements Noteable {
 
   """
   Total weight of open and closed descendant epic's issues. Available only when
-  feature flag unfiltered_epic_aggregates is enabled.
+  feature flag `unfiltered_epic_aggregates` is enabled.
   """
   descendantWeightSum: EpicDescendantWeights
 
@@ -2414,7 +2414,7 @@ type EpicIssue implements Noteable {
   epicIssueId: ID!
 
   """
-  Current health status. Available only when feature flag save_issuable_health_status is enabled.
+  Current health status. Available only when feature flag `save_issuable_health_status` is enabled.
   """
   healthStatus: HealthStatus
 
@@ -3405,7 +3405,7 @@ type Issue implements Noteable {
   epic: Epic
 
   """
-  Current health status. Available only when feature flag save_issuable_health_status is enabled.
+  Current health status. Available only when feature flag `save_issuable_health_status` is enabled.
   """
   healthStatus: HealthStatus
 
