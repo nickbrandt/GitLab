@@ -399,7 +399,7 @@ module EE
 
     def validate_plan_name
       if defined?(@plan_name) && @plan_name.present? && PLANS.exclude?(@plan_name) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        errors.add(:plan, _('is not included in the list'))
+        errors.add(:plan, 'is not included in the list')
       end
     end
 
@@ -407,7 +407,7 @@ module EE
       return if shared_runner_minutes_supported?
 
       if shared_runners_minutes_limit_changed?
-        errors.add(:shared_runners_minutes_limit, _('is not supported for this namespace'))
+        errors.add(:shared_runners_minutes_limit, 'is not supported for this namespace')
       end
     end
 

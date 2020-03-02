@@ -132,7 +132,7 @@ class Packages::Package < ApplicationRecord
     return unless project&.root_namespace
 
     unless name =~ %r{\A@#{project.root_namespace.path}/[^/]+\z}
-      errors.add(:name, _('is not valid'))
+      errors.add(:name, 'is not valid')
     end
   end
 

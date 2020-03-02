@@ -40,9 +40,6 @@ msgstr ""
 msgid " and %{sliced}"
 msgstr ""
 
-msgid " cant be 00000000 (branch removal)"
-msgstr ""
-
 msgid " degraded on %d point"
 msgid_plural " degraded on %d points"
 msgstr[0] ""
@@ -3246,6 +3243,9 @@ msgid "Cannot merge"
 msgstr ""
 
 msgid "Cannot modify managed Kubernetes cluster"
+msgstr ""
+
+msgid "Cannot modify provider during creation"
 msgstr ""
 
 msgid "Cannot refer to a group milestone by an internal id!"
@@ -8019,6 +8019,9 @@ msgid "Everything you need to create a GitLab Pages site using plain HTML."
 msgstr ""
 
 msgid "Evidence collection"
+msgstr ""
+
+msgid "Exactly one of %{attributes} is required"
 msgstr ""
 
 msgid "Example: @sub\\.company\\.com$"
@@ -13153,6 +13156,9 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
+msgid "Note parameters are invalid: %{errors}"
+msgstr ""
+
 msgid "Note that this invitation was sent to %{mail_to_invite_email}, but you are signed in as %{link_to_current_user} with email %{mail_to_current_user}."
 msgstr ""
 
@@ -15000,9 +15006,6 @@ msgstr ""
 msgid "Project visibility level will be changed to match namespace rules when transferring to a group."
 msgstr ""
 
-msgid "Project's mirror capacity threshold can't be higher than it's maximum capacity"
-msgstr ""
-
 msgid "Project: %{name}"
 msgstr ""
 
@@ -16057,6 +16060,9 @@ msgid "Release"
 msgid_plural "Releases"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Release does not have the same project as the milestone"
+msgstr ""
 
 msgid "Release notes"
 msgstr ""
@@ -20166,6 +20172,9 @@ msgstr ""
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
 msgstr ""
 
+msgid "Thread to reply to cannot be found"
+msgstr ""
+
 msgid "Threat Monitoring"
 msgstr ""
 
@@ -21338,6 +21347,9 @@ msgid "User identity was successfully removed."
 msgstr ""
 
 msgid "User identity was successfully updated."
+msgstr ""
+
+msgid "User is not allowed to resolve thread"
 msgstr ""
 
 msgid "User key was successfully removed."
@@ -22649,6 +22661,9 @@ msgstr ""
 msgid "You need to register a two-factor authentication app before you can set up a U2F device."
 msgstr ""
 
+msgid "You need to set terms to be enforced"
+msgstr ""
+
 msgid "You need to specify both an Access Token and a Host URL."
 msgstr ""
 
@@ -22945,9 +22960,6 @@ msgstr ""
 msgid "archived"
 msgstr ""
 
-msgid "are all invalid"
-msgstr ""
-
 msgid "assign yourself"
 msgstr ""
 
@@ -22969,12 +22981,6 @@ msgstr ""
 msgid "by %{user}"
 msgstr ""
 
-msgid "can not be empty when runner is not allowed to pick untagged jobs"
-msgstr ""
-
-msgid "cannot add duplicated environment scope"
-msgstr ""
-
 msgid "cannot be changed if a personal project has container registry tags."
 msgstr ""
 
@@ -22984,16 +22990,7 @@ msgstr ""
 msgid "cannot be modified"
 msgstr ""
 
-msgid "cannot be related to itself"
-msgstr ""
-
 msgid "cannot block others"
-msgstr ""
-
-msgid "cannot have groups assigned"
-msgstr ""
-
-msgid "cannot have projects assigned"
 msgstr ""
 
 msgid "cannot include leading slash or directory traversal."
@@ -23003,9 +23000,6 @@ msgid "cannot itself be blocked"
 msgstr ""
 
 msgid "cannot merge"
-msgstr ""
-
-msgid "cannot modify during creation"
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
@@ -23271,21 +23265,6 @@ msgstr ""
 msgid "does not have a supported extension. Only %{extension_list} are supported"
 msgstr ""
 
-msgid "does not have access to the project"
-msgstr ""
-
-msgid "does not have the same project as the milestone"
-msgstr ""
-
-msgid "does not match the diff refs"
-msgstr ""
-
-msgid "doesn't match the certificate"
-msgstr ""
-
-msgid "doesn't support new-style diff notes"
-msgstr ""
-
 msgid "done"
 msgstr ""
 
@@ -23389,15 +23368,6 @@ msgstr ""
 msgid "has already been taken"
 msgstr ""
 
-msgid "has to be a subgroup of the group"
-msgstr ""
-
-msgid "has to be the first element"
-msgstr ""
-
-msgid "has too deep level of nesting"
-msgstr ""
-
 msgid "help"
 msgstr ""
 
@@ -23433,13 +23403,7 @@ msgstr[1] ""
 msgid "invalid milestone state `%{state}`"
 msgstr ""
 
-msgid "invalid project"
-msgstr ""
-
 msgid "is"
-msgstr ""
-
-msgid "is a required field"
 msgstr ""
 
 msgid "is already associated to a GitLab Issue. New issue will not be associated."
@@ -23451,16 +23415,7 @@ msgstr ""
 msgid "is blocked by"
 msgstr ""
 
-msgid "is empty or does not exist"
-msgstr ""
-
 msgid "is enabled."
-msgstr ""
-
-msgid "is incomplete"
-msgstr ""
-
-msgid "is invalid"
 msgstr ""
 
 msgid "is invalid because there is downstream lock"
@@ -23475,9 +23430,6 @@ msgstr ""
 msgid "is not a descendant of the Group owning the template"
 msgstr ""
 
-msgid "is not a member of the project"
-msgstr ""
-
 msgid "is not a valid X509 certificate."
 msgstr ""
 
@@ -23488,18 +23440,6 @@ msgid "is not allowed for sign-up"
 msgstr ""
 
 msgid "is not an email you own"
-msgstr ""
-
-msgid "is not included in the list"
-msgstr ""
-
-msgid "is not linked to a SAML account"
-msgstr ""
-
-msgid "is not supported for this namespace"
-msgstr ""
-
-msgid "is not valid"
 msgstr ""
 
 msgid "is too long (%{current_value}). The maximum size is %{max_size}."
@@ -23571,9 +23511,6 @@ msgid "merged %{time_ago}"
 msgstr ""
 
 msgid "milestone should belong either to a project or a group."
-msgstr ""
-
-msgid "misses intermediates"
 msgstr ""
 
 msgid "missing"
@@ -23891,25 +23828,10 @@ msgstr ""
 msgid "mrWidget|to start a merge train when the pipeline succeeds"
 msgstr ""
 
-msgid "must be for the same project"
-msgstr ""
-
 msgid "must be greater than start date"
 msgstr ""
 
-msgid "must be present on both design and version"
-msgstr ""
-
-msgid "must be the same on design and version"
-msgstr ""
-
 msgid "n/a"
-msgstr ""
-
-msgid "needs to be assigned to at least one project"
-msgstr ""
-
-msgid "needs to be assigned to exactly one group"
 msgstr ""
 
 msgid "needs to be between 10 minutes and 1 month"
@@ -23943,9 +23865,6 @@ msgid "nounSeries|%{item}, %{nextItem}"
 msgstr ""
 
 msgid "nounSeries|%{item}, and %{lastItem}"
-msgstr ""
-
-msgid "only allowed for project cluster"
 msgstr ""
 
 msgid "opened %{timeAgoString} by %{user}"
@@ -24168,12 +24087,6 @@ msgid "updated %{time_ago}"
 msgstr ""
 
 msgid "user avatar"
-msgstr ""
-
-msgid "user cannot also be an Auditor."
-msgstr ""
-
-msgid "user cannot be created without the \"GitLab_Auditor_User\" addon"
 msgstr ""
 
 msgid "username"

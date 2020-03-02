@@ -257,13 +257,13 @@ class PagesDomain < ApplicationRecord
 
   def validate_matching_key
     unless has_matching_key?
-      self.errors.add(:key, _("doesn't match the certificate"))
+      self.errors.add(:key, "doesn't match the certificate")
     end
   end
 
   def validate_intermediates
     unless has_intermediates?
-      self.errors.add(:certificate, _('misses intermediates'))
+      self.errors.add(:certificate, 'misses intermediates')
     end
   end
 

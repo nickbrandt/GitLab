@@ -113,10 +113,10 @@ class DeployToken < ApplicationRecord
   end
 
   def no_groups
-    errors.add(:deploy_token, _('cannot have groups assigned')) if group_deploy_tokens.any?
+    errors.add(:deploy_token, 'cannot have groups assigned') if group_deploy_tokens.any?
   end
 
   def no_projects
-    errors.add(:deploy_token, _('cannot have projects assigned')) if project_deploy_tokens.any?
+    errors.add(:deploy_token, 'cannot have projects assigned') if project_deploy_tokens.any?
   end
 end

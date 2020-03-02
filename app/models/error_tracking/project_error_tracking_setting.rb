@@ -217,11 +217,11 @@ module ErrorTracking
       return if api_url.blank?
 
       unless api_url_slug(:prefix)
-        return errors.add(:api_url, _('is invalid'))
+        return errors.add(:api_url, 'is invalid')
       end
 
       unless api_url_slug(:organization)
-        errors.add(:project, _('is a required field'))
+        errors.add(:project, 'is a required field')
       end
     end
   end

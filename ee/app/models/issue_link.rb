@@ -59,7 +59,7 @@ class IssueLink < ApplicationRecord
     return unless source && target
 
     if source == target
-      errors.add(:source, _('cannot be related to itself'))
+      errors.add(:source, 'cannot be related to itself')
     end
   end
 end
