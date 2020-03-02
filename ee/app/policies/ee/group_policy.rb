@@ -75,7 +75,7 @@ module EE
       rule { can?(:read_cluster) & cluster_deployments_available }
         .enable :read_cluster_environments
 
-      rule { has_access & contribution_analytics_available }
+      rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
 
       rule { reporter & cycle_analytics_available }.policy do

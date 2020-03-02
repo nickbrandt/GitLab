@@ -206,11 +206,10 @@ templates](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/t
 
 ### Caching Node.js dependencies
 
-Assuming your project is using [npm](https://www.npmjs.com/) to install the Node.js
-dependencies, the following example defines `cache` globally so that all jobs inherit it.
-By default, npm stores cache data in the home folder `~/.npm` but since
-[you can't cache things outside of the project directory](../yaml/README.md#cachepaths),
-we tell npm to use `./.npm` instead, and it is cached per-branch:
+Assuming your project is using [npm](https://www.npmjs.com/) or
+[Yarn](https://classic.yarnpkg.com/en/) to install the Node.js dependencies, the
+following example defines `cache` globally so that all jobs inherit it.
+Node.js modules are installed in `node_modules/` and are cached per-branch:
 
 ```yaml
 #
@@ -222,10 +221,10 @@ image: node:latest
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-  - .npm/
+  - node_modules/
 
 before_script:
-  - npm ci --cache .npm --prefer-offline
+  - npm install
 
 test_async:
   script:

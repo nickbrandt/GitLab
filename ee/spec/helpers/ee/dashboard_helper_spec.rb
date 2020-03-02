@@ -10,8 +10,6 @@ describe DashboardHelper, type: :helper do
   describe '#dashboard_nav_links' do
     before do
       allow(helper).to receive(:current_user).and_return(user)
-
-      stub_feature_flags(group_level_cycle_analytics: false)
     end
 
     describe 'analytics' do
@@ -239,8 +237,6 @@ describe DashboardHelper, type: :helper do
 
   describe 'analytics_nav_url' do
     before do
-      stub_feature_flags(group_level_cycle_analytics: false)
-
       allow(helper).to receive(:current_user).and_return(user)
     end
 

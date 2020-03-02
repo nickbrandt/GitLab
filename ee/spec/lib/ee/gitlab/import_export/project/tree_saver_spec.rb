@@ -60,21 +60,12 @@ describe Gitlab::ImportExport::Project::TreeSaver do
     end
 
     context 'epics' do
-      it 'has epic_issue' do
-        expect(saved_project_json['issues'].first['epic_issue']).not_to be_empty
-        expect(saved_project_json['issues'].first['epic_issue']['id']).to eql(epic_issue.id)
+      it 'has issue epic' do
+        expect(saved_project_json['issues'].first['epic']).not_to be_empty
       end
 
-      it 'has epic' do
-        expect(saved_project_json['issues'].first['epic_issue']['epic']['title']).to eql(epic.title)
-      end
-
-      it 'does not have epic_id' do
-        expect(saved_project_json['issues'].first['epic_issue']['epic_id']).to be_nil
-      end
-
-      it 'does not have issue_id' do
-        expect(saved_project_json['issues'].first['epic_issue']['issue_id']).to be_nil
+      it 'has issue epic id' do
+        expect(saved_project_json['issues'].first['epic']['id']).to eql(epic.id)
       end
     end
   end

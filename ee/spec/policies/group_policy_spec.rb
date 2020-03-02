@@ -48,34 +48,7 @@ describe GroupPolicy do
       stub_licensed_features(contribution_analytics: true)
     end
 
-    context 'when signed in user is a member of the group' do
-      it { is_expected.to be_allowed(:read_group_contribution_analytics) }
-    end
-
-    describe 'when user is not a member of the group' do
-      let(:current_user) { non_group_member }
-      let(:private_group) { create(:group, :private) }
-
-      subject { described_class.new(non_group_member, private_group) }
-
-      context 'when user is not invited to any of the group projects' do
-        it do
-          is_expected.not_to be_allowed(:read_group_contribution_analytics)
-        end
-      end
-
-      context 'when user is invited to a group project, but not to the group' do
-        let(:private_project) { create(:project, :private, group: private_group) }
-
-        before do
-          private_project.add_guest(non_group_member)
-        end
-
-        it do
-          is_expected.not_to be_allowed(:read_group_contribution_analytics)
-        end
-      end
-    end
+    it { is_expected.to be_allowed(:read_group_contribution_analytics) }
   end
 
   context 'when contribution analytics is not available' do

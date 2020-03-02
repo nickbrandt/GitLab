@@ -14,6 +14,9 @@ describe ActiveRecord::QueryRecorder do
         TestQueries.first
       end
 
+      # Test first_only flag works as expected
+      expect(control.find_query(/.*query_recorder_spec.rb.*/, 0, first_only: true))
+        .to eq(control.find_query(/.*query_recorder_spec.rb.*/, 0).first)
       # Check #find_query
       expect(control.find_query(/.*/, 0).size)
         .to eq(control.data.keys.size)
@@ -29,7 +32,9 @@ describe ActiveRecord::QueryRecorder do
       # Ensure memoization value match the raw value above
       expect(control.count).to eq(control.log.size)
       # Ensure we have only two sources of queries
-      expect(control.data.keys.size).to eq(1)
+      expect(control.data.keys.size).to eq(2)
+      # Ensure we detect only queries from this file
+      expect(control.data.keys.find_all { |i| i.match(/query_recorder_spec.rb/) }.count).to eq(2)
     end
   end
 end

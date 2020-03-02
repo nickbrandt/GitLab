@@ -45,7 +45,7 @@ class Gitlab::Seeder::Vulnerabilities
     when :resolved
       vulnerability.resolved_by = author
     when :dismissed
-      vulnerability.dismissed_by = author
+      vulnerability.closed_by = author
     end
 
     vulnerability.tap(&:save!)

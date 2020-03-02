@@ -20,10 +20,6 @@ module CacheMarkdownField
     false
   end
 
-  def can_cache_field?(field)
-    true
-  end
-
   # Returns the default Banzai render context for the cached markdown field.
   def banzai_render_context(field)
     raise ArgumentError.new("Unknown field: #{field.inspect}") unless
@@ -42,23 +38,17 @@ module CacheMarkdownField
     context
   end
 
-  def rendered_field_content(markdown_field)
-    return unless can_cache_field?(markdown_field)
-
-    options = { skip_project_check: skip_project_check? }
-    Banzai::Renderer.cacheless_render_field(self, markdown_field, options)
-  end
-
-  # Update every applicable column in a row if any one is invalidated, as we only store
+  # Update every column in a row if any one is invalidated, as we only store
   # one version per row
   def refresh_markdown_cache
+    options = { skip_project_check: skip_project_check? }
+
     updates = cached_markdown_fields.markdown_fields.map do |markdown_field|
       [
         cached_markdown_fields.html_field(markdown_field),
-        rendered_field_content(markdown_field)
+        Banzai::Renderer.cacheless_render_field(self, markdown_field, options)
       ]
     end.to_h
-
     updates['cached_markdown_version'] = latest_cached_markdown_version
 
     updates.each { |field, data| write_markdown_field(field, data) }

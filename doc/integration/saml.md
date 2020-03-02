@@ -188,7 +188,7 @@ tell GitLab which groups are external via the `external_groups:` element:
         } }
 ```
 
-## Required groups **(STARTER ONLY)**
+## Required groups
 
 >**Note:**
 This setting is only available on GitLab 10.2 EE and above.
@@ -215,7 +215,7 @@ Example:
         } }
 ```
 
-## Admin Groups **(STARTER ONLY)**
+## Admin Groups
 
 >**Note:**
 This setting is only available on GitLab 8.8 EE and above.
@@ -239,7 +239,7 @@ considered `admin groups`.
         } }
 ```
 
-## Auditor Groups **(STARTER ONLY)**
+## Auditor Groups
 
 >**Note:**
 This setting is only available on GitLab 11.4 EE and above.

@@ -9,20 +9,8 @@ description: 'Learn how to contribute to GitLab.'
 
 - Set up GitLab's development environment with [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/README.md)
 - [GitLab contributing guide](contributing/index.md)
-  - [Issues workflow](contributing/issue_workflow.md). For information on:
-    - Issue tracker guidelines.
-    - Triaging.
-    - Labels.
-    - Feature proposals.
-    - Issue weight.
-    - Regression issues.
-    - Technical or UX debt.
-  - [Merge requests workflow](contributing/merge_request_workflow.md). For
-    information on:
-    - Merge request guidelines.
-    - Contribution acceptance criteria.
-    - Definition of done.
-    - Dependencies.
+  - [Issues workflow](contributing/issue_workflow.md) (issue tracker guidelines, triaging, labels, feature proposals, issue weight, regression issues, technical and UX debt)
+  - [Merge requests workflow](contributing/merge_request_workflow.md) (merge request guidelines, contribution acceptance criteria, definition of done, dependencies)
   - [Style guides](contributing/style_guides.md)
   - [Implement design & UI elements](contributing/design.md)
 - [GitLab Architecture Overview](architecture.md)

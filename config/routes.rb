@@ -121,7 +121,10 @@ Rails.application.routes.draw do
       draw :country
       draw :country_state
       draw :subscription
-      draw :analytics
+
+      constraints(-> (*) { Gitlab::Analytics.any_features_enabled? }) do
+        draw :analytics
+      end
     end
 
     if ENV['GITLAB_CHAOS_SECRET'] || Rails.env.development? || Rails.env.test?

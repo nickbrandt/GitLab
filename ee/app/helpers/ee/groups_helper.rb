@@ -98,10 +98,6 @@ module EE
     def get_group_sidebar_links
       links = super
 
-      if can?(current_user, :read_group_cycle_analytics, @group)
-        links << :cycle_analytics
-      end
-
       if can?(current_user, :read_group_contribution_analytics, @group) || show_promotions?
         links << :contribution_analytics
       end

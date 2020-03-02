@@ -1,52 +1,68 @@
-import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+
 import AssigneesListItem from 'ee/boards/components/boards_list_selector/assignees_list_item.vue';
+import mountComponent from 'helpers/vue_mount_component_helper';
+
 import { mockAssigneesList } from 'jest/boards/mock_data';
 
+const createComponent = () => {
+  const Component = Vue.extend(AssigneesListItem);
+
+  return mountComponent(Component, {
+    item: mockAssigneesList[0],
+  });
+};
+
 describe('AssigneesListItem', () => {
-  const assignee = mockAssigneesList[0];
-  let wrapper;
+  let vm;
 
   beforeEach(() => {
-    wrapper = shallowMount(AssigneesListItem, {
-      propsData: {
-        item: assignee,
-      },
-    });
+    vm = createComponent();
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    vm.$destroy();
   });
 
-  it('renders component container element with class `filter-dropdown-item`', () => {
-    expect(wrapper.contains('.filter-dropdown-item')).toBe(true);
-  });
-
-  it('emits `onItemSelect` event on component click and sends `assignee` as event param', () => {
-    wrapper.find('.filter-dropdown-item').trigger('click');
-
-    expect(wrapper.emitted().onItemSelect[0]).toEqual([assignee]);
-  });
-
-  describe('avatar', () => {
-    it('has alt text', () => {
-      expect(wrapper.find('.avatar').attributes('alt')).toBe(`${assignee.name}'s avatar`);
-    });
-
-    it('has src url', () => {
-      expect(wrapper.find('.avatar').attributes('src')).toBe(assignee.avatar_url);
+  describe('computed', () => {
+    describe('avatarAltText', () => {
+      it('returns computed alt text based on assignee.name', () => {
+        expect(vm.avatarAltText).toBe(`${mockAssigneesList[0].name}'s avatar`);
+      });
     });
   });
 
-  describe('user details', () => {
-    it('shows assignee name', () => {
-      expect(wrapper.find('.dropdown-user-details').text()).toContain(assignee.name);
+  describe('methods', () => {
+    describe('handleItemClick', () => {
+      it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
+        jest.spyOn(vm, '$emit');
+        const assignee = mockAssigneesList[0];
+
+        vm.handleItemClick();
+
+        expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
+      });
+    });
+  });
+
+  describe('template', () => {
+    it('renders component container element with class `filter-dropdown-item`', () => {
+      expect(vm.$el.classList.contains('filter-dropdown-item')).toBe(true);
     });
 
-    it('shows assignee username', () => {
-      expect(wrapper.find('.dropdown-user-details .dropdown-light-content').text()).toContain(
-        `@${assignee.username}`,
-      );
+    it('renders user item button element', () => {
+      const assignee = mockAssigneesList[0];
+      const buttonEl = vm.$el.querySelector('.dropdown-user');
+
+      expect(buttonEl).not.toBeNull();
+      expect(
+        buttonEl.querySelector('.avatar-container.s32 img.avatar.s32').getAttribute('src'),
+      ).toBe(assignee.avatar_url);
+
+      expect(buttonEl.querySelector('.dropdown-user-details').innerText).toContain(assignee.name);
+      expect(
+        buttonEl.querySelector('.dropdown-user-details .dropdown-light-content').innerText,
+      ).toContain(`@${assignee.username}`);
     });
   });
 });

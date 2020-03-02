@@ -212,7 +212,7 @@ describe('IssueToken', () => {
     });
 
     it('when getting checked', () => {
-      jest.spyOn(vm, '$emit').mockImplementation(() => {});
+      spyOn(vm, '$emit');
       vm.onRemoveRequest();
 
       expect(vm.$emit).toHaveBeenCalledWith('pendingIssuableRemoveRequest', vm.idKey);

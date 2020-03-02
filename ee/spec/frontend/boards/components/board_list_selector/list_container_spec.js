@@ -1,51 +1,55 @@
-import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
+
 import ListContainer from 'ee/boards/components/boards_list_selector/list_container.vue';
-import ListFilter from 'ee/boards/components/boards_list_selector/list_filter.vue';
-import ListContent from 'ee/boards/components/boards_list_selector/list_content.vue';
+import mountComponent from 'helpers/vue_mount_component_helper';
+
 import { mockAssigneesList } from 'jest/boards/mock_data';
 
+const createComponent = () => {
+  const Component = Vue.extend(ListContainer);
+
+  return mountComponent(Component, {
+    loading: false,
+    items: mockAssigneesList,
+    listType: 'assignees',
+  });
+};
+
 describe('ListContainer', () => {
-  let wrapper;
+  let vm;
 
   beforeEach(() => {
-    wrapper = shallowMount(ListContainer, {
-      propsData: {
-        loading: false,
-        items: mockAssigneesList,
-        listType: 'assignees',
-      },
-    });
+    vm = createComponent();
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    vm.$destroy();
   });
 
   describe('computed', () => {
     describe('filteredItems', () => {
       it('returns assignees list as it is when `query` is empty', () => {
-        wrapper.setData({ query: '' });
+        vm.query = '';
 
-        expect(wrapper.vm.filteredItems.length).toBe(mockAssigneesList.length);
+        expect(vm.filteredItems.length).toBe(mockAssigneesList.length);
       });
 
       it('returns filtered assignees list as it is when `query` has name', () => {
         const assignee = mockAssigneesList[0];
 
-        wrapper.setData({ query: assignee.name });
+        vm.query = assignee.name;
 
-        expect(wrapper.vm.filteredItems.length).toBe(1);
-        expect(wrapper.vm.filteredItems[0].name).toBe(assignee.name);
+        expect(vm.filteredItems.length).toBe(1);
+        expect(vm.filteredItems[0].name).toBe(assignee.name);
       });
 
       it('returns filtered assignees list as it is when `query` has username', () => {
         const assignee = mockAssigneesList[0];
 
-        wrapper.setData({ query: assignee.username });
+        vm.query = assignee.username;
 
-        expect(wrapper.vm.filteredItems.length).toBe(1);
-        expect(wrapper.vm.filteredItems[0].username).toBe(assignee.username);
+        expect(vm.filteredItems.length).toBe(1);
+        expect(vm.filteredItems[0].username).toBe(assignee.username);
       });
     });
   });
@@ -54,39 +58,39 @@ describe('ListContainer', () => {
     describe('handleSearch', () => {
       it('sets value of param `query` to component prop `query`', () => {
         const query = 'foobar';
-        wrapper.vm.handleSearch(query);
+        vm.handleSearch(query);
 
-        expect(wrapper.vm.query).toBe(query);
+        expect(vm.query).toBe(query);
       });
     });
 
     describe('handleItemClick', () => {
       it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
+        jest.spyOn(vm, '$emit');
         const assignee = mockAssigneesList[0];
 
-        wrapper.vm.handleItemClick(assignee);
+        vm.handleItemClick(assignee);
 
-        expect(wrapper.emitted().onItemSelect[0]).toEqual([assignee]);
+        expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
       });
     });
   });
 
   describe('template', () => {
     it('renders component container element with class `dropdown-assignees-list`', () => {
-      expect(wrapper.classes('dropdown-assignees-list')).toBe(true);
+      expect(vm.$el.classList.contains('dropdown-assignees-list')).toBe(true);
     });
 
     it('renders loading animation when prop `loading` is true', () => {
-      wrapper.setProps({ loading: true });
-
+      vm.loading = true;
       return Vue.nextTick().then(() => {
-        expect(wrapper.find('.dropdown-loading').exists()).toBe(true);
+        expect(vm.$el.querySelector('.dropdown-loading')).not.toBeNull();
       });
     });
 
     it('renders dropdown body elements', () => {
-      expect(wrapper.find(ListFilter).exists()).toBe(true);
-      expect(wrapper.find(ListContent).exists()).toBe(true);
+      expect(vm.$el.querySelector('.dropdown-input')).not.toBeNull();
+      expect(vm.$el.querySelector('.dropdown-content')).not.toBeNull();
     });
   });
 });

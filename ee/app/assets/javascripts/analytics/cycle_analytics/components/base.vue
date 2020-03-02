@@ -42,10 +42,6 @@ export default {
       type: String,
       required: true,
     },
-    hideGroupDropDown: {
-      type: Boolean,
-      required: true,
-    },
   },
   computed: {
     ...mapState([
@@ -210,7 +206,6 @@ export default {
         class="mt-3 py-2 px-3 d-flex bg-gray-light border-top border-bottom flex-column flex-md-row justify-content-between"
       >
         <groups-dropdown-filter
-          v-if="!hideGroupDropDown"
           class="js-groups-dropdown-filter dropdown-select"
           :query-params="$options.groupsQueryParams"
           :default-group="selectedGroup"

@@ -1,40 +1,43 @@
-import { GlLink } from '@gitlab/ui';
-import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import IssueCardInnerScopedLabel from '~/boards/components/issue_card_inner_scoped_label.vue';
 
 describe('IssueCardInnerScopedLabel Component', () => {
-  let wrapper;
+  let vm;
+  const Component = Vue.extend(IssueCardInnerScopedLabel);
+  const props = {
+    label: { title: 'Foo::Bar', description: 'Some Random Description' },
+    labelStyle: { background: 'white', color: 'black' },
+    scopedLabelsDocumentationLink: '/docs-link',
+  };
+  const createComponent = () => mountComponent(Component, { ...props });
 
   beforeEach(() => {
-    wrapper = shallowMount(IssueCardInnerScopedLabel, {
-      propsData: {
-        label: { title: 'Foo::Bar', description: 'Some Random Description' },
-        labelStyle: { background: 'white', color: 'black' },
-        scopedLabelsDocumentationLink: '/docs-link',
-      },
-    });
+    vm = createComponent();
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    vm.$destroy();
   });
 
   it('should render label title', () => {
-    expect(wrapper.find('.color-label').text()).toBe('Foo::Bar');
+    expect(vm.$el.querySelector('.color-label').textContent.trim()).toEqual('Foo::Bar');
   });
 
   it('should render question mark symbol', () => {
-    expect(wrapper.find('.fa-question-circle').exists()).toBe(true);
+    expect(vm.$el.querySelector('.fa-question-circle')).not.toBeNull();
   });
 
   it('should render label style provided', () => {
-    const label = wrapper.find('.color-label');
+    const node = vm.$el.querySelector('.color-label');
 
-    expect(label.attributes('style')).toContain('background: white;');
-    expect(label.attributes('style')).toContain('color: black;');
+    expect(node.style.background).toEqual(props.labelStyle.background);
+    expect(node.style.color).toEqual(props.labelStyle.color);
   });
 
   it('should render the docs link', () => {
-    expect(wrapper.find(GlLink).attributes('href')).toBe('/docs-link');
+    expect(vm.$el.querySelector('a.scoped-label').href).toContain(
+      props.scopedLabelsDocumentationLink,
+    );
   });
 });

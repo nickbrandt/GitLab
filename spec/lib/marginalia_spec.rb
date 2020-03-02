@@ -59,6 +59,7 @@ describe 'Marginalia spec' do
         "application"       => "test",
         "controller"        => "marginalia_test",
         "action"            => "first_user",
+        "line"              => "/spec/support/helpers/query_recorder.rb",
         "correlation_id"    => correlation_id
       }
     end
@@ -115,6 +116,7 @@ describe 'Marginalia spec' do
       {
         "application"       => "sidekiq",
         "job_class"         => "MarginaliaTestJob",
+        "line"              => "/spec/support/sidekiq_middleware.rb",
         "correlation_id"    => sidekiq_job['correlation_id'],
         "jid"               => sidekiq_job['jid']
       }
@@ -143,6 +145,7 @@ describe 'Marginalia spec' do
         let(:component_map) do
           {
             "application"  => "sidekiq",
+            "line"         => "/lib/gitlab/i18n.rb",
             "jid"          => delivery_job.job_id,
             "job_class"    => delivery_job.arguments.first
           }
