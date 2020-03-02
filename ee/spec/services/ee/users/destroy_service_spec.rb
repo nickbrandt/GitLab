@@ -34,79 +34,25 @@ describe Users::DestroyService do
     end
 
     describe 'audit events' do
-      context 'when licensed' do
-        before do
-          stub_licensed_features(admin_audit_log: true)
+      include_examples 'audit event logging' do
+        let(:fail_condition!) do
+          expect_any_instance_of(User)
+            .to receive(:destroy).and_return(false)
         end
 
-        context 'soft delete' do
-          let(:hard_delete) { false }
-
-          context 'when user destroy operation succeeds' do
-            it 'logs audit events for ghost user migration and destroy operation' do
-              service.execute(user, hard_delete: hard_delete)
-
-              expect(AuditEvent.last(3)).to contain_exactly(
-                have_attributes(details: hash_including(change: 'email address')),
-                have_attributes(details: hash_including(change: 'username')),
-                have_attributes(details: hash_including(remove: 'user'))
-              )
-            end
-          end
-
-          context 'when user destroy operation fails' do
-            before do
-              allow(user).to receive(:destroy).and_return(false)
-            end
-
-            it 'logs audit events for ghost user migration operation' do
-              service.execute(user, hard_delete: hard_delete)
-
-              expect(AuditEvent.last(2)).to contain_exactly(
-                have_attributes(details: hash_including(change: 'email address')),
-                have_attributes(details: hash_including(change: 'username'))
-              )
-            end
-          end
-        end
-
-        context 'hard delete' do
-          let(:hard_delete) { true }
-
-          context 'when user destroy operation succeeds' do
-            it 'logs audit events for destroy operation' do
-              service.execute(user, hard_delete: hard_delete)
-
-              expect(AuditEvent.last)
-                .to have_attributes(details: hash_including(remove: 'user'))
-            end
-          end
-
-          context 'when user destroy operation fails' do
-            before do
-              allow(user).to receive(:destroy).and_return(false)
-            end
-
-            it 'does not log any audit event' do
-              expect { service.execute(user, hard_delete: hard_delete) }
-                .not_to change { AuditEvent.count }
-            end
-          end
-        end
-      end
-
-      context 'when not licensed' do
-        before do
-          stub_licensed_features(
-            admin_audit_log: false,
-            audit_events: false,
-            extended_audit_events: false
-          )
-        end
-
-        it 'does not log any audit event' do
-          expect { service.execute(user) }
-            .not_to change { AuditEvent.count }
+        let(:attributes) do
+          {
+            author_id: current_user.id,
+            entity_id: @resource.id,
+            entity_type: 'User',
+            details: {
+              remove: 'user',
+              author_name: current_user.name,
+              target_id: @resource.full_path,
+              target_type: 'User',
+              target_details: @resource.full_path
+            }
+          }
         end
       end
     end
