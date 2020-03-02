@@ -1,6 +1,5 @@
 <script>
-import { BCarousel, BCarouselSlide } from 'bootstrap-vue';
-import { GlNewButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlNewButton, GlTooltipDirective, GlCarousel, GlCarouselSlide } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import securityDependencyImageUrl from 'ee_images/promotions/security-dependencies.png';
@@ -13,8 +12,8 @@ export default {
   },
   components: {
     GlNewButton,
-    BCarousel,
-    BCarouselSlide,
+    GlCarousel,
+    GlCarouselSlide,
   },
   mixins: [Tracking.mixin()],
   props: {
@@ -128,7 +127,7 @@ export default {
     <h4 class="discover-title center gl-text-gray-900">
       {{ $options.i18n.discoverTitle }}
     </h4>
-    <b-carousel
+    <gl-carousel
       v-model="slide"
       class="discover-carousel"
       :no-wrap="true"
@@ -139,14 +138,14 @@ export default {
       img-height="700"
       @sliding-start="onSlideStart"
     >
-      <b-carousel-slide v-for="{ index, imageUrl } in carouselImages" :key="index" img-blank>
+      <gl-carousel-slide v-for="{ index, imageUrl } in carouselImages" :key="index" img-blank>
         <img
           :src="imageUrl"
           class="discover-carousel-img w-100 box-shadow-default image-fluid d-block"
         />
-      </b-carousel-slide>
-    </b-carousel>
-    <b-carousel
+      </gl-carousel-slide>
+    </gl-carousel>
+    <gl-carousel
       ref="textCarousel"
       v-model="textSlide"
       class="discover-carousel discover-text-carousel"
@@ -155,7 +154,7 @@ export default {
       img-width="1440"
       img-height="200"
     >
-      <b-carousel-slide
+      <gl-carousel-slide
         v-for="{ index, caption } in $options.i18n.carouselCaptions"
         :key="index"
         img-blank
@@ -163,8 +162,8 @@ export default {
         <p class="gl-text-gray-900 text-left">
           {{ caption }}
         </p>
-      </b-carousel-slide>
-    </b-carousel>
+      </gl-carousel-slide>
+    </gl-carousel>
     <div class="discover-footer d-flex flex-nowrap flex-row justify-content-between mx-auto my-0">
       <p class="gl-text-gray-900 text-left mb-5" v-html="$options.i18n.discoverPlanCaption"></p>
     </div>
