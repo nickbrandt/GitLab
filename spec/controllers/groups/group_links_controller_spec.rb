@@ -56,6 +56,10 @@ describe Groups::GroupLinksController do
       context 'when owner access is requested' do
         let(:shared_group_access) { Gitlab::Access::OWNER }
 
+        before do
+          shared_with_group.add_owner(group_member)
+        end
+
         include_examples 'creates group group link'
 
         it 'allows admin access for group member' do
