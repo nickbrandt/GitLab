@@ -19,7 +19,7 @@
                 %strong.fly-out-top-item-name
                   = _('Productivity Analytics')
 
-      - if Gitlab::Analytics.cycle_analytics_enabled?
+      - if Feature.disabled?(:group_level_cycle_analytics) && Gitlab::Analytics.cycle_analytics_enabled?
         = nav_link(controller: :cycle_analytics) do
           = link_to analytics_cycle_analytics_path, class: 'qa-sidebar-cycle-analytics' do
             .nav-icon-container

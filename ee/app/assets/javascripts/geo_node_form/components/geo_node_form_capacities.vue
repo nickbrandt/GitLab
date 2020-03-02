@@ -36,20 +36,21 @@ export default {
           conditional: 'secondary',
         },
         {
-          id: 'node-verification-capacity-field',
-          label: __('Verification capacity'),
-          description: __(
-            'Control the maximum concurrency of verification operations for this Geo node',
-          ),
-          key: 'verificationMaxCapacity',
-        },
-        {
           id: 'node-container-repository-capacity-field',
           label: __('Container repositories sync capacity'),
           description: __(
             'Control the maximum concurrency of container repository operations for this Geo node',
           ),
           key: 'containerRepositoriesMaxCapacity',
+          conditional: 'secondary',
+        },
+        {
+          id: 'node-verification-capacity-field',
+          label: __('Verification capacity'),
+          description: __(
+            'Control the maximum concurrency of verification operations for this Geo node',
+          ),
+          key: 'verificationMaxCapacity',
         },
         {
           id: 'node-reverification-interval-field',

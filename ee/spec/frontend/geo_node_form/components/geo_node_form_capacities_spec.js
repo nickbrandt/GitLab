@@ -22,17 +22,17 @@ describe('GeoNodeFormCapacities', () => {
   const findGeoNodeFormRepositoryCapacityField = () =>
     wrapper.find('#node-repository-capacity-field');
   const findGeoNodeFormFileCapacityField = () => wrapper.find('#node-file-capacity-field');
-  const findGeoNodeFormVerificationCapacityField = () =>
-    wrapper.find('#node-verification-capacity-field');
   const findGeoNodeFormContainerRepositoryCapacityField = () =>
     wrapper.find('#node-container-repository-capacity-field');
+  const findGeoNodeFormVerificationCapacityField = () =>
+    wrapper.find('#node-verification-capacity-field');
   const findGeoNodeFormReverificationIntervalField = () =>
     wrapper.find('#node-reverification-interval-field');
 
   describe('template', () => {
     describe.each`
       primaryNode | showRepoCapacity | showFileCapacity | showVerificationCapacity | showContainerCapacity | showReverificationInterval
-      ${true}     | ${false}         | ${false}         | ${true}                  | ${true}               | ${true}
+      ${true}     | ${false}         | ${false}         | ${true}                  | ${false}              | ${true}
       ${false}    | ${true}          | ${true}          | ${true}                  | ${true}               | ${false}
     `(
       `conditional fields`,
@@ -40,8 +40,8 @@ describe('GeoNodeFormCapacities', () => {
         primaryNode,
         showRepoCapacity,
         showFileCapacity,
-        showVerificationCapacity,
         showContainerCapacity,
+        showVerificationCapacity,
         showReverificationInterval,
       }) => {
         beforeEach(() => {
@@ -58,18 +58,18 @@ describe('GeoNodeFormCapacities', () => {
         });
 
         it(`it ${
-          showVerificationCapacity ? 'shows' : 'hides'
-        } the Verification Capacity Field`, () => {
-          expect(findGeoNodeFormVerificationCapacityField().exists()).toBe(
-            showVerificationCapacity,
-          );
-        });
-
-        it(`it ${
           showContainerCapacity ? 'shows' : 'hides'
         } the Container Repository Capacity Field`, () => {
           expect(findGeoNodeFormContainerRepositoryCapacityField().exists()).toBe(
             showContainerCapacity,
+          );
+        });
+
+        it(`it ${
+          showVerificationCapacity ? 'shows' : 'hides'
+        } the Verification Capacity Field`, () => {
+          expect(findGeoNodeFormVerificationCapacityField().exists()).toBe(
+            showVerificationCapacity,
           );
         });
 

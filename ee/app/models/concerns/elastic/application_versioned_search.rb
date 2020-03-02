@@ -45,10 +45,14 @@ module Elastic
     end
 
     def maintain_elasticsearch_create
+      return if maintain_elasticsearch_incremental_bulk
+
       ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
     end
 
     def maintain_elasticsearch_update
+      return if maintain_elasticsearch_incremental_bulk
+
       ElasticIndexerWorker.perform_async(
         :update,
         self.class.to_s,
@@ -58,9 +62,19 @@ module Elastic
     end
 
     def maintain_elasticsearch_destroy
+      return if maintain_elasticsearch_incremental_bulk
+
       ElasticIndexerWorker.perform_async(
         :delete, self.class.to_s, self.id, self.es_id, es_parent: self.es_parent
       )
+    end
+
+    def maintain_elasticsearch_incremental_bulk
+      return false unless Feature.enabled?(:elastic_bulk_incremental_updates, self.project)
+
+      ::Elastic::ProcessBookkeepingService.track!(self)
+
+      true
     end
 
     class_methods do

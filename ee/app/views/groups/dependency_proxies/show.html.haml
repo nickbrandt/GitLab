@@ -4,7 +4,7 @@
   %h4= _('Dependency proxy')
 
   %p
-    - link_start = '<a href="%{url}">'.html_safe % { url: help_page_path('PLACEHOLDER') }
+    - link_start = '<a href="%{url}">'.html_safe % { url: help_page_path('user/packages/dependency_proxy/index') }
     = _('Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
 
 - if @group.public?
