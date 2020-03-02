@@ -12,20 +12,11 @@ describe('MergeRequestTable component', () => {
   let wrapper;
   let vuexStore;
 
-  const createStore = (initialState = {}, getters = {}) =>
+  const createStore = (initialState = {}) =>
     new Vuex.Store({
       state: {
         ...createState(),
         ...initialState,
-      },
-      actions: {
-        setProjectId: jest.fn(),
-        setPage: jest.fn(),
-        fetchMergeRequests: jest.fn(),
-      },
-      getters: {
-        showMrCount: () => false,
-        ...getters,
       },
     });
 
@@ -35,16 +26,40 @@ describe('MergeRequestTable component', () => {
       store,
     });
 
+  const bootstrap = initialState => {
+    vuexStore = createStore(initialState);
+    wrapper = createComponent(vuexStore);
+  };
+
   afterEach(() => {
     wrapper.destroy();
   });
 
   const findTable = () => wrapper.find(GlTable);
+  const findTableRow = index =>
+    findTable()
+      .findAll('tbody tr')
+      .at(index);
+  const findReviewTimeCol = rowIndex =>
+    findTableRow(rowIndex)
+      .findAll('td')
+      .at(1);
+
+  const updateMergeRequests = (index, attrs) =>
+    mergeRequests.map((item, idx) => {
+      if (idx !== index) {
+        return item;
+      }
+
+      return {
+        ...item,
+        ...attrs,
+      };
+    });
 
   describe('template', () => {
     beforeEach(() => {
-      vuexStore = createStore({ mergeRequests });
-      wrapper = createComponent(vuexStore);
+      bootstrap({ mergeRequests });
     });
 
     it('renders the GlTable component', () => {
@@ -71,20 +86,30 @@ describe('MergeRequestTable component', () => {
 
       tableHeaders.forEach((headerText, i) => expect(headers.at(i).text()).toEqual(headerText));
     });
-  });
 
-  describe('methods', () => {
-    describe('formatReviewTime', () => {
-      it('returns "days" when review time is >= 24', () => {
-        expect(wrapper.vm.formatReviewTime(51)).toBe('2 days');
+    describe('review time column', () => {
+      it('shows "days" when the review time is >= 24', () => {
+        bootstrap({ mergeRequests: updateMergeRequests(0, { review_time: 64 }) });
+
+        expect(findReviewTimeCol(0).text()).toBe('2 days');
       });
 
-      it('returns "hours" when review time is < 18', () => {
-        expect(wrapper.vm.formatReviewTime(18)).toBe('18 hours');
+      it('shows "hours" when review time is < 24', () => {
+        bootstrap({ mergeRequests: updateMergeRequests(0, { review_time: 18 }) });
+
+        expect(findReviewTimeCol(0).text()).toBe('18 hours');
       });
 
-      it('returns "< 1 hour" when review is < 1', () => {
-        expect(wrapper.vm.formatReviewTime(0)).toBe('< 1 hour');
+      it('shows "< 1 hour" when review time is < 1', () => {
+        bootstrap({ mergeRequests: updateMergeRequests(0, { review_time: 0 }) });
+
+        expect(findReviewTimeCol(0).text()).toBe('< 1 hour');
+      });
+
+      it('shows "-" when review time is null', () => {
+        bootstrap({ mergeRequests: updateMergeRequests(0, { review_time: null }) });
+
+        expect(findReviewTimeCol(0).text()).toBe('–');
       });
     });
   });

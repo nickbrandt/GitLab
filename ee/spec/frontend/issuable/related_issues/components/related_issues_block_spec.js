@@ -4,7 +4,7 @@ import {
   issuable1,
   issuable2,
   issuable3,
-} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
+} from 'jest/vue_shared/components/issue/related_issuable_mock_data';
 import {
   linkedIssueTypesMap,
   linkedIssueTypesTextMap,

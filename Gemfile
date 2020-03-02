@@ -383,7 +383,7 @@ group :development, :test do
 
   gem 'simple_po_parser', '~> 1.1.2', require: false
 
-  gem 'timecop', '~> 0.8.0'
+  gem 'timecop', '~> 0.9.1'
 
   gem 'png_quantizator', '~> 0.2.1', require: false
 
@@ -419,7 +419,8 @@ end
 
 gem 'octokit', '~> 4.15'
 
-gem 'mail_room', '~> 0.10.0'
+# https://gitlab.com/gitlab-org/gitlab/issues/207207
+gem 'gitlab-mail_room', '~> 0.0.3', require: 'mail_room'
 
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'

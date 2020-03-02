@@ -130,13 +130,17 @@ class Namespace < ApplicationRecord
       return unless host.ends_with?(gitlab_host)
 
       name = host.delete_suffix(gitlab_host)
-      Namespace.find_by_full_path(name)
+      Namespace.find_by_path(name)
     end
 
     # overridden in ee
     def reset_ci_minutes!(namespace_id)
       false
     end
+  end
+
+  def default_branch_protection
+    super || Gitlab::CurrentSettings.default_branch_protection
   end
 
   def visibility_level_field

@@ -8,7 +8,7 @@ import {
   issuable3,
   issuable4,
   issuable5,
-} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
+} from 'jest/vue_shared/components/issue/related_issuable_mock_data';
 import { PathIdSeparator } from 'ee/related_issues/constants';
 
 describe('RelatedIssuesList', () => {
@@ -180,11 +180,21 @@ describe('RelatedIssuesList', () => {
     });
 
     it('shows weight', () => {
-      expect(wrapper.find(IssueWeight).text()).toBe(issuable1.weight.toString());
+      expect(
+        wrapper
+          .find(IssueWeight)
+          .find('.board-card-info-text')
+          .text(),
+      ).toBe(issuable1.weight.toString());
     });
 
     it('shows due date', () => {
-      expect(wrapper.find(IssueDueDate).text()).toBe('Nov 22, 2010');
+      expect(
+        wrapper
+          .find(IssueDueDate)
+          .find('.board-card-info-text')
+          .text(),
+      ).toBe('Nov 22, 2010');
     });
   });
 });

@@ -1,50 +1,36 @@
-import Vue from 'vue';
-
+import { shallowMount } from '@vue/test-utils';
 import ListContent from 'ee/boards/components/boards_list_selector/list_content.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
-
 import { mockAssigneesList } from 'jest/boards/mock_data';
 
-const createComponent = () => {
-  const Component = Vue.extend(ListContent);
-
-  return mountComponent(Component, {
-    items: mockAssigneesList,
-    listType: 'assignees',
-  });
-};
-
 describe('ListContent', () => {
-  let vm;
+  let wrapper;
 
   beforeEach(() => {
-    vm = createComponent();
+    wrapper = shallowMount(ListContent, {
+      propsData: {
+        items: mockAssigneesList,
+        listType: 'assignees',
+      },
+    });
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
-  describe('methods', () => {
-    describe('handleItemClick', () => {
-      it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
-        jest.spyOn(vm, '$emit');
-        const assignee = mockAssigneesList[0];
+  it('emits `onItemSelect` event on component and sends `assignee` as event param', () => {
+    const assignee = mockAssigneesList[0];
 
-        vm.handleItemClick(assignee);
+    wrapper.vm.handleItemClick(assignee);
 
-        expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
-      });
-    });
+    expect(wrapper.emitted().onItemSelect[0]).toEqual([assignee]);
   });
 
-  describe('template', () => {
-    it('renders component container element with class `dropdown-content`', () => {
-      expect(vm.$el.classList.contains('dropdown-content')).toBe(true);
-    });
+  it('renders component container element with class `dropdown-content`', () => {
+    expect(wrapper.classes('dropdown-content')).toBe(true);
+  });
 
-    it('renders UL parent element as child within container', () => {
-      expect(vm.$el.querySelector('ul')).not.toBeNull();
-    });
+  it('renders UL parent element as child within container', () => {
+    expect(wrapper.find('ul').exists()).toBe(true);
   });
 });

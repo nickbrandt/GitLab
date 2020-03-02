@@ -1963,6 +1963,14 @@ class Project < ApplicationRecord
   end
 
   def ci_variables_for(ref:, environment: nil)
+    cache_key = "ci_variables_for:project:#{self&.id}:ref:#{ref}:environment:#{environment}"
+
+    ::Gitlab::SafeRequestStore.fetch(cache_key) do
+      uncached_ci_variables_for(ref: ref, environment: environment)
+    end
+  end
+
+  def uncached_ci_variables_for(ref:, environment: nil)
     result = if protected_for?(ref)
                variables
              else
@@ -2349,6 +2357,12 @@ class Project < ApplicationRecord
 
   def deploy_token_revoke_url_for(token)
     Gitlab::Routing.url_helpers.revoke_project_deploy_token_path(self, token)
+  end
+
+  def default_branch_protected?
+    branch_protection = Gitlab::Access::BranchProtection.new(self.namespace.default_branch_protection)
+
+    branch_protection.fully_protected? || branch_protection.developer_can_merge?
   end
 
   private
