@@ -5,7 +5,7 @@ module QA
     module Page
       module Group
         class SamlSSOSignUp < QA::Page::Base
-          view 'ee/app/views/groups/sso/sign_up_form.html.haml' do
+          view 'ee/app/views/groups/sso/_register_pane.html.haml' do
             element :sign_out_and_register_button
             element :new_user_email_field
             element :new_user_username_field
