@@ -3,6 +3,17 @@
 module EE
   module Audit
     module Changes
+      # Records an audit event in DB for model changes
+      #
+      # @param [Symbol] column column name to be audited
+      # @param [Hash] options the options to create an event with
+      # @option options [Symbol] :column column name to be audited
+      # @option options [User, Project, Group] :target_model scope the event belongs to
+      # @option options [Object] :model object being audited
+      # @option options [Boolean] :skip_changes whether to record from/to values
+      #
+      # @return [SecurityEvent, nil] the resulting object or nil if there is no
+      #   change detected
       def audit_changes(column, options = {})
         column = options[:column] || column
         # rubocop:disable Gitlab/ModuleWithInstanceVariables
@@ -10,7 +21,7 @@ module EE
         @model = options[:model]
         # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
-        return unless changed?(column)
+        return unless audit_required?(column)
 
         audit_event(parse_options(column, options))
       end
@@ -26,6 +37,14 @@ module EE
       end
 
       private
+
+      def audit_required?(column)
+        not_recently_created? && changed?(column)
+      end
+
+      def not_recently_created?
+        !model.previous_changes.has_key?(:id)
+      end
 
       def changed?(column)
         model.previous_changes.has_key?(column)
