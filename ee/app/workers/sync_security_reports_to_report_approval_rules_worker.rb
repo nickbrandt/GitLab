@@ -6,7 +6,7 @@ class SyncSecurityReportsToReportApprovalRulesWorker # rubocop:disable Scalabili
   include ApplicationWorker
   include SecurityScansQueue
 
-  latency_sensitive_worker!
+  urgency :high
   worker_resource_boundary :cpu
 
   def perform(pipeline_id)
