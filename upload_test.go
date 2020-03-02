@@ -138,6 +138,7 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files", true},
 		{"POST", `/api/v4/groups/import`, true},
 		{"POST", `/api/v4/projects/import`, true},
+		{"POST", `/import/gitlab_project`, true},
 	}
 
 	for _, tt := range tests {
