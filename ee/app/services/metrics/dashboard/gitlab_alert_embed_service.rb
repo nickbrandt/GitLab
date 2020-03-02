@@ -18,7 +18,7 @@ module Metrics
         # custom metrics from the DB.
         def valid_params?(params)
           [
-            params[:embedded],
+            embedded?(params[:embedded]),
             params[:prometheus_alert_id].is_a?(Integer)
           ].all?
         end
