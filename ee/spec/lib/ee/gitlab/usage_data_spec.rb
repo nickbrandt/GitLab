@@ -132,24 +132,30 @@ describe Gitlab::UsageData do
                   user = create(:user)
                   project = create(:project, :repository_private, :github_imported,
                                    :test_repo, :remote_mirror, creator: user)
+                  merge_request = create(:merge_request, source_project: project)
                   create(:deploy_key, user: user)
                   create(:key, user: user)
-                  create(:merge_request, source_project: project)
                   create(:project, creator: user)
                   create(:protected_branch, project: project)
                   create(:remote_mirror, project: project)
                   create(:snippet, author: user)
                   create(:suggestion, note: create(:note, project: project))
+                  create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
+                  create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
+                  create_list(:code_owner_rule, 3, approvals_required: 2)
+                  create_list(:code_owner_rule, 2)
                 end
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to eq(
                 deploy_keys: 2,
                 keys: 2,
-                merge_requests: 2,
+                merge_requests: 12,
                 projects_enforcing_code_owner_approval: 0,
+                merge_requests_with_optional_codeowners: 4,
+                merge_requests_with_required_codeowners: 8,
                 projects_imported_from_github: 2,
-                projects_with_repositories_enabled: 2,
+                projects_with_repositories_enabled: 12,
                 protected_branches: 2,
                 remote_mirrors: 2,
                 snippets: 2,
@@ -158,10 +164,12 @@ describe Gitlab::UsageData do
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:create]).to eq(
                 deploy_keys: 1,
                 keys: 1,
-                merge_requests: 1,
+                merge_requests: 6,
                 projects_enforcing_code_owner_approval: 0,
+                merge_requests_with_optional_codeowners: 2,
+                merge_requests_with_required_codeowners: 4,
                 projects_imported_from_github: 1,
-                projects_with_repositories_enabled: 1,
+                projects_with_repositories_enabled: 6,
                 protected_branches: 1,
                 remote_mirrors: 1,
                 snippets: 1,
