@@ -39,8 +39,8 @@ class SnippetBlobPresenter < BlobPresenter
   end
 
   def renderer
-    proxy = Warden::Proxy.new({}, Warden::Manager.new({})).tap do |i|
-      i.set_user(current_user, scope: :user)
+    proxy = Warden::Proxy.new({}, Warden::Manager.new({})).tap do |proxy_instance|
+      proxy_instance.set_user(current_user, scope: :user)
     end
 
     ApplicationController.renderer.new('warden' => proxy)

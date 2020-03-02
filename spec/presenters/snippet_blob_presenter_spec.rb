@@ -4,8 +4,6 @@ require 'spec_helper'
 
 describe SnippetBlobPresenter do
   describe '#rich_data' do
-    let_it_be(:snippet) { create(:personal_snippet) }
-
     before do
       allow_next_instance_of(described_class) do |instance|
         allow(instance).to receive(:current_user).and_return(nil)
