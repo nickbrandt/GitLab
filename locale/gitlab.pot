@@ -15789,17 +15789,10 @@ msgstr ""
 msgid "Pull"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Puma is running with a thread count above 1 and the Rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
-=======
 msgid "Pull requests from fork are not supported"
 msgstr ""
 
-msgid "Puma is running with a thread count above 1 and the rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
-msgstr ""
-
-msgid "Puma is running with a thread count above 1. Information on deprecated GitLab features in this configuration is available in the %{link_start}documentation%{link_end}."
->>>>>>> Add internationalization support to error messages
+msgid "Puma is running with a thread count above 1 and the Rugged service is enabled. This may decrease performance in some environments. See our %{link_start}documentation%{link_end} for details of this issue."
 msgstr ""
 
 msgid "Purchase more minutes"
