@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 class Import::GitlabProjectsController < Import::BaseController
+  include WorkhorseRequest
+
   before_action :whitelist_query_limiting, only: [:create]
   before_action :verify_gitlab_project_import_enabled
+
+  skip_before_action :authenticate_user!, only: [:authorize, :create]
+  before_action :verify_workhorse_api!, only: [:authorize]
 
   def new
     @namespace = Namespace.find(project_params[:namespace_id])
@@ -26,6 +31,19 @@ class Import::GitlabProjectsController < Import::BaseController
     else
       redirect_back_or_default(options: { alert: "Project could not be imported: #{@project.errors.full_messages.join(', ')}" })
     end
+  end
+
+  # TODO: include UploadsActions?
+  def authorize
+    set_workhorse_internal_api_content_type
+
+    authorized = ImportExportUploader.workhorse_authorize(
+      has_length: false,
+      maximum_size: Gitlab::CurrentSettings.max_attachment_size.megabytes.to_i)
+
+    render json: authorized
+  rescue SocketError
+    render json: _("Error uploading file"), status: :internal_server_error
   end
 
   private
