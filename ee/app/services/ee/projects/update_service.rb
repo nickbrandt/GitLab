@@ -21,10 +21,6 @@ module EE
         result = super do
           # Repository size limit comes as MB from the view
           project.repository_size_limit = ::Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
-
-          if changing_storage_size?
-            project.change_repository_storage(params.delete(:repository_storage))
-          end
         end
 
         if result[:status] == :success
@@ -39,13 +35,6 @@ module EE
         end
 
         result
-      end
-
-      def changing_storage_size?
-        new_repository_storage = params[:repository_storage]
-
-        new_repository_storage && project.repository.exists? &&
-          can?(current_user, :change_repository_storage, project)
       end
 
       private
