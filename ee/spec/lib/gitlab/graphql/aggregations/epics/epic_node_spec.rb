@@ -24,6 +24,7 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
         new_node = described_class.new(epic_id, fake_data)
 
         expect(new_node.parent_id).to eq parent_id
+        expect(new_node.epic_state_id).to eq epic_state_id
       end
     end
 
@@ -44,8 +45,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       it 'does not create any totals' do
         subject.assemble_issue_totals
 
-        expect(subject.immediate_totals(COUNT_FACET).count).to eq 0
-        expect(subject.immediate_totals(WEIGHT_SUM_FACET).count).to eq 0
+        expect(subject.direct_totals(COUNT_FACET).count).to eq 0
+        expect(subject.direct_totals(WEIGHT_SUM_FACET).count).to eq 0
       end
     end
 
@@ -60,9 +61,9 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
         it 'creates no sums for the weight if the issues have 0 weight' do
           subject.assemble_issue_totals
 
-          expect(subject.immediate_totals(COUNT_FACET).count).to eq 1
-          expect(subject.immediate_totals(WEIGHT_SUM_FACET).count).to eq 0
-          expect(subject).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
+          expect(subject.direct_totals(COUNT_FACET).count).to eq 1
+          expect(subject.direct_totals(WEIGHT_SUM_FACET).count).to eq 0
+          expect(subject).to have_direct_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
         end
       end
 
@@ -76,8 +77,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
         it 'creates two sums' do
           subject.assemble_issue_totals
 
-          expect(subject).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
-          expect(subject).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
+          expect(subject).to have_direct_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
+          expect(subject).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
         end
       end
 
@@ -92,10 +93,10 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
         it 'creates two sums' do
           subject.assemble_issue_totals
 
-          expect(subject).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
-          expect(subject).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
-          expect(subject).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 3)
-          expect(subject).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 5)
+          expect(subject).to have_direct_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
+          expect(subject).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
+          expect(subject).to have_direct_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 3)
+          expect(subject).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 5)
         end
       end
     end
@@ -115,7 +116,7 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       it 'adds up the number of the child epics' do
         subject.assemble_epic_totals([child_epic_node])
 
-        expect(subject).to have_immediate_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+        expect(subject).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
       end
     end
   end
@@ -124,8 +125,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
     subject { described_class.new(epic_id, [{ parent_id: nil, epic_state_id: CLOSED_EPIC_STATE }]) }
 
     before do
-      allow(subject).to receive(:immediate_totals).with(COUNT_FACET).and_return(immediate_count_totals)
-      allow(subject).to receive(:immediate_totals).with(WEIGHT_SUM_FACET).and_return(immediate_weight_sum_totals)
+      allow(subject).to receive(:direct_totals).with(COUNT_FACET).and_return(immediate_count_totals)
+      allow(subject).to receive(:direct_totals).with(WEIGHT_SUM_FACET).and_return(immediate_weight_sum_totals)
     end
 
     shared_examples 'returns calculated totals by facet' do |facet, count|
@@ -191,8 +192,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
 
       before do
         subject.child_ids << child_epic_id
-        allow(child_epic_node).to receive(:immediate_totals).with(COUNT_FACET).and_return(child_count_totals)
-        allow(child_epic_node).to receive(:immediate_totals).with(WEIGHT_SUM_FACET).and_return(child_weight_sum_totals)
+        allow(child_epic_node).to receive(:direct_totals).with(COUNT_FACET).and_return(child_count_totals)
+        allow(child_epic_node).to receive(:direct_totals).with(WEIGHT_SUM_FACET).and_return(child_weight_sum_totals)
       end
 
       context 'with a child that has issues of nonzero weight' do
@@ -210,13 +211,13 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
         it 'returns the correct count total' do
           subject.calculate_recursive_sums(COUNT_FACET, tree)
 
-          expect(subject.calculated_count_totals.count).to eq 2
+          expect(subject).to have_calculated_total(ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 1)
         end
 
         it 'returns the correct weight sum total' do
           subject.calculate_recursive_sums(WEIGHT_SUM_FACET, tree)
 
-          expect(subject.calculated_weight_sum_totals.count).to eq 1
+          expect(subject).to have_calculated_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 2)
         end
       end
     end

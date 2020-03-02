@@ -3,11 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Graphql::Loaders::BulkEpicAggregateLoader do
-  let_it_be(:closed_issue_state_id) { Issue.available_states[:closed] }
-  let_it_be(:opened_issue_state_id) { Issue.available_states[:opened] }
-
-  let_it_be(:closed_epic_state_id) { Epic.available_states[:closed] }
-  let_it_be(:opened_epic_state_id) { Epic.available_states[:opened] }
+  include_context 'includes EpicAggregate constants'
 
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:subgroup) { create(:group, :private, parent: group)}
@@ -65,12 +61,12 @@ describe Gitlab::Graphql::Loaders::BulkEpicAggregateLoader do
     it 'sums all the weights, even confidential, or in private groups' do
       expected_result = {
         parent_epic.id => [
-            result_for(parent_epic, issues_state: opened_issue_state_id, issues_count: 5, issues_weight_sum: 4),
-            result_for(parent_epic, issues_state: closed_issue_state_id, issues_count: 1, issues_weight_sum: 1)
+            result_for(parent_epic, issues_state: OPENED_ISSUE_STATE, issues_count: 5, issues_weight_sum: 4),
+            result_for(parent_epic, issues_state: CLOSED_ISSUE_STATE, issues_count: 1, issues_weight_sum: 1)
           ],
         epic_with_issues.id => [
-          result_for(epic_with_issues, issues_state: opened_issue_state_id, issues_count: 5, issues_weight_sum: 4),
-          result_for(epic_with_issues, issues_state: closed_issue_state_id, issues_count: 1, issues_weight_sum: 1)
+          result_for(epic_with_issues, issues_state: OPENED_ISSUE_STATE, issues_count: 5, issues_weight_sum: 4),
+          result_for(epic_with_issues, issues_state: CLOSED_ISSUE_STATE, issues_count: 1, issues_weight_sum: 1)
         ],
         epic_without_issues.id => [
           result_for(epic_without_issues, issues_state: nil, issues_count: 0, issues_weight_sum: 0)
@@ -132,6 +128,6 @@ describe Gitlab::Graphql::Loaders::BulkEpicAggregateLoader do
   end
 
   def result_for(epic, issues_state:, issues_count:, issues_weight_sum:)
-    { iid: epic.iid, issues_count: issues_count, issues_weight_sum: issues_weight_sum, parent_id: epic.parent_id, issues_state_id: issues_state, epic_state_id: Epic.available_states[epic.state_id] }.stringify_keys
+    { id: epic.id, iid: epic.iid, issues_count: issues_count, issues_weight_sum: issues_weight_sum, parent_id: epic.parent_id, issues_state_id: issues_state, epic_state_id: Epic.available_states[epic.state_id] }.stringify_keys
   end
 end

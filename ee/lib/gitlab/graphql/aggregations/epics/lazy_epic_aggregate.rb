@@ -9,13 +9,17 @@ module Gitlab
 
           attr_reader :facet, :epic_id, :lazy_state
 
+          PERMITTED_FACETS = [COUNT, WEIGHT_SUM].freeze
+
           # Because facets "count" and "weight_sum" share the same db query, but have a different graphql type object,
           # we can separate them and serve only the fields which are requested by the GraphQL query
           def initialize(query_ctx, epic_id, aggregate_facet)
             @epic_id = epic_id
 
-            raise ArgumentError.new("No aggregate facet provided. Please specify either #{COUNT} or #{WEIGHT_SUM}") unless aggregate_facet.present?
-            raise ArgumentError.new("Invalid aggregate facet #{aggregate_facet} provided. Please specify either #{COUNT} or #{WEIGHT_SUM}") unless [COUNT, WEIGHT_SUM].include?(aggregate_facet.to_sym)
+            error = validate_facet(aggregate_facet)
+            if error
+              raise ArgumentError.new("#{error}. Please specify either #{COUNT} or #{WEIGHT_SUM}")
+            end
 
             @facet = aggregate_facet.to_sym
 
@@ -33,18 +37,24 @@ module Gitlab
           def epic_aggregate
             # Check if the record was already loaded:
             # load from tree by epic
-            loaded_epic_info_node = @lazy_state[:tree][@epic_id]
-
-            if loaded_epic_info_node
-              # The pending IDs were already loaded,
-              # so return the result of that previous load
-              aggregate_object(loaded_epic_info_node)
-            else
+            unless tree[@epic_id]
               load_records_into_tree
             end
+
+            aggregate_object(tree[@epic_id])
           end
 
           private
+
+          def validate_facet(aggregate_facet)
+            unless aggregate_facet.present?
+              return "No aggregate facet provided."
+            end
+
+            unless PERMITTED_FACETS.include?(aggregate_facet.to_sym)
+              return "Invalid aggregate facet #{aggregate_facet} provided."
+            end
+          end
 
           def tree
             @lazy_state[:tree]
@@ -62,38 +72,26 @@ module Gitlab
             create_structure_from(raw_epic_aggregates)
 
             @lazy_state[:pending_ids].clear
-
-            # Now, get the matching node and return its aggregate depending on the facet:
-            epic_node = @lazy_state[:tree][@epic_id]
-            aggregate_object(epic_node)
           end
 
           def create_structure_from(aggregate_records)
             # create EpicNode object for each epic id
             aggregate_records.each do |epic_id, aggregates|
-              next if aggregates.nil? || aggregates.empty?
+              next if aggregates.blank?
 
-              new_node = EpicNode.new(epic_id, aggregates)
-              tree[epic_id] = new_node
+              tree[epic_id] = EpicNode.new(epic_id, aggregates)
             end
 
-            associate_parents_and_children
-            assemble_immediate_totals
+            assemble_direct_child_totals
           end
 
-          # each of the methods below are done one after the other
-          def associate_parents_and_children
-            tree.each do |epic_id, node|
-              node.child_ids = tree.select { |_, child_node| epic_id == child_node.parent_id }.keys
-            end
-          end
-
-          def assemble_immediate_totals
+          def assemble_direct_child_totals
             tree.each do |_, node|
-              node.assemble_issue_totals
+              node_children = tree.select { |_, child_node| node.epic_id == child_node.parent_id }
+              node.child_ids = node_children.keys
+              node.assemble_epic_totals(node_children.values)
 
-              node_children = tree.select { |_, child_node| node.epic_id == child_node.parent_id }.values
-              node.assemble_epic_totals(node_children)
+              node.assemble_issue_totals
             end
           end
 

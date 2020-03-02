@@ -317,7 +317,7 @@ Represents an epic.
 | `closedAt` | Time | Timestamp of the epic's closure |
 | `createdAt` | Time | Timestamp of the epic's creation |
 | `descendantCounts` | EpicDescendantCount | Number of open and closed descendant epics and issues |
-| `descendantWeightSum` | EpicDescendantWeights | Total weight of open and closed descendant epic's issues. Available only when feature flag `unfiltered_epic_aggregates` is enabled. |
+| `descendantWeightSum` | EpicDescendantWeights | Total weight of open and closed issues in the epic and its descendants. Available only when feature flag `unfiltered_epic_aggregates` is enabled. |
 | `description` | String | Description of the epic |
 | `downvotes` | Int! | Number of downvotes the epic has received |
 | `dueDate` | Time | Due date of the epic |
@@ -327,6 +327,7 @@ Represents an epic.
 | `group` | Group! | Group to which the epic belongs |
 | `hasChildren` | Boolean! | Indicates if the epic has children |
 | `hasIssues` | Boolean! | Indicates if the epic has direct issues |
+| `healthStatus` | HealthStatus | Current health status. Available only when feature flag `save_issuable_health_status` is enabled. |
 | `id` | ID! | ID of the epic |
 | `iid` | ID! | Internal ID of the epic |
 | `parent` | Epic | Parent epic of the epic |

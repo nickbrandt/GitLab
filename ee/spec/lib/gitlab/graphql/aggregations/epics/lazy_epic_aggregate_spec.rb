@@ -108,12 +108,12 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[epic_id]).to have_immediate_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
-          expect(tree[epic_id]).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_immediate_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
 
-          expect(tree[child_epic_id]).to have_immediate_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
-          expect(tree[child_epic_id]).to have_immediate_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
+          expect(tree[child_epic_id]).to have_direct_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
+          expect(tree[child_epic_id]).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
         end
 
         it 'assembles recursive sums for the parent', :aggregate_failures do
@@ -137,8 +137,8 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
           lazy_state = subject.instance_variable_get(:@lazy_state)
           tree = lazy_state[:tree]
 
-          expect(tree[other_epic_id].immediate_count_totals).to be_empty
-          expect(tree[other_epic_id].immediate_weight_sum_totals).to be_empty
+          expect(tree[other_epic_id].direct_count_totals).to be_empty
+          expect(tree[other_epic_id].direct_weight_sum_totals).to be_empty
         end
       end
     end

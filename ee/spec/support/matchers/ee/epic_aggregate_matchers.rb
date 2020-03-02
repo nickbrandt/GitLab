@@ -1,24 +1,26 @@
 # frozen_string_literal: true
 
-RSpec::Matchers.define :have_immediate_total do |type, facet, state, expected_value|
-  match do |epic_node_result|
-    expect(epic_node_result).not_to be_nil
-    immediate_totals = epic_node_result.immediate_totals(facet)
-    expect(immediate_totals).not_to be_empty
+%w[direct calculated].each do |total_type|
+  RSpec::Matchers.define :"have_#{total_type}_total" do |type, facet, state, expected_value|
+    match do |epic_node_result|
+      expect(epic_node_result).not_to be_nil
+      totals = epic_node_result.public_send("#{total_type}_totals", facet)
+      expect(totals).not_to be_empty
 
-    matching = immediate_totals.select { |sum| sum.type == type && sum.facet == facet && sum.state == state && sum.value == expected_value }
-    expect(matching).not_to be_empty
-  end
+      matching = totals.select { |sum| sum.type == type && sum.facet == facet && sum.state == state && sum.value == expected_value }
+      expect(matching).not_to be_empty
+    end
 
-  failure_message do |epic_node_result|
-    if epic_node_result.nil?
-      "expected for there to be an epic node, but it is nil"
-    else
-      immediate_totals = epic_node_result.immediate_totals(facet)
-      <<~FAILURE_MSG
-        expected epic node with id #{epic_node_result.epic_id} to have a sum with facet '#{facet}', state '#{state}', type '#{type}' and value '#{expected_value}'. Has #{immediate_totals.count} immediate sum objects#{", none of which match" if immediate_totals.count > 0}.
-        Sums: #{immediate_totals.inspect}
-      FAILURE_MSG
+    failure_message do |epic_node_result|
+      if epic_node_result.nil?
+        "expected for there to be an epic node, but it is nil"
+      else
+        totals = epic_node_result.public_send("#{total_type}_totals", facet)
+        <<~FAILURE_MSG
+          expected epic node with id #{epic_node_result.epic_id} to have a sum with facet '#{facet}', state '#{state}', type '#{type}' and value '#{expected_value}'. Has #{totals.count} #{total_type} sum objects#{", none of which match" if totals.count > 0}.
+          Sums: #{totals.inspect}
+        FAILURE_MSG
+      end
     end
   end
 end

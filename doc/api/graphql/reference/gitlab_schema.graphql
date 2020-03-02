@@ -1948,8 +1948,8 @@ type Epic implements Noteable {
   descendantCounts: EpicDescendantCount
 
   """
-  Total weight of open and closed descendant epic's issues. Available only when
-  feature flag `unfiltered_epic_aggregates` is enabled.
+  Total weight of open and closed issues in the epic and its descendants.
+  Available only when feature flag `unfiltered_epic_aggregates` is enabled.
   """
   descendantWeightSum: EpicDescendantWeights
 
@@ -2022,6 +2022,11 @@ type Epic implements Noteable {
   Indicates if the epic has direct issues
   """
   hasIssues: Boolean!
+
+  """
+  Current health status. Available only when feature flag `save_issuable_health_status` is enabled.
+  """
+  healthStatus: HealthStatus
 
   """
   ID of the epic
