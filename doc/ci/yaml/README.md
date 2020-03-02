@@ -632,6 +632,7 @@ This means the keys are treated as if joined by an OR. This relationship could b
 > (any of refs) OR (any of variables) OR (any of changes) OR (if Kubernetes is active)
 
 In the example below, the `test` job will **not** be created when **any** of the following are true:
+
 - The pipeline runs for the `master`.
 - There are changes to the README.md file in the root directory of the repo.
 
