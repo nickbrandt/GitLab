@@ -59,22 +59,22 @@ describe IssueLinks::ListService do
                                            title: issue_b.title,
                                            state: issue_b.state,
                                            reference: issue_b.to_reference(project),
-                                           path: "/#{project.full_path}/issues/#{issue_b.iid}",
-                                           relation_path: "/#{project.full_path}/issues/#{issue.iid}/links/#{issue_link_a.id}"))
+                                           path: "/#{project.full_path}/-/issues/#{issue_b.iid}",
+                                           relation_path: "/#{project.full_path}/-/issues/#{issue.iid}/links/#{issue_link_a.id}"))
 
         expect(subject).to include(include(id: issue_c.id,
                                            title: issue_c.title,
                                            state: issue_c.state,
                                            reference: issue_c.to_reference(project),
-                                           path: "/#{project.full_path}/issues/#{issue_c.iid}",
-                                           relation_path: "/#{project.full_path}/issues/#{issue.iid}/links/#{issue_link_b.id}"))
+                                           path: "/#{project.full_path}/-/issues/#{issue_c.iid}",
+                                           relation_path: "/#{project.full_path}/-/issues/#{issue.iid}/links/#{issue_link_b.id}"))
 
         expect(subject).to include(include(id: issue_d.id,
                                            title: issue_d.title,
                                            state: issue_d.state,
                                            reference: issue_d.to_reference(project),
-                                           path: "/#{project.full_path}/issues/#{issue_d.iid}",
-                                           relation_path: "/#{project.full_path}/issues/#{issue.iid}/links/#{issue_link_c.id}"))
+                                           path: "/#{project.full_path}/-/issues/#{issue_d.iid}",
+                                           relation_path: "/#{project.full_path}/-/issues/#{issue.iid}/links/#{issue_link_c.id}"))
       end
     end
 
@@ -188,7 +188,7 @@ describe IssueLinks::ListService do
 
         it 'returns related issue destroy relation path' do
           expect(subject.first[:relation_path])
-            .to eq("/#{project.full_path}/issues/#{issue.iid}/links/#{issue_link.id}")
+            .to eq("/#{project.full_path}/-/issues/#{issue.iid}/links/#{issue_link.id}")
         end
       end
     end
