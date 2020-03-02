@@ -186,7 +186,7 @@ describe ProjectsHelper do
         allow(project).to receive(:feature_available?) { security_dashboard_feature_available? }
         allow(helper).to receive(:can?) { can_admin_namespace? }
 
-        expected_value = user? && created_at > DateTime.new(2020, 1, 20) && gitlab_com? &&
+        expected_value = user? && created_at > DateTime.new(2019, 11, 1) && gitlab_com? &&
                          ab_feature_enabled? && !security_dashboard_feature_available? && can_admin_namespace?
 
         expect(helper.show_discover_project_security?(project)).to eq(expected_value)

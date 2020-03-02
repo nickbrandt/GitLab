@@ -83,7 +83,7 @@ module EE
     end
 
     def show_discover_group_security?(group)
-      security_feature_available_at = DateTime.new(2020, 1, 20)
+      security_feature_available_at = DateTime.new(2019, 11, 1)
 
       !!current_user &&
         ::Gitlab.com? &&
