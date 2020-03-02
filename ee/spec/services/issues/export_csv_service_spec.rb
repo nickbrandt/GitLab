@@ -54,6 +54,10 @@ describe Issues::ExportCsvService do
                     time_estimate: 72000)
     end
 
+    it 'includes the columns required for import' do
+      expect(csv.headers).to include('Title', 'Description')
+    end
+
     specify 'iid' do
       expect(csv[0]['Issue ID']).to eq issue.iid.to_s
     end
