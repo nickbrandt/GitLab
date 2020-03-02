@@ -3,14 +3,6 @@
 module Banzai
   module Filter
     class InlineClusterMetricsFilter < ::Banzai::Filter::InlineEmbedsFilter
-      def create_element(params)
-        doc.document.create_element(
-          'div',
-          class: 'js-render-metrics',
-          'data-dashboard-url': metrics_dashboard_url(params)
-        )
-      end
-
       def embed_params(node)
         url = node['href']
 
