@@ -9,6 +9,7 @@ describe 'layouts/nav/sidebar/_analytics' do
 
   before do
     stub_feature_flags(group_level_productivity_analytics: false)
+    stub_feature_flags(group_level_cycle_analytics: false)
   end
 
   context 'top-level items' do

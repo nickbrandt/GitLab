@@ -3,14 +3,15 @@
 require 'spec_helper'
 
 describe GroupsHelper do
-  let(:user) { create(:user, group_view: :security_dashboard) }
+  let(:owner) { create(:user, group_view: :security_dashboard) }
+  let(:current_user) { owner }
   let(:group) { create(:group, :private) }
 
   before do
-    allow(helper).to receive(:current_user) { user }
+    allow(helper).to receive(:current_user) { current_user }
     helper.instance_variable_set(:@group, group)
 
-    group.add_owner(user)
+    group.add_owner(owner)
   end
 
   describe '#group_epics_count' do
@@ -48,6 +49,21 @@ describe GroupsHelper do
                              epics: false)
 
       expect(helper.group_sidebar_links).not_to include(:contribution_analytics, :epics)
+    end
+
+    context 'when contribution analytics is available' do
+      before do
+        stub_licensed_features(contribution_analytics: true)
+      end
+
+      context 'signed in user is a project member but not a member of the group' do
+        let(:current_user) { create(:user) }
+        let(:private_project) { create(:project, :private, group: group)}
+
+        it 'hides Contribution Analytics' do
+          expect(helper.group_sidebar_links).not_to include(:contribution_analytics)
+        end
+      end
     end
   end
 
@@ -107,10 +123,10 @@ describe GroupsHelper do
 
     with_them do
       it 'returns the expected value' do
-        allow(helper).to receive(:current_user) { user? ? user : nil }
+        allow(helper).to receive(:current_user) { user? ? owner : nil }
         allow(::Gitlab).to receive(:com?) { gitlab_com? }
-        allow(user).to receive(:ab_feature_enabled?) { ab_feature_enabled? }
-        allow(user).to receive(:created_at) { created_at }
+        allow(owner).to receive(:ab_feature_enabled?) { ab_feature_enabled? }
+        allow(owner).to receive(:created_at) { created_at }
         allow(::Feature).to receive(:enabled?).with(:discover_security) { discover_security_feature_enabled? }
         allow(group).to receive(:feature_available?) { security_dashboard_feature_available? }
         allow(helper).to receive(:can?) { can_admin_group? }
