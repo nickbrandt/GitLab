@@ -9,12 +9,12 @@ module Gitlab
         include ActiveModel::Attributes
 
         MAX_RANGE_DAYS = 180.days.freeze
-        DEFAULT_DATE_RANGE = 30.days
+        DEFAULT_DATE_RANGE = 29.days # 30 including Date.today
 
         attr_writer :project_ids
 
-        attribute :created_after, :date
-        attribute :created_before, :date
+        attribute :created_after, :datetime
+        attribute :created_before, :datetime
 
         attr_accessor :group
 
@@ -27,12 +27,12 @@ module Gitlab
         validate :validate_date_range
 
         def initialize(params = {}, current_user:)
-          params[:created_before] ||= Date.today.at_end_of_day
-          params[:created_after] ||= default_created_after(params[:created_before])
+          super(params)
+
+          self.created_before = (self.created_before || Time.now).at_end_of_day
+          self.created_after  = (created_after || default_created_after).at_beginning_of_day
 
           @current_user = current_user
-
-          super(params)
         end
 
         def project_ids
@@ -42,8 +42,8 @@ module Gitlab
         def to_data_attributes
           {}.tap do |attrs|
             attrs[:group] = group_data_attributes if group
-            attrs[:created_after] = created_after.iso8601
-            attrs[:created_before] = created_before.iso8601
+            attrs[:created_after] = created_after.to_date.iso8601
+            attrs[:created_before] = created_before.to_date.iso8601
             attrs[:projects] = group_projects(project_ids) if group && project_ids.any?
           end
         end
@@ -90,16 +90,16 @@ module Gitlab
         def validate_date_range
           return if created_after.nil? || created_before.nil?
 
-          if (created_before - created_after).days > MAX_RANGE_DAYS
+          if (created_before - created_after) > MAX_RANGE_DAYS
             errors.add(:created_after, s_('CycleAnalytics|The given date range is larger than 180 days'))
           end
         end
 
-        def default_created_after(start_date = nil)
-          if start_date
-            (start_date.to_time - DEFAULT_DATE_RANGE).to_datetime
+        def default_created_after
+          if created_before
+            (created_before - DEFAULT_DATE_RANGE)
           else
-            DEFAULT_DATE_RANGE.ago.utc.beginning_of_day
+            DEFAULT_DATE_RANGE.ago
           end
         end
       end

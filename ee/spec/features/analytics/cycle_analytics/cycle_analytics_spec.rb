@@ -256,8 +256,15 @@ describe 'Group Value Stream Analytics', :js do
   context 'with lots of data', :js do
     let!(:issue) { create(:issue, project: project, created_at: 5.days.ago) }
 
+    around do |example|
+      Timecop.freeze { example.run }
+    end
+
     before do
       create_cycle(user, project, issue, mr, milestone, pipeline)
+
+      issue.metrics.update!(first_mentioned_in_commit_at: mr.created_at - 5.hours)
+      mr.metrics.update!(first_deployed_to_production_at: mr.created_at + 2.hours, merged_at: mr.created_at + 1.hour)
 
       deploy_master(user, project, environment: 'staging')
       deploy_master(user, project)
@@ -268,10 +275,10 @@ describe 'Group Value Stream Analytics', :js do
     dummy_stages = [
       { title: "Issue", description: "Time before an issue gets scheduled", events_count: 1, median: "5 days" },
       { title: "Plan", description: "Time before an issue starts implementation", events_count: 0, median: "Not enough data" },
-      { title: "Code", description: "Time until first merge request", events_count: 0, median: "Not enough data" },
+      { title: "Code", description: "Time until first merge request", events_count: 1, median: "about 5 hours" },
       { title: "Test", description: "Total test time for all commits/merges", events_count: 0, median: "Not enough data" },
-      { title: "Review", description: "Time between merge request creation and merge/close", events_count: 0, median: "Not enough data" },
-      { title: "Staging", description: "From merge request merge until deploy to production", events_count: 0, median: "Not enough data" },
+      { title: "Review", description: "Time between merge request creation and merge/close", events_count: 1, median: "about 1 hour" },
+      { title: "Staging", description: "From merge request merge until deploy to production", events_count: 1, median: "about 1 hour" },
       { title: "Total", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
     ]
 

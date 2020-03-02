@@ -205,7 +205,6 @@ describe Analytics::CycleAnalytics::StagesController do
       end
 
       include_examples 'cycle analytics data endpoint examples'
-      include_examples 'group permission check on the controller level'
     end
 
     describe 'GET `records`' do

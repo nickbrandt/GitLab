@@ -68,12 +68,12 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
     end
   end
 
-  it 'casts `created_after` to date' do
-    expect(subject.created_after).to be_a_kind_of(Date)
+  it 'casts `created_after` to `Time`' do
+    expect(subject.created_after).to be_a_kind_of(Time)
   end
 
-  it 'casts `created_before` to date' do
-    expect(subject.created_before).to be_a_kind_of(Date)
+  it 'casts `created_before` to `Time`' do
+    expect(subject.created_before).to be_a_kind_of(Time)
   end
 
   describe 'optional `project_ids`' do

@@ -234,6 +234,7 @@ export default {
             :start-date="startDate"
             :end-date="endDate"
             :max-date-range="$options.maxDateRange"
+            :include-selected-date="true"
             class="js-daterange-picker"
             @change="setDateRange"
           />

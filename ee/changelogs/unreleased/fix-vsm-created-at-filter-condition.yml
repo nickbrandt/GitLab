@@ -1,0 +1,5 @@
+---
+title: Pass correct Time object to Value Stream Management DataCollector
+merge_request: 25885
+author:
+type: fixed
