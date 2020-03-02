@@ -1,0 +1,5 @@
+---
+title: Don't show Contribution Analytics to users who are not group members
+merge_request:
+author:
+type: security
