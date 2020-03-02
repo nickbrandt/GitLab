@@ -3,15 +3,16 @@
 class ApprovalMergeRequestRule < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include ApprovalRuleLike
+  include EE::UsageStatistics # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
 
   scope :from_project_rule, -> (project_rule) do
     joins(:approval_merge_request_rule_source)
-    .where(
-      approval_merge_request_rule_sources: { approval_project_rule_id: project_rule.id }
-    )
+      .where(
+        approval_merge_request_rule_sources: { approval_project_rule_id: project_rule.id }
+      )
   end
   scope :for_unmerged_merge_requests, -> (merge_requests = nil) do
     query = joins(:merge_request).where.not(merge_requests: { state_id: MergeRequest.available_states[:merged] })
@@ -22,6 +23,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
       query
     end
   end
+  scope :code_owner_approval_optional, -> { code_owner.where(approvals_required: 0) }
+  scope :code_owner_approval_required, -> { code_owner.where('approvals_required > 0') }
 
   validates :name, uniqueness: { scope: [:merge_request_id, :rule_type] }
   validates :rule_type, uniqueness: { scope: :merge_request_id, message: proc { _('any-approver for the merge request already exists') } }, if: :any_approver?
