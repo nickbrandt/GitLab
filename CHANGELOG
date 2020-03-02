@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.24.0
+
+- Support Stackdriver Profiler through Labkit !461
+
 v 8.23.0
 
 - Don't set Cache-Control header for git archives !462
