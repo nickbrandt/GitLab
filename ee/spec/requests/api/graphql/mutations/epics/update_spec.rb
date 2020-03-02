@@ -134,9 +134,4 @@ describe Mutations::Epics::Update do
       end
     end
   end
-
-  it_behaves_like 'updating health status' do
-    let(:resource) { epic }
-    let(:user) { current_user }
-  end
 end

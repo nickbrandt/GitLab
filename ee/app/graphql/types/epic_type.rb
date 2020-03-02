@@ -137,11 +137,5 @@ module Types
         closed_issues: -1
       )
     end
-
-    field :health_status,
-      ::Types::HealthStatusEnum,
-      null: true,
-      description: 'Current health status',
-      feature_flag: :save_issuable_health_status
   end
 end

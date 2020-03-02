@@ -297,10 +297,5 @@ describe Epics::UpdateService do
       let(:issuable) { epic }
       let(:parent) { group }
     end
-
-    it_behaves_like 'updating issuable health status' do
-      let(:issuable) { epic }
-      let(:parent) { group }
-    end
   end
 end

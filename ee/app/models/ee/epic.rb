@@ -15,7 +15,6 @@ module EE
       include UsageStatistics
       include FromUnion
       include EpicTreeSorting
-      include HealthStatus
 
       enum state_id: {
         opened: ::Epic.available_states[:opened],
