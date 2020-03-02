@@ -26,6 +26,7 @@ import {
   mockLogsResult,
   mockEnvName,
   mockSearch,
+  mockLogsEndpoint,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -52,6 +53,8 @@ describe('Logs Store actions', () => {
   let state;
   let mock;
 
+  const latestGetParams = () => mock.history.get[mock.history.get.length - 1].params;
+
   convertToFixedRange.mockImplementation(range => {
     if (range === defaultTimeRange) {
       return { ...mockDefaultRange };
@@ -75,10 +78,16 @@ describe('Logs Store actions', () => {
 
   describe('setInitData', () => {
     it('should commit environment and pod name mutation', () =>
-      testAction(setInitData, { environmentName: mockEnvName, podName: mockPodName }, state, [
-        { type: types.SET_PROJECT_ENVIRONMENT, payload: mockEnvName },
-        { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
-      ]));
+      testAction(
+        setInitData,
+        { timeRange: mockFixedRange, environmentName: mockEnvName, podName: mockPodName },
+        state,
+        [
+          { type: types.SET_TIME_RANGE, payload: mockFixedRange },
+          { type: types.SET_PROJECT_ENVIRONMENT, payload: mockEnvName },
+          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
+        ],
+      ));
   });
 
   describe('setSearch', () => {
@@ -154,22 +163,13 @@ describe('Logs Store actions', () => {
       state.environments.current = mockEnvName;
       state.pods.current = mockPodName;
 
-      const endpoint = '/dummy_logs_path.json';
+      mock.onGet(mockLogsEndpoint).reply(200, {
+        pod_name: mockPodName,
+        pods: mockPods,
+        logs: mockLogsResult,
+      });
 
-      mock
-        .onGet(endpoint, {
-          params: {
-            pod_name: mockPodName,
-            ...mockDefaultRange,
-          },
-        })
-        .reply(200, {
-          pod_name: mockPodName,
-          pods: mockPods,
-          logs: mockLogsResult,
-        });
-
-      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
+      mock.onGet(mockLogsEndpoint).replyOnce(202); // mock reactive cache
 
       return testAction(
         fetchLogs,
@@ -183,6 +183,11 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
+        () => {
+          expect(latestGetParams()).toMatchObject({
+            pod_name: mockPodName,
+          });
+        },
       );
     });
 
@@ -193,10 +198,8 @@ describe('Logs Store actions', () => {
       state.pods.current = mockPodName;
       state.timeRange.current = mockFixedRange;
 
-      const endpoint = '/dummy_logs_path.json';
-
       mock
-        .onGet(endpoint, {
+        .onGet(mockLogsEndpoint, {
           params: {
             pod_name: mockPodName,
             start: mockFixedRange.start,
@@ -221,6 +224,13 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
+        () => {
+          expect(latestGetParams()).toMatchObject({
+            pod_name: mockPodName,
+            start: mockFixedRange.start,
+            end: mockFixedRange.end,
+          });
+        },
       );
     });
 
@@ -231,10 +241,8 @@ describe('Logs Store actions', () => {
       state.search = mockSearch;
       state.timeRange.current = 'INVALID_TIME_RANGE';
 
-      const endpoint = '/dummy_logs_path.json';
-
       mock
-        .onGet(endpoint, {
+        .onGet(mockLogsEndpoint, {
           params: {
             pod_name: mockPodName,
             search: mockSearch,
@@ -246,7 +254,7 @@ describe('Logs Store actions', () => {
           logs: mockLogsResult,
         });
 
-      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
+      mock.onGet(mockLogsEndpoint).replyOnce(202); // mock reactive cache
 
       return testAction(
         fetchLogs,
@@ -268,20 +276,20 @@ describe('Logs Store actions', () => {
       );
     });
 
-    it('should commit logs and pod data when no pod name defined', done => {
+    it('should commit logs and pod data when no pod name defined', () => {
       state.environments.options = mockEnvironments;
       state.environments.current = mockEnvName;
+      state.timeRange.current = mockDefaultRange;
 
-      const endpoint = '/dummy_logs_path.json';
-
-      mock.onGet(endpoint, { params: { ...mockDefaultRange } }).reply(200, {
+      mock.onGet(mockLogsEndpoint).reply(200, {
         pod_name: mockPodName,
         pods: mockPods,
         logs: mockLogsResult,
       });
-      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
-      testAction(
+      mock.onGet(mockLogsEndpoint).replyOnce(202); // mock reactive cache
+
+      return testAction(
         fetchLogs,
         null,
         state,
@@ -293,7 +301,9 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
-        done,
+        () => {
+          expect(latestGetParams()).toEqual({});
+        },
       );
     });
 
@@ -301,8 +311,7 @@ describe('Logs Store actions', () => {
       state.environments.options = mockEnvironments;
       state.environments.current = mockEnvName;
 
-      const endpoint = `/${mockProjectPath}/-/logs/elasticsearch.json?environment_name=${mockEnvName}`;
-      mock.onGet(endpoint).replyOnce(500);
+      mock.onGet(mockLogsEndpoint).replyOnce(500);
 
       return testAction(
         fetchLogs,
@@ -315,9 +324,6 @@ describe('Logs Store actions', () => {
           { type: types.RECEIVE_LOGS_DATA_ERROR },
         ],
         [],
-        () => {
-          expect(flash).toHaveBeenCalledTimes(1);
-        },
       );
     });
   });

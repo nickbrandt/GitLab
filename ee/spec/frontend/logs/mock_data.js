@@ -3,12 +3,13 @@ export const mockEnvName = 'production';
 export const mockEnvironmentsEndpoint = `${mockProjectPath}/environments.json`;
 export const mockEnvId = '99';
 export const mockDocumentationPath = '/documentation.md';
+export const mockLogsEndpoint = '/dummy_logs_path.json';
 
 const makeMockEnvironment = (id, name, advancedQuerying) => ({
   id,
   project_path: mockProjectPath,
   name,
-  logs_api_path: '/dummy_logs_path.json',
+  logs_api_path: mockLogsEndpoint,
   enable_advanced_logs_querying: advancedQuerying,
 });
 

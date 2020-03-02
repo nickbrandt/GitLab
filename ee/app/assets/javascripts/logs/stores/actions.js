@@ -16,6 +16,25 @@ const flashLogsError = () => {
   flash(s__('Metrics|There was an error fetching the logs, please try again'));
 };
 
+const logsRequestParams = ({ state }) => {
+  const params = {
+    environment: state.environments.options.find(({ name }) => name === state.environments.current),
+    podName: state.pods.current,
+    search: state.search,
+  };
+
+  if (state.timeRange.current) {
+    try {
+      const { start, end } = convertToFixedRange(state.timeRange.current);
+      params.start = start;
+      params.end = end;
+    } catch {
+      flashTimeRangeWarning();
+    }
+  }
+  return params;
+};
+
 const requestLogsUntilData = params =>
   backOff((next, stop) => {
     Api.getPodLogs(params)
@@ -32,9 +51,7 @@ const requestLogsUntilData = params =>
   });
 
 export const setInitData = ({ commit }, { timeRange, environmentName, podName }) => {
-  if (timeRange) {
-    commit(types.SET_TIME_RANGE, timeRange);
-  }
+  commit(types.SET_TIME_RANGE, timeRange);
   commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
   commit(types.SET_CURRENT_POD_NAME, podName);
 };
@@ -60,10 +77,15 @@ export const showEnvironment = ({ dispatch, commit }, environmentName) => {
   dispatch('fetchLogs');
 };
 
+/**
+ * Fetch environments data and initial logs
+ * @param {Object} store
+ * @param {String} environmentsPath
+ */
 export const fetchEnvironments = ({ commit, dispatch }, environmentsPath) => {
   commit(types.REQUEST_ENVIRONMENTS_DATA);
 
-  axios
+  return axios
     .get(environmentsPath)
     .then(({ data }) => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, data.environments);
@@ -76,26 +98,12 @@ export const fetchEnvironments = ({ commit, dispatch }, environmentsPath) => {
 };
 
 export const fetchLogs = ({ commit, state }) => {
-  const params = {
-    environment: state.environments.options.find(({ name }) => name === state.environments.current),
-    podName: state.pods.current,
-    search: state.search,
-  };
-
-  if (state.timeRange.current) {
-    try {
-      const { start, end } = convertToFixedRange(state.timeRange.current);
-      params.start = start;
-      params.end = end;
-    } catch {
-      flashTimeRangeWarning();
-    }
-  }
+  const fetchParams = logsRequestParams({ state });
 
   commit(types.REQUEST_PODS_DATA);
   commit(types.REQUEST_LOGS_DATA);
 
-  return requestLogsUntilData(params)
+  return requestLogsUntilData(fetchParams)
     .then(({ data }) => {
       const { pod_name, pods, logs } = data;
       commit(types.SET_CURRENT_POD_NAME, pod_name);
@@ -106,6 +114,22 @@ export const fetchLogs = ({ commit, state }) => {
     .catch(() => {
       commit(types.RECEIVE_PODS_DATA_ERROR);
       commit(types.RECEIVE_LOGS_DATA_ERROR);
+      flashLogsError();
+    });
+};
+
+export const fetchMoreLogsPrepend = ({ commit, state }) => {
+  const fetchParams = logsRequestParams({ state });
+
+  commit(types.REQUEST_LOGS_DATA_PREPEND);
+
+  return requestLogsUntilData(fetchParams)
+    .then(({ data }) => {
+      const { logs } = data;
+      commit(types.RECEIVE_LOGS_DATA_PREPEND_SUCCESS, logs);
+    })
+    .catch(() => {
+      commit(types.RECEIVE_LOGS_DATA_PREPEND_ERROR);
       flashLogsError();
     });
 };

@@ -1,22 +1,36 @@
 <script>
+import { throttle } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick, GlAlert } from '@gitlab/ui';
+import {
+  GlSprintf,
+  GlAlert,
+  GlDropdown,
+  GlDropdownItem,
+  GlFormGroup,
+  GlSearchBoxByClick,
+  GlInfiniteScroll,
+} from '@gitlab/ui';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
-import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
 import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
 import { timeRangeFromUrl } from '~/monitoring/utils';
+import { formatDate } from '../utils';
 
 export default {
   components: {
+    GlSprintf,
     GlAlert,
     GlDropdown,
     GlDropdownItem,
     GlFormGroup,
     GlSearchBoxByClick,
+    GlInfiniteScroll,
     DateTimePicker,
     LogControlButtons,
+  },
+  filters: {
+    formatDate,
   },
   props: {
     environmentName: {
@@ -44,6 +58,7 @@ export default {
       searchQuery: '',
       timeRanges,
       isElasticStackCalloutDismissed: false,
+      scrollDownButtonDisabled: true,
     };
   },
   computed: {
@@ -52,7 +67,7 @@ export default {
 
     timeRangeModel: {
       get() {
-        return this.timeRange.current;
+        return this.timeRange.selected;
       },
       set(val) {
         this.setTimeRange(val);
@@ -75,16 +90,6 @@ export default {
       return !this.isElasticStackCalloutDismissed && this.disableAdvancedControls;
     },
   },
-  watch: {
-    trace(val) {
-      this.$nextTick(() => {
-        if (val) {
-          scrollDown();
-        }
-        this.$refs.scrollButtons.update();
-      });
-    },
-  },
   mounted() {
     this.setInitData({
       timeRange: timeRangeFromUrl() || defaultTimeRange,
@@ -102,12 +107,26 @@ export default {
       'showPodLogs',
       'showEnvironment',
       'fetchEnvironments',
+      'fetchMoreLogsPrepend',
     ]),
+
+    topReached() {
+      if (!this.logs.isLoading) {
+        this.fetchMoreLogsPrepend();
+      }
+    },
+    scrollDown() {
+      this.$refs.infiniteScroll.scrollDown();
+    },
+    scroll: throttle(function scrollThrottled(e) {
+      const { scrollTop = 0, clientHeight = 0, scrollHeight = 0 } = e?.target || {};
+      this.scrollDownButtonDisabled = scrollTop + clientHeight === scrollHeight;
+    }, 200),
   },
 };
 </script>
 <template>
-  <div class="build-page-pod-logs mt-3">
+  <div class="environment-logs-viewer mt-3">
     <gl-alert
       v-if="shouldShowElasticStackCallout"
       class="mb-3 js-elasticsearch-alert"
@@ -209,14 +228,47 @@ export default {
       <log-control-buttons
         ref="scrollButtons"
         class="controllers align-self-end mb-1"
+        :scroll-down-button-disabled="scrollDownButtonDisabled"
         @refresh="showPodLogs(pods.current)"
+        @scrollDown="scrollDown"
       />
     </div>
-    <pre class="build-trace js-log-trace"><code class="bash js-build-output">{{trace}}
-      <div v-if="showLoader" class="build-loader-animation js-build-loader-animation">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-      </div></code></pre>
+
+    <gl-infinite-scroll
+      ref="infiniteScroll"
+      class="log-lines"
+      :max-list-height="600"
+      :fetched-items="logs.lines.length"
+      :total-items="logs.pageInfo.totalResults"
+      @topReached="topReached"
+      @scroll="scroll"
+    >
+      <template #items>
+        <pre
+          class="build-trace js-log-trace"
+        ><code class="bash js-build-output"><div v-if="showLoader" class="build-loader-animation js-build-loader-animation">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>{{trace}}
+          </code></pre>
+      </template>
+      <template #default
+        ><div></div
+      ></template>
+    </gl-infinite-scroll>
+
+    <div ref="logFooter" class="log-footer py-2 px-3">
+      <gl-sprintf :message="s__('Environments|Logs from %{start} to %{end}.')">
+        <template #start>{{ timeRange.current.start | formatDate }}</template>
+        <template #end>{{ timeRange.current.end | formatDate }}</template>
+      </gl-sprintf>
+      <gl-sprintf
+        :message="s__('Environments|Currently showing %{fetched} out of %{total} results.')"
+      >
+        <template #fetched>{{ logs.lines.length }}</template>
+        <template #total>{{ logs.pageInfo.totalResults }}</template>
+      </gl-sprintf>
+    </div>
   </div>
 </template>
