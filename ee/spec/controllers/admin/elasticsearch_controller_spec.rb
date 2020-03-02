@@ -32,7 +32,8 @@ describe Admin::ElasticsearchController do
 
         post :enqueue_index
 
-        expect(response).to have_gitlab_http_status(:not_found)
+        expect(controller).to set_flash[:warning].to include('create an index before enabling indexing')
+        expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
       end
     end
 
