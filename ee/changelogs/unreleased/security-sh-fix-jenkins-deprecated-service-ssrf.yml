@@ -1,0 +1,5 @@
+---
+title: Fix Service Side Request Forgery in JenkinsDeprecatedService
+merge_request:
+author:
+type: security
