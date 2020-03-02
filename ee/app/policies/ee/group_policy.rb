@@ -22,8 +22,8 @@ module EE
         ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
       end
 
-      condition(:owner_locked_memberships_to_ldap) do
-        @subject.lock_memberships_to_ldap?
+      condition(:members_locked_to_ldap) do
+        members_locked_to_ldap
       end
 
       condition(:memberships_locked_to_ldap, scope: :global) do
@@ -126,7 +126,7 @@ module EE
 
       rule { admin | (can_owners_manage_ldap & owner) }.enable :admin_ldap_settings
 
-      rule { ldap_synced }.prevent :admin_group_member
+      rule { ldap_synced & members_locked_to_ldap }.prevent :admin_group_member
 
       rule { ldap_synced & (admin | owner) }.enable :update_group_member
 
@@ -169,6 +169,12 @@ module EE
       return ::GroupMember::NO_ACCESS if needs_new_sso_session?
 
       super
+    end
+
+    def members_locked_to_ldap
+      return true unless ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
+
+      subject.lock_membership_to_ldap?
     end
 
     def sso_enforcement_prevents_access?
