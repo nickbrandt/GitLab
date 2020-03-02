@@ -3723,13 +3723,13 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
   end
 
   create_table "requirements", force: :cascade do |t|
-    t.integer "state", limit: 2, default: 1, null: false
-    t.integer "iid", null: false
-    t.integer "cached_markdown_version"
-    t.bigint "project_id", null: false
-    t.bigint "author_id"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.integer "project_id", null: false
+    t.integer "author_id"
+    t.integer "iid", null: false
+    t.integer "cached_markdown_version"
+    t.integer "state", limit: 2, default: 1, null: false
     t.string "title", limit: 255, null: false
     t.text "title_html"
     t.index ["author_id"], name: "index_requirements_on_author_id"
@@ -3737,7 +3737,7 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
     t.index ["project_id", "iid"], name: "index_requirements_on_project_id_and_iid", unique: true, where: "(project_id IS NOT NULL)"
     t.index ["project_id"], name: "index_requirements_on_project_id"
     t.index ["state"], name: "index_requirements_on_state"
-    t.index ["title"], name: "index_requirements_on_title"
+    t.index ["title"], name: "index_requirements_on_title_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["updated_at"], name: "index_requirements_on_updated_at"
   end
 
