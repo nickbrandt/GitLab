@@ -17,17 +17,7 @@ module Projects
       # exception.
       raise RepositoryAlreadyMoved if project.repository_storage == new_repository_storage_key
 
-      result = mirror_repository(new_repository_storage_key)
-
-      if project.wiki.repository_exists?
-        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
-      end
-
-      if project.design_repository.exists?
-        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
-      end
-
-      if result
+      if mirror_repositories(new_repository_storage_key)
         mark_old_paths_for_archive
 
         project.update(repository_storage: new_repository_storage_key, repository_read_only: false)
@@ -41,6 +31,16 @@ module Projects
     end
 
     private
+
+    def mirror_repositories(new_repository_storage_key)
+      result = mirror_repository(new_repository_storage_key)
+
+      if project.wiki.repository_exists?
+        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
+      end
+
+      result
+    end
 
     def mirror_repository(new_storage_key, type: Gitlab::GlRepository::PROJECT)
       return false unless wait_for_pushes(type)
@@ -77,13 +77,6 @@ module Projects
                                           wiki.disk_path,
                                           "#{new_project_path}.wiki")
         end
-
-        if design_repository.exists?
-          GitlabShellWorker.perform_async(:mv_repository,
-                                          old_repository_storage,
-                                          design_repository.disk_path,
-                                          "#{new_project_path}.design")
-        end
       end
     end
 
@@ -118,3 +111,5 @@ module Projects
     end
   end
 end
+
+Projects::UpdateRepositoryStorageService.prepend_if_ee('EE::Projects::UpdateRepositoryStorageService')

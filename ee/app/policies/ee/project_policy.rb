@@ -125,8 +125,6 @@ module EE
         @subject.feature_available?(:group_timelogs)
       end
 
-      rule { admin }.enable :change_repository_storage
-
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
         prevent :create_note

@@ -179,39 +179,6 @@ describe Projects::UpdateService, '#execute' do
     end
   end
 
-  describe 'repository_storage' do
-    let(:admin_user) { create(:user, admin: true) }
-    let(:user) { create(:user) }
-    let(:project) { create(:project, :repository) }
-    let(:opts) { { repository_storage: 'b' } }
-
-    before do
-      FileUtils.mkdir('tmp/tests/storage_b')
-
-      storages = {
-          'default' => Gitlab.config.repositories.storages.default,
-          'b' => { 'path' => 'tmp/tests/storage_b' }
-      }
-      stub_storage_settings(storages)
-    end
-
-    after do
-      FileUtils.rm_rf('tmp/tests/storage_b')
-    end
-
-    it 'calls the change repository storage method if the storage changed' do
-      expect(project).to receive(:change_repository_storage).with('b')
-
-      update_project(project, admin_user, opts).inspect
-    end
-
-    it "doesn't call the change repository storage for non-admin users" do
-      expect(project).not_to receive(:change_repository_storage)
-
-      update_project(project, user, opts).inspect
-    end
-  end
-
   context 'repository_size_limit assignment as Bytes' do
     let(:admin_user) { create(:user, admin: true) }
     let(:project) { create(:project, repository_size_limit: 0) }
