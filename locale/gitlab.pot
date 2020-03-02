@@ -8339,6 +8339,9 @@ msgstr ""
 msgid "False positive"
 msgstr ""
 
+msgid "Fast-forward merge is not possible. Rebase the source branch onto %{targetBranch} to allow this merge request to be merged."
+msgstr ""
+
 msgid "Fast-forward merge is not possible. Rebase the source branch onto the target branch or merge target branch into source branch to allow this merge request to be merged."
 msgstr ""
 
@@ -8789,7 +8792,7 @@ msgstr ""
 msgid "From %{providerTitle}"
 msgstr ""
 
-msgid "From %{source_title} into"
+msgid "From <code>%{source_title}</code> into"
 msgstr ""
 
 msgid "From Bitbucket"
