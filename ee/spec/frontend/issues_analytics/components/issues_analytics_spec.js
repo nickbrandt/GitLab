@@ -3,9 +3,8 @@ import MockAdapter from 'axios-mock-adapter';
 import Vuex from 'vuex';
 import { TEST_HOST } from 'helpers/test_constants';
 import IssuesAnalytics from 'ee/issues_analytics/components/issues_analytics.vue';
-import EmptyState from 'ee/issues_analytics/components/empty_state.vue';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { createStore } from 'ee/issues_analytics/stores';
 
 const localVue = createLocalVue();
@@ -28,6 +27,8 @@ describe('Issues Analytics component', () => {
       const propsData = data || {
         endpoint: TEST_HOST,
         filterBlockEl: document.querySelector('#mock-filter'),
+        noDataEmptyStateSvgPath: 'svg',
+        filtersEmptyStateSvgPath: 'svg',
       };
 
       return shallowMount(IssuesAnalytics, {
@@ -50,7 +51,7 @@ describe('Issues Analytics component', () => {
 
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findChartContainer = () => wrapper.find('.issues-analytics-chart');
-  const findEmptyState = () => wrapper.find(EmptyState);
+  const findEmptyState = () => wrapper.find(GlEmptyState);
 
   it('fetches chart data when mounted', () => {
     expect(store.dispatch).toHaveBeenCalledWith('issueAnalytics/fetchChartData', TEST_HOST);

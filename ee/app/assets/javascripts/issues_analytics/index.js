@@ -9,6 +9,8 @@ export default () => {
 
   if (!el) return null;
 
+  const { endpoint, noDataEmptyStateSvgPath, filtersEmptyStateSvgPath } = el.dataset;
+
   // Set default filters from URL
   store.dispatch('issueAnalytics/setFilters', window.location.search);
 
@@ -25,8 +27,10 @@ export default () => {
     render(createElement) {
       return createElement('issues-analytics', {
         props: {
-          endpoint: el.dataset.endpoint,
+          endpoint,
           filterBlockEl,
+          noDataEmptyStateSvgPath,
+          filtersEmptyStateSvgPath,
         },
       });
     },
