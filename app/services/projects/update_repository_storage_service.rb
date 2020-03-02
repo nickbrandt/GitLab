@@ -48,6 +48,7 @@ module Projects
       repository = type.repository_for(project)
       full_path = repository.full_path
       raw_repository = repository.raw
+      checksum = repository.checksum
 
       # Initialize a git repository on the target path
       gitlab_shell.create_repository(new_storage_key, raw_repository.relative_path, full_path)
@@ -56,7 +57,9 @@ module Projects
                                                    raw_repository.gl_repository,
                                                    full_path)
 
-      new_repository.fetch_repository_as_mirror(raw_repository)
+      result = new_repository.fetch_repository_as_mirror(raw_repository)
+
+      result && checksum == new_repository.checksum
     end
 
     def mark_old_paths_for_archive
