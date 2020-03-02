@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan', :reliable, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/208021', type: :bug } do
+  context 'Plan', :reliable do
     describe 'Editing scoped labels on issues' do
       let(:initial_label) { 'animal::fox' }
       let(:new_label_same_scope) { 'animal::dolphin' }
@@ -46,11 +46,11 @@ module QA
 
           expect(show.text_of_labels_block).to have_content(new_label_same_scope.gsub('::', ' '))
           expect(show.text_of_labels_block).to have_content(new_label_different_scope.gsub('::', ' '))
-          expect(show.text_of_labels_block).to have_content(new_label_same_scope_multi_colon.gsub('::', ' '))
-          expect(show.text_of_labels_block).to have_content(new_label_different_scope_multi_colon.gsub('::', ' '))
+          expect(show.text_of_labels_block).to have_content('group::car porsche')
+          expect(show.text_of_labels_block).to have_content('group::truck mercedes-bens')
 
           expect(show.text_of_labels_block).not_to have_content(initial_label.gsub('::', ' '))
-          expect(show.text_of_labels_block).not_to have_content(initial_label_multi_colon.gsub('::', ' '))
+          expect(show.text_of_labels_block).not_to have_content('group::car ferrari')
         end
       end
     end
