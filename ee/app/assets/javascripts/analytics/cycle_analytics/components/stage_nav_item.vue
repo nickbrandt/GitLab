@@ -99,14 +99,14 @@ export default {
     >
       <div
         ref="title"
-        class="stage-nav-item-cell text-truncate w-50 pr-2"
+        class="stage-nav-item-cell stage-name text-truncate w-50 pr-2"
         :class="{ 'font-weight-bold': isActive }"
       >
         <span v-if="isTitleOverflowing" v-gl-tooltip.hover :title="title">{{ title }}</span>
         <span v-else>{{ title }}</span>
       </div>
       <div class="stage-nav-item-cell w-50 d-flex justify-content-between">
-        <div ref="median" class="w-75 align-items-start">
+        <div ref="median" class="stage-median w-75 align-items-start">
           <span v-if="hasValue">{{ median }}</span>
           <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
         </div>

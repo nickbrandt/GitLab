@@ -18,8 +18,8 @@ describe('StageNavItem', () => {
   }
 
   let wrapper = null;
-  const findStageTitle = () => wrapper.find({ref: 'title'});
-  const findStageMedian = () => wrapper.find({ref: 'median'});
+  const findStageTitle = () => wrapper.find({ ref: 'title' });
+  const findStageMedian = () => wrapper.find({ ref: 'median' });
 
   afterEach(() => {
     wrapper.destroy();
