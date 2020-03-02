@@ -246,4 +246,46 @@ describe Groups::SsoController do
       end
     end
   end
+
+  describe 'POST authorize_managed_account' do
+    subject do
+      post :authorize_managed_account,
+           params: { group_id: group },
+           session: session
+    end
+
+    let(:session) { { "oauth_data" => oauth_data, "oauth_group_id" => group.id } }
+    let(:oauth_data) { { "info" => { name: 'Test', email: 'testuser@email.com' } } }
+    let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
+    let(:transfer_membership_service_spy) { spy('GroupSaml::GroupManagedAccounts::TransferMembershipService') }
+
+    before do
+      allow(GroupSaml::GroupManagedAccounts::TransferMembershipService)
+        .to receive(:new).with(user, group, hash_including(session)).and_return(transfer_membership_service_spy)
+    end
+
+    context 'when user is already signed in' do
+      context 'when service succeeds' do
+        before do
+          allow(transfer_membership_service_spy).to receive(:execute).and_return(true)
+        end
+
+        it 'redirects to group' do
+          subject
+
+          expect(response).to redirect_to group_url(group)
+        end
+      end
+
+      context 'when service fails' do
+        before do
+          allow(transfer_membership_service_spy).to receive(:execute).and_return(nil)
+        end
+
+        it 'renders the form' do
+          expect(subject).to render_template :sign_up_form
+        end
+      end
+    end
+  end
 end
