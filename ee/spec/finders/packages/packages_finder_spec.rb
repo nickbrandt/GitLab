@@ -65,6 +65,12 @@ describe ::Packages::PackagesFinder do
       end
     end
 
+    context 'with package_name' do
+      let(:params) { { package_name: 'maven' } }
+
+      it { is_expected.to eq([maven_package]) }
+    end
+
     context 'with nil params' do
       it { is_expected.to match_array([conan_package, maven_package]) }
     end

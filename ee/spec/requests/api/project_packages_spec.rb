@@ -104,18 +104,28 @@ describe API::ProjectPackages do
         context 'package types' do
           %w[conan maven npm nuget].each do |package_type|
             it "returns #{package_type} packages" do
-              url = package_type_url(package_type)
+              url = package_filter_url(:type, package_type)
               get api(url, user)
 
               expect(json_response.length).to eq(1)
               expect(json_response.map { |package| package['package_type'] }).to contain_exactly(package_type)
             end
           end
-
-          def package_type_url(package_type)
-            "/projects/#{project.id}/packages?package_type=#{package_type}"
-          end
         end
+      end
+
+      context 'filtering on package_name' do
+        it 'returns the named package' do
+          url = package_filter_url(:name, 'nuget')
+          get api(url, user)
+
+          expect(json_response.length).to eq(1)
+          expect(json_response.first['name']).to include(package2.name)
+        end
+      end
+
+      def package_filter_url(filter, param)
+        "/projects/#{project.id}/packages?package_#{filter}=#{param}"
       end
     end
 
