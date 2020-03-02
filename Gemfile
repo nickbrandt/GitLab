@@ -419,8 +419,7 @@ end
 
 gem 'octokit', '~> 4.15'
 
-# https://gitlab.com/gitlab-org/gitlab/issues/207207
-gem 'gitlab-mail_room', '~> 0.0.2', require: 'mail_room'
+gem 'mail_room', '~> 0.10.0'
 
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'

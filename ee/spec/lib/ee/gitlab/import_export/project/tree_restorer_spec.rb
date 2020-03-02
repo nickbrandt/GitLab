@@ -18,7 +18,6 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
     end
 
     context 'with group' do
-      let(:issue) { project.issues.find_by_title('Issue with Epic') }
       let!(:project) do
         create(:project,
                :builds_disabled,
@@ -36,8 +35,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
           expect { restored_project_json }.not_to change { Epic.count }
           expect(project.group.epics.count).to eq(1)
-          expect(issue.epic).to eq(epic)
-          expect(issue.epic_issue.relative_position).not_to be_nil
+          expect(project.issues.find_by_title('Issue with Epic').epic).not_to be_nil
         end
       end
 
@@ -47,9 +45,7 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
           expect { restored_project_json }.to change { Epic.count }.from(0).to(1)
           expect(project.group.epics.count).to eq(1)
-
-          expect(issue.epic).not_to be_nil
-          expect(issue.epic_issue.relative_position).not_to be_nil
+          expect(project.issues.find_by_title('Issue with Epic').epic).not_to be_nil
         end
       end
     end

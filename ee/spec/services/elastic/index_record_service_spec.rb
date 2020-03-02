@@ -25,10 +25,10 @@ describe Elastic::IndexRecordService, :elastic do
 
     with_them do
       it 'indexes new records' do
-        object = create(type)
-
-        # Prevent records from being added via bulk indexing updates
-        ::Elastic::ProcessBookkeepingService.clear_tracking!
+        object = nil
+        Sidekiq::Testing.disable! do
+          object = create(type)
+        end
 
         expect do
           expect(subject.execute(object, true)).to eq(true)
@@ -122,14 +122,10 @@ describe Elastic::IndexRecordService, :elastic do
       Sidekiq::Testing.inline! do
         expect(subject.execute(other_project, true)).to eq(true)
       end
-
-      # Prevent records from being added via bulk indexing updates
-      ::Elastic::ProcessBookkeepingService.clear_tracking!
-
       ensure_elasticsearch_index!
 
       # Only the project itself should be in the index
-      expect(Elasticsearch::Model.search('*').total_count).to eq(1)
+      expect(Elasticsearch::Model.search('*').total_count).to be 1
       expect(Project.elastic_search('*').records).to contain_exactly(other_project)
     end
 
@@ -316,9 +312,13 @@ describe Elastic::IndexRecordService, :elastic do
   end
 
   it 'skips records for which indexing is disabled' do
-    stub_ee_application_setting(elasticsearch_limit_indexing: true)
+    project = nil
 
-    project = create(:project, name: 'project_1')
+    Sidekiq::Testing.disable! do
+      project = create :project, name: 'project_1'
+    end
+
+    expect(project).to receive(:use_elasticsearch?).and_return(false)
 
     Sidekiq::Testing.inline! do
       expect(subject.execute(project, true)).to eq(true)

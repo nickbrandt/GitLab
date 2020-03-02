@@ -1,78 +1,72 @@
-import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import dateFormat from 'dateformat';
 import IssueDueDate from '~/boards/components/issue_due_date.vue';
-
-const createComponent = (dueDate = new Date(), closed = false) =>
-  shallowMount(IssueDueDate, {
-    propsData: {
-      closed,
-      date: dateFormat(dueDate, 'yyyy-mm-dd', true),
-    },
-  });
-
-const findTime = wrapper => wrapper.find('time');
+import mountComponent from '../../helpers/vue_mount_component_helper';
 
 describe('Issue Due Date component', () => {
-  let wrapper;
+  let vm;
   let date;
+  const Component = Vue.extend(IssueDueDate);
+  const createComponent = (dueDate = new Date(), closed = false) =>
+    mountComponent(Component, { closed, date: dateFormat(dueDate, 'yyyy-mm-dd', true) });
 
   beforeEach(() => {
     date = new Date();
+    vm = createComponent();
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    vm.$destroy();
   });
 
   it('should render "Today" if the due date is today', () => {
-    wrapper = createComponent();
+    const timeContainer = vm.$el.querySelector('time');
 
-    expect(findTime(wrapper).text()).toBe('Today');
+    expect(timeContainer.textContent.trim()).toEqual('Today');
   });
 
   it('should render "Yesterday" if the due date is yesterday', () => {
     date.setDate(date.getDate() - 1);
-    wrapper = createComponent(date);
+    vm = createComponent(date);
 
-    expect(findTime(wrapper).text()).toBe('Yesterday');
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual('Yesterday');
   });
 
   it('should render "Tomorrow" if the due date is one day from now', () => {
     date.setDate(date.getDate() + 1);
-    wrapper = createComponent(date);
+    vm = createComponent(date);
 
-    expect(findTime(wrapper).text()).toBe('Tomorrow');
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual('Tomorrow');
   });
 
   it('should render day of the week if due date is one week away', () => {
     date.setDate(date.getDate() + 5);
-    wrapper = createComponent(date);
+    vm = createComponent(date);
 
-    expect(findTime(wrapper).text()).toBe(dateFormat(date, 'dddd'));
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(dateFormat(date, 'dddd'));
   });
 
   it('should render month and day for other dates', () => {
     date.setDate(date.getDate() + 17);
-    wrapper = createComponent(date);
+    vm = createComponent(date);
     const today = new Date();
     const isDueInCurrentYear = today.getFullYear() === date.getFullYear();
     const format = isDueInCurrentYear ? 'mmm d' : 'mmm d, yyyy';
 
-    expect(findTime(wrapper).text()).toBe(dateFormat(date, format));
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(dateFormat(date, format));
   });
 
   it('should contain the correct `.text-danger` css class for overdue issue that is open', () => {
     date.setDate(date.getDate() - 17);
-    wrapper = createComponent(date);
+    vm = createComponent(date);
 
-    expect(findTime(wrapper).classes('text-danger')).toBe(true);
+    expect(vm.$el.querySelector('time').classList.contains('text-danger')).toEqual(true);
   });
 
   it('should not contain the `.text-danger` css class for overdue issue that is closed', () => {
     date.setDate(date.getDate() - 17);
-    const closed = true;
-    wrapper = createComponent(date, closed);
+    vm = createComponent(date, true);
 
-    expect(findTime(wrapper).classes('text-danger')).toBe(false);
+    expect(vm.$el.querySelector('time').classList.contains('text-danger')).toEqual(false);
   });
 });

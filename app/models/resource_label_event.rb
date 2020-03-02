@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
-class ResourceLabelEvent < ResourceEvent
+class ResourceLabelEvent < ApplicationRecord
+  include Importable
+  include Gitlab::Utils::StrongMemoize
   include CacheMarkdownField
+  include ResourceEventTools
 
   cache_markdown_field :reference
 
@@ -10,11 +13,8 @@ class ResourceLabelEvent < ResourceEvent
   belongs_to :label
 
   scope :inc_relations, -> { includes(:label, :user) }
-  scope :by_issue, ->(issue) { where(issue_id: issue.id) }
-  scope :by_merge_request, ->(merge_request) { where(merge_request_id: merge_request.id) }
 
   validates :label, presence: { unless: :importing? }, on: :create
-  validate :exactly_one_issuable
 
   after_save :expire_etag_cache
   after_destroy :expire_etag_cache
@@ -39,6 +39,12 @@ class ResourceLabelEvent < ResourceEvent
 
   def issuable
     issue || merge_request
+  end
+
+  def discussion_id(resource = nil)
+    strong_memoize(:discussion_id) do
+      Digest::SHA1.hexdigest(discussion_id_key.join("-"))
+    end
   end
 
   def project
@@ -102,6 +108,10 @@ class ResourceLabelEvent < ResourceEvent
 
   def resource_parent
     issuable.project || issuable.group
+  end
+
+  def discussion_id_key
+    [self.class.name, created_at, user_id]
   end
 end
 

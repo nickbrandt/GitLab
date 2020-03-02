@@ -22,9 +22,11 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 1. Configure the GitLab application servers with the appropriate details.
    This step is covered in [Configuring GitLab for HA](gitlab.md).
 
-## PostgreSQL in a Scaled and Highly Available Environment
+## PostgreSQL in a Scaled Environment
 
-This section is relevant for [Scalable and Highly Available Setups](README.md).
+This section is relevant for [Scaled Architecture](README.md#scalable-architecture-examples)
+environments including [Basic Scaling](README.md#basic-scaling) and
+[Full Scaling](README.md#full-scaling).
 
 ### Provide your own PostgreSQL instance **(CORE ONLY)**
 
@@ -91,6 +93,23 @@ deploy the bundled PostgreSQL.
 
 Advanced configuration options are supported and can be added if
 needed.
+
+Continue configuration of other components by going
+[back to Scaled Architectures](README.md#scalable-architecture-examples)
+
+## PostgreSQL with High Availability
+
+This section is relevant for [High Availability Architecture](README.md#high-availability-architecture-examples)
+environments including [Horizontal](README.md#horizontal),
+[Hybrid](README.md#hybrid), and
+[Fully Distributed](README.md#fully-distributed).
+
+### Provide your own PostgreSQL instance **(CORE ONLY)**
+
+If you want to use your own deployed PostgreSQL instance(s),
+see [Provide your own PostgreSQL instance](#provide-your-own-postgresql-instance-core-only)
+for more details. However, you can use the GitLab Omnibus package to easily
+deploy the bundled PostgreSQL.
 
 ### High Availability with GitLab Omnibus **(PREMIUM ONLY)**
 

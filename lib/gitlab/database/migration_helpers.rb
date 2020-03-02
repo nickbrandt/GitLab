@@ -215,7 +215,7 @@ module Gitlab
         fk_name = name || concurrent_foreign_key_name(source, column)
 
         unless foreign_key_exists?(source, name: fk_name)
-          raise missing_schema_object_message(source, "foreign key", fk_name)
+          raise "cannot find #{fk_name} on #{source} table"
         end
 
         disable_statement_timeout do
@@ -931,10 +931,7 @@ module Gitlab
       def column_for(table, name)
         name = name.to_s
 
-        column = columns(table).find { |column| column.name == name }
-        raise(missing_schema_object_message(table, "column", name)) if column.nil?
-
-        column
+        columns(table).find { |column| column.name == name }
       end
 
       # This will replace the first occurrence of a string in a column with
@@ -1168,18 +1165,6 @@ into similar problems in the future (e.g. when new tables are created).
       end
 
       private
-
-      def missing_schema_object_message(table, type, name)
-        <<~MESSAGE
-          Could not find #{type} "#{name}" on table "#{table}" which was referenced during the migration.
-          This issue could be caused by the database schema straying from the expected state.
-
-          To resolve this issue, please verify:
-            1. all previous migrations have completed
-            2. the database objects used in this migration match the Rails definition in schema.rb or structure.sql
-
-        MESSAGE
-      end
 
       def tables_match?(target_table, foreign_key_table)
         target_table.blank? || foreign_key_table == target_table

@@ -3,7 +3,6 @@
 class Groups::ContributionAnalyticsController < Groups::ApplicationController
   before_action :group
   before_action :check_contribution_analytics_available!
-  before_action :authorize_read_contribution_analytics!
 
   layout 'group'
 
@@ -28,28 +27,6 @@ class Groups::ContributionAnalyticsController < Groups::ApplicationController
   end
 
   def check_contribution_analytics_available!
-    return if group_has_access_to_feature?
-
-    show_promotions? ? render_promotion : render_404
-  end
-
-  def authorize_read_contribution_analytics!
-    render_403 unless user_has_access_to_feature?
-  end
-
-  def render_promotion
-    render 'shared/promotions/_promote_contribution_analytics'
-  end
-
-  def show_promotions?
-    LicenseHelper.show_promotions?(current_user)
-  end
-
-  def group_has_access_to_feature?
-    @group.feature_available?(:contribution_analytics)
-  end
-
-  def user_has_access_to_feature?
-    can?(current_user, :read_group_contribution_analytics, @group)
+    render_404 unless @group.feature_available?(:contribution_analytics) || LicenseHelper.show_promotions?(current_user)
   end
 end

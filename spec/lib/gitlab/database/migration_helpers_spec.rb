@@ -383,8 +383,7 @@ describe Gitlab::Database::MigrationHelpers do
         it 'raises an error' do
           expect(model).to receive(:foreign_key_exists?).and_return(false)
 
-          error_message = /Could not find foreign key "fk_name" on table "projects"/
-          expect { model.validate_foreign_key(:projects, :user_id, name: :fk_name) }.to raise_error(error_message)
+          expect { model.validate_foreign_key(:projects, :user_id) }.to raise_error(/cannot find/)
         end
       end
     end
@@ -588,8 +587,6 @@ describe Gitlab::Database::MigrationHelpers do
   end
 
   describe '#add_column_with_default' do
-    let(:column) { Project.columns.find { |c| c.name == "id" } }
-
     context 'outside of a transaction' do
       context 'when a column limit is not set' do
         before do
@@ -604,9 +601,6 @@ describe Gitlab::Database::MigrationHelpers do
 
           expect(model).to receive(:change_column_default)
             .with(:projects, :foo, 10)
-
-          expect(model).to receive(:column_for)
-            .with(:projects, :foo).and_return(column)
         end
 
         it 'adds the column while allowing NULL values' do
@@ -661,7 +655,6 @@ describe Gitlab::Database::MigrationHelpers do
         it 'adds the column with a limit' do
           allow(model).to receive(:transaction_open?).and_return(false)
           allow(model).to receive(:transaction).and_yield
-          allow(model).to receive(:column_for).with(:projects, :foo).and_return(column)
           allow(model).to receive(:update_column_in_batches).with(:projects, :foo, 10)
           allow(model).to receive(:change_column_null).with(:projects, :foo, false)
           allow(model).to receive(:change_column_default).with(:projects, :foo, 10)
@@ -728,68 +721,50 @@ describe Gitlab::Database::MigrationHelpers do
 
       before do
         allow(model).to receive(:transaction_open?).and_return(false)
+        allow(model).to receive(:column_for).and_return(old_column)
       end
 
-      context 'when the column to rename exists' do
-        before do
-          allow(model).to receive(:column_for).and_return(old_column)
+      it 'renames a column concurrently' do
+        expect(model).to receive(:check_trigger_permissions!).with(:users)
+
+        expect(model).to receive(:install_rename_triggers_for_postgresql)
+          .with(trigger_name, '"users"', '"old"', '"new"')
+
+        expect(model).to receive(:add_column)
+          .with(:users, :new, :integer,
+               limit: old_column.limit,
+               precision: old_column.precision,
+               scale: old_column.scale)
+
+        expect(model).to receive(:change_column_default)
+          .with(:users, :new, old_column.default)
+
+        expect(model).to receive(:update_column_in_batches)
+
+        expect(model).to receive(:change_column_null).with(:users, :new, false)
+
+        expect(model).to receive(:copy_indexes).with(:users, :old, :new)
+        expect(model).to receive(:copy_foreign_keys).with(:users, :old, :new)
+
+        model.rename_column_concurrently(:users, :old, :new)
+      end
+
+      context 'when default is false' do
+        let(:old_column) do
+          double(:column,
+               type: :boolean,
+               limit: nil,
+               default: false,
+               null: false,
+               precision: nil,
+               scale: nil)
         end
 
-        it 'renames a column concurrently' do
-          expect(model).to receive(:check_trigger_permissions!).with(:users)
-
-          expect(model).to receive(:install_rename_triggers_for_postgresql)
-            .with(trigger_name, '"users"', '"old"', '"new"')
-
-          expect(model).to receive(:add_column)
-            .with(:users, :new, :integer,
-                 limit: old_column.limit,
-                 precision: old_column.precision,
-                 scale: old_column.scale)
-
+        it 'copies the default to the new column' do
           expect(model).to receive(:change_column_default)
             .with(:users, :new, old_column.default)
 
-          expect(model).to receive(:update_column_in_batches)
-
-          expect(model).to receive(:change_column_null).with(:users, :new, false)
-
-          expect(model).to receive(:copy_indexes).with(:users, :old, :new)
-          expect(model).to receive(:copy_foreign_keys).with(:users, :old, :new)
-
           model.rename_column_concurrently(:users, :old, :new)
-        end
-
-        context 'when default is false' do
-          let(:old_column) do
-            double(:column,
-                 type: :boolean,
-                 limit: nil,
-                 default: false,
-                 null: false,
-                 precision: nil,
-                 scale: nil)
-          end
-
-          it 'copies the default to the new column' do
-            expect(model).to receive(:change_column_default)
-              .with(:users, :new, old_column.default)
-
-            model.rename_column_concurrently(:users, :old, :new)
-          end
-        end
-      end
-
-      context 'when the column to be renamed does not exist' do
-        before do
-          allow(model).to receive(:columns).and_return([])
-        end
-
-        it 'raises an error with appropriate message' do
-          expect(model).to receive(:check_trigger_permissions!).with(:users)
-
-          error_message = /Could not find column "missing_column" on table "users"/
-          expect { model.rename_column_concurrently(:users, :missing_column, :new) }.to raise_error(error_message)
         end
       end
     end
@@ -1158,9 +1133,8 @@ describe Gitlab::Database::MigrationHelpers do
       expect(column.name).to eq('id')
     end
 
-    it 'raises an error when a column does not exist' do
-      error_message = /Could not find column "kittens" on table "users"/
-      expect { model.column_for(:users, :kittens) }.to raise_error(error_message)
+    it 'returns nil when a column does not exist' do
+      expect(model.column_for(:users, :kittens)).to be_nil
     end
   end
 

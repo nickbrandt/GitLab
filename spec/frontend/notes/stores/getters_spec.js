@@ -35,7 +35,6 @@ describe('Getters Notes Store', () => {
       notesData: notesDataMock,
       userData: userDataMock,
       noteableData: noteableDataMock,
-      descriptionVersion: 'descriptionVersion',
     };
   });
 
@@ -384,12 +383,6 @@ describe('Getters Notes Store', () => {
       state.discussions.push({ id: '1' });
 
       expect(getters.getDiscussion(state)('1')).toEqual({ id: '1' });
-    });
-  });
-
-  describe('descriptionVersion', () => {
-    it('should return `descriptionVersion`', () => {
-      expect(getters.descriptionVersion(state)).toEqual('descriptionVersion');
     });
   });
 });
