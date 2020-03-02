@@ -28,6 +28,9 @@ export default {
         timeAgo: escape(getTimeago().format(createdAt)),
       });
     },
+    showReviewTime(value) {
+      return value !== null && value !== '';
+    },
     formatReviewTime(hours) {
       if (hours >= 24) {
         const days = Math.floor(hours / 24);
@@ -113,7 +116,7 @@ export default {
     </template>
 
     <template #cell(review_time)="{ value }">
-      <template v-if="value">
+      <template v-if="showReviewTime(value)">
         {{ formatReviewTime(value) }}
       </template>
       <template v-else>
