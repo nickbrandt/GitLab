@@ -129,7 +129,9 @@ module QA
             autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
           end
 
-          autoload :Metrics, 'qa/ee/page/project/operations/metrics'
+          module Metrics
+            autoload :Show, 'qa/ee/page/project/operations/metrics/show'
+          end
         end
 
         module Packages
