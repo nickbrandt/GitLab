@@ -353,7 +353,6 @@ describe Gitlab::UsageData do
                 user_dast_jobs: 0,
                 user_dependency_scanning_jobs: 0,
                 user_license_management_jobs: 0,
-                user_license_scanning_jobs: 0,
                 user_sast_jobs: 0
               )
             end

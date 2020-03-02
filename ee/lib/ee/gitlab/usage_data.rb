@@ -194,7 +194,7 @@ module EE
 
         # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
         # Omitted because not in use anymore: `gcp_clusters`, `gcp_clusters_disabled`, `gcp_clusters_enabled`
-        # rubocop: disable CodeReuse/ActiveRecord
+        # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
             clusters_applications_cert_managers: ::Clusters::Applications::CertManager.where(time_period).distinct_by_user,
@@ -314,14 +314,26 @@ module EE
         # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
         # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
         def usage_activity_by_stage_secure(time_period)
+          prefix = 'user_'
+
           results = {
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
 
           SECURE_PRODUCT_TYPES.each_with_object(results) do |(secure_type, type_with_name), response|
-            response["user_#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+            response["#{prefix}#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
           end
+
+          # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
+          combined_license_key = "#{prefix}license_management_jobs".to_sym
+          license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
+          if license_scan_count && results[combined_license_key]
+            results[combined_license_key] += license_scan_count
+          end
+
+          results
         end
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end
