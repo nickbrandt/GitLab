@@ -41,21 +41,74 @@ describe API::NpmPackages do
     let!(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
     let!(:package_dependency_link4) { create(:packages_dependency_link, package: package, dependency_type: :peerDependencies) }
 
-    context 'a public project' do
-      it 'returns the package info without oauth token' do
+    shared_examples 'returning the npm package info' do
+      it 'returns the package info' do
         get_package(package)
 
         expect_a_valid_package_response
+      end
+    end
+
+    shared_examples 'returning forbidden for unknown package' do
+      context 'with an unknown package' do
+        it 'returns forbidden' do
+          get api("/packages/npm/unknown")
+
+          expect(response).to have_gitlab_http_status(:forbidden)
+        end
+      end
+    end
+
+    context 'a public project' do
+      it_behaves_like 'returning the npm package info'
+
+      context 'with forward_npm_package_registry_requests enabled' do
+        before do
+          stub_feature_flags(forward_npm_package_registry_requests: { enabled: true })
+        end
+
+        context 'with application setting enabled' do
+          before do
+            stub_application_setting(npm_package_requests_forwarding: true)
+          end
+
+          it_behaves_like 'returning the npm package info'
+
+          context 'with unknown package' do
+            it 'returns a redirect' do
+              get api("/packages/npm/unknown")
+
+              expect(response).to have_gitlab_http_status(:found)
+              expect(response.headers['Location']).to eq('https://registry.npmjs.org/unknown')
+            end
+          end
+        end
+
+        context 'with application setting disabled' do
+          before do
+            stub_application_setting(npm_package_requests_forwarding: false)
+          end
+
+          it_behaves_like 'returning the npm package info'
+
+          it_behaves_like 'returning forbidden for unknown package'
+        end
+      end
+
+      context 'with forward_npm_package_registry_requests disabled' do
+        before do
+          stub_feature_flags(forward_npm_package_registry_requests: { enabled: false })
+        end
+
+        it_behaves_like 'returning the npm package info'
+
+        it_behaves_like 'returning forbidden for unknown package'
       end
 
       context 'project path with a dot' do
         let(:project) { create(:project, :public, namespace: group, path: 'foo.bar') }
 
-        it 'returns the package info' do
-          get_package(package)
-
-          expect_a_valid_package_response
-        end
+        it_behaves_like 'returning the npm package info'
       end
     end
 

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 module API
   class NpmPackages < Grape::API
+    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::Packages::DependencyProxyHelpers
+
     NPM_ENDPOINT_REQUIREMENTS = {
       package_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
@@ -13,8 +16,6 @@ module API
       require_packages_enabled!
       authenticate_non_get!
     end
-
-    helpers ::API::Helpers::PackagesHelpers
 
     helpers do
       def project_by_package_name
@@ -109,14 +110,16 @@ module API
     get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
-      authorize_read_package!(project_by_package_name)
-      authorize_packages_feature!(project_by_package_name)
+      redirect_registry_request(project_by_package_name.blank?, :npm, package_name: package_name) do
+        authorize_read_package!(project_by_package_name)
+        authorize_packages_feature!(project_by_package_name)
 
-      packages = ::Packages::Npm::PackageFinder
-        .new(project_by_package_name, package_name).execute
+        packages = ::Packages::Npm::PackageFinder
+          .new(project_by_package_name, package_name).execute
 
-      present ::Packages::Npm::PackagePresenter.new(package_name, packages),
-        with: EE::API::Entities::NpmPackage
+        present ::Packages::Npm::PackagePresenter.new(package_name, packages),
+          with: EE::API::Entities::NpmPackage
+      end
     end
 
     params do
