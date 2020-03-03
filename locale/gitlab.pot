@@ -2026,10 +2026,10 @@ msgstr ""
 msgid "Analyze a review version of your web application."
 msgstr ""
 
-msgid "Analyze your dependencies for known vulnerabilities"
+msgid "Analyze your dependencies for known vulnerabilities."
 msgstr ""
 
-msgid "Analyze your source code for known vulnerabilities"
+msgid "Analyze your source code for known vulnerabilities."
 msgstr ""
 
 msgid "Ancestors"
@@ -3460,7 +3460,7 @@ msgstr ""
 msgid "Check your .gitlab-ci.yml"
 msgstr ""
 
-msgid "Check your Docker images for known vulnerabilities"
+msgid "Check your Docker images for known vulnerabilities."
 msgstr ""
 
 msgid "Checking %{text} availability…"
@@ -17082,7 +17082,7 @@ msgstr ""
 msgid "Search users or groups"
 msgstr ""
 
-msgid "Search your project dependencies for their licenses and apply policies"
+msgid "Search your project dependencies for their licenses and apply policies."
 msgstr ""
 
 msgid "Search your projects"
@@ -17308,7 +17308,7 @@ msgstr ""
 msgid "SecurityConfiguration|Feature"
 msgstr ""
 
-msgid "SecurityConfiguration|Feature documentation"
+msgid "SecurityConfiguration|Feature documentation for %{featureName}"
 msgstr ""
 
 msgid "SecurityConfiguration|Not yet configured"

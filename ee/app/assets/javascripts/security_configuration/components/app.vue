@@ -1,6 +1,6 @@
 <script>
 import { GlLink } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -71,6 +71,13 @@ export default {
       return sprintf(body, { linkStart, linkEnd }, false);
     },
   },
+  methods: {
+    getFeatureDocumentationLinkLabel(featureName) {
+      return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
+        featureName,
+      });
+    },
+  },
 };
 </script>
 
@@ -125,7 +132,7 @@ export default {
                 <gl-link
                   target="_blank"
                   :href="feature.link"
-                  :aria-label="s__('SecurityConfiguration|Feature documentation')"
+                  :aria-label="getFeatureDocumentationLinkLabel(feature.name)"
                   >{{ __('More information') }}</gl-link
                 >
               </div>
