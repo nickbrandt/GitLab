@@ -216,6 +216,7 @@ func (u *upstream) configureRoutes() {
 		route("POST", apiPattern+`v4/projects/[0-9]+/wikis/attachments\z`, uploadAccelerateProxy),
 		route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
 		route("POST", apiPattern+`v4/groups/import`, upload.Accelerate(api, signingProxy)),
+		route("POST", apiPattern+`v4/projects/import`, upload.Accelerate(api, signingProxy)),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
