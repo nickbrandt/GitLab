@@ -163,7 +163,7 @@ describe('ErrorTrackingList', () => {
       it('it searches by query', () => {
         findSearchBox().vm.$emit('input', 'search');
         findSearchBox().trigger('keyup.enter');
-        expect(actions.searchByQuery.mock.calls[0][1]).toEqual('search');
+        expect(actions.searchByQuery.mock.calls[0][1]).toBe('search');
       });
 
       it('it sorts by fields', () => {

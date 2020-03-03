@@ -31,8 +31,6 @@ describe 'When a user searches for Sentry errors', :js, :use_clean_rails_memory_
 
     find('.gl-form-input').set('NotFound').native.send_keys(:return)
 
-    wait_for_requests
-
     page.within(find('.gl-table')) do
       results = page.all('.table-row')
       expect(results.count).to be(1)
