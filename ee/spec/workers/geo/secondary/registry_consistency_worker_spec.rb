@@ -79,13 +79,20 @@ describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
     # Somewhat of an integration test
     it 'creates missing registries for each registry class' do
       lfs_object = create(:lfs_object)
+      job_artifact = create(:ci_job_artifact)
 
-      expect do
-        subject.perform
-      end.to change { Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count }.from(0).to(1)
+      expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(0)
+      expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(0)
+
+      subject.perform
+
+      expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(1)
+      expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(1)
     end
 
     context 'when geo_lfs_registry_ssot_sync is disabled' do
+      let_it_be(:lfs_object) { create(:lfs_object) }
+
       before do
         stub_feature_flags(geo_lfs_registry_ssot_sync: false)
       end
@@ -94,8 +101,30 @@ describe Geo::Secondary::RegistryConsistencyWorker, :geo, :geo_fdw do
         expect(subject.perform).to be_falsey
       end
 
-      it 'does not execute RegistryConsistencyService' do
-        expect(Geo::RegistryConsistencyService).not_to receive(:new)
+      it 'does not execute RegistryConsistencyService for LFS objects' do
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000).and_call_original
+
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000)
+
+        subject.perform
+      end
+    end
+
+    context 'when geo_job_artifact_registry_ssot_sync is disabled' do
+      let_it_be(:job_artifact) { create(:ci_job_artifact) }
+
+      before do
+        stub_feature_flags(geo_job_artifact_registry_ssot_sync: false)
+      end
+
+      it 'returns false' do
+        expect(subject.perform).to be_falsey
+      end
+
+      it 'does not execute RegistryConsistencyService for Job Artifacts' do
+        allow(Geo::RegistryConsistencyService).to receive(:new).with(Geo::LfsObjectRegistry, batch_size: 1000).and_call_original
+
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::JobArtifactRegistry, batch_size: 1000)
 
         subject.perform
       end

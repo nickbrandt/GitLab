@@ -747,22 +747,18 @@ describe GeoNode, :request_store, :geo, type: :model do
 
   describe '#job_artifacts' do
     context 'when selective sync is enabled' do
-      it 'applies project restriction' do
+      it 'applies a CTE statement' do
         node.update!(selective_sync_type: 'namespaces')
 
-        expect(Ci::JobArtifact).to receive(:project_id_in).once.and_call_original
-
-        node.job_artifacts
+        expect(node.job_artifacts.to_sql).to match(/WITH .+restricted_job_artifacts/)
       end
     end
 
     context 'when selective sync is disabled' do
-      it 'does not apply project restriction' do
+      it 'doest not apply a CTE statement' do
         node.update!(selective_sync_type: nil)
 
-        expect(Ci::JobArtifact).not_to receive(:project_id_in)
-
-        node.job_artifacts
+        expect(node.job_artifacts.to_sql).not_to match(/WITH .+restricted_job_artifacts/)
       end
     end
   end

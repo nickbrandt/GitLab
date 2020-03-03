@@ -68,7 +68,7 @@ module Geo
     def find_migrated_local_job_artifacts_ids(batch_size:)
       return [] unless job_artifacts_object_store_enabled?
 
-      job_artifacts_finder.find_migrated_local(batch_size: batch_size, except_artifact_ids: scheduled_file_ids(:job_artifact))
+      job_artifacts_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:job_artifact))
                           .pluck(Geo::Fdw::Ci::JobArtifact.arel_table[:id])
                           .map { |id| ['job_artifact', id] }
     end

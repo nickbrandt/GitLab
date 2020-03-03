@@ -20,7 +20,7 @@ module EE
       DAST_REPORT_TYPES = %w[dast].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-      scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
+      scope :project_id_in, ->(ids) { where(project_id: ids) }
       scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
 
       scope :security_reports, -> do

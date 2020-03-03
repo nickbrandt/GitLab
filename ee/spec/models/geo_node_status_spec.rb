@@ -342,16 +342,40 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   end
 
   describe '#job_artifacts_failed_count' do
-    it 'counts failed job artifacts' do
-      # These should be ignored
-      create(:geo_upload_registry, :failed)
-      create(:geo_upload_registry, :avatar, :failed)
-      create(:geo_upload_registry, :attachment, :failed)
-      create(:geo_job_artifact_registry, :with_artifact, success: true)
+    context 'when geo_job_artifact_registry_ssot_sync is disabled' do
+      before do
+        stub_feature_flags(geo_job_artifact_registry_ssot_sync: false)
+      end
 
-      create(:geo_job_artifact_registry, :with_artifact, success: false)
+      it 'counts failed job artifacts' do
+        # These should be ignored
+        create(:geo_upload_registry, :failed)
+        create(:geo_upload_registry, :avatar, :failed)
+        create(:geo_upload_registry, :attachment, :failed)
+        create(:geo_job_artifact_registry, :with_artifact, success: true)
 
-      expect(subject.job_artifacts_failed_count).to eq(1)
+        create(:geo_job_artifact_registry, :with_artifact, success: false)
+
+        expect(subject.job_artifacts_failed_count).to eq(1)
+      end
+    end
+
+    context 'when geo_job_artifact_registry_ssot_sync is enabled' do
+      before do
+        stub_feature_flags(geo_job_artifact_registry_ssot_sync: true)
+      end
+
+      it 'counts failed job artifacts' do
+        # These should be ignored
+        create(:geo_upload_registry, :failed)
+        create(:geo_upload_registry, :avatar, :failed)
+        create(:geo_upload_registry, :attachment, :failed)
+        create(:geo_job_artifact_registry, :with_artifact, success: true)
+
+        create(:geo_job_artifact_registry, :with_artifact, :failed)
+
+        expect(subject.job_artifacts_failed_count).to eq(1)
+      end
     end
   end
 
