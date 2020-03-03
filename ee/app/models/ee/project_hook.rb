@@ -8,6 +8,7 @@ module EE
       include CustomModelNaming
       include Limitable
 
+      self.limit_scope = :project
       self.singular_route_key = :hook
     end
   end

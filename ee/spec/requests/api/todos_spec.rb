@@ -119,7 +119,7 @@ describe API::Todos do
       it 'returns 403 forbidden error' do
         subject
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
@@ -163,7 +163,7 @@ describe API::Todos do
 
         subject
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end

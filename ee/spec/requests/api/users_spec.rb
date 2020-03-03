@@ -11,7 +11,7 @@ describe API::Users do
       it 'updates the user with new name' do
         put api("/users/#{user.id}", admin), params: { name: 'New Name' }
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['name']).to eq('New Name')
       end
     end
@@ -68,7 +68,7 @@ describe API::Users do
           end.to change { user.reload.shared_runners_minutes_limit }
                    .from(nil).to(133)
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['shared_runners_minutes_limit']).to eq(133)
         end
       end
@@ -79,7 +79,7 @@ describe API::Users do
             put api("/users/#{user.id}", user), params: { shared_runners_minutes_limit: 133 }
           end.not_to change { user.reload.shared_runners_minutes_limit }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -91,7 +91,7 @@ describe API::Users do
     it 'creates user with new identity' do
       post api("/users", admin), params: attributes_for(:user, provider: 'group_saml', extern_uid: '67890', group_id_for_saml: saml_provider.group.id)
 
-      expect(response).to have_gitlab_http_status(201)
+      expect(response).to have_gitlab_http_status(:created)
       expect(json_response['identities'].first['extern_uid']).to eq('67890')
       expect(json_response['identities'].first['provider']).to eq('group_saml')
       expect(json_response['identities'].first['saml_provider_id']).to eq(saml_provider.id)
@@ -100,7 +100,7 @@ describe API::Users do
     it 'creates user with new identity without sending reset password email' do
       post api("/users", admin), params: attributes_for(:user, reset_password: false, provider: 'group_saml', extern_uid: '67890', group_id_for_saml: saml_provider.group.id)
 
-      expect(response).to have_gitlab_http_status(201)
+      expect(response).to have_gitlab_http_status(:created)
 
       new_user = User.find(json_response['id'])
       expect(new_user.recently_sent_password_reset?).to eq(false)
@@ -109,7 +109,7 @@ describe API::Users do
     it 'updates user with new identity' do
       put api("/users/#{user.id}", admin), params: { provider: 'group_saml', extern_uid: '67890', group_id_for_saml: saml_provider.group.id }
 
-      expect(response).to have_gitlab_http_status(200)
+      expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['identities'].first['extern_uid']).to eq('67890')
       expect(json_response['identities'].first['provider']).to eq('group_saml')
       expect(json_response['identities'].first['saml_provider_id']).to eq(saml_provider.id)
@@ -117,13 +117,13 @@ describe API::Users do
 
     it 'fails to update user with nonexistent identity' do
       put api("/users/#{user.id}", admin), params: { provider: 'group_saml', extern_uid: '67890', group_id_for_saml: 15 }
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
       expect(json_response['message']).to eq({ "identities.saml_provider_id" => ["can't be blank"] })
     end
 
     it 'fails to update user with nonexistent provider' do
       put api("/users/#{user.id}", admin), params: { provider: nil, extern_uid: '67890', group_id_for_saml: saml_provider.group.id }
-      expect(response).to have_gitlab_http_status(400)
+      expect(response).to have_gitlab_http_status(:bad_request)
       expect(json_response['message']).to eq({ "identities.provider" => ["can't be blank"] })
     end
   end
@@ -183,7 +183,7 @@ describe API::Users do
             put api("/users/#{user.id}", user), params: { note: 'new note' }
           end.not_to change { user.reload.note }
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end

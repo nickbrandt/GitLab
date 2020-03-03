@@ -23,7 +23,7 @@ describe API::Unleash do
       it 'responds with OK' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
 
       context 'when feature is not available' do
@@ -32,7 +32,7 @@ describe API::Unleash do
         it 'responds with forbidden' do
           subject
 
-          expect(response).to have_gitlab_http_status(403)
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
@@ -44,7 +44,7 @@ describe API::Unleash do
       it 'responds with OK' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -54,7 +54,7 @@ describe API::Unleash do
       it 'responds with unauthorized' do
         subject
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -65,7 +65,7 @@ describe API::Unleash do
       it 'responds with unauthorized' do
         subject
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
   end
@@ -168,7 +168,7 @@ describe API::Unleash do
         it 'responds with a list of features' do
           subject
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['version']).to eq(1)
           expect(json_response['features']).not_to be_empty
           expect(json_response['features'].map { |f| f['name'] }.sort).to eq(%w[feature1 feature2])
