@@ -70,6 +70,8 @@ class Packages::Package < ApplicationRecord
   scope :order_type_desc, -> { reorder('package_type DESC') }
   scope :order_project_name, -> { joins(:project).reorder('projects.name ASC') }
   scope :order_project_name_desc, -> { joins(:project).reorder('projects.name DESC') }
+  scope :order_project_path, -> { joins(:project).reorder('projects.path ASC, id ASC') }
+  scope :order_project_path_desc, -> { joins(:project).reorder('projects.path DESC, id DESC') }
 
   def self.for_projects(projects)
     return none unless projects.any?
@@ -107,6 +109,8 @@ class Packages::Package < ApplicationRecord
     when 'type_desc' then order_type_desc
     when 'project_name_asc' then order_project_name
     when 'project_name_desc' then order_project_name_desc
+    when 'project_path_asc' then order_project_path
+    when 'project_path_desc' then order_project_path_desc
     else
       order_created_desc
     end
