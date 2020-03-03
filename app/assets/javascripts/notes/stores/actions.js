@@ -544,7 +544,10 @@ export const receiveDescriptionVersionError = ({ commit }, error) => {
   commit(types.RECEIVE_DESCRIPTION_VERSION_ERROR, error);
 };
 
-export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingVersion }) => {
+export const softDeleteDescriptionVersion = (
+  { dispatch },
+  { endpoint, startingVersion, versionId },
+) => {
   let requestUrl = endpoint;
 
   if (startingVersion) {
@@ -555,7 +558,7 @@ export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingV
   return axios
     .delete(requestUrl)
     .then(() => {
-      dispatch('receiveDeleteDescriptionVersion');
+      dispatch('receiveDeleteDescriptionVersion', versionId);
     })
     .catch(error => {
       dispatch('receiveDeleteDescriptionVersionError', error);
@@ -566,8 +569,8 @@ export const softDeleteDescriptionVersion = ({ dispatch }, { endpoint, startingV
 export const requestDeleteDescriptionVersion = ({ commit }) => {
   commit(types.REQUEST_DELETE_DESCRIPTION_VERSION);
 };
-export const receiveDeleteDescriptionVersion = ({ commit }) => {
-  commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION, __('Deleted'));
+export const receiveDeleteDescriptionVersion = ({ commit }, versionId) => {
+  commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION, { [versionId]: __('Deleted') });
 };
 export const receiveDeleteDescriptionVersionError = ({ commit }, error) => {
   commit(types.RECEIVE_DELETE_DESCRIPTION_VERSION_ERROR, error);

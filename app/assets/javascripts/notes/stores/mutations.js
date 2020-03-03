@@ -298,9 +298,9 @@ export default {
   [types.REQUEST_DELETE_DESCRIPTION_VERSION](state) {
     state.isLoadingDescriptionVersion = true;
   },
-  [types.RECEIVE_DELETE_DESCRIPTION_VERSION](state, descriptionVersion) {
+  [types.RECEIVE_DELETE_DESCRIPTION_VERSION](state, versionId) {
     state.isLoadingDescriptionVersion = false;
-    state.descriptionVersion = descriptionVersion;
+    Object.assign(state.descriptionVersions, versionId);
   },
   [types.RECEIVE_DELETE_DESCRIPTION_VERSION_ERROR](state) {
     state.isLoadingDescriptionVersion = false;

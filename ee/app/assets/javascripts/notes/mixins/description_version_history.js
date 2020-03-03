@@ -39,8 +39,9 @@ export default {
     deleteDescriptionVersion() {
       const endpoint = this.note.delete_description_version_path;
       const startingVersion = this.note.start_description_version_id;
+      const versionId = this.note.description_version_id;
 
-      return this.softDeleteDescriptionVersion({ endpoint, startingVersion });
+      return this.softDeleteDescriptionVersion({ endpoint, startingVersion, versionId });
     },
   },
 };
