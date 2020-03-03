@@ -25,7 +25,7 @@ describe API::Vulnerabilities do
       it 'returns all vulnerabilities of a project' do
         get_vulnerabilities
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to include_pagination_headers
         expect(response).to match_response_schema('public_api/v4/vulnerabilities', dir: 'ee')
         expect(response.headers['X-Total']).to eq project.vulnerabilities.count.to_s
@@ -37,7 +37,7 @@ describe API::Vulnerabilities do
         it 'paginates the vulnerabilities according to the pagination params' do
           get_vulnerabilities
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(:ok)
           expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.second.id)
         end
       end
@@ -74,7 +74,7 @@ describe API::Vulnerabilities do
       it 'returns the desired vulnerability' do
         get_vulnerability
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
         expect(json_response['id']).to eq vulnerability_id
       end
@@ -82,7 +82,7 @@ describe API::Vulnerabilities do
       it 'returns the desired findings' do
         get_vulnerability
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
         expect(json_response['finding']['id']).to eq finding.id
       end
@@ -131,7 +131,7 @@ describe API::Vulnerabilities do
             report_type: finding.report_type
           ))
 
-        expect(response).to have_gitlab_http_status(201)
+        expect(response).to have_gitlab_http_status(:created)
         expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
       end
 
@@ -141,7 +141,7 @@ describe API::Vulnerabilities do
         it 'responds with expected error' do
           subject
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message']).to eq(expected_error_messages)
         end
       end
@@ -154,7 +154,7 @@ describe API::Vulnerabilities do
         it 'rejects creation of a new vulnerability from this finding' do
           subject
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message']).to eq(expected_error_messages)
         end
       end
@@ -195,7 +195,7 @@ describe API::Vulnerabilities do
         Timecop.freeze do
           dismiss_vulnerability
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
@@ -231,7 +231,7 @@ describe API::Vulnerabilities do
         it 'responds with error' do
           dismiss_vulnerability
 
-          expect(response).to have_gitlab_http_status(400)
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message']).to eq('base' => ['something went wrong'])
         end
       end
@@ -242,7 +242,7 @@ describe API::Vulnerabilities do
         it 'responds with 304 Not Modified' do
           dismiss_vulnerability
 
-          expect(response).to have_gitlab_http_status(304)
+          expect(response).to have_gitlab_http_status(:not_modified)
         end
       end
 
@@ -282,7 +282,7 @@ describe API::Vulnerabilities do
         Timecop.freeze do
           resolve_vulnerability
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
@@ -299,7 +299,7 @@ describe API::Vulnerabilities do
         it 'responds with 304 Not Modified response' do
           resolve_vulnerability
 
-          expect(response).to have_gitlab_http_status(304)
+          expect(response).to have_gitlab_http_status(:not_modified)
         end
       end
 
@@ -339,7 +339,7 @@ describe API::Vulnerabilities do
         Timecop.freeze do
           confirm_vulnerability
 
-          expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(:created)
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
@@ -356,7 +356,7 @@ describe API::Vulnerabilities do
         it 'responds with 304 Not Modified response' do
           confirm_vulnerability
 
-          expect(response).to have_gitlab_http_status(304)
+          expect(response).to have_gitlab_http_status(:not_modified)
         end
       end
 
