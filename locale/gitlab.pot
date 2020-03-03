@@ -24062,6 +24062,12 @@ msgstr ""
 msgid "success"
 msgstr ""
 
+msgid "suggestPipeline|1/2: Choose a template"
+msgstr ""
+
+msgid "suggestPipeline|We recommend the %{boldStart}Code Quality%{boldEnd} template, which will add a report widget to your Merge Requests. This way you’ll learn about code quality degradations much sooner. %{footerStart} Goodbye technical debt! %{footerEnd}"
+msgstr ""
+
 msgid "syntax is correct"
 msgstr ""
 
