@@ -27,13 +27,13 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
     end
 
     let(:ci_yaml) do
-      {
+      YAML.dump({
         test: {
           stage: 'test',
           script: 'echo',
           only: ['merge_requests']
         }
-      }
+      })
     end
 
     before do
@@ -41,7 +41,7 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
       target_project.add_developer(user)
       source_project.merge_pipelines_enabled = merge_pipelines_enabled
       stub_licensed_features(merge_pipelines: merge_pipelines_license)
-      stub_ci_pipeline_yaml_file(YAML.dump(ci_yaml))
+      stub_ci_pipeline_yaml_file(ci_yaml)
     end
 
     shared_examples_for 'detached merge request pipeline' do
@@ -130,6 +130,16 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
         end
 
         it_behaves_like 'detached merge request pipeline'
+      end
+    end
+
+    context 'when .gitlab-ci.yml is invalid' do
+      let(:ci_yaml) { 'invalid yaml file' }
+
+      it 'persists a pipeline with a config error' do
+        expect { subject }.to change { Ci::Pipeline.count }.by(1)
+        expect(merge_request.all_pipelines.last).to be_failed
+        expect(merge_request.all_pipelines.last).to be_config_error
       end
     end
   end
