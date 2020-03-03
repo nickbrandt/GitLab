@@ -8774,9 +8774,6 @@ msgstr ""
 msgid "Forking in progress"
 msgstr ""
 
-msgid "Forking repository"
-msgstr ""
-
 msgid "Forks"
 msgstr ""
 
