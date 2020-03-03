@@ -59,7 +59,7 @@ describe IncidentManagement::ProcessPrometheusAlertWorker do
       end
     end
 
-    context 'when project could not be found' do
+    context 'when project could not be found', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/208766' do
       it 'does not create an issue' do
         expect { subject.perform('1234', alert_params) }
           .not_to change(Issue, :count)
