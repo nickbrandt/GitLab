@@ -1,0 +1,5 @@
+---
+title: Fix White syntax highlighting theme in Monaco to match Pygments theme
+merge_request: 26364
+author:
+type: fixed
