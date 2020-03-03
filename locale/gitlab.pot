@@ -13190,6 +13190,9 @@ msgstr ""
 msgid "New..."
 msgstr ""
 
+msgid "Newest first"
+msgstr ""
+
 msgid "Newly registered users will by default be external"
 msgstr ""
 
@@ -13665,6 +13668,9 @@ msgid "Oh no!"
 msgstr ""
 
 msgid "Ok let's go"
+msgstr ""
+
+msgid "Oldest first"
 msgstr ""
 
 msgid "OmniAuth"
