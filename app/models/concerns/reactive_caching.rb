@@ -101,7 +101,7 @@ module ReactiveCaching
 
     def save_keys_in_set(resource, opts)
       cache_key = full_reactive_cache_key(resource)
-      cache_value = full_reactive_cache_key(*[resource, opts])
+      cache_value = full_reactive_cache_key(resource, opts)
 
       reactive_set_cache.write(cache_key, cache_value)
     end

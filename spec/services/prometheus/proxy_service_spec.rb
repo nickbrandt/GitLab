@@ -104,7 +104,7 @@ describe Prometheus::ProxyService do
 
       context 'when value present in cache' do
         before do
-          stub_reactive_cache(subject, return_value, opts)
+          stub_reactive_cache(subject, return_value, *opts)
         end
 
         it 'returns cached value' do
