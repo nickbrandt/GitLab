@@ -311,7 +311,7 @@ On the EC2 dashboard, look for Load Balancer in the left navigation bar:
    1. For **Ping Path**, enter `/explore`. (We use `/explore` as it's a public endpoint that does
    not require authorization.)
    1. Keep the default **Advanced Details** or adjust them according to your needs.
-1. For now, don't click **Add EC2 Instances**, as we don't have any instances to add yet. Come back
+1. Click **Add EC2 Instances** but, as we don't have any instances to add yet, come back
 to your load balancer after creating your GitLab instances and add them.
 1. Click **Add Tags** and add any tags you need.
 1. Click **Review and Create**, review all your settings, and click **Create** if you're happy.
