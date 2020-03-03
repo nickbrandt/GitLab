@@ -151,7 +151,7 @@ panel_groups:
       label: HTTP Errors
       unit: "errors / sec"
 - group: System metrics (Kubernetes)
-  priority: 5
+  priority: 15
   panels:
   - title: "Memory Usage (Total)"
     type: "area-chart"
