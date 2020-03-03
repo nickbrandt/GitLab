@@ -59,7 +59,7 @@ describe MergeRequests::RemoveApprovalService do
 
           it 'schedules RefreshApprovalsData' do
             expect(Analytics::CodeReviewMetricsWorker)
-              .to receive(:perform_async).with('::Analytics::RefreshApprovalsData', merge_request.id, force: true)
+              .to receive(:perform_async).with('Analytics::RefreshApprovalsData', merge_request.id, force: true)
 
             service.execute(merge_request)
           end

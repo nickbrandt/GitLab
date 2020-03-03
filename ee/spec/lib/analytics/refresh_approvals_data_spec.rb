@@ -48,4 +48,13 @@ describe Analytics::RefreshApprovalsData do
       end
     end
   end
+
+  describe '#execute_async' do
+    it 'schedules async execution' do
+      expect(Analytics::CodeReviewMetricsWorker)
+        .to receive(:perform_async).with(described_class.name, merge_request.id, force: true)
+
+      subject.execute_async(force: true)
+    end
+  end
 end

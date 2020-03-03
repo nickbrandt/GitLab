@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class ProductivityCalculator
+  class MergeRequestMetricsCalculator
     def initialize(merge_request)
       @merge_request = merge_request
     end
