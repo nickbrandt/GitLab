@@ -30,13 +30,13 @@ export default {
   },
 
   data: () => ({
-    isLoading: false,
+    isLoadingVulnerability: false,
     isCreatingIssue: false,
   }),
 
   methods: {
     onVulnerabilityStateChange(newState) {
-      this.isLoading = true;
+      this.isLoadingVulnerability = true;
 
       axios
         .post(`/api/v4/vulnerabilities/${this.vulnerability.id}/${newState}`)
@@ -50,7 +50,7 @@ export default {
           );
         })
         .finally(() => {
-          this.isLoading = false;
+          this.isLoadingVulnerability = false;
         });
     },
     createIssue() {
@@ -80,7 +80,7 @@ export default {
 
 <template>
   <div>
-    <gl-loading-icon v-if="isLoading" />
+    <gl-loading-icon v-if="isLoadingVulnerability" />
     <vulnerability-state-dropdown
       v-else
       :state="vulnerability.state"
