@@ -1,0 +1,5 @@
+---
+title: Allow filtering by release_tag within the project Issues API
+merge_request: 26374
+author:
+type: added

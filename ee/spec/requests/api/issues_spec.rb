@@ -197,6 +197,22 @@ describe API::Issues, :mailer do
 
       include_examples 'exposes epic'
     end
+
+    context 'when release tag is given' do
+      let!(:release_issue1) { create(:issue, project: project) }
+      let!(:release_issue2) { create(:issue, project: project) }
+      let!(:issue_outside_of_milestone) { create(:issue, project: project) }
+      let!(:release_milestone) { create(:milestone, project: project, title: 'v1', issues: [release_issue1, release_issue2]) }
+      let!(:release) { create(:release, milestones: [release_milestone], project: project) }
+
+      it 'returns issues which are assigned to the given release' do
+        get api("/projects/#{project.id}/issues?release_tag=#{release.tag}")
+
+        issue_ids = json_response.map { |i| i['id'] }
+
+        expect(issue_ids).to match_array([release_issue1.id, release_issue2.id])
+      end
+    end
   end
 
   describe 'GET /project/:id/issues/:issue_id' do

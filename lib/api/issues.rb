@@ -157,6 +157,7 @@ module API
       end
       params do
         use :issues_params
+        optional :release_tag, type: String, desc: 'Return issues which are assigned to a specific release (tag)'
       end
       get ":id/issues" do
         issues = paginate(find_issues(project_id: user_project.id))

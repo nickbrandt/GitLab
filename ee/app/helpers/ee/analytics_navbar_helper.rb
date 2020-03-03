@@ -33,7 +33,7 @@ module EE
       navbar_sub_item(
         title: _('Issues Analytics'),
         path: 'issues_analytics#show',
-        link: project_analytics_issues_analytics_path(project)
+        link: project_analytics_issues_analytics_path(project, state: 'all')
       )
     end
 
@@ -92,7 +92,7 @@ module EE
       navbar_sub_item(
         title: _('Issues Analytics'),
         path: 'issues_analytics#show',
-        link: group_issues_analytics_path(group)
+        link: group_issues_analytics_path(group, state: 'all')
       )
     end
 

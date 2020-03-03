@@ -351,6 +351,7 @@ GET /projects/:id/issues?author_id=5
 GET /projects/:id/issues?assignee_id=5
 GET /projects/:id/issues?my_reaction_emoji=star
 GET /projects/:id/issues?confidential=true
+GET /projects/:id/issues?release_tag=v1
 ```
 
 | Attribute           | Type             | Required   | Description                                                                                                                   |
@@ -361,6 +362,7 @@ GET /projects/:id/issues?confidential=true
 | `labels`            | string           | no         | Comma-separated list of label names, issues must have all labels to be returned. `None` lists all issues with no labels. `Any` lists all issues with at least one label. `No+Label` (Deprecated) lists all issues with no labels. Predefined names are case-insensitive. |
 | `with_labels_details` | boolean        | no         | If `true`, response will return more details for each label in labels field: `:name`, `:color`, `:description`, `:description_html`, `:text_color`. Default is `false`. `description_html` Introduced in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413) |
 | `milestone`         | string           | no         | The milestone title. `None` lists all issues with no milestone. `Any` lists all issues that have an assigned milestone.       |
+| `release_tag`       | string           | no         | The release tag name. Return issues associated with the given release tag. |
 | `scope`             | string           | no         | Return issues for the given scope: `created_by_me`, `assigned_to_me` or `all`.<br> For versions before 11.0, use the now deprecated `created-by-me` or `assigned-to-me` scopes instead.<br> _([Introduced][ce-13004] in GitLab 9.5. [Changed to snake_case][ce-18935] in GitLab 11.0)_ |
 | `author_id`         | integer          | no         | Return issues created by the given user `id`. Mutually exclusive with `author_username`. Combine with `scope=all` or `scope=assigned_to_me`. _([Introduced][ce-13004] in GitLab 9.5)_ |
 | `author_username`   | string           | no         | Return issues created by the given `username`. Similar to `author_id` and mutually exclusive with `author_id`. |
