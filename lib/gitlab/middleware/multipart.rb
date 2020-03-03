@@ -90,6 +90,11 @@ module Gitlab
             File.join(Rails.root, 'public/uploads/tmp')
           ]
 
+          packages_config = Gitlab.config.packages
+          if allow_packages_storage_path?(packages_config)
+            allowed_paths << File.join(packages_config.storage_path, 'tmp/uploads')
+          end
+
           ::UploadedFile.from_params(params, key, allowed_paths)
         end
 
@@ -105,6 +110,15 @@ module Gitlab
           # ActionDispatch::Request is based on Rack::Request but it caches params
           # inside other env keys, here we ensure everything is updated correctly
           ActionDispatch::Request.new(@request.env).update_param(key, value)
+        end
+
+        private
+
+        def allow_packages_storage_path?(config)
+          return unless config.enabled
+          return unless config['storage_path']
+
+          !config.object_store.enabled || !config.object_store.direct_upload
         end
       end
 

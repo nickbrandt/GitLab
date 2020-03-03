@@ -101,6 +101,86 @@ describe Gitlab::Middleware::Multipart do
     end
   end
 
+  context 'with packages storage' do
+    let(:storage_path) { 'shared/packages' }
+
+    RSpec.shared_examples 'allowing the upload' do
+      it 'allows files to be uploaded' do
+        Dir.mktmpdir do |dir|
+          packages_upload_dir = File.join(dir, storage_path, 'tmp/uploads')
+          FileUtils.mkdir_p(packages_upload_dir)
+
+          Tempfile.open('top-level', packages_upload_dir) do |tempfile|
+            env = post_env({ 'file' => tempfile.path }, { 'file.name' => original_filename, 'file.path' => tempfile.path }, Gitlab::Workhorse.secret, 'gitlab-workhorse')
+
+            expect(app).to receive(:call) do |env|
+              expect(get_params(env)['file']).to be_a(::UploadedFile)
+            end
+
+            middleware.call(env)
+          end
+        end
+      end
+    end
+
+    context 'with object storage disabled' do
+      before do
+        stub_config(packages: {
+          enabled: true,
+          object_store: {
+            enabled: false
+          },
+          storage_path: storage_path
+        })
+      end
+
+      it_behaves_like 'allowing the upload' do
+        before do
+          expect(Gitlab.config.packages).to receive(:storage_path).and_return(storage_path)
+        end
+      end
+    end
+
+    context 'with object storage enabled' do
+      context 'with direct upload enabled' do
+        before do
+          stub_config(packages: {
+            enabled: true,
+            object_store: {
+              enabled: true,
+              direct_upload: true
+            }
+          })
+        end
+
+        it_behaves_like 'allowing the upload' do
+          before do
+            expect(Gitlab.config.packages).not_to receive(:storage_path)
+          end
+        end
+      end
+
+      context 'with direct upload disabled' do
+        before do
+          stub_config(packages: {
+            enabled: true,
+            object_store: {
+              enabled: true,
+              direct_upload: false
+            },
+            storage_path: storage_path
+          })
+        end
+
+        it_behaves_like 'allowing the upload' do
+          before do
+            expect(Gitlab.config.packages).to receive(:storage_path).and_return(storage_path)
+          end
+        end
+      end
+    end
+  end
+
   it 'allows symlinks for uploads dir' do
     Tempfile.open('two-levels') do |tempfile|
       symlinked_dir = '/some/dir/uploads'
