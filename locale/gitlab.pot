@@ -13965,9 +13965,6 @@ msgstr ""
 msgid "PipelineStatusTooltip|Pipeline: %{ci_status}"
 msgstr ""
 
-msgid "PipelineStatusTooltip|Pipeline: %{commitText}"
-msgstr ""
-
 msgid "Pipelines"
 msgstr ""
 
