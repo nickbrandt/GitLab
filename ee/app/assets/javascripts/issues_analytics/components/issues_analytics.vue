@@ -1,17 +1,16 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import { engineeringNotation, sum, average } from '@gitlab/ui/src/utils/number_utils';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { GlColumnChart, GlChartLegend } from '@gitlab/ui/dist/charts';
 import { s__ } from '~/locale';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
-import EmptyState from './empty_state.vue';
 
 export default {
   components: {
-    EmptyState,
     GlLoadingIcon,
+    GlEmptyState,
     GlColumnChart,
     GlChartLegend,
   },
@@ -22,6 +21,14 @@ export default {
     },
     filterBlockEl: {
       type: HTMLDivElement,
+      required: true,
+    },
+    noDataEmptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    filtersEmptyStateSvgPath: {
+      type: String,
       required: true,
     },
   },
@@ -135,9 +142,7 @@ export default {
 </script>
 <template>
   <div class="issues-analytics-wrapper" data-qa-selector="issues_analytics_wrapper">
-    <div v-if="loading" class="issues-analytics-loading text-center">
-      <gl-loading-icon :inline="true" :size="4" />
-    </div>
+    <gl-loading-icon v-if="loading" :size="4" class="issues-analytics-loading" />
 
     <div v-if="showChart" class="issues-analytics-chart">
       <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues created per month') }}</h4>
@@ -161,26 +166,26 @@ export default {
       </div>
     </div>
 
-    <empty-state
+    <gl-empty-state
       v-if="showFiltersEmptyState"
-      image="illustrations/issues.svg"
       :title="s__('IssuesAnalytics|Sorry, your filter produced no results')"
-      :summary="
+      :description="
         s__(
           'IssuesAnalytics|To widen your search, change or remove filters in the filter bar above',
         )
       "
+      :svg-path="filtersEmptyStateSvgPath"
     />
 
-    <empty-state
+    <gl-empty-state
       v-if="showNoDataEmptyState"
-      image="illustrations/monitoring/getting_started.svg"
       :title="s__('IssuesAnalytics|There are no issues for the projects in your group')"
-      :summary="
+      :description="
         s__(
           'IssuesAnalytics|After you begin creating issues for your projects, we can start tracking and displaying metrics for them',
         )
       "
+      :svg-path="noDataEmptyStateSvgPath"
     />
   </div>
 </template>
