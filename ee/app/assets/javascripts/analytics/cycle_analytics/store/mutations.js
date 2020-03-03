@@ -226,15 +226,15 @@ export default {
   },
   [types.SET_TASKS_BY_TYPE_FILTERS](state, { filter, value }) {
     const {
-      tasksByType: { labelIds, ...tasksByTypeRest },
+      tasksByType: { selectedLabelIds, ...tasksByTypeRest },
     } = state;
     let updatedFilter = {};
     switch (filter) {
       case TASKS_BY_TYPE_FILTERS.LABEL:
         updatedFilter = {
-          labelIds: labelIds.includes(value)
-            ? labelIds.filter(v => v !== value)
-            : [...labelIds, value],
+          selectedLabelIds: selectedLabelIds.includes(value)
+            ? selectedLabelIds.filter(v => v !== value)
+            : [...selectedLabelIds, value],
         };
         break;
       case TASKS_BY_TYPE_FILTERS.SUBJECT:
@@ -243,7 +243,7 @@ export default {
       default:
         break;
     }
-    state.tasksByType = { ...tasksByTypeRest, labelIds, ...updatedFilter };
+    state.tasksByType = { ...tasksByTypeRest, selectedLabelIds, ...updatedFilter };
   },
   [types.INITIALIZE_CYCLE_ANALYTICS](
     state,

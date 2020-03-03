@@ -43,7 +43,7 @@ export const TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS = {
 
 export const TASKS_BY_TYPE_FILTERS = {
   SUBJECT: 'SUBJECT',
-  LABELS: 'LABELS',
+  LABEL: 'LABEL',
 };
 
 export const STAGE_ACTIONS = {

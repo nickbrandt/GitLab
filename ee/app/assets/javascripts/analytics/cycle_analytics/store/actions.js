@@ -622,6 +622,7 @@ export const updateSelectedDurationChartStages = ({ state, commit }, stages) => 
 };
 
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
+  console.log('setTasksByTypeFilters', data);
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
   dispatch('fetchTasksByTypeData');
 };

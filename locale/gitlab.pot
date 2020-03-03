@@ -19909,6 +19909,9 @@ msgstr ""
 msgid "There was an error fetching the environments information."
 msgstr ""
 
+msgid "There was an error fetching the top labels for the selected group"
+msgstr ""
+
 msgid "There was an error fetching the variables."
 msgstr ""
 
