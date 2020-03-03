@@ -722,6 +722,7 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
     t.jsonb "config_variables"
     t.boolean "has_exposed_artifacts"
     t.string "environment_auto_stop_in", limit: 255
+    t.string "expanded_environment_name", limit: 255
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_has_exposed_artifacts", where: "(has_exposed_artifacts IS TRUE)"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_interruptible", where: "(interruptible = true)"
