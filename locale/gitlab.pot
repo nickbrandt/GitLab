@@ -12462,6 +12462,9 @@ msgstr ""
 msgid "Metrics|Validating query"
 msgstr ""
 
+msgid "Metrics|Values"
+msgstr ""
+
 msgid "Metrics|View logs"
 msgstr ""
 
