@@ -78,7 +78,7 @@ describe Grafana::ProxyService do
         let(:return_value) { { 'http_status' => 200, 'body' => 'body' } }
 
         before do
-          stub_reactive_cache(service, return_value, cache_params)
+          stub_reactive_cache(service, return_value, *cache_params)
         end
 
         it 'returns cached value' do
