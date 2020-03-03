@@ -59,21 +59,23 @@ describe IncidentManagement::ProcessPrometheusAlertWorker do
       end
     end
 
-    context 'when project could not be found', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/208766' do
+    context 'when project could not be found' do
+      let(:non_existing_project_id) { (Project.maximum(:id) || 0) + 1 }
+
       it 'does not create an issue' do
-        expect { subject.perform('1234', alert_params) }
+        expect { subject.perform(non_existing_project_id, alert_params) }
           .not_to change(Issue, :count)
       end
 
       it 'does not relate issue to an event' do
-        expect { subject.perform('1234', alert_params) }
+        expect { subject.perform(non_existing_project_id, alert_params) }
           .not_to change(prometheus_alert.related_issues, :count)
       end
     end
 
     context 'when event could not be found' do
       before do
-        alert_params[:labels][:gitlab_alert_id] = '1234'
+        alert_params[:labels][:gitlab_alert_id] = (PrometheusAlertEvent.maximum(:id) || 0) + 1
       end
 
       it 'does not create an issue' do
