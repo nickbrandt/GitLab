@@ -1,0 +1,5 @@
+---
+title: "Prevent 'Invite group' for groups outside a group-managed account group"
+merge_request: 26081
+author:
+type: changed

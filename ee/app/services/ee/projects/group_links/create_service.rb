@@ -8,6 +8,8 @@ module EE
 
         override :execute
         def execute(group)
+          return error(error_message, 409) unless group_allowed_to_be_shared_with?(group)
+
           result = super
 
           log_audit_event(result[:link]) if result[:status] == :success
@@ -15,6 +17,16 @@ module EE
         end
 
         private
+
+        def group_allowed_to_be_shared_with?(group)
+          return true unless project.root_ancestor.kind == 'group' && project.root_ancestor.enforced_sso?
+
+          group.root_ancestor == project.root_ancestor
+        end
+
+        def error_message
+          _('This group cannot be invited to a project inside a group with enforced SSO')
+        end
 
         def log_audit_event(group_link)
           ::AuditEventService.new(
