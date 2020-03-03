@@ -95,13 +95,13 @@ describe API::ProjectPackages do
         end
       end
 
-      describe 'filtering on package type' do
+      context 'filtering on package_type' do
         let_it_be(:package1) { create(:conan_package, project: project) }
         let_it_be(:package2) { create(:maven_package, project: project) }
         let_it_be(:package3) { create(:npm_package, project: project) }
         let_it_be(:package4) { create(:nuget_package, project: project) }
 
-        context 'package types' do
+        context 'for each type' do
           %w[conan maven npm nuget].each do |package_type|
             it "returns #{package_type} packages" do
               url = package_filter_url(:type, package_type)
