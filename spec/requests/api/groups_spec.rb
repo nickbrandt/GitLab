@@ -580,14 +580,14 @@ describe API::Groups do
   describe 'PUT /groups/:id' do
     let(:new_group_name) { 'New Group'}
 
-    def make_upload_request
-      group_param = {
-        avatar: fixture_file_upload(file_path)
-      }
-      put api("/groups/#{group1.id}", user1), params: group_param
+    it_behaves_like 'group avatar upload' do
+      def make_upload_request
+        group_param = {
+          avatar: fixture_file_upload(file_path)
+        }
+        put api("/groups/#{group1.id}", user1), params: group_param
+      end
     end
-
-    it_behaves_like 'group avatar upload'
 
     context 'when authenticated as the group owner' do
       it 'updates the group' do
@@ -990,13 +990,15 @@ describe API::Groups do
   end
 
   describe "POST /groups" do
-    def make_upload_request
-      group = attributes_for_group_api request_access_enabled: false
-      group[:avatar] = fixture_file_upload(file_path)
-      post api("/groups", user3), params: group
-    end
+    it_behaves_like 'group avatar upload' do
+      def make_upload_request
+        params = attributes_for_group_api(request_access_enabled: false).tap do |attrs|
+          attrs[:avatar] = fixture_file_upload(file_path)
+        end
 
-    it_behaves_like 'group avatar upload'
+        post api("/groups", user3), params: params
+      end
+    end
 
     context "when authenticated as user without group permissions" do
       it "does not create group" do
