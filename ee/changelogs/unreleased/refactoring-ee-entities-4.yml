@@ -1,0 +1,5 @@
+---
+title: Separate vulnerabilities, feature flags, dependency entities into own class files
+merge_request: 26088
+author: Rajendra Kadam
+type: added
