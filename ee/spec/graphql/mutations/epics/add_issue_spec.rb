@@ -9,7 +9,7 @@ describe Mutations::Epics::AddIssue do
   let(:user) { issue.author }
   let(:issue) { create(:issue, project: project) }
 
-  subject(:mutation) { described_class.new(object: group, context: { current_user: user }) }
+  subject(:mutation) { described_class.new(object: group, context: { current_user: user }, field: nil) }
 
   describe '#resolve' do
     subject do
