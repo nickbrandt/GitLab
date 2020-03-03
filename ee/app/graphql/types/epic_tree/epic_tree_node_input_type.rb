@@ -7,13 +7,6 @@ module Types
       graphql_name 'EpicTreeNodeFieldsInputType'
       description 'A node of an epic tree.'
 
-      MoveTypeEnum = GraphQL::EnumType.define do
-        name 'MoveType'
-        description 'The position the adjacent object should be moved.'
-        value('before', 'The adjacent object will be moved before the object that is being moved.')
-        value('after', 'The adjacent object will be moved after the object that is being moved.')
-      end
-
       argument :id,
                GraphQL::ID_TYPE,
                required: true,
