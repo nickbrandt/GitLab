@@ -73,7 +73,7 @@ module ReactiveCaching
     end
 
     def clear_reactive_cache_set!(*args)
-      cache_key = full_reactive_cache_key(args)
+      cache_key = full_reactive_cache_key(*args)
 
       reactive_set_cache.clear_cache!(cache_key)
     end
@@ -101,8 +101,9 @@ module ReactiveCaching
 
     def save_keys_in_set(resource, opts)
       cache_key = full_reactive_cache_key(resource)
+      cache_value = full_reactive_cache_key(*[resource, opts])
 
-      reactive_set_cache.write(cache_key, "#{cache_key}:#{opts}")
+      reactive_set_cache.write(cache_key, cache_value)
     end
 
     def reactive_set_cache
@@ -127,7 +128,6 @@ module ReactiveCaching
 
       [prefix, hashed, suffix].flatten.compact.join(':')
     end
-
 
     def alive_reactive_cache_key(*qualifiers)
       full_reactive_cache_key(*qualifiers, alive: true)

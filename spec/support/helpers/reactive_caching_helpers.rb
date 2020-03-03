@@ -31,7 +31,7 @@ module ReactiveCachingHelpers
 
   def write_reactive_cache(subject, data, *qualifiers)
     start_reactive_cache_lifetime(subject, *qualifiers)
-    Rails.cache.write(reactive_cache_key(subject, *qualifiers), data)
+    Rails.cache.write(reactive_cache_key(subject, *qualifiers, alive: false), data)
   end
 
   def reactive_cache_alive?(subject, *qualifiers)
