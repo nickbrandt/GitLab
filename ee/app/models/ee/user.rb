@@ -53,6 +53,7 @@ module EE
       has_many :protected_branch_unprotect_access_levels, dependent: :destroy, class_name: "::ProtectedBranch::UnprotectAccessLevel" # rubocop:disable Cop/ActiveRecordDependent
 
       has_many :smartcard_identities
+      has_many :scim_identities
 
       belongs_to :managing_group, class_name: 'Group', optional: true, inverse_of: :managed_users
 
