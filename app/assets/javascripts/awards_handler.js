@@ -112,7 +112,7 @@ export class AwardsHandler {
 
     const $menu = $(`.${this.menuClass}`);
     if ($menu.length) {
-      if ($menu.is('.is-visible')) {
+      if ($menu.is('.is-active')) {
         $addBtn.removeClass('is-active');
         this.hideMenuElement($menu);
         $('.js-emoji-menu-search').blur();
@@ -594,7 +594,14 @@ export class AwardsHandler {
    * the menu being opened and closed. */
 
   showMenuElement($emojiMenu) {
+    $emojiMenu.attr('disabled', true);
     $emojiMenu.addClass(IS_RENDERED);
+
+    $emojiMenu.on('transitionend', e => {
+      if (e.currentTarget === e.target) {
+        $emojiMenu.removeAttr('disabled');
+      }
+    });
 
     // enqueues animation as a microtask, so it begins ASAP once IS_RENDERED added
     return Promise.resolve().then(() => $emojiMenu.addClass(IS_VISIBLE));
