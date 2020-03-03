@@ -25,7 +25,7 @@ class ServiceDeskSetting < ApplicationRecord
 
   def valid_issue_template
     if issue_template_missing?
-      errors.add(:issue_template_key, "is empty or does not exist")
+      errors.add(:issue_template_key, 'is empty or does not exist')
     end
   end
 end

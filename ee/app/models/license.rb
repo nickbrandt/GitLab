@@ -476,7 +476,7 @@ class License < ApplicationRecord
   def valid_license
     return if license?
 
-    self.errors.add(:base, "The license key is invalid. Make sure it is exactly as you received it from GitLab Inc.")
+    self.errors.add(:base, _('The license key is invalid. Make sure it is exactly as you received it from GitLab Inc.'))
   end
 
   def prior_historical_max
@@ -542,6 +542,6 @@ class License < ApplicationRecord
   def not_expired
     return unless self.license? && self.expired?
 
-    self.errors.add(:base, "This license has already expired.")
+    self.errors.add(:base, _('This license has already expired.'))
   end
 end

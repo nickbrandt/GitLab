@@ -108,13 +108,13 @@ module DesignManagement
 
       return if id_a == id_b
 
-      errors.add(:issue, "must be the same on design and version")
+      errors.add(:issue, 'must be the same on design and version')
     end
 
     def design_and_version_have_issue_id
       return if [design, version].all? { |obj| obj.try(:issue_id).present? }
 
-      errors.add(:issue, "must be present on both design and version")
+      errors.add(:issue, 'must be present on both design and version')
     end
   end
 end

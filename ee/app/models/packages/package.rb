@@ -125,7 +125,7 @@ class Packages::Package < ApplicationRecord
                            .id_not_in(id)
                            .exists?
 
-    errors.add(:base, 'Package recipe already exists') if recipe_exists
+    errors.add(:base, _('Package recipe already exists')) if recipe_exists
   end
 
   def valid_npm_package_name
@@ -140,7 +140,7 @@ class Packages::Package < ApplicationRecord
     return unless project
 
     if project.package_already_taken?(name)
-      errors.add(:base, 'Package already exists')
+      errors.add(:base, _('Package already exists'))
     end
   end
 end

@@ -131,7 +131,7 @@ module EE
 
     def cannot_be_admin_and_auditor
       if admin? && auditor?
-        errors.add(:admin, "user cannot also be an Auditor.")
+        errors.add(:admin, 'user cannot also be an Auditor.')
       end
     end
 

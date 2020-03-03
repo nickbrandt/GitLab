@@ -310,7 +310,7 @@ module EE
       return if custom_project_templates_group_id.blank?
       return if children.exists?(id: custom_project_templates_group_id)
 
-      errors.add(:custom_project_templates_group_id, "has to be a subgroup of the group")
+      errors.add(:custom_project_templates_group_id, 'has to be a subgroup of the group')
     end
 
     def billed_group_members

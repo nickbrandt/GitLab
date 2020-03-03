@@ -22,7 +22,7 @@ class Packages::MavenMetadatum < ApplicationRecord
 
   def maven_package_type
     unless package && package.maven?
-      errors.add(:base, 'Package type must be Maven')
+      errors.add(:base, _('Package type must be Maven'))
     end
   end
 end
