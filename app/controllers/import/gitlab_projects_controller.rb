@@ -6,7 +6,7 @@ class Import::GitlabProjectsController < Import::BaseController
   before_action :whitelist_query_limiting, only: [:create]
   before_action :verify_gitlab_project_import_enabled
 
-  skip_before_action :authenticate_user!, only: [:authorize, :create]
+  skip_before_action :verify_authenticity_token, only: [:authorize]
   before_action :verify_workhorse_api!, only: [:authorize]
 
   def new
@@ -33,7 +33,6 @@ class Import::GitlabProjectsController < Import::BaseController
     end
   end
 
-  # TODO: include UploadsActions?
   def authorize
     set_workhorse_internal_api_content_type
 
