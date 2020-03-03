@@ -1581,6 +1581,7 @@ ActiveRecord::Schema.define(version: 2020_02_27_165129) do
     t.integer "start_date_sourcing_epic_id"
     t.integer "due_date_sourcing_epic_id"
     t.integer "health_status", limit: 2
+    t.index "group_id, ((iid)::character varying) varchar_pattern_ops", name: "index_epics_on_group_id_and_iid_varchar_pattern"
     t.index ["assignee_id"], name: "index_epics_on_assignee_id"
     t.index ["author_id"], name: "index_epics_on_author_id"
     t.index ["closed_by_id"], name: "index_epics_on_closed_by_id"

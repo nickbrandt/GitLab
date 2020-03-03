@@ -1,0 +1,5 @@
+---
+title: Add possibility to search for epics by partial iids using GraphQL
+merge_request: 24673
+author:
+type: added

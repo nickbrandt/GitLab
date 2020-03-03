@@ -194,6 +194,51 @@ describe Resolvers::EpicResolver do
           expect(resolve_epics).to contain_exactly(epic1, epic2, epic3, epic4)
         end
       end
+
+      context 'with partial iids' do
+        let!(:other_group) { create(:group, :private) }
+
+        let!(:epic3) { create(:epic, group: group, iid: '1122') }
+        let!(:epic4) { create(:epic, group: group, iid: '132') }
+        let!(:epic5) { create(:epic, group: group, iid: '62') }
+        let!(:epic6) { create(:epic, group: other_group, iid: '11999') }
+
+        it 'returns the expected epics if just the first number of iid is requested' do
+          epics = resolve_epics(iid_starts_with: '1')
+
+          expect(epics).to contain_exactly(epic3, epic4)
+        end
+
+        it 'returns the expected epics if first two numbers of iid are requested' do
+          epics = resolve_epics(iid_starts_with: '11')
+
+          expect(epics).to contain_exactly(epic3)
+        end
+
+        it 'returns the expected epics if last two numbers of iid are given' do
+          epics = resolve_epics(iid_starts_with: '32')
+
+          expect(epics).to be_empty
+        end
+
+        it 'returns the expected epics if exact number of iid is given' do
+          epics = resolve_epics(iid_starts_with: '62')
+
+          expect(epics).to contain_exactly(epic5)
+        end
+
+        it 'fails if iid_starts_with contains a non-numeric string' do
+          expect { resolve_epics(iid_starts_with: 'foo') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'foo is not a valid iid search term')
+        end
+
+        it 'fails if iid_starts_with contains a non-numeric string with line breaks' do
+          expect { resolve_epics(iid_starts_with: "foo\n1") }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, "foo\n1 is not a valid iid search term")
+        end
+
+        it 'fails if iid_starts_with contains a string which contains a negative number' do
+          expect { resolve_epics(iid_starts_with: '-1') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, '-1 is not a valid iid search term')
+        end
+      end
     end
   end
 
