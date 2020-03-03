@@ -46,7 +46,7 @@ module EE
 
       validates :elasticsearch_replicas,
                 presence: true,
-                numericality: { only_integer: true, greater_than: 0 }
+                numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
       validates :elasticsearch_max_bulk_size_mb,
                 presence: true,
