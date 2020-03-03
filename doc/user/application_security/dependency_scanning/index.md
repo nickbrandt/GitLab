@@ -14,6 +14,7 @@ application is using an external (open source) library which is known to be vuln
 
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your dependencies for known
 vulnerabilities using Dependency Scanning.
+All dependencies are scanned, including the transitive dependencies (also known as nested dependencies).
 
 You can take advantage of Dependency Scanning by either [including the CI job](#configuration)
 in your existing `.gitlab-ci.yml` file or by implicitly using
