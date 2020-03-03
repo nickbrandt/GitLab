@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
-class GroupHook < ProjectHook
+class GroupHook < WebHook
   include CustomModelNaming
   include TriggerableHooks
+  include Limitable
 
+  self.limit_name = 'group_hooks'
+  self.limit_scope = :group
   self.singular_route_key = :hook
 
   triggerable_hooks [
@@ -20,22 +23,9 @@ class GroupHook < ProjectHook
 
   belongs_to :group
 
-  clear_validators!
   validates :url, presence: true, addressable_url: true
-  validate :validate_group_hook_limits_not_exceeded, on: :create
 
   def pluralized_name
     _('Group Hooks')
-  end
-
-  private
-
-  def validate_group_hook_limits_not_exceeded
-    return unless group
-
-    if group.actual_limits.exceeded?(:group_hooks, GroupHook.where(group: group))
-      errors.add(:base, _("Maximum number of group hooks (%{count}) exceeded") %
-        { count: group.actual_limits.group_hooks })
-    end
   end
 end
