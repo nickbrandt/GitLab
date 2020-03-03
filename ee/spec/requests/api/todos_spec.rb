@@ -75,39 +75,24 @@ describe API::Todos do
         get api('/todos', personal_access_token: pat)
       end
 
-      context 'when the feature is enabled' do
-        before do
-          api_request
-        end
-
-        it_behaves_like 'an endpoint that responds with success'
-
-        it 'avoids N+1 queries', :request_store do
-          control = ActiveRecord::QueryRecorder.new { api_request }
-
-          create_todo_for_mentioned_in_design
-
-          expect { api_request }.not_to exceed_query_limit(control)
-        end
-
-        it 'includes the Design Todo in the response' do
-          expect(json_response).to include(
-            a_hash_including('id' => design_todo.id)
-          )
-        end
+      before do
+        api_request
       end
 
-      context 'when the feature is disabled' do
-        before do
-          stub_feature_flags(design_management_todos_api: false)
-          api_request
-        end
+      it_behaves_like 'an endpoint that responds with success'
 
-        it_behaves_like 'an endpoint that responds with success'
+      it 'avoids N+1 queries', :request_store do
+        control = ActiveRecord::QueryRecorder.new { api_request }
 
-        it 'does not include the Design Todo in the response' do
-          expect(json_response).to be_empty
-        end
+        create_todo_for_mentioned_in_design
+
+        expect { api_request }.not_to exceed_query_limit(control)
+      end
+
+      it 'includes the Design Todo in the response' do
+        expect(json_response).to include(
+          a_hash_including('id' => design_todo.id)
+        )
       end
     end
   end
