@@ -4,7 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 export default {
   ...Api,
   geoNodesPath: '/api/:version/geo_nodes',
-  geoDesignsPath: '/api/:version/geo_replication/designs',
+  geoReplicationPath: '/api/:version/geo_replication/:replicable',
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
@@ -233,18 +233,18 @@ export default {
     return axios.get(url, { params });
   },
 
-  getGeoDesigns(params = {}) {
-    const url = Api.buildUrl(this.geoDesignsPath);
+  getGeoReplicableItems(replicable, params = {}) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
     return axios.get(url, { params });
   },
 
-  initiateAllGeoDesignSyncs(action) {
-    const url = Api.buildUrl(this.geoDesignsPath);
+  initiateAllGeoReplicableSyncs(replicable, action) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
     return axios.post(`${url}/${action}`, {});
   },
 
-  initiateGeoDesignSync({ projectId, action }) {
-    const url = Api.buildUrl(this.geoDesignsPath);
+  initiateGeoReplicableSync(replicable, { projectId, action }) {
+    const url = Api.buildUrl(this.geoReplicationPath).replace(':replicable', replicable);
     return axios.put(`${url}/${projectId}/${action}`, {});
   },
 

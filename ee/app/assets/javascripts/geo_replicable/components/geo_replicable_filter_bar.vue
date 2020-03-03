@@ -6,7 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import { DEFAULT_SEARCH_DELAY, ACTION_TYPES } from '../store/constants';
 
 export default {
-  name: 'GeoDesignsFilterBar',
+  name: 'GeoReplicableFilterBar',
   components: {
     GlTabs,
     GlTab,
@@ -16,22 +16,22 @@ export default {
     Icon,
   },
   computed: {
-    ...mapState(['currentFilterIndex', 'filterOptions', 'searchFilter']),
+    ...mapState(['currentFilterIndex', 'filterOptions', 'searchFilter', 'replicableType']),
     search: {
       get() {
         return this.searchFilter;
       },
       set: debounce(function debounceSearch(newVal) {
         this.setSearch(newVal);
-        this.fetchDesigns();
+        this.fetchReplicableItems();
       }, DEFAULT_SEARCH_DELAY),
     },
   },
   methods: {
-    ...mapActions(['setFilter', 'setSearch', 'fetchDesigns', 'initiateAllDesignSyncs']),
+    ...mapActions(['setFilter', 'setSearch', 'fetchReplicableItems', 'initiateAllReplicableSyncs']),
     filterChange(filterIndex) {
       this.setFilter(filterIndex);
-      this.fetchDesigns();
+      this.fetchReplicableItems();
     },
   },
   actionTypes: ACTION_TYPES,
@@ -57,8 +57,8 @@ export default {
               <icon name="chevron-down" />
             </span>
           </template>
-          <gl-dropdown-item @click="initiateAllDesignSyncs($options.actionTypes.RESYNC)">{{
-            __('Resync all designs')
+          <gl-dropdown-item @click="initiateAllReplicableSyncs($options.actionTypes.RESYNC)">{{
+            __(`Resync all ${replicableType}`)
           }}</gl-dropdown-item>
         </gl-dropdown>
       </div>

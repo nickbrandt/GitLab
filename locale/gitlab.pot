@@ -12913,9 +12913,6 @@ msgstr ""
 msgid "No %{providerTitle} repositories found"
 msgstr ""
 
-msgid "No Design Repositories match this filter"
-msgstr ""
-
 msgid "No Epic"
 msgstr ""
 
@@ -16604,9 +16601,6 @@ msgstr ""
 msgid "Resync"
 msgstr ""
 
-msgid "Resync all designs"
-msgstr ""
-
 msgid "Retry"
 msgstr ""
 
@@ -19709,9 +19703,6 @@ msgstr ""
 msgid "There was an error fetching median data for stages"
 msgstr ""
 
-msgid "There was an error fetching the Designs"
-msgstr ""
-
 msgid "There was an error fetching the Node's Groups"
 msgstr ""
 
@@ -19752,9 +19743,6 @@ msgid "There was an error saving your notification settings."
 msgstr ""
 
 msgid "There was an error subscribing to this label."
-msgstr ""
-
-msgid "There was an error syncing the Design Repositories."
 msgstr ""
 
 msgid "There was an error trying to validate your query"

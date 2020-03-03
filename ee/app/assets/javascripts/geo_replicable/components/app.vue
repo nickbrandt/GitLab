@@ -1,17 +1,17 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
-import GeoDesignsFilterBar from './geo_designs_filter_bar.vue';
-import GeoDesigns from './geo_designs.vue';
-import GeoDesignsEmptyState from './geo_designs_empty_state.vue';
+import GeoReplicableFilterBar from './geo_replicable_filter_bar.vue';
+import GeoReplicable from './geo_replicable.vue';
+import GeoReplicableEmptyState from './geo_replicable_empty_state.vue';
 
 export default {
-  name: 'GeoDesignsApp',
+  name: 'GeoReplicableApp',
   components: {
     GlLoadingIcon,
-    GeoDesignsFilterBar,
-    GeoDesigns,
-    GeoDesignsEmptyState,
+    GeoReplicableFilterBar,
+    GeoReplicable,
+    GeoReplicableEmptyState,
   },
   props: {
     geoSvgPath: {
@@ -26,33 +26,29 @@ export default {
       type: String,
       required: true,
     },
-    designManagementLink: {
-      type: String,
-      required: true,
-    },
   },
   computed: {
-    ...mapState(['isLoading', 'totalDesigns']),
-    hasDesigns() {
-      return this.totalDesigns > 0;
+    ...mapState(['isLoading', 'totalReplicableItems']),
+    hasData() {
+      return this.totalReplicableItems > 0;
     },
   },
   created() {
-    this.fetchDesigns();
+    this.fetchReplicableItems();
   },
   methods: {
-    ...mapActions(['fetchDesigns']),
+    ...mapActions(['fetchReplicableItems']),
   },
 };
 </script>
 
 <template>
-  <article class="geo-designs-container">
-    <geo-designs-filter-bar />
+  <article class="geo-replicable-container">
+    <geo-replicable-filter-bar />
     <gl-loading-icon v-if="isLoading" size="xl" />
     <template v-else>
-      <geo-designs v-if="hasDesigns" />
-      <geo-designs-empty-state
+      <geo-replicable v-if="hasData" />
+      <geo-replicable-empty-state
         v-else
         :issues-svg-path="issuesSvgPath"
         :geo-troubleshooting-link="geoTroubleshootingLink"

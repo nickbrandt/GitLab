@@ -12,37 +12,37 @@ export default {
   [types.SET_PAGE](state, page) {
     state.currentPage = page;
   },
-  [types.REQUEST_DESIGNS](state) {
+  [types.REQUEST_REPLICABLE_ITEMS](state) {
     state.isLoading = true;
   },
-  [types.RECEIVE_DESIGNS_SUCCESS](state, { data, perPage, total }) {
+  [types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, { data, perPage, total }) {
     state.isLoading = false;
-    state.designs = data;
+    state.replicableItems = data;
     state.pageSize = perPage;
-    state.totalDesigns = total;
+    state.totalReplicableItems = total;
   },
-  [types.RECEIVE_DESIGNS_ERROR](state) {
+  [types.RECEIVE_REPLICABLE_ITEMS_ERROR](state) {
     state.isLoading = false;
-    state.designs = [];
+    state.replicableItems = [];
     state.pageSize = 0;
-    state.totalDesigns = 0;
+    state.totalReplicableItems = 0;
   },
-  [types.REQUEST_INITIATE_ALL_DESIGN_SYNCS](state) {
+  [types.REQUEST_INITIATE_ALL_REPLICABLE_SYNCS](state) {
     state.isLoading = true;
   },
-  [types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_SUCCESS](state) {
+  [types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS](state) {
     state.isLoading = false;
   },
-  [types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_ERROR](state) {
+  [types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_ERROR](state) {
     state.isLoading = false;
   },
-  [types.REQUEST_INITIATE_DESIGN_SYNC](state) {
+  [types.REQUEST_INITIATE_REPLICABLE_SYNC](state) {
     state.isLoading = true;
   },
-  [types.RECEIVE_INITIATE_DESIGN_SYNC_SUCCESS](state) {
+  [types.RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS](state) {
     state.isLoading = false;
   },
-  [types.RECEIVE_INITIATE_DESIGN_SYNC_ERROR](state) {
+  [types.RECEIVE_INITIATE_REPLICABLE_SYNC_ERROR](state) {
     state.isLoading = false;
   },
 };

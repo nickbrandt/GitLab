@@ -561,17 +561,19 @@ describe('Api', () => {
     });
   });
 
-  describe('GeoDesigns', () => {
+  describe('GeoReplicable', () => {
     let expectedUrl;
     let apiResponse;
     let mockParams;
+    let mockReplicableType;
 
     beforeEach(() => {
-      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/designs`;
+      mockReplicableType = 'designs';
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/${mockReplicableType}`;
     });
 
-    describe('getGeoDesigns', () => {
-      it('fetches designs', () => {
+    describe('getGeoReplicableItems', () => {
+      it('fetches replicableItems based on replicableType', () => {
         apiResponse = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
         mockParams = { page: 1 };
 
@@ -579,14 +581,14 @@ describe('Api', () => {
         jest.spyOn(axios, 'get');
         mock.onGet(expectedUrl).replyOnce(200, apiResponse);
 
-        return Api.getGeoDesigns(mockParams).then(({ data }) => {
+        return Api.getGeoReplicableItems(mockReplicableType, mockParams).then(({ data }) => {
           expect(data).toEqual(apiResponse);
           expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: mockParams });
         });
       });
     });
 
-    describe('initiateAllGeoDesignSyncs', () => {
+    describe('initiateAllGeoReplicableSyncs', () => {
       it('POSTs with correct action', () => {
         apiResponse = [{ status: 'ok' }];
         mockParams = {};
@@ -597,14 +599,16 @@ describe('Api', () => {
         jest.spyOn(axios, 'post');
         mock.onPost(`${expectedUrl}/${mockAction}`).replyOnce(201, apiResponse);
 
-        return Api.initiateAllGeoDesignSyncs(mockAction).then(({ data }) => {
-          expect(data).toEqual(apiResponse);
-          expect(axios.post).toHaveBeenCalledWith(`${expectedUrl}/${mockAction}`, mockParams);
-        });
+        return Api.initiateAllGeoReplicableSyncs(mockReplicableType, mockAction).then(
+          ({ data }) => {
+            expect(data).toEqual(apiResponse);
+            expect(axios.post).toHaveBeenCalledWith(`${expectedUrl}/${mockAction}`, mockParams);
+          },
+        );
       });
     });
 
-    describe('initiateGeoDesignSync', () => {
+    describe('initiateGeoReplicableSync', () => {
       it('PUTs with correct action and projectId', () => {
         apiResponse = [{ status: 'ok' }];
         mockParams = {};
@@ -616,15 +620,16 @@ describe('Api', () => {
         jest.spyOn(axios, 'put');
         mock.onPut(`${expectedUrl}/${mockProjectId}/${mockAction}`).replyOnce(201, apiResponse);
 
-        return Api.initiateGeoDesignSync({ projectId: mockProjectId, action: mockAction }).then(
-          ({ data }) => {
-            expect(data).toEqual(apiResponse);
-            expect(axios.put).toHaveBeenCalledWith(
-              `${expectedUrl}/${mockProjectId}/${mockAction}`,
-              mockParams,
-            );
-          },
-        );
+        return Api.initiateGeoReplicableSync(mockReplicableType, {
+          projectId: mockProjectId,
+          action: mockAction,
+        }).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.put).toHaveBeenCalledWith(
+            `${expectedUrl}/${mockProjectId}/${mockAction}`,
+            mockParams,
+          );
+        });
       });
     });
   });

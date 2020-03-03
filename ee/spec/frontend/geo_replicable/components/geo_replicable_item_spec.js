@@ -1,35 +1,35 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlLink, GlButton } from '@gitlab/ui';
-import GeoDesign from 'ee/geo_designs/components/geo_design.vue';
-import store from 'ee/geo_designs/store';
-import { ACTION_TYPES } from 'ee/geo_designs/store/constants';
-import { MOCK_BASIC_FETCH_DATA_MAP } from '../mock_data';
+import GeoReplicableItem from 'ee/geo_replicable/components/geo_replicable_item.vue';
+import createStore from 'ee/geo_replicable/store';
+import { ACTION_TYPES } from 'ee/geo_replicable/store/constants';
+import { MOCK_BASIC_FETCH_DATA_MAP, MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignsApp', () => {
+describe('GeoReplicableItem', () => {
   let wrapper;
-  const mockDesign = MOCK_BASIC_FETCH_DATA_MAP.data[0];
+  const mockReplicableItem = MOCK_BASIC_FETCH_DATA_MAP.data[0];
 
   const actionSpies = {
-    initiateDesignSync: jest.fn(),
+    initiateReplicableSync: jest.fn(),
   };
 
   const propsData = {
-    name: mockDesign.name,
-    projectId: mockDesign.projectId,
-    syncStatus: mockDesign.state,
-    lastSynced: mockDesign.lastSyncedAt,
+    name: mockReplicableItem.name,
+    projectId: mockReplicableItem.projectId,
+    syncStatus: mockReplicableItem.state,
+    lastSynced: mockReplicableItem.lastSyncedAt,
     lastVerified: null,
     lastChecked: null,
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesign, {
+    wrapper = mount(GeoReplicableItem, {
       localVue,
-      store,
+      store: createStore(MOCK_REPLICABLE_TYPE),
       propsData,
       methods: {
         ...actionSpies,
@@ -73,9 +73,9 @@ describe('GeoDesignsApp', () => {
         expect(findGlButton().exists()).toBe(true);
       });
 
-      it('calls initiateDesignSyncs when clicked', () => {
+      it('calls initiateReplicableSync when clicked', () => {
         findGlButton().trigger('click');
-        expect(actionSpies.initiateDesignSync).toHaveBeenCalledWith({
+        expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith({
           projectId: propsData.projectId,
           name: propsData.name,
           action: ACTION_TYPES.RESYNC,

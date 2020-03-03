@@ -1,3 +1,3 @@
-import initGeoDesigns from 'ee/geo_designs';
+import initGeoReplicable from 'ee/geo_replicable';
 
-document.addEventListener('DOMContentLoaded', initGeoDesigns);
+document.addEventListener('DOMContentLoaded', initGeoReplicable);

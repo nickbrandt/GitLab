@@ -1,19 +1,20 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import store from 'ee/geo_designs/store';
-import GeoDesignStatus from 'ee/geo_designs/components/geo_design_status.vue';
+import createStore from 'ee/geo_replicable/store';
+import GeoReplicableStatus from 'ee/geo_replicable/components/geo_replicable_status.vue';
 import {
   FILTER_STATES,
   STATUS_ICON_NAMES,
   STATUS_ICON_CLASS,
   DEFAULT_STATUS,
-} from 'ee/geo_designs/store/constants';
+} from 'ee/geo_replicable/store/constants';
 import Icon from '~/vue_shared/components/icon.vue';
+import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignStatus', () => {
+describe('GeoReplicableStatus', () => {
   let wrapper;
 
   const propsData = {
@@ -21,9 +22,9 @@ describe('GeoDesignStatus', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesignStatus, {
+    wrapper = mount(GeoReplicableStatus, {
       localVue,
-      store,
+      store: createStore(MOCK_REPLICABLE_TYPE),
       propsData,
     });
   };
@@ -32,8 +33,8 @@ describe('GeoDesignStatus', () => {
     wrapper.destroy();
   });
 
-  const findGeoDesignStatusContainer = () => wrapper.find('div');
-  const findIcon = () => findGeoDesignStatusContainer().find(Icon);
+  const findGeoReplicableStatusContainer = () => wrapper.find('div');
+  const findIcon = () => findGeoReplicableStatusContainer().find(Icon);
 
   describe('template', () => {
     beforeEach(() => {
@@ -41,7 +42,7 @@ describe('GeoDesignStatus', () => {
     });
 
     it('renders status container', () => {
-      expect(findGeoDesignStatusContainer().exists()).toBe(true);
+      expect(findGeoReplicableStatusContainer().exists()).toBe(true);
     });
   });
 

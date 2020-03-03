@@ -1,27 +1,28 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlTabs, GlTab, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import GeoDesignsFilterBar from 'ee/geo_designs/components/geo_designs_filter_bar.vue';
-import store from 'ee/geo_designs/store';
-import { DEFAULT_SEARCH_DELAY } from 'ee/geo_designs/store/constants';
+import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
+import createStore from 'ee/geo_replicable/store';
+import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/store/constants';
+import { MOCK_REPLICABLE_TYPE } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignsFilterBar', () => {
+describe('GeoReplicableFilterBar', () => {
   let wrapper;
 
   const actionSpies = {
     setSearch: jest.fn(),
     setFilter: jest.fn(),
-    fetchDesigns: jest.fn(),
-    initiateAllDesignSyncs: jest.fn(),
+    fetchReplicableItems: jest.fn(),
+    initiateAllReplicableSyncs: jest.fn(),
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesignsFilterBar, {
+    wrapper = mount(GeoReplicableFilterBar, {
       localVue,
-      store,
+      store: createStore(MOCK_REPLICABLE_TYPE),
       methods: {
         ...actionSpies,
       },
@@ -71,10 +72,10 @@ describe('GeoDesignsFilterBar', () => {
         expect(findGlDropdownItem().exists()).toBe(true);
       });
 
-      it('calls initiateAllDesignSyncs when clicked', () => {
+      it('calls initiateAllReplicableSyncs when clicked', () => {
         const innerButton = findGlDropdownItem().find('button');
         innerButton.trigger('click');
-        expect(actionSpies.initiateAllDesignSyncs).toHaveBeenCalled();
+        expect(actionSpies.initiateAllReplicableSyncs).toHaveBeenCalled();
       });
     });
   });
@@ -82,7 +83,7 @@ describe('GeoDesignsFilterBar', () => {
   describe('when search changes', () => {
     beforeEach(() => {
       createComponent();
-      actionSpies.fetchDesigns.mockClear(); // Will get called on init
+      actionSpies.fetchReplicableItems.mockClear(); // Will get called on init
       wrapper.vm.search = 'test search';
     });
 
@@ -93,11 +94,11 @@ describe('GeoDesignsFilterBar', () => {
       expect(actionSpies.setSearch).toHaveBeenCalledWith('test search');
     });
 
-    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling fetchDesigns`, () => {
-      expect(actionSpies.fetchDesigns).not.toHaveBeenCalled();
+    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling fetchReplicableItems`, () => {
+      expect(actionSpies.fetchReplicableItems).not.toHaveBeenCalled();
 
       jest.runAllTimers(); // Debounce
-      expect(actionSpies.fetchDesigns).toHaveBeenCalled();
+      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 
@@ -113,8 +114,8 @@ describe('GeoDesignsFilterBar', () => {
       expect(actionSpies.setFilter).toHaveBeenCalledWith(testValue);
     });
 
-    it('should call fetchDesigns', () => {
-      expect(actionSpies.fetchDesigns).toHaveBeenCalled();
+    it('should call fetchReplicableItems', () => {
+      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 });

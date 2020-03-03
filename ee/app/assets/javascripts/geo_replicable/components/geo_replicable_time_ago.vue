@@ -2,7 +2,7 @@
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
-  name: 'GeoDesignTimeAgo',
+  name: 'GeoReplicableTimeAgo',
   components: {
     TimeAgo,
   },
