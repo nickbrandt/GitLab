@@ -4993,9 +4993,6 @@ msgstr ""
 msgid "Commits|An error occurred while fetching merge requests data."
 msgstr ""
 
-msgid "Commits|Commit: %{commitText}"
-msgstr ""
-
 msgid "Commits|History"
 msgstr ""
 
