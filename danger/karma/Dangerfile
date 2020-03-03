@@ -3,7 +3,8 @@
 
 def get_karma_files(files)
   files.select do |file|
-    file.start_with?('ee/spec/javascripts', 'spec/javascripts')
+    file.start_with?('ee/spec/javascripts', 'spec/javascripts') &&
+    !file.end_with?('/browser_spec.js')
   end
 end
 
@@ -15,7 +16,7 @@ unless new_karma_files.empty?
     markdown(<<~MARKDOWN)
     ## New karma spec file
 
-    New frontend specs should be
+    New frontend specs ([except `browser_specs`](https://gitlab.com/gitlab-org/gitlab/blob/3b6fe2f1077eedb0b8aff02a7350234f0b7dc4f9/spec/javascripts/lib/utils/browser_spec.js#L2)) should be
     [written in jest](https://docs.gitlab.com/ee/development/testing_guide/frontend_testing.html#jest).
 
     You have created the following tests, please migrate them over to jest:
