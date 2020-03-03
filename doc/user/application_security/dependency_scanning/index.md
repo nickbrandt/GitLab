@@ -153,6 +153,8 @@ using environment variables.
 | `BUNDLER_AUDIT_UPDATE_DISABLED`         | Disable automatic updates for the `bundler-audit` analyzer (default: `"false"`). Useful if you're running Dependency Scanning in an offline, air-gapped environment.|
 | `BUNDLER_AUDIT_ADVISORY_DB_URL`         | URL of the advisory database used by bundler-audit (default: `https://github.com/rubysec/ruby-advisory-db`). |
 | `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME`    | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL` (default: `master`). |
+| `RETIREJS_JS_ADVISORY_DB`               | Path or URL to Retire.js [`jsrepository.json`](https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json) vulnerability data file. |
+| `RETIREJS_NODE_ADVISORY_DB`             | Path or URL to Retire.js [`npmrepository.json`](https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/npmrepository.json) vulnerability data file. |
 
 ### Using private Maven repos
 
