@@ -17914,6 +17914,9 @@ msgstr ""
 msgid "Size settings for static websites"
 msgstr ""
 
+msgid "Skip older, pending deployment jobs"
+msgstr ""
+
 msgid "Skip this for now"
 msgstr ""
 
@@ -22047,6 +22050,9 @@ msgid "Welcome to your Issue Board!"
 msgstr ""
 
 msgid "What are you searching for?"
+msgstr ""
+
+msgid "When a deployment job is successful, skip older deployment jobs that are still pending"
 msgstr ""
 
 msgid "When a runner is locked, it cannot be assigned to other projects"
