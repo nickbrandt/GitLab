@@ -11,6 +11,7 @@ describe 'EE Clusters', :js do
   before do
     project.add_maintainer(user)
     gitlab_sign_in(user)
+    stub_feature_flags(clusters_list_redesign: false)
   end
 
   context 'when user has a cluster' do
