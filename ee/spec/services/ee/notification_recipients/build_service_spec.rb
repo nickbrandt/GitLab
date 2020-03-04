@@ -2,29 +2,30 @@
 
 require 'spec_helper'
 
-describe NotificationRecipientService do
-  let(:service) { described_class }
-  let(:assignee) { create(:user) }
+describe NotificationRecipients::BuildService do
+  subject(:service) { described_class }
+
   let(:project) { create(:project, :public) }
   let(:other_projects) { create_list(:project, 5, :public) }
 
-  describe '#build_new_note_recipients' do
-    let(:issue) { create(:issue, project: project, assignees: [assignee]) }
-    let(:note) { create(:note_on_issue, noteable: issue, project_id: issue.project_id) }
+  describe '#build_new_review_recipients' do
+    let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+    let(:review) { create(:review, merge_request: merge_request, project: project, author: merge_request.author) }
+    let(:notes) { create_list(:note_on_merge_request, 3, review: review, noteable: review.merge_request, project: review.project) }
 
     shared_examples 'no N+1 queries' do
       it 'avoids N+1 queries', :request_store do
         create_user
 
-        service.build_new_note_recipients(note)
+        service.build_new_review_recipients(review)
 
         control_count = ActiveRecord::QueryRecorder.new do
-          service.build_new_note_recipients(note)
+          service.build_new_review_recipients(review)
         end
 
         create_user
 
-        expect { service.build_new_note_recipients(note) }.not_to exceed_query_limit(control_count)
+        expect { service.build_new_review_recipients(review) }.not_to exceed_query_limit(control_count)
       end
     end
 
@@ -44,7 +45,7 @@ describe NotificationRecipientService do
     context 'when there are multiple subscribers' do
       def create_user
         subscriber = create(:user)
-        issue.subscriptions.create(user: subscriber, project: project, subscribed: true)
+        merge_request.subscriptions.create(user: subscriber, project: project, subscribed: true)
       end
 
       include_examples 'no N+1 queries'
