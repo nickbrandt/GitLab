@@ -68,6 +68,11 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "%d code quality issue"
+msgid_plural "%d code quality issues"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -4851,6 +4856,9 @@ msgid "Code Owners"
 msgstr ""
 
 msgid "Code Owners to the merge request changes."
+msgstr ""
+
+msgid "Code Quality"
 msgstr ""
 
 msgid "Code Review"
@@ -23188,6 +23196,9 @@ msgstr ""
 msgid "ciReport|Fixed:"
 msgstr ""
 
+msgid "ciReport|Found %{issuesWithCount}"
+msgstr ""
+
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
@@ -23204,6 +23215,9 @@ msgid "ciReport|No changes to code quality"
 msgstr ""
 
 msgid "ciReport|No changes to performance metrics"
+msgstr ""
+
+msgid "ciReport|No code quality issues found"
 msgstr ""
 
 msgid "ciReport|Performance metrics"
@@ -23234,6 +23248,9 @@ msgid "ciReport|There was an error creating the merge request. Please try again.
 msgstr ""
 
 msgid "ciReport|There was an error dismissing the vulnerability. Please try again."
+msgstr ""
+
+msgid "ciReport|There was an error fetching the codequality report."
 msgstr ""
 
 msgid "ciReport|There was an error reverting the dismissal. Please try again."

@@ -154,6 +154,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           get :security
           get :licenses
+          get :codequality_report
         end
       end
 
