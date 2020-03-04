@@ -344,11 +344,48 @@ describe Gitlab::UsageData do
           end
 
           context 'for secure' do
+            let_it_be(:user) { create(:user, group_view: :security_dashboard) }
+            let_it_be(:ci_build_container_scanning) { create(:ci_build, name: 'container_scanning', user: user) }
+            let_it_be(:ci_build_dast) { create(:ci_build, name: 'dast', user: user) }
+            let_it_be(:ci_build_dependency_scanning) { create(:ci_build, name: 'dependency_scanning', user: user) }
+            let_it_be(:ci_build_license_management) { create(:ci_build, name: 'license_management', user: user) }
+            let_it_be(:ci_build_sast) { create(:ci_build, name: 'sast', user: user) }
+
             it 'includes accurate usage_activity_by_stage data' do
-              create(:user, group_view: :security_dashboard)
+              expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
+                user_preferences_group_overview_security_dashboard: 1,
+                user_container_scanning_jobs: 1,
+                user_dast_jobs: 1,
+                user_dependency_scanning_jobs: 1,
+                user_license_management_jobs: 1,
+                user_sast_jobs: 1
+              )
+            end
+
+            it 'combines license_scanning into license_management' do
+              create(:ci_build, name: 'license_scanning', user: user)
 
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
-                user_preferences_group_overview_security_dashboard: 1
+                user_preferences_group_overview_security_dashboard: 1,
+                user_container_scanning_jobs: 1,
+                user_dast_jobs: 1,
+                user_dependency_scanning_jobs: 1,
+                user_license_management_jobs: 2,
+                user_sast_jobs: 1
+              )
+            end
+
+            it 'has to resort to 0 for counting license scan' do
+              allow(Gitlab::Database::BatchCount).to receive(:batch_distinct_count).and_raise(ActiveRecord::StatementInvalid)
+              allow(::Ci::Build).to receive(:distinct_count_by).and_raise(ActiveRecord::StatementInvalid)
+
+              expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
+                user_preferences_group_overview_security_dashboard: 1,
+                user_container_scanning_jobs: -1,
+                user_dast_jobs: -1,
+                user_dependency_scanning_jobs: -1,
+                user_license_management_jobs: -1,
+                user_sast_jobs: -1
               )
             end
           end

@@ -5,6 +5,28 @@ module EE
     module UsageData
       extend ActiveSupport::Concern
 
+      SECURE_PRODUCT_TYPES = {
+        container_scanning: {
+          name: :container_scanning_jobs
+        },
+        dast: {
+          name: :dast_jobs
+        },
+        dependency_scanning: {
+          name: :dependency_scanning_jobs
+        },
+        license_management: {
+          name: :license_management_jobs
+        },
+        license_scanning: {
+          name: :license_scanning_jobs,
+          fallback: 0
+        },
+        sast: {
+          name: :sast_jobs
+        }
+      }.freeze
+
       class_methods do
         extend ::Gitlab::Utils::Override
 
@@ -92,23 +114,14 @@ module EE
 
         # rubocop: disable CodeReuse/ActiveRecord
         def security_products_usage
-          types = {
-            container_scanning: :container_scanning_jobs,
-            dast: :dast_jobs,
-            dependency_scanning: :dependency_scanning_jobs,
-            license_management: :license_management_jobs,
-            license_scanning: :license_scanning_jobs,
-            sast: :sast_jobs
-          }
-
-          results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1), batch: false)
+          results = count(::Ci::Build.where(name: SECURE_PRODUCT_TYPES.keys).group(:name), fallback: Hash.new(-1), batch: false)
 
           license_scan_count = results.delete("license_scanning")
           if license_scan_count && results["license_management"]
             results["license_management"] += license_scan_count
           end
 
-          results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
+          results.each_with_object({}) { |(key, value), response| response[SECURE_PRODUCT_TYPES[key.to_sym][:name]] = value }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -154,7 +167,7 @@ module EE
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects, batch: false),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting, batch: false),
-                                         template_repositories:  count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
+                                         template_repositories: count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
                                        },
                                        service_desk_counts,
                                        security_products_usage,
@@ -194,7 +207,7 @@ module EE
 
         # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
         # Omitted because not in use anymore: `gcp_clusters`, `gcp_clusters_disabled`, `gcp_clusters_enabled`
-        # rubocop: disable CodeReuse/ActiveRecord
+        # rubocop:disable CodeReuse/ActiveRecord
         def usage_activity_by_stage_configure(time_period)
           {
             clusters_applications_cert_managers: ::Clusters::Applications::CertManager.where(time_period).distinct_by_user,
@@ -314,10 +327,24 @@ module EE
         # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
         # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
         def usage_activity_by_stage_secure(time_period)
-          {
+          prefix = 'user_'
+
+          results = {
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
+
+          SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id, fallback: attribs.fetch(:fallback, -1))
+          end
+
+          # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
+          combined_license_key = "#{prefix}license_management_jobs".to_sym
+          license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
+          results[combined_license_key] += license_scan_count
+
+          results
         end
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end
