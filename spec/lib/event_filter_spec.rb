@@ -79,6 +79,16 @@ describe EventFilter do
       it 'returns all events' do
         expect(filtered_events).to eq(Event.all)
       end
+
+      context 'the :wiki_events filter is disabled' do
+        before do
+          stub_feature_flags(wiki_events: false)
+        end
+
+        it 'does not return wiki events' do
+          expect(filtered_events).to eq(Event.not_wiki_page)
+        end
+      end
     end
 
     context 'with the "wiki" filter' do
@@ -86,6 +96,16 @@ describe EventFilter do
 
       it 'returns only wiki page events' do
         expect(filtered_events).to contain_exactly(wiki_page_event, wiki_page_update_event)
+      end
+
+      context 'the :wiki_events filter is disabled' do
+        before do
+          stub_feature_flags(wiki_events: false)
+        end
+
+        it 'does not return wiki events' do
+          expect(filtered_events).not_to include(wiki_page_event, wiki_page_update_event)
+        end
       end
     end
 
@@ -95,6 +115,16 @@ describe EventFilter do
       it 'returns all events' do
         expect(filtered_events).to eq(Event.all)
       end
+
+      context 'the :wiki_events filter is disabled' do
+        before do
+          stub_feature_flags(wiki_events: false)
+        end
+
+        it 'does not return wiki events' do
+          expect(filtered_events).to eq(Event.not_wiki_page)
+        end
+      end
     end
 
     context 'with a nil filter' do
@@ -102,6 +132,16 @@ describe EventFilter do
 
       it 'returns all events' do
         expect(filtered_events).to eq(Event.all)
+      end
+
+      context 'the :wiki_events filter is disabled' do
+        before do
+          stub_feature_flags(wiki_events: false)
+        end
+
+        it 'does not return wiki events' do
+          expect(filtered_events).to eq(Event.not_wiki_page)
+        end
       end
     end
   end

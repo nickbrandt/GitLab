@@ -82,6 +82,7 @@ class Event < ApplicationRecord
   scope :code_push, -> { where(action: PUSHED) }
   scope :merged, -> { where(action: MERGED) }
   scope :for_wiki_page, -> { where(target_type: WikiPage::Meta.name) }
+  scope :not_wiki_page, -> { where('target_type IS NULL or target_type <> ?', WikiPage::Meta.name) }
 
   scope :with_associations, -> do
     # We're using preload for "push_event_payload" as otherwise the association
