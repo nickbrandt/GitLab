@@ -125,25 +125,19 @@ module Backup
     end
 
     def unpack
+      if ENV['BACKUP'].blank? && non_tarred_backup?
+        progress.puts "Non tarred backup found in #{backup_path}, using that"
+
+        return false
+      end
+
       Dir.chdir(backup_path) do
-        if ENV['BACKUP'].present?
-          # User has indicated which backup to restore
-          tar_file = File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
-
-          unless File.exist?(tar_file)
-            progress.puts "The backup file #{tar_file} does not exist!"
-            exit 1
-          end
-
         # check for existing backups in the backup dir
-        elsif File.exist?(File.join(backup_path, 'backup_information.yml'))
-          progress.puts "Non tarred backup found in #{backup_path}, using that"
-          break false
-        elsif backup_file_list.empty?
+        if backup_file_list.empty?
           progress.puts "No backups found in #{backup_path}"
           progress.puts "Please make sure that file name ends with #{FILE_NAME_SUFFIX}"
           exit 1
-        elsif backup_file_list.many?
+        elsif backup_file_list.many? && ENV["BACKUP"].nil?
           progress.puts 'Found more than one backup:'
           # print list of available backups
           progress.puts " " + available_timestamps.join("\n ")
@@ -152,7 +146,16 @@ module Backup
           exit 1
         end
 
-        tar_file = backup_file_list.first
+        tar_file = if ENV['BACKUP'].present?
+                     File.basename(ENV['BACKUP']) + FILE_NAME_SUFFIX
+                   else
+                     backup_file_list.first
+                   end
+
+        unless File.exist?(tar_file)
+          progress.puts "The backup file #{tar_file} does not exist!"
+          exit 1
+        end
 
         progress.print 'Unpacking backup ... '
 
@@ -163,7 +166,6 @@ module Backup
           exit 1
         end
       end
-      true
     end
 
     def tar_version
@@ -176,6 +178,10 @@ module Backup
     end
 
     private
+
+    def non_tarred_backup?
+      File.exist?(File.join(backup_path, 'backup_information.yml'))
+    end
 
     def backup_path
       Gitlab.config.backup.path
