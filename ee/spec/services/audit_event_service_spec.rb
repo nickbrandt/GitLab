@@ -269,6 +269,27 @@ describe AuditEventService do
     end
   end
 
+  describe '#for_changes' do
+    let(:author_name) { 'Administrator' }
+    let(:current_user) { User.new(name: author_name) }
+    let(:changed_model) { ApprovalProjectRule.new(id: 6, name: 'Security') }
+    let(:options) { { as: 'required approvers', from: 3, to: 4 } }
+
+    subject(:service) { described_class.new(current_user, project, options).for_changes(changed_model) }
+
+    it 'sets the details attribute' do
+      expect(service.instance_variable_get(:@details)).to eq(
+        change: 'required approvers',
+        from: 3,
+        to: 4,
+        author_name: author_name,
+        target_id: 6,
+        target_type: 'ApprovalProjectRule',
+        target_details: 'Security'
+      )
+    end
+  end
+
   describe 'license' do
     let(:project) { create(:project) }
     let(:user) { create(:user) }
