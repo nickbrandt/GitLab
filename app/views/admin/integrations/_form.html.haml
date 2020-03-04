@@ -1,9 +1,9 @@
 %h3.page-title
   = @service.title
 
-%p #{@service.description} template.
+%p= @service.description
 
-= form_for :service, url: admin_application_settings_service_path, method: :put, html: { class: 'fieldset-form' } do |form|
+= form_for :service, url: admin_application_settings_integration_path, method: :put, html: { class: 'fieldset-form' } do |form|
   = render 'shared/service_settings', form: form, service: @service
 
   .footer-block.row-content-block

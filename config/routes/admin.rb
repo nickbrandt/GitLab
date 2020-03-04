@@ -121,6 +121,7 @@ namespace :admin do
     get '/', to: redirect('admin/application_settings/general'), as: nil
 
     resources :services, only: [:index, :edit, :update]
+    resources :integrations, only: [:edit, :update, :test]
 
     get :usage_data
     put :reset_registration_token
