@@ -484,6 +484,9 @@ msgstr ""
 msgid "%{title} changes"
 msgstr ""
 
+msgid "%{token}..."
+msgstr ""
+
 msgid "%{totalWeight} total weight"
 msgstr ""
 
