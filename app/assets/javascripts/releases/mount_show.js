@@ -6,7 +6,11 @@ import detailModule from './stores/modules/detail';
 export default () => {
   const el = document.getElementById('js-show-release-page');
 
-  const store = createStore({ detail: detailModule });
+  const store = createStore({
+    modules: {
+      detail: detailModule,
+    },
+  });
   store.dispatch('detail/setInitialState', el.dataset);
 
   return new Vue({
