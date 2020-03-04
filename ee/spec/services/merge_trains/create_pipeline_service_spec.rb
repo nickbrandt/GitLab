@@ -118,6 +118,18 @@ describe MergeTrains::CreatePipelineService do
               let(:expected_reason) { '3:Invalid merge source' }
             end
           end
+
+          context 'when there is a conflict on merge ref creation' do
+            before do
+              allow(project.repository).to receive(:merge_to_ref) do
+                raise Gitlab::Git::CommandError.new('Failed to create merge commit')
+              end
+            end
+
+            it_behaves_like 'returns an error' do
+              let(:expected_reason) { 'Failed to create merge commit' }
+            end
+          end
         end
 
         context 'when previous_ref is nil' do
