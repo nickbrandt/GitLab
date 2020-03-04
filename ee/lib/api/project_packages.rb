@@ -25,7 +25,9 @@ module API
         optional :sort, type: String, values: %w[asc desc], default: 'asc',
                         desc: 'Return packages sorted in `asc` or `desc` order.'
         optional :package_type, type: String, values: %w[conan maven npm nuget],
-                        desc: 'Return packages of a certain type'
+                                desc: 'Return packages of a certain type'
+        optional :package_name, type: String,
+                                desc: 'Return packages with this name'
       end
       get ':id/packages' do
         packages = ::Packages::PackagesFinder

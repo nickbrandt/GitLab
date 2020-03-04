@@ -15,6 +15,7 @@ module Packages
     def execute
       packages = project.packages
       packages = filter_by_package_type(packages)
+      packages = filter_by_package_name(packages)
       packages = order_packages(packages)
       packages
     end
@@ -25,6 +26,12 @@ module Packages
       return packages unless params[:package_type]
 
       packages.with_package_type(params[:package_type])
+    end
+
+    def filter_by_package_name(packages)
+      return packages unless params[:package_name]
+
+      packages.search_by_name(params[:package_name])
     end
 
     def order_packages(packages)
