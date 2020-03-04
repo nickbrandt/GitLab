@@ -50,7 +50,7 @@ describe 'Group active tab' do
       end
 
       it_behaves_like 'page has active tab', _('Group overview')
-      it_behaves_like 'page has active sub tab', _('Contribution Analytics')
+      it_behaves_like 'page has active sub tab', _('Contribution')
     end
   end
 
@@ -78,7 +78,7 @@ describe 'Group active tab' do
       end
 
       it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('Issues Analytics')
+      it_behaves_like 'page has active sub tab', _('Issues')
     end
 
     context 'on group Contribution Analytics' do
@@ -87,7 +87,7 @@ describe 'Group active tab' do
       end
 
       it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('Contribution Analytics')
+      it_behaves_like 'page has active sub tab', _('Contribution')
     end
 
     context 'on group Productivity Analytics' do
@@ -98,7 +98,7 @@ describe 'Group active tab' do
       end
 
       it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('Productivity Analytics')
+      it_behaves_like 'page has active sub tab', _('Productivity')
     end
   end
 end

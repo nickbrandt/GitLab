@@ -27,7 +27,7 @@ describe 'layouts/nav/sidebar/_group' do
       it 'is visible' do
         render
 
-        expect(rendered).to have_text 'Contribution Analytics'
+        expect(rendered).to have_text 'Contribution'
       end
     end
 
@@ -44,7 +44,7 @@ describe 'layouts/nav/sidebar/_group' do
         it 'is not visible' do
           render
 
-          expect(rendered).not_to have_text 'Contribution Analytics'
+          expect(rendered).not_to have_text 'Contribution'
         end
       end
     end
@@ -62,7 +62,7 @@ describe 'layouts/nav/sidebar/_group' do
 
         render
 
-        expect(rendered).to have_text 'Contribution Analytics'
+        expect(rendered).to have_text 'Contribution'
       end
     end
 
@@ -71,7 +71,7 @@ describe 'layouts/nav/sidebar/_group' do
 
       render
 
-      expect(rendered).to have_text 'Contribution Analytics'
+      expect(rendered).to have_text 'Contribution'
     end
 
     describe 'group issue boards link' do

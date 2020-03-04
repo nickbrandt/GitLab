@@ -12,12 +12,12 @@
             .nav-icon-container
               = sprite_icon('comment')
             %span.nav-item-name
-              = _('Productivity Analytics')
+              = _('Productivity')
           %ul.sidebar-sub-level-items.is-fly-out-only
             = nav_link(controller: :productivity_analytics, html_options: { class: "fly-out-top-item qa-sidebar-productivity-analytics-fly-out" } ) do
               = link_to analytics_productivity_analytics_path do
                 %strong.fly-out-top-item-name
-                  = _('Productivity Analytics')
+                  = _('Productivity')
 
       - if Feature.disabled?(:group_level_cycle_analytics) && Gitlab::Analytics.cycle_analytics_enabled?
         = nav_link(controller: :cycle_analytics) do
