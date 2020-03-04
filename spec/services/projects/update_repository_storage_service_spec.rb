@@ -37,7 +37,9 @@ describe Projects::UpdateRepositoryStorageService do
           expect(project_repository_double).to receive(:checksum)
             .and_return(checksum)
 
-          subject.execute('test_second_storage')
+          result = subject.execute('test_second_storage')
+
+          expect(result[:status]).to eq(:success)
           expect(project).not_to be_repository_read_only
           expect(project.repository_storage).to eq('test_second_storage')
           expect(gitlab_shell.repository_exists?('default', old_path)).to be(false)
@@ -59,8 +61,9 @@ describe Projects::UpdateRepositoryStorageService do
             .with(project.repository.raw).and_return(false)
           expect(GitlabShellWorker).not_to receive(:perform_async)
 
-          subject.execute('test_second_storage')
+          result = subject.execute('test_second_storage')
 
+          expect(result[:status]).to eq(:error)
           expect(project).not_to be_repository_read_only
           expect(project.repository_storage).to eq('default')
         end
@@ -74,8 +77,9 @@ describe Projects::UpdateRepositoryStorageService do
             .and_return('not matching checksum')
           expect(GitlabShellWorker).not_to receive(:perform_async)
 
-          subject.execute('test_second_storage')
+          result = subject.execute('test_second_storage')
 
+          expect(result[:status]).to eq(:error)
           expect(project).not_to be_repository_read_only
           expect(project.repository_storage).to eq('default')
         end
@@ -90,8 +94,9 @@ describe Projects::UpdateRepositoryStorageService do
           expect(project_repository_double).to receive(:checksum)
             .and_return(checksum)
 
-          subject.execute('test_second_storage')
+          result = subject.execute('test_second_storage')
 
+          expect(result[:status]).to eq(:success)
           expect(project.repository_storage).to eq('test_second_storage')
           expect(project.reload_pool_repository).to be_nil
         end

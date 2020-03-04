@@ -41,8 +41,9 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       old_repository_path = repository.full_path
 
-      subject.execute('test_second_storage')
+      result = subject.execute('test_second_storage')
 
+      expect(result[:status]).to eq(:success)
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('test_second_storage')
       expect(gitlab_shell.repository_exists?('default', old_project_repository_path)).to be(false)
@@ -98,8 +99,9 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       expect(GitlabShellWorker).not_to receive(:perform_async)
 
-      subject.execute('test_second_storage')
+      result = subject.execute('test_second_storage')
 
+      expect(result[:status]).to eq(:error)
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('default')
     end
@@ -119,8 +121,9 @@ RSpec.shared_examples 'moves repository to another storage' do |repository_type|
 
       expect(GitlabShellWorker).not_to receive(:perform_async)
 
-      subject.execute('test_second_storage')
+      result = subject.execute('test_second_storage')
 
+      expect(result[:status]).to eq(:error)
       expect(project).not_to be_repository_read_only
       expect(project.repository_storage).to eq('default')
     end
