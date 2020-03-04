@@ -8,8 +8,8 @@ describe Projects::LfsPointers::LfsDownloadLinkListService do
   let(:new_oids) { { 'oid1' => 123, 'oid2' => 125 } }
   let(:remote_uri) { URI.parse(lfs_endpoint) }
 
-  let(:objects_response) do
-    body = new_oids.map do |oid, size|
+  def objects_response(oids)
+    body = oids.map do |oid, size|
       {
         'oid' => oid,
         'size' => size,
@@ -19,7 +19,7 @@ describe Projects::LfsPointers::LfsDownloadLinkListService do
       }
     end
 
-    Struct.new(:success?, :objects).new(true, body)
+    Struct.new(:success?, :objects).new(true, body).to_json
   end
 
   let(:invalid_object_response) do
@@ -34,7 +34,7 @@ describe Projects::LfsPointers::LfsDownloadLinkListService do
   before do
     allow(project).to receive(:lfs_enabled?).and_return(true)
     response = instance_double(Gitlab::HTTP::Response)
-    allow(response).to receive(:body).and_return(objects_response.to_json)
+    allow(response).to receive(:body).and_return(objects_response(new_oids))
     allow(response).to receive(:success?).and_return(true)
     allow(Gitlab::HTTP).to receive(:post).and_return(response)
   end
@@ -43,6 +43,35 @@ describe Projects::LfsPointers::LfsDownloadLinkListService do
     it 'retrieves each download link of every non existent lfs object' do
       subject.execute(new_oids).each do |lfs_download_object|
         expect(lfs_download_object.link).to eq "#{import_url}/gitlab-lfs/objects/#{lfs_download_object.oid}"
+      end
+    end
+
+    context 'when lfs objects size is larger than the batch size' do
+      def stub_request(batch)
+        response = instance_double Gitlab::HTTP::Response, body: objects_response(batch), success?: true
+        expect(Gitlab::HTTP).to receive(:post).with(
+          remote_uri,
+          {
+            body: { operation: 'download', objects: batch.map { |k, v| { oid: k, size: v } } }.to_json,
+            headers: subject.send(:headers)
+          }
+        ).and_return(response)
+      end
+
+      let(:new_oids) { { 'oid1' => 123, 'oid2' => 125, 'oid3' => 126, 'oid4' => 127, 'oid5' => 128 } }
+
+      before do
+        stub_const("#{described_class.name}::REQUEST_BATCH_SIZE", 2)
+
+        stub_request([['oid1', 123], ['oid2', 125]])
+        stub_request([['oid3', 126], ['oid4', 127]])
+        stub_request([['oid5', 128]])
+      end
+
+      it 'retreives them in batches' do
+        subject.execute(new_oids).each do |lfs_download_object|
+          expect(lfs_download_object.link).to eq "#{import_url}/gitlab-lfs/objects/#{lfs_download_object.oid}"
+        end
       end
     end
 

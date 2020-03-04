@@ -7,6 +7,10 @@ module Projects
     class LfsDownloadLinkListService < BaseService
       DOWNLOAD_ACTION = 'download'
 
+      # This could be different per server, but it seems like a reasonable value to start with.
+      # https://github.com/git-lfs/git-lfs/issues/419
+      REQUEST_BATCH_SIZE = 100
+
       DownloadLinksError = Class.new(StandardError)
       DownloadLinkNotFound = Class.new(StandardError)
 
@@ -25,7 +29,13 @@ module Projects
       def execute(oids)
         return [] unless project&.lfs_enabled? && remote_uri && oids.present?
 
-        get_download_links(oids)
+        download_links = []
+
+        oids.each_slice(REQUEST_BATCH_SIZE) do |batch|
+          download_links += get_download_links(batch)
+        end
+
+        download_links
       end
 
       private
