@@ -1,0 +1,5 @@
+---
+title: Resolve Usage Ping timeouts on security_products_usage for large hosts
+merge_request: 26296
+author:
+type: fixed
