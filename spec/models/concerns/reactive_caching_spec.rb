@@ -114,7 +114,7 @@ describe ReactiveCaching, :use_clean_rails_memory_store_caching do
 
   describe '#with_reactive_cache_set', :use_clean_rails_redis_caching do
     subject(:go!) do
-      instance.with_reactive_cache_set('resource', {test_param: true}.stringify_keys) do |data|
+      instance.with_reactive_cache_set('resource', {test_param: true}) do |data|
         data
       end
     end
@@ -132,7 +132,7 @@ describe ReactiveCaching, :use_clean_rails_memory_store_caching do
       let(:set_cache) { Gitlab::ReactiveCacheSetCache.new }
 
       before do
-        stub_reactive_cache(instance, true, resource, { test_param: true }.stringify_keys)
+        stub_reactive_cache(instance, true, resource, { test_param: true })
       end
 
       it 'saves keys in set' do

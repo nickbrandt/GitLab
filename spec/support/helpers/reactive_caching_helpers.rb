@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 module ReactiveCachingHelpers
-  def reactive_cache_key(subject, *qualifiers, alive: false)
+  def reactive_cache_key(subject, *qualifiers)
     prefix = subject.class.reactive_cache_key.call(subject)
     hashed = Digest::SHA1.hexdigest(qualifiers.to_json) if qualifiers.present?
-    suffix = 'alive' if alive
 
-    [prefix, hashed, suffix].flatten.compact.join(':')
+    [prefix, hashed].flatten.compact.join(':')
   end
 
   def alive_reactive_cache_key(subject, *qualifiers)
-    reactive_cache_key(subject, *qualifiers, alive: true)
+    reactive_cache_key(subject, *qualifiers) + ':alive'
   end
 
   def stub_reactive_cache(subject = nil, data = nil, *qualifiers)
@@ -31,7 +30,7 @@ module ReactiveCachingHelpers
 
   def write_reactive_cache(subject, data, *qualifiers)
     start_reactive_cache_lifetime(subject, *qualifiers)
-    Rails.cache.write(reactive_cache_key(subject, *qualifiers, alive: false), data)
+    Rails.cache.write(reactive_cache_key(subject, *qualifiers), data)
   end
 
   def reactive_cache_alive?(subject, *qualifiers)

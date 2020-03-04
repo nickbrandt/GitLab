@@ -120,17 +120,16 @@ module ReactiveCaching
       Rails.cache.write(alive_reactive_cache_key(*args), true, expires_in: self.class.reactive_cache_lifetime)
     end
 
-    def full_reactive_cache_key(*qualifiers, alive: false)
+    def full_reactive_cache_key(*qualifiers)
       prefix = self.class.reactive_cache_key
       prefix = prefix.call(self) if prefix.respond_to?(:call)
       hashed = Digest::SHA1.hexdigest(qualifiers.to_json) if qualifiers.present?
-      suffix = 'alive' if alive
 
-      [prefix, hashed, suffix].flatten.compact.join(':')
+      [prefix, hashed].flatten.compact.join(':')
     end
 
     def alive_reactive_cache_key(*qualifiers)
-      full_reactive_cache_key(*qualifiers, alive: true)
+      full_reactive_cache_key(*qualifiers) + ':alive'
     end
 
     def locking_reactive_cache(*args)
