@@ -79,7 +79,7 @@ module EE
       end
 
       def repository_full_path
-        File.join(params[:namespace_id], project_path)
+        File.join(params[:namespace_id], repository_path)
       end
 
       def decoded_authorization

@@ -3,6 +3,8 @@ require 'spec_helper'
 
 describe Gitlab::GlRepository::RepoType do
   let_it_be(:project) { create(:project) }
+  let_it_be(:personal_snippet) { create(:personal_snippet, author: project.owner) }
+  let_it_be(:project_snippet) { create(:project_snippet, project: project, author: project.owner) }
 
   describe Gitlab::GlRepository::DESIGN do
     it_behaves_like 'a repo type' do
@@ -24,6 +26,8 @@ describe Gitlab::GlRepository::RepoType do
       expect(described_class.valid?(project.design_repository.full_path)).to be_truthy
       expect(described_class.valid?(project.repository.full_path)).to be_falsey
       expect(described_class.valid?(project.wiki.repository.full_path)).to be_falsey
+      expect(described_class.valid?("snippets/#{personal_snippet.id}")).to be_falsey
+      expect(described_class.valid?("#{project.full_path}/snippets/#{project_snippet.id}")).to be_falsey
     end
   end
 end

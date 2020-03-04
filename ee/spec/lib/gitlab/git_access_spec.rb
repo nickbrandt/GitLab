@@ -674,7 +674,7 @@ describe Gitlab::GitAccess do
       protocol,
       authentication_abilities: authentication_abilities,
       namespace_path: namespace_path,
-      project_path: project_path,
+      repository_path: project_path,
       redirected_path: redirected_path
     )
   end
