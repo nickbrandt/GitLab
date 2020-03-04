@@ -54,6 +54,21 @@ describe "Git HTTP requests (Geo)", :geo do
     end
   end
 
+  shared_examples_for 'a Geo 200 git-lfs request' do
+    subject do
+      make_request
+      response
+    end
+
+    context 'valid Geo JWT token' do
+      it 'returns an OK response with binary data' do
+        is_expected.to have_gitlab_http_status(:ok)
+
+        expect(response.content_type).to eq('application/octet-stream')
+      end
+    end
+  end
+
   shared_examples_for 'a Geo 302 redirect to Primary' do
     # redirect_url needs to be defined when using this shared example
 
@@ -323,9 +338,7 @@ describe "Git HTTP requests (Geo)", :geo do
           end
 
           context 'with selective sync not enabled' do
-            it 'is handled by the secondary' do
-              is_expected.to have_gitlab_http_status(:ok)
-            end
+            it_behaves_like 'a Geo 200 git-lfs request'
           end
 
           context 'with selective sync is enabled' do
