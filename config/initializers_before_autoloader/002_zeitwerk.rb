@@ -10,6 +10,9 @@ Rails.autoloaders.each do |autoloader|
   # Mailer previews are also loaded manually by Rails
   autoloader.ignore(Rails.root.join('app/mailers/previews'))
   autoloader.ignore(Rails.root.join('ee/app/mailers/previews')) if Gitlab.ee?
+  # Ignore these files because these are only used in Rake tasks
+  # and are not available in production
+  autoloader.ignore(Rails.root.join('lib/gitlab/graphql/docs'))
 
   autoloader.inflector.inflect(
     'api' => 'API',
