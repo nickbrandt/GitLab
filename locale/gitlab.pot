@@ -17201,10 +17201,10 @@ msgstr ""
 msgid "Security dashboard"
 msgstr ""
 
-msgid "Security report is out of date. Please incorporate latest changes from %{targetBranchName}"
+msgid "Security report is out of date. Please update your branch with the latest changes from the target branch (%{targetBranchName})"
 msgstr ""
 
-msgid "Security report is out of date. Retry the pipeline for the target branch."
+msgid "Security report is out of date. Run %{newPipelineLinkStart}a new pipeline%{newPipelineLinkEnd} for the target branch (%{targetBranchName})"
 msgstr ""
 
 msgid "SecurityConfiguration|Configured"
