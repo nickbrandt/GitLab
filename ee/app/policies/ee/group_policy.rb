@@ -134,8 +134,10 @@ module EE
 
       rule { admin | owner }.enable :admin_group_saml
 
-      rule { admin | (can_owners_manage_ldap & owner) }.enable :admin_ldap_group_links
-
+      rule { admin | (can_owners_manage_ldap & owner) }.policy do
+        enable :admin_ldap_group_links
+        enable :admin_ldap_group_settings
+      end
 
       rule { ldap_synced & ~owners_bypass_ldap_lock }.prevent :admin_group_member
 

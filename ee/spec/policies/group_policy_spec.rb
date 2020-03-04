@@ -273,6 +273,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
 
       context 'does not allow group owners to manage ldap' do
         before do
@@ -280,6 +281,7 @@ describe GroupPolicy do
         end
 
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -288,6 +290,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
   end
 
@@ -301,6 +304,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'guests' do
@@ -308,6 +312,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'reporter' do
@@ -315,6 +320,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'developer' do
@@ -322,6 +328,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'maintainer' do
@@ -329,6 +336,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_disallowed(:override_group_member) }
       it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+      it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
     end
 
     context 'owner' do
@@ -345,6 +353,7 @@ describe GroupPolicy do
 
         it { is_expected.to be_disallowed(:override_group_member) }
         it { is_expected.to be_disallowed(:admin_ldap_group_links) }
+        it { is_expected.to be_disallowed(:admin_ldap_group_settings) }
       end
     end
 
@@ -353,6 +362,7 @@ describe GroupPolicy do
 
       it { is_expected.to be_allowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+      it { is_expected.to be_allowed(:admin_ldap_group_settings) }
     end
 
     context 'when memberships locked to LDAP' do
