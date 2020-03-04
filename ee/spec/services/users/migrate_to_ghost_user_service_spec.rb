@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Users::MigrateToGhostUserService do
   context 'epics' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+    let!(:user)   { create(:user) }
+    let(:service) { described_class.new(user) }
 
     context 'deleted user is present as both author and edited_user' do
       include_examples "migrating a deleted user's associated records to the ghost user", Epic, [:author, :last_edited_by] do
@@ -23,8 +23,8 @@ describe Users::MigrateToGhostUserService do
   end
 
   context 'vulnerability_feedback author' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+    let!(:user)   { create(:user) }
+    let(:service) { described_class.new(user) }
 
     include_examples "migrating a deleted user's associated records to the ghost user", Vulnerabilities::Feedback, [:author] do
       let(:created_record) { create(:vulnerability_feedback, author: user) }
@@ -32,8 +32,8 @@ describe Users::MigrateToGhostUserService do
   end
 
   context 'vulnerability_feedback comment author' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+    let!(:user)   { create(:user) }
+    let(:service) { described_class.new(user) }
 
     include_examples "migrating a deleted user's associated records to the ghost user", Vulnerabilities::Feedback, [:comment_author] do
       let(:created_record) { create(:vulnerability_feedback, comment_author: user) }
@@ -41,8 +41,8 @@ describe Users::MigrateToGhostUserService do
   end
 
   context 'reviews' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+    let!(:user)   { create(:user) }
+    let(:service) { described_class.new(user) }
 
     include_examples "migrating a deleted user's associated records to the ghost user", Review, [:author] do
       let(:created_record) { create(:review, author: user) }
@@ -50,8 +50,8 @@ describe Users::MigrateToGhostUserService do
   end
 
   context 'requirements' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+    let!(:user)   { create(:user) }
+    let(:service) { described_class.new(user) }
 
     include_examples "migrating a deleted user's associated records to the ghost user", Requirement, [:author] do
       let(:created_record) { create(:requirement, author: user) }

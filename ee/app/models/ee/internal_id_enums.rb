@@ -9,7 +9,7 @@ module EE
 
       override :usage_resources
       def usage_resources
-        super.merge(requirements: 7)
+        super.merge(requirements: 1000)
       end
     end
   end
