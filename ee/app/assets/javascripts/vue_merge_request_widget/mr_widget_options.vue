@@ -328,6 +328,8 @@ export default {
         :can-dismiss-vulnerability="mr.canDismissVulnerability"
         :diverged-commits-count="mr.divergedCommitsCount"
         :mr-state="mr.state"
+        :target-branch-tree-path="mr.targetBranchTreePath"
+        :new-pipeline-path="mr.newPipelinePath"
         class="js-security-widget"
       />
       <mr-widget-licenses

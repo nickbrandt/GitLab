@@ -9,7 +9,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
-import { s__, sprintf } from '~/locale';
+import { GlSprintf, GlLink } from '@gitlab/ui';
 import { mrStates } from '~/mr_popover/constants';
 
 export default {
@@ -20,6 +20,8 @@ export default {
     IssuesList,
     IssueModal,
     Icon,
+    GlSprintf,
+    GlLink,
   },
   mixins: [securityReportsMixin, glFeatureFlagsMixin()],
   props: {
@@ -124,6 +126,16 @@ export default {
       required: false,
       default: null,
     },
+    targetBranchTreePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    newPipelinePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   componentNames,
   computed: {
@@ -164,24 +176,11 @@ export default {
     hasSastReports() {
       return this.enabledReports.sast;
     },
-    subHeadingText() {
-      const isMRBranchOutdated = this.divergedCommitsCount > 0;
-      if (isMRBranchOutdated) {
-        return sprintf(
-          s__(
-            'Security report is out of date. Please incorporate latest changes from %{targetBranchName}',
-          ),
-          {
-            targetBranchName: this.targetBranch,
-          },
-        );
-      }
-      return sprintf(
-        s__('Security report is out of date. Retry the pipeline for the target branch.'),
-      );
-    },
     isMRActive() {
       return this.mrState !== mrStates.merged && this.mrState !== mrStates.closed;
+    },
+    isMRBranchOutdated() {
+      return this.divergedCommitsCount > 0;
     },
   },
 
@@ -294,7 +293,36 @@ export default {
 
     <template v-if="isMRActive && isBaseSecurityReportOutOfDate" #subHeading>
       <div class="text-secondary-700 text-1">
-        <span>{{ subHeadingText }}</span>
+        <gl-sprintf
+          v-if="isMRBranchOutdated"
+          :message="
+            __(
+              'Security report is out of date. Please update your branch with the latest changes from the target branch (%{targetBranchName})',
+            )
+          "
+        >
+          <template #targetBranchName>
+            <gl-link class="text-1" :href="targetBranchTreePath">{{ targetBranch }}</gl-link>
+          </template>
+        </gl-sprintf>
+
+        <gl-sprintf
+          v-else
+          :message="
+            __(
+              'Security report is out of date. Run %{newPipelineLinkStart}a new pipeline%{newPipelineLinkEnd} for the target branch (%{targetBranchName})',
+            )
+          "
+        >
+          <template #newPipelineLink="{ content }">
+            <gl-link class="text-1" :href="`${newPipelinePath}?ref=${targetBranch}`">{{
+              content
+            }}</gl-link>
+          </template>
+          <template #targetBranchName>
+            <gl-link class="text-1" :href="targetBranchTreePath">{{ targetBranch }}</gl-link>
+          </template>
+        </gl-sprintf>
       </div>
     </template>
 
