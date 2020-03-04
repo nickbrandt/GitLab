@@ -82,6 +82,8 @@ module Ci
 
     has_one :pipeline_config, class_name: 'Ci::PipelineConfig', inverse_of: :pipeline
 
+    has_many :daily_report_results, class_name: 'Ci::DailyReportResult', foreign_key: :last_pipeline_id
+
     accepts_nested_attributes_for :variables, reject_if: :persisted?
 
     delegate :id, to: :project, prefix: true
@@ -189,10 +191,10 @@ module Ci
       end
 
       after_transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success do |pipeline|
-        # We want to wait a little bit to ensure that all BuildFinishedWorkers finish first
-        # because this is where code coverage is parsed and stored in CI build records which
-        # the daily code coverage worker relies on.
-        pipeline.run_after_commit { Ci::DailyCodeCoverageWorker.perform_in(5.minutes, pipeline.id) }
+        # We wait a little bit to ensure that all BuildFinishedWorkers finish first
+        # because this is where some metrics like code coverage is parsed and stored
+        # in CI build records which the daily build metrics worker relies on.
+        pipeline.run_after_commit { Ci::DailyReportResultsWorker.perform_in(10.minutes, pipeline.id) }
       end
 
       after_transition do |pipeline, transition|
@@ -942,6 +944,14 @@ module Ci
 
     def cacheable?
       Ci::PipelineEnums.ci_config_sources.key?(config_source.to_sym)
+    end
+
+    def source_ref_path
+      if branch? || merge_request?
+        Gitlab::Git::BRANCH_REF_PREFIX + ref.to_s
+      elsif tag?
+        Gitlab::Git::TAG_REF_PREFIX + ref.to_s
+      end
     end
 
     private

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::DailyCodeCoverageWorker do
+describe Ci::DailyReportResultsWorker do
   describe '#perform' do
     let!(:pipeline) { create(:ci_pipeline) }
 
@@ -12,7 +12,7 @@ describe Ci::DailyCodeCoverageWorker do
       let(:pipeline_id) { pipeline.id }
 
       it 'executes service' do
-        expect_any_instance_of(Ci::DailyCodeCoverageService)
+        expect_any_instance_of(Ci::DailyReportResultService)
           .to receive(:execute).with(pipeline)
 
         subject
@@ -23,7 +23,7 @@ describe Ci::DailyCodeCoverageWorker do
       let(:pipeline_id) { 123 }
 
       it 'does not execute service' do
-        expect_any_instance_of(Ci::DailyCodeCoverageService)
+        expect_any_instance_of(Ci::DailyReportResultService)
           .not_to receive(:execute)
 
         expect { subject }
