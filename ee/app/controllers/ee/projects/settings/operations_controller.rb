@@ -58,7 +58,13 @@ module EE
             permitted_params[:tracing_setting_attributes] = [:external_url]
           end
 
+          permitted_params.merge!(status_page_setting_params)
+
           permitted_params
+        end
+
+        def status_page_setting_params
+          { status_page_setting_attributes: [:aws_s3_bucket_name, :aws_region, :aws_access_key, :aws_secret_key, :enabled] }
         end
 
         override :track_events
