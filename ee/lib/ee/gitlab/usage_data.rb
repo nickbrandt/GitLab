@@ -29,7 +29,7 @@ module EE
           # self hosted instances, prevent them from running on GitLab.com and allow instance maintainers
           # to disable them via a feature flag.
           return super if (::Feature.disabled?(:usage_ping_batch_counter) && ::Gitlab.com?) ||
-                          ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
+            ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
 
           if ::Feature.disabled?(:usage_activity_by_stage_monthly)
             super.merge(usage_activity_by_stage)
@@ -320,16 +320,14 @@ module EE
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
 
-          SECURE_PRODUCT_TYPES.each_with_object(results) do |(secure_type, type_with_name), response|
-            response["#{prefix}#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+          SECURE_PRODUCT_TYPES.each do |secure_type, type_with_name|
+            results["#{prefix}#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym
           license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
-          if license_scan_count && results[combined_license_key]
-            results[combined_license_key] += license_scan_count
-          end
+          results[combined_license_key] += license_scan_count
 
           results
         end
