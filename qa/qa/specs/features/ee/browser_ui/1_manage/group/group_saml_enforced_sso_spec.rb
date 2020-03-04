@@ -30,7 +30,7 @@ module QA
         Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
-      context 'Access' do
+      context 'Access', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/issues/205455', type: :flaky } do
         let(:project) do
           Resource::Project.fabricate! do |project|
             project.name = 'project-in-saml-enforced-group-for-access-test'
@@ -91,7 +91,7 @@ module QA
         end
 
         after(:all) do
-          @group.remove_member(@owner_user)
+          @group.remove_member(@owner_user) if @owner_user
         end
 
         it_behaves_like 'user access' do
