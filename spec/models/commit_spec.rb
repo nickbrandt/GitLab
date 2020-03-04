@@ -444,61 +444,6 @@ eos
     it { is_expected.to respond_to(:id) }
   end
 
-  describe '#closes_issues' do
-    let(:issue) { create :issue, project: project }
-    let(:other_project) { create(:project, :public) }
-    let(:other_issue) { create :issue, project: other_project }
-    let(:committer) { create :user }
-
-    before do
-      project.add_developer(committer)
-      other_project.add_developer(committer)
-    end
-
-    it 'detects issues that this commit is marked as closing' do
-      ext_ref = "#{other_project.full_path}##{other_issue.iid}"
-
-      allow(commit).to receive_messages(
-        safe_message: "Fixes ##{issue.iid} and #{ext_ref}",
-        committer_email: committer.email
-      )
-
-      expect(commit.closes_issues).to include(issue)
-      expect(commit.closes_issues).to include(other_issue)
-    end
-
-    it 'ignores referenced issues when auto-close is disabled' do
-      project.update!(autoclose_referenced_issues: false)
-
-      allow(commit).to receive_messages(
-        safe_message: "Fixes ##{issue.iid}",
-        committer_email: committer.email
-      )
-
-      expect(commit.closes_issues).to be_empty
-    end
-
-    context 'with personal snippet' do
-      let(:commit) { personal_snippet.commit }
-
-      it 'does not call Gitlab::ClosingIssueExtractor' do
-        expect(Gitlab::ClosingIssueExtractor).not_to receive(:new)
-
-        commit.closes_issues
-      end
-    end
-
-    context 'with project snippet' do
-      let(:commit) { project_snippet.commit }
-
-      it 'does not call Gitlab::ClosingIssueExtractor' do
-        expect(Gitlab::ClosingIssueExtractor).not_to receive(:new)
-
-        commit.closes_issues
-      end
-    end
-  end
-
   it_behaves_like 'a mentionable' do
     subject { create(:project, :repository).commit }
 

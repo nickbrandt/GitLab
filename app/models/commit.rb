@@ -242,14 +242,6 @@ class Commit
     data
   end
 
-  # Discover issues should be closed when this commit is pushed to a project's
-  # default branch.
-  def closes_issues(current_user = self.committer)
-    return unless repository.repo_type.project?
-
-    Gitlab::ClosingIssueExtractor.new(project, current_user).closed_by_message(safe_message)
-  end
-
   def lazy_author
     BatchLoader.for(author_email.downcase).batch do |emails, loader|
       users = User.by_any_email(emails, confirmed: true).includes(:emails)
