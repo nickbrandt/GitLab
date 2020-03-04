@@ -98,7 +98,7 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
         tree = lazy_state[:tree]
 
         expect(tree[child_epic_id].parent_id).to eq epic_id
-        expect(tree[epic_id].child_ids).to match_array([child_epic_id])
+        expect(tree[epic_id].children.map(&:epic_id)).to match_array([child_epic_id])
       end
 
       context 'for a parent-child relationship' do

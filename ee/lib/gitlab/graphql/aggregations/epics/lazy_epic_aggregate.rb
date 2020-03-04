@@ -87,10 +87,14 @@ module Gitlab
 
           def assemble_direct_child_totals
             tree.each do |_, node|
-              node_children = tree.select { |_, child_node| node.epic_id == child_node.parent_id }
-              node.child_ids = node_children.keys
-              node.assemble_epic_totals(node_children.values)
+              parent = tree[node.parent_id]
+              next if parent.nil?
 
+              parent.children << node
+            end
+
+            tree.each do |_, node|
+              node.assemble_epic_totals
               node.assemble_issue_totals
             end
           end

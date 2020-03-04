@@ -110,11 +110,11 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       let!(:child_epic_node) { described_class.new(child_epic_id, [{ parent_id: epic_id, epic_state_id: CLOSED_EPIC_STATE }]) }
 
       before do
-        subject.child_ids << child_epic_id
+        subject.children << child_epic_node
       end
 
       it 'adds up the number of the child epics' do
-        subject.assemble_epic_totals([child_epic_node])
+        subject.assemble_epic_totals
 
         expect(subject).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
       end
@@ -191,7 +191,7 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       let(:immediate_weight_sum_totals) { [] }
 
       before do
-        subject.child_ids << child_epic_id
+        subject.children << child_epic_node
         allow(child_epic_node).to receive(:direct_totals).with(COUNT_FACET).and_return(child_count_totals)
         allow(child_epic_node).to receive(:direct_totals).with(WEIGHT_SUM_FACET).and_return(child_weight_sum_totals)
       end

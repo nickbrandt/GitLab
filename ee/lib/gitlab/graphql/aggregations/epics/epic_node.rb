@@ -14,7 +14,7 @@ module Gitlab
                       :direct_count_totals, :direct_weight_sum_totals, # only counts/weights of direct issues and child epic counts
                       :count_aggregate, :weight_sum_aggregate
 
-          attr_accessor :child_ids, :calculated_count_totals, :calculated_weight_sum_totals
+          attr_accessor :children, :calculated_count_totals, :calculated_weight_sum_totals
 
           def initialize(epic_id, flat_info_list)
             # epic aggregate records from the DB loader look like the following:
@@ -23,7 +23,7 @@ module Gitlab
             # so in order to get a sum of the entire tree, we have to add that up recursively
             @epic_id = epic_id
             @epic_info_flat_list = flat_info_list
-            @child_ids = []
+            @children = []
             @direct_count_totals = []
             @direct_weight_sum_totals = []
 
@@ -43,7 +43,7 @@ module Gitlab
             end
           end
 
-          def assemble_epic_totals(children)
+          def assemble_epic_totals
             [OPENED_EPIC_STATE, CLOSED_EPIC_STATE].each do |epic_state|
               create_sum_if_needed(COUNT, epic_state, EPIC_TYPE, children.select { |node| node.epic_state_id == epic_state }.count)
             end
@@ -91,15 +91,26 @@ module Gitlab
             return calculated_totals(facet) if calculated_totals(facet)
 
             sum_total = []
-            child_ids.each do |child_id|
-              child = tree[child_id]
-              # get the child's totals, add to your own
+            children.each do |child|
               child_sums = child.calculate_recursive_sums(facet, tree)
               sum_total.concat(child_sums)
             end
             sum_total.concat(direct_totals(facet))
             set_calculated_total(facet, sum_total)
           end
+
+          def inspect
+            {
+                epic_id: @epic_id,
+                parent_id: @parent_id,
+                direct_count_totals: direct_count_totals,
+                direct_weight_sum_totals: direct_weight_sum_totals,
+                children: children,
+                object_id: object_id
+            }.to_json
+          end
+
+          alias_method :to_s, :inspect
 
           private
 

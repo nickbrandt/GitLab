@@ -138,11 +138,5 @@ module Types
       resolve: -> (epic, args, ctx) do
         Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
       end
-
-    field :health_status,
-      ::Types::HealthStatusEnum,
-      null: true,
-      description: 'Current health status',
-      feature_flag: :save_issuable_health_status
   end
 end
