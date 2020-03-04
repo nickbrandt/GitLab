@@ -6,6 +6,8 @@ module Gitlab
       class BulkEpicAggregateLoader
         include ::Gitlab::Graphql::Aggregations::Epics::Constants
 
+        MAXIMUM_LOADABLE = 100_001
+
         attr_reader :target_epic_ids, :results
 
         # This class retrieves each epic and its child epics recursively
@@ -25,8 +27,12 @@ module Gitlab
             .left_joins(epic_issues: :issue)
             .group("issues.state_id", "epics.id", "epics.iid", "epics.parent_id", "epics.state_id")
             .select("epics.id, epics.iid, epics.parent_id, epics.state_id AS epic_state_id, issues.state_id AS issues_state_id, COUNT(issues) AS issues_count, SUM(COALESCE(issues.weight, 0)) AS issues_weight_sum")
+            .limit(MAXIMUM_LOADABLE)
 
-          raw_results = raw_results.map(&:attributes).map(&:with_indifferent_access)
+          raw_results = raw_results.map { |record| record.attributes.with_indifferent_access }
+
+          raise ArgumentError.new("There are too many records to load. Please select fewer epics or contact your administrator.") if raw_results.count == MAXIMUM_LOADABLE
+
           @results = raw_results.group_by { |record| record[:id] }
         end
         # rubocop: enable CodeReuse/ActiveRecord

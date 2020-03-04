@@ -87,6 +87,12 @@ describe Gitlab::Graphql::Loaders::BulkEpicAggregateLoader do
       expect(result.keys).to match_array([parent_epic.id, epic_with_issues.id, epic_without_issues.id])
     end
 
+    it 'errors when the number of retrieved records exceeds the maximum' do
+      stub_const("Gitlab::Graphql::Loaders::BulkEpicAggregateLoader::MAXIMUM_LOADABLE", 1)
+
+      expect { subject.execute }.to raise_error(ArgumentError, /too many records/)
+    end
+
     context 'testing for a single database query' do
       it 'does not repeat database queries for subepics' do
         recorder = ActiveRecord::QueryRecorder.new { described_class.new(epic_ids: epic_with_issues.id).execute }
@@ -128,6 +134,14 @@ describe Gitlab::Graphql::Loaders::BulkEpicAggregateLoader do
   end
 
   def result_for(epic, issues_state:, issues_count:, issues_weight_sum:)
-    { id: epic.id, iid: epic.iid, issues_count: issues_count, issues_weight_sum: issues_weight_sum, parent_id: epic.parent_id, issues_state_id: issues_state, epic_state_id: Epic.available_states[epic.state_id] }.stringify_keys
+    {
+      id: epic.id,
+      iid: epic.iid,
+      issues_count: issues_count,
+      issues_weight_sum: issues_weight_sum,
+      parent_id: epic.parent_id,
+      issues_state_id: issues_state,
+      epic_state_id: Epic.available_states[epic.state_id]
+    }.stringify_keys
   end
 end

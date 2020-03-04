@@ -9,6 +9,6 @@ shared_context 'includes EpicAggregate constants' do
   OPENED_ISSUE_STATE = Gitlab::Graphql::Aggregations::Epics::Constants::OPENED_ISSUE_STATE
   CLOSED_ISSUE_STATE = Gitlab::Graphql::Aggregations::Epics::Constants::CLOSED_ISSUE_STATE
 
-  WEIGHT_SUM_FACET = Gitlab::Graphql::Aggregations::Epics::Constants::WEIGHT_SUM
-  COUNT_FACET = Gitlab::Graphql::Aggregations::Epics::Constants::COUNT
+  WEIGHT_SUM = Gitlab::Graphql::Aggregations::Epics::Constants::WEIGHT_SUM
+  COUNT = Gitlab::Graphql::Aggregations::Epics::Constants::COUNT
 end

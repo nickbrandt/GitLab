@@ -67,43 +67,34 @@ module Gitlab
 
             # Fire off the db query and get the results (grouped by epic_id and facet)
             raw_epic_aggregates = Gitlab::Graphql::Loaders::BulkEpicAggregateLoader.new(epic_ids: pending_ids).execute
-
-            # Assemble the tree and sum immediate child epic/issues
-            create_structure_from(raw_epic_aggregates)
-
+            create_epic_nodes(raw_epic_aggregates)
             @lazy_state[:pending_ids].clear
           end
 
-          def create_structure_from(aggregate_records)
-            # create EpicNode object for each epic id
+          def create_epic_nodes(aggregate_records)
             aggregate_records.each do |epic_id, aggregates|
               next if aggregates.blank?
 
               tree[epic_id] = EpicNode.new(epic_id, aggregates)
             end
 
-            assemble_direct_child_totals
+            relate_parents_and_children
           end
 
-          def assemble_direct_child_totals
+          def relate_parents_and_children
             tree.each do |_, node|
               parent = tree[node.parent_id]
               next if parent.nil?
 
               parent.children << node
             end
-
-            tree.each do |_, node|
-              node.assemble_epic_totals
-              node.assemble_issue_totals
-            end
           end
 
           def aggregate_object(node)
             if @facet == COUNT
-              node.aggregate_count(tree)
+              node.aggregate_count
             else
-              node.aggregate_weight_sum(tree)
+              node.aggregate_weight_sum
             end
           end
         end

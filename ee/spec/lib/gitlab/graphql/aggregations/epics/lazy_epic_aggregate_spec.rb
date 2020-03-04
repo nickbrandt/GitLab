@@ -21,20 +21,20 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
 
     context 'with valid facets :weight_sum or :count' do
       specify 'as a symbol', :aggregate_failures do
-        [:weight_sum, :count].each do |valid_facet|
-          described_class.new(query_ctx, epic_id, valid_facet)
+        [WEIGHT_SUM, COUNT].each do |valid_facet|
+          expect { described_class.new(query_ctx, epic_id, valid_facet) }.not_to raise_error
         end
       end
 
       specify 'as a string', :aggregate_failures do
         %w(weight_sum count).each do |valid_facet|
-          described_class.new(query_ctx, epic_id, valid_facet)
+          expect { described_class.new(query_ctx, epic_id, valid_facet) }.not_to raise_error
         end
       end
     end
 
     it 'adds the epic_id to lazy state' do
-      described_class.new(query_ctx, epic_id, :count)
+      described_class.new(query_ctx, epic_id, COUNT)
 
       expect(query_ctx[:lazy_epic_aggregate][:pending_ids]).to match [epic_id]
     end
@@ -46,7 +46,7 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
     end
     let(:epic_info_node) { Gitlab::Graphql::Aggregations::Epics::EpicNode.new(epic_id, [single_record] ) }
 
-    subject { described_class.new(query_ctx, epic_id, :count) }
+    subject { described_class.new(query_ctx, epic_id, COUNT) }
 
     before do
       subject.instance_variable_set(:@lazy_state, fake_state)
@@ -79,8 +79,9 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
       end
 
       before do
-        allow(Gitlab::Graphql::Aggregations::Epics::EpicNode).to receive(:aggregate_count).and_call_original
-        expect_any_instance_of(Gitlab::Graphql::Loaders::BulkEpicAggregateLoader).to receive(:execute).and_return(fake_data)
+        expect_next_instance_of(Gitlab::Graphql::Loaders::BulkEpicAggregateLoader) do |loader|
+          expect(loader).to receive(:execute).and_return(fake_data)
+        end
       end
 
       it 'clears the pending IDs' do
@@ -94,53 +95,38 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
       it 'creates the parent-child associations', :aggregate_failures do
         subject.epic_aggregate
 
-        lazy_state = subject.instance_variable_get(:@lazy_state)
-        tree = lazy_state[:tree]
-
         expect(tree[child_epic_id].parent_id).to eq epic_id
         expect(tree[epic_id].children.map(&:epic_id)).to match_array([child_epic_id])
       end
 
       context 'for a parent-child relationship' do
-        it 'assembles direct sums', :aggregate_failures do
-          subject.epic_aggregate
-
-          lazy_state = subject.instance_variable_get(:@lazy_state)
-          tree = lazy_state[:tree]
-
-          expect(tree[epic_id]).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
-          expect(tree[epic_id]).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_direct_total(EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
-
-          expect(tree[child_epic_id]).to have_direct_total(ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
-          expect(tree[child_epic_id]).to have_direct_total(ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
-        end
-
         it 'assembles recursive sums for the parent', :aggregate_failures do
           subject.epic_aggregate
 
-          lazy_state = subject.instance_variable_get(:@lazy_state)
-          tree = lazy_state[:tree]
-
-          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, COUNT_FACET, OPENED_ISSUE_STATE, 2)
-          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, COUNT_FACET, CLOSED_ISSUE_STATE, 4)
-          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, WEIGHT_SUM_FACET, OPENED_ISSUE_STATE, 5)
-          expect(tree[epic_id]).to have_aggregate(tree, ISSUE_TYPE, WEIGHT_SUM_FACET, CLOSED_ISSUE_STATE, 17)
-          expect(tree[epic_id]).to have_aggregate(tree, EPIC_TYPE, COUNT_FACET, CLOSED_EPIC_STATE, 1)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT, OPENED_ISSUE_STATE, 2)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, COUNT, CLOSED_ISSUE_STATE, 4)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM, OPENED_ISSUE_STATE, 5)
+          expect(tree[epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM, CLOSED_ISSUE_STATE, 17)
+          expect(tree[epic_id]).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 1)
         end
       end
 
       context 'for a standalone epic with no issues' do
-        it 'assembles direct totals', :aggregate_failures do
+        it 'assembles recursive sums', :aggregate_failures do
           subject.epic_aggregate
 
-          lazy_state = subject.instance_variable_get(:@lazy_state)
-          tree = lazy_state[:tree]
-
-          expect(tree[other_epic_id].direct_count_totals).to be_empty
-          expect(tree[other_epic_id].direct_weight_sum_totals).to be_empty
+          expect(tree[other_epic_id]).to have_aggregate(ISSUE_TYPE, COUNT, OPENED_ISSUE_STATE, 0)
+          expect(tree[other_epic_id]).to have_aggregate(ISSUE_TYPE, COUNT, CLOSED_ISSUE_STATE, 0)
+          expect(tree[other_epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM, OPENED_ISSUE_STATE, 0)
+          expect(tree[other_epic_id]).to have_aggregate(ISSUE_TYPE, WEIGHT_SUM, CLOSED_ISSUE_STATE, 0)
+          expect(tree[other_epic_id]).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 0)
         end
       end
     end
+  end
+
+  def tree
+    lazy_state = subject.instance_variable_get(:@lazy_state)
+    lazy_state[:tree]
   end
 end
