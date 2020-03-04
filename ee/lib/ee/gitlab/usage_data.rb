@@ -119,9 +119,7 @@ module EE
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           license_scan_count = results.delete(:license_scanning_jobs)
-          if license_scan_count && results[:license_management_jobs]
-            results[:license_management_jobs] += license_scan_count
-          end
+          results[:license_management_jobs] += license_scan_count
 
           results
         end
