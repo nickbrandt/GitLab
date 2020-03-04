@@ -6,7 +6,7 @@ describe Gitlab::GlRepository do
     let_it_be(:project) { create(:project, :repository) }
 
     it 'parses a design gl_repository' do
-      expect(described_class.parse("design-#{project.id}")).to eq([project, EE::Gitlab::GlRepository::DESIGN])
+      expect(described_class.parse("design-#{project.id}")).to eq([project, project, EE::Gitlab::GlRepository::DESIGN])
     end
   end
 
