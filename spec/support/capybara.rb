@@ -113,6 +113,18 @@ RSpec.configure do |config|
     end
   end
 
+  # The :capybara_ignore_server_errors metadata means unhandled exceptions raised
+  # by the application under test will not necessarily fail the server. This is
+  # useful when testing conditions that are expected to raise a 500 error in
+  # production; it should not be used on the happy path.
+  config.around(:each, :capybara_ignore_server_errors) do |example|
+    Capybara.raise_server_errors = false
+
+    example.run
+  ensure
+    Capybara.raise_server_errors = true
+  end
+
   config.after(:example, :js) do |example|
     # when a test fails, display any messages in the browser's console
     # but fail don't add the message if the failure is a pending test that got
