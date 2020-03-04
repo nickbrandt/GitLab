@@ -22,7 +22,7 @@ module EE
 
       def execute
         COLUMNS.each do |column|
-          audit_changes(column, as: column.to_s, target_model: @project, model: model)
+          audit_changes(column, as: column.to_s, entity: @project, model: model)
         end
       end
 

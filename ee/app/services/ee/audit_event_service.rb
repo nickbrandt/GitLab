@@ -99,17 +99,19 @@ module EE
 
     # Builds the @details attribute for changes
     #
+    # @param model [Object] the target model being audited
+    #
     # @return [AuditEventService]
-    def for_changes
+    def for_changes(model)
       @details =
         {
           change: @details[:as] || @details[:column],
           from: @details[:from],
           to: @details[:to],
           author_name: @author.name,
-          target_id: @entity.id,
-          target_type: @entity.class.name,
-          target_details: @details[:target_details] || @entity.name
+          target_id: model.id,
+          target_type: model.class.name,
+          target_details: @details[:target_details] || model.name
         }
 
       self

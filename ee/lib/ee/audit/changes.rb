@@ -17,7 +17,7 @@ module EE
       def audit_changes(column, options = {})
         column = options[:column] || column
         # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        @target_model = options[:target_model]
+        @entity = options[:entity]
         @model = options[:model]
         # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
@@ -28,8 +28,8 @@ module EE
 
       protected
 
-      def target_model
-        @target_model || model # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      def entity
+        @entity || model # rubocop:disable Gitlab/ModuleWithInstanceVariables
       end
 
       def model
@@ -67,8 +67,8 @@ module EE
       end
 
       def audit_event(options)
-        ::AuditEventService.new(@current_user, target_model, options) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-          .for_changes.security_event
+        ::AuditEventService.new(@current_user, entity, options) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          .for_changes(model).security_event
       end
     end
   end
