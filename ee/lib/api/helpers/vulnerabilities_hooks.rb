@@ -6,9 +6,7 @@ module API
       extend ActiveSupport::Concern
 
       included do
-        after do
-          not_found! unless Feature.enabled?(:first_class_vulnerabilities, @project)
-
+        before do
           authenticate!
         end
       end

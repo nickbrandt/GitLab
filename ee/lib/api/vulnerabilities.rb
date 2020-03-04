@@ -33,9 +33,8 @@ module API
         success EE::API::Entities::Vulnerability
       end
       get ':id' do
-        vulnerability = Vulnerability.find(params[:id])
-        @project = vulnerability.project
-        authorize_vulnerability!(vulnerability, :read_vulnerability)
+        vulnerability = find_and_authorize_vulnerability!(:read_vulnerability)
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
         render_vulnerability(vulnerability)
       end
 
@@ -44,7 +43,7 @@ module API
       end
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        @project = vulnerability.project
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
         break not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
@@ -56,7 +55,7 @@ module API
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        @project = vulnerability.project
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
         break not_modified! if vulnerability.dismissed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
@@ -68,7 +67,7 @@ module API
       end
       post ':id/confirm' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        @project = vulnerability.project
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
         break not_modified! if vulnerability.confirmed?
 
         vulnerability = ::Vulnerabilities::ConfirmService.new(current_user, vulnerability).execute
