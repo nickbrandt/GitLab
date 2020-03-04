@@ -188,6 +188,11 @@ module EE
         ::Group
       end
 
+      def nullify_lost_group_parents(groups, lost_groups)
+        epics_to_update = in_selected_groups(groups).where(parent: in_selected_groups(lost_groups))
+        epics_to_update.update_all(parent_id: nil)
+      end
+
       # Return the deepest relation level for an epic.
       # Example 1:
       # epic1 - parent: nil

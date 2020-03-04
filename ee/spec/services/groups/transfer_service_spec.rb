@@ -97,4 +97,75 @@ describe Groups::TransferService, '#execute' do
       expect(group.parent).to eq(new_group)
     end
   end
+
+  context 'with epics' do
+    context 'when epics feature is disabled' do
+      it 'transfers a group successfully' do
+        transfer_service.execute(new_group)
+
+        expect(group.parent).to eq(new_group)
+      end
+    end
+
+    context 'when epics feature is enabled' do
+      let(:root_group) { create(:group) }
+      let(:subgroup_group_level_1) { create(:group, parent: root_group) }
+      let(:subgroup_group_level_2) { create(:group, parent: subgroup_group_level_1) }
+      let(:subgroup_group_level_3) { create(:group, parent: subgroup_group_level_2) }
+
+      let!(:root_epic) { create(:epic, group: root_group) }
+      let!(:level_1_epic_1) { create(:epic, group: subgroup_group_level_1, parent: root_epic) }
+      let!(:level_1_epic_2) { create(:epic, group: subgroup_group_level_1, parent: level_1_epic_1) }
+      let!(:level_2_epic_1) { create(:epic, group: subgroup_group_level_2, parent: root_epic) }
+      let!(:level_2_epic_2) { create(:epic, group: subgroup_group_level_2, parent: level_1_epic_1) }
+      let!(:level_2_subepic) { create(:epic, group: subgroup_group_level_2, parent: level_2_epic_2) }
+      let!(:level_3_epic) { create(:epic, group: subgroup_group_level_3, parent: level_2_epic_2) }
+
+      before do
+        root_group.add_owner(user)
+
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when group is moved completely out of the main group' do
+        let(:group) { subgroup_group_level_1 }
+
+        before do
+          transfer_service.execute(new_group)
+        end
+
+        it 'keeps relations between epics in the group structure' do
+          expect(level_1_epic_2.reload.parent).to eq(level_1_epic_1)
+          expect(level_2_epic_2.reload.parent).to eq(level_1_epic_1)
+          expect(level_2_subepic.reload.parent).to eq(level_2_epic_2)
+          expect(level_3_epic.reload.parent).to eq(level_2_epic_2)
+        end
+
+        it 'removes relations to epics of the old parent group' do
+          expect(level_1_epic_1.reload.parent).to be_nil
+          expect(level_2_epic_1.reload.parent).to be_nil
+        end
+      end
+
+      context 'when group is moved some levels up' do
+        let(:group) { subgroup_group_level_2 }
+
+        before do
+          transfer_service.execute(root_group)
+        end
+
+        it 'keeps relations between epics in the group structure' do
+          expect(level_1_epic_1.reload.parent).to eq(root_epic)
+          expect(level_1_epic_2.reload.parent).to eq(level_1_epic_1)
+          expect(level_2_epic_1.reload.parent).to eq(root_epic)
+          expect(level_2_subepic.reload.parent).to eq(level_2_epic_2)
+          expect(level_3_epic.reload.parent).to eq(level_2_epic_2)
+        end
+
+        it 'removes relations to epics of the old parent group' do
+          expect(level_2_epic_2.reload.parent).to be_nil
+        end
+      end
+    end
+  end
 end
