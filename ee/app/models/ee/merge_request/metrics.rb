@@ -3,6 +3,14 @@
 module EE
   module MergeRequest
     module Metrics
+      extend ActiveSupport::Concern
+
+      class_methods do
+        def review_time_field
+          @review_time_field ||= Arel.sql("LEAST(merge_request_metrics.first_comment_at, merge_request_metrics.first_approved_at)")
+        end
+      end
+
       def review_time
         return unless review_start_at
 
@@ -10,7 +18,7 @@ module EE
       end
 
       def review_start_at
-        first_comment_at
+        [first_comment_at, first_approved_at].compact.min
       end
 
       def review_end_at

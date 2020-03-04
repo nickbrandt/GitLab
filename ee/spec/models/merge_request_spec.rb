@@ -743,13 +743,19 @@ describe MergeRequest do
   end
 
   describe 'review time sorting' do
-    it 'orders by first_comment_at' do
-      merge_request_1 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 1.day.ago })
-      merge_request_2 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: 3.days.ago })
-      merge_request_3 = create(:merge_request, :with_productivity_metrics, metrics_data: { first_comment_at: nil })
+    def create_mr(metrics_data = {})
+      create(:merge_request, :with_productivity_metrics, metrics_data: metrics_data)
+    end
 
-      expect(described_class.order_review_time_desc).to match([merge_request_2, merge_request_1, merge_request_3])
-      expect(described_class.sort_by_attribute('review_time_desc')).to match([merge_request_2, merge_request_1, merge_request_3])
+    it 'orders by first_comment_at or first_approved_at whatever is earlier' do
+      mr1 = create_mr(first_comment_at: 1.day.ago)
+      mr2 = create_mr(first_comment_at: 3.days.ago)
+      mr3 = create_mr(first_approved_at: 5.days.ago)
+      mr4 = create_mr(first_comment_at: 1.day.ago, first_approved_at: 4.days.ago)
+      mr5 = create_mr(first_comment_at: nil, first_approved_at: nil)
+
+      expect(described_class.order_review_time_desc).to match([mr3, mr4, mr2, mr1, mr5])
+      expect(described_class.sort_by_attribute('review_time_desc')).to match([mr3, mr4, mr2, mr1, mr5])
     end
   end
 end

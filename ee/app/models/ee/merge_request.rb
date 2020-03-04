@@ -63,7 +63,8 @@ module EE
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
 
       scope :order_review_time_desc, -> do
-        joins(:metrics).reorder(::Gitlab::Database.nulls_last_order('merge_request_metrics.first_comment_at'))
+        joins(:metrics)
+          .reorder(::Gitlab::Database.nulls_last_order(::MergeRequest::Metrics.review_time_field))
       end
 
       scope :with_code_review_api_entity_associations, -> do
@@ -97,7 +98,7 @@ module EE
       # Returns an array of arel columns
       def grouping_columns(sort)
         grouping_columns = super
-        grouping_columns << ::MergeRequest::Metrics.arel_table[:first_comment_at] if sort.to_s == 'review_time_desc'
+        grouping_columns << ::MergeRequest::Metrics.review_time_field if sort.to_s == 'review_time_desc'
         grouping_columns
       end
     end
