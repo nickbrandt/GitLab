@@ -123,7 +123,7 @@ module ReactiveCaching
     def full_reactive_cache_key(*qualifiers, alive: false)
       prefix = self.class.reactive_cache_key
       prefix = prefix.call(self) if prefix.respond_to?(:call)
-      hashed = Digest::SHA1.hexdigest(qualifiers.to_json)
+      hashed = Digest::SHA1.hexdigest(qualifiers.to_json) if qualifiers.present?
       suffix = 'alive' if alive
 
       [prefix, hashed, suffix].flatten.compact.join(':')
