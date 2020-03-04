@@ -24,7 +24,7 @@ module QA
         target_project.visit!
       end
 
-      it 'configures and syncs a (pull) mirrored repository' do
+      it 'configures and syncs a (pull) mirrored repository', quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/208761' do
         # Configure the target project to pull from the source project
         # And get the public key to be used as a deploy key
         Page::Project::Menu.perform(&:go_to_repository_settings)

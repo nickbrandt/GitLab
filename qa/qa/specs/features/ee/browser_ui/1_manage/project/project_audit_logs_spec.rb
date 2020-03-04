@@ -48,7 +48,7 @@ module QA
         it_behaves_like 'project audit event logs', ["Add user access as guest"]
       end
 
-      context "Add deploy key" do
+      context "Add deploy key", quarantine: 'https://gitlab.com/gitlab-org/gitlab/issues/208761' do
         before do
           key = Runtime::Key::RSA.new
           deploy_key_title = 'deploy key title'
