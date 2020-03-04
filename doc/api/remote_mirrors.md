@@ -43,6 +43,44 @@ NOTE: **Note:**
 For security reasons, the `url` attribute will always be scrubbed of username
 and password information.
 
+## Create a remote mirror
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/24189) in GitLab 12.9.
+
+Create a remote mirror for a project. The mirror will be disabled by default. You can enable it by including the optional parameter `enabled` when creating it:
+
+```text
+POST /projects/:id/remote_mirrors
+```
+
+| Attribute                 | Type    | Required   | Description                                         |
+| :----------               | :-----  | :--------- | :------------                                       |
+| `url`                     | String  | yes        | The URL of the remote repository to be mirrored.    |
+| `enabled`                 | Boolean | no         | Determines if the mirror is enabled.                |
+| `only_protected_branches` | Boolean | no         | Determines if only protected branches are mirrored. |
+
+Example request:
+
+```sh
+curl --request POST --data "url=https://username:token@example.com/gitlab/example.git" --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/projects/42/remote_mirrors'
+```
+
+Example response:
+
+```json
+{
+    "enabled": false,
+    "id": 101486,
+    "last_error": null,
+    "last_successful_update_at": null,
+    "last_update_at": null,
+    "last_update_started_at": null,
+    "only_protected_branches": false,
+    "update_status": "none",
+    "url": "https://*****:*****@example.com/gitlab/example.git"
+}
+```
+
 ## Update a remote mirror's attributes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/38121) in GitLab 12.9.
