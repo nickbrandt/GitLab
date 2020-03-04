@@ -6,12 +6,25 @@ module EE
       extend ActiveSupport::Concern
 
       SECURE_PRODUCT_TYPES = {
-        container_scanning: :container_scanning_jobs,
-        dast: :dast_jobs,
-        dependency_scanning: :dependency_scanning_jobs,
-        license_management: :license_management_jobs,
-        license_scanning: :license_scanning_jobs,
-        sast: :sast_jobs
+        container_scanning: {
+          name: :container_scanning_jobs
+        },
+        dast: {
+          name: :dast_jobs
+        },
+        dependency_scanning: {
+          name: :dependency_scanning_jobs
+        },
+        license_management: {
+          name: :license_management_jobs
+        },
+        license_scanning: {
+          name: :license_scanning_jobs,
+          fallback: 0
+        },
+        sast: {
+          name: :sast_jobs
+        }
       }.freeze
 
       class_methods do
@@ -29,7 +42,7 @@ module EE
           # self hosted instances, prevent them from running on GitLab.com and allow instance maintainers
           # to disable them via a feature flag.
           return super if (::Feature.disabled?(:usage_ping_batch_counter) && ::Gitlab.com?) ||
-            ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
+                          ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
 
           if ::Feature.disabled?(:usage_activity_by_stage_monthly)
             super.merge(usage_activity_by_stage)
@@ -108,7 +121,7 @@ module EE
             results["license_management"] += license_scan_count
           end
 
-          results.each_with_object({}) { |(key, value), response| response[SECURE_PRODUCT_TYPES[key.to_sym]] = value }
+          results.each_with_object({}) { |(key, value), response| response[SECURE_PRODUCT_TYPES[key.to_sym][:name]] = value }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -320,8 +333,8 @@ module EE
             user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard.where(time_period))
           }
 
-          SECURE_PRODUCT_TYPES.each do |secure_type, type_with_name|
-            results["#{prefix}#{type_with_name}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id)
+          SECURE_PRODUCT_TYPES.each do |secure_type, attribs|
+            results["#{prefix}#{attribs[:name]}".to_sym] = distinct_count(::Ci::Build.where(name: secure_type).where(time_period), :user_id, fallback: attribs.fetch(:fallback, -1))
           end
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
