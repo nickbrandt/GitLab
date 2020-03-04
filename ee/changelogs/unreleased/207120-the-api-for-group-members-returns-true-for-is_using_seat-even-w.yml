@@ -1,0 +1,5 @@
+---
+title: API for Namespace members has correct boolean if user using paid seat
+merge_request: 25988
+author:
+type: fixed

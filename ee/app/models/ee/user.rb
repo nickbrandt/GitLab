@@ -250,15 +250,10 @@ module EE
     end
 
     def using_license_seat?
-      return false unless active?
-      return false if internal?
-      return false unless License.current
-
-      if License.current.exclude_guests_from_active_count?
-        highest_role > ::Gitlab::Access::GUEST
-      else
-        true
-      end
+      active? &&
+      !internal? &&
+      has_current_license? &&
+      paid_in_current_license?
     end
 
     def using_gitlab_com_seat?(namespace)
@@ -352,6 +347,12 @@ module EE
         ::Namespace.select(select).where(type: nil, owner: self),
         reporter_developer_maintainer_owned_groups.select(select).where(parent_id: nil)
       ]).to_sql
+    end
+
+    def paid_in_current_license?
+      return true unless License.current.exclude_guests_from_active_count?
+
+      highest_role > ::Gitlab::Access::GUEST
     end
   end
 end
