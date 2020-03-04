@@ -375,6 +375,42 @@ describe GroupPolicy do
         it { is_expected.not_to be_allowed(:override_group_member) }
         it { is_expected.not_to be_allowed(:update_group_member) }
       end
+
+      context 'when LDAP sync is enabled' do
+        let(:current_user) { owner }
+
+        before do
+          allow(group).to receive(:ldap_synced?).and_return(true)
+        end
+
+        context 'Group Owner disable membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: true)
+          end
+
+          it { is_expected.to be_allowed(:admin_group_member) }
+          it { is_expected.to be_allowed(:override_group_member) }
+          it { is_expected.to be_allowed(:update_group_member) }
+        end
+
+        context 'Group Owner keeps the membership lock' do
+          before do
+            group.update!(unlock_membership_to_ldap: false)
+          end
+
+          it { is_expected.not_to be_allowed(:admin_group_member) }
+          it { is_expected.not_to be_allowed(:override_group_member) }
+          it { is_expected.not_to be_allowed(:update_group_member) }
+        end
+      end
+
+      context 'when LDAP sync is disable' do
+        let(:current_user) { owner }
+
+        it { is_expected.not_to be_allowed(:admin_group_member) }
+        it { is_expected.not_to be_allowed(:override_group_member) }
+        it { is_expected.not_to be_allowed(:update_group_member) }
+      end
     end
   end
 
