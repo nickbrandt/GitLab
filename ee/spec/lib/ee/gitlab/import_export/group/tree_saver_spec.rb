@@ -141,15 +141,12 @@ describe Gitlab::ImportExport::Group::TreeSaver do
 
     context 'when there are boards with predefined milestones' do
       let(:milestone) { Milestone::Upcoming }
-
-      before do
-        create(:board, group: group, milestone_id: milestone.id)
-      end
+      let!(:board_with_milestone) { create(:board, group: group, milestone_id: milestone.id) }
 
       it 'saves the milestone data' do
         expect_successful_save(group_tree_saver)
 
-        board_data = saved_group_json['boards'].last
+        board_data = saved_group_json['boards'].find { |board| board['id'] == board_with_milestone.id }
 
         expect(board_data).to include(
           'milestone_id' => milestone.id,
@@ -164,15 +161,12 @@ describe Gitlab::ImportExport::Group::TreeSaver do
 
     context 'when there are boards with persisted milestones' do
       let(:milestone) { create(:milestone) }
-
-      before do
-        create(:board, group: group, milestone: milestone)
-      end
+      let!(:board_with_milestone) { create(:board, group: group, milestone_id: milestone.id) }
 
       it 'saves the milestone data' do
         expect_successful_save(group_tree_saver)
 
-        board_data = saved_group_json['boards'].last
+        board_data = saved_group_json['boards'].find { |board| board['id'] == board_with_milestone.id }
 
         expect(board_data).to include(
           'milestone_id' => milestone.id,
