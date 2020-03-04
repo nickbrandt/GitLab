@@ -21,8 +21,6 @@ module Gitlab
           entry :terminal, Entry::Terminal,
             description: 'Configuration of the webide terminal.'
 
-          helpers :terminal
-
           attributes :terminal
         end
       end
