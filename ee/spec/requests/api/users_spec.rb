@@ -57,6 +57,16 @@ describe API::Users do
         expect(AuditEvent.count).to eq(1)
       end
     end
+
+    describe 'POST /users/:id/block' do
+      it 'creates audit event when blocking user' do
+        stub_licensed_features(extended_audit_events: true)
+
+        expect do
+          post api("/users/#{user.id}/block", admin)
+        end.to change { AuditEvent.count }.by(1)
+      end
+    end
   end
 
   context 'shared_runners_minutes_limit' do
