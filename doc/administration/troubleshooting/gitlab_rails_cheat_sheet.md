@@ -753,12 +753,6 @@ Ci::Pipeline.where(project_id: p.id).where(status: 'pending').each {|p| p.cancel
 Ci::Pipeline.where(project_id: p.id).where(status: 'pending').count
 ```
 
-### Manually modify runner minutes
-
-```ruby
-Namespace.find_by_full_path("user/proj").namespace_statistics.update(shared_runners_seconds: 27360)
-```
-
 ### Remove artifacts more than a week old
 
 The Latest version of these steps can be found in the [job artifacts documentation](../job_artifacts.md)
