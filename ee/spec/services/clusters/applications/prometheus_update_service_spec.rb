@@ -10,7 +10,7 @@ describe Clusters::Applications::PrometheusUpdateService do
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
     let(:empty_alerts_values_update_yaml) { "---\nalertmanager:\n  enabled: false\nserverFiles:\n  alerts: {}\n" }
     let!(:patch_command) { application.patch_command(empty_alerts_values_update_yaml) }
-    let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
+    let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::API) }
 
     subject(:service) { described_class.new(application, project) }
 
