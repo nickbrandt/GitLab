@@ -6,12 +6,17 @@ describe OperationsHelper do
   describe '#status_page_settings_data' do
     subject { helper.status_page_settings_data(status_page_setting) }
 
+    before do
+      allow(helper).to receive(:can?) { true }
+    end
+
     context 'setting does not exist' do
       let(:status_page_setting) { nil }
 
       it 'returns the correct values' do
         expect(subject.keys)
           .to contain_exactly(
+            'user-can-enable-status-page',
             'setting-enabled',
             'setting-aws-access-key',
             'setting-masked-aws-secret-key',
