@@ -303,17 +303,17 @@ describe('Cycle analytics mutations', () => {
       expect(state.tasksByType).toEqual({ subject: 'cool-subject' });
     });
 
-    it('will toggle the specified label id in the tasksByType.labelIds state key', () => {
+    it('will toggle the specified label id in the tasksByType.selectedLabelIds state key', () => {
       state = {
-        tasksByType: { labelIds: [10, 20, 30] },
+        tasksByType: { selectedLabelIds: [10, 20, 30] },
       };
       const labelFilter = { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: 20 };
       mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
 
-      expect(state.tasksByType).toEqual({ labelIds: [10, 30] });
+      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30] });
 
       mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
-      expect(state.tasksByType).toEqual({ labelIds: [10, 30, 20] });
+      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30, 20] });
     });
   });
 

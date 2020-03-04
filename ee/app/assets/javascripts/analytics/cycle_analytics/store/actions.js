@@ -3,19 +3,13 @@ import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import { historyPushState } from '~/lib/utils/common_utils';
 import { setUrlParams } from '~/lib/utils/url_utility';
-import createFlash, { hideFlash } from '~/flash';
+import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
 import { toYmd } from '../../shared/utils';
-
-const removeError = () => {
-  const flashEl = document.querySelector('.flash-alert');
-  if (flashEl) {
-    hideFlash(flashEl);
-  }
-};
+import { removeFlash } from '../utils';
 
 const handleErrorOrRethrow = ({ action, error }) => {
   if (error?.response?.status === httpStatus.FORBIDDEN) {
@@ -167,7 +161,7 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
 };
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
-  removeError();
+  removeFlash();
 
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
@@ -182,12 +176,12 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
 export const hideCustomStageForm = ({ commit }) => {
   commit(types.HIDE_CUSTOM_STAGE_FORM);
-  removeError();
+  removeFlash();
 };
 
 export const showCustomStageForm = ({ commit }) => {
   commit(types.SHOW_CUSTOM_STAGE_FORM);
-  removeError();
+  removeFlash();
 };
 
 export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}) => {
@@ -209,7 +203,7 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
     endEventLabelId,
   });
   dispatch('setSelectedStage', selectedStage);
-  removeError();
+  removeFlash();
 };
 
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
@@ -346,7 +340,7 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
 
 export const clearCustomStageFormErrors = ({ commit }) => {
   commit(types.CLEAR_CUSTOM_STAGE_FORM_ERRORS);
-  removeError();
+  removeFlash();
 };
 
 export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
@@ -622,7 +616,6 @@ export const updateSelectedDurationChartStages = ({ state, commit }, stages) => 
 };
 
 export const setTasksByTypeFilters = ({ dispatch, commit }, data) => {
-  console.log('setTasksByTypeFilters', data);
   commit(types.SET_TASKS_BY_TYPE_FILTERS, data);
   dispatch('fetchTasksByTypeData');
 };

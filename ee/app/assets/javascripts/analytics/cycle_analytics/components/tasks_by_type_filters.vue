@@ -5,8 +5,11 @@ import {
   GlNewDropdown,
   GlNewDropdownItem,
   GlSearchBoxByType,
+  GlIcon,
 } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
+import createFlash from '~/flash';
+import { removeFlash } from '../utils';
 import {
   TASKS_BY_TYPE_FILTERS,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
@@ -19,6 +22,7 @@ export default {
   components: {
     GlSegmentedControl,
     GlDropdownDivider,
+    GlIcon,
     GlNewDropdown,
     GlNewDropdownItem,
     GlSearchBoxByType,
@@ -27,8 +31,7 @@ export default {
     maxLabels: {
       type: Number,
       required: false,
-      // default: TASKS_BY_TYPE_MAX_LABELS,
-      default: 2,
+      default: TASKS_BY_TYPE_MAX_LABELS,
     },
     labels: {
       type: Array,
@@ -87,6 +90,9 @@ export default {
     maxLabelsSelected() {
       return this.selectedLabelIds.length >= this.maxLabels;
     },
+    hasMatchingLabels() {
+      return this.availableLabels.length;
+    },
   },
   methods: {
     canUpdateLabelFilters(value) {
@@ -96,11 +102,20 @@ export default {
     isLabelSelected(id) {
       return this.selectedLabelIds.includes(id);
     },
+    isLabelDisabled(id) {
+      return this.maxLabelsSelected && !this.isLabelSelected(id);
+    },
     handleLabelSelected(value) {
-      console.log('handleLabelSelected', value);
-      // e.preventDefault();
+      removeFlash('notice');
       if (this.canUpdateLabelFilters(value)) {
         this.$emit('updateFilter', { filter: TASKS_BY_TYPE_FILTERS.LABEL, value });
+      } else {
+        const { maxLabels } = this;
+        const message = sprintf(
+          s__('CycleAnalytics|Only %{maxLabels} labels can be selected at this time'),
+          { maxLabels },
+        );
+        createFlash(message, 'notice');
       }
     },
   },
@@ -138,27 +153,34 @@ export default {
         <div ref="labelsFilter" class="js-tasks-by-type-chart-filters-labels mb-3 px-3">
           <p class="font-weight-bold text-left my-2">
             {{ s__('CycleAnalytics|Select labels') }}
-            <br />
-            <small>{{ selectedLabelLimitText }}</small>
           </p>
+          <small>{{ selectedLabelLimitText }}</small>
           <gl-search-box-by-type
             v-model.trim="labelsSearchTerm"
             class="js-tasks-by-type-chart-filters-subject mb-2"
           />
-          <!-- TODO: make label dropdown item? -->
           <gl-new-dropdown-item
             v-for="label in availableLabels"
             :key="label.id"
-            :is-checked="isLabelSelected(label.id)"
+            :disabled="isLabelDisabled(label.id)"
+            :class="{
+              'pl-4': !isLabelSelected(label.id),
+              'cursor-not-allowed': isLabelDisabled(label.id),
+            }"
             @click="() => handleLabelSelected(label.id)"
           >
+            <gl-icon
+              v-if="isLabelSelected(label.id)"
+              class="text-gray-700 mr-1 vertical-align-middle"
+              name="mobile-issue-close"
+            />
             <span
               :style="{ 'background-color': label.color }"
               class="d-inline-block dropdown-label-box"
             ></span>
             {{ label.name }}
           </gl-new-dropdown-item>
-          <div v-show="availableLabels.length < 1" class="text-secondary">
+          <div v-show="!hasMatchingLabels" class="text-secondary">
             {{ __('No matching labels') }}
           </div>
         </div>

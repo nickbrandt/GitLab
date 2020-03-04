@@ -6134,6 +6134,9 @@ msgstr ""
 msgid "CycleAnalytics|Number of tasks"
 msgstr ""
 
+msgid "CycleAnalytics|Only %{maxLabels} labels can be selected at this time"
+msgstr ""
+
 msgid "CycleAnalytics|Project selected"
 msgid_plural "CycleAnalytics|%d projects selected"
 msgstr[0] ""
@@ -13171,6 +13174,9 @@ msgid "No license. All rights reserved"
 msgstr ""
 
 msgid "No licenses found."
+msgstr ""
+
+msgid "No matching labels"
 msgstr ""
 
 msgid "No matching results"

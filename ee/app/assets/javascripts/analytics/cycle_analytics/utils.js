@@ -2,6 +2,7 @@ import { isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
+import { hideFlash } from '~/flash';
 import {
   newDate,
   dayAfter,
@@ -16,6 +17,13 @@ import { STAGE_NAME } from './constants';
 import { toYmd } from '../shared/utils';
 
 const EVENT_TYPE_LABEL = 'label';
+
+export const removeFlash = (type = 'alert') => {
+  const flashEl = document.querySelector(`.flash-${type}`);
+  if (flashEl) {
+    hideFlash(flashEl);
+  }
+};
 
 export const isStartEvent = ev => Boolean(ev) && Boolean(ev.canBeStartEvent) && ev.canBeStartEvent;
 
