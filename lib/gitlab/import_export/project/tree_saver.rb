@@ -15,27 +15,22 @@ module Gitlab
         end
 
         def save
-          project_tree = tree_saver.serialize(@project, reader.project_tree)
-          fix_project_tree(project_tree)
-          tree_saver.save(project_tree, @shared.export_path, ImportExport.project_filename)
+          json_writer = ImportExport::JSON::LegacyWriter.new(File.join(@shared.export_path, "project.json"))
+
+          serializer = ImportExport::JSON::StreamingSerializer.new(@project, reader.project_tree, json_writer)
+          serializer.overrides['description'] = @params[:description] if @params[:description].present?
+          serializer.additional_relations['project_members'] = group_members_array
+          serializer.execute
 
           true
-        rescue => e
-          @shared.error(e)
-          false
+        #rescue => e
+        #  @shared.error(e)
+        #  false
+        ensure
+          json_writer&.close
         end
 
         private
-
-        # Aware that the resulting hash needs to be pure-hash and
-        # does not include any AR objects anymore, only objects that run `.to_json`
-        def fix_project_tree(project_tree)
-          if @params[:description].present?
-            project_tree['description'] = @params[:description]
-          end
-
-          project_tree['project_members'] += group_members_array
-        end
 
         def reader
           @reader ||= Gitlab::ImportExport::Reader.new(shared: @shared)
@@ -57,10 +52,6 @@ module Gitlab
           non_null_user_ids = @project.project_members.where.not(user_id: nil).select(:user_id)
 
           GroupMembersFinder.new(@project.group).execute.where.not(user_id: non_null_user_ids)
-        end
-
-        def tree_saver
-          @tree_saver ||= RelationTreeSaver.new
         end
       end
     end
