@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::LDAP::Access do
+describe Gitlab::Auth::Ldap::Access do
   include LdapHelpers
 
   let(:user) { create(:omniauth_user) }
@@ -13,15 +13,15 @@ describe Gitlab::Auth::LDAP::Access do
   describe '#allowed?' do
     context 'LDAP user' do
       it 'finds a user by dn first' do
-        expect(Gitlab::Auth::LDAP::Person).to receive(:find_by_dn).and_return(:ldap_user)
-        expect(Gitlab::Auth::LDAP::Person).not_to receive(:find_by_email)
+        expect(Gitlab::Auth::Ldap::Person).to receive(:find_by_dn).and_return(:ldap_user)
+        expect(Gitlab::Auth::Ldap::Person).not_to receive(:find_by_email)
 
         access.allowed?
       end
 
       it 'finds a user by email if not found by dn' do
-        expect(Gitlab::Auth::LDAP::Person).to receive(:find_by_dn).and_return(nil)
-        expect(Gitlab::Auth::LDAP::Person).to receive(:find_by_email)
+        expect(Gitlab::Auth::Ldap::Person).to receive(:find_by_dn).and_return(nil)
+        expect(Gitlab::Auth::Ldap::Person).to receive(:find_by_email)
 
         access.allowed?
       end
@@ -35,12 +35,12 @@ describe Gitlab::Auth::LDAP::Access do
 
       context 'when exists in LDAP/AD' do
         before do
-          allow(Gitlab::Auth::LDAP::Person).to receive(:find_by_dn).and_return(user)
+          allow(Gitlab::Auth::Ldap::Person).to receive(:find_by_dn).and_return(user)
         end
 
         context 'user blocked in LDAP/AD' do
           before do
-            allow(Gitlab::Auth::LDAP::Person).to receive(:disabled_via_active_directory?).and_return(true)
+            allow(Gitlab::Auth::Ldap::Person).to receive(:disabled_via_active_directory?).and_return(true)
           end
 
           it 'blocks user in GitLab' do
@@ -65,7 +65,7 @@ describe Gitlab::Auth::LDAP::Access do
         context 'user unblocked in LDAP/AD' do
           before do
             user.update_column(:state, :ldap_blocked)
-            allow(Gitlab::Auth::LDAP::Person).to receive(:disabled_via_active_directory?).and_return(false)
+            allow(Gitlab::Auth::Ldap::Person).to receive(:disabled_via_active_directory?).and_return(false)
           end
 
           it 'unblocks user in GitLab' do
@@ -327,14 +327,14 @@ describe Gitlab::Auth::LDAP::Access do
       end
 
       it 'adds a Kerberos identity if it is in Active Directory but not in GitLab' do
-        allow_any_instance_of(EE::Gitlab::Auth::LDAP::Person).to receive_messages(kerberos_principal: 'mylogin@FOO.COM')
+        allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: 'mylogin@FOO.COM')
 
         expect { access.update_user }.to change(user.identities.where(provider: :kerberos), :count).from(0).to(1)
         expect(user.identities.where(provider: 'kerberos').last.extern_uid).to eq('mylogin@FOO.COM')
       end
 
       it 'updates existing Kerberos identity in GitLab if Active Directory has a different one' do
-        allow_any_instance_of(EE::Gitlab::Auth::LDAP::Person).to receive_messages(kerberos_principal: 'otherlogin@BAR.COM')
+        allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: 'otherlogin@BAR.COM')
         user.identities.build(provider: 'kerberos', extern_uid: 'mylogin@FOO.COM').save
 
         expect { access.update_user }.not_to change(user.identities.where(provider: 'kerberos'), :count)
@@ -342,7 +342,7 @@ describe Gitlab::Auth::LDAP::Access do
       end
 
       it 'does not remove Kerberos identities from GitLab if they are none in the LDAP provider' do
-        allow_any_instance_of(EE::Gitlab::Auth::LDAP::Person).to receive_messages(kerberos_principal: nil)
+        allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: nil)
         user.identities.build(provider: 'kerberos', extern_uid: 'otherlogin@BAR.COM').save
 
         expect { access.update_user }.not_to change(user.identities.where(provider: 'kerberos'), :count)
@@ -350,14 +350,14 @@ describe Gitlab::Auth::LDAP::Access do
       end
 
       it 'does not modify identities in GitLab if they are no kerberos principal in the LDAP provider' do
-        allow_any_instance_of(EE::Gitlab::Auth::LDAP::Person).to receive_messages(kerberos_principal: nil)
+        allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: nil)
 
         expect { access.update_user }.not_to change(user.identities, :count)
       end
 
       it 'does not add a Kerberos identity when in a read-only GitLab instance' do
         allow(Gitlab::Database).to receive(:read_only?).and_return(true)
-        allow_any_instance_of(EE::Gitlab::Auth::LDAP::Person).to receive_messages(kerberos_principal: 'mylogin@FOO.COM')
+        allow_any_instance_of(EE::Gitlab::Auth::Ldap::Person).to receive_messages(kerberos_principal: 'mylogin@FOO.COM')
 
         expect { access.update_user }.not_to change(user.identities.where(provider: :kerberos), :count)
       end

@@ -4,7 +4,7 @@ module EE
   module SelectsHelper
     def ldap_server_select_options
       options_from_collection_for_select(
-        ::Gitlab::Auth::LDAP::Config.available_servers,
+        ::Gitlab::Auth::Ldap::Config.available_servers,
         'provider_name',
         'label'
       )

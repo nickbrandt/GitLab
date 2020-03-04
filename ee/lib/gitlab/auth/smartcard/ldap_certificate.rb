@@ -3,7 +3,7 @@
 module Gitlab
   module Auth
     module Smartcard
-      class LDAPCertificate < Gitlab::Auth::Smartcard::Base
+      class LdapCertificate < Gitlab::Auth::Smartcard::Base
         def initialize(provider, certificate)
           super(certificate)
 
@@ -51,11 +51,11 @@ module Gitlab
         end
 
         def adapter
-          @adapter ||= Gitlab::Auth::LDAP::Adapter.new(@provider)
+          @adapter ||= Gitlab::Auth::Ldap::Adapter.new(@provider)
         end
 
         def ldap_user
-          @ldap_user ||= ::Gitlab::Auth::LDAP::Person.find_by_certificate_issuer_and_serial(
+          @ldap_user ||= ::Gitlab::Auth::Ldap::Person.find_by_certificate_issuer_and_serial(
             @certificate.issuer.to_s(OpenSSL::X509::Name::RFC2253),
             @certificate.serial.to_s,
             adapter)

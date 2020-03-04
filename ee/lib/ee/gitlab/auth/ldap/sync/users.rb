@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Sync
           class Users
             attr_reader :provider, :proxy
@@ -38,7 +38,7 @@ module EE
               end
 
               true
-            rescue ::Gitlab::Auth::LDAP::LDAPConnectionError
+            rescue ::Gitlab::Auth::Ldap::LdapConnectionError
               Rails.logger.warn("Error syncing #{attribute} users for provider '#{provider}'. LDAP connection Error") # rubocop:disable Gitlab/RailsLogger
 
               false
@@ -56,7 +56,7 @@ module EE
             end
 
             def update_user_by_dn(member_dn)
-              user = ::Gitlab::Auth::LDAP::User.find_by_uid_and_provider(member_dn, provider)
+              user = ::Gitlab::Auth::Ldap::User.find_by_uid_and_provider(member_dn, provider)
 
               if user.present?
                 user[attribute] = true

@@ -198,7 +198,7 @@ describe 'Admin updates EE-only settings' do
 
   describe 'LDAP settings' do
     before do
-      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(ldap_setting)
+      allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(ldap_setting)
 
       visit general_admin_application_settings_path
     end
