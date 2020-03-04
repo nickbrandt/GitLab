@@ -11,6 +11,8 @@ const defaultEnvironmentId = 3;
 const documentationPath = '/docs';
 const chartEmptyStateSvgPath = '/chart-svgs';
 const emptyStateSvgPath = '/svgs';
+const wafNoDataSvgPath = '/waf-no-data-svg';
+const networkPolicyNoDataSvgPath = '/network-policy-no-data-svg';
 const environmentsEndpoint = `${TEST_HOST}/environments`;
 const wafStatisticsEndpoint = `${TEST_HOST}/waf`;
 const networkPolicyStatisticsEndpoint = `${TEST_HOST}/network_policy`;
@@ -37,6 +39,8 @@ describe('ThreatMonitoringApp component', () => {
         defaultEnvironmentId,
         chartEmptyStateSvgPath,
         emptyStateSvgPath,
+        wafNoDataSvgPath,
+        networkPolicyNoDataSvgPath,
         documentationPath,
         showUserCallout: true,
         userCalloutId,

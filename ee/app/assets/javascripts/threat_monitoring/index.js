@@ -11,6 +11,8 @@ export default () => {
     environmentsEndpoint,
     chartEmptyStateSvgPath,
     emptyStateSvgPath,
+    wafNoDataSvgPath,
+    networkPolicyNoDataSvgPath,
     documentationPath,
     defaultEnvironmentId,
     showUserCallout,
@@ -33,6 +35,8 @@ export default () => {
         props: {
           chartEmptyStateSvgPath,
           emptyStateSvgPath,
+          wafNoDataSvgPath,
+          networkPolicyNoDataSvgPath,
           documentationPath,
           defaultEnvironmentId: parseInt(defaultEnvironmentId, 10),
           showUserCallout: parseBoolean(showUserCallout),
