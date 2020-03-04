@@ -38,14 +38,14 @@ describe "Git HTTP requests (Geo)", :geo do
     auth_token
   end
 
-  shared_examples_for 'Geo 200 request' do
+  shared_examples_for 'a Geo 200 git request' do
     subject do
       make_request
       response
     end
 
     context 'valid Geo JWT token' do
-      it 'returns an OK response' do
+      it 'returns an OK response with JSON data' do
         is_expected.to have_gitlab_http_status(:ok)
 
         expect(response.content_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
@@ -54,7 +54,7 @@ describe "Git HTTP requests (Geo)", :geo do
     end
   end
 
-  shared_examples_for 'Geo 302 redirect to Primary' do
+  shared_examples_for 'a Geo 302 redirect to Primary' do
     # redirect_url needs to be defined when using this shared example
 
     subject do
@@ -72,7 +72,7 @@ describe "Git HTTP requests (Geo)", :geo do
     end
   end
 
-  shared_examples_for 'Geo request' do
+  shared_examples_for 'a Geo git request' do
     subject do
       make_request
       response
@@ -119,16 +119,16 @@ describe "Git HTTP requests (Geo)", :geo do
         end
 
         context 'with selective sync not enabled' do
-          it_behaves_like 'Geo request'
-          it_behaves_like 'Geo 200 request'
+          it_behaves_like 'a Geo git request'
+          it_behaves_like 'a Geo 200 git request'
 
           context 'when terms are enforced' do
             before do
               enforce_terms
             end
 
-            it_behaves_like 'Geo request'
-            it_behaves_like 'Geo 200 request'
+            it_behaves_like 'a Geo git request'
+            it_behaves_like 'a Geo 200 git request'
           end
         end
 
@@ -141,14 +141,14 @@ describe "Git HTTP requests (Geo)", :geo do
           let_it_be(:project) { create(:project) } # no repository
           let(:redirect_url) { "#{primary_url}/#{project.full_path}.git/info/refs?service=git-upload-pack" }
 
-          it_behaves_like 'Geo 302 redirect to Primary'
+          it_behaves_like 'a Geo 302 redirect to Primary'
 
           context 'when terms are enforced' do
             before do
               enforce_terms
             end
 
-            it_behaves_like 'Geo 302 redirect to Primary'
+            it_behaves_like 'a Geo 302 redirect to Primary'
           end
         end
       end
@@ -166,7 +166,7 @@ describe "Git HTTP requests (Geo)", :geo do
           response
         end
 
-        it_behaves_like 'Geo 302 redirect to Primary'
+        it_behaves_like 'a Geo 302 redirect to Primary'
       end
     end
 
@@ -175,16 +175,16 @@ describe "Git HTTP requests (Geo)", :geo do
         post "/#{project.full_path}.git/git-upload-pack", params: {}, headers: env
       end
 
-      it_behaves_like 'Geo request'
-      it_behaves_like 'Geo 200 request'
+      it_behaves_like 'a Geo git request'
+      it_behaves_like 'a Geo 200 git request'
 
       context 'when terms are enforced' do
         before do
           enforce_terms
         end
 
-        it_behaves_like 'Geo request'
-        it_behaves_like 'Geo 200 request'
+        it_behaves_like 'a Geo git request'
+        it_behaves_like 'a Geo 200 git request'
       end
     end
 
@@ -218,7 +218,7 @@ describe "Git HTTP requests (Geo)", :geo do
                 env['User-Agent'] = 'git-lfs/2.4.2 (GitHub; darwin amd64; go 1.10.2)'
               end
 
-              it_behaves_like 'Geo 302 redirect to Primary'
+              it_behaves_like 'a Geo 302 redirect to Primary'
             end
 
             context 'with an invalid git-lfs version' do
@@ -273,7 +273,7 @@ describe "Git HTTP requests (Geo)", :geo do
                 allow(current_node).to receive(:projects_include?).with(project.id).and_return(false)
               end
 
-              it_behaves_like 'Geo 302 redirect to Primary'
+              it_behaves_like 'a Geo 302 redirect to Primary'
             end
 
             where(:description, :version) do
@@ -336,7 +336,7 @@ describe "Git HTTP requests (Geo)", :geo do
               allow(current_node).to receive(:projects_include?).with(project.id).and_return(false)
             end
 
-            it_behaves_like 'Geo 302 redirect to Primary'
+            it_behaves_like 'a Geo 302 redirect to Primary'
           end
         end
       end
@@ -362,7 +362,7 @@ describe "Git HTTP requests (Geo)", :geo do
               response
             end
 
-            it_behaves_like 'Geo 302 redirect to Primary'
+            it_behaves_like 'a Geo 302 redirect to Primary'
           end
         end
       end
