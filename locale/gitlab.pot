@@ -5115,6 +5115,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Jira Integration first at Settings > Integrations > Jira"
+msgstr ""
+
 msgid "Configure Let's Encrypt"
 msgstr ""
 
@@ -8956,6 +8959,9 @@ msgstr ""
 msgid "From Google Code"
 msgstr ""
 
+msgid "From Project"
+msgstr ""
+
 msgid "From issue creation until deploy to production"
 msgstr ""
 
@@ -10608,7 +10614,19 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
+msgid "Import %{status}"
+msgstr ""
+
 msgid "Import CSV"
+msgstr ""
+
+msgid "Import Issues"
+msgstr ""
+
+msgid "Import Issues From Jira"
+msgstr ""
+
+msgid "Import Jira Issues"
 msgstr ""
 
 msgid "Import Projects from Gitea"
@@ -11139,6 +11157,9 @@ msgid "Jan"
 msgstr ""
 
 msgid "January"
+msgstr ""
+
+msgid "Jira Issue Import"
 msgstr ""
 
 msgid "JiraService|Events for %{noteable_model_name} are disabled."
