@@ -143,7 +143,7 @@ module LicenseHelper
   end
 
   def renewal_instructions_message
-    renewal_faq_url = 'https://about.gitlab.com/pricing/licensing-faq/#self-managed-gitlab'
+    renewal_faq_url = 'https://docs.gitlab.com/ee/subscriptions/#renew-your-subscription'
 
     renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
     link_end = '</a>'.html_safe
