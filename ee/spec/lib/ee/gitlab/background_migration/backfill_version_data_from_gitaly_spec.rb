@@ -20,7 +20,7 @@ describe Gitlab::BackgroundMigration::BackfillVersionDataFromGitaly do
 
   def create_version_with_missing_data(attrs = {})
     version = create_version(attrs)
-    version.update_columns(author_id: nil, created_at: nil)
+    version.update_columns(author_id: nil)
     version
   end
 
@@ -29,19 +29,17 @@ describe Gitlab::BackgroundMigration::BackfillVersionDataFromGitaly do
     commit = issue.project.design_repository.commit(version.sha)
 
     expect(version).to have_attributes(
-      author_id: nil,
-      created_at: nil
+      author_id: nil
     )
     expect(commit.author.id).to be_present
-    expect(commit.created_at).to be_present
 
     expect { perform_worker }.to(
       change do
         version.reload
-        [version.author_id, version.created_at]
+        version.author_id
       end
-      .from([nil, nil])
-      .to([commit.author.id, commit.created_at])
+      .from(nil)
+      .to(commit.author.id)
     )
   end
 
@@ -73,7 +71,7 @@ describe Gitlab::BackgroundMigration::BackfillVersionDataFromGitaly do
     expect { perform_worker }.not_to(
       change do
         version.reload
-        [version.author_id, version.created_at]
+        version.author_id
       end
     )
   end
