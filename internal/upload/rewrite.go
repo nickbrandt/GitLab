@@ -2,6 +2,7 @@ package upload
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,6 +16,9 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload/exif"
 )
+
+// ErrInjectedClientParam means that the client sent a parameter that overrides one of our own fields
+var ErrInjectedClientParam = errors.New("injected client parameter")
 
 var (
 	multipartUploadRequests = prometheus.NewCounterVec(
@@ -44,9 +48,10 @@ var (
 )
 
 type rewriter struct {
-	writer  *multipart.Writer
-	preauth *api.Response
-	filter  MultipartFormProcessor
+	writer          *multipart.Writer
+	preauth         *api.Response
+	filter          MultipartFormProcessor
+	finalizedFields map[string]bool
 }
 
 func init() {
@@ -69,9 +74,10 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, pr
 	multipartUploadRequests.WithLabelValues(filter.Name()).Inc()
 
 	rew := &rewriter{
-		writer:  writer,
-		preauth: preauth,
-		filter:  filter,
+		writer:          writer,
+		preauth:         preauth,
+		filter:          filter,
+		finalizedFields: make(map[string]bool),
 	}
 
 	for {
@@ -88,7 +94,10 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, pr
 			continue
 		}
 
-		// Copy form field
+		if rew.finalizedFields[name] {
+			return ErrInjectedClientParam
+		}
+
 		if p.FileName() != "" {
 			err = rew.handleFilePart(r.Context(), name, p)
 		} else {
@@ -143,6 +152,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 
 	for key, value := range fh.GitLabFinalizeFields(name) {
 		rew.writer.WriteField(key, value)
+		rew.finalizedFields[key] = true
 	}
 
 	multipartFileUploadBytes.WithLabelValues(rew.filter.Name()).Add(float64(fh.Size))
