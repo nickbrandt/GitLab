@@ -4,10 +4,16 @@ require 'spec_helper'
 
 describe OperationsHelper do
   describe '#status_page_settings_data' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:project) { create(:project, :private) }
+
     subject { helper.status_page_settings_data(status_page_setting) }
 
     before do
-      allow(helper).to receive(:can?) { true }
+      helper.instance_variable_set(:@project, project)
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper)
+        .to receive(:can?).with(user, :admin_operations, project) { true }
     end
 
     context 'setting does not exist' do
@@ -25,8 +31,19 @@ describe OperationsHelper do
           )
       end
 
-      it 'returns nil for the values' do
-        expect(subject.values.uniq).to contain_exactly(nil)
+      it 'returns nil or true for the values' do
+        expect(subject.values.uniq).to contain_exactly('true', nil)
+      end
+
+      context 'user does not have permission' do
+        before do
+          allow(helper)
+            .to receive(:can?).with(user, :admin_operations, project) { false }
+        end
+
+        it 'returns nil or true for the values' do
+          expect(subject.values.uniq).to contain_exactly('false', nil)
+        end
       end
     end
 
@@ -35,6 +52,7 @@ describe OperationsHelper do
 
       it 'returns the correct values' do
         aggregate_failures do
+          expect(subject['user-can-enable-status-page']).to eq('true')
           expect(subject['setting-enabled']).to eq(status_page_setting.enabled)
           expect(subject['setting-aws-access-key']).to eq(status_page_setting.aws_access_key)
           expect(subject['setting-masked-aws-secret-key']).to eq(status_page_setting.masked_aws_secret_key)
