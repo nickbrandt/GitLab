@@ -3,7 +3,6 @@
 require 'optparse'
 require 'logger'
 require 'time'
-require_relative '../../../../lib/gitlab/sidekiq_logging/json_formatter'
 
 module Gitlab
   module SidekiqCluster
@@ -16,6 +15,8 @@ module Gitlab
       CommandError = Class.new(StandardError)
 
       def initialize(log_output = STDERR)
+        require_relative '../../../../lib/gitlab/sidekiq_logging/json_formatter'
+
         # As recommended by https://github.com/mperham/sidekiq/wiki/Advanced-Options#concurrency
         @max_concurrency = 50
         @min_concurrency = 0
