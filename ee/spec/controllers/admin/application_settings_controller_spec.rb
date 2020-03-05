@@ -20,7 +20,7 @@ describe Admin::ApplicationSettingsController do
       settings = {
           help_text: 'help_text',
           elasticsearch_url: 'http://my-elastic.search:9200',
-          elasticsearch_indexing: true,
+          elasticsearch_indexing: false,
           elasticsearch_aws: true,
           elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
           elasticsearch_aws_secret_access_key: 'elasticsearch_aws_secret_access_key',
