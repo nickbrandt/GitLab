@@ -152,6 +152,12 @@ module Gitlab
         end
       end
 
+      def replicate(source_repository)
+        wrapped_gitaly_errors do
+          gitaly_repository_client.replicate(source_repository)
+        end
+      end
+
       def expire_has_local_branches_cache
         clear_memoization(:has_local_branches)
       end

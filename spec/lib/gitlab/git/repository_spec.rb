@@ -2181,4 +2181,52 @@ describe Gitlab::Git::Repository, :seed_helper do
       end
     end
   end
+
+  describe '#replicate' do
+    let(:second_storage_path) { 'tmp/tests/second_storage' }
+    let(:new_repository) do
+      Gitlab::Git::Repository.new('test_second_storage', TEST_REPO_PATH, '', 'group/project')
+    end
+    let(:new_repository_path) { File.join(second_storage_path, new_repository.relative_path) }
+
+    subject { new_repository.replicate(repository) }
+
+    before do
+      stub_storage_settings('test_second_storage' => {
+        'gitaly_address' => Gitlab.config.repositories.storages.default.gitaly_address,
+        'path' => second_storage_path
+      })
+      # TODO: SetupHelper should be creating this
+      FileUtils.mkdir_p("tmp/tests/second_storage") unless File.exist?("tmp/tests/second_storage")
+      Gitlab::Shell.new.create_repository('test_second_storage', TEST_REPO_PATH, 'group/project')
+    end
+
+    after do
+      Gitlab::Shell.new.remove_repository('test_second_storage', TEST_REPO_PATH)
+    end
+
+    it 'mirrors the source repository' do
+      subject
+
+      expect(refs(new_repository_path)).to eq(refs(repository_path))
+    end
+
+    context 'with keep-around refs' do
+      let(:sha) { SeedRepo::Commit::ID }
+      let(:keep_around_ref) { "refs/keep-around/#{sha}" }
+      let(:tmp_ref) { "refs/tmp/#{SecureRandom.hex}" }
+
+      before do
+        repository.write_ref(keep_around_ref, sha)
+        repository.write_ref(tmp_ref, sha)
+      end
+
+      it 'includes the temporary and keep-around refs' do
+        subject
+
+        expect(refs(new_repository_path)).to include(keep_around_ref)
+        expect(refs(new_repository_path)).to include(tmp_ref)
+      end
+    end
+  end
 end
