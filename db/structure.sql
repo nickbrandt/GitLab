@@ -5975,6 +5975,24 @@ CREATE SEQUENCE public.term_agreements_id_seq
 
 ALTER SEQUENCE public.term_agreements_id_seq OWNED BY public.term_agreements.id;
 
+CREATE TABLE public.terraform_states (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    file_store smallint,
+    file character varying(255)
+);
+
+CREATE SEQUENCE public.terraform_states_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.terraform_states_id_seq OWNED BY public.terraform_states.id;
+
 CREATE TABLE public.timelogs (
     id integer NOT NULL,
     time_spent integer NOT NULL,
@@ -7327,6 +7345,8 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 ALTER TABLE ONLY public.term_agreements ALTER COLUMN id SET DEFAULT nextval('public.term_agreements_id_seq'::regclass);
 
+ALTER TABLE ONLY public.terraform_states ALTER COLUMN id SET DEFAULT nextval('public.terraform_states_id_seq'::regclass);
+
 ALTER TABLE ONLY public.timelogs ALTER COLUMN id SET DEFAULT nextval('public.timelogs_id_seq'::regclass);
 
 ALTER TABLE ONLY public.todos ALTER COLUMN id SET DEFAULT nextval('public.todos_id_seq'::regclass);
@@ -8227,6 +8247,9 @@ ALTER TABLE ONLY public.tags
 
 ALTER TABLE ONLY public.term_agreements
     ADD CONSTRAINT term_agreements_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT terraform_states_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.timelogs
     ADD CONSTRAINT timelogs_pkey PRIMARY KEY (id);
@@ -9966,6 +9989,8 @@ CREATE INDEX index_term_agreements_on_term_id ON public.term_agreements USING bt
 
 CREATE INDEX index_term_agreements_on_user_id ON public.term_agreements USING btree (user_id);
 
+CREATE INDEX index_terraform_states_on_project_id ON public.terraform_states USING btree (project_id);
+
 CREATE INDEX index_timelogs_on_issue_id ON public.timelogs USING btree (issue_id);
 
 CREATE INDEX index_timelogs_on_merge_request_id ON public.timelogs USING btree (merge_request_id);
@@ -11270,6 +11295,9 @@ ALTER TABLE ONLY public.pages_domain_acme_orders
 
 ALTER TABLE ONLY public.ci_subscriptions_projects
     ADD CONSTRAINT fk_rails_7871f9a97b FOREIGN KEY (upstream_project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.terraform_states
+    ADD CONSTRAINT fk_rails_78f54ca485 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.software_license_policies
     ADD CONSTRAINT fk_rails_7a7a2a92de FOREIGN KEY (software_license_id) REFERENCES public.software_licenses(id) ON DELETE CASCADE;
@@ -12742,6 +12770,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200304211738
 20200305121159
 20200305151736
+20200305200641
 20200306095654
 20200306160521
 20200306170211
