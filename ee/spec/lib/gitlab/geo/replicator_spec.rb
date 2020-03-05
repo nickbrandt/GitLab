@@ -8,6 +8,18 @@ describe Gitlab::Geo::Replicator do
   let_it_be(:primary_node) { create(:geo_node, :primary) }
   let_it_be(:secondary_node) { create(:geo_node) }
 
+  before(:all) do
+    ActiveRecord::Schema.define do
+      create_table :dummy_models
+    end
+  end
+
+  after(:all) do
+    ActiveRecord::Schema.define do
+      drop_table :dummy_models, force: true
+    end
+  end
+
   context 'with defined events' do
     before do
       stub_const('DummyReplicator', Class.new(Gitlab::Geo::Replicator))
@@ -46,7 +58,7 @@ describe Gitlab::Geo::Replicator do
 
     context 'model DSL' do
       before do
-        stub_const('DummyModel', Class.new)
+        stub_const('DummyModel', Class.new(ApplicationRecord))
 
         DummyModel.class_eval do
           include ActiveModel::Model

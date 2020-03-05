@@ -84,10 +84,8 @@ module Geo
       model_record.file
     end
 
-    private
-
     # Specify the model this replicator belongs to
-    def model
+    def self.model
       ::Packages::PackageFile
     end
   end
@@ -351,3 +349,30 @@ For example, to add support for files referenced by a `Widget` model with a
    ```
 
 Widget files should now be replicated and verified by Geo!
+
+### Verification statistics with Blob Replicator Strategy
+
+GitLab Geo stores statistic data in the `geo_node_statuses` table.
+
+1. Add fields `widget_count`, `widget_checksummed_count`, and `widget_checksum_failed_count`
+   to `GeoNodeStatus#RESOURCE_STATUS_FIELDS` array in `ee/app/models/geo_node_status.rb`.
+1. Add the same fields to `GeoNodeStatus#PROMETHEUS_METRICS` hash in
+   `ee/app/models/geo_node_status.rb`.
+1. Add the same fields to `Sidekiq metrics` table in
+   `doc/administration/monitoring/prometheus/gitlab_metrics.md`.
+1. Add the same fields to `GET /geo_nodes/status` example response in `doc/api/geo_nodes.md`.
+1. Modify `GeoNodeStatus#load_verification_data` to make sure the fields mantioned above
+   are set:
+
+   ```ruby
+     self.widget_count = Geo::WidgetReplicator.model.count
+     self.widget_checksummed_count = Geo::WidgetReplicator.checksummed.count
+     self.widget_checksum_failed_count = Geo::WidgetReplicator.checksum_failed.count
+   ```
+
+1. Make sure `Widget` model has `checksummed` and `checksum_failed` scopes.
+1. Update `ee/spec/fixtures/api/schemas/public_api/v4/geo_node_status.json` with new fields.
+1. Update `GeoNodeStatus#PROMETHEUS_METRICS` hash in `ee/app/models/geo_node_status.rb` with new fields.
+1. Update `Sidekiq metrics` table in `doc/administration/monitoring/prometheus/gitlab_metrics.md` with new fields.
+1. Update `GET /geo_nodes/status` example response in `doc/api/geo_nodes.md` with new fields.
+1. Update `ee/spec/models/geo_node_status_spec.rb` and `ee/spec/factories/geo_node_statuses.rb` with new fields.
