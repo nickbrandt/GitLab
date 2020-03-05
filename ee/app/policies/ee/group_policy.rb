@@ -18,6 +18,10 @@ module EE
         @subject.feature_available?(:cycle_analytics_for_groups)
       end
 
+      condition(:group_activity_analytics_available) do
+        @subject.feature_available?(:group_activity_analytics)
+      end
+
       condition(:can_owners_manage_ldap, scope: :global) do
         ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
       end
@@ -77,6 +81,9 @@ module EE
 
       rule { has_access & contribution_analytics_available }
         .enable :read_group_contribution_analytics
+
+      rule { can?(:read_group) & group_activity_analytics_available }
+        .enable :read_group_activity_analytics
 
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
