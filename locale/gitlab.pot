@@ -22449,6 +22449,9 @@ msgstr ""
 msgid "You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?"
 msgstr ""
 
+msgid "You are not allowed to push into this branch. Create another branch or open a merge request."
+msgstr ""
+
 msgid "You are not allowed to unlink your primary login account"
 msgstr ""
 
@@ -22567,9 +22570,6 @@ msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
 msgstr ""
 
 msgid "You can try again using %{begin_link}basic search%{end_link}"
-msgstr ""
-
-msgid "You can't commit to this project"
 msgstr ""
 
 msgid "You cannot access the raw file. Please wait a minute."
