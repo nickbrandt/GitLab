@@ -3133,9 +3133,6 @@ msgstr ""
 msgid "CI / CD"
 msgstr ""
 
-msgid "CI / CD Analytics"
-msgstr ""
-
 msgid "CI / CD Charts"
 msgstr ""
 
@@ -14552,6 +14549,9 @@ msgstr ""
 msgid "Proceed"
 msgstr ""
 
+msgid "Productivity"
+msgstr ""
+
 msgid "Productivity Analytics"
 msgstr ""
 
@@ -16429,9 +16429,6 @@ msgid "Reports|no changed test results"
 msgstr ""
 
 msgid "Repository"
-msgstr ""
-
-msgid "Repository Analytics"
 msgstr ""
 
 msgid "Repository Graph"
@@ -21738,6 +21735,9 @@ msgid "Validity"
 msgstr ""
 
 msgid "Value"
+msgstr ""
+
+msgid "Value Stream"
 msgstr ""
 
 msgid "Value Stream Analytics"
