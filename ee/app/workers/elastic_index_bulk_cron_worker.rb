@@ -8,7 +8,7 @@ class ElasticIndexBulkCronWorker
   # application, so there's no useful context to add.
   include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
-  feature_category :search
+  feature_category :global_search
   idempotent!
 
   def perform
