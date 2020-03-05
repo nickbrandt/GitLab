@@ -1,0 +1,48 @@
+.tribute-container {
+  background: $white-light;
+  border: 1px solid $gl-gray-100;
+  border-radius: $border-radius-base;
+  box-shadow: 0 0 5px $issue-boards-card-shadow;
+  color: $black;
+  margin-top: 12px;
+  max-height: 200px;
+  min-width: 120px;
+  overflow-y: auto;
+  z-index: 11110 !important;
+
+  ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding: 8px 1px;
+  }
+
+  li {
+    cursor: pointer;
+    padding: 8px 16px;
+    white-space: nowrap;
+
+    div.avatar {
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
+    }
+
+    small {
+      color: $gl-gray-500;
+    }
+
+    &.highlight {
+      background-color: $gray-darker;
+      color: $gl-text-color;
+
+      .avatar {
+        @include disable-all-animation;
+        border: 1px solid $white-light;
+      }
+
+      small {
+        color: inherit;
+      }
+    }
+  }
+}
