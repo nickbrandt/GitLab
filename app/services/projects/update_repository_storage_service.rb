@@ -65,7 +65,7 @@ module Projects
                                                    raw_repository.gl_repository,
                                                    full_path)
 
-      unless new_repository.fetch_repository_as_mirror(raw_repository)
+      unless new_repository.replicate(raw_repository)
         raise Error, s_('UpdateRepositoryStorage|Failed to fetch %{type} repository as mirror') % { type: type.name }
       end
 
