@@ -102,9 +102,7 @@ module Gitlab
     end
 
     def check_single_change_access(change)
-      change_access = Checks::SnippetCheck.new(change, logger: logger)
-
-      change_access.exec
+      Checks::SnippetCheck.new(change, logger: logger).validate!
     rescue Checks::TimedLogger::TimeoutError
       raise TimeoutError, logger.full_message
     end
