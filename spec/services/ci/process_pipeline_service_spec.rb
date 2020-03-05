@@ -43,12 +43,32 @@ describe Ci::ProcessPipelineService do
       pipeline.processables.update_all(scheduling_type: nil)
     end
 
-    it 'populates scheduling_type before processing' do
-      process_pipeline
+    context 'FF disable_populating_scheduling_type_on_the_fly is disabled' do
+      before do
+        stub_feature_flags(disable_populating_scheduling_type_on_the_fly: false)
+      end
 
-      expect(build1.scheduling_type).to eq('stage')
-      expect(build2.scheduling_type).to eq('stage')
-      expect(build3.scheduling_type).to eq('dag')
+      it 'populates scheduling_type before processing' do
+        process_pipeline
+
+        expect(build1.reload.scheduling_type).to eq('stage')
+        expect(build2.reload.scheduling_type).to eq('stage')
+        expect(build3.reload.scheduling_type).to eq('dag')
+      end
+    end
+
+    context 'FF disable_populating_scheduling_type_on_the_fly is enabled' do
+      before do
+        stub_feature_flags(disable_populating_scheduling_type_on_the_fly: true)
+      end
+
+      it 'does not populate scheduling_type' do
+        process_pipeline
+
+        expect(build1.reload.scheduling_type).to be_nil
+        expect(build2.reload.scheduling_type).to be_nil
+        expect(build3.reload.scheduling_type).to be_nil
+      end
     end
   end
 

@@ -84,6 +84,7 @@ module Ci
 
     # scheduling_type column of previous builds/bridges have not been populated,
     # so we calculate this value on runtime when we need it.
+    # @deprecated: Will be removed by 13.0 https://gitlab.com/gitlab-org/gitlab/issues/208228
     def find_legacy_scheduling_type
       strong_memoize(:find_legacy_scheduling_type) do
         needs.exists? ? :dag : :stage

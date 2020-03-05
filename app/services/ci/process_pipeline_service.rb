@@ -50,7 +50,10 @@ module Ci
     # Given that this service runs multiple times during the pipeline
     # life cycle we need to ensure we populate the data once.
     # See more: https://gitlab.com/gitlab-org/gitlab/issues/205426
+    # @deprecated: Will be removed by 13.0 https://gitlab.com/gitlab-org/gitlab/issues/208228
     def ensure_scheduling_type_for_processables
+      return if Feature.enabled?(:disable_populating_scheduling_type_on_the_fly)
+
       lease = Gitlab::ExclusiveLease.new("set-scheduling-types:#{pipeline.id}", timeout: 1.hour.to_i)
       return unless lease.try_obtain
 
