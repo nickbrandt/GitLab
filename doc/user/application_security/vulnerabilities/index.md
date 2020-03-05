@@ -41,7 +41,7 @@ Each vulnerability in this list now has its own [standalone page](./standalone-p
 
 First, navigate to the **Vulnerability List** found under your project's **Security** tab.
 
-This list is very similar to the current [Security Dashboard](../security_dashboard/index.md) and will eventually replace it.
+This list is very similar to the one on the current [Security Dashboard](../security_dashboard/index.md) and will eventually replace it.
 There are a few key differences however.
 
 1. You can not interract with vulnerabilities on the list view.
