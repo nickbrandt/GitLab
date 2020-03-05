@@ -48,9 +48,24 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :designs, only: [], constraints: { id: /\d+/ } do
-          member do
-            get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
+        # DEPRECATED: Remove this redirection in GitLab 13.0.
+        # This redirection supports old (pre-12.9) routes to Design Management raw images.
+        # https://gitlab.com/gitlab-org/gitlab/issues/208256
+        get '/designs/:id(/*ref)',
+          as: :design,
+          contraints: { id: /\d+/, ref: Gitlab::PathRegex.git_reference_regex },
+          to: redirect { |params|
+            namespace_id, project_id, id, ref = params.values_at(:namespace_id, :project_id, :id, :ref)
+            # The :ref route segment is optional in both this route, and the route
+            # we redirect to (where it is called :sha).
+            ref_path = "/#{ref}" if ref
+            "#{namespace_id}/#{project_id}/-/design_management/designs/#{id}#{ref_path}/raw_image"
+          }
+
+        namespace :design_management do
+          namespace :designs, path: 'designs/:design_id(/:sha)', constraints: -> (params) { params[:sha].nil? || Gitlab::Git.commit_id?(params[:sha]) } do
+            resource :raw_image, only: :show
+            resources :resized_image, only: :show, constraints: -> (params) { DesignManagement::DESIGN_IMAGE_SIZES.include?(params[:id]) }
           end
         end
 

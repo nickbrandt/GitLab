@@ -5,12 +5,20 @@ require 'spec_helper'
 describe Gitlab::UrlBuilder do
   describe '.build' do
     context 'when passing a DesignManagement::Design' do
-      it 'returns a proper URL' do
+      it 'returns a proper URL to the raw (unresized) image' do
         design = build_stubbed(:design)
 
-        url = described_class.build(design)
+        url = described_class.build(design, ref: 'master')
 
-        expect(url).to eq "#{Settings.gitlab['url']}/#{design.project.full_path}/-/designs/#{design.id}"
+        expect(url).to eq "#{Settings.gitlab['url']}/#{design.project.full_path}/-/design_management/designs/#{design.id}/master/raw_image"
+      end
+
+      it 'returns a proper URL to the resized image' do
+        design = build_stubbed(:design)
+
+        url = described_class.build(design, ref: 'master', size: 'small')
+
+        expect(url).to eq "#{Settings.gitlab['url']}/#{design.project.full_path}/-/design_management/designs/#{design.id}/master/resized_image/small"
       end
     end
 
