@@ -103,6 +103,7 @@ module Gitlab
 
     def check_single_change_access(change)
       Checks::SnippetCheck.new(change, logger: logger).validate!
+      Checks::PushSingleFileCheck.new(change, repository: repository).validate!
     rescue Checks::TimedLogger::TimeoutError
       raise TimeoutError, logger.full_message
     end
