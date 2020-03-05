@@ -126,6 +126,7 @@ class License < ApplicationRecord
     report_approver_rules
     sast
     security_dashboard
+    status_page
     subepics
     threat_monitoring
     tracing
