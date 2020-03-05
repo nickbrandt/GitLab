@@ -94,10 +94,11 @@ describe Note do
   end
 
   describe '.by_humans' do
-    it 'return human notes only' do
+    it 'excludes notes by bots and service users' do
       user_note = create(:note)
       create(:system_note)
       create(:note, author: create(:user, :bot))
+      create(:note, author: create(:user, :service_user))
 
       expect(described_class.by_humans).to match_array([user_note])
     end
