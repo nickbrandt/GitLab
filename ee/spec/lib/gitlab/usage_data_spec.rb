@@ -123,6 +123,12 @@ describe Gitlab::UsageData do
       expect(count_data[:sast_jobs]).to eq(1)
     end
 
+    it 'correctly shows failure for combined license management' do
+      allow(Gitlab::Database::BatchCount).to receive(:batch_count).and_raise(ActiveRecord::StatementInvalid)
+
+      expect(count_data[:license_management_jobs]).to eq(-1)
+    end
+
     it 'gathers group overview preferences usage data', :aggregate_failures do
       expect(subject[:counts][:user_preferences_group_overview_details]).to eq(User.active.count - 2) # we have exactly 2 active users with security dashboard set
       expect(subject[:counts][:user_preferences_group_overview_security_dashboard]).to eq 2
