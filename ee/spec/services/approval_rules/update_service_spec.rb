@@ -5,7 +5,7 @@ require 'spec_helper'
 describe ApprovalRules::UpdateService do
   let(:project) { create(:project) }
   let(:user) { project.creator }
-  let(:approval_rule) { target.approval_rules.create(name: 'foo') }
+  let(:approval_rule) { target.approval_rules.create(name: 'foo', approvals_required: 2) }
 
   shared_examples 'editable' do
     let(:new_approvers) { create_list(:user, 2) }
@@ -187,6 +187,61 @@ describe ApprovalRules::UpdateService do
         it 'does not associate the approval rule to the protected branch' do
           expect(subject[:status]).to eq(:success)
           expect(subject[:rule].protected_branches).to be_empty
+        end
+      end
+    end
+
+    describe 'audit events' do
+      subject(:operation) do
+        described_class.new(
+          approval_rule,
+          user,
+          name: 'developers',
+          approvals_required: 1
+        ).execute
+      end
+
+      context 'when licensed' do
+        before do
+          stub_licensed_features(audit_events: true)
+        end
+
+        context 'when rule update operation succeeds' do
+          it 'logs an audit event' do
+            expect { operation }.to change { AuditEvent.count }.by(1)
+          end
+
+          it 'logs the audit event info' do
+            operation
+
+            expect(AuditEvent.last).to have_attributes(
+              details: hash_including(change: 'number of required approvals', from: 2, to: 1)
+            )
+          end
+        end
+
+        context 'when rule update operation fails' do
+          before do
+            allow(approval_rule).to receive(:update).and_return(false)
+          end
+
+          it 'does not log any audit event' do
+            expect { operation }.not_to change { AuditEvent.count }
+          end
+        end
+      end
+
+      context 'when not licensed' do
+        before do
+          stub_licensed_features(
+            admin_audit_log: false,
+            audit_events: false,
+            extended_audit_events: false
+          )
+        end
+
+        it 'does not log any audit event' do
+          expect { operation }.not_to change { AuditEvent.count }
         end
       end
     end
