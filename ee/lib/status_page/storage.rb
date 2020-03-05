@@ -2,6 +2,14 @@
 
 module StatusPage
   module Storage
+    def self.details_path(id)
+      "incident/#{id}.json"
+    end
+
+    def self.list_path
+      'list.json'
+    end
+
     class Error < StandardError
       def initialize(bucket:, error:, **args)
         super(
