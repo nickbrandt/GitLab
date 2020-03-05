@@ -35,6 +35,16 @@ describe('EE Sidebar store', () => {
     });
   });
 
+  describe('setStatus', () => {
+    it('sets status', () => {
+      expect(store.status).toEqual('');
+      const status = 'onTrack';
+      store.setStatus(status);
+
+      expect(store.status).toEqual(status);
+    });
+  });
+
   describe('setWeightData', () => {
     beforeEach(() => {
       expect(store.weight).toBe(null);

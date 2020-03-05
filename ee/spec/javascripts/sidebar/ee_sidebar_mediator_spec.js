@@ -3,6 +3,7 @@ import CESidebarMediator from '~/sidebar/sidebar_mediator';
 import CESidebarStore from '~/sidebar/stores/sidebar_store';
 import SidebarService from '~/sidebar/services/sidebar_service';
 import Mock from './ee_mock_data';
+import waitForPromises from 'spec/helpers/wait_for_promises';
 
 describe('EE Sidebar mediator', () => {
   let mediator;
@@ -25,5 +26,29 @@ describe('EE Sidebar mediator', () => {
 
     expect(mediator.store.weight).toBe(mockData.weight);
     expect(mediator.store.status).toBe(mockGraphQlData.project.issue.healthStatus);
+  });
+
+  it('updates status when updateStatus is called', () => {
+    const healthStatus = 'onTrack';
+
+    spyOn(mediator.service, 'updateWithGraphQl').and.returnValue(
+      Promise.resolve({
+        data: {
+          updateIssue: {
+            issue: {
+              healthStatus,
+            },
+          },
+        },
+      }),
+    );
+
+    expect(mediator.store.status).toBe('');
+
+    mediator.updateStatus(healthStatus);
+
+    return waitForPromises().then(() => {
+      expect(mediator.store.status).toBe(healthStatus);
+    });
   });
 });

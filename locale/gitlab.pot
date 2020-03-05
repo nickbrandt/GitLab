@@ -3721,6 +3721,9 @@ msgstr ""
 msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
+msgid "Choose which status most accurately reflects the current state of this issue:"
+msgstr ""
+
 msgid "CiStatusLabel|canceled"
 msgstr ""
 
@@ -7958,6 +7961,9 @@ msgid "Error occurred when saving assignees"
 msgstr ""
 
 msgid "Error occurred when toggling the notification subscription"
+msgstr ""
+
+msgid "Error occurred while updating the issue status"
 msgstr ""
 
 msgid "Error occurred while updating the issue weight"
