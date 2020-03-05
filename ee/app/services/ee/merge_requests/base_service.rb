@@ -35,6 +35,28 @@ module EE
 
         super
       end
+
+      def reset_approvals?(merge_request, _newrev)
+        merge_request.target_project.reset_approvals_on_push
+      end
+
+      def reset_approvals(merge_request, newrev = nil)
+        return unless reset_approvals?(merge_request, newrev)
+
+        merge_request.approvals.delete_all
+        create_new_approval_todos_for_all_approvers(merge_request)
+      end
+
+      def all_approvers(merge_request)
+        merge_request.overall_approvers(exclude_code_owners: true)
+      end
+
+      def create_new_approval_todos_for_all_approvers(merge_request)
+        return unless ::Feature.enabled?(:create_approval_todos_on_mr_update, merge_request.project, default_enabled: true)
+        return if merge_request.closed?
+
+        todo_service.add_merge_request_approvers(merge_request, all_approvers(merge_request))
+      end
     end
   end
 end
