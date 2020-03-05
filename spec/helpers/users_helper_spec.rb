@@ -180,27 +180,40 @@ describe UsersHelper do
   end
 
   describe '#work_information' do
-    it "returns job title concatinated with organization if both are present" do
-      user = create(:user, organization: 'GitLab', job_title: 'Frontend Engineer')
-      expect(helper.work_information(user)).to eq('Frontend Engineer at GitLab')
+    subject { helper.work_information(user) }
+
+    context 'when both job_title and organization are present' do
+      let(:user) { create(:user, organization: 'GitLab', job_title: 'Frontend Engineer') }
+
+      it 'returns job title concatinated with organization' do
+        is_expected.to eq('Frontend Engineer at GitLab')
+      end
     end
 
-    it "returns organization if only organization is present" do
-      user = create(:user, organization: 'GitLab')
-      expect(helper.work_information(user)).to eq('GitLab')
+    context 'when only organization is present' do
+      let(:user) { create(:user, organization: 'GitLab') }
+
+      it "returns organization" do
+        is_expected.to eq('GitLab')
+      end
     end
 
-    it "returns job title if only job_title is present" do
-      user = create(:user, job_title: 'Frontend Engineer')
-      expect(helper.work_information(user)).to eq('Frontend Engineer')
+    context 'when only job_title is present' do
+      let(:user) { create(:user, job_title: 'Frontend Engineer') }
+
+      it 'returns job title' do
+        is_expected.to eq('Frontend Engineer')
+      end
     end
 
-    it "returns nil if job_title and organization are not present" do
-      expect(helper.work_information(user)).to be_nil
+    context 'when neither organization nor job_title are present' do
+      it { is_expected.to be_nil }
     end
 
-    it "returns nil user paramater is nil" do
-      expect(helper.work_information(nil)).to be_nil
+    context 'when user parameter is nil' do
+      let(:user) { nil }
+
+      it { is_expected.to be_nil }
     end
   end
 end

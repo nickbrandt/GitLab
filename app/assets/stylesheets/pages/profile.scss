@@ -197,23 +197,6 @@
 }
 
 .user-profile {
-  .cover-controls {
-    @include media-breakpoint-down(xs) {
-      position: static;
-      display: flex;
-      padding: 0 0.875rem 1.25rem;
-    }
-
-    a {
-      margin-left: 0.25rem;
-
-      @include media-breakpoint-down(xs) {
-        margin: 0 0.125rem;
-        flex: 1 0 auto;
-      }
-    }
-  }
-
   .profile-header {
     margin: 0 $gl-padding;
 

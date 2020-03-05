@@ -383,32 +383,38 @@ describe 'User edit profile' do
   end
 
   context 'work information', :js do
-    it 'shows user\'s job title and organization when both entered' do
-      fill_in 'user_job_title', with: 'Frontend Engineer'
-      fill_in 'user_organization', with: 'GitLab - work info test'
-      submit_settings
+    context 'when job title and organziation are entered' do
+      it "shows job title and organzation on user's profile" do
+        fill_in 'user_job_title', with: 'Frontend Engineer'
+        fill_in 'user_organization', with: 'GitLab - work info test'
+        submit_settings
 
-      visit_user
+        visit_user
 
-      expect(page).to have_content('Frontend Engineer at GitLab - work info test')
+        expect(page).to have_content('Frontend Engineer at GitLab - work info test')
+      end
     end
 
-    it 'shows user\'s job title when only job title is entered' do
-      fill_in 'user_job_title', with: 'Frontend Engineer - work info test'
-      submit_settings
+    context 'when only job title is entered' do
+      it "shows only job title on user's profile" do
+        fill_in 'user_job_title', with: 'Frontend Engineer - work info test'
+        submit_settings
 
-      visit_user
+        visit_user
 
-      expect(page).to have_content('Frontend Engineer - work info test')
+        expect(page).to have_content('Frontend Engineer - work info test')
+      end
     end
 
-    it 'shows user\'s organization when only organization is entered' do
-      fill_in 'user_organization', with: 'GitLab - work info test'
-      submit_settings
+    context 'when only organization is entered' do
+      it "shows only organization on user's profile" do
+        fill_in 'user_organization', with: 'GitLab - work info test'
+        submit_settings
 
-      visit_user
+        visit_user
 
-      expect(page).to have_content('GitLab - work info test')
+        expect(page).to have_content('GitLab - work info test')
+      end
     end
   end
 end
