@@ -36,7 +36,7 @@ module Types
       def image(parent:)
         sha = cached_stateful_version(parent).sha
 
-        ::Gitlab::Routing.url_helpers.project_design_url(design.project, design, sha)
+        Gitlab::UrlBuilder.build(design, ref: sha)
       end
 
       def event(parent:)

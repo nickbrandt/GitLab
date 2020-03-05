@@ -55,22 +55,50 @@ describe DesignManagement::Action do
         end
       end
 
-      context 'the version is the most current' do
-        let(:version) { newest }
+      context 'when given a Version instance' do
+        context 'the version is the most current' do
+          let(:version) { newest }
 
-        it { is_expected.to have_attributes(size: 6) }
+          it { is_expected.to have_attributes(size: 6) }
+        end
+
+        context 'the version is the oldest' do
+          let(:version) { oldest }
+
+          it { is_expected.to have_attributes(size: 2) }
+        end
+
+        context 'the version is the middle one' do
+          let(:version) { middle }
+
+          it { is_expected.to have_attributes(size: 4) }
+        end
       end
 
-      context 'the version is the oldest' do
-        let(:version) { oldest }
+      context 'when given a commit SHA' do
+        context 'the version is the most current' do
+          let(:version) { newest.sha }
 
-        it { is_expected.to have_attributes(size: 2) }
+          it { is_expected.to have_attributes(size: 6) }
+        end
+
+        context 'the version is the oldest' do
+          let(:version) { oldest.sha }
+
+          it { is_expected.to have_attributes(size: 2) }
+        end
+
+        context 'the version is the middle one' do
+          let(:version) { middle.sha }
+
+          it { is_expected.to have_attributes(size: 4) }
+        end
       end
 
-      context 'the version is the middle one' do
-        let(:version) { middle }
+      context 'when given a String that is not a commit SHA' do
+        let(:version) { 'foo' }
 
-        it { is_expected.to have_attributes(size: 4) }
+        it { expect { subject }.to raise_error(ArgumentError) }
       end
     end
   end

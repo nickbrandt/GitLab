@@ -116,5 +116,13 @@ FactoryBot.define do
         create_versions[design, evaluator, commit_version]
       end
     end
+
+    trait :with_smaller_image_versions do
+      with_lfs_file
+
+      after :create do |design|
+        design.versions.each { |v| DesignManagement::GenerateImageVersionsService.new(v).execute }
+      end
+    end
   end
 end

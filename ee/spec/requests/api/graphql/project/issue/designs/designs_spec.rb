@@ -180,7 +180,7 @@ describe 'Getting designs related to an issue' do
       end
 
       def image_url(design, sha = nil)
-        Gitlab::Routing.url_helpers.project_design_url(design.project, design, sha)
+        Gitlab::UrlBuilder.build(design, ref: sha)
       end
 
       def global_id(object)

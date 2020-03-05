@@ -42,7 +42,7 @@ RSpec.shared_examples 'a GraphQL type with design fields' do
     it 'resolves to the design image URL' do
       image = field.resolve(instance, args, context)
       sha = design.versions.first.sha
-      url = ::Gitlab::Routing.url_helpers.project_design_url(design.project, design, sha)
+      url = ::Gitlab::Routing.url_helpers.project_design_management_designs_raw_image_url(design.project, design, sha)
 
       expect(image).to eq(url)
     end
