@@ -122,6 +122,8 @@ module Gitlab
 
       def cycle_analytics_usage_data
         Gitlab::CycleAnalytics::UsageData.new.to_json
+      rescue ActiveRecord::StatementInvalid
+        { avg_cycle_analytics: {} }
       end
 
       def features_usage_data
