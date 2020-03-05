@@ -7,6 +7,7 @@ module EE
 
       def migrate_records
         migrate_epics
+        migrate_requirements
         migrate_vulnerabilities_feedback
         migrate_reviews
         super
@@ -18,6 +19,10 @@ module EE
         ::Epic.where(last_edited_by_id: user.id).update_all(last_edited_by_id: ghost_user.id)
       end
       # rubocop: enable CodeReuse/ActiveRecord
+
+      def migrate_requirements
+        user.requirements.update_all(author_id: ghost_user.id)
+      end
 
       def migrate_vulnerabilities_feedback
         user.vulnerability_feedback.update_all(author_id: ghost_user.id)
