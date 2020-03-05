@@ -20,8 +20,10 @@ describe('EE Sidebar mediator', () => {
   it('processes fetched data', () => {
     const mockData =
       Mock.responseMap.GET['/gitlab-org/gitlab-shell/issues/5.json?serializer=sidebar'];
-    mediator.processFetchedData(mockData);
+    const mockGraphQlData = Mock.graphQlResponseData;
+    mediator.processFetchedData(mockData, mockGraphQlData);
 
-    expect(mediator.store.weight).toEqual(mockData.weight);
+    expect(mediator.store.weight).toBe(mockData.weight);
+    expect(mediator.store.status).toBe(mockGraphQlData.project.issue.healthStatus);
   });
 });
