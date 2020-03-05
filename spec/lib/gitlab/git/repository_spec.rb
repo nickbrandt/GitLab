@@ -492,50 +492,6 @@ describe Gitlab::Git::Repository, :seed_helper do
     end
   end
 
-  describe '#fetch_repository_as_mirror' do
-    let(:new_repository) do
-      Gitlab::Git::Repository.new('default', 'my_project.git', '', 'group/project')
-    end
-
-    subject { new_repository.fetch_repository_as_mirror(repository) }
-
-    before do
-      new_repository.create_repository
-    end
-
-    after do
-      new_repository.remove
-    end
-
-    it 'fetches a repository as a mirror remote' do
-      subject
-
-      expect(refs(new_repository_path)).to eq(refs(repository_path))
-    end
-
-    context 'with keep-around refs' do
-      let(:sha) { SeedRepo::Commit::ID }
-      let(:keep_around_ref) { "refs/keep-around/#{sha}" }
-      let(:tmp_ref) { "refs/tmp/#{SecureRandom.hex}" }
-
-      before do
-        repository_rugged.references.create(keep_around_ref, sha, force: true)
-        repository_rugged.references.create(tmp_ref, sha, force: true)
-      end
-
-      it 'includes the temporary and keep-around refs' do
-        subject
-
-        expect(refs(new_repository_path)).to include(keep_around_ref)
-        expect(refs(new_repository_path)).to include(tmp_ref)
-      end
-    end
-
-    def new_repository_path
-      File.join(TestEnv.repos_path, new_repository.relative_path)
-    end
-  end
-
   describe '#fetch_remote' do
     it 'delegates to the gitaly RepositoryService' do
       ssh_auth = double(:ssh_auth)

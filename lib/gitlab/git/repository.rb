@@ -773,12 +773,6 @@ module Gitlab
         !has_visible_content?
       end
 
-      def fetch_repository_as_mirror(repository)
-        wrapped_gitaly_errors do
-          gitaly_remote_client.fetch_internal_remote(repository)
-        end
-      end
-
       # Fetch remote for repository
       #
       # remote - remote name
