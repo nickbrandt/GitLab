@@ -38,13 +38,7 @@ module EE
     def mirror_was_hard_failed(project)
       return if project.emails_disabled?
 
-      recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
-
-      if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_maintainers
-      end
-
-      recipients.each do |recipient|
+      owners_and_maintainers_without_invites(project).each do |recipient|
         mailer.mirror_was_hard_failed_email(project.id, recipient.user.id).deliver_later
       end
     end
@@ -78,10 +72,10 @@ module EE
     private
 
     def owners_and_maintainers_without_invites(project)
-      recipients = project.members.active_without_invites_and_requests.owners_and_masters
+      recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
 
       if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_masters
+        recipients = project.group.members.active_without_invites_and_requests.owners_and_maintainers
       end
 
       recipients
