@@ -19,6 +19,15 @@ module Analytics
         MergeRequestsFinder.new(@current_user, params).execute.count
     end
 
+    def new_members_count
+      @new_members_count ||=
+        GroupMembersFinder.new(@group, @current_user)
+          .execute(
+            include_relations: [:direct, :descendants],
+            params: { created_after: DURATION.ago }
+          ).count
+    end
+
     private
 
     def params

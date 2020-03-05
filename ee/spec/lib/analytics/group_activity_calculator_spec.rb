@@ -64,4 +64,36 @@ describe Analytics::GroupActivityCalculator do
       end
     end
   end
+
+  context 'with members' do
+    it 'returns the count of recently added members' do
+      expect(subject.new_members_count).to eq 1 # current_user
+    end
+
+    context 'when there is a member who was not added recently' do
+      let(:old_member) { create(:user, created_at: 102.days.ago) }
+
+      before do
+        Timecop.freeze(100.days.ago) do
+          subgroup.add_developer old_member
+        end
+      end
+
+      it 'returns the count of recently added members' do
+        expect(subject.new_members_count).to eq 1 # current_user
+      end
+    end
+
+    context 'when user does not have access to some members' do
+      let(:secret_member) { create(:user) }
+
+      before do
+        secret_subgroup.add_developer secret_member
+      end
+
+      it 'does not include those members' do
+        expect { secret_member }.not_to change { subject.new_members_count }
+      end
+    end
+  end
 end
