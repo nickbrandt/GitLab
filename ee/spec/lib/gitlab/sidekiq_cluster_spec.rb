@@ -51,13 +51,6 @@ describe Gitlab::SidekiqCluster do
     end
   end
 
-  describe '.parse_queues' do
-    it 'returns an Array containing the parsed queues' do
-      expect(described_class.parse_queues(%w(foo bar,baz)))
-        .to eq([%w(foo), %w(bar baz)])
-    end
-  end
-
   describe '.start' do
     it 'starts Sidekiq with the given queues, environment and options' do
       expected_options = {
