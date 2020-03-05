@@ -65,25 +65,23 @@ describe Gitlab::UsageData do
 
           context 'for configure' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  cluster = create(:cluster, user: user)
-                  project = create(:project, creator: user)
-                  create(:clusters_applications_cert_manager, :installed, cluster: cluster)
-                  create(:clusters_applications_helm, :installed, cluster: cluster)
-                  create(:clusters_applications_ingress, :installed, cluster: cluster)
-                  create(:clusters_applications_knative, :installed, cluster: cluster)
-                  create(:cluster, :disabled, user: user)
-                  create(:cluster_provider_gcp, :created)
-                  create(:cluster_provider_aws, :created)
-                  create(:cluster_platform_kubernetes)
-                  create(:cluster, :group, :disabled, user: user)
-                  create(:cluster, :group, user: user)
-                  create(:slack_service, project: project)
-                  create(:slack_slash_commands_service, project: project)
-                  create(:prometheus_service, project: project)
-                end
+              for_defined_days_back do
+                user = create(:user)
+                cluster = create(:cluster, user: user)
+                project = create(:project, creator: user)
+                create(:clusters_applications_cert_manager, :installed, cluster: cluster)
+                create(:clusters_applications_helm, :installed, cluster: cluster)
+                create(:clusters_applications_ingress, :installed, cluster: cluster)
+                create(:clusters_applications_knative, :installed, cluster: cluster)
+                create(:cluster, :disabled, user: user)
+                create(:cluster_provider_gcp, :created)
+                create(:cluster_provider_aws, :created)
+                create(:cluster_platform_kubernetes)
+                create(:cluster, :group, :disabled, user: user)
+                create(:cluster, :group, user: user)
+                create(:slack_service, project: project)
+                create(:slack_slash_commands_service, project: project)
+                create(:prometheus_service, project: project)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:configure]).to eq(
@@ -127,24 +125,22 @@ describe Gitlab::UsageData do
 
           context 'for create' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  project = create(:project, :repository_private, :github_imported,
-                                   :test_repo, :remote_mirror, creator: user)
-                  merge_request = create(:merge_request, source_project: project)
-                  create(:deploy_key, user: user)
-                  create(:key, user: user)
-                  create(:project, creator: user)
-                  create(:protected_branch, project: project)
-                  create(:remote_mirror, project: project)
-                  create(:snippet, author: user)
-                  create(:suggestion, note: create(:note, project: project))
-                  create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
-                  create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
-                  create_list(:code_owner_rule, 3, approvals_required: 2)
-                  create_list(:code_owner_rule, 2)
-                end
+              for_defined_days_back do
+                user = create(:user)
+                project = create(:project, :repository_private, :github_imported,
+                                  :test_repo, :remote_mirror, creator: user)
+                merge_request = create(:merge_request, source_project: project)
+                create(:deploy_key, user: user)
+                create(:key, user: user)
+                create(:project, creator: user)
+                create(:protected_branch, project: project)
+                create(:remote_mirror, project: project)
+                create(:snippet, author: user)
+                create(:suggestion, note: create(:note, project: project))
+                create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
+                create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
+                create_list(:code_owner_rule, 3, approvals_required: 2)
+                create_list(:code_owner_rule, 2)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to eq(
@@ -180,14 +176,12 @@ describe Gitlab::UsageData do
 
           context 'for manage' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  create(:event, author: user)
-                  create(:group_member, user: user)
-                  create(:key, type: 'LDAPKey', user: user)
-                  create(:group_member, ldap: true, user: user)
-                end
+              for_defined_days_back do
+                user = create(:user)
+                create(:event, author: user)
+                create(:group_member, user: user)
+                create(:key, type: 'LDAPKey', user: user)
+                create(:group_member, ldap: true, user: user)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
@@ -207,18 +201,16 @@ describe Gitlab::UsageData do
 
           context 'for monitor' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user    = create(:user, dashboard: 'operations')
-                  cluster = create(:cluster, user: user)
-                  project = create(:project, creator: user)
+              for_defined_days_back do
+                user    = create(:user, dashboard: 'operations')
+                cluster = create(:cluster, user: user)
+                project = create(:project, creator: user)
 
-                  create(:clusters_applications_prometheus, :installed, cluster: cluster)
-                  create(:users_ops_dashboard_project, user: user)
-                  create(:prometheus_service, project: project)
-                  create(:project_error_tracking_setting, project: project)
-                  create(:project_tracing_setting, project: project)
-                end
+                create(:clusters_applications_prometheus, :installed, cluster: cluster)
+                create(:users_ops_dashboard_project, user: user)
+                create(:prometheus_service, project: project)
+                create(:project_error_tracking_setting, project: project)
+                create(:project_tracing_setting, project: project)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:monitor]).to eq(
@@ -244,10 +236,8 @@ describe Gitlab::UsageData do
 
           context 'for package' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  create(:project, packages: [create(:package)] )
-                end
+              for_defined_days_back do
+                create(:project, packages: [create(:package)] )
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:package]).to eq(
@@ -263,22 +253,20 @@ describe Gitlab::UsageData do
             it 'includes accurate usage_activity_by_stage data' do
               stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
 
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  project = create(:project, creator: user)
-                  issue = create(:issue, project: project, author: User.support_bot)
-                  create(:issue, project: project, author: user)
-                  board = create(:board, project: project)
-                  create(:user_list, board: board, user: user)
-                  create(:milestone_list, board: board, milestone: create(:milestone, project: project), user: user)
-                  create(:list, board: board, label: create(:label, project: project), user: user)
-                  create(:note, project: project, noteable: issue, author: user)
-                  create(:epic, author: user)
-                  create(:todo, project: project, target: issue, author: user)
-                  create(:jira_service, :jira_cloud_service, active: true, project: create(:project, :jira_dvcs_cloud, creator: user))
-                  create(:jira_service, active: true, project: create(:project, :jira_dvcs_server, creator: user))
-                end
+              for_defined_days_back do
+                user = create(:user)
+                project = create(:project, creator: user)
+                issue = create(:issue, project: project, author: User.support_bot)
+                create(:issue, project: project, author: user)
+                board = create(:board, project: project)
+                create(:user_list, board: board, user: user)
+                create(:milestone_list, board: board, milestone: create(:milestone, project: project), user: user)
+                create(:list, board: board, label: create(:label, project: project), user: user)
+                create(:note, project: project, noteable: issue, author: user)
+                create(:epic, author: user)
+                create(:todo, project: project, target: issue, author: user)
+                create(:jira_service, :jira_cloud_service, active: true, project: create(:project, :jira_dvcs_cloud, creator: user))
+                create(:jira_service, active: true, project: create(:project, :jira_dvcs_server, creator: user))
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:plan]).to eq(
@@ -316,14 +304,12 @@ describe Gitlab::UsageData do
 
           context 'for release' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  create(:deployment, :failed, user: user)
-                  create(:project, :mirror, mirror_trigger_builds: true)
-                  create(:release, author: user)
-                  create(:deployment, :success, user: user)
-                end
+              for_defined_days_back do
+                user = create(:user)
+                create(:deployment, :failed, user: user)
+                create(:project, :mirror, mirror_trigger_builds: true)
+                create(:release, author: user)
+                create(:deployment, :success, user: user)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to eq(
@@ -347,7 +333,7 @@ describe Gitlab::UsageData do
             let_it_be(:user) { create(:user, group_view: :security_dashboard) }
 
             before do
-              Timecop.travel 2.days.ago do
+              for_defined_days_back do
                 create(:ci_build, name: 'container_scanning', user: user)
                 create(:ci_build, name: 'dast', user: user)
                 create(:ci_build, name: 'dependency_scanning', user: user)
@@ -368,7 +354,7 @@ describe Gitlab::UsageData do
             end
 
             it 'combines license_scanning into license_management' do
-              Timecop.travel 2.days.ago do
+              for_defined_days_back do
                 create(:ci_build, name: 'license_scanning', user: user)
               end
 
@@ -399,19 +385,17 @@ describe Gitlab::UsageData do
 
           context 'for verify' do
             it 'includes accurate usage_activity_by_stage data' do
-              [29, 2].each do |n|
-                Timecop.travel n.days.ago do
-                  user = create(:user)
-                  create(:ci_build, user: user)
-                  create(:ci_empty_pipeline, source: :external, user: user)
-                  create(:ci_empty_pipeline, user: user)
-                  create(:ci_pipeline, :auto_devops_source, user: user)
-                  create(:ci_pipeline, :repository_source, user: user)
-                  create(:ci_pipeline_schedule, owner: user)
-                  create(:ci_trigger, owner: user)
-                  create(:clusters_applications_runner, :installed)
-                  create(:github_service)
-                end
+              for_defined_days_back do
+                user = create(:user)
+                create(:ci_build, user: user)
+                create(:ci_empty_pipeline, source: :external, user: user)
+                create(:ci_empty_pipeline, user: user)
+                create(:ci_pipeline, :auto_devops_source, user: user)
+                create(:ci_pipeline, :repository_source, user: user)
+                create(:ci_pipeline_schedule, owner: user)
+                create(:ci_trigger, owner: user)
+                create(:clusters_applications_runner, :installed)
+                create(:github_service)
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage][:verify]).to eq(
@@ -441,6 +425,14 @@ describe Gitlab::UsageData do
             end
           end
         end
+      end
+    end
+  end
+
+  def for_defined_days_back(days: [29, 2])
+    days.each do |n|
+      Timecop.travel(n.days.ago) do
+        yield
       end
     end
   end
