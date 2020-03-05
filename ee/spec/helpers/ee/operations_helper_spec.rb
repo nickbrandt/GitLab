@@ -53,7 +53,7 @@ describe OperationsHelper do
       it 'returns the correct values' do
         aggregate_failures do
           expect(subject['user-can-enable-status-page']).to eq('true')
-          expect(subject['setting-enabled']).to eq(status_page_setting.enabled)
+          expect(subject['setting-enabled']).to eq(status_page_setting.enabled.to_s)
           expect(subject['setting-aws-access-key']).to eq(status_page_setting.aws_access_key)
           expect(subject['setting-masked-aws-secret-key']).to eq(status_page_setting.masked_aws_secret_key)
           expect(subject['setting-aws-region']).to eq(status_page_setting.aws_region)
