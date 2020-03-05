@@ -151,7 +151,7 @@ export default {
         </gl-form-group>
         <gl-form-group
           id="pods-dropdown-fg"
-          :label="s__('Environments|Pod logs from')"
+          :label="s__('Environments|Logs from')"
           label-size="sm"
           label-for="pods-dropdown"
           class="col-3 px-1"
