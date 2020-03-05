@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class RefreshApprovalsData
+  class RefreshReassignData
     include MergeRequestMetricsRefresh
 
     # Override `MergeRequestMetricsRefresh#initialize` to accept single MR only
@@ -12,12 +12,12 @@ module Analytics
     private
 
     def metric_already_present?(metrics)
-      metrics.first_approved_at
+      metrics.first_reassigned_at
     end
 
     def update_metric!(metrics)
       metrics.update!(
-        first_approved_at: MergeRequestMetricsCalculator.new(metrics.merge_request).first_approved_at
+        first_reassigned_at: MergeRequestMetricsCalculator.new(metrics.merge_request).first_reassigned_at
       )
     end
   end
