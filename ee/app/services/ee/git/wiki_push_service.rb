@@ -3,16 +3,16 @@
 module EE
   module Git
     module WikiPushService
+      extend ::Gitlab::Utils::Override
+
+      override :execute
       def execute
         super
 
         return unless project.use_elasticsearch?
 
-        # Check if one of the changes we got was for the default branch. If it was, trigger an ES update
-        params[:changes].each do |change|
-          branch_name = ::Gitlab::Git.ref_name(change[:ref])
-          next unless project.wiki.default_branch == branch_name
-
+        # For all changes on the default branch (usually master) trigger an ES update
+        default_branch_changes.each do |change|
           project.wiki.index_wiki_blobs(change[:newrev])
         end
       end

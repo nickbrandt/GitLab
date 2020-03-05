@@ -85,14 +85,14 @@ class EventCreateService
   # Create a new wiki page event
   #
   # @param [WikiPage::Meta] wiki_page_meta The event target
-  # @param [User] current_user The event author
+  # @param [User] author The event author
   # @param [Integer] action One of the Event::WIKI_ACTIONS
-  def wiki_event(wiki_page_meta, current_user, action)
+  def wiki_event(wiki_page_meta, author, action)
     return unless Feature.enabled?(:wiki_events)
 
     raise IllegalActionError, action unless Event::WIKI_ACTIONS.include?(action)
 
-    create_record_event(wiki_page_meta, current_user, action)
+    create_record_event(wiki_page_meta, author, action)
   end
 
   private

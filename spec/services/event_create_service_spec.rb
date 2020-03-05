@@ -168,7 +168,8 @@ describe EventCreateService do
             valid?: true,
             persisted?: true,
             action: action,
-            wiki_page: wiki_page
+            wiki_page: wiki_page,
+            author: user
           )
         end
 
