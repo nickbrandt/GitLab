@@ -4,7 +4,7 @@ type: reference, howto
 
 # First Class Vulnerabilities **(ULTIMATE)**
 
-First class vulnerabilites are the next evolution of vulnerabilities at GitLab.
+First class vulnerabilities are the next evolution of vulnerabilities at GitLab.
 They are an experimental feature and are behind a [feature flag](#enabling-the-feature).
 See the relevant section below on how to enable them.
 
