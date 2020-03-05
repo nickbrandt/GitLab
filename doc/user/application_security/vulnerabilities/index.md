@@ -35,7 +35,7 @@ To use the project vulnerability list:
 
 At the project level, the Vulnerability List displays the first class vulnerabilities for your project. Use it to find and fix vulnerabilities affecting the [default branch](../../project/repository/branches/index.md#default-branch).
 
-Each vulnerability in this list now has its own, [standalone page](./standalone-page.md).
+Each vulnerability in this list now has its own [standalone page](./standalone-page.md).
 
 ![Project Security Dashboard](img/vulnerability_list.png)
 
