@@ -2453,6 +2453,9 @@ msgstr ""
 msgid "At least one of group_id or project_id must be specified"
 msgstr ""
 
+msgid "At risk"
+msgstr ""
+
 msgid "Attach a file"
 msgstr ""
 
@@ -12787,6 +12790,9 @@ msgstr ""
 msgid "Need help?"
 msgstr ""
 
+msgid "Needs attention"
+msgstr ""
+
 msgid "Network"
 msgstr ""
 
@@ -13393,6 +13399,9 @@ msgid "OmniAuth"
 msgstr ""
 
 msgid "Omnibus Protected Paths throttle is active. From 12.4, Omnibus throttle is deprecated and will be removed in a future release. Please read the %{relative_url_link_start}Migrating Protected Paths documentation%{relative_url_link_end}."
+msgstr ""
+
+msgid "On track"
 msgstr ""
 
 msgid "Onboarding"
@@ -17908,6 +17917,9 @@ msgid "Sidebar|None"
 msgstr ""
 
 msgid "Sidebar|Only numeral characters allowed"
+msgstr ""
+
+msgid "Sidebar|Status"
 msgstr ""
 
 msgid "Sidebar|Weight"

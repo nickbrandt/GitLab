@@ -7,10 +7,11 @@ export default class SidebarMediator extends CESidebarMediator {
     this.store = new Store(options);
   }
 
-  processFetchedData(data) {
-    super.processFetchedData(data);
-    this.store.setWeightData(data);
-    this.store.setEpicData(data);
+  processFetchedData(restData, graphQlData) {
+    super.processFetchedData(restData);
+    this.store.setWeightData(restData);
+    this.store.setEpicData(restData);
+    this.store.setStatusData(graphQlData);
   }
 
   updateWeight(newWeight) {
