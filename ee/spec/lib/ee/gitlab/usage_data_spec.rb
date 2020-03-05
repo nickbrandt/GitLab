@@ -345,11 +345,16 @@ describe Gitlab::UsageData do
 
           context 'for secure' do
             let_it_be(:user) { create(:user, group_view: :security_dashboard) }
-            let_it_be(:ci_build_container_scanning) { create(:ci_build, name: 'container_scanning', user: user) }
-            let_it_be(:ci_build_dast) { create(:ci_build, name: 'dast', user: user) }
-            let_it_be(:ci_build_dependency_scanning) { create(:ci_build, name: 'dependency_scanning', user: user) }
-            let_it_be(:ci_build_license_management) { create(:ci_build, name: 'license_management', user: user) }
-            let_it_be(:ci_build_sast) { create(:ci_build, name: 'sast', user: user) }
+
+            before do
+              Timecop.travel 2.days.ago do
+                create(:ci_build, name: 'container_scanning', user: user)
+                create(:ci_build, name: 'dast', user: user)
+                create(:ci_build, name: 'dependency_scanning', user: user)
+                create(:ci_build, name: 'license_management', user: user)
+                create(:ci_build, name: 'sast', user: user)
+              end
+            end
 
             it 'includes accurate usage_activity_by_stage data' do
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
@@ -363,7 +368,9 @@ describe Gitlab::UsageData do
             end
 
             it 'combines license_scanning into license_management' do
-              create(:ci_build, name: 'license_scanning', user: user)
+              Timecop.travel 2.days.ago do
+                create(:ci_build, name: 'license_scanning', user: user)
+              end
 
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
                 user_preferences_group_overview_security_dashboard: 1,
