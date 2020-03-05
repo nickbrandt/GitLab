@@ -11,8 +11,7 @@ module Geo
     class_methods do
     end
 
-    # Called by Packages::PackageFile on create
-    def publish_created_event
+    def handle_after_create_commit
       publish(:created, **created_params)
     end
 
