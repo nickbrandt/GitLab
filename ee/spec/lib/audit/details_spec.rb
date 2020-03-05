@@ -130,6 +130,25 @@ describe Audit::Details do
           end
         end
       end
+
+      context 'update merge request approval permissions' do
+        let(:merge_request_approval_action) do
+          {
+            change: 'prevent merge request approval from authors',
+            from: false,
+            to: true,
+            author_name: user.name,
+            target_id: project.id,
+            target_type: 'ApprovalProjectRules'
+          }
+        end
+
+        it 'humanizes merge request approval permissions action' do
+          string = described_class.humanize(merge_request_approval_action)
+
+          expect(string).to eq('Changed prevent merge request approval from authors from false to true')
+        end
+      end
     end
 
     context 'group' do
@@ -197,13 +216,13 @@ describe Audit::Details do
     context 'change email' do
       let(:action) do
         {
-            change: 'email',
-            from: 'a@b.com',
-            to: 'c@b.com',
-            author_name: 'author',
-            target_id: '',
-            target_type: 'Email',
-            target_details: 'Email'
+          change: 'email',
+          from: 'a@b.com',
+          to: 'c@b.com',
+          author_name: 'author',
+          target_id: '',
+          target_type: 'Email',
+          target_details: 'Email'
         }
       end
 
