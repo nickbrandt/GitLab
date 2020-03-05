@@ -3,11 +3,11 @@ import MockAdapter from 'axios-mock-adapter';
 import { GlModal, GlButton } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import {
-  metricsDashboardPayload,
   mockApiEndpoint,
-  mockedQueryResultPayload,
+  mockedQueryResultFixture,
   environmentData,
 } from '../../../../../spec/frontend/monitoring/mock_data';
+import { getJSONFixture } from '../../../../../spec/frontend/helpers/fixtures';
 import { propsData } from '../../../../../spec/frontend/monitoring/init_utils';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 import Tracking from '~/tracking';
@@ -16,6 +16,11 @@ import axios from '~/lib/utils/axios_utils';
 import * as types from '~/monitoring/stores/mutation_types';
 
 const localVue = createLocalVue();
+
+const metricsDashboardFixture = getJSONFixture(
+  'metrics_dashboard/environment_metrics_dashboard.json',
+);
+const metricsDashboardPayload = metricsDashboardFixture.dashboard;
 
 describe('Dashboard', () => {
   let Component;
@@ -56,9 +61,10 @@ describe('Dashboard', () => {
       `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
       metricsDashboardPayload,
     );
+
     component.vm.$store.commit(
       `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
-      mockedQueryResultPayload,
+      mockedQueryResultFixture,
     );
     component.vm.$store.commit(
       `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
