@@ -232,7 +232,7 @@ module Gitlab
       end
 
       def count(relation, column = nil, fallback: -1, batch: true)
-        if batch && Feature.enabled?(:usage_ping_batch_counter)
+        if batch && Feature.enabled?(:usage_ping_batch_counter, default_enabled: true)
           Gitlab::Database::BatchCount.batch_count(relation, column)
         else
           relation.count
@@ -242,7 +242,7 @@ module Gitlab
       end
 
       def distinct_count(relation, column = nil, fallback: -1, batch: true)
-        if batch && Feature.enabled?(:usage_ping_batch_counter)
+        if batch && Feature.enabled?(:usage_ping_batch_counter, default_enabled: true)
           Gitlab::Database::BatchCount.batch_distinct_count(relation, column)
         else
           relation.distinct_count_by(column)

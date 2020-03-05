@@ -37,20 +37,11 @@ module EE
 
         override :uncached_data
         def uncached_data
-          # The `usage_activity_by_stage` queries are likely to time out on large instances, and are sure
-          # to time out on GitLab.com. Since we are mostly interested in gathering these statistics for
-          # self hosted instances, prevent them from running on GitLab.com and allow instance maintainers
-          # to disable them via a feature flag.
-          return super if (::Feature.disabled?(:usage_ping_batch_counter) && ::Gitlab.com?) ||
-                          ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
+          return super if ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
 
-          if ::Feature.disabled?(:usage_activity_by_stage_monthly)
-            super.merge(usage_activity_by_stage)
-          else
-            time_period = { created_at: 28.days.ago..Time.current }
-            usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
-            super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)
-          end
+          time_period = { created_at: 28.days.ago..Time.current }
+          usage_activity_by_stage_monthly = usage_activity_by_stage(:usage_activity_by_stage_monthly, time_period)
+          super.merge(usage_activity_by_stage).merge(usage_activity_by_stage_monthly)
         end
 
         override :features_usage_data

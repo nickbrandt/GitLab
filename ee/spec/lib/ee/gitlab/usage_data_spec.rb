@@ -14,38 +14,6 @@ describe Gitlab::UsageData do
       end
 
       describe '.uncached_data' do
-        context 'when on Gitlab.com' do
-          before do
-            allow(Gitlab).to receive(:com?).and_return(true)
-          end
-
-          it "does #{'not' unless usage_ping_batch_counter_on} include usage_activity_by_stage data" do
-            expect(described_class.uncached_data.include?(:usage_activity_by_stage)).to be(usage_ping_batch_counter_on)
-            expect(described_class.uncached_data.include?(:usage_activity_by_stage_monthly)).to be(usage_ping_batch_counter_on)
-          end
-
-          context 'when feature is enabled' do
-            before do
-              stub_feature_flags(usage_activity_by_stage: true)
-            end
-
-            it "does #{'not' unless usage_ping_batch_counter_on} include usage_activity_by_stage data" do
-              expect(described_class.uncached_data.include?(:usage_activity_by_stage)).to be(usage_ping_batch_counter_on)
-              expect(described_class.uncached_data.include?(:usage_activity_by_stage_monthly)).to be(usage_ping_batch_counter_on)
-            end
-
-            context 'when the :usage_activity_by_stage_monthly feature is disabled' do
-              before do
-                stub_feature_flags(usage_activity_by_stage_monthly: false)
-              end
-
-              it "does not include usage_activity_by_stage data" do
-                expect(described_class.uncached_data.include?(:usage_activity_by_stage_monthly)).to be(false)
-              end
-            end
-          end
-        end
-
         context 'when the :usage_activity_by_stage feature is not enabled' do
           before do
             stub_feature_flags(usage_activity_by_stage: false)
@@ -57,7 +25,7 @@ describe Gitlab::UsageData do
           end
         end
 
-        context 'when not on Gitlab.com' do
+        context 'when the :usage_activity_by_stage feature is enabled' do
           it 'includes usage_activity_by_stage data' do
             expect(described_class.uncached_data).to include(:usage_activity_by_stage)
             expect(described_class.uncached_data).to include(:usage_activity_by_stage_monthly)
