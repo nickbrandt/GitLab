@@ -37,6 +37,18 @@ describe MergeRequests::RefreshService do
 
       @oldrev = @commits.last.id
       @newrev = @commits.first.id
+
+      @approver = create(:user)
+      @project.add_developer(@approver)
+
+      perform_enqueued_jobs do
+        @merge_request.update(approver_ids: [@approver].map(&:id).join(','))
+        @fork_merge_request.update(approver_ids: [@approver].map(&:id).join(','))
+      end
+    end
+
+    def approval_todos(merge_request)
+      Todo.where(action: Todo::APPROVAL_REQUIRED, target: merge_request)
     end
 
     context 'push to origin repo source branch' do
@@ -54,6 +66,8 @@ describe MergeRequests::RefreshService do
 
         expect(@merge_request.approvals).to be_empty
         expect(@fork_merge_request.approvals).not_to be_empty
+        expect(approval_todos(@merge_request).map(&:user)).to contain_exactly(@approver)
+        expect(approval_todos(@fork_merge_request)).to be_empty
       end
     end
 
@@ -67,6 +81,8 @@ describe MergeRequests::RefreshService do
         it 'does not reset approvals' do
           expect(@merge_request.approvals).not_to be_empty
           expect(@fork_merge_request.approvals).not_to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
+          expect(approval_todos(@fork_merge_request)).to be_empty
         end
       end
     end
@@ -86,6 +102,8 @@ describe MergeRequests::RefreshService do
 
           expect(@merge_request.approvals).not_to be_empty
           expect(@fork_merge_request.approvals).to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
+          expect(approval_todos(@fork_merge_request).map(&:user)).to contain_exactly(@approver)
         end
       end
 
@@ -99,6 +117,8 @@ describe MergeRequests::RefreshService do
 
           expect(@merge_request.approvals).not_to be_empty
           expect(@fork_merge_request.approvals).to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
+          expect(approval_todos(@fork_merge_request)).to be_empty
         end
       end
     end
@@ -113,6 +133,8 @@ describe MergeRequests::RefreshService do
         it 'does not reset approvals', :sidekiq_might_not_need_inline do
           expect(@merge_request.approvals).not_to be_empty
           expect(@fork_merge_request.approvals).not_to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
+          expect(approval_todos(@fork_merge_request)).to be_empty
         end
       end
     end
@@ -127,6 +149,8 @@ describe MergeRequests::RefreshService do
       it 'does not reset approvals' do
         expect(@merge_request.approvals).not_to be_empty
         expect(@fork_merge_request.approvals).not_to be_empty
+        expect(approval_todos(@merge_request)).to be_empty
+        expect(approval_todos(@fork_merge_request)).to be_empty
       end
     end
 
@@ -142,6 +166,7 @@ describe MergeRequests::RefreshService do
 
         it 'resets approvals' do
           expect(@merge_request.approvals).to be_empty
+          expect(approval_todos(@merge_request).map(&:user)).to contain_exactly(@approver)
         end
       end
 
@@ -156,6 +181,7 @@ describe MergeRequests::RefreshService do
 
         it 'does not reset approvals' do
           expect(@merge_request.approvals).not_to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
         end
       end
 
@@ -170,6 +196,7 @@ describe MergeRequests::RefreshService do
 
         it 'does not reset approvals' do
           expect(@merge_request.approvals).not_to be_empty
+          expect(approval_todos(@merge_request)).to be_empty
         end
       end
 
@@ -185,6 +212,7 @@ describe MergeRequests::RefreshService do
 
           it 'resets the approvals' do
             expect(@merge_request.approvals).to be_empty
+            expect(approval_todos(@merge_request)).to be_empty
           end
         end
 
@@ -198,6 +226,7 @@ describe MergeRequests::RefreshService do
 
           it 'resets the approvals' do
             expect(@merge_request.approvals).to be_empty
+            expect(approval_todos(@merge_request).map(&:user)).to contain_exactly(@approver)
           end
         end
       end

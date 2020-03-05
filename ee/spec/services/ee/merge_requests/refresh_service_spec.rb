@@ -66,7 +66,7 @@ describe MergeRequests::RefreshService do
       let(:service) { described_class.new(project, current_user) }
       let(:enable_code_owner) { true }
       let(:enable_report_approver_rules) { true }
-      let(:todo_service) { double(:todo_service) }
+      let(:todo_service) { double(:todo_service, add_merge_request_approvers: true) }
       let(:notification_service) { double(:notification_service) }
 
       before do

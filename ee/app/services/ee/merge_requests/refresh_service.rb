@@ -22,13 +22,7 @@ module EE
         merge_requests = merge_requests_for(branch_name, mr_states: [:opened, :closed])
 
         merge_requests.each do |merge_request|
-          target_project = merge_request.target_project
-
-          if target_project.reset_approvals_on_push &&
-              merge_request.rebase_commit_sha != newrev
-
-            merge_request.approvals.delete_all
-          end
+          reset_approvals(merge_request, newrev)
         end
       end
 
@@ -54,6 +48,10 @@ module EE
           .execute(project, @push.branch_name, @push.newrev)
       end
       # rubocop:enable Gitlab/ModuleWithInstanceVariables
+
+      def reset_approvals?(merge_request, newrev)
+        super && merge_request.rebase_commit_sha != newrev
+      end
     end
   end
 end

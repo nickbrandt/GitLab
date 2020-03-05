@@ -24,7 +24,7 @@ module EE
 
         return merge_request if update_task_event?
 
-        new_approvers = merge_request.overall_approvers(exclude_code_owners: true) - old_approvers
+        new_approvers = all_approvers(merge_request) - old_approvers
 
         if new_approvers.any?
           todo_service.add_merge_request_approvers(merge_request, new_approvers)
@@ -45,12 +45,6 @@ module EE
         super
 
         reset_approvals(merge_request)
-      end
-
-      def reset_approvals(merge_request)
-        target_project = merge_request.target_project
-
-        merge_request.approvals.delete_all if target_project.reset_approvals_on_push
       end
     end
   end
