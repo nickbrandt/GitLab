@@ -291,14 +291,6 @@ class Commit
     notes.includes(:author, :award_emoji)
   end
 
-  def merge_requests
-    strong_memoize(:merge_requests) do
-      next MergeRequest.none unless repository.repo_type.project? && project
-
-      project.merge_requests.by_commit_sha(sha)
-    end
-  end
-
   def method_missing(method, *args, &block)
     @raw.__send__(method, *args, &block) # rubocop:disable GitlabSecurity/PublicSend
   end

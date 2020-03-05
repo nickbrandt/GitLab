@@ -720,32 +720,6 @@ eos
     end
   end
 
-  describe '#merge_requests' do
-    let!(:project) { create(:project, :repository) }
-    let!(:merge_request1) { create(:merge_request, source_project: project, source_branch: 'master', target_branch: 'feature') }
-    let!(:merge_request2) { create(:merge_request, source_project: project, source_branch: 'merged-target', target_branch: 'feature') }
-    let(:commit1) { merge_request1.merge_request_diff.commits.last }
-    let(:commit2) { merge_request1.merge_request_diff.commits.first }
-
-    it 'returns merge_requests that introduced that commit' do
-      expect(commit1.merge_requests).to contain_exactly(merge_request1, merge_request2)
-      expect(commit2.merge_requests).to contain_exactly(merge_request1)
-    end
-
-    context 'with personal snippet' do
-      it 'returns empty relation' do
-        expect(personal_snippet.repository.commit.merge_requests).to eq MergeRequest.none
-      end
-    end
-
-    context 'with project snippet' do
-      it 'returns empty relation' do
-        expect(project_snippet.project).not_to receive(:merge_requests)
-        expect(project_snippet.repository.commit.merge_requests).to eq MergeRequest.none
-      end
-    end
-  end
-
   describe 'signed commits' do
     let(:gpg_signed_commit) { project.commit_by(oid: '0b4bc9a49b562e85de7cc9e834518ea6828729b9') }
     let(:x509_signed_commit) { project.commit_by(oid: '189a6c924013fc3fe40d6f1ec1dc20214183bc97') }
