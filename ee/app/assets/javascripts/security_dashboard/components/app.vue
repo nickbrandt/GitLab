@@ -2,6 +2,8 @@
 import { isUndefined } from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
+import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
+import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
@@ -14,11 +16,13 @@ export default {
   components: {
     Filters,
     IssueModal,
+    LoadingError,
+    PaginationLinks,
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
+    VulnerabilityList,
     VulnerabilitySeverity,
-    LoadingError,
   },
   props: {
     vulnerabilitiesEndpoint: {
@@ -62,7 +66,14 @@ export default {
     },
   },
   computed: {
-    ...mapState('vulnerabilities', ['modal', 'pageInfo', 'loadingVulnerabilitiesErrorCode']),
+    ...mapState(['dashboardType']),
+    ...mapState('vulnerabilities', [
+      'isLoadingVulnerabilities',
+      'loadingVulnerabilitiesErrorCode',
+      'modal',
+      'pageInfo',
+      'vulnerabilities',
+    ]),
     ...mapGetters('filters', ['activeFilters']),
     ...mapGetters('vulnerabilities', ['loadingVulnerabilitiesFailedWithRecognizedErrorCode']),
     canCreateIssue() {
@@ -95,6 +106,12 @@ export default {
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
+    shouldUseFirstClassVulns() {
+      // NOTE: This is currently set to only show on the project dashboard.
+      // Eventually, we'll need it to show on the group and instance dashboards.
+      // But **NEVER** the pipeline dashboard
+      return gon?.features?.firstClassVulnerabilities && this.dashboardType === 'project';
+    },
   },
   watch: {
     'pageInfo.total': 'emitVulnerabilitiesCountChanged',
@@ -111,9 +128,9 @@ export default {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
-    this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
+    this.fetchPage();
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -140,6 +157,9 @@ export default {
     emitVulnerabilitiesCountChanged(count) {
       this.$emit('vulnerabilitiesCountChanged', count);
     },
+    fetchPage(page = this.pageInfo.page) {
+      this.fetchVulnerabilities({ ...this.activeFilters, page });
+    },
   },
 };
 </script>
@@ -160,7 +180,23 @@ export default {
 
       <div class="row mt-4">
         <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-          <security-dashboard-table>
+          <template v-if="shouldUseFirstClassVulns">
+            <vulnerability-list
+              :is-loading="isLoadingVulnerabilities"
+              :vulnerabilities="vulnerabilities"
+            >
+              <template #emptyState>
+                <slot name="emptyState"></slot>
+              </template>
+            </vulnerability-list>
+            <pagination-links
+              v-if="pageInfo.total > 1"
+              class="justify-content-center prepend-top-default"
+              :page-info="pageInfo"
+              :change="fetchPage"
+            />
+          </template>
+          <security-dashboard-table v-else>
             <template #emptyState>
               <slot name="emptyState"></slot>
             </template>
