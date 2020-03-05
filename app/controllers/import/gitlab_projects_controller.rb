@@ -48,7 +48,7 @@ class Import::GitlabProjectsController < Import::BaseController
   private
 
   def file_is_valid?
-    return false unless project_params[:file] && project_params[:file].respond_to?(:read)
+    return false unless project_params[:file]
 
     filename = project_params[:file].original_filename
 
