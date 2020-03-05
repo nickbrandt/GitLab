@@ -14,10 +14,10 @@ To use first class vulnerabilities, you must first configure one of the [securit
 
 First class vulnerabilities are generated from the following reports:
 
-* [Container Scanning](../container_scanning/index.md)
-* [Dynamic Application Security Testing](../dast/index.md)
-* [Dependency Scanning](../dependency_scanning/index.md)
-* [Static Application Security Testing](../sast/index.md)
+- [Container Scanning](../container_scanning/index.md)
+- [Dynamic Application Security Testing](../dast/index.md)
+- [Dependency Scanning](../dependency_scanning/index.md)
+- [Static Application Security Testing](../sast/index.md)
 
 ## Requirements
 
