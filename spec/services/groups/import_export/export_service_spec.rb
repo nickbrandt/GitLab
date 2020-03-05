@@ -39,7 +39,7 @@ describe Groups::ImportExport::ExportService do
       let(:service) { described_class.new(group: group, user: another_user, params: { shared: shared }) }
 
       let(:expected_message) do
-        "User with ID: %s does not have permission to Group %s with ID: %s." %
+        "User with ID: %s does not have required permissions for Group: %s with ID: %s" %
           [another_user.id, group.name, group.id]
       end
 

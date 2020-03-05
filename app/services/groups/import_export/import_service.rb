@@ -52,12 +52,7 @@ module Groups
         if current_user.can?(:admin_group, group)
           true
         else
-          @shared.error(
-            Gitlab::ImportExport::Error.new(
-              "User with ID: %s does not have permission to Group %s with ID: %s." %
-              [current_user.id, group.name, group.id]
-            )
-          )
+          @shared.error(::Gitlab::ImportExport::Error.permission_error(current_user, group))
 
           false
         end

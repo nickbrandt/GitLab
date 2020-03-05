@@ -61,7 +61,7 @@ describe Groups::ImportExport::ImportService do
         allow(Gitlab::ImportExport::Shared).to receive(:new).and_return(shared)
 
         expect(shared).to receive(:error) do |param|
-          expect(param.message).to include 'does not have permission to'
+          expect(param.message).to include 'does not have required permissions for'
         end
 
         expect { subject }.to raise_error(Gitlab::ImportExport::Error)
