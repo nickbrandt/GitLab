@@ -17,6 +17,7 @@ class License < ApplicationRecord
     description_diffs
     elastic_search
     export_issues
+    group_activity_analytics
     group_bulk_edit
     group_burndown_charts
     group_webhooks

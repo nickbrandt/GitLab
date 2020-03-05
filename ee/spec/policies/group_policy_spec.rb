@@ -61,6 +61,26 @@ describe GroupPolicy do
     it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
   end
 
+  context 'when group activity analytics is available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: true)
+    end
+
+    it { is_expected.to be_allowed(:read_group_activity_analytics) }
+  end
+
+  context 'when group activity analytics is not available' do
+    let(:current_user) { developer }
+
+    before do
+      stub_licensed_features(group_activity_analytics: false)
+    end
+
+    it { is_expected.not_to be_allowed(:read_group_activity_analytics) }
+  end
+
   context 'when timelogs report feature is enabled' do
     before do
       stub_licensed_features(group_timelogs: true)
