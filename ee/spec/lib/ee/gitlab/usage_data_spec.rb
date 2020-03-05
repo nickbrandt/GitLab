@@ -347,12 +347,14 @@ describe Gitlab::UsageData do
             let_it_be(:user) { create(:user, group_view: :security_dashboard) }
 
             before do
-              Timecop.travel 2.days.ago do
-                create(:ci_build, name: 'container_scanning', user: user)
-                create(:ci_build, name: 'dast', user: user)
-                create(:ci_build, name: 'dependency_scanning', user: user)
-                create(:ci_build, name: 'license_management', user: user)
-                create(:ci_build, name: 'sast', user: user)
+              [29, 2].each do |n|
+                Timecop.travel n.days.ago do
+                  create(:ci_build, name: 'container_scanning', user: user)
+                  create(:ci_build, name: 'dast', user: user)
+                  create(:ci_build, name: 'dependency_scanning', user: user)
+                  create(:ci_build, name: 'license_management', user: user)
+                  create(:ci_build, name: 'sast', user: user)
+                end
               end
             end
 
@@ -368,8 +370,10 @@ describe Gitlab::UsageData do
             end
 
             it 'combines license_scanning into license_management' do
-              Timecop.travel 2.days.ago do
-                create(:ci_build, name: 'license_scanning', user: user)
+              [29, 2].each do |n|
+                Timecop.travel n.days.ago do
+                  create(:ci_build, name: 'license_scanning', user: user)
+                end
               end
 
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:secure]).to eq(
