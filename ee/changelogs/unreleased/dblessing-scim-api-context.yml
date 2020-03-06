@@ -1,0 +1,5 @@
+---
+title: Fix SCIM API not creating new users
+merge_request: 26514
+author:
+type: fixed

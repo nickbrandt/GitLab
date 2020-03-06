@@ -136,6 +136,12 @@ describe API::Scim do
         end
       end
 
+      it_behaves_like 'storing arguments in the application context' do
+        let(:expected_params) { { root_namespace: group.full_path_components.first } }
+
+        subject { post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}") }
+      end
+
       context 'with allowed domain setting switched on' do
         let(:new_user) { User.find_by_email('work@example.com') }
         let(:member) { GroupMember.find_by(user: new_user, group: group) }

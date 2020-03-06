@@ -51,14 +51,16 @@ module API
           unauthorized! unless token && ScimOauthAccessToken.token_matches_for_group?(token, group)
         end
 
+        # Instance variable `@group` is necessary for the
+        # Gitlab::ApplicationContext in API::API
         def find_and_authenticate_group!(group_path)
-          group = find_group(group_path)
+          @group = find_group(group_path)
 
-          scim_not_found!(message: "Group #{group_path} not found") unless group
+          scim_not_found!(message: "Group #{group_path} not found") unless @group
 
-          check_access_to_group!(group)
+          check_access_to_group!(@group)
 
-          group
+          @group
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
