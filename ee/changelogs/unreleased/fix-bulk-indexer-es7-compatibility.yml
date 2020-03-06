@@ -1,0 +1,5 @@
+---
+title: BulkIndexer change _routing -> routing to support ES 7
+merge_request: 26639
+author:
+type: fixed
