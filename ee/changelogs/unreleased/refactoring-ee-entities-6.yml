@@ -1,0 +1,5 @@
+---
+title: Separate npm, subs and geo entities into own class file
+merge_request: 26674
+author: Rajendra Kadam
+type: added
