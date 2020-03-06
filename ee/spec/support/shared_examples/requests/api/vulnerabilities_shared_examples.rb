@@ -4,6 +4,7 @@ RSpec.shared_examples 'forbids access to vulnerability API endpoint in case of d
   context 'when "first-class vulnerabilities" feature is disabled' do
     before do
       stub_feature_flags(first_class_vulnerabilities: false)
+      stub_feature_flags(first_class_vulnerabilities: { enabled: false, thing: project })
     end
 
     it 'responds with "not found"' do
