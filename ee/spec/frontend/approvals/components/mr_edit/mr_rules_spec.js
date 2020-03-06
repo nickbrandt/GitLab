@@ -6,7 +6,7 @@ import MRRules from 'ee/approvals/components/mr_edit/mr_rules.vue';
 import Rules from 'ee/approvals/components/rules.vue';
 import RuleControls from 'ee/approvals/components/rule_controls.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import { createEmptyRule, createMRRule, createMRRuleWithSource } from '../../mocks';
+import { createEmptyRule, createMRRule, createMRRuleWithSource } from '../../mock_data';
 
 const { HEADERS } = Rules;
 
@@ -26,6 +26,7 @@ describe('EE Approvals MRRules', () => {
     wrapper = mount(localVue.extend(MRRules), {
       localVue,
       store: new Vuex.Store(store),
+      attachToDocument: true,
     });
   };
 
@@ -44,7 +45,7 @@ describe('EE Approvals MRRules', () => {
       hasLoaded: true,
       rules: [],
     };
-    store.modules.approvals.actions.putRule = jasmine.createSpy('putRule');
+    store.modules.approvals.actions.putRule = jest.fn();
   });
 
   afterEach(() => {
