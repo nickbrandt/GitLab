@@ -252,6 +252,8 @@ export const removeItem = ({ dispatch }, { parentItem, item }) => {
 export const toggleAddItemForm = ({ commit }, data) => commit(types.TOGGLE_ADD_ITEM_FORM, data);
 export const toggleCreateEpicForm = ({ commit }, data) =>
   commit(types.TOGGLE_CREATE_EPIC_FORM, data);
+export const toggleCreateIssueForm = ({ commit }, data) =>
+  commit(types.TOGGLE_CREATE_ISSUE_FORM, data);
 
 export const setPendingReferences = ({ commit }, data) =>
   commit(types.SET_PENDING_REFERENCES, data);
@@ -448,42 +450,62 @@ export const reorderItem = (
     });
 };
 
+export const receiveCreateIssueSuccess = ({ commit }) =>
+  commit(types.RECEIVE_CREATE_ITEM_SUCCESS, { insertAt: 0, items: [] });
+export const receiveCreateIssueFailure = ({ commit }) => {
+  commit(types.RECEIVE_CREATE_ITEM_FAILURE);
+  flash(s__('Epics|Something went wrong while creating issue.'));
+};
 export const createNewIssue = ({ state, dispatch }, { issuesEndpoint, title }) => {
   const { parentItem } = state;
 
   // necessary because parentItem comes from GraphQL and we are using REST API here
   const epicId = parseInt(parentItem.id.replace(/^gid:\/\/gitlab\/Epic\//, ''), 10);
 
+  dispatch('requestCreateItem');
   return axios
     .post(issuesEndpoint, { epic_id: epicId, title })
-    .then(() =>
+    .then(({ data }) => {
+      dispatch('receiveCreateIssueSuccess', data);
       dispatch('fetchItems', {
         parentItem,
-      }),
-    )
+      });
+    })
     .catch(e => {
-      flash(__('Could not create issue'));
+      dispatch('receiveCreateIssueFailure');
       throw e;
     });
 };
 
-export const fetchProjects = ({ state, commit }) =>
+export const requestProjects = ({ commit }) => commit(types.REQUEST_PROJECTS);
+export const receiveProjectsSuccess = ({ commit }, data) =>
+  commit(types.RECIEVE_PROJECTS_SUCCESS, data);
+export const receiveProjectsFailure = ({ commit }) => {
+  commit(types.RECIEVE_PROJECTS_FAILURE);
+  flash(__('Something went wrong while fetching projects.'));
+};
+export const fetchProjects = ({ state, dispatch }, searchKey = '') => {
+  const params = {
+    include_subgroups: true,
+    order_by: 'last_activity_at',
+    with_issues_enabled: true,
+    with_shared: false,
+  };
+
+  if (searchKey) {
+    params.search = searchKey;
+  }
+
+  dispatch('requestProjects');
   axios
     .get(state.projectsEndpoint, {
-      params: {
-        include_subgroups: true,
-        order_by: 'last_activity_at',
-        with_issues_enabled: true,
-        with_shared: false,
-      },
+      params,
     })
     .then(({ data }) => {
-      commit(types.SET_PROJECTS, data);
+      dispatch('receiveProjectsSuccess', data);
     })
-    .catch(e => {
-      flash(__('Could not fetch projects'));
-      throw e;
-    });
+    .catch(() => dispatch('receiveProjectsFailure'));
+};
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

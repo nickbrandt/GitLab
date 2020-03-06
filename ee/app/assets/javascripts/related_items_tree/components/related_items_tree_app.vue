@@ -37,11 +37,6 @@ export default {
     IssueActionsSplitButton,
     SlotSwitch,
   },
-  data() {
-    return {
-      isCreateIssueFormVisible: false,
-    };
-  },
   computed: {
     ...mapState([
       'parentItem',
@@ -54,6 +49,7 @@ export default {
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
+      'showCreateIssueForm',
       'autoCompleteEpics',
       'autoCompleteIssues',
       'pendingReferences',
@@ -61,7 +57,6 @@ export default {
       'issuableType',
       'epicsEndpoint',
       'issuesEndpoint',
-      'projects',
     ]),
     ...mapGetters(['itemAutoCompleteSources', 'itemPathIdSeparator', 'directChildren']),
     disableContents() {
@@ -76,7 +71,7 @@ export default {
         return FORM_SLOTS.createEpic;
       }
 
-      if (this.isCreateIssueFormVisible) {
+      if (this.showCreateIssueForm) {
         return FORM_SLOTS.createIssue;
       }
 
@@ -93,6 +88,7 @@ export default {
       'fetchItems',
       'toggleAddItemForm',
       'toggleCreateEpicForm',
+      'toggleCreateIssueForm',
       'setPendingReferences',
       'addPendingReferences',
       'removePendingReference',
@@ -137,15 +133,11 @@ export default {
       this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
-    showAddIssueForm() {
+    handleShowAddIssueForm() {
       this.toggleAddItemForm({ toggleState: true, issuableType: issuableTypesMap.ISSUE });
     },
-    showCreateIssueForm() {
-      return this.fetchProjects().then(() => {
-        this.toggleAddItemForm({ toggleState: false });
-        this.toggleCreateEpicForm({ toggleState: false });
-        this.isCreateIssueFormVisible = true;
-      });
+    handleShowCreateIssueForm() {
+      this.toggleCreateIssueForm({ toggleState: true });
     },
   },
 };
@@ -168,8 +160,8 @@ export default {
         <issue-actions-split-button
           slot="issueActions"
           class="ml-1"
-          @showAddIssueForm="showAddIssueForm"
-          @showCreateIssueForm="showCreateIssueForm"
+          @showAddIssueForm="handleShowAddIssueForm"
+          @showCreateIssueForm="handleShowCreateIssueForm"
         />
       </related-items-tree-header>
       <slot-switch
@@ -206,8 +198,7 @@ export default {
         />
         <create-issue-form
           :slot="$options.FORM_SLOTS.createIssue"
-          :projects="projects"
-          @cancel="isCreateIssueFormVisible = false"
+          @cancel="toggleCreateIssueForm({ toggleState: false })"
           @submit="createNewIssue"
         />
       </slot-switch>

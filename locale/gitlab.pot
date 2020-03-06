@@ -5630,9 +5630,6 @@ msgstr ""
 msgid "Could not create group"
 msgstr ""
 
-msgid "Could not create issue"
-msgstr ""
-
 msgid "Could not create project"
 msgstr ""
 
@@ -5640,9 +5637,6 @@ msgid "Could not delete %{design}. Please try again."
 msgstr ""
 
 msgid "Could not delete chat nickname %{chat_name}."
-msgstr ""
-
-msgid "Could not fetch projects"
 msgstr ""
 
 msgid "Could not find design"
@@ -7838,6 +7832,9 @@ msgid "Epics|Something went wrong while assigning issue to epic."
 msgstr ""
 
 msgid "Epics|Something went wrong while creating child epics."
+msgstr ""
+
+msgid "Epics|Something went wrong while creating issue."
 msgstr ""
 
 msgid "Epics|Something went wrong while fetching child epics."
@@ -13178,6 +13175,9 @@ msgstr ""
 msgid "No licenses found."
 msgstr ""
 
+msgid "No matches found"
+msgstr ""
+
 msgid "No matching labels"
 msgstr ""
 
@@ -18318,6 +18318,9 @@ msgid "Something went wrong while fetching latest comments."
 msgstr ""
 
 msgid "Something went wrong while fetching projects"
+msgstr ""
+
+msgid "Something went wrong while fetching projects."
 msgstr ""
 
 msgid "Something went wrong while fetching related merge requests."

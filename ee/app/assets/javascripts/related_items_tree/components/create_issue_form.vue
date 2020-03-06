@@ -1,9 +1,18 @@
 <script>
-import { GlButton, GlDropdown, GlDropdownItem, GlFormInput } from '@gitlab/ui';
+import { mapState, mapActions } from 'vuex';
+import {
+  GlButton,
+  GlDropdown,
+  GlDropdownItem,
+  GlFormInput,
+  GlSearchBoxByType,
+  GlLoadingIcon,
+} from '@gitlab/ui';
+import { debounce } from 'underscore';
 
 import { __ } from '~/locale';
-
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
+import { SEARCH_DEBOUNCE } from '../constants';
 
 export default {
   components: {
@@ -11,24 +20,20 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlFormInput,
+    GlSearchBoxByType,
+    GlLoadingIcon,
     ProjectAvatar,
   },
-
-  props: {
-    projects: {
-      type: Array,
-      required: true,
-    },
-  },
-
   data() {
     return {
       selectedProject: null,
+      searchKey: '',
       title: '',
+      preventDropdownClose: false,
     };
   },
-
   computed: {
+    ...mapState(['projectsFetchInProgress', 'itemCreateInProgress', 'projects']),
     dropdownToggleText() {
       if (this.selectedProject) {
         return this.selectedProject.name_with_namespace;
@@ -36,25 +41,73 @@ export default {
 
       return __('Select a project');
     },
-
-    hasValidInput() {
-      return this.title.trim() !== '' && this.selectedProject;
+  },
+  watch: {
+    /**
+     * We're using `debounce` here as `GlSearchBoxByType` doesn't
+     * support `lazy` or `debounce` props as per https://bootstrap-vue.js.org/docs/components/form-input/.
+     * This is a known GitLab UI issue https://gitlab.com/gitlab-org/gitlab-ui/-/issues/631
+     */
+    searchKey: debounce(function debounceSearch() {
+      this.fetchProjects(this.searchKey);
+    }, SEARCH_DEBOUNCE),
+    /**
+     * As Issue Create Form already has `autofocus` set for
+     * Issue title field, we cannot leverage `autofocus` prop
+     * again for search input field, so we manually set
+     * focus only when dropdown is opened and content is loaded.
+     */
+    projectsFetchInProgress(value) {
+      if (!value) {
+        this.$nextTick(() => {
+          this.$refs.searchInputField.focusInput();
+        });
+      }
     },
   },
-
   methods: {
+    ...mapActions(['fetchProjects']),
     cancel() {
       this.$emit('cancel');
     },
-
     createIssue() {
-      if (!this.hasValidInput) {
+      if (!this.selectedProject) {
         return;
       }
 
       const { selectedProject, title } = this;
       const { issues: issuesEndpoint } = selectedProject._links;
       this.$emit('submit', { issuesEndpoint, title });
+    },
+    handleDropdownShow() {
+      this.searchKey = '';
+      this.fetchProjects();
+    },
+    handleDropdownHide(e) {
+      // Check if dropdown closure is to be prevented.
+      if (this.preventDropdownClose) {
+        e.preventDefault();
+        this.preventDropdownClose = false;
+      }
+    },
+    /**
+     * As GlDropdown can get closed if any item within
+     * it is clicked, we have to work around that behaviour
+     * by preventing dropdown close if user has clicked
+     * clear button on search input field. This hack
+     * won't be required once we add support for
+     * `BDropdownForm` https://bootstrap-vue.js.org/docs/components/dropdown#b-dropdown-form
+     * within GitLab UI.
+     */
+    handleSearchInputContainerClick({ target }) {
+      // Check if clicked target was an icon.
+      if (
+        target?.classList.contains('gl-icon') ||
+        target?.getAttribute('href')?.includes('clear')
+      ) {
+        // Enable flag to prevent dropdown close.
+        this.preventDropdownClose = true;
+      }
     },
   },
 };
@@ -67,7 +120,7 @@ export default {
         <label class="label-bold">{{ s__('Issue|Title') }}</label>
         <gl-form-input
           ref="titleInput"
-          v-model="title"
+          v-model.trim="title"
           :placeholder="__('New issue title')"
           autofocus
         />
@@ -75,30 +128,55 @@ export default {
       <div class="col-sm">
         <label class="label-bold">{{ __('Project') }}</label>
         <gl-dropdown
+          ref="dropdownButton"
           :text="dropdownToggleText"
-          class="w-100"
-          menu-class="w-100"
+          class="w-100 projects-dropdown"
+          menu-class="w-100 overflow-hidden"
           toggle-class="d-flex align-items-center justify-content-between text-truncate"
+          @show="handleDropdownShow"
+          @hide="handleDropdownHide"
         >
-          <gl-dropdown-item
-            v-for="project in projects"
-            :key="project.id"
-            class="w-100"
-            @click="selectedProject = project"
-          >
-            <project-avatar :project="project" :size="32" />
-            {{ project.name }}
-            <div class="text-secondary">{{ project.namespace.name }}</div>
-          </gl-dropdown-item>
+          <div class="mx-2 mb-1" @click="handleSearchInputContainerClick">
+            <gl-search-box-by-type
+              ref="searchInputField"
+              v-model="searchKey"
+              :disabled="projectsFetchInProgress"
+            />
+          </div>
+          <gl-loading-icon
+            v-show="projectsFetchInProgress"
+            class="projects-fetch-loading align-items-center p-2"
+            size="md"
+          />
+          <div v-if="!projectsFetchInProgress" class="dropdown-contents overflow-auto p-1">
+            <span v-if="!projects.length" class="d-block text-center p-2">{{
+              __('No matches found')
+            }}</span>
+            <gl-dropdown-item
+              v-for="project in projects"
+              :key="project.id"
+              class="w-100"
+              @click="selectedProject = project"
+            >
+              <project-avatar :project="project" :size="32" />
+              {{ project.name }}
+              <div class="text-secondary">{{ project.namespace.name }}</div>
+            </gl-dropdown-item>
+          </div>
         </gl-dropdown>
       </div>
     </div>
 
     <div class="row my-1">
       <div class="col-sm flex-sm-grow-0 mb-2 mb-sm-0">
-        <gl-button class="w-100" variant="success" :disabled="!hasValidInput" @click="createIssue">
-          {{ __('Create issue') }}
-        </gl-button>
+        <gl-button
+          class="w-100"
+          variant="success"
+          :disabled="!selectedProject || itemCreateInProgress"
+          :loading="itemCreateInProgress"
+          @click="createIssue"
+          >{{ __('Create issue') }}</gl-button
+        >
       </div>
       <div class="col-sm flex-sm-grow-0 ml-auto">
         <gl-button class="w-100" @click="cancel">{{ __('Cancel') }}</gl-button>

@@ -392,6 +392,17 @@ describe('RelatedItemsTree', () => {
         });
       });
 
+      describe(types.TOGGLE_CREATE_ISSUE_FORM, () => {
+        it('should set value of `showCreateIssueForm` as it is and `showAddItemForm` as false on state', () => {
+          const data = { toggleState: true };
+
+          mutations[types.TOGGLE_CREATE_ISSUE_FORM](state, data);
+
+          expect(state.showCreateIssueForm).toBe(data.toggleState);
+          expect(state.showAddItemForm).toBe(false);
+        });
+      });
+
       describe(types.SET_PENDING_REFERENCES, () => {
         it('should set `pendingReferences` to state based on provided `references` param', () => {
           const reference = ['foo'];
@@ -544,6 +555,33 @@ describe('RelatedItemsTree', () => {
           expect(state.children[state.parentItem.reference]).toEqual(
             expect.arrayContaining(['bar', 'foo']),
           );
+        });
+      });
+
+      describe(types.REQUEST_PROJECTS, () => {
+        it('should set `projectsFetchInProgress` to true within state', () => {
+          mutations[types.REQUEST_PROJECTS](state);
+
+          expect(state.projectsFetchInProgress).toBe(true);
+        });
+      });
+
+      describe(types.RECIEVE_PROJECTS_SUCCESS, () => {
+        it('should set `projectsFetchInProgress` to false and provided `projects` param as it is within the state', () => {
+          const projects = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
+
+          mutations[types.RECIEVE_PROJECTS_SUCCESS](state, projects);
+
+          expect(state.projects).toBe(projects);
+          expect(state.projectsFetchInProgress).toBe(false);
+        });
+      });
+
+      describe(types.RECIEVE_PROJECTS_FAILURE, () => {
+        it('should set `projectsFetchInProgress` to false within state', () => {
+          mutations[types.RECIEVE_PROJECTS_FAILURE](state);
+
+          expect(state.projectsFetchInProgress).toBe(false);
         });
       });
     });

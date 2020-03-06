@@ -17,6 +17,8 @@ import { getJSONFixture } from 'helpers/fixtures';
 import {
   mockInitialConfig,
   mockParentItem,
+  mockEpics,
+  mockIssues,
 } from '../../../javascripts/related_items_tree/mock_data';
 
 const mockProjects = getJSONFixture('static/projects.json');
@@ -26,6 +28,10 @@ const createComponent = () => {
 
   store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setInitialParentItem', mockParentItem);
+  store.dispatch('setItemChildren', {
+    parentItem: mockParentItem,
+    children: [...mockEpics, ...mockIssues],
+  });
 
   return shallowMount(RelatedItemsTreeApp, {
     store,
@@ -41,7 +47,6 @@ describe('RelatedItemsTreeApp', () => {
   const findIssueActionsSplitButton = () => wrapper.find(IssueActionsSplitButton);
   const showCreateIssueForm = () => {
     findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
-    return axios.waitFor(mockInitialConfig.projectsEndpoint).then(() => wrapper.vm.$nextTick());
   };
 
   beforeEach(() => {
@@ -273,11 +278,10 @@ describe('RelatedItemsTreeApp', () => {
       it('shows create item form', () => {
         expect(findCreateIssueForm().exists()).toBe(false);
 
-        return showCreateIssueForm().then(() => {
-          const form = findCreateIssueForm();
+        showCreateIssueForm();
 
-          expect(form.exists()).toBe(true);
-          expect(form.props().projects).toBe(mockProjects);
+        return wrapper.vm.$nextTick(() => {
+          expect(findCreateIssueForm().exists()).toBe(true);
         });
       });
     });
