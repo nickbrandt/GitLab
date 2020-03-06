@@ -38,10 +38,10 @@ describe ApplicationSettings::UpdateService do
       using RSpec::Parameterized::TableSyntax
 
       where(:index_exists, :indexing_enabled, :input_value, :result) do
-        false  | false | '1' | false
-        false  | true  | '1' | true
-        true   | false | '1' | true
-        true   | true  | '1' | true
+        false  | false | true | false
+        false  | true  | true | true
+        true   | false | true | true
+        true   | true  | true | true
       end
 
       with_them do
