@@ -27,10 +27,14 @@ module API
         render_api_error!(errors, 400)
       end
 
-      def present_merge_request_approval_state(presenter:)
+      def present_merge_request_approval_state(presenter:, target_branch: nil)
         merge_request = find_merge_request_with_access(params[:merge_request_iid])
 
-        present merge_request.approval_state, with: presenter, current_user: current_user
+        present(
+          merge_request.approval_state(target_branch: target_branch),
+          with: presenter,
+          current_user: current_user
+        )
       end
     end
 
@@ -62,8 +66,14 @@ module API
           success: ::EE::API::Entities::MergeRequestApprovalSettings,
           hidden: true
         }
+        params do
+          optional :target_branch, type: String, desc: 'Branch that scoped approval rules apply to'
+        end
         get 'approval_settings' do
-          present_merge_request_approval_state(presenter: ::EE::API::Entities::MergeRequestApprovalSettings)
+          present_merge_request_approval_state(
+            presenter: ::EE::API::Entities::MergeRequestApprovalSettings,
+            target_branch: declared_params[:target_branch]
+          )
         end
 
         desc 'Get approval state of merge request' do

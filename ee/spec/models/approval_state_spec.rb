@@ -1519,6 +1519,16 @@ describe ApprovalState do
                 another_project_rule
               ])
             end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  project_rule
+                ])
+              end
+            end
           end
 
           context 'but scoped_approval_rules feature is disabled' do
@@ -1584,6 +1594,16 @@ describe ApprovalState do
               expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
                 another_mr_rule
               ])
+            end
+
+            context 'and target_branch is specified' do
+              subject { described_class.new(merge_request, target_branch: 'v1-stable') }
+
+              it 'returns the rules that are applicable to the specified target_branch' do
+                expect(subject.user_defined_rules.map(&:approval_rule)).to eq([
+                  mr_rule
+                ])
+              end
             end
           end
 

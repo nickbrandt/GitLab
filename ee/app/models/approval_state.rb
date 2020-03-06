@@ -13,9 +13,10 @@ class ApprovalState
   def_delegators :@merge_request, :merge_status, :approved_by_users, :approvals, :approval_feature_available?
   alias_method :approved_approvers, :approved_by_users
 
-  def initialize(merge_request)
+  def initialize(merge_request, target_branch: nil)
     @merge_request = merge_request
     @project = merge_request.target_project
+    @target_branch = target_branch || merge_request.target_branch
   end
 
   # Excludes the author if 'author-approval' is explicitly disabled on project settings.
@@ -168,6 +169,8 @@ class ApprovalState
 
   private
 
+  attr_reader :target_branch
+
   def filter_approvers(approvers, unactioned:)
     approvers = approvers.uniq
     approvers -= approved_approvers if unactioned
@@ -209,12 +212,6 @@ class ApprovalState
       merge_request_rules.map do |rule|
         ApprovalWrappedRule.wrap(merge_request, rule)
       end
-    end
-  end
-
-  def target_branch
-    strong_memoize(:target_branch) do
-      merge_request.target_branch
     end
   end
 end
