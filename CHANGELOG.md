@@ -2,6 +2,10 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.8.3
+
+- Unreleased due to tagging failure.
+
 ## 12.8.2
 
 ### Security (17 changes)
