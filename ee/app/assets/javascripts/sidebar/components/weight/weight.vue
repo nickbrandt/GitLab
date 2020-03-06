@@ -176,7 +176,7 @@ export default {
         class="float-right js-weight-edit-link"
         data-qa-selector="edit_weight_link"
         href="#"
-        @click="onEditClick(!shouldShowEditField)"
+        @click.prevent="onEditClick(!shouldShowEditField)"
         >{{ __('Edit') }}</a
       >
     </div>
