@@ -2,9 +2,13 @@ import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __, s__, sprintf } from '~/locale';
+import addPageInfo from './utils/add_page_info';
 import * as types from './mutation_types';
 
 const API_MINIMUM_QUERY_LENGTH = 3;
+
+const searchProjects = (searchQuery, searchOptions) =>
+  Api.projects(searchQuery, searchOptions).then(addPageInfo);
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
   const isProject = ({ id }) => id === project.id;
@@ -141,7 +145,7 @@ export const receiveRemoveProjectError = ({ commit }) => {
   createFlash(__('Something went wrong, unable to remove project'));
 };
 
-export const fetchSearchResults = ({ state, dispatch }) => {
+export const fetchSearchResults = ({ state, dispatch, commit }) => {
   const { searchQuery } = state;
   dispatch('requestSearchResults');
 
@@ -149,17 +153,30 @@ export const fetchSearchResults = ({ state, dispatch }) => {
     return dispatch('setMinimumQueryMessage');
   }
 
-  return Api.projects(searchQuery, {})
-    .then(results => dispatch('receiveSearchResultsSuccess', results))
+  return searchProjects(searchQuery)
+    .then(payload => commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, payload))
+    .catch(() => dispatch('receiveSearchResultsError'));
+};
+
+export const fetchSearchResultsNextPage = ({ state, dispatch, commit }) => {
+  const {
+    searchQuery,
+    pageInfo: { totalPages, page, nextPage },
+  } = state;
+
+  if (totalPages <= page) {
+    return Promise.resolve();
+  }
+
+  const searchOptions = { page: nextPage };
+
+  return searchProjects(searchQuery, searchOptions)
+    .then(payload => commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, payload))
     .catch(() => dispatch('receiveSearchResultsError'));
 };
 
 export const requestSearchResults = ({ commit }) => {
   commit(types.REQUEST_SEARCH_RESULTS);
-};
-
-export const receiveSearchResultsSuccess = ({ commit }, results) => {
-  commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, results);
 };
 
 export const receiveSearchResultsError = ({ commit }) => {

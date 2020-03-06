@@ -1,17 +1,15 @@
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-
+import waitForPromises from 'helpers/wait_for_promises';
 import createState from 'ee/security_dashboard/store/modules/project_selector/state';
 import * as types from 'ee/security_dashboard/store/modules/project_selector/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/project_selector/actions';
 import createFlash from '~/flash';
-import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 
-jest.mock('~/api');
 jest.mock('~/flash');
 
-describe('projectSelector actions', () => {
+describe('EE projectSelector actions', () => {
   const getMockProjects = n => [...Array(n).keys()].map(i => ({ id: i, name: `project-${i}` }));
 
   const mockAddEndpoint = 'mock-add_endpoint';
@@ -21,6 +19,20 @@ describe('projectSelector actions', () => {
   let mockAxios;
   let mockDispatchContext;
   let state;
+
+  const pageInfo = {
+    page: 1,
+    nextPage: 2,
+    total: 50,
+    totalPages: 5,
+  };
+
+  const responseHeaders = {
+    'X-Next-Page': pageInfo.nextPage,
+    'X-Page': pageInfo.page,
+    'X-Total': pageInfo.total,
+    'X-Total-Pages': pageInfo.totalPages,
+  };
 
   beforeEach(() => {
     mockAxios = new MockAdapter(axios);
@@ -71,7 +83,23 @@ describe('projectSelector actions', () => {
   });
 
   describe('addProjects', () => {
-    it('posts selected project ids to project add endpoint', () => {
+    it(`posts the selected project's ids to the add-endpoint`, () => {
+      const projectIds = ['1', '2'];
+
+      state.selectedProjects = [{ id: projectIds[0], name: '1' }, { id: projectIds[1], name: '2' }];
+      state.projectEndpoints.add = mockAddEndpoint;
+
+      mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
+
+      actions.addProjects({ state, dispatch: () => {} });
+
+      return waitForPromises().then(() => {
+        const requestData = mockAxios.history.post[0].data;
+        expect(requestData).toBe(JSON.stringify({ project_ids: projectIds }));
+      });
+    });
+
+    it('dispatches the correct actions when the request is successful', () => {
       state.projectEndpoints.add = mockAddEndpoint;
 
       mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
@@ -406,6 +434,25 @@ describe('projectSelector actions', () => {
     });
   });
 
+  describe('setSearchQuery', () => {
+    it('commits the REQUEST_SEARCH_RESULTS mutation', () => {
+      const payload = 'search-query';
+
+      return testAction(
+        actions.setSearchQuery,
+        payload,
+        state,
+        [
+          {
+            type: types.SET_SEARCH_QUERY,
+            payload,
+          },
+        ],
+        [],
+      );
+    });
+  });
+
   describe('fetchSearchResults', () => {
     it.each([null, undefined, false, NaN, 0, ''])(
       'dispatches setMinimumQueryMessage if the search query is falsy',
@@ -452,11 +499,35 @@ describe('projectSelector actions', () => {
     );
 
     it('dispatches the correct actions when the query is valid', () => {
-      const mockProjects = [{ id: 0, name: 'mock-name1' }];
-      Api.projects.mockResolvedValueOnce(mockProjects);
+      const projects = [{ id: 0, name: 'mock-name1' }];
+
+      mockAxios.onGet().replyOnce(200, projects, responseHeaders);
       state.searchQuery = 'mock-query';
 
       return testAction(
+        actions.fetchSearchResults,
+        null,
+        state,
+        [
+          {
+            type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
+            payload: { data: projects, headers: responseHeaders, pageInfo },
+          },
+        ],
+        [
+          {
+            type: 'requestSearchResults',
+          },
+        ],
+      );
+    });
+
+    it('dispatches the correct actions when the request is not successful', () => {
+      mockAxios.onGet(mockListEndpoint).replyOnce(500);
+
+      state.searchQuery = 'mock-query';
+
+      testAction(
         actions.fetchSearchResults,
         null,
         state,
@@ -466,8 +537,7 @@ describe('projectSelector actions', () => {
             type: 'requestSearchResults',
           },
           {
-            type: 'receiveSearchResultsSuccess',
-            payload: mockProjects,
+            type: 'receiveSearchResultsError',
           },
         ],
       );
@@ -489,25 +559,6 @@ describe('projectSelector actions', () => {
       ));
   });
 
-  describe('receiveSearchResultsSuccess', () => {
-    it('commits the RECEIVE_SEARCH_RESULTS_SUCCESS mutation', () => {
-      const mockProjects = [{ id: 0, name: 'mock-project1' }];
-
-      return testAction(
-        actions.receiveSearchResultsSuccess,
-        mockProjects,
-        state,
-        [
-          {
-            type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
-            payload: mockProjects,
-          },
-        ],
-        [],
-      );
-    });
-  });
-
   describe('receiveSearchResultsError', () => {
     it('commits the RECEIVE_SEARCH_RESULTS_ERROR mutation', () =>
       testAction(
@@ -521,6 +572,59 @@ describe('projectSelector actions', () => {
         ],
         [],
       ));
+  });
+
+  describe('fetchSearchResultsNextPage', () => {
+    describe('when the current page-index is smaller than the number of total pages', () => {
+      beforeEach(() => {
+        state.pageInfo.totalPages = 2;
+        state.pageInfo.page = 1;
+      });
+
+      it('dispatches the "receiveNextPageSuccess" action if the request is successful', () => {
+        const projects = [{ id: 0, name: 'mock-name1' }];
+
+        mockAxios.onGet().replyOnce(200, projects, responseHeaders);
+
+        return testAction(
+          actions.fetchSearchResultsNextPage,
+          null,
+          state,
+          [
+            {
+              type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
+              payload: { data: projects, headers: responseHeaders, pageInfo },
+            },
+          ],
+          [],
+        );
+      });
+
+      it('dispatches the "receiveSearchResultsError" action if the request is not successful', () => {
+        mockAxios.onGet(mockListEndpoint).replyOnce(500);
+
+        return testAction(
+          actions.fetchSearchResultsNextPage,
+          null,
+          state,
+          [],
+          [
+            {
+              type: 'receiveSearchResultsError',
+            },
+          ],
+        );
+      });
+    });
+
+    describe('when the current page-index is equal to the number of total pages', () => {
+      it('does not commit any mutations or dispatch any actions', () => {
+        state.pageInfo.totalPages = 1;
+        state.pageInfo.page = 1;
+
+        return testAction(actions.fetchSearchResultsNextPage, [], state);
+      });
+    });
   });
 
   describe('setProjectEndpoints', () => {
