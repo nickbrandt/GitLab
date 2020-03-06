@@ -122,9 +122,9 @@ module Elastic
         indexes :iid, type: :integer
 
         indexes :title, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :description, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
         indexes :state, type: :text
         indexes :project_id, type: :integer
         indexes :author_id, type: :integer
@@ -144,16 +144,16 @@ module Elastic
 
         ### MERGE REQUESTS
         indexes :target_branch, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :source_branch, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :merge_status, type: :text
         indexes :source_project_id, type: :integer
         indexes :target_project_id, type: :integer
 
         ### NOTES
         indexes :note, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
 
         indexes :issue do
           indexes :assignee_id, type: :integer
@@ -168,14 +168,14 @@ module Elastic
 
         ### PROJECTS
         indexes :name, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :path, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :name_with_namespace, type: :text,
-          index_options: 'offsets',
+          index_options: 'docs',
           analyzer: :my_ngram_analyzer
         indexes :path_with_namespace, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
         indexes :namespace_id, type: :integer
         indexes :archived, type: :boolean
 
@@ -190,23 +190,23 @@ module Elastic
 
         ### SNIPPETS
         indexes :file_name, type: :text,
-          index_options: 'offsets'
+          index_options: 'docs'
         indexes :content, type: :text,
-          index_options: 'offsets'
+          index_options: 'positions'
 
         ### REPOSITORIES
         indexes :blob do
           indexes :type, type: :keyword
 
           indexes :id, type: :text,
-            index_options: 'offsets',
+            index_options: 'docs',
             analyzer: :sha_analyzer
           indexes :rid, type: :keyword
           indexes :oid, type: :text,
-            index_options: 'offsets',
+            index_options: 'docs',
             analyzer: :sha_analyzer
           indexes :commit_sha, type: :text,
-            index_options: 'offsets',
+            index_options: 'docs',
             analyzer: :sha_analyzer
           indexes :path, type: :text,
             analyzer: :path_analyzer
@@ -214,7 +214,7 @@ module Elastic
             analyzer: :code_analyzer,
             search_analyzer: :code_search_analyzer
           indexes :content, type: :text,
-            index_options: 'offsets',
+            index_options: 'positions',
             analyzer: :code_analyzer,
             search_analyzer: :code_search_analyzer
           indexes :language, type: :keyword
@@ -224,26 +224,26 @@ module Elastic
           indexes :type, type: :keyword
 
           indexes :id, type: :text,
-            index_options: 'offsets',
+            index_options: 'docs',
             analyzer: :sha_analyzer
           indexes :rid, type: :keyword
           indexes :sha, type: :text,
-            index_options: 'offsets',
+            index_options: 'docs',
             analyzer: :sha_analyzer
 
           indexes :author do
-            indexes :name, type: :text, index_options: 'offsets'
-            indexes :email, type: :text, index_options: 'offsets'
+            indexes :name, type: :text, index_options: 'docs'
+            indexes :email, type: :text, index_options: 'docs'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
           indexes :committer do
-            indexes :name, type: :text, index_options: 'offsets'
-            indexes :email, type: :text, index_options: 'offsets'
+            indexes :name, type: :text, index_options: 'docs'
+            indexes :email, type: :text, index_options: 'docs'
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
-          indexes :message, type: :text, index_options: 'offsets'
+          indexes :message, type: :text, index_options: 'positions'
         end
       end
     end
