@@ -8,12 +8,12 @@ module Analytics
 
     idempotent!
 
-    def perform(operation, merge_request_id, **execute_args)
+    def perform(operation, merge_request_id, execute_kwargs = {})
       ::MergeRequest.find_by_id(merge_request_id).try do |merge_request|
         break unless merge_request.project.feature_available?(:code_review_analytics)
 
         operation_klass = operation.constantize
-        operation_klass.new(merge_request).execute(**execute_args)
+        operation_klass.new(merge_request).execute(**execute_kwargs.deep_symbolize_keys)
       end
     end
   end
