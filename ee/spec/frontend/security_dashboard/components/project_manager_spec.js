@@ -30,6 +30,7 @@ describe('Project Manager component', () => {
           actions: {
             setSearchQuery: jest.fn(),
             fetchSearchResults: jest.fn(),
+            fetchSearchResultsNextPage: jest.fn(),
             addProjects: jest.fn(),
             clearSearchResults: jest.fn(),
             toggleSelectedProject: jest.fn(),
@@ -104,10 +105,23 @@ describe('Project Manager component', () => {
       expect(getProjectList().exists()).toBe(true);
     });
 
-    it('dispatches the right actions when the project-list emits a projectRemoved event', () => {
+    it('dispatches the right actions when the project-list emits a "bottomReached" event', () => {
+      const projectSelector = getProjectSelector();
+      const fetchSearchResultsNextPageAction = getMockAction('fetchSearchResultsNextPage');
+
+      expect(fetchSearchResultsNextPageAction).toHaveBeenCalledTimes(0);
+
+      projectSelector.vm.$emit('bottomReached');
+
+      expect(fetchSearchResultsNextPageAction).toHaveBeenCalledTimes(1);
+    });
+
+    it('dispatches the right actions when the project-list emits a "projectRemoved" event', () => {
       const mockProject = { remove_path: 'foo' };
-      const projectList = wrapper.find(ProjectList);
+      const projectList = getProjectList();
       const removeProjectAction = getMockAction('removeProject');
+
+      expect(removeProjectAction).toHaveBeenCalledTimes(0);
 
       projectList.vm.$emit('projectRemoved', mockProject);
 
