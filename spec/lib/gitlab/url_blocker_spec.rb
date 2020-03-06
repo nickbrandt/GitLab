@@ -501,58 +501,6 @@ describe Gitlab::UrlBlocker, :stub_invalid_dns_only do
               it_behaves_like 'dns rebinding checks'
             end
           end
-
-          context 'with ip ranges in whitelist' do
-            let(:ipv4_range) { '127.0.0.0/28' }
-            let(:ipv6_range) { 'fd84:6d02:f6d8:c89e::/124' }
-
-            let(:whitelist) do
-              [
-                ipv4_range,
-                ipv6_range
-              ]
-            end
-
-            it 'blocks ipv4 range when not in whitelist' do
-              stub_application_setting(outbound_local_requests_whitelist: [])
-
-              IPAddr.new(ipv4_range).to_range.to_a.each do |ip|
-                expect(described_class).to be_blocked_url("http://#{ip}",
-                  url_blocker_attributes)
-              end
-            end
-
-            it 'allows all ipv4s in the range when in whitelist' do
-              IPAddr.new(ipv4_range).to_range.to_a.each do |ip|
-                expect(described_class).not_to be_blocked_url("http://#{ip}",
-                  url_blocker_attributes)
-              end
-            end
-
-            it 'blocks ipv6 range when not in whitelist' do
-              stub_application_setting(outbound_local_requests_whitelist: [])
-
-              IPAddr.new(ipv6_range).to_range.to_a.each do |ip|
-                expect(described_class).to be_blocked_url("http://[#{ip}]",
-                  url_blocker_attributes)
-              end
-            end
-
-            it 'allows all ipv6s in the range when in whitelist' do
-              IPAddr.new(ipv6_range).to_range.to_a.each do |ip|
-                expect(described_class).not_to be_blocked_url("http://[#{ip}]",
-                  url_blocker_attributes)
-              end
-            end
-
-            it 'blocks IPs outside the range' do
-              expect(described_class).to be_blocked_url("http://[fd84:6d02:f6d8:c89e:0:0:1:f]",
-                url_blocker_attributes)
-
-              expect(described_class).to be_blocked_url("http://127.0.1.15",
-                url_blocker_attributes)
-            end
-          end
         end
       end
 
