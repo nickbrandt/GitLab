@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'ee/bin/sidekiq-cluster' do
+describe 'bin/sidekiq-cluster' do
   using RSpec::Parameterized::TableSyntax
 
   context 'when selecting some queues and excluding others' do
@@ -13,7 +13,7 @@ describe 'ee/bin/sidekiq-cluster' do
 
     with_them do
       it 'runs successfully', :aggregate_failures do
-        cmd = %w[ee/bin/sidekiq-cluster --dryrun] + args
+        cmd = %w[bin/sidekiq-cluster --dryrun] + args
 
         output, status = Gitlab::Popen.popen(cmd, Rails.root.to_s)
 
@@ -31,14 +31,14 @@ describe 'ee/bin/sidekiq-cluster' do
       %w[--experimental-queue-selector *]
     ].each do |args|
       it "runs successfully with `#{args}`", :aggregate_failures do
-        cmd = %w[ee/bin/sidekiq-cluster --dryrun] + args
+        cmd = %w[bin/sidekiq-cluster --dryrun] + args
 
         output, status = Gitlab::Popen.popen(cmd, Rails.root.to_s)
 
         expect(status).to be(0)
         expect(output).to include('"bundle", "exec", "sidekiq"')
         expect(output).to include('-qdefault,1')
-        expect(output).to include('-qcronjob:update_all_mirrors,1')
+        expect(output).to include('-qcronjob:ci_archive_traces_cron,1')
       end
     end
   end

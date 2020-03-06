@@ -83,7 +83,7 @@ module Gitlab
       end
 
       if dryrun
-        puts "Sidekiq command: #{cmd}"
+        puts "Sidekiq command: #{cmd}" # rubocop:disable Rails/Output
         return
       end
 
