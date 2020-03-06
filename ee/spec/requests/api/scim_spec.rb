@@ -9,6 +9,7 @@ describe API::Scim do
 
   before do
     stub_licensed_features(group_allowed_email_domains: true, group_saml: true)
+    stub_feature_flags(scim_identities: false)
 
     group.add_owner(user)
   end
