@@ -1,9 +1,5 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-## 12.8.4
-
-- No changes.
-
 ## 12.8.3
 
 - Unreleased due to tagging failure.
