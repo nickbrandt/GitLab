@@ -42,22 +42,26 @@ module Gitlab
         all_queues = SidekiqConfig::CliMethods.all_queues(@rails_path)
         queue_names = SidekiqConfig::CliMethods.worker_queues(@rails_path)
 
-        queue_groups =
+        queue_groups = argv.map do |queues|
+          next queue_names if queues == '*'
+
+          # When using the experimental queue query syntax, we treat
+          # each queue group as a worker attribute query, and resolve
+          # the queues for the queue group using this query.
           if @experimental_queue_selector
-            # When using the experimental queue query syntax, we treat
-            # each queue group as a worker attribute query, and resolve
-            # the queues for the queue group using this query.
-            argv.map do |queues|
-              SidekiqConfig::CliMethods.query_workers(queues, all_queues)
-            end
+            SidekiqConfig::CliMethods.query_workers(queues, all_queues)
           else
-            SidekiqCluster.parse_queues(argv).map do |queues|
-              SidekiqConfig::CliMethods.expand_queues(queues, queue_names)
-            end
+            SidekiqConfig::CliMethods.expand_queues(queues.split(','), queue_names)
           end
+        end
 
         if @negate_queues
           queue_groups.map! { |queues| queue_names - queues }
+        end
+
+        if queue_groups.all?(&:empty?)
+          raise CommandError,
+            'No queues found, you must select at least one queue'
         end
 
         @logger.info("Starting cluster with #{queue_groups.length} processes")

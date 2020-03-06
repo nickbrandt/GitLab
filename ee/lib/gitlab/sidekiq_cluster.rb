@@ -45,10 +45,6 @@ module Gitlab
       pids.each { |pid| signal(pid, signal) }
     end
 
-    def self.parse_queues(array)
-      array.map { |chunk| chunk.split(',') }
-    end
-
     # Starts Sidekiq workers for the pairs of processes.
     #
     # Example:
