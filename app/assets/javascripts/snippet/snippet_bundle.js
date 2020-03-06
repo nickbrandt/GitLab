@@ -1,14 +1,15 @@
-/* global ace */
 import { initEditorLite } from '~/blob/utils';
 import setupCollapsibleInputs from './collapsible_input';
 
 let editor;
 
 const initAce = () => {
-  editor = ace.edit('editor');
-
+  const editorEl = document.getElementById('editor');
   const form = document.querySelector('.snippet-form-holder form');
   const content = document.querySelector('.snippet-file-content');
+
+  editor = initEditorLite({ el: editorEl });
+
   form.addEventListener('submit', () => {
     content.value = editor.getValue();
   });

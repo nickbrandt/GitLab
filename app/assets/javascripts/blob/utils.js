@@ -1,15 +1,22 @@
+/* global ace */
 import Editor from '~/editor/editor_lite';
 
 export function initEditorLite({ el, blobPath, blobContent }) {
-  if(!el) {
+  if (!el) {
     throw new Error(`"el" parameter is required to initialize Editor`);
   }
-  const editor = new Editor();
-  editor.createInstance({
-    el,
-    blobPath,
-    blobContent,
-  });
+  let editor;
+
+  if (window?.gon?.features?.monacoSnippets) {
+    editor = new Editor();
+    editor.createInstance({
+      el,
+      blobPath,
+      blobContent,
+    });
+  } else {
+    editor = ace.edit(el);
+  }
 
   return editor;
 }

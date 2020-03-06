@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
 import SnippetBlobEdit from '~/snippets/components/snippet_blob_edit.vue';
 import BlobHeaderEdit from '~/blob/components/blob_edit_header.vue';
 import BlobContentEdit from '~/blob/components/blob_edit_content.vue';
 import { shallowMount } from '@vue/test-utils';
-import { initEditorLite } from '~/blob/utils';
 
 jest.mock('~/blob/utils', () => jest.fn());
 
