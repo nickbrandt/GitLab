@@ -54,6 +54,6 @@ perhaps from an old server to a new server for example, is to
 then restore it on the new server.
 
 In the event of merging two GitLab instances together (for example, both instances have existing data on them and one can't be wiped),
-refer to the instructions in [Migrating from self-hosted GitLab to GitLab.com](#migrating-from-self-hosted-gitlab-to-gitlabcom).
+refer to the instructions in [Migrating from self-managed GitLab to GitLab.com](#migrating-from-self-managed-gitlab-to-gitlabcom).
 
 Additionally, you can migrate users using the [Users API](../../../api/users.md) with an admin user.
