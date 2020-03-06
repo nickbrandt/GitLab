@@ -9,27 +9,27 @@ module Gitlab
         end
 
         def can_add_user?(user)
-          can_add_user_to_main_project = check_group_membership(user, project)
-          can_add_user_to_source_project = project.forked? ? check_group_membership(user, project.forked_from_project) : true
-
-          can_add_user_to_main_project && can_add_user_to_source_project
+          check_project_membership(user) && check_source_project_membership(user)
         end
 
         private
 
         attr_reader :project
 
-        def check_group_membership(user, given_project)
-          root_ancestor = project_root_ancestor(given_project)
-
-          return true unless root_ancestor.kind == 'group'
-          return true unless root_ancestor.enforced_group_managed_accounts?
-
-          root_ancestor == user.managing_group
+        def check_project_membership(user)
+          check_group_managed_account(project.root_ancestor, user)
         end
 
-        def project_root_ancestor(given_project)
-          given_project.root_ancestor
+        def check_source_project_membership(user)
+          return true unless project.forked?
+
+          check_group_managed_account(project.forked_from_project.root_ancestor, user)
+        end
+
+        def check_group_managed_account(root_ancestor, user)
+          return true unless root_ancestor.is_a?(Group) && root_ancestor.enforced_group_managed_accounts?
+
+          root_ancestor == user.managing_group
         end
       end
     end

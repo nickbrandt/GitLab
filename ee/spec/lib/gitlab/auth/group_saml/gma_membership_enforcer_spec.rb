@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
   include ProjectForksHelper
+
   let_it_be(:group) { create(:group_with_managed_accounts, :private) }
   let_it_be(:project) { create(:project, namespace: group)}
   let_it_be(:managed_user) { create(:user, :group_managed, managing_group: group) }
@@ -30,7 +31,7 @@ describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
   end
 
   context 'when the project is forked' do
-    let(:forked_project) { fork_project(project, managed_user_for_project) }
+    subject { described_class.new(fork_project(project, managed_user_for_project)) }
 
     before do
       project.add_developer(managed_user_for_project)
@@ -38,13 +39,13 @@ describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
 
     context 'when user is group-managed' do
       it 'allows adding user to project' do
-        expect(described_class.new(forked_project).can_add_user?(managed_user)).to be_truthy
+        expect(subject.can_add_user?(managed_user)).to be_truthy
       end
     end
 
     context 'when user is not group-managed' do
       it 'does not allow adding user to project' do
-        expect(described_class.new(forked_project).can_add_user?(create(:user))).to be_falsey
+        expect(subject.can_add_user?(create(:user))).to be_falsey
       end
     end
   end
@@ -53,6 +54,8 @@ describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
     let(:project) { create(:project) }
     let(:forked_project) { create(:project, namespace: group) }
 
+    subject { described_class.new(forked_project) }
+
     before do
       project.add_developer(managed_user_for_project)
       fork_project(project, managed_user_for_project, namespace: group, target_project: forked_project)
@@ -60,13 +63,13 @@ describe Gitlab::Auth::GroupSaml::GmaMembershipEnforcer do
 
     context 'when user is group-managed' do
       it 'allows adding user to project' do
-        expect(described_class.new(forked_project).can_add_user?(managed_user)).to be_truthy
+        expect(subject.can_add_user?(managed_user)).to be_truthy
       end
     end
 
     context 'when user is not group-managed' do
       it 'does not allow adding user to project' do
-        expect(described_class.new(forked_project).can_add_user?(create(:user))).to be_falsey
+        expect(subject.can_add_user?(create(:user))).to be_falsey
       end
     end
   end
