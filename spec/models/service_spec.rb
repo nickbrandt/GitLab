@@ -20,7 +20,7 @@ describe Service do
         create(:service, project: project, type: 'Service')
       end
 
-      it 'allowes only one service of each type per project' do
+      it 'allows only one service of each type per project' do
         expect(build(:service, project: project, type: 'Service')).to be_invalid
       end
     end
