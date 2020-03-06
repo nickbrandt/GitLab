@@ -504,9 +504,17 @@ describe Gitlab::UrlBlocker, :stub_invalid_dns_only do
         end
       end
 
-      def stub_domain_resolv(domain, ip, &block)
-        address = double(ip_address: ip, ipv4_private?: true, ipv6_link_local?: false, ipv4_loopback?: false, ipv6_loopback?: false, ipv4?: false)
-        allow(Addrinfo).to receive(:getaddrinfo).with(domain, any_args).and_return([address])
+      def stub_domain_resolv(domain, ip, port = 80, &block)
+        address = instance_double(Addrinfo,
+          ip_address: ip,
+          ipv4_private?: true,
+          ipv6_linklocal?: false,
+          ipv4_loopback?: false,
+          ipv6_loopback?: false,
+          ipv4?: false,
+          ip_port: port
+        )
+        allow(Addrinfo).to receive(:getaddrinfo).with(domain, port, any_args).and_return([address])
         allow(address).to receive(:ipv6_v4mapped?).and_return(false)
 
         yield
