@@ -269,11 +269,14 @@ describe Gitlab::Elastic::Indexer do
     end
   end
 
-  context 'when SSL env vars are not set' do
+  context 'when SSL env vars are not set explicitly' do
+    let(:ruby_cert_file) { OpenSSL::X509::DEFAULT_CERT_FILE }
+    let(:ruby_cert_dir) { OpenSSL::X509::DEFAULT_CERT_DIR }
+
     subject { envvars }
 
-    it 'they will not be passed down to child process' do
-      is_expected.not_to include('SSL_CERT_FILE', 'SSL_CERT_DIR')
+    it 'they will be set to default values determined by Ruby' do
+      is_expected.to include('SSL_CERT_FILE' => ruby_cert_file, 'SSL_CERT_DIR' => ruby_cert_dir)
     end
   end
 
