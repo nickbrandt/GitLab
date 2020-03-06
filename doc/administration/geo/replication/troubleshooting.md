@@ -167,7 +167,7 @@ sudo gitlab-rake gitlab:geo:check
    ```
 
    - Ensure that you have the `gitlab_rails['db_password']` set to the plain text-password used when creating the hash for `postgresql['sql_user_password']`.
-```
+
 1. Rails is unable to connect to the database
 
    ```plaintext
