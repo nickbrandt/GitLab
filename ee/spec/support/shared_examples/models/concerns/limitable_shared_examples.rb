@@ -7,7 +7,7 @@ RSpec.shared_examples 'includes Limitable concern' do
     it { is_expected.to be_a(Limitable) }
 
     context 'without plan limits configured' do
-      it 'can create new group hooks' do
+      it 'can create new models' do
         expect { subject.save }.to change { described_class.count }
       end
     end

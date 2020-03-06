@@ -25,6 +25,8 @@ module EE
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
         has_many :security_scans, class_name: 'Security::Scan', through: :builds
 
+        has_one :source_project, class_name: 'Ci::Sources::Project', foreign_key: :pipeline_id
+
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
@@ -65,7 +67,20 @@ module EE
               ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
             end
           end
+
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+            next unless pipeline.triggers_subscriptions?
+
+            pipeline.run_after_commit do
+              ::Ci::TriggerDownstreamSubscriptionsWorker.perform_async(pipeline.id)
+            end
+          end
         end
+      end
+
+      def triggers_subscriptions?
+        # Currently we trigger subscriptions only for tags.
+        tag? && project_has_subscriptions?
       end
 
       def retryable?
@@ -144,6 +159,12 @@ module EE
       end
 
       private
+
+      def project_has_subscriptions?
+        return false unless ::Feature.enabled?(:ci_project_subscriptions, project)
+
+        project.downstream_projects.any?
+      end
 
       def merge_train_ref?
         ::MergeRequest.merge_train_ref?(ref)
