@@ -563,17 +563,17 @@ From each of the panels in the dashboard, you can access the context menu by cli
 
 The options are:
 
-- [View logs](#view-pod-logs-ultimate)
+- [View logs](#view-logs-ultimate)
 - [Download CSV](#downloading-data-as-csv)
 - [Generate link to chart](#embedding-gitlab-managed-kubernetes-metrics)
 - [Alerts](#setting-up-alerts-for-prometheus-metrics-ultimate)
 
-### View Pod Logs **(ULTIMATE)**
+### View Logs **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/122013) in GitLab 12.8.
 
-If you have [Pod Logs](../clusters/kubernetes_pod_logs.md) enabled,
-you can navigate from the charts in the dashboard to view Pod Logs by
+If you have [Logs](../clusters/kubernetes_pod_logs.md) enabled,
+you can navigate from the charts in the dashboard to view Logs by
 clicking on the context menu in the upper-right corner.
 
 If you use the **Timeline zoom** function at the bottom of the chart, logs will narrow down to the time range you selected.
