@@ -23,13 +23,14 @@ module Gitlab
           update_all
         ).freeze
 
+        NON_STICKY_READS = %i(
+          select
+          quote_column_name
+        ).freeze
+
         # hosts - The hosts to use for load balancing.
         def initialize(hosts = [])
           @load_balancer = LoadBalancer.new(hosts)
-        end
-
-        def select(*args)
-          read_using_load_balancer(:select, args)
         end
 
         def select_all(arel, name = nil, binds = [], preparable: nil)
@@ -39,6 +40,12 @@ module Gitlab
                                       sticky: true)
           else
             read_using_load_balancer(:select_all, [arel, name, binds])
+          end
+        end
+
+        NON_STICKY_READS.each do |name|
+          define_method(name) do |*args, &block|
+            read_using_load_balancer(name, args, &block)
           end
         end
 
