@@ -1,18 +1,15 @@
 <script>
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlIcon, GlTooltip } from '@gitlab/ui';
 import { approximateDuration } from '~/lib/utils/datetime_utility';
-import Icon from '~/vue_shared/components/icon.vue';
 import StageCardListItem from './stage_card_list_item.vue';
 
 export default {
   name: 'StageNavItem',
   components: {
     StageCardListItem,
-    Icon,
+    GlIcon,
     GlButton,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
+    GlTooltip,
   },
   props: {
     isDefaultStage: {
@@ -83,7 +80,7 @@ export default {
     checkIfTitleOverflows() {
       const [titleEl] = this.$refs.title?.children;
       if (titleEl) {
-        this.isTitleOverflowing = titleEl.offsetWidth > this.$refs.title.offsetWidth;
+        this.isTitleOverflowing = titleEl.scrollWidth > this.$refs.title.offsetWidth;
       }
     },
   },
@@ -102,8 +99,10 @@ export default {
         class="stage-nav-item-cell stage-name text-truncate w-50 pr-2"
         :class="{ 'font-weight-bold': isActive }"
       >
-        <span v-if="isTitleOverflowing" v-gl-tooltip.hover :title="title">{{ title }}</span>
-        <span v-else>{{ title }}</span>
+        <gl-tooltip v-if="isTitleOverflowing" :target="() => $refs.titleSpan">
+          {{ title }}
+        </gl-tooltip>
+        <span ref="titleSpan">{{ title }}</span>
       </div>
       <div class="stage-nav-item-cell w-50 d-flex justify-content-between">
         <div ref="median" class="stage-median w-75 align-items-start">
@@ -116,38 +115,26 @@ export default {
             class="more-actions-toggle btn btn-transparent p-0"
             data-toggle="dropdown"
           >
-            <icon class="icon" name="ellipsis_v" />
+            <gl-icon class="icon" name="ellipsis_v" />
           </gl-button>
           <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
             <template v-if="isDefaultStage">
               <li>
-                <button
-                  type="button"
-                  class="btn-default btn-transparent"
-                  @click="handleDropdownAction('hide', $event)"
-                >
+                <gl-button @click="handleDropdownAction('hide', $event)">
                   {{ __('Hide stage') }}
-                </button>
+                </gl-button>
               </li>
             </template>
             <template v-else>
               <li>
-                <button
-                  type="button"
-                  class="btn-default btn-transparent"
-                  @click="handleDropdownAction('edit', $event)"
-                >
+                <gl-button @click="handleDropdownAction('edit', $event)">
                   {{ __('Edit stage') }}
-                </button>
+                </gl-button>
               </li>
               <li>
-                <button
-                  type="button"
-                  class="btn-danger danger"
-                  @click="handleDropdownAction('remove', $event)"
-                >
+                <gl-button @click="handleDropdownAction('remove', $event)">
                   {{ __('Remove stage') }}
-                </button>
+                </gl-button>
               </li>
             </template>
           </ul>
