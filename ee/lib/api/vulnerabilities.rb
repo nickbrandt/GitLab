@@ -86,6 +86,7 @@ module API
         use :pagination
       end
       get ':id/vulnerabilities' do
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
         authorize! :read_vulnerability, user_project
 
         vulnerabilities = paginate(
@@ -102,6 +103,7 @@ module API
         requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
       end
       post ':id/vulnerabilities' do
+        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
         authorize! :create_vulnerability, user_project
 
         vulnerability = ::Vulnerabilities::CreateService.new(
