@@ -1,5 +1,5 @@
 /* global ace */
-import Editor from '~/editor/editor_lite';
+import { initEditorLite } from '~/blob/utils';
 import setupCollapsibleInputs from './collapsible_input';
 
 let editor;
@@ -20,8 +20,7 @@ const initMonaco = () => {
   const fileNameEl = document.querySelector('.js-snippet-file-name');
   const form = document.querySelector('.snippet-form-holder form');
 
-  editor = new Editor();
-  editor.createInstance({
+  editor = initEditorLite({
     el: editorEl,
     blobPath: fileNameEl.value,
     blobContent: contentEl.value,
