@@ -3,6 +3,12 @@ import { LICENSE_APPROVAL_STATUS } from '../constants';
 
 export const isLoading = state => state.isLoadingManagedLicenses || state.isLoadingLicenseReport;
 
+export const isLicenseBeingUpdated = state => (id = null) => state.pendingLicenses.includes(id);
+
+export const isAddingNewLicense = (_, getters) => getters.isLicenseBeingUpdated();
+
+export const hasPendingLicenses = state => state.pendingLicenses.length > 0;
+
 export const licenseReport = state => state.newLicenses;
 
 export const licenseSummaryText = (state, getters) => {

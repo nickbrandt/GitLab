@@ -7,6 +7,9 @@ describe('AddLicenseForm', () => {
   const Component = Vue.extend(LicenseIssueBody);
   let vm;
 
+  const findSubmitButton = () => vm.$el.querySelector('.js-submit');
+  const findCancelButton = () => vm.$el.querySelector('.js-cancel');
+
   beforeEach(() => {
     vm = mountComponent(Component);
   });
@@ -23,7 +26,7 @@ describe('AddLicenseForm', () => {
       vm.licenseName = name;
 
       Vue.nextTick(() => {
-        const linkEl = vm.$el.querySelector('.js-submit');
+        const linkEl = findSubmitButton();
         linkEl.click();
 
         expect(vm.$emit).toHaveBeenCalledWith('addLicense', {
@@ -31,13 +34,12 @@ describe('AddLicenseForm', () => {
           license: { name },
         });
 
-        expect(vm.$emit).toHaveBeenCalledWith('closeForm');
         done();
       });
     });
 
     it('clicking the Cancel button closes the form', () => {
-      const linkEl = vm.$el.querySelector('.js-cancel');
+      const linkEl = findCancelButton();
       jest.spyOn(vm, '$emit').mockImplementation(() => {});
       linkEl.click();
 
@@ -124,10 +126,24 @@ describe('AddLicenseForm', () => {
       Vue.nextTick(() => {
         expect(vm.submitDisabled).toBe(true);
 
-        const submitButton = vm.$el.querySelector('.js-submit');
+        const submitButton = findSubmitButton();
 
         expect(submitButton).not.toBeNull();
         expect(submitButton.disabled).toBe(true);
+        done();
+      });
+    });
+
+    it('disables submit and cancel while a new license is being added', done => {
+      vm.loading = true;
+      Vue.nextTick(() => {
+        const submitButton = findSubmitButton();
+        const cancelButton = findCancelButton();
+
+        expect(submitButton).not.toBeNull();
+        expect(submitButton.disabled).toBe(true);
+        expect(cancelButton).not.toBeNull();
+        expect(cancelButton.disabled).toBe(true);
         done();
       });
     });

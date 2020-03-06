@@ -19,8 +19,15 @@ describe('AdminLicenseManagementRow', () => {
   let store;
   let actions;
 
+  const createComponent = (props = { license: approvedLicense }) => {
+    vm = mountComponentWithStore(Component, { props, store });
+  };
+
   const findNthDropdown = num => [...vm.$el.querySelectorAll('.dropdown-item')][num];
   const findNthDropdownIcon = num => findNthDropdown(num).querySelector('svg');
+  const findLoadingIcon = () => vm.$el.querySelector('.js-loading-icon');
+  const findDropdownToggle = () => vm.$el.querySelector('.dropdown > button');
+  const findRemoveButton = () => vm.$el.querySelector('.js-remove-button');
 
   beforeEach(() => {
     actions = {
@@ -39,9 +46,7 @@ describe('AdminLicenseManagementRow', () => {
       },
     });
 
-    const props = { license: approvedLicense };
-
-    vm = mountComponentWithStore(Component, { props, store });
+    createComponent();
   });
 
   afterEach(() => {
@@ -120,7 +125,7 @@ describe('AdminLicenseManagementRow', () => {
 
   describe('interaction', () => {
     it('triggering setLicenseInModal by clicking the cancel button', () => {
-      const linkEl = vm.$el.querySelector('.js-remove-button');
+      const linkEl = findRemoveButton();
       linkEl.click();
 
       expect(actions.setLicenseInModal).toHaveBeenCalled();
@@ -159,7 +164,7 @@ describe('AdminLicenseManagementRow', () => {
     });
 
     it('renders the removal button', () => {
-      const buttonEl = vm.$el.querySelector('.js-remove-button');
+      const buttonEl = findRemoveButton();
 
       expect(buttonEl).not.toBeNull();
       expect(buttonEl.querySelector('.ic-remove')).not.toBeNull();
@@ -185,6 +190,19 @@ describe('AdminLicenseManagementRow', () => {
 
       expect(secondOption).not.toBeNull();
       expect(secondOption.innerText.trim()).toBe('Denied');
+    });
+
+    it('does not show a loading icon and enables both the dropdown and the remove button by default', () => {
+      expect(findLoadingIcon()).toBeNull();
+      expect(findDropdownToggle().disabled).toBe(false);
+      expect(findRemoveButton().disabled).toBe(false);
+    });
+
+    it('shows a loading icon and disables both the dropdown and the remove button while loading', () => {
+      createComponent({ license: approvedLicense, loading: true });
+      expect(findLoadingIcon()).not.toBeNull();
+      expect(findDropdownToggle().disabled).toBe(true);
+      expect(findRemoveButton().disabled).toBe(true);
     });
   });
 });

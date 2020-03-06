@@ -7,6 +7,7 @@ export default () => ({
   isDeleting: false,
   isLoadingLicenseReport: false,
   isLoadingManagedLicenses: false,
+  pendingLicenses: [],
   isSaving: false,
   loadLicenseReportError: false,
   loadManagedLicensesError: false,

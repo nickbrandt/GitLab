@@ -276,4 +276,31 @@ describe('License store mutations', () => {
       expect(store.state.licenseManagement.isLoadingLicenseReport).toBe(false);
     });
   });
+
+  describe('ADD_PENDING_LICENSE', () => {
+    it('appends given id to pendingLicenses', () => {
+      store.commit(`licenseManagement/${types.ADD_PENDING_LICENSE}`, 5);
+      expect(store.state.licenseManagement.pendingLicenses).toEqual([5]);
+      store.commit(`licenseManagement/${types.ADD_PENDING_LICENSE}`, null);
+      expect(store.state.licenseManagement.pendingLicenses).toEqual([5, null]);
+    });
+  });
+
+  describe('REMOVE_PENDING_LICENSE', () => {
+    beforeEach(() => {
+      store.replaceState({
+        ...store.state,
+        licenseManagement: {
+          pendingLicenses: [5, null],
+        },
+      });
+    });
+
+    it('appends given id to pendingLicenses', () => {
+      store.commit(`licenseManagement/${types.REMOVE_PENDING_LICENSE}`, null);
+      expect(store.state.licenseManagement.pendingLicenses).toEqual([5]);
+      store.commit(`licenseManagement/${types.REMOVE_PENDING_LICENSE}`, 5);
+      expect(store.state.licenseManagement.pendingLicenses).toEqual([]);
+    });
+  });
 });
