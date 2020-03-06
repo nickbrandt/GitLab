@@ -28,6 +28,60 @@ describe('getters', () => {
     });
   });
 
+  describe('isLicenseBeingUpdated', () => {
+    beforeEach(() => {
+      state = createState();
+    });
+
+    it.each([5, null])('returns true if given license is being updated', licenseId => {
+      state.pendingLicenses = [licenseId];
+
+      expect(getters.isLicenseBeingUpdated(state)(licenseId)).toBe(true);
+    });
+
+    it('returns true if a new license is being added and no param is passed to the getter', () => {
+      state.pendingLicenses = [null];
+
+      expect(getters.isLicenseBeingUpdated(state)()).toBe(true);
+    });
+
+    it.each`
+      pendingLicenses | queriedLicense
+      ${[null]}       | ${5}
+      ${[5]}          | ${null}
+      ${[5]}          | ${undefined}
+    `(
+      'returns false if given license is not being updated',
+      ({ pendingLicenses, queriedLicense }) => {
+        state.pendingLicenses = pendingLicenses;
+        expect(getters.isLicenseBeingUpdated(state)(queriedLicense)).toBe(false);
+      },
+    );
+  });
+
+  describe('isAddingNewLicense', () => {
+    it.each([true, false])('calls isLicenseBeingUpdated internally', returnValue => {
+      const isLicenseBeingUpdatedMock = jest.fn().mockImplementation(() => returnValue);
+      expect(
+        getters.isAddingNewLicense({}, { isLicenseBeingUpdated: isLicenseBeingUpdatedMock }),
+      ).toBe(returnValue);
+    });
+  });
+
+  describe('hasPendingLicenses', () => {
+    it('returns true if there are some pending licenses', () => {
+      state = createState();
+      state.pendingLicenses = [null];
+      expect(getters.hasPendingLicenses(state)).toBe(true);
+    });
+
+    it('returns false if there are no pending licenses', () => {
+      state = createState();
+      state.pendingLicenses = [];
+      expect(getters.hasPendingLicenses(state)).toBe(false);
+    });
+  });
+
   describe('licenseReport', () => {
     it('should return the new licenses from the state', () => {
       const newLicenses = { test: 'foo' };

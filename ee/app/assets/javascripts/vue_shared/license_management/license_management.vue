@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
@@ -38,6 +38,21 @@ export default {
   },
   computed: {
     ...mapState(LICENSE_MANAGEMENT, ['managedLicenses', 'isLoadingManagedLicenses', 'isAdmin']),
+    ...mapGetters(LICENSE_MANAGEMENT, [
+      'isLicenseBeingUpdated',
+      'hasPendingLicenses',
+      'isAddingNewLicense',
+    ]),
+    showLoadingSpinner() {
+      return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
+    },
+  },
+  watch: {
+    isAddingNewLicense(isAddingNewLicense) {
+      if (!isAddingNewLicense) {
+        this.closeAddLicenseForm();
+      }
+    },
   },
   mounted() {
     this.setAPISettings({
@@ -67,7 +82,7 @@ export default {
 };
 </script>
 <template>
-  <gl-loading-icon v-if="isLoadingManagedLicenses" />
+  <gl-loading-icon v-if="showLoadingSpinner" />
   <div v-else class="license-management">
     <delete-confirmation-modal v-if="isAdmin" />
 
@@ -108,6 +123,7 @@ export default {
         <div v-if="formIsOpen" class="prepend-top-default append-bottom-default">
           <add-license-form
             :managed-licenses="managedLicenses"
+            :loading="isAddingNewLicense"
             @addLicense="setLicenseApproval"
             @closeForm="closeAddLicenseForm"
           />
@@ -115,7 +131,11 @@ export default {
       </template>
 
       <template #default="{ listItem }">
-        <admin-license-management-row v-if="isAdmin" :license="listItem" />
+        <admin-license-management-row
+          v-if="isAdmin"
+          :license="listItem"
+          :loading="isLicenseBeingUpdated(listItem.id)"
+        />
         <license-management-row v-else :license="listItem" />
       </template>
     </paginated-list>

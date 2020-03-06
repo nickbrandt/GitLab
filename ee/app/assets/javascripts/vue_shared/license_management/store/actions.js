@@ -18,9 +18,11 @@ export const resetLicenseInModal = ({ commit }) => {
 export const requestDeleteLicense = ({ commit }) => {
   commit(types.REQUEST_DELETE_LICENSE);
 };
-export const receiveDeleteLicense = ({ commit, dispatch }) => {
+export const receiveDeleteLicense = ({ commit, dispatch }, id) => {
   commit(types.RECEIVE_DELETE_LICENSE);
-  dispatch('fetchManagedLicenses');
+  return dispatch('fetchManagedLicenses').then(() => {
+    dispatch('removePendingLicense', id);
+  });
 };
 export const receiveDeleteLicenseError = ({ commit }, error) => {
   commit(types.RECEIVE_DELETE_LICENSE_ERROR, error);
@@ -28,14 +30,16 @@ export const receiveDeleteLicenseError = ({ commit }, error) => {
 export const deleteLicense = ({ dispatch, state }) => {
   const licenseId = state.currentLicenseInModal.id;
   dispatch('requestDeleteLicense');
+  dispatch('addPendingLicense', licenseId);
   const endpoint = `${state.apiUrlManageLicenses}/${licenseId}`;
   return axios
     .delete(endpoint)
     .then(() => {
-      dispatch('receiveDeleteLicense');
+      dispatch('receiveDeleteLicense', licenseId);
     })
     .catch(error => {
       dispatch('receiveDeleteLicenseError', error);
+      dispatch('removePendingLicense', licenseId);
     });
 };
 
@@ -89,7 +93,7 @@ export const fetchParsedLicenseReport = ({ dispatch, state }) => {
 export const requestSetLicenseApproval = ({ commit }) => {
   commit(types.REQUEST_SET_LICENSE_APPROVAL);
 };
-export const receiveSetLicenseApproval = ({ commit, dispatch, state }) => {
+export const receiveSetLicenseApproval = ({ commit, dispatch, state }, id) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL);
   // If we have the licenses API endpoint, fetch from there. This corresponds
   // to the cases that we're viewing the merge request or pipeline pages.
@@ -97,10 +101,11 @@ export const receiveSetLicenseApproval = ({ commit, dispatch, state }) => {
   // the project settings page.
   // https://gitlab.com/gitlab-org/gitlab/issues/201867
   if (state.licensesApiPath) {
-    dispatch('fetchParsedLicenseReport');
-  } else {
-    dispatch('fetchManagedLicenses');
+    return dispatch('fetchParsedLicenseReport');
   }
+  return dispatch('fetchManagedLicenses').then(() => {
+    dispatch('removePendingLicense', id);
+  });
 };
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);
@@ -110,12 +115,23 @@ export const setIsAdmin = ({ commit }, payload) => {
   commit(types.SET_IS_ADMIN, payload);
 };
 
+export const addPendingLicense = ({ state, commit }, id = null) => {
+  if (!state.pendingLicenses.includes(id)) {
+    commit(types.ADD_PENDING_LICENSE, id);
+  }
+};
+
+export const removePendingLicense = ({ commit }, id = null) => {
+  commit(types.REMOVE_PENDING_LICENSE, id);
+};
+
 export const setLicenseApproval = ({ dispatch, state }, payload) => {
   const { apiUrlManageLicenses } = state;
   const { license, newStatus } = payload;
   const { id, name } = license;
 
   dispatch('requestSetLicenseApproval');
+  dispatch('addPendingLicense', id);
 
   let request;
 
@@ -131,10 +147,11 @@ export const setLicenseApproval = ({ dispatch, state }, payload) => {
 
   return request
     .then(() => {
-      dispatch('receiveSetLicenseApproval');
+      dispatch('receiveSetLicenseApproval', id);
     })
     .catch(error => {
       dispatch('receiveSetLicenseApprovalError', error);
+      dispatch('removePendingLicense', id);
     });
 };
 export const approveLicense = ({ dispatch }, license) => {

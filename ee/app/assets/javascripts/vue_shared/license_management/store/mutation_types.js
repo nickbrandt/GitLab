@@ -14,6 +14,8 @@ export const RESET_LICENSE_IN_MODAL = 'RESET_LICENSE_IN_MODAL';
 export const SET_API_SETTINGS = 'SET_API_SETTINGS';
 export const SET_LICENSE_IN_MODAL = 'SET_LICENSE_IN_MODAL';
 export const SET_IS_ADMIN = 'SET_IS_ADMIN';
+export const ADD_PENDING_LICENSE = 'ADD_PENDING_LICENSE';
+export const REMOVE_PENDING_LICENSE = 'REMOVE_PENDING_LICENSE';
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

@@ -31,11 +31,17 @@ const PaginatedListMock = {
 
 const noop = () => {};
 
-const createComponent = ({ state, props, actionMocks, isAdmin }) => {
+const createComponent = ({ state, getters, props, actionMocks, isAdmin }) => {
   const fakeStore = new Vuex.Store({
     modules: {
       licenseManagement: {
         namespaced: true,
+        getters: {
+          isAddingNewLicense: () => false,
+          hasPendingLicenses: () => false,
+          isLicenseBeingUpdated: () => () => false,
+          ...getters,
+        },
         state: {
           managedLicenses,
           isLoadingManagedLicenses: true,
@@ -76,9 +82,18 @@ describe('License Management', () => {
       ${'when admin'}     | ${true}
       ${'when developer'} | ${false}
     `('$desc', ({ isAdmin }) => {
-      it('when loading should render loading icon', () => {
+      it('should render loading icon during initial loading', () => {
         createComponent({ state: { isLoadingManagedLicenses: true }, isAdmin });
         expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+      });
+
+      it('should render list of managed licenses while updating a license', () => {
+        createComponent({
+          state: { isLoadingManagedLicenses: true },
+          getters: { hasPendingLicenses: () => true },
+          isAdmin,
+        });
+        expect(wrapper.find({ name: 'PaginatedList' }).props('list')).toBe(managedLicenses);
       });
 
       describe('when not loading', () => {

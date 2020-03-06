@@ -96,4 +96,10 @@ export default {
       currentLicenseInModal: null,
     });
   },
+  [types.ADD_PENDING_LICENSE](state, id) {
+    state.pendingLicenses.push(id);
+  },
+  [types.REMOVE_PENDING_LICENSE](state, id) {
+    state.pendingLicenses = state.pendingLicenses.filter(pendingLicense => pendingLicense !== id);
+  },
 };

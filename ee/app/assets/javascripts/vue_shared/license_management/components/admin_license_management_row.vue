@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_management/store/utils';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -17,6 +17,7 @@ export default {
   components: {
     GlDropdown,
     GlDropdownItem,
+    GlLoadingIcon,
     Icon,
     IssueStatusIcon,
   },
@@ -27,6 +28,11 @@ export default {
       validator: license =>
         Boolean(license.name) &&
         Object.values(LICENSE_APPROVAL_STATUS).includes(license.approvalStatus),
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   LICENSE_APPROVAL_STATUS,
@@ -61,8 +67,10 @@ export default {
     <span class="js-license-name" data-qa-selector="license_name_content">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
+        <gl-loading-icon v-if="loading" class="js-loading-icon d-flex align-items-center mr-2" />
         <gl-dropdown
           :text="dropdownText"
+          :disabled="loading"
           toggle-class="d-flex justify-content-between align-items-center"
           right
         >
@@ -76,6 +84,7 @@ export default {
           </gl-dropdown-item>
         </gl-dropdown>
         <button
+          :disabled="loading"
           class="btn btn-blank js-remove-button"
           type="button"
           data-toggle="modal"
