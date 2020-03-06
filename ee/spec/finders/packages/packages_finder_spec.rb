@@ -74,5 +74,11 @@ describe ::Packages::PackagesFinder do
     context 'with nil params' do
       it { is_expected.to match_array([conan_package, maven_package]) }
     end
+
+    context 'with processing packages' do
+      let_it_be(:nuget_package) { create(:nuget_package, project: project, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+      it { is_expected.to match_array([conan_package, maven_package]) }
+    end
   end
 end
