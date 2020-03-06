@@ -27,6 +27,7 @@ import {
   transformedDurationMedianData,
   endpoints,
 } from '../mock_data';
+import { shouldFlashAMessage } from '../helpers';
 
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
@@ -40,10 +41,6 @@ const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stag
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
-
-  function shouldFlashAMessage(msg = flashErrorMessage) {
-    expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
-  }
 
   function shouldSetUrlParams({ action, payload, result }) {
     const store = {
@@ -338,7 +335,7 @@ describe('Cycle analytics actions', () => {
   describe('fetchTopRankedGroupLabels', () => {
     beforeEach(() => {
       gon.api_version = 'v4';
-      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE } };
+      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE }, ...getters };
     });
 
     describe('succeeds', () => {
@@ -347,21 +344,16 @@ describe('Cycle analytics actions', () => {
       });
 
       it('dispatches receiveTopRankedGroupLabelsSuccess if the request succeeds', () => {
-        const dispatch = jest.fn();
-
-        return actions
-          .fetchTopRankedGroupLabels({
-            dispatch,
-            state,
-            getters,
-          })
-          .then(() => {
-            expect(dispatch).toHaveBeenCalledWith('requestTopRankedGroupLabels');
-            expect(dispatch).toHaveBeenCalledWith(
-              'receiveTopRankedGroupLabelsSuccess',
-              groupLabels,
-            );
-          });
+        return testAction(
+          actions.fetchTopRankedGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsSuccess', payload: groupLabels },
+          ],
+        );
       });
     });
 
@@ -371,18 +363,16 @@ describe('Cycle analytics actions', () => {
       });
 
       it('dispatches receiveTopRankedGroupLabelsError if the request fails', () => {
-        const dispatch = jest.fn();
-
-        return actions
-          .fetchTopRankedGroupLabels({
-            dispatch,
-            state,
-            getters,
-          })
-          .then(() => {
-            expect(dispatch).toHaveBeenCalledWith('requestTopRankedGroupLabels');
-            expect(dispatch).toHaveBeenCalledWith('receiveTopRankedGroupLabelsError', error);
-          });
+        return testAction(
+          actions.fetchTopRankedGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsError', payload: error },
+          ],
+        );
       });
     });
 
@@ -628,7 +618,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAMessage();
+        shouldFlashAMessage(flashErrorMessage);
       });
     });
   });
@@ -681,7 +671,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 
@@ -741,7 +731,7 @@ describe('Cycle analytics actions', () => {
         );
       });
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 

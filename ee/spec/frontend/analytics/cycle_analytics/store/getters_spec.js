@@ -8,7 +8,6 @@ import {
   durationChartPlottableMedianData,
   allowedStages,
   selectedProjects,
-  groupLabels,
 } from '../mock_data';
 
 let state = null;
@@ -38,7 +37,7 @@ describe('Cycle analytics getters', () => {
           selectedProjects,
         };
 
-        expect(getters.selectedProjectIds(state)).toEqual(selectedProjects.map(({ id }) => id));
+        expect(getters.selectedProjectIds(state)).toEqual([1, 2]);
       });
     });
 
@@ -46,25 +45,6 @@ describe('Cycle analytics getters', () => {
       it('will return an empty array', () => {
         state = { selectedProjects: [] };
         expect(getters.selectedProjectIds(state)).toEqual([]);
-      });
-    });
-  });
-
-  describe('topRankedLabelIds', () => {
-    describe('with topRankedLabels set', () => {
-      it('returns the `fullPath` value of the group', () => {
-        state = {
-          topRankedLabels: groupLabels,
-        };
-
-        expect(getters.topRankedLabelIds(state)).toEqual(groupLabels.map(({ id }) => id));
-      });
-    });
-
-    describe('without topRankedLabels set', () => {
-      it('will return an empty array', () => {
-        state = { topRankedLabels: [] };
-        expect(getters.topRankedLabelIds(state)).toEqual([]);
       });
     });
   });

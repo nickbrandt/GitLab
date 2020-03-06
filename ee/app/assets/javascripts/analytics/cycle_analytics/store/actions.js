@@ -279,9 +279,7 @@ export const fetchTopRankedGroupLabels = ({
   },
 }) => {
   dispatch('requestTopRankedGroupLabels');
-  const {
-    tasksByType: { subject },
-  } = state;
+  const { subject } = state.tasksByType;
 
   return Api.cycleAnalyticsTopLabels({
     subject,
@@ -403,22 +401,21 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
-    topRankedLabelIds,
   } = getters;
 
   const {
-    tasksByType: { subject },
+    tasksByType: { subject, selectedLabelIds },
   } = state;
 
   // dont request if we have no labels selected...for now
-  if (topRankedLabelIds.length) {
+  if (selectedLabelIds.length) {
     const params = {
       group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
       subject,
-      label_ids: topRankedLabelIds,
+      label_ids: selectedLabelIds,
     };
 
     dispatch('requestTasksByTypeData');

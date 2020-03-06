@@ -1,23 +1,19 @@
 import { shallowMount, mount } from '@vue/test-utils';
-import { GlNewDropdownItem, GlSegmentedControl } from '@gitlab/ui';
+import { GlDropdownItem, GlSegmentedControl } from '@gitlab/ui';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type_filters.vue';
 import {
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
+import { shouldFlashAMessage } from '../helpers';
 import { groupLabels } from '../mock_data';
 
 const selectedLabelIds = [groupLabels[0].id];
 
-const findSubjectFilters = ctx =>
-  ctx.find('.js-tasks-by-type-chart-filters-subject').find(GlSegmentedControl);
+const findSubjectFilters = ctx => ctx.find(GlSegmentedControl);
 const findSelectedSubjectFilters = ctx => findSubjectFilters(ctx).attributes('checked');
-const findDropdownLabels = ctx =>
-  ctx.find('.js-tasks-by-type-chart-filters-labels').findAll(GlNewDropdownItem);
-
-const shouldFlashAMessage = (msg = '') =>
-  expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
+const findDropdownLabels = ctx => ctx.findAll(GlDropdownItem);
 
 const selectLabelAtIndex = (ctx, index) => {
   findDropdownLabels(ctx)
@@ -26,9 +22,8 @@ const selectLabelAtIndex = (ctx, index) => {
   return ctx.vm.$nextTick();
 };
 
-function createComponent({ props = {}, shallow = true }) {
-  const fn = shallow ? shallowMount : mount;
-  return fn(TasksByTypeFilters, {
+function createComponent({ props = {}, mountFn = shallowMount }) {
+  return mountFn(TasksByTypeFilters, {
     propsData: {
       selectedLabelIds,
       labels: groupLabels,
@@ -37,7 +32,7 @@ function createComponent({ props = {}, shallow = true }) {
     },
     stubs: {
       GlNewDropdown: true,
-      GlNewDropdownItem: true,
+      GlDropdownItem: true,
     },
   });
 }
@@ -59,11 +54,11 @@ describe('TasksByTypeFilters', () => {
     });
 
     it('emits the `updateFilter` event when a subject label is clicked', () => {
-      expect(wrapper.emitted().updateFilter).toBeUndefined();
+      expect(wrapper.emitted('updateFilter')).toBeUndefined();
       return selectLabelAtIndex(wrapper, 0).then(() => {
-        expect(wrapper.emitted().updateFilter).toBeDefined();
+        expect(wrapper.emitted('updateFilter')).toBeDefined();
 
-        expect(wrapper.emitted().updateFilter[0]).toEqual([
+        expect(wrapper.emitted('updateFilter')[0]).toEqual([
           { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: groupLabels[0].id },
         ]);
       });
@@ -107,7 +102,7 @@ describe('TasksByTypeFilters', () => {
       });
 
       it('should not allow selecting another label', () => {
-        expect(wrapper.emitted().updateFilter).toBeUndefined();
+        expect(wrapper.emitted('updateFilter')).toBeUndefined();
       });
 
       it('should display a message', () => {
@@ -122,8 +117,8 @@ describe('TasksByTypeFilters', () => {
     });
 
     it('emits the `updateFilter` event when a subject filter is clicked', () => {
-      wrapper = createComponent({ shallow: false });
-      expect(wrapper.emitted().updateFilter).toBeUndefined();
+      wrapper = createComponent({ mountFn: mount });
+      expect(wrapper.emitted('updateFilter')).toBeUndefined();
 
       findSubjectFilters(wrapper)
         .findAll('label:not(.active)')
@@ -131,8 +126,8 @@ describe('TasksByTypeFilters', () => {
         .trigger('click');
 
       return wrapper.vm.$nextTick(() => {
-        expect(wrapper.emitted().updateFilter).toBeDefined();
-        expect(wrapper.emitted().updateFilter[0]).toEqual([
+        expect(wrapper.emitted('updateFilter')).toBeDefined();
+        expect(wrapper.emitted('updateFilter')[0]).toEqual([
           {
             filter: TASKS_BY_TYPE_FILTERS.SUBJECT,
             value: TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,

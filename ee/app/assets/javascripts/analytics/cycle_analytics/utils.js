@@ -25,6 +25,13 @@ export const removeFlash = (type = 'alert') => {
   }
 };
 
+export const toggleSelectedLabel = ({ selectedLabelIds = [], value = null }) => {
+  if (!value) return selectedLabelIds;
+  return selectedLabelIds.includes(value)
+    ? selectedLabelIds.filter(v => v !== value)
+    : [...selectedLabelIds, value];
+};
+
 export const isStartEvent = ev => Boolean(ev) && Boolean(ev.canBeStartEvent) && ev.canBeStartEvent;
 
 export const eventToOption = (obj = null) => {

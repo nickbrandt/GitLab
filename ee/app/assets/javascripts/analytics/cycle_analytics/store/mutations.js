@@ -1,6 +1,6 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
-import { transformRawStages, transformRawTasksByTypeData } from '../utils';
+import { transformRawStages, transformRawTasksByTypeData, toggleSelectedLabel } from '../utils';
 import { TASKS_BY_TYPE_FILTERS } from '../constants';
 
 export default {
@@ -74,10 +74,10 @@ export default {
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS](state, data = []) {
     const { tasksByType } = state;
-    state.topRankedLabels = data.length ? data.map(convertObjectPropsToCamelCase) : [];
+    state.topRankedLabels = data.map(convertObjectPropsToCamelCase);
     state.tasksByType = {
       ...tasksByType,
-      selectedLabelIds: data.length ? data.map(({ id }) => id) : [],
+      selectedLabelIds: data.map(({ id }) => id),
     };
   },
   [types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR](state) {
@@ -232,9 +232,7 @@ export default {
     switch (filter) {
       case TASKS_BY_TYPE_FILTERS.LABEL:
         updatedFilter = {
-          selectedLabelIds: selectedLabelIds.includes(value)
-            ? selectedLabelIds.filter(v => v !== value)
-            : [...selectedLabelIds, value],
+          selectedLabelIds: toggleSelectedLabel({ selectedLabelIds, value }),
         };
         break;
       case TASKS_BY_TYPE_FILTERS.SUBJECT:

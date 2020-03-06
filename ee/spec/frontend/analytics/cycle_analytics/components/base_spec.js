@@ -419,14 +419,13 @@ describe('Cycle Analytics component', () => {
   });
 
   describe('with failed requests while loading', () => {
-    function mockRequestCycleAnalyticsData({
+    const mockRequestCycleAnalyticsData = ({
       overrides = {},
       mockFetchStageData = true,
       mockFetchStageMedian = true,
       mockFetchDurationData = true,
       mockFetchTasksByTypeData = true,
-      mockFetchTasksByTypeTopLabelsData = true,
-    }) {
+    }) => {
       const defaultStatus = 200;
       const defaultRequests = {
         fetchSummaryData: {
@@ -447,16 +446,14 @@ describe('Cycle Analytics component', () => {
         ...overrides,
       };
 
+      mock
+        .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
+        .reply(defaultStatus, mockData.groupLabels);
+
       if (mockFetchTasksByTypeData) {
         mock
           .onGet(mockData.endpoints.tasksByTypeData)
           .reply(defaultStatus, { ...mockData.tasksByTypeData });
-      }
-
-      if (mockFetchTasksByTypeTopLabelsData) {
-        mock
-          .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
-          .reply(defaultStatus, mockData.groupLabels);
       }
 
       if (mockFetchDurationData) {
@@ -476,7 +473,7 @@ describe('Cycle Analytics component', () => {
       Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
         mock.onGet(endpoint).replyOnce(status, response);
       });
-    }
+    };
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');

@@ -2,8 +2,8 @@
 import {
   GlDropdownDivider,
   GlSegmentedControl,
-  GlNewDropdown,
-  GlNewDropdownItem,
+  GlDropdown,
+  GlDropdownItem,
   GlSearchBoxByType,
   GlIcon,
 } from '@gitlab/ui';
@@ -23,8 +23,8 @@ export default {
     GlSegmentedControl,
     GlDropdownDivider,
     GlIcon,
-    GlNewDropdown,
-    GlNewDropdownItem,
+    GlDropdown,
+    GlDropdownItem,
     GlSearchBoxByType,
   },
   props: {
@@ -132,13 +132,16 @@ export default {
       <p>{{ selectedFiltersText }}</p>
     </div>
     <div class="flex-column">
-      <gl-new-dropdown
-        icon="settings"
+      <gl-dropdown
         aria-expanded="false"
         :aria-label="__('CycleAnalytics|Display chart filters')"
         right
       >
-        <div ref="subjectFilter" class="js-tasks-by-type-chart-filters-subject mb-3 px-3">
+        <template #button-content>
+          <gl-icon class="vertical-align-top" name="settings" />
+          <gl-icon name="chevron-down" />
+        </template>
+        <div class="mb-3 px-3">
           <p class="font-weight-bold text-left mb-2">{{ s__('CycleAnalytics|Show') }}</p>
           <gl-segmented-control
             v-model="selectedSubjectFilter"
@@ -150,16 +153,13 @@ export default {
           />
         </div>
         <gl-dropdown-divider />
-        <div ref="labelsFilter" class="js-tasks-by-type-chart-filters-labels mb-3 px-3">
+        <div class="mb-3 px-3">
           <p class="font-weight-bold text-left my-2">
             {{ s__('CycleAnalytics|Select labels') }}
+            <br /><small>{{ selectedLabelLimitText }}</small>
           </p>
-          <small>{{ selectedLabelLimitText }}</small>
-          <gl-search-box-by-type
-            v-model.trim="labelsSearchTerm"
-            class="js-tasks-by-type-chart-filters-subject mb-2"
-          />
-          <gl-new-dropdown-item
+          <gl-search-box-by-type v-model.trim="labelsSearchTerm" class="mb-2" />
+          <gl-dropdown-item
             v-for="label in availableLabels"
             :key="label.id"
             :disabled="isLabelDisabled(label.id)"
@@ -179,12 +179,12 @@ export default {
               class="d-inline-block dropdown-label-box"
             ></span>
             {{ label.name }}
-          </gl-new-dropdown-item>
+          </gl-dropdown-item>
           <div v-show="!hasMatchingLabels" class="text-secondary">
             {{ __('No matching labels') }}
           </div>
         </div>
-      </gl-new-dropdown>
+      </gl-dropdown>
     </div>
   </div>
 </template>
