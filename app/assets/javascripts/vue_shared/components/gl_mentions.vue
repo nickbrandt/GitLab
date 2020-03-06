@@ -1,5 +1,6 @@
 <script>
 import escape from 'lodash/escape';
+import sanitize from 'sanitize-html';
 import Tribute from 'tributejs';
 import axios from '~/lib/utils/axios_utils';
 import { spriteIcon } from '~/lib/utils/common_utils';
@@ -13,15 +14,17 @@ import { spriteIcon } from '~/lib/utils/common_utils';
 function createMenuItemTemplate({ original }) {
   const rectAvatarClass = original.type === 'Group' ? 'rect-avatar' : '';
 
+  const avatarClasses = `avatar avatar-inline center s26 ${rectAvatarClass}
+    align-items-center d-inline-flex justify-content-center`;
+
   const avatarTag = original.avatar_url
     ? `<img
         src="${original.avatar_url}"
-        alt="${original.username} avatar"
-        class="avatar ${rectAvatarClass} avatar-inline center s26"/>`
-    : `<div class="avatar ${rectAvatarClass} avatar-inline center s26">
-        ${original.username.charAt(0).toUpperCase()}</div>`;
+        alt="${original.username}'s avatar"
+        class="${avatarClasses}"/>`
+    : `<div class="${avatarClasses}">${original.username.charAt(0).toUpperCase()}</div>`;
 
-  const name = escape(this.sanitize(original.name));
+  const name = escape(sanitize(original.name));
 
   const count = original.count && !original.mentionsDisabled ? ` (${original.count})` : '';
 
@@ -90,11 +93,6 @@ export default {
     if (this.tribute) {
       this.tribute.detach(input);
     }
-  },
-  methods: {
-    sanitize(str) {
-      return str.replace(/<(?:.|\n)*?>/gm, '');
-    },
   },
   render(h) {
     return h('div', this.$slots.default);
