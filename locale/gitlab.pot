@@ -363,6 +363,9 @@ msgstr ""
 msgid "%{name} found %{resultsString}"
 msgstr ""
 
+msgid "%{name} is scheduled for %{action}"
+msgstr ""
+
 msgid "%{name}'s avatar"
 msgstr ""
 
@@ -1583,6 +1586,9 @@ msgid "Algorithm"
 msgstr ""
 
 msgid "All"
+msgstr ""
+
+msgid "All %{replicableType} are being scheduled for %{action}"
 msgstr ""
 
 msgid "All Members"
@@ -13127,7 +13133,7 @@ msgstr ""
 msgid "No %{providerTitle} repositories found"
 msgstr ""
 
-msgid "No Design Repositories match this filter"
+msgid "No %{replicableType} match this filter"
 msgstr ""
 
 msgid "No Epic"
@@ -16866,7 +16872,7 @@ msgstr ""
 msgid "Resync"
 msgstr ""
 
-msgid "Resync all designs"
+msgid "Resync all %{replicableType}"
 msgstr ""
 
 msgid "Retry"
@@ -19986,10 +19992,10 @@ msgstr ""
 msgid "There was an error fetching median data for stages"
 msgstr ""
 
-msgid "There was an error fetching the Node's Groups"
+msgid "There was an error fetching the %{replicableType}"
 msgstr ""
 
-msgid "There was an error fetching the designs"
+msgid "There was an error fetching the Node's Groups"
 msgstr ""
 
 msgid "There was an error fetching the environments information."
@@ -20034,7 +20040,10 @@ msgstr ""
 msgid "There was an error subscribing to this label."
 msgstr ""
 
-msgid "There was an error syncing the designs."
+msgid "There was an error syncing project %{name}"
+msgstr ""
+
+msgid "There was an error syncing the %{replicableType}"
 msgstr ""
 
 msgid "There was an error trying to validate your query"
