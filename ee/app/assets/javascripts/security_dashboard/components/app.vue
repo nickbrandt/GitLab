@@ -110,7 +110,7 @@ export default {
       // NOTE: This is currently set to only show on the project dashboard.
       // Eventually, we'll need it to show on the group and instance dashboards.
       // But **NEVER** the pipeline dashboard
-      return gon?.features?.firstClassVulnerabilities && this.dashboardType === 'project';
+      return Boolean(gon?.features?.firstClassVulnerabilities && this.dashboardType === 'project');
     },
   },
   watch: {
@@ -130,7 +130,7 @@ export default {
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
-    this.fetchPage();
+    this.fetchPage(this.pageInfo.page);
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -157,7 +157,7 @@ export default {
     emitVulnerabilitiesCountChanged(count) {
       this.$emit('vulnerabilitiesCountChanged', count);
     },
-    fetchPage(page = this.pageInfo.page) {
+    fetchPage(page) {
       this.fetchVulnerabilities({ ...this.activeFilters, page });
     },
   },

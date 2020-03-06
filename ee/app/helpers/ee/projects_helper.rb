@@ -216,8 +216,7 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
-          # TODO: Switch these depending on a feature flag
-          # vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
+          # TODO: This is truly awful, make it better
           vulnerabilities_endpoint: ::Feature.enabled?(:first_class_vulnerabilities, project) ? expose_path(api_v4_projects_vulnerabilities_path(id: @project.id)) : project_security_vulnerability_findings_path(project),
           vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),

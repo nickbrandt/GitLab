@@ -9,6 +9,8 @@ import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_c
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 import LoadingError from 'ee/security_dashboard/components/loading_error.vue';
+import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
+import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 
 import createStore from 'ee/security_dashboard/store';
 import { getParameterValues } from '~/lib/utils/url_utility';
@@ -83,6 +85,10 @@ describe('Security Dashboard app', () => {
 
     it('does not render the vulnerability count list', () => {
       expect(wrapper.find(VulnerabilityCountList).exists()).toBe(false);
+    });
+
+    it('does not render the vulnerability list', () => {
+      expect(wrapper.find(VulnerabilityList).exists()).toBe(false);
     });
 
     it('does not lock to a project', () => {
@@ -189,6 +195,52 @@ describe('Security Dashboard app', () => {
       store.dispatch('vulnerabilities/receiveVulnerabilitiesError', errorCode);
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find(LoadingError).exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('with the first_class_vulnerabilities feature flag turned on', () => {
+    beforeEach(() => {
+      gon.features = gon.features || {};
+      gon.features.firstClassVulnerabilities = true;
+
+      setup();
+      createComponent();
+    });
+
+    describe.each`
+      dashboardType | showVulnerabilityList
+      ${'pipeline'} | ${false}
+      ${'project'}  | ${true}
+      ${'group'}    | ${false}
+      ${'instance'} | ${false}
+    `('with an empty $dashboardType', ({ dashboardType, showVulnerabilityList }) => {
+      beforeEach(() => {
+        wrapper.vm.$store.state.dashboardType = dashboardType;
+      });
+
+      it(`should ${showVulnerabilityList ? '' : 'not '} show the vulnerability`, () => {
+        expect(wrapper.find(VulnerabilityList).exists()).toEqual(showVulnerabilityList);
+      });
+    });
+
+    describe('on the project dashboard', () => {
+      beforeEach(() => {
+        wrapper.vm.$store.state.dashboardType = 'project';
+      });
+
+      it('should not render the pagination', () => {
+        expect(wrapper.find(PaginationLinks).exists()).toEqual(false);
+      });
+
+      describe('with more than one page of vulnerabilities', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.state.vulnerabilities.pageInfo = { total: 2 };
+        });
+
+        it('should render the pagination', () => {
+          expect(wrapper.find(PaginationLinks).exists()).toEqual(true);
+        });
       });
     });
   });

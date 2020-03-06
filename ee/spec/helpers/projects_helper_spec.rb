@@ -109,6 +109,7 @@ describe ProjectsHelper do
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
 
+      # TODO: Update these
       it 'returns the "vulnerability findings" endpoint paths' do
         expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
         expect(subject[:vulnerabilities_summary_endpoint]).to(

@@ -64,8 +64,6 @@ export default {
     <vulnerability-list
       v-else
       :is-loading="isLoadingVulnerabilities"
-      :dashboard-documentation="dashboardDocumentation"
-      :empty-state-svg-path="emptyStateSvgPath"
       :vulnerabilities="vulnerabilities"
     >
       <template #emptyState>
