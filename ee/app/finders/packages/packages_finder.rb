@@ -13,7 +13,7 @@ module Packages
     end
 
     def execute
-      packages = project.packages
+      packages = project.packages.processed
       packages = filter_by_package_type(packages)
       packages = filter_by_package_name(packages)
       packages = order_packages(packages)

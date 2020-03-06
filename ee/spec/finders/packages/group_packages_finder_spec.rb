@@ -46,6 +46,12 @@ describe Packages::GroupPackagesFinder do
           it { is_expected.to match_array([package1, package2]) }
         end
       end
+
+      context 'when there are processing packages' do
+        let!(:package4) { create(:nuget_package, project: project, name: Packages::Nuget::CreatePackageService::TEMPORARY_PACKAGE_NAME) }
+
+        it { is_expected.to match_array([package1, package2]) }
+      end
     end
 
     context 'group has package of all types' do
