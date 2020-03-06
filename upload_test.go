@@ -83,7 +83,7 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 		if err != nil {
 			t.Fatal(err)
 		}
-		nValues := 7 // file name, path, size, md5, sha1, sha256, sha512 for just the upload (no metadata because we are not POSTing a valid zip file)
+		nValues := 9 // file name, path, remote_url, remote_id, size, md5, sha1, sha256, sha512 for just the upload (no metadata because we are not POSTing a valid zip file)
 		if len(r.MultipartForm.Value) != nValues {
 			t.Errorf("Expected to receive exactly %d values", nValues)
 		}

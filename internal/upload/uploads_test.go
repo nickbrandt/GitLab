@@ -135,6 +135,14 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			t.Error("Expected to the file to be in tempPath")
 		}
 
+		if r.FormValue("file.remote_url") != "" {
+			t.Error("Expected to receive empty remote_url")
+		}
+
+		if r.FormValue("file.remote_id") != "" {
+			t.Error("Expected to receive empty remote_id")
+		}
+
 		if r.FormValue("file.size") != "4" {
 			t.Error("Expected to receive the file size")
 		}
@@ -152,8 +160,8 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			}
 		}
 
-		if valueCnt := len(r.MultipartForm.Value); valueCnt != 8 {
-			t.Fatal("Expected to receive exactly 8 values but got", valueCnt)
+		if valueCnt := len(r.MultipartForm.Value); valueCnt != 10 {
+			t.Fatal("Expected to receive exactly 10 values but got", valueCnt)
 		}
 
 		w.WriteHeader(202)

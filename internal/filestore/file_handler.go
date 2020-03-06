@@ -60,18 +60,10 @@ func (fh *FileHandler) GitLabFinalizeFields(prefix string) map[string]string {
 		return fmt.Sprintf("%s.%s", prefix, field)
 	}
 
-	if fh.Name != "" {
-		data[key("name")] = fh.Name
-	}
-	if fh.LocalPath != "" {
-		data[key("path")] = fh.LocalPath
-	}
-	if fh.RemoteURL != "" {
-		data[key("remote_url")] = fh.RemoteURL
-	}
-	if fh.RemoteID != "" {
-		data[key("remote_id")] = fh.RemoteID
-	}
+	data[key("name")] = fh.Name
+	data[key("path")] = fh.LocalPath
+	data[key("remote_url")] = fh.RemoteURL
+	data[key("remote_id")] = fh.RemoteID
 	data[key("size")] = strconv.FormatInt(fh.Size, 10)
 	for hashName, hash := range fh.hashes {
 		data[key(hashName)] = hash
