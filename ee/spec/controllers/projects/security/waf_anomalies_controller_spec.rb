@@ -8,6 +8,7 @@ describe Projects::Security::WafAnomaliesController do
 
   let_it_be(:project) { create(:project, :public, :repository, group: group) }
   let_it_be(:environment) { create(:environment, :with_review_app, project: project) }
+  let_it_be(:cluster) { create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [environment.project]) }
 
   let_it_be(:action_params) { { project_id: project, namespace_id: project.namespace, environment_id: environment } }
 
@@ -22,7 +23,7 @@ describe Projects::Security::WafAnomaliesController do
       sign_in(user)
 
       allow_next_instance_of(::Security::WafAnomalySummaryService) do |instance|
-        allow(instance).to receive(:elasticsearch_client).at_most(:twice) { es_client }
+        allow(instance).to receive(:elasticsearch_client).at_most(3).times { es_client }
       end
     end
 
