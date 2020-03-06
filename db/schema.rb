@@ -4502,6 +4502,7 @@ ActiveRecord::Schema.define(version: 2020_03_04_160823) do
     t.string "metadata_version", null: false
     t.text "raw_metadata", null: false
     t.bigint "vulnerability_id"
+    t.index ["id"], name: "undefined_vulnerabilities", where: "(severity = 0)"
     t.index ["primary_identifier_id"], name: "index_vulnerability_occurrences_on_primary_identifier_id"
     t.index ["project_id", "primary_identifier_id", "location_fingerprint", "scanner_id"], name: "index_vulnerability_occurrences_on_unique_keys", unique: true
     t.index ["scanner_id"], name: "index_vulnerability_occurrences_on_scanner_id"
