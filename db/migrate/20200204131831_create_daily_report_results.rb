@@ -9,12 +9,12 @@ class CreateDailyReportResults < ActiveRecord::Migration[6.0]
       t.bigint :project_id, null: false
       t.bigint :last_pipeline_id, null: false
       t.float :value, null: false
-      t.integer :param, limit: 2, null: false
+      t.integer :param_type, limit: 2, null: false
       t.string :ref_path, null: false # rubocop:disable Migration/AddLimitToStringColumns
       t.string :title, null: false # rubocop:disable Migration/AddLimitToStringColumns
 
       t.index :last_pipeline_id
-      t.index [:project_id, :ref_path, :param, :date, :title], name: 'index_daily_report_results_unique_columns', unique: true
+      t.index [:project_id, :ref_path, :param_type, :date, :title], name: 'index_daily_report_results_unique_columns', unique: true
       t.foreign_key :projects, on_delete: :cascade
       t.foreign_key :ci_pipelines, column: :last_pipeline_id, on_delete: :cascade
     end

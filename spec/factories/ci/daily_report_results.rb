@@ -6,7 +6,7 @@ FactoryBot.define do
     date { Time.zone.now.to_date }
     project
     last_pipeline factory: :ci_pipeline
-    param { Ci::DailyReportResult.params[:coverage] }
+    param_type { Ci::DailyReportResult.param_types[:coverage] }
     title { 'rspec' }
     value { 77.0 }
   end

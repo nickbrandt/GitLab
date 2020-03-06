@@ -13,25 +13,27 @@ module Ci
       coverage: 12
     }.freeze
 
-    enum param: REPORT_PARAMS
+    enum param_type: REPORT_PARAMS
 
     def self.store_coverage(pipeline)
       return unless Feature.enabled?(:ci_daily_code_coverage, default_enabled: true)
 
-      ref_path = connection.quote(pipeline.source_ref_path)
-      date = connection.quote(pipeline.created_at.to_date)
-      param = params[:coverage]
+      base_attrs = {
+        project_id: pipeline.project_id,
+        ref_path: pipeline.source_ref_path,
+        param_type: param_types[:coverage],
+        date: pipeline.created_at.to_date,
+        last_pipeline_id: pipeline.id
+      }
 
-      pipeline.builds.with_coverage.each do |build|
-        title = connection.quote(build.group_name)
-
-        connection.execute <<-EOF.strip_heredoc
-          INSERT INTO #{table_name} (project_id, ref_path, param, title, date, last_pipeline_id, value)
-          VALUES (#{build.project_id}, #{ref_path}, #{param}, #{title}, #{date}, #{pipeline.id}, #{build.coverage})
-          ON CONFLICT (project_id, ref_path, param, title, date)
-          DO UPDATE SET value = #{build.coverage}, last_pipeline_id = #{pipeline.id} WHERE #{table_name}.last_pipeline_id < #{pipeline.id};
-        EOF
+      data = pipeline.builds.with_coverage.map do |build|
+        base_attrs.merge(
+          title: build.group_name,
+          value: build.coverage
+        )
       end
+
+      upsert_all(data, unique_by: :index_daily_report_results_unique_columns) if data.any?
     end
   end
 end

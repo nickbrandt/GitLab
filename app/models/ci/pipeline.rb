@@ -948,9 +948,9 @@ module Ci
 
     def source_ref_path
       if branch? || merge_request?
-        Gitlab::Git::BRANCH_REF_PREFIX + ref.to_s
+        Gitlab::Git::BRANCH_REF_PREFIX + source_ref.to_s
       elsif tag?
-        Gitlab::Git::TAG_REF_PREFIX + ref.to_s
+        Gitlab::Git::TAG_REF_PREFIX + source_ref.to_s
       end
     end
 
