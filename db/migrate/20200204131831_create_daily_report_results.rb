@@ -14,7 +14,7 @@ class CreateDailyReportResults < ActiveRecord::Migration[6.0]
       t.string :title, null: false # rubocop:disable Migration/AddLimitToStringColumns
 
       t.index :last_pipeline_id
-      t.index [:project_id, :ref_path, :param, :title, :date], name: 'index_daily_build_report_metrics_unique_columns', unique: true, order: { date: :desc }
+      t.index [:project_id, :ref_path, :param, :date, :title], name: 'index_daily_report_results_unique_columns', unique: true
       t.foreign_key :projects, on_delete: :cascade
       t.foreign_key :ci_pipelines, column: :last_pipeline_id, on_delete: :cascade
     end
