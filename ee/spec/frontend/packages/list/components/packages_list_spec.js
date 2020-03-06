@@ -5,6 +5,7 @@ import Tracking from '~/tracking';
 import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
 import PackageTags from 'ee/packages/shared/components/package_tags.vue';
+import PackagesListLoader from 'ee/packages/list/components/packages_list_loader.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
 import stubChildren from 'helpers/stub_children';
@@ -16,12 +17,11 @@ localVue.use(Vuex);
 describe('packages_list', () => {
   let wrapper;
   let store;
-  let state;
-  let getListSpy;
 
   const GlSortingItem = { name: 'sorting-item-stub', template: '<div><slot></slot></div>' };
   const EmptySlotStub = { name: 'empty-slot-stub', template: '<div>bar</div>' };
 
+  const findPackagesListLoader = () => wrapper.find(PackagesListLoader);
   const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
   const findPackageListTable = () => wrapper.find(GlTable);
   const findPackageListSorting = () => wrapper.find(GlSorting);
@@ -32,7 +32,40 @@ describe('packages_list', () => {
   const findPackageTags = () => wrapper.findAll(PackageTags);
   const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
-  const mountComponent = options => {
+  const createStore = (isGroupPage, packages, isLoading) => {
+    const state = {
+      isLoading,
+      packages,
+      pagination: {
+        perPage: 1,
+        total: 1,
+        page: 1,
+      },
+      config: {
+        isGroupPage,
+      },
+      sorting: {
+        orderBy: 'version',
+        sort: 'desc',
+      },
+    };
+    store = new Vuex.Store({
+      state,
+      getters: {
+        getList: () => packages,
+      },
+    });
+    store.dispatch = jest.fn();
+  };
+
+  const mountComponent = ({
+    isGroupPage = false,
+    packages = packageList,
+    isLoading = false,
+    ...options
+  } = {}) => {
+    createStore(isGroupPage, packages, isLoading);
+
     wrapper = mount(PackagesList, {
       localVue,
       store,
@@ -45,41 +78,37 @@ describe('packages_list', () => {
     });
   };
 
-  beforeEach(() => {
-    getListSpy = jest.fn();
-    getListSpy.mockReturnValue(packageList);
-    state = {
-      packages: [...packageList],
-      pagination: {
-        perPage: 1,
-        total: 1,
-        page: 1,
-      },
-      config: {
-        isGroupPage: false,
-      },
-      sorting: {
-        orderBy: 'version',
-        sort: 'desc',
-      },
-    };
-    store = new Vuex.Store({
-      state,
-      getters: {
-        getList: getListSpy,
-      },
-    });
-    store.dispatch = jest.fn();
-  });
-
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
+  });
+
+  describe('when is loading', () => {
+    beforeEach(() => {
+      mountComponent({
+        packages: [],
+        isLoading: true,
+      });
+    });
+
+    it('shows skeleton loader when loading', () => {
+      expect(findPackagesListLoader().exists()).toBe(true);
+    });
+  });
+
+  describe('when is not loading', () => {
+    beforeEach(() => {
+      mountComponent();
+    });
+
+    it('does not show skeleton loader when not loading', () => {
+      expect(findPackagesListLoader().exists()).toBe(false);
+    });
   });
 
   describe('when is isGroupPage', () => {
     beforeEach(() => {
-      state.config.isGroupPage = true;
-      mountComponent();
+      mountComponent({ isGroupPage: true });
     });
 
     it('has project field', () => {
@@ -177,8 +206,8 @@ describe('packages_list', () => {
 
   describe('when the list is empty', () => {
     beforeEach(() => {
-      getListSpy.mockReturnValue([]);
       mountComponent({
+        packages: [],
         slots: {
           'empty-state': EmptySlotStub,
         },

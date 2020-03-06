@@ -34,6 +34,7 @@ import {
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import PackageTags from '../../shared/components/package_tags.vue';
+import PackagesListLoader from './packages_list_loader.vue';
 
 export default {
   components: {
@@ -47,6 +48,7 @@ export default {
     GlModal,
     GlIcon,
     PackageTags,
+    PackagesListLoader,
   },
   directives: { GlTooltip: GlTooltipDirective },
   mixins: [Tracking.mixin()],
@@ -63,6 +65,7 @@ export default {
       isGroupPage: state => state.config.isGroupPage,
       orderBy: state => state.sorting.orderBy,
       sort: state => state.sorting.sort,
+      isLoading: 'isLoading',
     }),
     ...mapGetters({ list: 'getList' }),
     currentPage: {
@@ -99,7 +102,7 @@ export default {
           key: LIST_KEY_PROJECT,
           label: LIST_LABEL_PROJECT,
           orderBy: LIST_KEY_PROJECT,
-          class: ['text-center'],
+          class: ['text-left'],
         },
         {
           key: LIST_KEY_VERSION,
@@ -183,11 +186,12 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex flex-column align-items-end">
-    <slot v-if="isListEmpty" name="empty-state"></slot>
+  <div class="d-flex flex-column">
+    <slot v-if="isListEmpty && !isLoading" name="empty-state"></slot>
+
     <template v-else>
       <gl-sorting
-        class="my-3"
+        class="my-3 align-self-end"
         :text="sortText"
         :is-ascending="isSortAscending"
         @sortDirectionChange="onDirectionChange"
@@ -202,7 +206,18 @@ export default {
         </gl-sorting-item>
       </gl-sorting>
 
-      <gl-table :items="list" :fields="headerFields" :no-local-sorting="true" stacked="md">
+      <gl-table
+        :items="list"
+        :fields="headerFields"
+        :no-local-sorting="true"
+        :busy="isLoading"
+        stacked="md"
+        class="package-list-table"
+      >
+        <template #table-busy>
+          <packages-list-loader :is-group="isGroupPage" />
+        </template>
+
         <template #cell(name)="{value, item}">
           <div
             class="flex-truncate-parent d-flex align-items-center justify-content-end justify-content-md-start"
