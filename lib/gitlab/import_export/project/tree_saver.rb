@@ -15,7 +15,7 @@ module Gitlab
         end
 
         def save
-          json_writer = ImportExport::JSON::LegacyWriter.new(File.join(@shared.export_path, "project.json"))
+          json_writer = ImportExport::JSON::LegacyWriter.new(@full_path)
 
           serializer = ImportExport::JSON::StreamingSerializer.new(exportable, reader.project_tree, json_writer)
           serializer.execute
@@ -40,11 +40,10 @@ module Gitlab
 
         def exportable_params
           params = {
-          presenter_class: presenter_class,
-            current_user: @current_user,
-            group_members_tree: reader.group_members_tree
+            presenter_class: presenter_class,
+            current_user: @current_user
           }
-          params[:override_description] = @params[:description] if @params[:description]
+          params[:override_description] = @params[:description] if @params[:description].present?
           params
         end
 

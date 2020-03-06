@@ -42,8 +42,7 @@ module Gitlab
           raise ArgumentError, 'definition needs to be Hash' unless definition.is_a?(Hash)
           raise ArgumentError, 'definition needs to have exactly one Hash element' unless definition.one?
 
-          key = definition.first.first
-          options = definition.first.second
+          key, options = definition.first
 
           record = exportable.public_send(key) # rubocop: disable GitlabSecurity/PublicSend
           if record.is_a?(ActiveRecord::Relation)
@@ -53,17 +52,14 @@ module Gitlab
           end
         end
 
-        def serialize_many_relations(key, record, options)
+        def serialize_many_relations(key, records, options)
           key_preloads = preloads&.dig(key)
+          records = records.preload(key_preloads) if key_preloads
 
-          record.in_batches(of: BATCH_SIZE) do |batch| # rubocop:disable Cop/InBatches
-            batch = batch.preload(key_preloads) if key_preloads
+          records.find_each(batch_size: BATCH_SIZE) do |record|
+            json = Raw.new(record.to_json(options))
 
-            batch.each do |item|
-              item = Raw.new(item.to_json(options))
-
-              json_writer.append(key, item)
-            end
+            json_writer.append(key, json)
           end
         end
 

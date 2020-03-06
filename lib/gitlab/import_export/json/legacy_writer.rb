@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module ImportExport
     module JSON
@@ -12,7 +14,6 @@ module Gitlab
           @keys = Set.new
 
           mkdir_p(File.dirname(@path))
-          file.write('{}')
         end
 
         def close
@@ -27,10 +28,10 @@ module Gitlab
         end
 
         def write(key, value)
-          raise RuntimeError, "key '#{key}' already written" if @keys.include?(key)
+          raise ArgumentError, "key '#{key}' already written" if @keys.include?(key)
 
           # rewind by one byte, to overwrite '}'
-          file.pos = file.size-1
+          file.pos = file.size - 1
 
           file.write(',') if @keys.any?
           file.write(key.to_json)
@@ -52,7 +53,7 @@ module Gitlab
           end
 
           # rewind by two bytes, to overwrite ']}'
-          file.pos = file.size-2
+          file.pos = file.size - 2
 
           file.write(',') if @last_array_count > 0
           file.write(value.to_json)
@@ -63,7 +64,11 @@ module Gitlab
         private
 
         def file
-          @file ||= File.open(@path, "wb")
+          @file ||= begin
+            file = File.open(@path, "wb")
+            file.write('{}')
+            file
+          end
         end
       end
     end
