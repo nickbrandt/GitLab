@@ -9,14 +9,22 @@ describe Event do
     let_it_be(:guest) { create(:user) }
     let_it_be(:author) { create(:author) }
     let_it_be(:admin) { create(:admin) }
+    let_it_be(:project) { create(:project) }
+
     let(:epic) { create(:epic, group: group, author: author) }
     let(:note_on_epic) { create(:note, :on_epic, noteable: epic) }
     let(:event) { described_class.new(group: group, target: target, author: author) }
 
     before do
       stub_licensed_features(epics: true)
-      group.add_developer(member)
-      group.add_guest(guest)
+
+      project.add_developer(member)
+      project.add_guest(guest)
+
+      if defined?(group)
+        group.add_developer(member)
+        group.add_guest(guest)
+      end
     end
 
     shared_examples 'visible to group members only' do
@@ -31,6 +39,23 @@ describe Event do
     shared_examples 'visible to everybody' do
       it 'is visible to other users' do
         expect(event.visible_to_user?(non_member)).to eq true
+        expect(event.visible_to_user?(member)).to eq true
+        expect(event.visible_to_user?(guest)).to eq true
+        expect(event.visible_to_user?(admin)).to eq true
+      end
+    end
+
+    context 'design event' do
+      include DesignManagementTestHelpers
+
+      before do
+        enable_design_management
+      end
+
+      it 'is visible to authorised users' do
+        event = create(:event, :for_design, project: project)
+
+        expect(event.visible_to_user?(non_member)).to eq false
         expect(event.visible_to_user?(member)).to eq true
         expect(event.visible_to_user?(guest)).to eq true
         expect(event.visible_to_user?(admin)).to eq true
