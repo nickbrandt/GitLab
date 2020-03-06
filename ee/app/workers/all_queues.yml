@@ -570,6 +570,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: status_page_publish_incident
+  :feature_category: :status_page
+  :has_external_dependencies: true
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: sync_seat_link_request
   :feature_category: :analysis
   :has_external_dependencies: true
