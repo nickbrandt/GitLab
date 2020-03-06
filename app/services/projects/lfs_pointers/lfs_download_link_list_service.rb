@@ -13,6 +13,7 @@ module Projects
 
       DownloadLinksError = Class.new(StandardError)
       DownloadLinkNotFound = Class.new(StandardError)
+      DownloadLinksRequestEntityTooLargeError = Class.new(StandardError)
 
       attr_reader :remote_uri
 
@@ -29,22 +30,39 @@ module Projects
       def execute(oids)
         return [] unless project&.lfs_enabled? && remote_uri && oids.present?
 
+        get_download_links_in_batches(oids)
+      end
+
+      private
+
+      def get_download_links_in_batches(oids, batch_size = REQUEST_BATCH_SIZE)
         download_links = []
 
-        oids.each_slice(REQUEST_BATCH_SIZE) do |batch|
+        oids.each_slice(batch_size) do |batch|
           download_links += get_download_links(batch)
         end
 
         download_links
-      end
 
-      private
+      rescue DownloadLinksRequestEntityTooLargeError => e
+        # Log this exceptions to see how open it happens
+        Gitlab::ErrorTracking
+          .track_exception(e, project_id: project&.id, batch_size: batch_size, oids_count: oids.count)
+
+        # Try again with a smaller batch
+        batch_size /= 2
+
+        retry if batch_size > REQUEST_BATCH_SIZE / 3
+
+        raise DownloadLinksError, 'Unable to download due to RequestEntityTooLarge errors'
+      end
 
       def get_download_links(oids)
         response = Gitlab::HTTP.post(remote_uri,
                                      body: request_body(oids),
                                      headers: headers)
 
+        raise DownloadLinksRequestEntityTooLargeError if response.request_entity_too_large?
         raise DownloadLinksError, response.message unless response.success?
 
         # Since the LFS Batch API may return a Content-Ttpe of
