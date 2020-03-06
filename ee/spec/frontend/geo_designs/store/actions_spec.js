@@ -29,32 +29,39 @@ describe('GeoDesigns Store Actions', () => {
     mock.restore();
   });
 
-  describe('requestDesigns', () => {
-    it('should commit mutation REQUEST_DESIGNS', done => {
-      testAction(actions.requestDesigns, null, state, [{ type: types.REQUEST_DESIGNS }], [], done);
-    });
-  });
-
-  describe('receiveDesignsSuccess', () => {
-    it('should commit mutation RECEIVE_DESIGNS_SUCCESS', done => {
+  describe('requestReplicableItems', () => {
+    it('should commit mutation REQUEST_REPLICABLE_ITEMS', done => {
       testAction(
-        actions.receiveDesignsSuccess,
-        MOCK_BASIC_FETCH_DATA_MAP,
+        actions.requestReplicableItems,
+        null,
         state,
-        [{ type: types.RECEIVE_DESIGNS_SUCCESS, payload: MOCK_BASIC_FETCH_DATA_MAP }],
+        [{ type: types.REQUEST_REPLICABLE_ITEMS }],
         [],
         done,
       );
     });
   });
 
-  describe('receiveDesignsError', () => {
-    it('should commit mutation RECEIVE_DESIGNS_ERROR', () => {
+  describe('receiveReplicableItemsSuccess', () => {
+    it('should commit mutation RECEIVE_REPLICABLE_ITEMS_SUCCESS', done => {
       testAction(
-        actions.receiveDesignsError,
+        actions.receiveReplicableItemsSuccess,
+        MOCK_BASIC_FETCH_DATA_MAP,
+        state,
+        [{ type: types.RECEIVE_REPLICABLE_ITEMS_SUCCESS, payload: MOCK_BASIC_FETCH_DATA_MAP }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveReplicableItemsError', () => {
+    it('should commit mutation RECEIVE_REPLICABLE_ITEMS_ERROR', () => {
+      testAction(
+        actions.receiveReplicableItemsError,
         null,
         state,
-        [{ type: types.RECEIVE_DESIGNS_ERROR }],
+        [{ type: types.RECEIVE_REPLICABLE_ITEMS_ERROR }],
         [],
         () => {
           expect(flash).toHaveBeenCalledTimes(1);
@@ -79,8 +86,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestDesigns' },
-            { type: 'receiveDesignsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
+            { type: 'requestReplicableItems' },
+            { type: 'receiveReplicableItemsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
           ],
           done,
         );
@@ -98,7 +105,7 @@ describe('GeoDesigns Store Actions', () => {
           {},
           state,
           [],
-          [{ type: 'requestDesigns' }, { type: 'receiveDesignsError' }],
+          [{ type: 'requestReplicableItems' }, { type: 'receiveReplicableItemsError' }],
           done,
         );
       });
@@ -130,8 +137,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestDesigns' },
-            { type: 'receiveDesignsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
+            { type: 'requestReplicableItems' },
+            { type: 'receiveReplicableItemsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
           ],
           fetchDesignsCall,
         );
@@ -161,8 +168,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestDesigns' },
-            { type: 'receiveDesignsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
+            { type: 'requestReplicableItems' },
+            { type: 'receiveReplicableItemsSuccess', payload: MOCK_BASIC_FETCH_DATA_MAP },
           ],
           fetchDesignsCall,
         );
@@ -170,27 +177,27 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('requestInitiateAllDesignSyncs', () => {
-    it('should commit mutation REQUEST_INITIATE_ALL_DESIGN_SYNCS', done => {
+  describe('requestInitiateAllReplicableSyncs', () => {
+    it('should commit mutation REQUEST_INITIATE_ALL_REPLICABLE_SYNCS', done => {
       testAction(
-        actions.requestInitiateAllDesignSyncs,
+        actions.requestInitiateAllReplicableSyncs,
         null,
         state,
-        [{ type: types.REQUEST_INITIATE_ALL_DESIGN_SYNCS }],
+        [{ type: types.REQUEST_INITIATE_ALL_REPLICABLE_SYNCS }],
         [],
         done,
       );
     });
   });
 
-  describe('receiveInitiateAllDesignSyncsSuccess', () => {
-    it('should commit mutation RECEIVE_INITIATE_ALL_DESIGN_SYNCS_SUCCESS and call fetchDesigns and toast', () => {
+  describe('receiveInitiateAllReplicableSyncsSuccess', () => {
+    it('should commit mutation RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS and call fetchReplicableItems and toast', () => {
       testAction(
-        actions.receiveInitiateAllDesignSyncsSuccess,
+        actions.receiveInitiateAllReplicableSyncsSuccess,
         { action: ACTION_TYPES.RESYNC },
         state,
-        [{ type: types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_SUCCESS }],
-        [{ type: 'fetchDesigns' }],
+        [{ type: types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS }],
+        [{ type: 'fetchReplicableItems' }],
         () => {
           expect(toast).toHaveBeenCalledTimes(1);
           toast.mockClear();
@@ -199,13 +206,13 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('receiveInitiateAllDesignSyncsError', () => {
-    it('should commit mutation RECEIVE_INITIATE_ALL_DESIGN_SYNCS_ERROR', () => {
+  describe('receiveInitiateAllReplicableSyncsError', () => {
+    it('should commit mutation RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_ERROR', () => {
       testAction(
-        actions.receiveInitiateAllDesignSyncsError,
+        actions.receiveInitiateAllReplicableSyncsError,
         ACTION_TYPES.RESYNC,
         state,
-        [{ type: types.RECEIVE_INITIATE_ALL_DESIGN_SYNCS_ERROR }],
+        [{ type: types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_ERROR }],
         [],
         () => {
           expect(flash).toHaveBeenCalledTimes(1);
@@ -232,8 +239,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestInitiateAllDesignSyncs' },
-            { type: 'receiveInitiateAllDesignSyncsSuccess', payload: { action } },
+            { type: 'requestInitiateAllReplicableSyncs' },
+            { type: 'receiveInitiateAllReplicableSyncsSuccess', payload: { action } },
           ],
           done,
         );
@@ -254,8 +261,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestInitiateAllDesignSyncs' },
-            { type: 'receiveInitiateAllDesignSyncsError' },
+            { type: 'requestInitiateAllReplicableSyncs' },
+            { type: 'receiveInitiateAllReplicableSyncsError' },
           ],
           done,
         );
@@ -263,27 +270,27 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('requestInitiateDesignSync', () => {
-    it('should commit mutation REQUEST_INITIATE_DESIGN_SYNC', done => {
+  describe('requestInitiateReplicableSync', () => {
+    it('should commit mutation REQUEST_INITIATE_REPLICABLE_SYNC', done => {
       testAction(
-        actions.requestInitiateDesignSync,
+        actions.requestInitiateReplicableSync,
         null,
         state,
-        [{ type: types.REQUEST_INITIATE_DESIGN_SYNC }],
+        [{ type: types.REQUEST_INITIATE_REPLICABLE_SYNC }],
         [],
         done,
       );
     });
   });
 
-  describe('receiveInitiateDesignSyncSuccess', () => {
-    it('should commit mutation RECEIVE_INITIATE_DESIGN_SYNC_SUCCESS and call fetchDesigns and toast', () => {
+  describe('receiveInitiateReplicableSyncSuccess', () => {
+    it('should commit mutation RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS and call fetchReplicableItems and toast', () => {
       testAction(
-        actions.receiveInitiateDesignSyncSuccess,
+        actions.receiveInitiateReplicableSyncSuccess,
         { action: ACTION_TYPES.RESYNC, projectName: 'test' },
         state,
-        [{ type: types.RECEIVE_INITIATE_DESIGN_SYNC_SUCCESS }],
-        [{ type: 'fetchDesigns' }],
+        [{ type: types.RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS }],
+        [{ type: 'fetchReplicableItems' }],
         () => {
           expect(toast).toHaveBeenCalledTimes(1);
           toast.mockClear();
@@ -292,13 +299,13 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('receiveInitiateDesignSyncError', () => {
-    it('should commit mutation RECEIVE_INITIATE_DESIGN_SYNC_ERROR', () => {
+  describe('receiveInitiateReplicableSyncError', () => {
+    it('should commit mutation RECEIVE_INITIATE_REPLICABLE_SYNC_ERROR', () => {
       testAction(
-        actions.receiveInitiateDesignSyncError,
+        actions.receiveInitiateReplicableSyncError,
         { action: ACTION_TYPES.RESYNC, projectId: 1, projectName: 'test' },
         state,
-        [{ type: types.RECEIVE_INITIATE_DESIGN_SYNC_ERROR }],
+        [{ type: types.RECEIVE_INITIATE_REPLICABLE_SYNC_ERROR }],
         [],
         () => {
           expect(flash).toHaveBeenCalledTimes(1);
@@ -329,8 +336,8 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestInitiateDesignSync' },
-            { type: 'receiveInitiateDesignSyncSuccess', payload: { name, action } },
+            { type: 'requestInitiateReplicableSync' },
+            { type: 'receiveInitiateReplicableSyncSuccess', payload: { name, action } },
           ],
           done,
         );
@@ -353,9 +360,9 @@ describe('GeoDesigns Store Actions', () => {
           state,
           [],
           [
-            { type: 'requestInitiateDesignSync' },
+            { type: 'requestInitiateReplicableSync' },
             {
-              type: 'receiveInitiateDesignSyncError',
+              type: 'receiveInitiateReplicableSyncError',
               payload: { name: 'test' },
             },
           ],

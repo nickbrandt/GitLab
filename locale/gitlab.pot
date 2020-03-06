@@ -19792,10 +19792,10 @@ msgstr ""
 msgid "There was an error fetching median data for stages"
 msgstr ""
 
-msgid "There was an error fetching the Designs"
+msgid "There was an error fetching the Node's Groups"
 msgstr ""
 
-msgid "There was an error fetching the Node's Groups"
+msgid "There was an error fetching the designs"
 msgstr ""
 
 msgid "There was an error fetching the environments information."
@@ -19837,7 +19837,7 @@ msgstr ""
 msgid "There was an error subscribing to this label."
 msgstr ""
 
-msgid "There was an error syncing the Design Repositories."
+msgid "There was an error syncing the designs."
 msgstr ""
 
 msgid "There was an error trying to validate your query"
