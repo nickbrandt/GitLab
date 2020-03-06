@@ -2152,8 +2152,6 @@ describe Gitlab::Git::Repository, :seed_helper do
         'gitaly_address' => Gitlab.config.repositories.storages.default.gitaly_address,
         'path' => second_storage_path
       })
-      # TODO: SetupHelper should be creating this
-      FileUtils.mkdir_p("tmp/tests/second_storage") unless File.exist?("tmp/tests/second_storage")
       Gitlab::Shell.new.create_repository('test_second_storage', TEST_REPO_PATH, 'group/project')
     end
 

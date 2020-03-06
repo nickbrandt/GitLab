@@ -141,6 +141,7 @@ module TestEnv
     end
 
     FileUtils.mkdir_p(repos_path)
+    FileUtils.mkdir_p(Rails.root.join('tmp', 'tests', 'second_storage'))
     FileUtils.mkdir_p(backup_path)
     FileUtils.mkdir_p(pages_path)
     FileUtils.mkdir_p(artifacts_path)
@@ -175,8 +176,6 @@ module TestEnv
       # Gitaly has been spawned outside this process already
       return
     end
-
-    FileUtils.mkdir_p("tmp/tests/second_storage") unless File.exist?("tmp/tests/second_storage")
 
     spawn_script = Rails.root.join('scripts/gitaly-test-spawn').to_s
     Bundler.with_original_env do
