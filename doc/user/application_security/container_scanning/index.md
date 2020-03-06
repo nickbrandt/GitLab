@@ -239,7 +239,7 @@ Container Scanning can be executed on an offline air-gapped GitLab Ultimate inst
    self-signed certificate, then you must set `DOCKER_INSECURE: true` in the above
    `container_scanning` section of your `.gitlab-ci.yml`.
 
-It may be worthwhile to set up a [scheduled pipeline](../../project/pipelines/schedules.md) to automatically build a new version of the vulnerabilities database on a preset schedule. You can use the following `.gitlab-yml.ci` as a template:
+It may be worthwhile to set up a [scheduled pipeline](../../../ci/pipelines/schedules.md) to automatically build a new version of the vulnerabilities database on a preset schedule. You can use the following `.gitlab-yml.ci` as a template:
 
 ```yaml
 image: docker:stable
