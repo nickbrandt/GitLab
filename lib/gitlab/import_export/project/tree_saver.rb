@@ -17,15 +17,13 @@ module Gitlab
         def save
           json_writer = ImportExport::JSON::LegacyWriter.new(File.join(@shared.export_path, "project.json"))
 
-          serializer = ImportExport::JSON::StreamingSerializer.new(@project, reader.project_tree, json_writer)
-          serializer.overrides['description'] = @params[:description] if @params[:description].present?
-          serializer.additional_relations['project_members'] = group_members_array
+          serializer = ImportExport::JSON::StreamingSerializer.new(exportable, reader.project_tree, json_writer)
           serializer.execute
 
           true
-        #rescue => e
-        #  @shared.error(e)
-        #  false
+        rescue => e
+          @shared.error(e)
+          false
         ensure
           json_writer&.close
         end
@@ -36,22 +34,22 @@ module Gitlab
           @reader ||= Gitlab::ImportExport::Reader.new(shared: @shared)
         end
 
-        def group_members_array
-          group_members.as_json(reader.group_members_tree).each do |group_member|
-            group_member['source_type'] = 'Project' # Make group members project members of the future import
-          end
+        def exportable
+          @project.present(exportable_params)
         end
 
-        def group_members
-          return [] unless @current_user.can?(:admin_group, @project.group)
+        def exportable_params
+          params = {
+          presenter_class: presenter_class,
+            current_user: @current_user,
+            group_members_tree: reader.group_members_tree
+          }
+          params[:override_description] = @params[:description] if @params[:description]
+          params
+        end
 
-          # We need `.where.not(user_id: nil)` here otherwise when a group has an
-          # invitee, it would make the following query return 0 rows since a NULL
-          # user_id would be present in the subquery
-          # See http://stackoverflow.com/questions/129077/not-in-clause-and-null-values
-          non_null_user_ids = @project.project_members.where.not(user_id: nil).select(:user_id)
-
-          GroupMembersFinder.new(@project.group).execute.where.not(user_id: non_null_user_ids)
+        def presenter_class
+          Projects::ImportExport::ProjectExportPresenter
         end
       end
     end

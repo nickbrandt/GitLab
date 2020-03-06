@@ -6,9 +6,6 @@ module Gitlab
       class StreamingSerializer
         include Gitlab::ImportExport::CommandLineUtil
 
-        attr_reader :overrides
-        attr_reader :additional_relations
-
         BATCH_SIZE = 100
 
         class Raw < String
@@ -20,9 +17,7 @@ module Gitlab
         def initialize(exportable, relations_schema, json_writer)
           @exportable = exportable
           @relations_schema = relations_schema
-          @overrides = {}
           @json_writer = json_writer
-          @additional_relations = {}
         end
 
         def execute
@@ -40,10 +35,7 @@ module Gitlab
         def serialize_root
           attributes = exportable.as_json(
             relations_schema.merge(include: nil, preloads: nil))
-
-          data = attributes.merge(overrides)
-
-          json_writer.set(data)
+          json_writer.set(attributes)
         end
 
         def serialize_relation(definition)
@@ -54,7 +46,6 @@ module Gitlab
           options = definition.first.second
 
           record = exportable.public_send(key) # rubocop: disable GitlabSecurity/PublicSend
-
           if record.is_a?(ActiveRecord::Relation)
             serialize_many_relations(key, record, options)
           else
@@ -73,12 +64,6 @@ module Gitlab
 
               json_writer.append(key, item)
             end
-          end
-
-          additional_relations[key].to_a.each do |item|
-            item = Raw.new(item.to_json(options))
-
-            json_writer.append(key, item)
           end
         end
 
