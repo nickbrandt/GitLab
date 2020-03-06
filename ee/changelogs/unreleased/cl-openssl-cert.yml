@@ -1,0 +1,5 @@
+---
+title: Set the default SSL cert path environment variables when invoking indexer
+merge_request: 26036
+author:
+type: fixed
