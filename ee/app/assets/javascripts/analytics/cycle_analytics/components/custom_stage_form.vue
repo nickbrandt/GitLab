@@ -280,10 +280,10 @@ export default {
         <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
       </gl-dropdown>
     </div>
-
     <gl-form-group
       ref="name"
       :label="s__('CustomCycleAnalytics|Name')"
+      label-for="custom-stage-name"
       :state="!hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
     >
@@ -302,6 +302,7 @@ export default {
         <gl-form-group
           ref="startEventIdentifier"
           :label="s__('CustomCycleAnalytics|Start event')"
+          label-for="custom-stage-start-event"
           :state="!hasFieldErrors('startEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('startEventIdentifier')"
         >
@@ -318,6 +319,7 @@ export default {
         <gl-form-group
           ref="startEventLabelId"
           :label="s__('CustomCycleAnalytics|Start event label')"
+          label-for="custom-stage-start-event-label"
           :state="!hasFieldErrors('startEventLabelId')"
           :invalid-feedback="fieldErrorMessage('startEventLabelId')"
         >
@@ -336,6 +338,7 @@ export default {
         <gl-form-group
           ref="endEventIdentifier"
           :label="s__('CustomCycleAnalytics|Stop event')"
+          label-for="custom-stage-stop-event"
           :state="!hasFieldErrors('endEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
         >
@@ -353,6 +356,7 @@ export default {
         <gl-form-group
           ref="endEventLabelId"
           :label="s__('CustomCycleAnalytics|Stop event label')"
+          label-for="custom-stage-stop-event-label"
           :state="!hasFieldErrors('endEventLabelId')"
           :invalid-feedback="fieldErrorMessage('endEventLabelId')"
         >
