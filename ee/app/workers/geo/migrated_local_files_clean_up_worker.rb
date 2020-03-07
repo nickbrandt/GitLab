@@ -58,7 +58,7 @@ module Geo
     def find_migrated_local_attachments_ids(batch_size:)
       return [] unless attachments_object_store_enabled?
 
-      attachments_finder.find_migrated_local(batch_size: batch_size, except_file_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
+      attachments_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
                         .pluck(:uploader, :id)
                         .map { |uploader, id| [uploader.sub(/Uploader\z/, '').underscore, id] }
     end

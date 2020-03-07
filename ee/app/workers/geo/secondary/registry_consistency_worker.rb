@@ -16,7 +16,7 @@ module Geo
       feature_category :geo_replication
 
       # This is probably not the best place to "register" replicables for this functionality
-      REGISTRY_CLASSES = [Geo::JobArtifactRegistry, Geo::LfsObjectRegistry].freeze
+      REGISTRY_CLASSES = [Geo::JobArtifactRegistry, Geo::LfsObjectRegistry, Geo::UploadRegistry].freeze
       BATCH_SIZE = 1000
 
       # @return [Boolean] true if at least 1 registry was created, else false
