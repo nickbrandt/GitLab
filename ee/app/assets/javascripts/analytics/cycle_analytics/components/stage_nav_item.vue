@@ -57,7 +57,7 @@ export default {
       return this.canEdit && this.isHover;
     },
     openMenuClasses() {
-      return this.menuOpen ? 'd-flex flex-row justify-content-end' : '';
+      return this.menuOpen ? 'd-flex justify-content-end' : '';
     },
   },
   mounted() {

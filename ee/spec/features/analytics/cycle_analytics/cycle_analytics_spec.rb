@@ -741,22 +741,6 @@ describe 'Group Value Stream Analytics', :js do
             expect(nav).not_to have_text(custom_stage_name)
           end
         end
-
-        context 'custom stage with a long name' do
-          let(:bad_custom_stage_name) { 'This is a very very very long stage name that will break the ui' }
-          let(:params) { { name: bad_custom_stage_name, start_event_identifier: start_event_identifier, end_event_identifier: end_event_identifier } }
-
-          before do
-            create_custom_stage
-            select_group
-
-            expect(page).to have_text bad_custom_stage_name
-          end
-
-          it 'will have a tooltip for the stage' do
-            expect(page.find(".stage-nav")).to have_css "span[title='#{bad_custom_stage_name}']"
-          end
-        end
       end
     end
 
