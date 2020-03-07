@@ -19,6 +19,11 @@ FactoryBot.define do
       retry_count { 1 }
     end
 
+    trait :never_synced do
+      success { false }
+      retry_count { nil }
+    end
+
     trait :with_file do
       after(:build, :stub) do |registry, _|
         file =

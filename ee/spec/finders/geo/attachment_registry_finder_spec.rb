@@ -53,7 +53,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         end
 
         it 'returns attachments without an entry on the tracking database, excluding from exception list' do
-          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_issuable_synced_nested_project.id])
+          attachments = subject.find_unsynced(batch_size: 10, except_ids: [upload_issuable_synced_nested_project.id])
 
           expect(attachments).to match_ids(upload_unsynced_project, upload_synced_project, upload_personal_snippet,
                                            upload_remote_unsynced_project, upload_remote_synced_group)
@@ -64,7 +64,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns local attachments only' do
-          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_synced_project.id])
+          attachments = subject.find_unsynced(batch_size: 10, except_ids: [upload_synced_project.id])
 
           expect(attachments).to match_ids(upload_issuable_synced_nested_project, upload_unsynced_project,
                                            upload_personal_snippet)
@@ -75,7 +75,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
         it 'returns attachments without an entry on the tracking database, excluding from exception list' do
-          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_synced_project.id])
+          attachments = subject.find_unsynced(batch_size: 10, except_ids: [upload_synced_project.id])
 
           expect(attachments).to match_ids(upload_issuable_synced_nested_project, upload_personal_snippet,
                                            upload_remote_synced_group)
@@ -101,7 +101,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       it 'returns attachments stored remotely and successfully synced locally' do
-        attachments = subject.find_migrated_local(batch_size: 100, except_file_ids: [upload_remote_unsynced_project.id])
+        attachments = subject.find_migrated_local(batch_size: 100, except_ids: [upload_remote_unsynced_project.id])
 
         expect(attachments).to match_ids(upload_remote_synced_project)
       end
