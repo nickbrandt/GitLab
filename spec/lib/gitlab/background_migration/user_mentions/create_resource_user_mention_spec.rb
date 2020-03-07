@@ -2,6 +2,8 @@
 
 require 'spec_helper'
 require './db/post_migrate/20200128134110_migrate_commit_notes_mentions_to_db'
+require './db/post_migrate/20200127131953_migrate_snippet_mentions_to_db'
+require './db/post_migrate/20200127151953_migrate_snippet_notes_mentions_to_db'
 require './db/post_migrate/20200211155539_migrate_merge_request_mentions_to_db'
 
 describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: 20200211155539 do
@@ -97,11 +99,38 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
 
       it_behaves_like 'resource notes mentions migration', MigrateCommitNotesMentionsToDb, Commit
     end
+
+    context 'migrate snippet mentions' do
+      let(:snippets) { table(:snippets) }
+      let(:snippet_user_mentions) { table(:snippet_user_mentions) }
+
+      let!(:snippet1) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title1', description: description_mentions) }
+      let!(:snippet2) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title2', description: 'some description') }
+      let!(:snippet3) { snippets.create!(project_id: project.id, author_id: author.id, title: 'title3', description: 'description with an email@example.com and some other @ char here.') }
+
+      let(:user_mentions) { snippet_user_mentions }
+      let(:resource) { snippet1 }
+
+      it_behaves_like 'resource mentions migration', MigrateSnippetMentionsToDb, Snippet
+
+      context 'mentions in note' do
+        let!(:note1) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions) }
+        let!(:note2) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: 'sample note') }
+        let!(:note3) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions, system: true) }
+        # this not does not have actual mentions
+        let!(:note4) { notes.create!(noteable_id: snippet1.id, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: 'note3 for an email@somesite.com and some other rando @ ref' ) }
+        # this note points to an innexistent noteable record in snippets table
+        let!(:note5) { notes.create!(noteable_id: snippets.maximum(:id) + 10, noteable_type: 'Snippet', project_id: project.id, author_id: author.id, note: description_mentions) }
+
+        it_behaves_like 'resource notes mentions migration', MigrateSnippetNotesMentionsToDb, Snippet
+      end
+    end
   end
 
   context 'checks no_quote_columns' do
     it 'has correct no_quote_columns' do
       expect(Gitlab::BackgroundMigration::UserMentions::Models::MergeRequest.no_quote_columns).to match([:note_id, :merge_request_id])
+      expect(Gitlab::BackgroundMigration::UserMentions::Models::Snippet.no_quote_columns).to match([:note_id, :snippet_id])
     end
 
     it 'commit has correct no_quote_columns' do
