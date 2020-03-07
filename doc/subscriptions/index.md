@@ -180,7 +180,7 @@ The following table describes details of your subscription for groups:
 
 ## Renew your subscription
 
-To renew your subscription, [prepare for renewal by reviewing your account](#prepare-for-renewal-by-checking-your-account), then do one of the following:
+To renew your subscription, [prepare for renewal by reviewing your account](#prepare-for-renewal-by-reviewing-your-account), then do one of the following:
 
 - [Renew a GitLab.com subscription](#renew-or-change-a-gitlabcom-subscription).
 - [Renew a self-managed subscription](#renew-a-self-managed-subscription).
