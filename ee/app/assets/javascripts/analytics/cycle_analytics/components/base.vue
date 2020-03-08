@@ -13,6 +13,7 @@ import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
+import UrlSync from './url_sync.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -27,6 +28,7 @@ export default {
     StageDropdownFilter,
     Scatterplot,
     TasksByTypeChart,
+    UrlSync,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -203,6 +205,7 @@ export default {
 
 <template>
   <div class="js-cycle-analytics">
+    <url-sync />
     <div class="page-title-holder d-flex align-items-center">
       <h3 class="page-title">{{ __('Value Stream Analytics') }}</h3>
     </div>
