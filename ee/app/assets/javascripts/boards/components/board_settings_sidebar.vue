@@ -212,6 +212,9 @@ export default {
           :disabled="updating"
           :placeholder="$options.inputPlaceholderText"
           trim
+          number
+          type="number"
+          min="0"
           @input="handleWipLimitChange"
           @keydown.enter.native="onEnter"
           @blur="offFocus"
