@@ -8,21 +8,21 @@ const mockData = {
   },
 };
 
+const mockGenerateNewSCIMToken = jest.fn(() => Promise.resolve(mockData));
+
+jest.mock('ee/saml_providers/scim_token_service', () => {
+  return jest.fn(() => {
+    return { generateNewSCIMToken: mockGenerateNewSCIMToken };
+  });
+});
+
 describe('SCIMTokenToggleArea', () => {
   const FIXTURE = 'groups/saml_providers/show.html';
   let scimTokenToggleArea;
-  let generateNewSCIMToken;
   preloadFixtures(FIXTURE);
 
   beforeEach(() => {
     loadFixtures(FIXTURE);
-
-    generateNewSCIMToken = jasmine
-      .createSpy('generateNewSCIMToken')
-      .and.callFake(() => Promise.resolve(mockData));
-    spyOnDependency(SCIMTokenToggleArea, 'SCIMTokenService').and.returnValue({
-      generateNewSCIMToken,
-    });
 
     scimTokenToggleArea = new SCIMTokenToggleArea(
       '.js-generate-scim-token-container',
@@ -67,15 +67,15 @@ describe('SCIMTokenToggleArea', () => {
 
   describe('resetSCIMToken', () => {
     it('does not trigger token generation when the confirm is canceled', () => {
-      spyOn(window, 'confirm').and.returnValue(false);
+      jest.spyOn(window, 'confirm').mockReturnValue(false);
 
       scimTokenToggleArea.resetSCIMToken();
 
-      expect(generateNewSCIMToken).not.toHaveBeenCalled();
+      expect(mockGenerateNewSCIMToken).not.toHaveBeenCalled();
     });
 
     it('populates the scim form with the token data if the confirm is accepted', done => {
-      spyOn(window, 'confirm').and.returnValue(true);
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
 
       scimTokenToggleArea
         .resetSCIMToken()
