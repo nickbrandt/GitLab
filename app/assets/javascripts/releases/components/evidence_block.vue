@@ -23,18 +23,19 @@ export default {
       required: true,
     },
   },
-  computed: {
-    evidenceTitle() {
-      return sprintf(__('%{tag}-evidence.json'), { tag: this.release.tagName });
+  methods: {
+    evidenceTitle(index) {
+      const [tag, filename] = this.release.evidences[index].filepath.split('/').slice(-2);
+      return sprintf(__(`${tag}-${filename}`));
     },
-    evidenceUrl() {
-      return this.release.assets && this.release.assets.evidenceFilePath;
+    evidenceUrl(index) {
+      return this.release.evidences[index].filepath;
     },
-    shortSha() {
-      return truncateSha(this.sha);
+    sha(index) {
+      return this.release.evidences[index].sha;
     },
-    sha() {
-      return this.release.evidenceSha;
+    shortSha(index) {
+      return truncateSha(this.release.evidences[index].sha);
     },
   },
 };
@@ -47,28 +48,34 @@ export default {
         {{ __('Evidence collection') }}
       </b>
     </div>
-    <div class="d-flex align-items-baseline">
+    <div
+      v-for="(evidence, index) in this.release.evidences"
+      v-bind:key="index"
+      class="d-flex align-items-baseline"
+    >
       <gl-link
         v-gl-tooltip
         class="monospace"
         :title="__('Download evidence JSON')"
-        :download="evidenceTitle"
-        :href="evidenceUrl"
+        :download="evidenceTitle(index)"
+        :href="evidenceUrl(index)"
       >
-        <icon name="review-list" class="align-top append-right-4" /><span>{{ evidenceTitle }}</span>
+        <icon name="review-list" class="align-top append-right-4" /><span>
+          {{ evidenceTitle(index) }}
+        </span>
       </gl-link>
 
       <expand-button>
         <template slot="short">
-          <span class="js-short monospace">{{ shortSha }}</span>
+          <span class="js-short monospace">{{ shortSha(index) }}</span>
         </template>
         <template slot="expanded">
-          <span class="js-expanded monospace gl-pl-1">{{ sha }}</span>
+          <span class="js-expanded monospace gl-pl-1">{{ sha(index) }}</span>
         </template>
       </expand-button>
       <clipboard-button
         :title="__('Copy commit SHA')"
-        :text="sha"
+        :text="sha(index)"
         css-class="btn-default btn-transparent btn-clipboard"
       />
     </div>
