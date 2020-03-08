@@ -71,19 +71,19 @@ export const release = {
   evidences: [
     {
       filepath:
-        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidence-1.json',
+        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidences/1.json',
       sha: 'fb3a125fd69a0e5048ebfb0ba43eb32ce4911520dd8d',
       collected_at: '2018-10-19 15:43:20 +0200',
     },
     {
       filepath:
-        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidence-2.json',
+        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidences/2.json',
       sha: '6ebd17a66e6a861175735416e49cf677678029805712dd71bb805c609e2d9108',
       collected_at: '2018-10-19 15:43:20 +0200',
     },
     {
       filepath:
-        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidence-3.json',
+        'https://20592.qa-tunnel.gitlab.info/root/test-deployments/-/releases/v1.1.2/evidences/3.json',
       sha: '2f65beaf275c3cb4b4e24fb01d481cc475d69c957830833f15338384816b5cba',
       collected_at: '2018-10-19 15:43:20 +0200',
     },

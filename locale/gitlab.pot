@@ -22,6 +22,9 @@ msgstr ""
 msgid " (from %{timeoutSource})"
 msgstr ""
 
+msgid " Collected %{time}"
+msgstr ""
+
 msgid " Please sign in."
 msgstr ""
 
@@ -470,6 +473,9 @@ msgid "%{tags} tag per image name"
 msgstr ""
 
 msgid "%{tags} tags per image name"
+msgstr ""
+
+msgid "%{tag}-%{evidence}-%{filename}"
 msgstr ""
 
 msgid "%{template_project_id} is unknown or invalid"
@@ -5565,6 +5571,9 @@ msgid "Copy commands"
 msgstr ""
 
 msgid "Copy commit SHA"
+msgstr ""
+
+msgid "Copy evidence SHA"
 msgstr ""
 
 msgid "Copy file contents"
