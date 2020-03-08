@@ -17,6 +17,9 @@ import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type_chart.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
+import * as commonUtils from '~/lib/utils/common_utils';
+import * as urlUtils from '~/lib/utils/url_utility';
+import { toYmd } from 'ee/analytics/shared/utils';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
@@ -35,7 +38,9 @@ const defaultStubs = {
 };
 
 function createComponent({
-  opts = {},
+  opts = {
+    stubs: defaultStubs,
+  },
   shallow = true,
   withStageSelected = false,
   scatterplotEnabled = true,
@@ -94,6 +99,13 @@ describe('Cycle Analytics component', () => {
       .find(StageTable)
       .findAll('.stage-nav-item')
       .at(index);
+
+  const shouldSetUrlParams = result => {
+    return wrapper.vm.$nextTick().then(() => {
+      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(result, window.location.href, true);
+      expect(commonUtils.historyPushState).toHaveBeenCalled();
+    });
+  };
 
   const displaysProjectsDropdownFilter = flag => {
     expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
@@ -597,6 +609,84 @@ describe('Cycle Analytics component', () => {
         expect(findFlashError().innerText.trim()).toEqual(
           'There was an error while fetching value stream analytics duration data.',
         );
+      });
+    });
+  });
+
+  describe('Url Sync', () => {
+    beforeEach(() => {
+      commonUtils.historyPushState = jest.fn();
+      urlUtils.setUrlParams = jest.fn();
+
+      mock = new MockAdapter(axios);
+      wrapper = createComponent({
+        shallow: false,
+        stubs: {
+          ...defaultStubs,
+        },
+      });
+
+      wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
+        createdAfter: mockData.startDate,
+        createdBefore: mockData.endDate,
+      });
+    });
+
+    afterEach(() => {
+      commonUtils.historyPushState = null;
+      urlUtils.setUrlParams = null;
+      wrapper.destroy();
+      mock.restore();
+    });
+
+    it('sets the created_after and created_before url parameters', () => {
+      shouldSetUrlParams({
+        created_after: toYmd(mockData.startDate),
+        created_before: toYmd(mockData.endDate),
+        group_id: null,
+        'project_ids[]': [],
+      });
+    });
+
+    describe('with a group selected', () => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('setSelectedGroup', {
+          ...mockData.group,
+        });
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the group_id url parameter', () => {
+        shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: mockData.group.full_path,
+          'project_ids[]': [],
+        });
+      });
+    });
+
+    describe('with a group and selectedProjectIds set', () => {
+      const selectedProjectIds = mockData.selectedProjects.map(({ id }) => id);
+
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('setSelectedGroup', {
+          ...mockData.group,
+        });
+
+        wrapper.vm.$store.dispatch('setSelectedProjects', mockData.selectedProjects);
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the project_ids url parameter', () => {
+        shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: mockData.group.full_path,
+          'project_ids[]': selectedProjectIds,
+        });
       });
     });
   });

@@ -1,5 +1,3 @@
-import * as commonUtils from '~/lib/utils/common_utils';
-import * as urlUtils from '~/lib/utils/url_utility';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
@@ -12,7 +10,6 @@ import {
 } from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
-import { toYmd } from 'ee/analytics/shared/utils';
 import {
   group,
   summaryData,
@@ -47,9 +44,6 @@ describe('Cycle analytics actions', () => {
   }
 
   beforeEach(() => {
-    commonUtils.historyPushState = jest.fn();
-    urlUtils.setUrlParams = jest.fn();
-
     state = {
       startDate,
       endDate,
@@ -1526,8 +1520,6 @@ describe('Cycle analytics actions', () => {
     };
 
     beforeEach(() => {
-      commonUtils.historyPushState = jest.fn();
-      urlUtils.setUrlParams = jest.fn();
       mockDispatch = jest.fn(() => Promise.resolve());
       mockCommit = jest.fn();
       store = {

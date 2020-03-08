@@ -23,7 +23,7 @@ export default {
     },
   },
   render() {
-    return this.$slots.default;
+    return null;
   },
 };
 </script>
