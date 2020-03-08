@@ -11,7 +11,7 @@ describe OperationsHelper do
 
     before do
       helper.instance_variable_set(:@project, project)
-      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:current_user) { user }
       allow(helper)
         .to receive(:can?).with(user, :admin_operations, project) { true }
     end
@@ -31,8 +31,15 @@ describe OperationsHelper do
           )
       end
 
-      it 'returns nil or true for the values' do
-        expect(subject.values.uniq).to contain_exactly('true', nil)
+      it 'returns the correct values' do
+        expect(subject).to eq(
+          'user-can-enable-status-page' => 'true',
+          'setting-enabled' => nil,
+          'setting-aws-access-key' => nil,
+          'setting-masked-aws-secret-key' => nil,
+          'setting-aws-region' => nil,
+          'setting-aws-s3-bucket-name' => nil
+        )
       end
 
       context 'user does not have permission' do
@@ -41,8 +48,15 @@ describe OperationsHelper do
             .to receive(:can?).with(user, :admin_operations, project) { false }
         end
 
-        it 'returns nil or true for the values' do
-          expect(subject.values.uniq).to contain_exactly('false', nil)
+        it 'returns the correct values' do
+          expect(subject).to eq(
+            'user-can-enable-status-page' => 'false',
+            'setting-enabled' => nil,
+            'setting-aws-access-key' => nil,
+            'setting-masked-aws-secret-key' => nil,
+            'setting-aws-region' => nil,
+            'setting-aws-s3-bucket-name' => nil
+          )
         end
       end
     end

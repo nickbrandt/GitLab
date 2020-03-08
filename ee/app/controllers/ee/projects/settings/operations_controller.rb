@@ -41,7 +41,7 @@ module EE
             project.feature_available?(:tracing, current_user)
           end
 
-          def has_status_page_licence?
+          def has_status_page_license?
             project.feature_available?(:status_page, current_user)
           end
 
@@ -62,7 +62,7 @@ module EE
             permitted_params[:tracing_setting_attributes] = [:external_url]
           end
 
-          if has_status_page_licence?
+          if has_status_page_license?
             permitted_params.merge!(status_page_setting_params)
           end
 
