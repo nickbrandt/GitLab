@@ -5,7 +5,6 @@ import initAlertsSettings from '~/alerts_service_settings';
 document.addEventListener('DOMContentLoaded', () => {
   const prometheusSettingsWrapper = document.querySelector('.js-prometheus-metrics-monitoring');
   const integrationSettingsForm = new IntegrationSettingsForm('.js-integration-settings-form');
-  console.log(integrationSettingsForm);
   integrationSettingsForm.init();
 
   if (prometheusSettingsWrapper) {
