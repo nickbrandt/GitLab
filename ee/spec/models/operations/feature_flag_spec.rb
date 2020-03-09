@@ -213,4 +213,45 @@ describe Operations::FeatureFlag do
       end
     end
   end
+
+  describe '.for_unleash_client' do
+    let_it_be(:project) { create(:project) }
+    let!(:feature_flag) do
+      create(:operations_feature_flag, project: project,
+             name: 'feature1', active: true, version: 2)
+    end
+    let!(:strategy) do
+      create(:operations_strategy, feature_flag: feature_flag,
+             name: 'default', parameters: {})
+    end
+
+    it 'matches wild cards in the scope' do
+      create(:operations_scope, strategy: strategy, environment_scope: 'review/*')
+
+      flags = described_class.for_unleash_client(project, 'review/feature-branch')
+
+      expect(flags).to eq([feature_flag])
+    end
+
+    it 'matches wild cards case sensitively' do
+      create(:operations_scope, strategy: strategy, environment_scope: 'Staging/*')
+
+      flags = described_class.for_unleash_client(project, 'staging/feature')
+
+      expect(flags).to eq([])
+    end
+
+    it 'returns feature flags ordered by id' do
+      create(:operations_scope, strategy: strategy, environment_scope: 'production')
+      feature_flag_b = create(:operations_feature_flag, project: project,
+                              name: 'feature2', active: true, version: 2)
+      strategy_b = create(:operations_strategy, feature_flag: feature_flag_b,
+                          name: 'default', parameters: {})
+      create(:operations_scope, strategy: strategy_b, environment_scope: '*')
+
+      flags = described_class.for_unleash_client(project, 'production')
+
+      expect(flags.map(&:id)).to eq([feature_flag.id, feature_flag_b.id])
+    end
+  end
 end

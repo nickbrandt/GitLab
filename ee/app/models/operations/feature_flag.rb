@@ -50,6 +50,14 @@ module Operations
       def preload_relations
         preload(:scopes)
       end
+
+      def for_unleash_client(project, environment)
+        includes(strategies: :scopes)
+          .where(project: project)
+          .merge(Operations::FeatureFlags::Scope.on_environment(environment))
+          .reorder(:id)
+          .references(:operations_scopes)
+      end
     end
 
     private
