@@ -64,11 +64,19 @@ export default {
 </script>
 
 <template>
-  <div v-if="isFetchingMergeRequests || (!isFetchingMergeRequests && totalCount)" id="related-merge-requests">
+  <div
+    v-if="isFetchingMergeRequests || (!isFetchingMergeRequests && totalCount)"
+    id="related-merge-requests"
+  >
     <div id="merge-requests" class="card card-slim mt-3">
       <div class="card-header">
         <div class="card-title mt-0 mb-0 h5 merge-requests-title">
-            <a id="user-content-related-merge-requests" class="anchor" href="#related-merge-requests" aria-hidden="true"></a>
+          <a
+            id="user-content-related-merge-requests"
+            class="anchor"
+            href="#related-merge-requests"
+            aria-hidden="true"
+          ></a>
           <span class="mr-1">
             {{ __('Related merge requests') }}
           </span>

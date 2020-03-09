@@ -118,7 +118,12 @@ export default {
     <div class="card card-slim">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
         <h3 class="card-title mt-0 mb-0 h5">
-          <a id="user-content-related-issues" class="anchor" href="#related-issues" aria-hidden="true"></a>
+          <a
+            id="user-content-related-issues"
+            class="anchor"
+            href="#related-issues"
+            aria-hidden="true"
+          ></a>
           {{ __('Linked issues') }}
           <a v-if="hasHelpPath" :href="helpPath">
             <i
