@@ -14,18 +14,32 @@ describe SubscriptionsController do
         stub_experiment_for_user(paid_signup_flow: true)
       end
 
-      context 'with unauthorized user' do
+      context 'with unauthenticated user' do
         it { is_expected.to have_gitlab_http_status(:redirect) }
-        it { is_expected.to redirect_to new_user_registration_path }
+        it { is_expected.to redirect_to new_user_registration_path(redirect_from: 'checkout') }
 
         it 'stores subscription URL for later' do
           subject
 
-          expect(controller.stored_location_for(:user)).to eq(new_subscriptions_path(plan_id: 'bronze_id'))
+          expected_subscription_path = new_subscriptions_path(experiment_started: true, plan_id: 'bronze_id')
+
+          expect(controller.stored_location_for(:user)).to eq(expected_subscription_path)
+        end
+
+        it 'tracks the event when experiment starts' do
+          expect(Gitlab::Tracking).to receive(:event).with('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start_experiment', label: nil, value: nil)
+
+          subject
+        end
+
+        it 'does not track event when user got redirected to the subscription page again' do
+          get :new, params: { plan_id: 'bronze_id', experiment_started: 'true' }
+
+          expect(Gitlab::Tracking).not_to receive(:event).with('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start_experiment', label: nil, value: nil)
         end
       end
 
-      context 'with authorized user' do
+      context 'with authenticated user' do
         before do
           sign_in(user)
         end
@@ -34,6 +48,7 @@ describe SubscriptionsController do
         it { is_expected.to render_template :new }
 
         it 'tracks the event with the right parameters' do
+          expect(Gitlab::Tracking).to receive(:event).with('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start_experiment', label: nil, value: nil)
           expect(Gitlab::Tracking).to receive(:event).with('Growth::Acquisition::Experiment::PaidSignUpFlow', 'start', label: nil, value: nil)
 
           subject
@@ -197,7 +212,13 @@ describe SubscriptionsController do
         it 'returns the group edit location in JSON format' do
           subject
 
-          expect(response.body).to eq({ location: "/-/subscriptions/groups/#{group.path}/edit?plan_id=x&quantity=2" }.to_json)
+          expected_response = {
+            location: "/-/subscriptions/groups/#{group.path}/edit?plan_id=x&quantity=2",
+            plan_id: 'x',
+            quantity: 2
+          }
+
+          expect(response.body).to eq(expected_response.to_json)
         end
       end
 
@@ -234,7 +255,13 @@ describe SubscriptionsController do
         it 'returns the selected group location in JSON format' do
           subject
 
-          expect(response.body).to eq({ location: "/#{selected_group.path}" }.to_json)
+          expected_response = {
+            location: "/#{selected_group.path}",
+            plan_id: 'x',
+            quantity: 1
+          }
+
+          expect(response.body).to eq(expected_response.to_json)
         end
       end
 
