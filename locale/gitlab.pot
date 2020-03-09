@@ -5172,7 +5172,7 @@ msgstr ""
 msgid "Configure limits on the number of inbound alerts able to be sent to a project."
 msgstr ""
 
-msgid "Configure paths to be protected by Rack Attack. A web server restart is required after changing these settings."
+msgid "Configure paths to be protected by Rack Attack."
 msgstr ""
 
 msgid "Configure repository mirroring."
