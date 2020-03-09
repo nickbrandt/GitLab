@@ -3,13 +3,11 @@
 require 'spec_helper'
 
 describe Projects::EvidencesController do
-  let!(:project)         { create(:project, :repository, :public) }
-  let!(:private_project) { create(:project, :repository, :private) }
+  let!(:project) { create(:project, :repository, :public) }
+  let_it_be(:private_project) { create(:project, :repository, :private) }
+  let_it_be(:developer)  { create(:user) }
+  let_it_be(:reporter)   { create(:user) }
   let(:user)             { developer }
-  let(:developer)        { create(:user) }
-  let(:reporter)         { create(:user) }
-  let!(:release_1)       { create(:release, project: project, released_at: Time.zone.parse('2018-10-18')) }
-  let!(:release_2)       { create(:release, project: project, released_at: Time.zone.parse('2019-10-19')) }
 
   before do
     project.add_developer(developer)

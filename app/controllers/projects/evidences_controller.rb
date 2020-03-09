@@ -3,7 +3,6 @@
 class Projects::EvidencesController < Projects::ApplicationController
   before_action :require_non_empty_project
   before_action :release
-  before_action :authorize_read_release!
   before_action :authorize_read_release_evidence!
 
   def show
