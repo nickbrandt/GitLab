@@ -107,7 +107,7 @@ export default {
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
-    shouldUseFirstClassVulns() {
+    shouldUseFirstClassVulnerabilities() {
       const { dashboardType } = this;
       return Boolean(
         gon?.features?.firstClassVulnerabilities &&
@@ -115,6 +115,9 @@ export default {
             dashboardType === DASHBOARD_TYPES.GROUP ||
             dashboardType === DASHBOARD_TYPES.INSTANCE),
       );
+    },
+    hasMultiplePages() {
+      return this.pageInfo.total > 1;
     },
   },
   watch: {
@@ -184,7 +187,7 @@ export default {
 
       <div class="row mt-4">
         <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-          <template v-if="shouldUseFirstClassVulns">
+          <template v-if="shouldUseFirstClassVulnerabilities">
             <vulnerability-list
               :is-loading="isLoadingVulnerabilities"
               :vulnerabilities="vulnerabilities"
@@ -194,7 +197,7 @@ export default {
               </template>
             </vulnerability-list>
             <pagination-links
-              v-if="pageInfo.total > 1"
+              v-if="hasMultiplePages"
               class="justify-content-center prepend-top-default"
               :page-info="pageInfo"
               :change="fetchPage"
