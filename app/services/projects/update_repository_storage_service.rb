@@ -23,7 +23,7 @@ module Projects
 
       success
 
-    rescue Error => e
+    rescue Error, ArgumentError, Gitlab::Git::BaseError => e
       project.update(repository_read_only: false)
 
       Gitlab::ErrorTracking.track_exception(e, project_path: project.full_path)
@@ -58,10 +58,7 @@ module Projects
                                                    raw_repository.gl_repository,
                                                    full_path)
 
-      unless new_repository.replicate(raw_repository)
-        raise Error, s_('UpdateRepositoryStorage|Failed to fetch %{type} repository as mirror') % { type: type.name }
-      end
-
+      new_repository.replicate(raw_repository)
       new_checksum = new_repository.checksum
 
       if checksum != new_checksum

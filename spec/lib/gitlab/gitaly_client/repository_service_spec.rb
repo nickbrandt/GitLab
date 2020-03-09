@@ -304,7 +304,6 @@ describe Gitlab::GitalyClient::RepositoryService do
       expect_any_instance_of(Gitaly::RepositoryService::Stub)
         .to receive(:replicate_repository)
         .with(gitaly_request_with_path(storage_name, relative_path), kind_of(Hash))
-        .and_return(double(value: true))
 
       client.replicate(source_repository)
     end

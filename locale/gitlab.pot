@@ -21370,9 +21370,6 @@ msgstr ""
 msgid "UpdateRepositoryStorage|Error moving repository storage for %{project_full_path} - %{message}"
 msgstr ""
 
-msgid "UpdateRepositoryStorage|Failed to fetch %{type} repository as mirror"
-msgstr ""
-
 msgid "UpdateRepositoryStorage|Failed to verify %{type} repository checksum from %{old} to %{new}"
 msgstr ""
 
