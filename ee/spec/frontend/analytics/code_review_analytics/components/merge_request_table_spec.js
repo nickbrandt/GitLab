@@ -59,6 +59,8 @@ describe('MergeRequestTable component', () => {
 
   describe('template', () => {
     beforeEach(() => {
+      jest.spyOn(global, 'Date').mockImplementationOnce(() => new Date('2020-03-09T11:01:58.135Z'));
+
       bootstrap({ mergeRequests });
     });
 
