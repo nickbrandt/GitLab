@@ -2206,6 +2206,7 @@ ActiveRecord::Schema.define(version: 2020_03_06_170531) do
     t.integer "duplicated_to_id"
     t.integer "promoted_to_epic_id"
     t.integer "health_status", limit: 2
+    t.index ["author_id", "id", "created_at"], name: "index_issues_on_author_id_and_id_and_created_at"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["closed_by_id"], name: "index_issues_on_closed_by_id"
     t.index ["confidential"], name: "index_issues_on_confidential"
