@@ -11,7 +11,7 @@ module MergeRequests
       # return if merge_request.merged? # nothing to do, this worker has already run at least once
 
       # These operations need to happen transactionally
-      ActiveRecord::Base.transaction do
+      ActiveRecord::Base.transaction(requires_new: true) do
         merge_request.mark_as_merged
         create_event(merge_request)
         create_note(merge_request)
@@ -20,14 +20,14 @@ module MergeRequests
         # Better to have duplicate notifications than no notifications.
         todo_service.merge_merge_request(merge_request, current_user)
         notification_service.merge_mr(merge_request, current_user)
-
-        # These operations are idempotent so can be safely run multiple times
-        close_issues(merge_request)
-        invalidate_cache_counts(merge_request, users: merge_request.assignees)
-        merge_request.update_project_counter_caches
-        delete_non_latest_diffs(merge_request)
-        cleanup_environments(merge_request)
       end
+
+      # These operations are idempotent so can be safely run multiple times
+      close_issues(merge_request)
+      invalidate_cache_counts(merge_request, users: merge_request.assignees)
+      merge_request.update_project_counter_caches
+      delete_non_latest_diffs(merge_request)
+      cleanup_environments(merge_request)
 
       # Anything after this point will be executed at-most-once. Less important activity only
       # TODO: make all the work in here a separate sidekiq job so it can go in the transaction
