@@ -140,6 +140,13 @@ describe MergeRequests::SquashService do
     context 'when the merge request has already been merged' do
       let(:merge_request) { merge_request_with_one_commit }
 
+      it 'checks the side-effects for multiple calls' do
+        merge_request.mark_as_merged
+
+        expect(service).to be_idempotent
+        expect { IdempotentWorkerHelper::WORKER_EXEC_TIMES.times { service.execute } }.not_to raise_error
+      end
+
       it 'idempotently returns a success' do
         merge_request.mark_as_merged
         result = service.execute

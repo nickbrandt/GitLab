@@ -4,6 +4,10 @@ module MergeRequests
   class SquashService < MergeRequests::BaseService
     include Git::Logger
 
+    def idempotent?
+      true
+    end
+
     def execute
       # If performing a squash would result in no change, then
       # immediately return a success message without performing a squash
