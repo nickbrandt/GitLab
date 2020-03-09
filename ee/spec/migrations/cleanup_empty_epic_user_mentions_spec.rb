@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200214173000_cleanup_empty_epic_user_mentions')
 
-describe CleanupEmptyEpicUserMentions, :migration, :sidekiq do
+describe CleanupEmptyEpicUserMentions, :sidekiq do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }

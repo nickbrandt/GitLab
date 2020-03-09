@@ -7,7 +7,7 @@ require './db/post_migrate/20200214174519_remigrate_epic_mentions_to_db'
 require './db/post_migrate/20200214174607_remigrate_epic_notes_mentions_to_db'
 require './db/post_migrate/20200124110831_migrate_design_notes_mentions_to_db'
 
-describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: :latest do
   include MigrationsHelpers
 
   context 'when migrating data' do

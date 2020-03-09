@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesCheckProgress do
+describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesCheckProgress, schema: :latest do
   context 'when there is MigrateApproverToApprovalRulesInBatch jobs' do
     it 'reschedules check' do
       allow(Gitlab::BackgroundMigration).to receive(:exists?).with('MigrateApproverToApprovalRulesInBatch').and_return(true)

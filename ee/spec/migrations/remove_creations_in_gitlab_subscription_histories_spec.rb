@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20200113151354_remove_creations_in_gitlab_subscription_histories.rb')
 
-describe RemoveCreationsInGitlabSubscriptionHistories, :migration do
+describe RemoveCreationsInGitlabSubscriptionHistories do
   GITLAB_SUBSCRIPTION_CREATED = 0
   GITLAB_SUBSCRIPTION_UPDATED = 1
   GITLAB_SUBSCRIPTION_DESTROYED = 2
