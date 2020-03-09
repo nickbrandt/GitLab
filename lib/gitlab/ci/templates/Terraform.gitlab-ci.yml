@@ -18,6 +18,8 @@ cache:
     - .terraform
 
 before_script:
+  - apk update && apk add jq
+  - alias convert_report="jq '([.resource_changes[].change.actions] | flatten) | {\"create\": (map(select(. == \"create\")) | length),\"update\":(map(select(. == \"update\")) | length),\"delete\": (map(select(. == \"delete\")) | length)}'"
   - terraform --version
   - terraform init
 
@@ -35,15 +37,12 @@ validate:
 plan:
   stage: build
   script:
-    - apk update && apk add jq
     - terraform plan -out=$PLAN
-    - "terraform show --json $PLAN | jq '([.resource_changes[].change.actions] | flatten) | {\"create\": (map(select(. == \"create\")) | length),\"update\":(map(select(. == \"update\")) | length),\"delete\": (map(select(. == \"delete\")) | length)}' > tfplan.json"
+    - "terraform show --json $PLAN | convert_report > tfplan.json"
   artifacts:
     name: plan
     paths:
       - $PLAN
-    reports:
-      terraform: tfplan.json
 
 # Separate apply job for manual launching Terraform as it can be destructive
 # action.
