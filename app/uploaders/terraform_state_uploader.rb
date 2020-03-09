@@ -3,7 +3,7 @@
 class TerraformStateUploader < GitlabUploader
   include ObjectStorage::Concern
 
-  storage_options Gitlab.config.uploads
+  storage_options Gitlab.config.terraform_state
 
   delegate :project_id, to: :model
 

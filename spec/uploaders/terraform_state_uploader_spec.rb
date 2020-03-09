@@ -8,7 +8,7 @@ describe TerraformStateUploader do
   let(:terraform_state) { create(:terraform_state, file: fixture_file_upload('spec/fixtures/terraform.tfstate')) }
 
   before do
-    stub_uploads_object_storage
+    stub_terraform_state_object_storage
   end
 
   describe '#filename' do
