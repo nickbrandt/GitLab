@@ -103,8 +103,8 @@ export default {
       </div>
       <gl-loading-icon
         v-if="group.isChildrenLoading"
-        size="md"
-        class="d-none d-sm-inline-flex flex-shrink-0 append-right-10"
+        size="lg"
+        class="d-none d-sm-inline-flex flex-shrink-0 append-right-8"
       />
       <div
         :class="{ 'd-sm-flex': !group.isChildrenLoading }"
