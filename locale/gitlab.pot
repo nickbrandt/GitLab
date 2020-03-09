@@ -18174,6 +18174,9 @@ msgstr ""
 msgid "Snippets|Optionally add a description about what your snippet does or how to use it..."
 msgstr ""
 
+msgid "Snippets|Optionally add a description about what your snippet does or how to use it…"
+msgstr ""
+
 msgid "Snowplow"
 msgstr ""
 
