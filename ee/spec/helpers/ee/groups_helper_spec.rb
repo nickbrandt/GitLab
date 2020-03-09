@@ -138,4 +138,37 @@ describe GroupsHelper do
       end
     end
   end
+
+  describe '#show_group_activity_analytics?' do
+    before do
+      stub_licensed_features(group_activity_analytics: feature_available)
+      allow(helper).to receive(:current_user) { current_user }
+      allow(helper).to receive(:can?) { |*args| Ability.allowed?(*args) }
+    end
+
+    context 'when feature is not available for group' do
+      let(:feature_available) { false }
+
+      it 'returns false' do
+        expect(helper.show_group_activity_analytics?).to be false
+      end
+    end
+
+    context 'when current user does not have access to the group' do
+      let(:feature_available) { true }
+      let(:current_user) { create(:user) }
+
+      it 'returns false' do
+        expect(helper.show_group_activity_analytics?).to be false
+      end
+    end
+
+    context 'when feature is available and user has access to it' do
+      let(:feature_available) { true }
+
+      it 'returns true' do
+        expect(helper.show_group_activity_analytics?).to be true
+      end
+    end
+  end
 end

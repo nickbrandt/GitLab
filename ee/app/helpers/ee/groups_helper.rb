@@ -93,6 +93,14 @@ module EE
         current_user.ab_feature_enabled?(:discover_security)
     end
 
+    def show_group_activity_analytics?
+      return false unless @group.feature_available?(:group_activity_analytics)
+
+      return false unless can?(current_user, :read_group_activity_analytics, @group)
+
+      true
+    end
+
     private
 
     def get_group_sidebar_links
