@@ -241,6 +241,7 @@ module EE
         def usage_activity_by_stage_manage(time_period)
           {
             events: distinct_count(::Event.where(time_period), :author_id),
+            group_creators: distinct_count(::Group.where(time_period), :author_id),
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
             ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id)

@@ -166,6 +166,7 @@ describe Gitlab::UsageData do
             clusters_applications_jupyter
             in_review_folder
             grafana_integrated_projects
+            group_creators
             groups
             issues
             issues_created_from_gitlab_error_tracking_ui
