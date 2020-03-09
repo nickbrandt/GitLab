@@ -1616,6 +1616,7 @@ ActiveRecord::Schema.define(version: 2020_03_06_170531) do
     t.string "target_type"
     t.bigint "group_id"
     t.index ["action"], name: "index_events_on_action"
+    t.index ["author_id", "created_at"], name: "index_events_on_author_id_and_created_at"
     t.index ["author_id", "project_id"], name: "index_events_on_author_id_and_project_id"
     t.index ["created_at", "author_id"], name: "analytics_index_events_on_created_at_and_author_id"
     t.index ["group_id"], name: "index_events_on_group_id_partial", where: "(group_id IS NOT NULL)"
