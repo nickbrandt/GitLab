@@ -51,7 +51,7 @@ describe Projects::UpdateRepositoryStorageService do
         it 'bails out and does nothing' do
           expect do
             subject.execute(project.repository_storage)
-          end.to raise_error(described_class::RepositoryAlreadyMoved)
+          end.to raise_error(ArgumentError, /repository and source have the same storage/)
         end
       end
 

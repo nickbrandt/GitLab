@@ -5,19 +5,12 @@ module Projects
     include Gitlab::ShellAdapter
 
     Error = Class.new(StandardError)
-    RepositoryAlreadyMoved = Class.new(StandardError)
 
     def initialize(project)
       @project = project
     end
 
     def execute(new_repository_storage_key)
-      # Raising an exception is a little heavy handed but this behavior (doing
-      # nothing if the repo is already on the right storage) prevents data
-      # loss, so it is valuable for us to be able to observe it via the
-      # exception.
-      raise RepositoryAlreadyMoved if project.repository_storage == new_repository_storage_key
-
       mirror_repositories(new_repository_storage_key)
 
       mark_old_paths_for_archive
