@@ -64,7 +64,7 @@ export default {
 </script>
 
 <template>
-  <div id="related-merge-requests" v-if="isFetchingMergeRequests || (!isFetchingMergeRequests && totalCount)">
+  <div v-if="isFetchingMergeRequests || (!isFetchingMergeRequests && totalCount)" id="related-merge-requests">
     <div id="merge-requests" class="card card-slim mt-3">
       <div class="card-header">
         <div class="card-title mt-0 mb-0 h5 merge-requests-title">
