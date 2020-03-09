@@ -318,6 +318,12 @@ module EE
       feature_available?(:code_owner_approval_required)
     end
 
+    def github_external_pull_request_pipelines_available?
+      mirror? &&
+        feature_available?(:ci_cd_projects) &&
+        feature_available?(:github_project_service_integration)
+    end
+
     def scoped_approval_rules_enabled?
       ::Feature.enabled?(:scoped_approval_rules, self, default_enabled: true)
     end
