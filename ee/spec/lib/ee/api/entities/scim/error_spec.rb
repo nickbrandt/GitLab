@@ -2,9 +2,10 @@
 
 require 'spec_helper'
 
-describe ::EE::Gitlab::Scim::NotFound do
+describe ::EE::API::Entities::Scim::Error do
+  let(:params) { { detail: 'error' } }
   let(:entity) do
-    described_class.new({})
+    described_class.new(params)
   end
 
   subject { entity.as_json }
@@ -14,10 +15,10 @@ describe ::EE::Gitlab::Scim::NotFound do
   end
 
   it 'contains the detail' do
-    expect(subject[:detail]).to be_nil
+    expect(subject[:detail]).to eq(params[:detail])
   end
 
   it 'contains the status' do
-    expect(subject[:status]).to eq(404)
+    expect(subject[:status]).to eq(412)
   end
 end

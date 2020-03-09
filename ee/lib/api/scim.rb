@@ -34,15 +34,15 @@ module API
         end
 
         def scim_not_found!(message:)
-          render_scim_error(EE::Gitlab::Scim::NotFound, message)
+          render_scim_error(::EE::API::Entities::Scim::NotFound, message)
         end
 
         def scim_error!(message:)
-          render_scim_error(EE::Gitlab::Scim::Error, message)
+          render_scim_error(::EE::API::Entities::Scim::Error, message)
         end
 
         def scim_conflict!(message:)
-          render_scim_error(EE::Gitlab::Scim::Conflict, message)
+          render_scim_error(::EE::API::Entities::Scim::Conflict, message)
         end
 
         def check_access_to_group!(group)
@@ -65,7 +65,7 @@ module API
 
         # rubocop: disable CodeReuse/ActiveRecord
         def update_scim_user(identity)
-          parser = EE::Gitlab::Scim::ParamsParser.new(params)
+          parser = ::EE::Gitlab::Scim::ParamsParser.new(params)
           parsed_hash = parser.update_params
 
           if parser.deprovision_user?
@@ -107,7 +107,7 @@ module API
           status 200
 
           result_set = { resources: response_page, total_results: results.count, items_per_page: per_page(params[:count]), start_index: params[:startIndex] }
-          present result_set, with: ::EE::Gitlab::Scim::Users
+          present result_set, with: ::EE::API::Entities::Scim::Users
         rescue ScimFinder::UnsupportedFilter
           scim_error!(message: 'Unsupported Filter')
         end
@@ -124,7 +124,7 @@ module API
 
           status 200
 
-          present identity, with: ::EE::Gitlab::Scim::User
+          present identity, with: ::EE::API::Entities::Scim::User
         end
 
         desc 'Create a SAML user' do
@@ -132,14 +132,14 @@ module API
         end
         post do
           group = find_and_authenticate_group!(params[:group])
-          parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.post_params).execute
+          parser = ::EE::Gitlab::Scim::ParamsParser.new(params)
+          result = ::EE::Gitlab::Scim::ProvisioningService.new(group, parser.post_params).execute
 
           case result.status
           when :success
             status 201
 
-            present result.identity, with: ::EE::Gitlab::Scim::User
+            present result.identity, with: ::EE::API::Entities::Scim::User
           when :conflict
             scim_conflict!(message: "Error saving user with #{params.inspect}: #{result.message}")
           when :error

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::EE::Gitlab::Scim::Users do
+describe ::EE::API::Entities::Scim::Users do
   let(:user) { build(:user) }
   let(:identity) { build(:group_saml_identity, user: user) }
 
