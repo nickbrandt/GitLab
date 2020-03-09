@@ -117,6 +117,15 @@ describe Projects::Settings::OperationsController do
 
         expect(project.tracing_setting).to be_nil
       end
+
+      it 'does not create status_page_setting' do
+        update_project(
+          project,
+          status_page_params: attributes_for(:status_page_setting)
+        )
+
+        expect(project.status_page_setting).to be_nil
+      end
     end
 
     context 'format html' do
@@ -158,7 +167,7 @@ describe Projects::Settings::OperationsController do
 
     context 'with a license' do
       before do
-        stub_licensed_features(tracing: true, incident_management: true)
+        stub_licensed_features(tracing: true, incident_management: true, status_page: true)
       end
 
       shared_examples 'user with write access' do |project_visibility|
@@ -324,7 +333,7 @@ describe Projects::Settings::OperationsController do
 
     context 'without a license' do
       before do
-        stub_licensed_features(tracing: false, incident_management: false)
+        stub_licensed_features(tracing: false, incident_management: false, status_page: false)
       end
 
       it_behaves_like 'user without write access', :public, :maintainer
