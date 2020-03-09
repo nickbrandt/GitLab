@@ -64,6 +64,10 @@ describe('BoardSettingsSideBar', () => {
       findList: bs.findList,
       addList: bs.addList,
       removeList: bs.removeList,
+      scopedLabels: {
+        enabled: false,
+        scopedLabelsDocumentationLink: '',
+      },
     };
 
     boardsStore.initEESpecific(storeMock);

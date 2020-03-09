@@ -90,7 +90,7 @@ export default {
             new ListLabel({
               id: label.id,
               title: label.title,
-              color: label.color[0],
+              color: label.color,
               textColor: label.text_color,
             }),
           );

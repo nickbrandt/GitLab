@@ -13,6 +13,7 @@ import { __, n__ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import boardsStoreEE from '../stores/boards_store_ee';
 import flash from '~/flash';
+import { isScopedLabel } from '~/lib/utils/common_utils';
 
 // NOTE: need to revisit how we handle headerHeight, because we have so many different header and footer options.
 export default {
@@ -157,6 +158,12 @@ export default {
     onEnter() {
       this.offFocus();
     },
+    showScopedLabels(label) {
+      return boardsStoreEE.store.scopedLabels.enabled && isScopedLabel(label);
+    },
+    helpLink() {
+      return boardsStoreEE.store.scopedLabels.helpLink;
+    },
   },
 };
 </script>
@@ -176,7 +183,7 @@ export default {
           <gl-label
             :title="activeListLabel.title"
             :background-color="activeListLabel.color"
-            color="light"
+            :scoped="showScopedLabels(activeListLabel)"
           />
         </template>
         <template v-else-if="boardListType === $options.assignee">
