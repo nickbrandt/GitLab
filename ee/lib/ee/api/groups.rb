@@ -110,6 +110,9 @@ module EE
             desc 'Get a specific audit event in this group.' do
               success EE::API::Entities::AuditEvent
             end
+            params do
+              requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
+            end
             get '/:audit_event_id' do
               audit_log_finder_params = audit_log_finder_params(user_group)
               audit_event = AuditLogFinder.new(audit_log_finder_params.merge(id: params[:audit_event_id])).execute

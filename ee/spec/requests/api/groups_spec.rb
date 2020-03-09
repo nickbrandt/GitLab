@@ -465,9 +465,17 @@ describe API::Groups do
             end
           end
 
+          context 'invalid audit_event_id' do
+            let(:path) { "/groups/#{group.id}/audit_events/an-invalid-id" }
+
+            it_behaves_like '400 response' do
+              let(:request) { get api(path, user) }
+            end
+          end
+
           context 'non existent audit event' do
             context 'non existent audit event of a group' do
-              let(:path) { "/groups/#{group.id}/audit_events/non-existent-id" }
+              let(:path) { "/groups/#{group.id}/audit_events/666777" }
 
               it_behaves_like '404 response' do
                 let(:request) { get api(path, user) }
