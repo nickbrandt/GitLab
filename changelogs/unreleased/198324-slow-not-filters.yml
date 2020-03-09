@@ -1,0 +1,5 @@
+---
+title: Improve NOT IssuableFinder via memoization
+merge_request: 26832
+author:
+type: performance

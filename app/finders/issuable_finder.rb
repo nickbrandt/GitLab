@@ -49,6 +49,8 @@ class IssuableFinder
 
   NEGATABLE_PARAMS_HELPER_KEYS = %i[include_subgroups in].freeze
 
+  MEMOIZED_PARAMS = %i[project projects group author milestones labels].freeze
+
   attr_accessor :current_user, :params
 
   class << self
@@ -91,9 +93,11 @@ class IssuableFinder
     end
   end
 
-  def initialize(current_user, params = {})
+  def initialize(current_user, params = {}, params_to_memoize = {})
     @current_user = current_user
     @params = params
+
+    memoize_params(params_to_memoize.compact)
   end
 
   def execute
@@ -384,6 +388,35 @@ class IssuableFinder
     klass.all
   end
 
+  def memoize_params(params_to_memoize)
+    # If `memoized_params` are present, then this is an instance of IssuableFinder instantiated from within
+    # itself (see #by_negation method) to get negated items, so we can use pre-loaded values from `params_to_memoize`
+    return unless params_to_memoize.present?
+
+    MEMOIZED_PARAMS.each do |param|
+      instance_variable_set(:"@#{param}", params_to_memoize[param])
+    end
+  end
+
+  def memoized_params
+    @memo = MEMOIZED_PARAMS.map do |param|
+      instance_value = instance_variable_get(:"@#{param}")
+      next if !instance_value.present? || skip_memoized_param?(param)
+
+      [param, instance_value]
+    end.compact.to_h
+  end
+
+  # We want to avoid passing the memoized groups/projects to the negated self.class if we're passing groups or projects
+  # into as NOT params, otherwise the search just doesn't work.
+  def skip_memoized_param?(param)
+    return unless params[:not].present? && %i[group project projects].include?(param)
+    # If @projects is an Array then `by_projects` won't work. This happens when it defaults to the single @project value
+    return true if param == :projects && projects.is_a?(Array)
+
+    (params[:not].keys & %i[group_id project_id]).any?
+  end
+
   def attempt_group_search_optimizations?
     params[:attempt_group_search_optimizations] &&
       Feature.enabled?(:attempt_group_search_optimizations, default_enabled: true)
@@ -420,7 +453,7 @@ class IssuableFinder
       not_helpers = params.slice(*NEGATABLE_PARAMS_HELPER_KEYS).merge(params[:not].slice(*NEGATABLE_PARAMS_HELPER_KEYS))
       not_param = { key => value }.with_indifferent_access.merge(not_helpers).merge(not_query: true)
 
-      items_to_negate = self.class.new(current_user, not_param).execute
+      items_to_negate = self.class.new(current_user, not_param, memoized_params).execute
 
       items = items.where.not(id: items_to_negate)
     end

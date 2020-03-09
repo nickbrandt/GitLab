@@ -773,6 +773,33 @@ describe IssuesFinder do
     end
   end
 
+  describe '#memoized_params' do
+    it 'returns all MEMOIZED_PARAMS that are not nil' do
+      finder = described_class.new(user)
+      finder.instance_variable_set(:@author, user)
+      finder.instance_variable_set(:@milestones, [1, 2, 3])
+      finder.instance_variable_set(:@project, project1)
+
+      expect(finder.memoized_params.keys).to contain_exactly(:author, :milestones, :project)
+      expect(finder.memoized_params[:author]).to eq(user)
+      expect(finder.memoized_params[:milestones]).to eq([1, 2, 3])
+      expect(finder.memoized_params[:project]).to eq(project1)
+    end
+  end
+
+  context 'when giving memoized_params' do
+    let(:label) { build(:label, title: 'any foo', project: project2) }
+    let(:label2) { build(:label, title: 'bar none', project: project2) }
+
+    it 'pre-sets memoized param instance variables' do
+      finder = described_class.new(user, {}, { author: user2, labels: [label, label2] })
+
+      expect(finder.memoized_params).not_to be_empty
+      expect(finder.instance_variable_get(:@labels)).to contain_exactly(label, label2)
+      expect(finder.instance_variable_get(:@author)).to eq(user2)
+    end
+  end
+
   describe '#row_count', :request_store do
     it 'returns the number of rows for the default state' do
       finder = described_class.new(user)
