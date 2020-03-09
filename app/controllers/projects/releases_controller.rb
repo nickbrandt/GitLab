@@ -22,14 +22,6 @@ class Projects::ReleasesController < Projects::ApplicationController
     end
   end
 
-  def evidence
-    respond_to do |format|
-      format.json do
-        render json: release.evidence_summary
-      end
-    end
-  end
-
   def show
     return render_404 unless Feature.enabled?(:release_show_page, project, default_enabled: true)
 
@@ -62,11 +54,6 @@ class Projects::ReleasesController < Projects::ApplicationController
 
   def authorize_update_release!
     access_denied! unless can?(current_user, :update_release, release)
-  end
-
-  def authorize_read_release_evidence!
-    access_denied! unless Feature.enabled?(:release_evidence, project, default_enabled: true)
-    access_denied! unless can?(current_user, :read_release_evidence, release)
   end
 
   def release

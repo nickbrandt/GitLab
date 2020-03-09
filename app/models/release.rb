@@ -16,7 +16,7 @@ class Release < ApplicationRecord
 
   has_many :milestone_releases
   has_many :milestones, through: :milestone_releases
-  has_one :evidence
+  has_many :evidences
 
   default_value_for :released_at, allows_nil: false do
     Time.zone.now
@@ -75,14 +75,6 @@ class Release < ApplicationRecord
 
   def name
     self.read_attribute(:name) || tag
-  end
-
-  def evidence_sha
-    evidence&.summary_sha
-  end
-
-  def evidence_summary
-    evidence&.summary || {}
   end
 
   def milestone_titles

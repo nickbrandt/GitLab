@@ -30,6 +30,10 @@ class Evidence < ApplicationRecord
     safe_summary
   end
 
+  def collected_at
+    self.created_at
+  end
+
   private
 
   def generate_summary_and_sha

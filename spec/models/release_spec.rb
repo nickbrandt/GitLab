@@ -15,7 +15,7 @@ RSpec.describe Release do
     it { is_expected.to have_many(:links).class_name('Releases::Link') }
     it { is_expected.to have_many(:milestones) }
     it { is_expected.to have_many(:milestone_releases) }
-    it { is_expected.to have_one(:evidence) }
+    it { is_expected.to have_many(:evidences) }
   end
 
   describe 'validation' do
@@ -141,38 +141,6 @@ RSpec.describe Release do
       it 'returns tag' do
         expect(release.name).to eq(release.tag)
       end
-    end
-  end
-
-  describe '#evidence_sha' do
-    subject { release.evidence_sha }
-
-    context 'when a release was created before evidence collection existed' do
-      let!(:release) { create(:release) }
-
-      it { is_expected.to be_nil }
-    end
-
-    context 'when a release was created with evidence collection' do
-      let!(:release) { create(:release, :with_evidence) }
-
-      it { is_expected.to eq(release.evidence.summary_sha) }
-    end
-  end
-
-  describe '#evidence_summary' do
-    subject { release.evidence_summary }
-
-    context 'when a release was created before evidence collection existed' do
-      let!(:release) { create(:release) }
-
-      it { is_expected.to eq({}) }
-    end
-
-    context 'when a release was created with evidence collection' do
-      let!(:release) { create(:release, :with_evidence) }
-
-      it { is_expected.to eq(release.evidence.summary) }
     end
   end
 

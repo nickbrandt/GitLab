@@ -4,26 +4,30 @@ require 'spec_helper'
 
 describe API::Entities::Release do
   let_it_be(:project) { create(:project) }
-  let_it_be(:user) { create(:user) }
+  let_it_be(:release) { create(:release, :with_evidence, project: project) }
+  let(:evidence) { release.evidences.first }
+  let(:user) { create(:user) }
   let(:entity) { described_class.new(release, current_user: user) }
+  let(:subject_evidence) { subject[:evidences].first }
 
-  describe 'evidence' do
-    let(:release) { create(:release, :with_evidence, project: project) }
+  subject { entity.as_json }
 
-    subject { entity.as_json }
-
+  describe 'evidences' do
     context 'when the current user can download code' do
       it 'exposes the evidence sha and the json path' do
         allow(Ability).to receive(:allowed?).and_call_original
         allow(Ability).to receive(:allowed?)
           .with(user, :download_code, project).and_return(true)
 
-        expect(subject[:evidence_sha]).to eq(release.evidence_sha)
-        expect(subject[:assets][:evidence_file_path]).to eq(
-          Gitlab::Routing.url_helpers.evidence_project_release_url(project,
-                                                                   release.tag,
-                                                                   format: :json)
-        )
+        expect(subject_evidence[:sha]).to eq(evidence.summary_sha)
+        expect(subject_evidence[:collected_at]).to eq(evidence.collected_at)
+        expect(subject_evidence[:filepath]).to eq(
+          Gitlab::Routing.url_helpers.namespace_project_evidence_url(
+            namespace_id: project.namespace,
+            project_id: project,
+            tag: release,
+            id: evidence.id,
+            format: :json))
       end
     end
 
@@ -33,8 +37,7 @@ describe API::Entities::Release do
         allow(Ability).to receive(:allowed?)
           .with(user, :download_code, project).and_return(false)
 
-        expect(subject.keys).not_to include(:evidence_sha)
-        expect(subject[:assets].keys).not_to include(:evidence_file_path)
+        expect(subject.keys).not_to include(:evidences)
       end
     end
   end
