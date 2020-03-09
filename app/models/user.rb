@@ -1672,6 +1672,14 @@ class User < ApplicationRecord
     callouts.any?
   end
 
+  def gitlab_employee?
+    strong_memoize(:is_gitlab_employee) do
+      domain = Mail::Address.new(email).domain
+
+      domain == "gitlab.com"
+    end
+  end
+
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
 

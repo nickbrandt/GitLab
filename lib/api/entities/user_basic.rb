@@ -11,6 +11,7 @@ module API
 
       expose :avatar_path, if: ->(user, options) { options.fetch(:only_path, false) && user.avatar_path }
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
+      expose :gitlab_employee?, as: :is_gitlab_employee, if: ->(user, options) { user.gitlab_employee? }
 
       expose :web_url do |user, options|
         Gitlab::Routing.url_helpers.user_url(user)
