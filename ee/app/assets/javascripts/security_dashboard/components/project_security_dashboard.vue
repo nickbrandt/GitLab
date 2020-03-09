@@ -1,6 +1,6 @@
 <script>
 import { isUndefined } from 'lodash';
-import { GlEmptyState, GlSprintf } from '@gitlab/ui';
+import { GlEmptyState, GlSprintf, GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -8,10 +8,10 @@ import ReportsNotConfigured from './empty_states/reports_not_configured.vue';
 import SecurityDashboard from './security_dashboard_vuex.vue';
 
 export default {
-  name: 'ProjectSecurityDashboard',
   components: {
     GlEmptyState,
     GlSprintf,
+    GlLink,
     Icon,
     ReportsNotConfigured,
     SecurityDashboard,
@@ -94,7 +94,7 @@ export default {
               "
             >
               <template #pipelineLink>
-                <a :href="pipeline.path">#{{ pipeline.id }}</a>
+                <gl-link :href="pipeline.path">#{{ pipeline.id }}</gl-link>
               </template>
               <template #timeago>
                 <timeago-tooltip :time="pipeline.created" />
@@ -113,14 +113,14 @@ export default {
           </span>
           <span class="js-security-dashboard-right pull-right">
             <icon name="branch" />
-            <a :href="branch.path" class="monospace">{{ branch.id }}</a>
+            <gl-link :href="branch.path" class="monospace">{{ branch.id }}</gl-link>
             <span class="text-muted prepend-left-5 append-right-5">&middot;</span>
             <icon name="commit" />
-            <a :href="commit.path" class="monospace">{{ commit.id }}</a>
+            <gl-link :href="commit.path" class="monospace">{{ commit.id }}</gl-link>
           </span>
         </div>
       </div>
-      <h4 class="mt-4 mb-3">{{ __('Vulnerabilities') }}</h4>
+      <h4>{{ __('Vulnerabilities') }}</h4>
       <security-dashboard
         :lock-to-project="project"
         :vulnerabilities-endpoint="vulnerabilitiesEndpoint"

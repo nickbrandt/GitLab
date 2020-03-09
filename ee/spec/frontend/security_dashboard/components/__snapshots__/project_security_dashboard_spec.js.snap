@@ -27,7 +27,7 @@ exports[`Project Security Dashboard component Headline renders renders branch an
   </svg>
    
   <a
-    class="monospace"
+    class="gl-link monospace"
     href="http://test.host/branch"
   >
     master
@@ -49,7 +49,7 @@ exports[`Project Security Dashboard component Headline renders renders branch an
   </svg>
    
   <a
-    class="monospace"
+    class="gl-link monospace"
     href="http://test.host/commit"
   >
     1234adf

@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
-
 import ProjectSecurityDashboard from 'ee/security_dashboard/components/project_security_dashboard.vue';
 import createStore from 'ee/security_dashboard/store';
 import { trimText } from 'helpers/text_helper';
