@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
 const localVue = createLocalVue();
@@ -18,6 +18,7 @@ describe('packages_list_app', () => {
 
   const emptyListHelpUrl = 'helpUrl';
   const findListComponent = () => wrapper.find(PackageList);
+  const findTabComponent = (index = 0) => wrapper.findAll(GlTab).at(index);
 
   const mountComponent = () => {
     wrapper = shallowMount(PackageListApp, {
@@ -27,6 +28,8 @@ describe('packages_list_app', () => {
         GlEmptyState,
         GlLoadingIcon,
         PackageList,
+        GlTab,
+        GlTabs,
       },
     });
   };
@@ -80,5 +83,19 @@ describe('packages_list_app', () => {
     const list = findListComponent();
     list.vm.$emit('sort:changed');
     expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+  });
+
+  describe('tab change', () => {
+    it('calls requestPackagesList when all tab is clicked', () => {
+      findTabComponent().trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
+
+    it('calls requestPackagesList when a package type tab is clicked', () => {
+      findTabComponent(1).trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
   });
 });

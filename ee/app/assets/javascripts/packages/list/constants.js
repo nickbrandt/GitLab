@@ -1,4 +1,4 @@
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
 
 export const FETCH_PACKAGES_LIST_ERROR_MESSAGE = __(
   'Something went wrong while fetching the packages list.',
@@ -33,3 +33,59 @@ export const DESCENDING_ORDER = 'desc';
 
 // The following is not translated because it is used to build a JavaScript exception error message
 export const MISSING_DELETE_PATH_ERROR = 'Missing delete_api_path link';
+
+export const TABLE_HEADER_FIELDS = [
+  {
+    key: LIST_KEY_NAME,
+    label: LIST_LABEL_NAME,
+    orderBy: LIST_KEY_NAME,
+    class: ['text-left'],
+  },
+  {
+    key: LIST_KEY_PROJECT,
+    label: LIST_LABEL_PROJECT,
+    orderBy: LIST_KEY_PROJECT,
+    class: ['text-left'],
+  },
+  {
+    key: LIST_KEY_VERSION,
+    label: LIST_LABEL_VERSION,
+    orderBy: LIST_KEY_VERSION,
+    class: ['text-center'],
+  },
+  {
+    key: LIST_KEY_PACKAGE_TYPE,
+    label: LIST_LABEL_PACKAGE_TYPE,
+    orderBy: LIST_ORDER_BY_PACKAGE_TYPE,
+    class: ['text-center'],
+  },
+  {
+    key: LIST_KEY_CREATED_AT,
+    label: LIST_LABEL_CREATED_AT,
+    orderBy: LIST_KEY_CREATED_AT,
+    class: ['text-center'],
+  },
+];
+
+export const PACKAGE_REGISTRY_TABS = [
+  {
+    title: __('All'),
+    type: null,
+  },
+  {
+    title: s__('PackageRegistry|Conan'),
+    type: 'conan',
+  },
+  {
+    title: s__('PackageRegistry|Maven'),
+    type: 'maven',
+  },
+  {
+    title: s__('PackageRegistry|NPM'),
+    type: 'npm',
+  },
+  {
+    title: s__('PackageRegistry|NuGet'),
+    type: 'nuget',
+  },
+];

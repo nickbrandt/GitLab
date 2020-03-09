@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { last } from 'lodash';
-import { GlTable, GlSorting, GlPagination, GlModal } from '@gitlab/ui';
+import { GlTable, GlPagination, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
@@ -24,10 +24,8 @@ describe('packages_list', () => {
   const findPackagesListLoader = () => wrapper.find(PackagesListLoader);
   const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
   const findPackageListTable = () => wrapper.find(GlTable);
-  const findPackageListSorting = () => wrapper.find(GlSorting);
   const findPackageListPagination = () => wrapper.find(GlPagination);
   const findPackageListDeleteModal = () => wrapper.find(GlModal);
-  const findSortingItems = () => wrapper.findAll(GlSortingItem);
   const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
   const findPackageTags = () => wrapper.findAll(PackageTags);
   const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
@@ -127,11 +125,6 @@ describe('packages_list', () => {
       mountComponent();
     });
 
-    it('contains a sorting component', () => {
-      const sorting = findPackageListSorting();
-      expect(sorting.exists()).toBe(true);
-    });
-
     it('contains a table component', () => {
       const sorting = findPackageListTable();
       expect(sorting.exists()).toBe(true);
@@ -219,35 +212,6 @@ describe('packages_list', () => {
       const emptySlot = findEmptySlot();
       expect(table.exists()).toBe(false);
       expect(emptySlot.exists()).toBe(true);
-    });
-  });
-
-  describe('sorting component', () => {
-    let sorting;
-    let sortingItems;
-
-    beforeEach(() => {
-      mountComponent();
-      sorting = findPackageListSorting();
-      sortingItems = findSortingItems();
-    });
-
-    it('has all the sortable items', () => {
-      expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
-    });
-
-    it('on sort change set sorting in vuex and emit event', () => {
-      sorting.vm.$emit('sortDirectionChange');
-      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { sort: 'asc' });
-      expect(wrapper.emitted('sort:changed')).toBeTruthy();
-    });
-
-    it('on sort item click set sorting and emit event', () => {
-      const item = sortingItems.at(0);
-      const { orderBy } = wrapper.vm.sortableFields[0];
-      item.vm.$emit('click');
-      expect(store.dispatch).toHaveBeenCalledWith('setSorting', { orderBy });
-      expect(wrapper.emitted('sort:changed')).toBeTruthy();
     });
   });
 

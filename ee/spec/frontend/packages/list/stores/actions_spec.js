@@ -72,6 +72,38 @@ describe('Actions Package list store', () => {
       );
     });
 
+    it('should fetch packages of a certain type when selectedType is present', done => {
+      const packageType = 'maven';
+
+      testAction(
+        actions.requestPackagesList,
+        undefined,
+        {
+          config: { isGroupPage: false, resourceId: 1 },
+          sorting,
+          selectedType: { type: packageType },
+        },
+        [],
+        [
+          { type: 'setLoading', payload: true },
+          { type: 'receivePackagesListSuccess', payload: { data: 'foo', headers } },
+          { type: 'setLoading', payload: false },
+        ],
+        () => {
+          expect(Api.projectPackages).toHaveBeenCalledWith(1, {
+            params: {
+              page: 1,
+              per_page: 20,
+              sort: sorting.sort,
+              order_by: sorting.orderBy,
+              package_type: packageType,
+            },
+          });
+          done();
+        },
+      );
+    });
+
     it('should create flash on API error', done => {
       Api.projectPackages = jest.fn().mockRejectedValue();
       testAction(

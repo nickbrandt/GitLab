@@ -13855,6 +13855,9 @@ msgstr ""
 msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
+msgid "PackageRegistry|Conan"
+msgstr ""
+
 msgid "PackageRegistry|Conan Command"
 msgstr ""
 
@@ -13918,10 +13921,19 @@ msgstr ""
 msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
 msgstr ""
 
+msgid "PackageRegistry|Maven"
+msgstr ""
+
 msgid "PackageRegistry|Maven Command"
 msgstr ""
 
 msgid "PackageRegistry|Maven XML"
+msgstr ""
+
+msgid "PackageRegistry|NPM"
+msgstr ""
+
+msgid "PackageRegistry|NuGet"
 msgstr ""
 
 msgid "PackageRegistry|NuGet Command"

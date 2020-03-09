@@ -1,13 +1,18 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import PackageList from './packages_list.vue';
+import PackageSort from './packages_sort.vue';
+import { PACKAGE_REGISTRY_TABS } from '../constants';
 
 export default {
   components: {
     GlEmptyState,
+    GlTab,
+    GlTabs,
     PackageList,
+    PackageSort,
   },
   computed: {
     ...mapState({
@@ -28,37 +33,52 @@ export default {
         false,
       );
     },
+    tabsToRender() {
+      return PACKAGE_REGISTRY_TABS;
+    },
   },
   mounted() {
     this.requestPackagesList();
   },
   methods: {
-    ...mapActions(['requestPackagesList', 'requestDeletePackage']),
+    ...mapActions(['requestPackagesList', 'requestDeletePackage', 'setSelectedType']),
     onPageChanged(page) {
       return this.requestPackagesList({ page });
     },
     onPackageDeleteRequest(item) {
       return this.requestDeletePackage(item);
     },
+    tabChanged(e) {
+      const selectedType = PACKAGE_REGISTRY_TABS[e];
+
+      this.setSelectedType(selectedType);
+      this.requestPackagesList();
+    },
   },
 };
 </script>
 
 <template>
-  <package-list
-    @page:changed="onPageChanged"
-    @package:delete="onPackageDeleteRequest"
-    @sort:changed="requestPackagesList"
-  >
-    <template #empty-state>
-      <gl-empty-state
-        :title="s__('PackageRegistry|There are no packages yet')"
-        :svg-path="emptyListIllustration"
-      >
-        <template #description>
-          <p v-html="emptyListText"></p>
-        </template>
-      </gl-empty-state>
+  <gl-tabs @input="tabChanged">
+    <template #tabs-end>
+      <div class="align-self-center ml-auto">
+        <package-sort @sort:changed="requestPackagesList" />
+      </div>
     </template>
-  </package-list>
+
+    <gl-tab v-for="(tab, index) in tabsToRender" :key="index" :title="tab.title">
+      <package-list @page:changed="onPageChanged" @package:delete="onPackageDeleteRequest">
+        <template #empty-state>
+          <gl-empty-state
+            :title="s__('PackageRegistry|There are no packages yet')"
+            :svg-path="emptyListIllustration"
+          >
+            <template #description>
+              <p v-html="emptyListText"></p>
+            </template>
+          </gl-empty-state>
+        </template>
+      </package-list>
+    </gl-tab>
+  </gl-tabs>
 </template>
