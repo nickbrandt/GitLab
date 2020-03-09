@@ -124,29 +124,29 @@ replicating data from those features will cause the data to be **lost**.
 If you wish to use those features on a **secondary** node, or to execute a failover
 successfully, you must replicate their data using some other means.
 
-| Feature                                             | Replicated                 | Verified                    | Notes                                       |
-|-----------------------------------------------------|--------------------------  |-----------------------------|---------------------------------------------|
-| Application data in PostgreSQL                      | **Yes**                    | **Yes**                     |                                             |
-| Project repository                                  | **Yes**                    | **Yes**                     |                                             |
-| Project wiki repository                             | **Yes**                    | **Yes**                     |                                             |
-| Project designs repository                          | **Yes**                    | [No][design-verification]   |                                             |
-| Uploads                                             | **Yes**                    | [No][upload-verification]   | Verified only on transfer, or manually (*1*)|
-| LFS objects                                         | **Yes**                    | [No][lfs-verification]      | Verified only on transfer, or manually (*1*). Unavailable for new LFS objects in 11.11.x and 12.0.x (*2*). |
-| CI job artifacts (other than traces)                | **Yes**                    | [No][artifact-verification] | Verified only manually (*1*)                |
-| Archived traces                                     | **Yes**                    | [No][artifact-verification] | Verified only on transfer, or manually (*1*)|
-| Personal snippets                                   | **Yes**                    | **Yes**                     |                                             |
-| Project snippets                                    | **Yes**                    | **Yes**                     |                                             |
-| Object pools for forked project deduplication       | **Yes**                    | No                          |                                             |
-| [Server-side Git Hooks][custom-hooks]               | No                         | No                          |                                             |
-| [Elasticsearch integration][elasticsearch]          | No                         | No                          |                                             |
-| [GitLab Pages][gitlab-pages]                        | [No][pages-replication]    | No                          |                                             |
-| [Container Registry][container-registry]            | **Yes**                    | No                          |                                             |
-| [NPM Registry][npm-registry]                        | [No][packages-replication] | No                          |                                             |
-| [Maven Repository][maven-repository]                | [No][packages-replication] | No                          |                                             |
-| [Conan Repository][conan-repository]                | [No][packages-replication] | No                          |                                             |
-| [NuGet Repository][nuget-repository]                | [No][packages-replication] | No                          |                                             |
-| [External merge request diffs][merge-request-diffs] | [No][diffs-replication]    | No                          |                                             |
-| Content in object storage                           | **Yes**                    | No                          |                                             |
+| Feature                                             | Replicated                      | Verified                    | Notes                                       |
+|-----------------------------------------------------|--------------------------       |-----------------------------|---------------------------------------------|
+| Application data in PostgreSQL                      | **Yes**                         | **Yes**                     |                                             |
+| Project repository                                  | **Yes**                         | **Yes**                     |                                             |
+| Project wiki repository                             | **Yes**                         | **Yes**                     |                                             |
+| Project designs repository                          | **Yes**                         | [No][design-verification]   |                                             |
+| Uploads                                             | **Yes**                         | [No][upload-verification]   | Verified only on transfer, or manually (*1*)|
+| LFS objects                                         | **Yes**                         | [No][lfs-verification]      | Verified only on transfer, or manually (*1*). Unavailable for new LFS objects in 11.11.x and 12.0.x (*2*). |
+| CI job artifacts (other than traces)                | **Yes**                         | [No][artifact-verification] | Verified only manually (*1*)                |
+| Archived traces                                     | **Yes**                         | [No][artifact-verification] | Verified only on transfer, or manually (*1*)|
+| Personal snippets                                   | **Yes**                         | **Yes**                     |                                             |
+| Project snippets                                    | **Yes**                         | **Yes**                     |                                             |
+| Object pools for forked project deduplication       | **Yes**                         | No                          |                                             |
+| [Server-side Git Hooks][custom-hooks]               | No                              | No                          |                                             |
+| [Elasticsearch integration][elasticsearch]          | [No][elasticsearch-replication] | No                          |                                             |
+| [GitLab Pages][gitlab-pages]                        | [No][pages-replication]         | No                          |                                             |
+| [Container Registry][container-registry]            | **Yes**                         | No                          |                                             |
+| [NPM Registry][npm-registry]                        | [No][packages-replication]      | No                          |                                             |
+| [Maven Repository][maven-repository]                | [No][packages-replication]      | No                          |                                             |
+| [Conan Repository][conan-repository]                | [No][packages-replication]      | No                          |                                             |
+| [NuGet Repository][nuget-repository]                | [No][packages-replication]      | No                          |                                             |
+| [External merge request diffs][merge-request-diffs] | [No][diffs-replication]         | No                          |                                             |
+| Content in object storage                           | **Yes**                         | No                          |                                             |
 
 - (*1*): The integrity can be verified manually using
   [Integrity Check Rake Task](../../raketasks/check.md) on both nodes and comparing
@@ -162,6 +162,7 @@ successfully, you must replicate their data using some other means.
 [diffs-replication]: https://gitlab.com/gitlab-org/gitlab/issues/33817
 [pages-replication]: https://gitlab.com/groups/gitlab-org/-/epics/589
 [packages-replication]: https://gitlab.com/groups/gitlab-org/-/epics/2346
+[elasticsearch-replication]: https://gitlab.com/gitlab-org/gitlab/-/issues/1186
 
 [custom-hooks]: ../../custom_hooks.md
 [elasticsearch]: ../../../integration/elasticsearch.md
