@@ -1,13 +1,13 @@
 import Vue from 'vue';
+import { mount } from '@vue/test-utils';
 
 import SidebarLabels from 'ee/epic/components/sidebar_items/sidebar_labels.vue';
 import createStore from 'ee/epic/store';
 
-import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData, mockLabels } from '../../mock_data';
 
 describe('SidebarLabelsComponent', () => {
-  let vm;
+  let wrapper;
   let store;
 
   beforeEach(() => {
@@ -16,26 +16,30 @@ describe('SidebarLabelsComponent', () => {
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
 
-    vm = mountComponentWithStore(Component, {
+    wrapper = mount(Component, {
+      propsData: { canUpdate: false, sidebarCollapsed: false },
       store,
-      props: { canUpdate: false, sidebarCollapsed: false },
+      stubs: {
+        GlLabel: true,
+      },
     });
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('data', () => {
     it('returns default data props', () => {
-      expect(vm.sidebarExpandedOnClick).toBe(false);
+      expect(wrapper.vm.sidebarExpandedOnClick).toBe(false);
     });
   });
 
   describe('computed', () => {
     describe('epicContext', () => {
       it('returns object containing `this.labels` as a child prop', () => {
-        expect(vm.epicContext.labels).toBe(vm.labels);
+        expect(wrapper.vm.epicContext.labels).toBe(wrapper.vm.labels);
       });
     });
   });
@@ -43,11 +47,11 @@ describe('SidebarLabelsComponent', () => {
   describe('methods', () => {
     describe('toggleSidebarRevealLabelsDropdown', () => {
       it('calls `toggleSidebar` action with param `sidebarCollapse`', () => {
-        jest.spyOn(vm, 'toggleSidebar');
+        jest.spyOn(wrapper.vm, 'toggleSidebar');
 
-        vm.toggleSidebarRevealLabelsDropdown();
+        wrapper.vm.toggleSidebarRevealLabelsDropdown();
 
-        expect(vm.toggleSidebar).toHaveBeenCalledWith(
+        expect(wrapper.vm.toggleSidebar).toHaveBeenCalledWith(
           jasmine.objectContaining({
             sidebarCollapsed: false,
           }),
@@ -57,14 +61,14 @@ describe('SidebarLabelsComponent', () => {
 
     describe('handleDropdownClose', () => {
       it('calls `toggleSidebar` action only when `sidebarExpandedOnClick` prop is true', () => {
-        jest.spyOn(vm, 'toggleSidebar');
+        jest.spyOn(wrapper.vm, 'toggleSidebar');
 
-        vm.sidebarExpandedOnClick = true;
+        wrapper.vm.sidebarExpandedOnClick = true;
 
-        vm.handleDropdownClose();
+        wrapper.vm.handleDropdownClose();
 
-        expect(vm.sidebarExpandedOnClick).toBe(false);
-        expect(vm.toggleSidebar).toHaveBeenCalledWith(
+        expect(wrapper.vm.sidebarExpandedOnClick).toBe(false);
+        expect(wrapper.vm.toggleSidebar).toHaveBeenCalledWith(
           jasmine.objectContaining({
             sidebarCollapsed: false,
           }),
@@ -86,34 +90,34 @@ describe('SidebarLabelsComponent', () => {
 
       it('initializes `epicContext.labels` as empty array when `label.isAny` is `true`', () => {
         const labelIsAny = { isAny: true };
-        vm.handleLabelClick(labelIsAny);
+        wrapper.vm.handleLabelClick(labelIsAny);
 
-        expect(Array.isArray(vm.epicContext.labels)).toBe(true);
-        expect(vm.epicContext.labels.length).toBe(0);
+        expect(Array.isArray(wrapper.vm.epicContext.labels)).toBe(true);
+        expect(wrapper.vm.epicContext.labels.length).toBe(0);
       });
 
       it('adds provided `label` to epicContext.labels', () => {
-        vm.handleLabelClick(label);
+        wrapper.vm.handleLabelClick(label);
         // epicContext.labels gets initialized with initialLabels, hence
         // newly insert label will be at second position (index `1`)
-        expect(vm.epicContext.labels.length).toBe(2);
-        expect(vm.epicContext.labels[1].id).toBe(label.id);
-        vm.handleLabelClick(label);
+        expect(wrapper.vm.epicContext.labels.length).toBe(2);
+        expect(wrapper.vm.epicContext.labels[1].id).toBe(label.id);
+        wrapper.vm.handleLabelClick(label);
       });
 
       it('filters epicContext.labels to exclude provided `label` if it is already present in `epicContext.labels`', () => {
-        vm.handleLabelClick(label); // Select
-        vm.handleLabelClick(label); // Un-select
+        wrapper.vm.handleLabelClick(label); // Select
+        wrapper.vm.handleLabelClick(label); // Un-select
 
-        expect(vm.epicContext.labels.length).toBe(1);
-        expect(vm.epicContext.labels[0].id).toBe(mockLabels[0].id);
+        expect(wrapper.vm.epicContext.labels.length).toBe(1);
+        expect(wrapper.vm.epicContext.labels[0].id).toBe(mockLabels[0].id);
       });
     });
   });
 
   describe('template', () => {
     it('renders labels select element container', () => {
-      expect(vm.$el.classList.contains('js-labels-block')).toBe(true);
+      expect(wrapper.vm.$el.classList.contains('js-labels-block')).toBe(true);
     });
   });
 });

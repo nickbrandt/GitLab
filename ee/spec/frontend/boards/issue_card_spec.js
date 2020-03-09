@@ -1,9 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
 import ListIssueEE from 'ee/boards/models/issue';
 import ListLabel from '~/boards/models/label';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import defaultStore from '~/boards/stores';
+import { GlLabel } from '@gitlab/ui';
 
 describe('Issue card component', () => {
   let wrapper;
@@ -11,7 +12,7 @@ describe('Issue card component', () => {
   let list;
 
   const createComponent = (props = {}, store = defaultStore) => {
-    wrapper = mount(IssueCardInner, {
+    wrapper = shallowMount(IssueCardInner, {
       store,
       propsData: {
         list,
@@ -33,7 +34,7 @@ describe('Issue card component', () => {
       label: {
         id: 5000,
         title: 'Testing',
-        color: 'red',
+        color: '#ff0000',
         description: 'testing;',
         textColor: 'white',
       },
@@ -62,7 +63,7 @@ describe('Issue card component', () => {
       const label1 = new ListLabel({
         id: 3,
         title: 'testing 123',
-        color: 'blue',
+        color: '#000cff',
         text_color: 'white',
         description: 'test',
       });
@@ -80,13 +81,14 @@ describe('Issue card component', () => {
           id: 9001,
           type,
           title,
+          color: '#000000',
         }),
       );
 
       createComponent({ groupId: 1 });
 
-      expect(wrapper.findAll('.badge').length).toBe(3);
-      expect(wrapper.text()).toContain(title);
+      expect(wrapper.findAll(GlLabel).length).toBe(3);
+      expect(wrapper.find(GlLabel).props('title')).toContain(title);
     });
 
     it('shows no labels when the isShowingLabels state is false', () => {
