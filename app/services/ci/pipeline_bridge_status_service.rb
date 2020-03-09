@@ -5,7 +5,13 @@ module Ci
     def execute(pipeline)
       return unless pipeline.bridge_triggered?
 
-      pipeline.source_bridge.inherit_status_from_downstream!(pipeline)
+      begin
+        pipeline.source_bridge.inherit_status_from_downstream!(pipeline)
+      rescue StateMachines::InvalidTransition => e
+        Gitlab::ErrorTracking.track_exception(e,
+          bridge_id: pipeline.source_bridge.id,
+          downstream_pipeline_id: pipeline.id)
+      end
     end
   end
 end
