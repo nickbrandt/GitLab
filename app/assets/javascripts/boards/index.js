@@ -84,7 +84,6 @@ export default () => {
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
       detailIssue: boardsStore.detail,
-      defaultAvatar: $boardApp.dataset.defaultAvatar,
     },
     computed: {
       detailIssueVisible() {
@@ -129,13 +128,10 @@ export default () => {
               position = -1;
             }
 
-            boardsStore.addList(
-              {
-                ...listObj,
-                position,
-              },
-              this.defaultAvatar,
-            );
+            boardsStore.addList({
+              ...listObj,
+              position,
+            });
           });
 
           boardsStore.addBlankState();
