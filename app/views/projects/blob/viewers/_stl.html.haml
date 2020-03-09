@@ -1,7 +1,7 @@
 .file-content.is-stl-loading
   .text-center#js-stl-viewer{ data: { endpoint: blob_raw_path } }
-   %gl-loading-icon{ "aria-hidden" => "true", "aria-label" => "Loading" }
-   .prepend-top-default.append-bottom-default
+    .prepend-top-default.append-bottom-default
+      .spinner.spinner-md.mt-1
   .text-center.prepend-top-default.append-bottom-default.stl-controls
     .btn-group
       %button.btn.btn-default.btn-sm.js-material-changer{ data: { type: 'wireframe' } }
