@@ -70,7 +70,7 @@ module EE
       def build_smartcard_identity(user, params)
         smartcard_identity_attrs = params.slice(:certificate_subject, :certificate_issuer)
 
-        if smartcard_identity_attrs.any?
+        unless smartcard_identity_attrs.empty?
           user.smartcard_identities.build(subject: params[:certificate_subject],
                                           issuer: params[:certificate_issuer])
         end
