@@ -49,4 +49,28 @@ describe Admin::IntegrationsController do
       end
     end
   end
+
+  describe '#test' do
+    context 'testable' do
+      let(:integration) { create(:jira_service, project: project) }
+
+      it 'returns ok' do
+        allow_any_instance_of(integration.class).to receive(:test) { { success: true } }
+
+        put :test, params: { id: integration.class.to_param }
+
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+    end
+
+    context 'not testable' do
+      let(:integration) { create(:alerts_service, project: project) }
+
+      it 'returns not found' do
+        put :test, params: { id: integration.class.to_param }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
 end
