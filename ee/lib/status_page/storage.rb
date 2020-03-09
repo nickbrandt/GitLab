@@ -2,6 +2,8 @@
 
 module StatusPage
   module Storage
+    # Size limit of the generated JSON uploaded to CDN.
+    JSON_MAX_SIZE = 1.megabyte
     # Limit the amount of the recent incidents in the JSON list
     MAX_RECENT_INCIDENTS = 20
     # Limit the amount of comments per incident

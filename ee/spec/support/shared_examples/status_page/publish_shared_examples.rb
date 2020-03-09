@@ -48,7 +48,7 @@ RSpec.shared_examples 'publish incidents' do
   end
 
   context 'when limits exceeded' do
-    let(:too_big) { 'a' * StatusPage::PublishBaseService::JSON_MAX_SIZE }
+    let(:too_big) { 'a' * StatusPage::Storage::JSON_MAX_SIZE }
 
     before do
       if content.is_a?(Array)

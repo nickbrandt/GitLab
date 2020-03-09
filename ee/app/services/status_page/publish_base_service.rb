@@ -2,8 +2,6 @@
 
 module StatusPage
   class PublishBaseService
-    JSON_MAX_SIZE = 1.megabyte
-
     def initialize(project:, storage_client:, serializer:)
       @project = project
       @storage_client = storage_client
@@ -40,7 +38,9 @@ module StatusPage
     end
 
     def limit_exceeded?(json)
-      !Gitlab::Utils::DeepSize.new(json, max_size: JSON_MAX_SIZE).valid?
+      !Gitlab::Utils::DeepSize
+        .new(json, max_size: Storage::JSON_MAX_SIZE)
+        .valid?
     end
 
     def error(message, payload = {})
