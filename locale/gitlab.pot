@@ -2509,6 +2509,9 @@ msgstr ""
 msgid "Authenticating"
 msgstr ""
 
+msgid "Authentication Failure"
+msgstr ""
+
 msgid "Authentication Log"
 msgstr ""
 
@@ -5169,6 +5172,9 @@ msgstr ""
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
 msgstr ""
 
+msgid "Connected"
+msgstr ""
+
 msgid "Connecting"
 msgstr ""
 
@@ -6371,6 +6377,9 @@ msgid "Deleted chat nickname: %{chat_name}!"
 msgstr ""
 
 msgid "Deleted in this version"
+msgstr ""
+
+msgid "Deleting"
 msgstr ""
 
 msgid "Deleting the license failed."
@@ -18720,6 +18729,9 @@ msgstr ""
 msgid "Status:"
 msgstr ""
 
+msgid "Status: %{title}"
+msgstr ""
+
 msgid "Stay updated about the performance and health of your environment by configuring Prometheus to monitor your deployments."
 msgstr ""
 
@@ -21099,6 +21111,9 @@ msgid "Unmarked this %{noun} as Work In Progress."
 msgstr ""
 
 msgid "Unmarks this %{noun} as Work In Progress."
+msgstr ""
+
+msgid "Unreachable"
 msgstr ""
 
 msgid "Unresolve"
