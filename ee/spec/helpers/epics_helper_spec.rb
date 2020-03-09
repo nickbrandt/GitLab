@@ -77,7 +77,7 @@ describe EpicsHelper, type: :helper do
       let(:end_date) { nil }
 
       it 'returns start date with year' do
-        is_expected.to eq('From Jul 22, 2018')
+        is_expected.to eq('Jul 22, 2018 – No end date')
       end
     end
 
@@ -86,7 +86,7 @@ describe EpicsHelper, type: :helper do
       let(:end_date) { Date.new(2018, 7, 22) }
 
       it 'returns end date with year' do
-        is_expected.to eq('Until Jul 22, 2018')
+        is_expected.to eq('No start date – Jul 22, 2018')
       end
     end
   end
