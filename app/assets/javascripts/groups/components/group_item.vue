@@ -95,7 +95,7 @@ export default {
   <li :id="groupDomId" :class="rowClass" class="group-row" @click.stop="onClickRowGroup">
     <div
       :class="{ 'project-row-contents': !isGroup }"
-      class="group-row-contents d-flex align-items-center py-2"
+      class="group-row-contents d-flex align-items-center py-2 pr-3"
     >
       <div class="folder-toggle-wrap append-right-4 d-flex align-items-center">
         <item-caret :is-group-open="group.isOpen" />
