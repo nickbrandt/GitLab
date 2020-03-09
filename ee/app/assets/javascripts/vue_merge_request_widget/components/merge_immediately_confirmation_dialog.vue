@@ -1,6 +1,6 @@
 <script>
 import { GlModal, GlButton } from '@gitlab/ui';
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { __, sprintf } from '~/locale';
 
 export default {
@@ -22,7 +22,7 @@ export default {
           "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information.",
         ),
         {
-          docsLinkStart: `<a href="${_.escape(
+          docsLinkStart: `<a href="${esc(
             this.docsUrl,
           )}" target="_blank" rel="noopener noreferrer">`,
           docsLinkEnd: '</a>',
