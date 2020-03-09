@@ -36,7 +36,8 @@ describe('Evidence Block', () => {
   });
 
   it('renders the title for the dowload link', () => {
-    expect(wrapper.find(GlLink).text()).toBe(`${release.tagName}-evidence.json`);
+    const [tag, filename] = release.evidences[0].filepath.split('/').slice(-2);
+    expect(wrapper.find(GlLink).text()).toBe(`${tag}-${filename}`);
   });
 
   it('renders the correct hover text for the download', () => {
@@ -44,19 +45,20 @@ describe('Evidence Block', () => {
   });
 
   it('renders the correct file link for download', () => {
-    expect(wrapper.find(GlLink).attributes().download).toBe(`${release.tagName}-evidence.json`);
+    const [tag, filename] = release.evidences[0].filepath.split('/').slice(-2);
+    expect(wrapper.find(GlLink).attributes().download).toBe(`${tag}-${filename}`);
   });
 
   describe('sha text', () => {
     it('renders the short sha initially', () => {
-      expect(wrapper.find('.js-short').text()).toBe(truncateSha(release.evidenceSha));
+      expect(wrapper.find('.js-short').text()).toBe(truncateSha(release.evidences[0].sha));
     });
 
     it('renders the long sha after expansion', () => {
       wrapper.find('.js-text-expander-prepend').trigger('click');
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.find('.js-expanded').text()).toBe(release.evidenceSha);
+        expect(wrapper.find('.js-expanded').text()).toBe(release.evidences[0].sha);
       });
     });
   });
@@ -72,7 +74,7 @@ describe('Evidence Block', () => {
 
     it('copies the sha', () => {
       expect(wrapper.find(ClipboardButton).attributes('data-clipboard-text')).toBe(
-        release.evidenceSha,
+        release.evidences[0].sha,
       );
     });
   });
