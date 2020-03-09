@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'ProductivityAnalytics' do
+describe 'Groups::ProductivityAnalytics' do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
@@ -14,13 +14,11 @@ describe 'ProductivityAnalytics' do
       milestone_title: 'user',
       merged_after: Date.yesterday.to_time,
       merged_before: Date.today.to_time,
-      group_id: group,
       project_id: project.full_path
     }
   end
 
   before do
-    stub_feature_flags(group_level_productivity_analytics: false)
     stub_licensed_features(productivity_analytics: true)
 
     sign_in(user)
@@ -29,7 +27,7 @@ describe 'ProductivityAnalytics' do
   end
 
   it 'exposes valid url params in data attributes' do
-    visit analytics_productivity_analytics_path(params)
+    visit group_analytics_productivity_analytics_path(group, params)
 
     element = page.find('#js-productivity-analytics')
 
@@ -57,7 +55,7 @@ describe 'ProductivityAnalytics' do
     end
 
     it 'does not expose params in data attributes' do
-      visit analytics_productivity_analytics_path(params)
+      visit group_analytics_productivity_analytics_path(group, params)
 
       element = page.find('#js-productivity-analytics')
 

@@ -8,7 +8,6 @@ describe Analytics::AnalyticsController do
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(group_level_productivity_analytics: false)
     stub_feature_flags(group_level_cycle_analytics: false)
 
     sign_in(user)
@@ -23,14 +22,6 @@ describe Analytics::AnalyticsController do
         get :index
 
         expect(response).to redirect_to(analytics_cycle_analytics_path)
-      end
-
-      it 'redirects to productivity analytics' do
-        stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true)
-
-        get :index
-
-        expect(response).to redirect_to(analytics_productivity_analytics_path)
       end
     end
 

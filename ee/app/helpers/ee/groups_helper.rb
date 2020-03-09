@@ -11,17 +11,6 @@ module EE
         .count
     end
 
-    override :group_overview_nav_link_paths
-    def group_overview_nav_link_paths
-      if ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, @group, default_enabled: true)
-        super
-      else
-        super + %w[
-          groups/insights#show
-        ]
-      end
-    end
-
     override :group_nav_link_paths
     def group_nav_link_paths
       if ::Gitlab::CurrentSettings.should_check_namespace_plan? && can?(current_user, :admin_group, @group)

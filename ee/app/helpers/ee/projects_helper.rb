@@ -4,17 +4,6 @@ module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
 
-    override :sidebar_projects_paths
-    def sidebar_projects_paths
-      if ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, @project, default_enabled: true)
-        super
-      else
-        super + %w[
-          projects/insights#show
-        ]
-      end
-    end
-
     override :sidebar_settings_paths
     def sidebar_settings_paths
       super + %w[
