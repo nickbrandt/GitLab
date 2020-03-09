@@ -10,6 +10,7 @@ import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
 import VulnerabilitySeverity from './vulnerability_severity.vue';
 import LoadingError from './loading_error.vue';
+import { DASHBOARD_TYPES } from '../store/constants';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -107,10 +108,13 @@ export default {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
     shouldUseFirstClassVulns() {
-      // NOTE: This is currently set to only show on the project dashboard.
-      // Eventually, we'll need it to show on the group and instance dashboards.
-      // But **NEVER** the pipeline dashboard
-      return Boolean(gon?.features?.firstClassVulnerabilities && this.dashboardType === 'project');
+      const { dashboardType } = this;
+      return Boolean(
+        gon?.features?.firstClassVulnerabilities &&
+          (dashboardType === DASHBOARD_TYPES.PROJECT ||
+            dashboardType === DASHBOARD_TYPES.GROUP ||
+            dashboardType === DASHBOARD_TYPES.INSTANCE),
+      );
     },
   },
   watch: {

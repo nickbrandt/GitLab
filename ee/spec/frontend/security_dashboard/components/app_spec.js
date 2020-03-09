@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 
+import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 import Filters from 'ee/security_dashboard/components/filters.vue';
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
@@ -10,9 +11,9 @@ import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerabili
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
 import LoadingError from 'ee/security_dashboard/components/loading_error.vue';
 import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
-import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 
 import createStore from 'ee/security_dashboard/store';
+import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { getParameterValues } from '~/lib/utils/url_utility';
 import axios from '~/lib/utils/axios_utils';
 
@@ -209,24 +210,24 @@ describe('Security Dashboard app', () => {
     });
 
     describe.each`
-      dashboardType | showVulnerabilityList
-      ${'pipeline'} | ${false}
-      ${'project'}  | ${true}
-      ${'group'}    | ${false}
-      ${'instance'} | ${false}
-    `('with an empty $dashboardType', ({ dashboardType, showVulnerabilityList }) => {
+      dashboardType               | showVulnerabilityList
+      ${DASHBOARD_TYPES.PIPELINE} | ${false}
+      ${DASHBOARD_TYPES.PROJECT}  | ${true}
+      ${DASHBOARD_TYPES.GROUP}    | ${true}
+      ${DASHBOARD_TYPES.INSTANCE} | ${true}
+    `('with a dashobard type of $dashboardType', ({ dashboardType, showVulnerabilityList }) => {
       beforeEach(() => {
         wrapper.vm.$store.state.dashboardType = dashboardType;
       });
 
-      it(`should ${showVulnerabilityList ? '' : 'not '} show the vulnerability`, () => {
+      it(`should ${showVulnerabilityList ? '' : 'not '}show the vulnerability`, () => {
         expect(wrapper.find(VulnerabilityList).exists()).toEqual(showVulnerabilityList);
       });
     });
 
     describe('on the project dashboard', () => {
       beforeEach(() => {
-        wrapper.vm.$store.state.dashboardType = 'project';
+        wrapper.vm.$store.state.dashboardType = DASHBOARD_TYPES.PROJECT;
       });
 
       it('should not render the pagination', () => {
