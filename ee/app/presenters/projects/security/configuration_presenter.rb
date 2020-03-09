@@ -8,11 +8,11 @@ module Projects
       presents :project
 
       SCAN_DESCRIPTIONS = {
-        container_scanning: _('Check your Docker images for known vulnerabilities'),
+        container_scanning: _('Check your Docker images for known vulnerabilities.'),
         dast: _('Analyze a review version of your web application.'),
-        dependency_scanning: _('Analyze your dependencies for known vulnerabilities'),
-        license_management: _('Search your project dependencies for their licenses and apply policies'),
-        sast: _('Analyze your source code for known vulnerabilities')
+        dependency_scanning: _('Analyze your dependencies for known vulnerabilities.'),
+        license_management: _('Search your project dependencies for their licenses and apply policies.'),
+        sast: _('Analyze your source code for known vulnerabilities.')
       }.freeze
 
       SCAN_DOCS = {
