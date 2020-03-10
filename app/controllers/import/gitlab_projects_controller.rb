@@ -52,7 +52,7 @@ class Import::GitlabProjectsController < Import::BaseController
     # https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/470
     # is released and GITLAB_WORKHORSE_VERSION is updated accordingly.
     if with_workhorse_upload_acceleration?
-      return false unless project_params[:file]
+      return false unless project_params[:file].is_a?(::UploadedFile)
     else
       return false unless project_params[:file] && project_params[:file].respond_to?(:read)
     end
