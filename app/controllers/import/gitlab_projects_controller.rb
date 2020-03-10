@@ -48,7 +48,14 @@ class Import::GitlabProjectsController < Import::BaseController
   private
 
   def file_is_valid?
-    return false unless project_params[:file]
+    # TODO: remove the condition and the private method after the WH version including
+    # https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/470
+    # is released and GITLAB_WORKHORSE_VERSION is updated accordingly.
+    if with_workhorse_upload_acceleration?
+      return false unless project_params[:file]
+    else
+      return false unless project_params[:file] && project_params[:file].respond_to?(:read)
+    end
 
     filename = project_params[:file].original_filename
 
@@ -67,5 +74,9 @@ class Import::GitlabProjectsController < Import::BaseController
 
   def whitelist_query_limiting
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42437')
+  end
+
+  def with_workhorse_upload_acceleration?
+    request.headers[Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER].present?
   end
 end
