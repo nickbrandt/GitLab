@@ -109,13 +109,32 @@ describe ProjectsHelper do
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
 
-      # TODO: Update these
-      it 'returns the "vulnerability findings" endpoint paths' do
-        expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
-        expect(subject[:vulnerabilities_summary_endpoint]).to(
-          eq(
-            summary_project_security_vulnerability_findings_path(project)
-          ))
+      context 'when first_class_vulnerabilities is enabled' do
+        before do
+          stub_feature_flags(first_class_vulnerabilities: true)
+        end
+
+        it 'returns first class vulnerabilities endpoints' do
+          expect(subject[:vulnerabilities_endpoint]).to eq expose_path(api_v4_projects_vulnerabilities_path(id: project.id))
+          expect(subject[:vulnerabilities_summary_endpoint]).to(
+            eq(
+              summary_project_security_vulnerability_findings_path(project)
+            ))
+        end
+      end
+
+      context 'when first_class_vulnerabilities is disabled' do
+        before do
+          stub_feature_flags(first_class_vulnerabilities: false)
+        end
+
+        it 'returns vulnerability findings endpoints' do
+          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
+          expect(subject[:vulnerabilities_summary_endpoint]).to(
+            eq(
+              summary_project_security_vulnerability_findings_path(project)
+            ))
+        end
       end
     end
   end
