@@ -2,6 +2,8 @@
 
 module Types
   class EpicType < BaseObject
+    include ::Gitlab::Graphql::Aggregations::Epics::Constants
+
     graphql_name 'Epic'
     description 'Represents an epic.'
 
@@ -121,21 +123,20 @@ module Types
           resolver: Resolvers::EpicIssuesResolver
 
     field :descendant_counts, Types::EpicDescendantCountType, null: true, complexity: 10,
-          description: 'Number of open and closed descendant epics and issues',
-          resolve: -> (epic, args, ctx) do
-            Epics::DescendantCountService.new(epic, ctx[:current_user])
-          end
+      description: 'Number of open and closed descendant epics and issues',
+      resolve: -> (epic, args, ctx) do
+        if Feature.enabled?(:unfiltered_epic_aggregates)
+          Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, COUNT)
+        else
+          Epics::DescendantCountService.new(epic, ctx[:current_user])
+        end
+      end
 
     field :descendant_weight_sum, Types::EpicDescendantWeightSumType, null: true, complexity: 10,
-          description: "Total weight of open and closed descendant epic's issues",
-          feature_flag: :unfiltered_epic_aggregates
-
-    def descendant_weight_sum
-      OpenStruct.new(
-        # We shouldn't stop the whole query, so returning -1 for a semi-noisy error
-        opened_issues: -1,
-        closed_issues: -1
-      )
-    end
+      description: "Total weight of open and closed issues in the epic and its descendants",
+      feature_flag: :unfiltered_epic_aggregates,
+      resolve: -> (epic, args, ctx) do
+        Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
+      end
   end
 end
