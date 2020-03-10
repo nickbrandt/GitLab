@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -9,9 +9,10 @@ import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 
 export default {
   components: {
+    GlAlert,
     GlLoadingIcon,
-    VulnerabilityStateDropdown,
     LoadingButton,
+    VulnerabilityStateDropdown,
   },
 
   props: {
@@ -80,6 +81,15 @@ export default {
 
 <template>
   <div>
+    <gl-alert
+      v-if="vulnerability.resolved_on_default_branch"
+      :title="__('Vulnerability resolved in the default branch')"
+      >{{
+        __(
+          'The vulnerability is no longer detected. Verify the vulnerability has been remediated before changing its status.',
+        )
+      }}</gl-alert
+    >
     <gl-loading-icon v-if="isLoadingVulnerability" />
     <vulnerability-state-dropdown
       v-else
