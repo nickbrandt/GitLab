@@ -23,6 +23,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    evidences() {
+      return this.release.evidences;
+    },
+  },
   methods: {
     evidenceTitle(index) {
       const [tag, filename] = this.release.evidences[index].filepath.split('/').slice(-2);
@@ -48,11 +53,7 @@ export default {
         {{ __('Evidence collection') }}
       </b>
     </div>
-    <div
-      v-for="(evidence, index) in this.release.evidences"
-      v-bind:key="index"
-      class="d-flex align-items-baseline"
-    >
+    <div v-for="(evidence, index) in evidences" :key="index" class="d-flex align-items-baseline">
       <gl-link
         v-gl-tooltip
         class="monospace"
