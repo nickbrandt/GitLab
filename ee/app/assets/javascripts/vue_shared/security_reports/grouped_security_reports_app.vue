@@ -104,18 +104,6 @@ export default {
       required: false,
       default: undefined,
     },
-    canDismissVulnerability: {
-      type: Boolean,
-      required: true,
-    },
-    canCreateMergeRequest: {
-      type: Boolean,
-      required: true,
-    },
-    canCreateIssue: {
-      type: Boolean,
-      required: true,
-    },
     divergedCommitsCount: {
       type: Number,
       required: false,
@@ -146,8 +134,6 @@ export default {
       'dependencyScanning',
       'summaryCounts',
       'modal',
-      'canCreateIssuePermission',
-      'canCreateFeedbackPermission',
     ]),
     ...mapGetters([
       'groupedSummaryText',
@@ -159,6 +145,9 @@ export default {
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
       'isBaseSecurityReportOutOfDate',
+      'canCreateIssue',
+      'canCreateMergeRequest',
+      'canDismissVulnerability',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
     securityTab() {
@@ -197,9 +186,6 @@ export default {
     );
     this.setCreateVulnerabilityFeedbackDismissalPath(this.createVulnerabilityFeedbackDismissalPath);
     this.setPipelineId(this.pipelineId);
-
-    this.setCanCreateIssuePermission(this.canCreateIssue);
-    this.setCanCreateFeedbackPermission(this.canCreateFeedback);
 
     const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
 
@@ -241,8 +227,6 @@ export default {
       'setCreateVulnerabilityFeedbackMergeRequestPath',
       'setCreateVulnerabilityFeedbackDismissalPath',
       'setPipelineId',
-      'setCanCreateIssuePermission',
-      'setCanCreateFeedbackPermission',
       'dismissVulnerability',
       'revertDismissVulnerability',
       'createNewIssue',

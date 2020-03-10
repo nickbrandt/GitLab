@@ -55,22 +55,6 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('SET_CAN_CREATE_ISSUE_PERMISSION', () => {
-    it('should set permission for create issue', () => {
-      mutations[types.SET_CAN_CREATE_ISSUE_PERMISSION](stateCopy, true);
-
-      expect(stateCopy.canCreateIssuePermission).toEqual(true);
-    });
-  });
-
-  describe('SET_CAN_CREATE_FEEDBACK_PERMISSION', () => {
-    it('should set permission for create feedback', () => {
-      mutations[types.SET_CAN_CREATE_FEEDBACK_PERMISSION](stateCopy, true);
-
-      expect(stateCopy.canCreateFeedbackPermission).toEqual(true);
-    });
-  });
-
   describe('REQUEST_CONTAINER_SCANNING_DIFF', () => {
     it('should set container scanning loading flag to true', () => {
       mutations[types.REQUEST_CONTAINER_SCANNING_DIFF](stateCopy);
