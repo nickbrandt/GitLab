@@ -63,7 +63,7 @@ describe API::Geo do
       end
     end
 
-    describe 'GET /geo/transfers/attachment/1' do
+    describe 'GET /geo/transfers/attachment/:id' do
       let(:note) { create(:note, :with_attachment) }
       let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
       let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, upload) }
@@ -81,7 +81,7 @@ describe API::Geo do
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
 
-      context 'attachment file exists' do
+      context 'when attachment file exists' do
         subject(:request) { get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header }
 
         it 'responds with 200 with X-Sendfile' do
@@ -95,11 +95,23 @@ describe API::Geo do
         it_behaves_like 'with terms enforced'
       end
 
-      context 'attachment does not exist' do
+      context 'when attachment does not exist' do
         it 'responds with 404' do
           get api("/geo/transfers/attachment/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'when attachment has mount_point nil' do
+        it 'responds with 200 with X-Sendfile' do
+          upload.update(mount_point: nil)
+
+          get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response.headers['Content-Type']).to eq('application/octet-stream')
+          expect(response.headers['X-Sendfile']).to eq(note.attachment.path)
         end
       end
     end
