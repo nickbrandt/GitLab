@@ -10,6 +10,7 @@ import {
 const textBuilder = results => {
   const { failed, errored, resolved, total } = results;
 
+  const failedOrErrored = (failed || 0) + (errored || 0);
   const failedString = failed ? n__('%d failed', '%d failed', failed) : null;
   const erroredString = errored ? n__('%d error', '%d errors', errored) : null;
   const combinedString =
@@ -21,7 +22,7 @@ const textBuilder = results => {
 
   let resultsString = s__('Reports|no changed test results');
 
-  if (failed || errored) {
+  if (failedOrErrored) {
     if (resolved) {
       resultsString = sprintf(s__('Reports|%{combinedString} and %{resolvedString}'), {
         combinedString,
