@@ -67,7 +67,8 @@ module Elastic
         last_score: last_score
       )
 
-      specs.each { |spec, _| submit_document(spec) }
+      refs = deserialize_all(specs)
+      refs.preload_database_records.each { |ref| submit_document(ref) }
       failures = bulk_indexer.flush
 
       # Re-enqueue any failures so they are retried
@@ -85,17 +86,24 @@ module Elastic
       )
     end
 
-    def submit_document(spec)
-      ref = ::Gitlab::Elastic::DocumentReference.deserialize(spec)
+    def deserialize_all(specs)
+      refs = ::Gitlab::Elastic::DocumentReference::Collection.new
+      specs.each do |spec, _|
+        refs.deserialize_and_add(spec)
+      rescue ::Gitlab::Elastic::DocumentReference::InvalidError => err
+        logger.warn(
+          message: 'submit_document_failed',
+          reference: spec,
+          error_class: err.class.to_s,
+          error_message: err.message
+        )
+      end
 
+      refs
+    end
+
+    def submit_document(ref)
       bulk_indexer.process(ref)
-    rescue ::Gitlab::Elastic::DocumentReference::InvalidError => err
-      logger.warn(
-        message: 'submit_document_failed',
-        reference: spec,
-        error_class: err.class.to_s,
-        error_message: err.message
-      )
     end
 
     def bulk_indexer
