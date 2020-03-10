@@ -7,21 +7,20 @@ describe API::Entities::Release do
   let_it_be(:release) { create(:release, :with_evidence, project: project) }
   let(:evidence) { release.evidences.first }
   let(:user) { create(:user) }
-  let(:entity) { described_class.new(release, current_user: user) }
-  let(:subject_evidence) { subject[:evidences].first }
-
-  subject { entity.as_json }
+  let(:entity) { described_class.new(release, current_user: user).as_json }
 
   describe 'evidences' do
     context 'when the current user can download code' do
+      let(:entity_evidence) { entity[:evidences].first }
+
       it 'exposes the evidence sha and the json path' do
         allow(Ability).to receive(:allowed?).and_call_original
         allow(Ability).to receive(:allowed?)
           .with(user, :download_code, project).and_return(true)
 
-        expect(subject_evidence[:sha]).to eq(evidence.summary_sha)
-        expect(subject_evidence[:collected_at]).to eq(evidence.collected_at)
-        expect(subject_evidence[:filepath]).to eq(
+        expect(entity_evidence[:sha]).to eq(evidence.summary_sha)
+        expect(entity_evidence[:collected_at]).to eq(evidence.collected_at)
+        expect(entity_evidence[:filepath]).to eq(
           Gitlab::Routing.url_helpers.namespace_project_evidence_url(
             namespace_id: project.namespace,
             project_id: project,
@@ -37,7 +36,7 @@ describe API::Entities::Release do
         allow(Ability).to receive(:allowed?)
           .with(user, :download_code, project).and_return(false)
 
-        expect(subject.keys).not_to include(:evidences)
+        expect(entity.keys).not_to include(:evidences)
       end
     end
   end
