@@ -15,8 +15,8 @@ class AddIndexOnProjectIdAndTypeToServices < ActiveRecord::Migration[6.0]
   end
 
   def down
-    remove_concurrent_index :services, [:project_id, :type]
-
     add_concurrent_index :services, :project_id, name: INDEX_NAME
+
+    remove_concurrent_index :services, [:project_id, :type]
   end
 end

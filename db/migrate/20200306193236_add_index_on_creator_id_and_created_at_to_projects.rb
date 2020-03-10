@@ -15,8 +15,8 @@ class AddIndexOnCreatorIdAndCreatedAtToProjects < ActiveRecord::Migration[6.0]
   end
 
   def down
-    remove_concurrent_index :projects, [:creator_id, :created_at]
-
     add_concurrent_index :projects, :creator_id, name: INDEX_NAME
+
+    remove_concurrent_index :projects, [:creator_id, :created_at]
   end
 end
