@@ -4454,6 +4454,7 @@ ActiveRecord::Schema.define(version: 2020_03_06_170531) do
     t.index ["dismissed_by_id"], name: "index_vulnerabilities_on_dismissed_by_id"
     t.index ["due_date_sourcing_milestone_id"], name: "index_vulnerabilities_on_due_date_sourcing_milestone_id"
     t.index ["epic_id"], name: "index_vulnerabilities_on_epic_id"
+    t.index ["id"], name: "undefined_vulnerability", where: "(severity = 0)"
     t.index ["last_edited_by_id"], name: "index_vulnerabilities_on_last_edited_by_id"
     t.index ["milestone_id"], name: "index_vulnerabilities_on_milestone_id"
     t.index ["project_id"], name: "index_vulnerabilities_on_project_id"
