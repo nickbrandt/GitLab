@@ -131,6 +131,7 @@ describe Snippet, :elastic do
       'file_name',
       'content',
       'created_at',
+      'description',
       'updated_at',
       'state',
       'project_id',
