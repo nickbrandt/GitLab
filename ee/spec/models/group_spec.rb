@@ -257,6 +257,20 @@ describe Group do
     end
   end
 
+  describe '#vulnerabilities' do
+    let(:subgroup) { create(:group, parent: group) }
+    let(:group_project) { create(:project, namespace: group) }
+    let(:subgroup_project) { create(:project, namespace: subgroup) }
+    let!(:group_vulnerability) { create(:vulnerability, project: group_project) }
+    let!(:subgroup_vulnerability) { create(:vulnerability, project: subgroup_project) }
+
+    subject { group.vulnerabilities }
+
+    it 'returns vulnerabilities for all projects in the group and its subgroups' do
+      is_expected.to contain_exactly(group_vulnerability, subgroup_vulnerability)
+    end
+  end
+
   describe '#mark_ldap_sync_as_failed' do
     it 'sets the state to failed' do
       group.start_ldap_sync
