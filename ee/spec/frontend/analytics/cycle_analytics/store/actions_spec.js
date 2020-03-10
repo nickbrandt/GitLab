@@ -39,10 +39,6 @@ describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAMessage(msg = flashErrorMessage) {
-    expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
-  }
-
   beforeEach(() => {
     state = {
       startDate,

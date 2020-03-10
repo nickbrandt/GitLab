@@ -1,18 +1,12 @@
 import dateFormat from 'dateformat';
 import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
-import createFlash, { hideFlash } from '~/flash';
+import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
-
-const removeError = () => {
-  const flashEl = document.querySelector('.flash-alert');
-  if (flashEl) {
-    hideFlash(flashEl);
-  }
-};
+import { removeFlash } from '../utils';
 
 const handleErrorOrRethrow = ({ action, error }) => {
   if (error?.response?.status === httpStatus.FORBIDDEN) {
@@ -32,9 +26,7 @@ const isStageNameExistsError = ({ status, errors }) => {
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
-export const setSelectedGroup = ({ commit }, group) => {
-  commit(types.SET_SELECTED_GROUP, group);
-};
+export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 
 export const setSelectedProjects = ({ commit }, projects) => {
   commit(types.SET_SELECTED_PROJECTS, projects);

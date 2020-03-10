@@ -1,4 +1,3 @@
-<script>
 import { mapState, mapGetters } from 'vuex';
 import { historyPushState } from '~/lib/utils/common_utils';
 import { setUrlParams } from '~/lib/utils/url_utility';
@@ -22,8 +21,4 @@ export default {
       historyPushState(setUrlParams(this.query, window.location.href, true));
     },
   },
-  render() {
-    return null;
-  },
 };
-</script>
