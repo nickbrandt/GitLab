@@ -142,4 +142,4 @@ To help avoid abuse, users are rate limited to:
 | ---------------- | --------------------------- |
 | Export           | 1 project per 5 minutes     |
 | Download export  | 10 projects per 10 minutes  |
-| Import           | 30 projects per 10 minutes  |
+| Import           | 30 projects per 5 minutes  |
