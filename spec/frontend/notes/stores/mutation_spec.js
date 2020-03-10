@@ -588,7 +588,7 @@ describe('Notes Store mutations', () => {
 
     it('adds a descriptionVersion', () => {
       mutations.RECEIVE_DESCRIPTION_VERSION(state, { descriptionVersion, versionId });
-      expect(state.descriptionVersions[versionId]).toContain(descriptionVersion);
+      expect(state.descriptionVersions[versionId]).toBe(descriptionVersion);
     });
   });
 
@@ -600,7 +600,7 @@ describe('Notes Store mutations', () => {
 
     it('updates descriptionVersion to "Deleted"', () => {
       mutations.RECEIVE_DELETE_DESCRIPTION_VERSION(state, { [versionId]: deleted });
-      expect(state.descriptionVersions[versionId]).toContain(deleted);
+      expect(state.descriptionVersions[versionId]).toBe(deleted);
     });
   });
 });
