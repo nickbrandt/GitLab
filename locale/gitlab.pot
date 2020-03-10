@@ -15422,6 +15422,9 @@ msgstr ""
 msgid "ProjectSettings|View and edit files in this project"
 msgstr ""
 
+msgid "ProjectSettings|View and edit files in this project. Non-project members will only have read access"
+msgstr ""
+
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
 msgstr ""
 
