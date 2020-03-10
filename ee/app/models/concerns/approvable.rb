@@ -31,9 +31,12 @@ module Approvable
     end
   end
 
-  def approval_state
-    @approval_state ||= ApprovalState.new(self)
+  # rubocop:disable Gitlab/ModuleWithInstanceVariables
+  def approval_state(target_branch: nil)
+    @approval_state ||= {}
+    @approval_state[target_branch] ||= ApprovalState.new(self, target_branch: target_branch)
   end
+  # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
   def approvals_given
     approvals.size

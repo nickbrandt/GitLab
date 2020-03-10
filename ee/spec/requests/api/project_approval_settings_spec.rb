@@ -42,6 +42,36 @@ describe API::ProjectApprovalSettings do
         expect(rule['name']).to eq('security')
       end
 
+      context 'when target_branch is specified' do
+        let(:protected_branch) { create(:protected_branch, project: project, name: 'master') }
+        let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test') }
+
+        let!(:another_rule) do
+          create(
+            :approval_project_rule,
+            name: 'test',
+            project: project,
+            protected_branches: [another_protected_branch]
+          )
+        end
+
+        before do
+          stub_licensed_features(multiple_approval_rules: true)
+          rule.update!(protected_branches: [protected_branch])
+        end
+
+        it 'filters the rules returned by target branch' do
+          get api("#{url}?target_branch=test", developer)
+
+          expect(json_response['rules'].size).to eq(1)
+
+          rule_response = json_response['rules'].first
+
+          expect(rule_response['id']).to eq(another_rule.id)
+          expect(rule_response['name']).to eq('test')
+        end
+      end
+
       context 'private group filtering' do
         let_it_be(:private_group) { create :group, :private }
 
