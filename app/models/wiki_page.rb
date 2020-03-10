@@ -29,6 +29,12 @@ class WikiPage
 
   alias_method :==, :eql?
 
+  def meta
+    raise 'Metadata only available for valid pages' unless valid?
+
+    @meta ||= WikiPage::Meta.find_or_create(slug, self)
+  end
+
   # Sorts and groups pages by directory.
   #
   # pages - an array of WikiPage objects.
@@ -236,6 +242,7 @@ class WikiPage
     end
 
     save do
+      @meta = nil if title_changed?
       wiki.update_page(
         @page,
         content: content,
