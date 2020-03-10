@@ -215,5 +215,26 @@ describe MergeRequests::UpdateService, :mailer do
         update_merge_request({})
       end
     end
+
+    context 'when reassigned' do
+      it 'schedules for analytics metric update' do
+        expect(Analytics::CodeReviewMetricsWorker)
+          .to receive(:perform_async).with('Analytics::RefreshReassignData', merge_request.id, {})
+
+        update_merge_request({ assignee_ids: [user2.id] })
+      end
+
+      context 'when code_review_analytics is not available' do
+        before do
+          stub_licensed_features(code_review_analytics: false)
+        end
+
+        it 'does not schedule for analytics metric update' do
+          expect(Analytics::CodeReviewMetricsWorker).not_to receive(:perform_async)
+
+          update_merge_request({ assignee_ids: [user2.id] })
+        end
+      end
+    end
   end
 end
