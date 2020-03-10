@@ -63,7 +63,9 @@ describe SoftwareLicensePolicies::CreateService do
 
       context "when an argument error is raised" do
         before do
-          allow_any_instance_of(Project).to receive(:software_license_policies).and_raise(ArgumentError)
+          allow_next_instance_of(Project) do |instance|
+            allow(instance).to receive(:software_license_policies).and_raise(ArgumentError)
+          end
         end
 
         specify { expect(subject.execute[:status]).to be(:error) }

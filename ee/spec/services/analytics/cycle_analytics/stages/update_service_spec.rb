@@ -61,7 +61,9 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
       context 'when the update fails' do
         before do
           invalid_stage = Analytics::CycleAnalytics::GroupStage.new(name: '')
-          expect_any_instance_of(described_class).to receive(:find_stage).and_return(invalid_stage)
+          expect_next_instance_of(described_class) do |instance|
+            expect(instance).to receive(:find_stage).and_return(invalid_stage)
+          end
         end
 
         it 'returns unsuccessful service response' do

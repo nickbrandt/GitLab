@@ -91,9 +91,9 @@ describe IncidentManagement::ProcessPrometheusAlertWorker do
 
     context 'when issue could not be created' do
       before do
-        allow_any_instance_of(IncidentManagement::CreateIssueService)
-          .to receive(:execute)
-          .and_return( { error: true } )
+        allow_next_instance_of(IncidentManagement::CreateIssueService) do |instance|
+          allow(instance).to receive(:execute).and_return( { error: true } )
+        end
       end
 
       it 'does not relate issue to an event' do

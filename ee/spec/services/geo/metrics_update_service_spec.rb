@@ -195,7 +195,9 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       end
 
       it 'increments a counter when metrics fail to retrieve' do
-        allow_any_instance_of(Geo::NodeStatusPostService).to receive(:execute).and_return(false)
+        allow_next_instance_of(Geo::NodeStatusPostService) do |instance|
+          allow(instance).to receive(:execute).and_return(false)
+        end
 
         # Run once to get the gauge set
         subject.execute

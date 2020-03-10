@@ -84,7 +84,9 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
         context "when an unexpected error occurs" do
           before do
-            allow_any_instance_of(Gitlab::Ci::Reports::LicenseScanning::Report).to receive(:violates?).and_raise('heck')
+            allow_next_instance_of(Gitlab::Ci::Reports::LicenseScanning::Report) do |instance|
+              allow(instance).to receive(:violates?).and_raise('heck')
+            end
           end
 
           specify { expect(subject[:status]).to be(:error) }

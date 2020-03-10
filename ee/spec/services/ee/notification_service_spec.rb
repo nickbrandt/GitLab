@@ -398,7 +398,9 @@ describe EE::NotificationService, :mailer do
 
     it_behaves_like 'project emails are disabled' do
       before do
-        allow_any_instance_of(::Gitlab::Alerting::Alert).to receive(:valid?).and_return(true)
+        allow_next_instance_of(::Gitlab::Alerting::Alert) do |instance|
+          allow(instance).to receive(:valid?).and_return(true)
+        end
       end
 
       let(:alert_params) { { 'labels' => { 'gitlab_alert_id' => 'unknown' } } }
