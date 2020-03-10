@@ -82,7 +82,7 @@ module EE
     end
 
     def send_new_review_notification(review)
-      recipients = ::NotificationRecipientService.build_new_review_recipients(review)
+      recipients = ::NotificationRecipients::BuildService.build_new_review_recipients(review)
 
       recipients.each do |recipient|
         mailer.new_review_email(recipient.user.id, review.id).deliver_later
@@ -96,7 +96,7 @@ module EE
     end
 
     def approve_mr_email(merge_request, project, current_user)
-      recipients = ::NotificationRecipientService.build_recipients(merge_request, current_user, action: 'approve')
+      recipients = ::NotificationRecipients::BuildService.build_recipients(merge_request, current_user, action: 'approve')
 
       recipients.each do |recipient|
         mailer.approved_merge_request_email(recipient.user.id, merge_request.id, current_user.id).deliver_later
@@ -104,7 +104,7 @@ module EE
     end
 
     def unapprove_mr_email(merge_request, project, current_user)
-      recipients = ::NotificationRecipientService.build_recipients(merge_request, current_user, action: 'unapprove')
+      recipients = ::NotificationRecipients::BuildService.build_recipients(merge_request, current_user, action: 'unapprove')
 
       recipients.each do |recipient|
         mailer.unapproved_merge_request_email(recipient.user.id, merge_request.id, current_user.id).deliver_later
@@ -129,7 +129,7 @@ module EE
     def epic_status_change_email(target, current_user, status)
       action = status == 'reopened' ? 'reopen' : 'close'
 
-      recipients = ::NotificationRecipientService.build_recipients(
+      recipients = ::NotificationRecipients::BuildService.build_recipients(
         target,
         current_user,
         action: action
