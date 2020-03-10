@@ -165,7 +165,7 @@ RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member =
 
     context 'with object storage disabled' do
       before do
-        allow(Gitlab.config.packages.object_store).to receive(:enabled).and_return(false)
+        stub_package_file_object_storage(enabled: false)
       end
 
       context 'without a file from workhorse' do

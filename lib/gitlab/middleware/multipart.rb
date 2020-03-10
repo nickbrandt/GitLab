@@ -114,11 +114,12 @@ module Gitlab
 
         private
 
-        def allow_packages_storage_path?(config)
-          return unless config.enabled
-          return unless config['storage_path']
+        def allow_packages_storage_path?(packages_config)
+          return unless packages_config.enabled
+          return unless packages_config['storage_path']
+          return if packages_config.object_store.enabled && packages_config.object_store.direct_upload
 
-          !config.object_store.enabled || !config.object_store.direct_upload
+          true
         end
       end
 
