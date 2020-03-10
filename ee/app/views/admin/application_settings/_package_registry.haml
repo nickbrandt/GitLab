@@ -1,4 +1,4 @@
-- if Feature.enabled?(:forward_npm_package_registry_requests) && Gitlab.config.packages.enabled
+- if Feature.enabled?(:forward_npm_package_registry_requests, default_enabled: true) && Gitlab.config.packages.enabled
   %section.settings.as-package.no-animate#js-package-settings{ class: ('expanded' if expanded_by_default?) }
     .settings-header
       %h4

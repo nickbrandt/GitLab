@@ -28,7 +28,7 @@ module API
         end
 
         def redirect_registry_request_available?
-          Feature.enabled?(:forward_npm_package_registry_requests) &&
+          Feature.enabled?(:forward_npm_package_registry_requests, default_enabled: true) &&
             ::Gitlab::CurrentSettings.current_application_settings.npm_package_requests_forwarding
         end
       end
