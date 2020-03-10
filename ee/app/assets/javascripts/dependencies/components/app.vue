@@ -76,7 +76,7 @@ export default {
       const { jobPath } = this.reportInfo;
 
       const body = __(
-        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest pipeline%{linkEnd} scan',
+        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest successful%{linkEnd} scan',
       );
 
       const linkStart = jobPath ? `<a href="${jobPath}">` : '';
