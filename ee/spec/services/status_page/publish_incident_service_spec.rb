@@ -26,14 +26,10 @@ describe StatusPage::PublishIncidentService do
     end
 
     context 'when uploading details fails' do
-      it 'returns error and skip list upload' do
+      it 'propagates the exception' do
         expect_to_upload_details(issue, status: 404)
 
-        expect(result).to be_error
-
-        path = StatusPage::Storage.details_path(issue.iid)
-        expect(result.message).to include('NotFound')
-        expect(result.message).to include(path)
+        expect { result }.to raise_error(StatusPage::Storage::Error)
       end
     end
 
@@ -42,11 +38,7 @@ describe StatusPage::PublishIncidentService do
         expect_to_upload_details(issue)
         expect_to_upload_list(status: 404)
 
-        expect(result).to be_error
-
-        path = StatusPage::Storage.list_path
-        expect(result.message).to include('NotFound')
-        expect(result.message).to include(path)
+        expect { result }.to raise_error(StatusPage::Storage::Error)
       end
     end
 

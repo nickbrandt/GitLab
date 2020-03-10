@@ -47,10 +47,8 @@ RSpec.shared_examples 'publish incidents' do
         .and_raise(exception)
     end
 
-    it 'returns an error with exception' do
-      expect(result).to be_error
-      expect(result.message).to eq(exception.message)
-      expect(result.payload).to eq(error: exception)
+    it 'propagates the exception' do
+      expect { result }.to raise_error(exception)
     end
   end
 

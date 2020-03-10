@@ -51,8 +51,6 @@ module StatusPage
       storage_client.upload_object(key, content)
 
       success(object_key: key)
-    rescue StatusPage::Storage::Error => e
-      error(e.message, error: e)
     end
 
     def limit_exceeded?(json)
