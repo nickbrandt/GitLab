@@ -8,7 +8,6 @@ describe Gitlab::Shell do
   let(:repository) { project.repository }
   let(:gitlab_shell) { described_class.new }
 
-  it { is_expected.to respond_to :create_repository }
   it { is_expected.to respond_to :remove_repository }
   it { is_expected.to respond_to :fork_repository }
 
@@ -53,30 +52,6 @@ describe Gitlab::Shell do
     before do
       allow(Gitlab.config.gitlab_shell).to receive(:path).and_return(gitlab_shell_path)
       allow(Gitlab.config.gitlab_shell).to receive(:git_timeout).and_return(800)
-    end
-
-    describe '#create_repository' do
-      let(:repository_storage) { 'default' }
-      let(:repository_storage_path) do
-        Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-          Gitlab.config.repositories.storages[repository_storage].legacy_disk_path
-        end
-      end
-      let(:repo_name) { 'project/path' }
-      let(:created_path) { File.join(repository_storage_path, repo_name + '.git') }
-
-      after do
-        FileUtils.rm_rf(created_path)
-      end
-
-      it 'returns false when the command fails' do
-        FileUtils.mkdir_p(File.dirname(created_path))
-        # This file will block the creation of the repo's .git directory. That
-        # should cause #create_repository to fail.
-        FileUtils.touch(created_path)
-
-        expect(gitlab_shell.create_repository(repository_storage, repo_name, repo_name)).to be_falsy
-      end
     end
 
     describe '#remove_repository' do

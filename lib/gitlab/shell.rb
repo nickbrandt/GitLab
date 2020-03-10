@@ -77,47 +77,6 @@ module Gitlab
       end
     end
 
-    # Initialize a new project repository using a Project model
-    #
-    # @param [Project] project
-    # @return [Boolean] whether repository could be created
-    def create_project_repository(project)
-      create_repository(project.repository_storage, project.disk_path, project.full_path)
-    end
-
-    # Initialize a new wiki repository using a Project model
-    #
-    # @param [Project] project
-    # @return [Boolean] whether repository could be created
-    def create_wiki_repository(project)
-      create_repository(project.repository_storage, project.wiki.disk_path, project.wiki.full_path)
-    end
-
-    # Init new repository
-    #
-    # @example Create a repository
-    #   create_repository("default", "path/to/gitlab-ci", "gitlab/gitlab-ci")
-    #
-    # @param [String] storage the shard key
-    # @param [String] disk_path project path on disk
-    # @param [String] gl_project_path project name
-    # @return [Boolean] whether repository could be created
-    def create_repository(storage, disk_path, gl_project_path)
-      relative_path = disk_path.dup
-      relative_path << '.git' unless relative_path.end_with?('.git')
-
-      # During creation of a repository, gl_repository may not be known
-      # because that depends on a yet-to-be assigned project ID in the
-      # database (e.g. project-1234), so for now it is blank.
-      repository = Gitlab::Git::Repository.new(storage, relative_path, '', gl_project_path)
-      wrapped_gitaly_errors { repository.gitaly_repository_client.create_repository }
-
-      true
-    rescue => err # Once the Rugged codes gets removes this can be improved
-      Rails.logger.error("Failed to add repository #{storage}/#{disk_path}: #{err}") # rubocop:disable Gitlab/RailsLogger
-      false
-    end
-
     # Import wiki repository from external service
     #
     # @param [Project] project

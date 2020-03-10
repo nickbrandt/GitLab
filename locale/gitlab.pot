@@ -8348,7 +8348,7 @@ msgstr ""
 msgid "Failed to create a branch for this issue. Please try again."
 msgstr ""
 
-msgid "Failed to create repository via gitlab-shell"
+msgid "Failed to create repository"
 msgstr ""
 
 msgid "Failed to create resources"

@@ -2,6 +2,7 @@
 
 class ProjectWiki
   include Storage::LegacyProjectWiki
+  include Gitlab::Utils::StrongMemoize
 
   MARKUPS = {
     'Markdown' => :markdown,
@@ -63,14 +64,15 @@ class ProjectWiki
 
   # Returns the Gitlab::Git::Wiki object.
   def wiki
-    @wiki ||= begin
-      gl_repository = Gitlab::GlRepository::WIKI.identifier_for_container(project)
-      raw_repository = Gitlab::Git::Repository.new(project.repository_storage, disk_path + '.git', gl_repository, full_path)
+    strong_memoize(:wiki) do
+      repository.create_if_not_exists
+      raise CouldNotCreateWikiError unless repository_exists?
 
-      create_repo!(raw_repository) unless raw_repository.exists?
-
-      Gitlab::Git::Wiki.new(raw_repository)
+      Gitlab::Git::Wiki.new(repository.raw)
     end
+  rescue => err
+    Gitlab::ErrorTracking.track_exception(err, project_wiki: { project_id: project.id, full_path: full_path, disk_path: disk_path })
+    raise CouldNotCreateWikiError
   end
 
   def repository_exists?
@@ -191,14 +193,6 @@ class ProjectWiki
   end
 
   private
-
-  def create_repo!(raw_repository)
-    gitlab_shell.create_wiki_repository(project)
-
-    raise CouldNotCreateWikiError unless raw_repository.exists?
-
-    repository.after_create
-  end
 
   def commit_details(action, message = nil, title = nil)
     commit_message = message.presence || default_message(action, title)
