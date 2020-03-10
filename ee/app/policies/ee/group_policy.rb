@@ -58,6 +58,11 @@ module EE
         @subject.feature_available?(:group_timelogs)
       end
 
+      with_scope :global
+      condition(:cluster_health_available) do
+        License.feature_available?(:cluster_health)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -163,6 +168,8 @@ module EE
       end
 
       rule { ~group_timelogs_available }.prevent :read_group_timelogs
+
+      rule { can?(:read_cluster) & cluster_health_available }.enable :read_cluster_health
     end
 
     override :lookup_access_level!
