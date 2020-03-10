@@ -1,0 +1,5 @@
+---
+title: Preload database records in bulk indexing
+merge_request: 26754
+author:
+type: performance
