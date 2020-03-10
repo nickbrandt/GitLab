@@ -1,0 +1,6 @@
+fragment BoardFragment on Board {
+  id,
+  name,
+  weight
+}
+
