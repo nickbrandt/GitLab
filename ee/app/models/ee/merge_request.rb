@@ -58,8 +58,6 @@ module EE
           .having("COUNT(users.id) = ?", usernames.size)
       end
 
-      participant :participant_approvers
-
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
 
       scope :order_review_time_desc, -> do
@@ -162,14 +160,6 @@ module EE
         .select { |pos| file_paths.include?(pos.file_path) }
 
       super.concat(positions)
-    end
-
-    def participant_approvers
-      strong_memoize(:participant_approvers) do
-        next [] unless approval_needed?
-
-        approval_state.filtered_approvers(code_owner: false, unactioned: true)
-      end
     end
 
     def enabled_reports

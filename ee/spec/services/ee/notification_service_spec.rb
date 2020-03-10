@@ -640,10 +640,10 @@ describe EE::NotificationService, :mailer do
           reset_delivered_emails!
         end
 
-        it 'emails the approvers' do
+        it 'does not email the approvers' do
           notification.new_merge_request(merge_request, @u_disabled)
 
-          project_approvers.each { |approver| should_email(approver) }
+          project_approvers.each { |approver| should_not_email(approver) }
         end
 
         it 'does not email the approvers when approval is not necessary' do
@@ -666,10 +666,10 @@ describe EE::NotificationService, :mailer do
             reset_delivered_emails!
           end
 
-          it 'emails the MR approvers' do
+          it 'does not email the MR approvers' do
             notification.new_merge_request(merge_request, @u_disabled)
 
-            mr_approvers.each { |approver| should_email(approver) }
+            mr_approvers.each { |approver| should_not_email(approver) }
           end
 
           it 'does not email approvers set on the project who are not approvers of this MR' do

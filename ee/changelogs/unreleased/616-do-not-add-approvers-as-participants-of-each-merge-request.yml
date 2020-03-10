@@ -1,0 +1,5 @@
+---
+title: Do not automatically add approvers as participants of each merge request
+merge_request: 25546
+author:
+type: changed
