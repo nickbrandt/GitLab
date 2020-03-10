@@ -66,11 +66,11 @@ class Release < ApplicationRecord
   end
 
   def upcoming_release?
-    released_at.present? && released_at > Time.zone.now
+    released_at.present? && released_at.to_i > Time.zone.now.to_i
   end
 
   def historical_release?
-    released_at.present? && released_at < created_at
+    released_at.present? && released_at.to_i < created_at.to_i
   end
 
   def name
