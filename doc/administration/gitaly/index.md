@@ -861,7 +861,7 @@ default level is `WARN`.
 You can run a gRPC trace with:
 
 ```shell
-GRPC_TRACE=all GRPC_VERBOSITY=DEBUG sudo gitlab-rake gitlab:gitaly:check
+sudo GRPC_TRACE=all GRPC_VERBOSITY=DEBUG gitlab-rake gitlab:gitaly:check
 ```
 
 ### Observing `gitaly-ruby` traffic
