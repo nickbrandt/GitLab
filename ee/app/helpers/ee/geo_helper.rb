@@ -159,7 +159,6 @@ module EE
         path: path,
         method: 'delete',
         modal_attributes: {
-          modalId: 'geo-entry-removal-modal',
           title: s_('Geo|Remove tracking database entry'),
           message: s_('Geo|Tracking database entry will be removed. Are you sure?'),
           okVariant: 'danger',
