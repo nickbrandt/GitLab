@@ -125,6 +125,7 @@ class License < ApplicationRecord
     prometheus_alerts
     pseudonymizer
     report_approver_rules
+    requirements
     sast
     security_dashboard
     status_page

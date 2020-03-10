@@ -33,6 +33,9 @@ module EE
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
 
+      with_scope :subject
+      condition(:requirements_available) { @subject.feature_available?(:requirements) }
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -359,6 +362,16 @@ module EE
       rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
+
+      rule { can?(:read_project) & requirements_available }.enable :read_requirement
+
+      rule { requirements_available & reporter }.policy do
+        enable :create_requirement
+        enable :admin_requirement
+        enable :update_requirement
+      end
+
+      rule { requirements_available & owner }.enable :destroy_requirement
     end
 
     override :lookup_access_level!
