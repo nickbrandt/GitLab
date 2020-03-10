@@ -34,6 +34,14 @@ module Gitlab
                                         .join('GITLAB_SHELL_VERSION')).strip
       end
 
+      # Return a SSH url for a given project path
+      #
+      # @param [String] full_path project path (URL)
+      # @return [String] SSH URL
+      def url_to_repo(full_path)
+        Gitlab.config.gitlab_shell.ssh_path_prefix + "#{full_path}.git"
+      end
+
       private
 
       # Create (if necessary) and link the secret token file
@@ -234,14 +242,6 @@ module Gitlab
       Gitlab::ErrorTracking.track_exception(e, old_name: old_name, new_name: new_name, storage: storage)
 
       false
-    end
-
-    # Return a SSH url for a given project path
-    #
-    # @param [String] full_path project path (URL)
-    # @return [String] SSH URL
-    def url_to_repo(full_path)
-      Gitlab.config.gitlab_shell.ssh_path_prefix + "#{full_path}.git"
     end
 
     # Return GitLab shell version

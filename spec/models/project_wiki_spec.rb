@@ -34,7 +34,7 @@ describe ProjectWiki do
 
   describe "#url_to_repo" do
     it "returns the correct ssh url to the repo" do
-      expect(subject.url_to_repo).to eq(gitlab_shell.url_to_repo(subject.full_path))
+      expect(subject.url_to_repo).to eq(Gitlab::Shell.url_to_repo(subject.full_path))
     end
   end
 

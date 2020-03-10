@@ -12,7 +12,13 @@ describe Gitlab::Shell do
   it { is_expected.to respond_to :remove_repository }
   it { is_expected.to respond_to :fork_repository }
 
-  it { expect(gitlab_shell.url_to_repo('diaspora')).to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + "diaspora.git") }
+  describe '.url_to_repo' do
+    let(:full_path) { 'diaspora/disaspora-rails' }
+
+    subject { described_class.url_to_repo(full_path) }
+
+    it { is_expected.to eq(Gitlab.config.gitlab_shell.ssh_path_prefix + full_path + '.git') }
+  end
 
   describe 'memoized secret_token' do
     let(:secret_file) { 'tmp/tests/.secret_shell_test' }

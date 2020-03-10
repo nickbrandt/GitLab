@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectWiki
-  include Gitlab::ShellAdapter
   include Storage::LegacyProjectWiki
 
   MARKUPS = {
@@ -47,7 +46,7 @@ class ProjectWiki
   end
 
   def url_to_repo
-    gitlab_shell.url_to_repo(full_path)
+    Gitlab::Shell.url_to_repo(full_path)
   end
 
   def ssh_url_to_repo
