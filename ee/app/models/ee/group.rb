@@ -305,6 +305,10 @@ module EE
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
     end
 
+    def vulnerabilities
+      ::Vulnerability.where(project: ::Project.for_group_and_its_subgroups(self))
+    end
+
     private
 
     def custom_project_templates_group_allowed
