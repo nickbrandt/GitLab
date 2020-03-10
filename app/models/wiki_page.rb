@@ -21,6 +21,14 @@ class WikiPage
     ActiveModel::Name.new(self, nil, 'wiki')
   end
 
+  def eql?(other)
+    return false unless other.present? && other.is_a?(self.class)
+
+    slug == other.slug && wiki.project == other.wiki.project
+  end
+
+  alias_method :==, :eql?
+
   # Sorts and groups pages by directory.
   #
   # pages - an array of WikiPage objects.
