@@ -7,12 +7,6 @@ describe Gitlab::Shell do
   let_it_be(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
   let(:gitlab_shell) { described_class.new }
-  let(:popen_vars) { { 'GIT_TERMINAL_PROMPT' => ENV['GIT_TERMINAL_PROMPT'] } }
-  let(:timeout) { Gitlab.config.gitlab_shell.git_timeout }
-
-  before do
-    allow(Project).to receive(:find).and_return(project)
-  end
 
   it { is_expected.to respond_to :create_repository }
   it { is_expected.to respond_to :remove_repository }
@@ -49,7 +43,6 @@ describe Gitlab::Shell do
   describe 'projects commands' do
     let(:gitlab_shell_path) { File.expand_path('tmp/tests/gitlab-shell') }
     let(:projects_path) { File.join(gitlab_shell_path, 'bin/gitlab-projects') }
-    let(:gitlab_shell_hooks_path) { File.join(gitlab_shell_path, 'hooks') }
 
     before do
       allow(Gitlab.config.gitlab_shell).to receive(:path).and_return(gitlab_shell_path)

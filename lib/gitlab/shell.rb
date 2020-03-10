@@ -6,8 +6,6 @@ require 'securerandom'
 
 module Gitlab
   class Shell
-    GITLAB_SHELL_ENV_VARS = %w(GIT_TERMINAL_PROMPT).freeze
-
     Error = Class.new(StandardError)
 
     class << self
@@ -271,21 +269,10 @@ module Gitlab
       false
     end
 
-    # Return hooks folder path used by projects
-    #
-    # @return [String] path
-    def hooks_path
-      File.join(gitlab_shell_path, 'hooks')
-    end
-
     protected
 
     def gitlab_shell_path
       File.expand_path(Gitlab.config.gitlab_shell.path)
-    end
-
-    def gitlab_shell_user_home
-      File.expand_path("~#{Gitlab.config.gitlab_shell.ssh_user}")
     end
 
     def full_path(storage, dir_name)
