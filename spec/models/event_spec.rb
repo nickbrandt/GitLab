@@ -99,6 +99,38 @@ describe Event do
     end
   end
 
+  describe '#target_title' do
+    let_it_be(:project) { create(:project) }
+
+    let(:author) { project.owner }
+    let(:target) { nil }
+
+    let(:event) do
+      described_class.new(project: project,
+                          target: target,
+                          author_id: author.id)
+    end
+
+    context 'for an issue' do
+      let(:issue) { create(:issue, project: project) }
+      let(:target) { issue }
+
+      it 'delegates to issue title' do
+        expect(event.target_title).to eq(issue.title)
+      end
+    end
+
+    context 'for a wiki page' do
+      let(:wiki) { create(:project_wiki, project: project) }
+      let(:wiki_page) { create(:wiki_page, wiki: wiki) }
+      let(:event) { create(:wiki_page_event, project: project, wiki_page: wiki_page) }
+
+      it 'delegates to issue title' do
+        expect(event.target_title).to eq(wiki_page.title)
+      end
+    end
+  end
+
   describe '#membership_changed?' do
     context "created" do
       subject { build(:event, :created).membership_changed? }
@@ -165,7 +197,11 @@ describe Event do
     let(:note_on_project_snippet) { create(:note_on_project_snippet, author: author, noteable: project_snippet, project: project) }
     let(:note_on_personal_snippet) { create(:note_on_personal_snippet, author: author, noteable: personal_snippet, project: nil) }
     let(:milestone_on_project) { create(:milestone, project: project) }
-    let(:event) { described_class.new(project: project, target: target, author_id: author.id) }
+    let(:event) do
+      described_class.new(project: project,
+                          target: target,
+                          author_id: author.id)
+    end
 
     before do
       project.add_developer(member)
@@ -332,6 +368,19 @@ describe Event do
           expect(event.visible_to_user?(admin)).to be_truthy
         end
       end
+
+      context 'wiki-page event', :aggregate_failures do
+        let(:project) { create(:project) }
+        let(:event) { create(:wiki_page_event, project: project) }
+
+        it do
+          expect(event.visible_to_user?(nil)).to be_falsy
+          expect(event.visible_to_user?(non_member)).to be_falsy
+          expect(event.visible_to_user?(member)).to be_truthy
+          expect(event.visible_to_user?(guest)).to be_truthy
+          expect(event.visible_to_user?(admin)).to be_truthy
+        end
+      end
     end
 
     context 'project snippet note event' do
@@ -410,6 +459,55 @@ describe Event do
           expect(event.visible_to_user?(non_member)).to be_falsy
           expect(event.visible_to_user?(author)).to be_truthy
           expect(event.visible_to_user?(admin)).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe '.for_wiki_page' do
+    let_it_be(:events) do
+      [
+        create(:closed_issue_event),
+        create(:wiki_page_event),
+        create(:closed_issue_event),
+        create(:event, :created),
+        create(:wiki_page_event)
+      ]
+    end
+
+    it 'only contains the wiki page events' do
+      wiki_events = events.select(&:wiki_page?)
+
+      expect(described_class.for_wiki_page).to match_array(wiki_events)
+    end
+  end
+
+  describe '#wiki_page and #wiki_page?' do
+    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:title) { FFaker::Lorem.sentence }
+
+    context 'for a wiki page event' do
+      let(:wiki) { create(:project_wiki, project: project) }
+      let(:wiki_page) do
+        wiki.create_page(title, FFaker::Lorem.sentence)
+        page_title, page_dir = wiki.page_title_and_dir(title)
+        page = wiki.wiki.page(title: page_title, dir: page_dir, version: nil)
+
+        WikiPage.new(wiki, page)
+      end
+
+      subject(:event) { create(:wiki_page_event, project: project, wiki_page: wiki_page) }
+
+      it { is_expected.to have_attributes(wiki_page?: be_truthy, wiki_page: wiki_page) }
+    end
+
+    [:issue, :user, :merge_request, :snippet, :milestone, nil].each do |kind|
+      context "for a #{kind} event" do
+        it 'is nil' do
+          target = create(kind) if kind
+          event = create(:event, project: project, target: target)
+
+          expect(event).to have_attributes(wiki_page: be_nil, wiki_page?: be_falsy)
         end
       end
     end
