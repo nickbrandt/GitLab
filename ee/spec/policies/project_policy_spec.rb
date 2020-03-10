@@ -1397,4 +1397,8 @@ describe ProjectPolicy do
       end
     end
   end
+
+  it_behaves_like 'resource with requirement permissions' do
+    let(:resource) { project }
+  end
 end
