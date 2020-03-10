@@ -54,12 +54,21 @@ export default {
       this.setSelectedType(selectedType);
       this.requestPackagesList();
     },
+    emptyStateTitle({ title, type }) {
+      if (type) {
+        return sprintf(s__('PackageRegistry|There are no %{packageType} packages yet'), {
+          packageType: title,
+        });
+      }
+
+      return s__('PackageRegistry|There are no packages yet');
+    },
   },
 };
 </script>
 
 <template>
-  <gl-tabs @input="tabChanged">
+  <gl-tabs active-tab-class="js-package-active-tab" @input="tabChanged">
     <template #tabs-end>
       <div class="align-self-center ml-auto">
         <package-sort @sort:changed="requestPackagesList" />
@@ -69,10 +78,7 @@ export default {
     <gl-tab v-for="(tab, index) in tabsToRender" :key="index" :title="tab.title">
       <package-list @page:changed="onPageChanged" @package:delete="onPackageDeleteRequest">
         <template #empty-state>
-          <gl-empty-state
-            :title="s__('PackageRegistry|There are no packages yet')"
-            :svg-path="emptyListIllustration"
-          >
+          <gl-empty-state :title="emptyStateTitle(tab)" :svg-path="emptyListIllustration">
             <template #description>
               <p v-html="emptyListText"></p>
             </template>

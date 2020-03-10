@@ -1,4 +1,5 @@
 import { __, s__ } from '~/locale';
+import { PackageType } from '../shared/constants';
 
 export const FETCH_PACKAGES_LIST_ERROR_MESSAGE = __(
   'Something went wrong while fetching the packages list.',
@@ -74,18 +75,18 @@ export const PACKAGE_REGISTRY_TABS = [
   },
   {
     title: s__('PackageRegistry|Conan'),
-    type: 'conan',
+    type: PackageType.CONAN,
   },
   {
     title: s__('PackageRegistry|Maven'),
-    type: 'maven',
+    type: PackageType.MAVEN,
   },
   {
     title: s__('PackageRegistry|NPM'),
-    type: 'npm',
+    type: PackageType.NPM,
   },
   {
     title: s__('PackageRegistry|NuGet'),
-    type: 'nuget',
+    type: PackageType.NUGET,
   },
 ];

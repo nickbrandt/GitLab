@@ -3,6 +3,7 @@
 exports[`packages_list_app renders 1`] = `
 <b-tabs-stub
   activenavitemclass="gl-tab-nav-item-active gl-tab-nav-item-active-indigo"
+  activetabclass="js-package-active-tab"
   class="gl-tabs"
   contentclass=",gl-tab-content"
   navclass="gl-tabs-nav"
@@ -97,7 +98,7 @@ exports[`packages_list_app renders 1`] = `
                 class="svg-250 svg-content"
               >
                 <img
-                  alt="There are no packages yet"
+                  alt="There are no Conan packages yet"
                   class=""
                   src="helpSvg"
                 />
@@ -114,7 +115,7 @@ exports[`packages_list_app renders 1`] = `
                   class="center"
                   style=""
                 >
-                  There are no packages yet
+                  There are no Conan packages yet
                 </h4>
                  
                 <p
@@ -164,7 +165,7 @@ exports[`packages_list_app renders 1`] = `
                 class="svg-250 svg-content"
               >
                 <img
-                  alt="There are no packages yet"
+                  alt="There are no Maven packages yet"
                   class=""
                   src="helpSvg"
                 />
@@ -181,7 +182,7 @@ exports[`packages_list_app renders 1`] = `
                   class="center"
                   style=""
                 >
-                  There are no packages yet
+                  There are no Maven packages yet
                 </h4>
                  
                 <p
@@ -231,7 +232,7 @@ exports[`packages_list_app renders 1`] = `
                 class="svg-250 svg-content"
               >
                 <img
-                  alt="There are no packages yet"
+                  alt="There are no NPM packages yet"
                   class=""
                   src="helpSvg"
                 />
@@ -248,7 +249,7 @@ exports[`packages_list_app renders 1`] = `
                   class="center"
                   style=""
                 >
-                  There are no packages yet
+                  There are no NPM packages yet
                 </h4>
                  
                 <p
@@ -298,7 +299,7 @@ exports[`packages_list_app renders 1`] = `
                 class="svg-250 svg-content"
               >
                 <img
-                  alt="There are no packages yet"
+                  alt="There are no NuGet packages yet"
                   class=""
                   src="helpSvg"
                 />
@@ -315,7 +316,7 @@ exports[`packages_list_app renders 1`] = `
                   class="center"
                   style=""
                 >
-                  There are no packages yet
+                  There are no NuGet packages yet
                 </h4>
                  
                 <p

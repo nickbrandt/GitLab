@@ -58,13 +58,20 @@ describe('packages_list_app', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('generate the correct empty list link', () => {
-    const emptyState = findListComponent();
-    const link = emptyState.find('a');
+  describe('empty state', () => {
+    it('generate the correct empty list link', () => {
+      const link = findListComponent().find('a');
 
-    expect(link.html()).toMatchInlineSnapshot(
-      `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
-    );
+      expect(link.html()).toMatchInlineSnapshot(
+        `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
+      );
+    });
+
+    it('includes the right content on the default tab', () => {
+      const heading = findListComponent().find('h4');
+
+      expect(heading.text()).toBe('There are no packages yet');
+    });
   });
 
   it('call requestPackagesList on page:changed', () => {
