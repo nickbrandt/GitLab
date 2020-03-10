@@ -28,6 +28,39 @@ describe Users::BuildService do
           end
         end
       end
+
+      context 'smartcard authentication enabled' do
+        before do
+          allow(Gitlab::Auth::Smartcard).to receive(:enabled?).and_return(true)
+        end
+
+        context 'smartcard params' do
+          let(:subject) { '/O=Random Corp Ltd/CN=gitlab-user/emailAddress=gitlab-user@random-corp.org' }
+          let(:issuer) { '/O=Random Corp Ltd/CN=Random Corp' }
+          let(:smartcard_identity_params) do
+            { certificate_subject: subject, certificate_issuer: issuer }
+          end
+
+          before do
+            params.merge!(smartcard_identity_params)
+          end
+
+          it 'sets smartcard identity attributes' do
+            expect(SmartcardIdentity).to(
+              receive(:new)
+                .with(hash_including(issuer: issuer, subject: subject))
+                .and_call_original)
+
+            service.execute
+          end
+        end
+
+        context 'missing smartcard params' do
+          it 'works as expected' do
+            expect { service.execute }.not_to raise_error
+          end
+        end
+      end
     end
   end
 end
