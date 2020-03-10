@@ -23,48 +23,16 @@ module LicenseHelper
     return unless signed_in
     return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
 
+    message = []
+
     is_trial = current_license.trial?
-    message = ["Your #{'trial ' if is_trial}license"]
 
-    message << expiration_message
-
-    message << link_to('Buy now!', ::EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank') if is_trial
-
-    if current_license.expired? && current_license.will_block_changes?
-      message << 'Pushing code and creation of issues and merge requests'
-
-      message << block_changes_message
-
-      message << if is_admin
-                   'Upload a new license in the admin area'
-                 else
-                   'Ask an admin to upload a new license'
-                 end
-
-      message << 'to'
-      message << (current_license.block_changes? ? 'restore' : 'ensure uninterrupted')
-      message << 'service.'
-    end
-
+    message << license_message_subject(is_trial: is_trial)
+    message << trial_purchase_message if is_trial
+    message << expiration_blocking_message(is_admin: is_admin)
     message << renewal_instructions_message unless is_trial
 
-    message.join(' ').html_safe
-  end
-
-  def expiration_message
-    if current_license.expired?
-      "expired on #{current_license.expires_at}."
-    else
-      "will expire in #{pluralize(current_license.remaining_days, 'day')}."
-    end
-  end
-
-  def block_changes_message
-    if current_license.block_changes?
-      'has been disabled.'
-    else
-      "will be disabled on #{current_license.block_changes_at}."
-    end
+    message.reject {|string| string.blank? }.join(' ').html_safe
   end
 
   def seats_calculation_message
@@ -142,10 +110,71 @@ module LicenseHelper
     User.active.count
   end
 
+  def license_message_subject(is_trial:)
+    message = []
+
+    if current_license.expired?
+      expires_at = current_license.expires_at
+
+      message << if is_trial
+                   _('Your trial license expired on %{expires_at}.') % { expires_at: expires_at }
+                 else
+                   _('Your license expired on %{expires_at}.') % { expires_at: expires_at }
+                 end
+    else
+      remaining_days = pluralize(current_license.remaining_days, 'day')
+
+      message << if is_trial
+                   _('Your trial license will expire in %{remaining_days}.') % { remaining_days: remaining_days }
+                 else
+                   _('Your license will expire in %{remaining_days}.') % { remaining_days: remaining_days }
+                 end
+    end
+
+    message.join(' ')
+  end
+
+  def trial_purchase_message
+    buy_now_url = ::EE::SUBSCRIPTIONS_PLANS_URL
+    buy_now_link_start = "<a href='#{buy_now_url}' target='_blank' rel='noopener'>".html_safe
+    link_end = '</a>'.html_safe
+
+    _('%{buy_now_link_start}Buy now!%{link_end}') % { buy_now_link_start: buy_now_link_start, link_end: link_end }
+  end
+
+  def expiration_blocking_message(is_admin:)
+    return '' unless current_license.expired? && current_license.will_block_changes?
+
+    message = []
+
+    message << if current_license.block_changes?
+                 _('Pushing code and creation of issues and merge requests has been disabled.')
+               else
+                 _('Pushing code and creation of issues and merge requests will be disabled on %{disabled_on}.') % { disabled_on: current_license.block_changes_at }
+               end
+
+    message << if is_admin
+
+                 if current_license.block_changes?
+                   _('Upload a new license in the admin area to restore service.')
+                 else
+                   _('Upload a new license in the admin area to ensure uninterrupted service.')
+                 end
+               else
+                 if current_license.block_changes?
+                   _('Ask an admin to upload a new license to restore service.')
+                 else
+                   _('Ask an admin to upload a new license to ensure uninterrupted service.')
+                 end
+               end
+
+    message.join(' ')
+  end
+
   def renewal_instructions_message
     renewal_faq_url = 'https://docs.gitlab.com/ee/subscriptions/#renew-your-subscription'
 
-    renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank'>".html_safe
+    renewal_faq_link_start = "<a href='#{renewal_faq_url}' target='_blank' rel='noopener'>".html_safe
     link_end = '</a>'.html_safe
 
     _('For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}') % { link_start: renewal_faq_link_start, link_end: link_end }
