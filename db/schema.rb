@@ -3471,9 +3471,8 @@ ActiveRecord::Schema.define(version: 2020_03_11_165635) do
     t.index ["created_at", "id"], name: "index_projects_api_vis20_created_at", where: "(visibility_level = 20)"
     t.index ["created_at", "id"], name: "index_projects_on_created_at_and_id"
     t.index ["creator_id", "created_at"], name: "index_projects_on_mirror_creator_id_created_at", where: "((mirror = true) AND (mirror_trigger_builds = true))"
-    t.index ["creator_id"], name: "index_projects_on_creator_id"
+    t.index ["creator_id", "created_at"], name: "index_projects_on_creator_id_and_created_at"
     t.index ["description"], name: "index_projects_on_description_trigram", opclass: :gin_trgm_ops, using: :gin
-    t.index ["id", "creator_id"], name: "index_projects_on_id_and_creator_id"
     t.index ["id", "repository_storage", "last_repository_updated_at"], name: "idx_projects_on_repository_storage_last_repository_updated_at"
     t.index ["id"], name: "index_on_id_partial_with_legacy_storage", where: "((storage_version < 2) OR (storage_version IS NULL))"
     t.index ["id"], name: "index_projects_on_id_partial_for_visibility", unique: true, where: "(visibility_level = ANY (ARRAY[10, 20]))"
