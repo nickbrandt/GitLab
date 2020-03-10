@@ -22,6 +22,18 @@ FactoryBot.define do
       action { Event::CLOSED }
       target factory: :closed_issue
     end
+
+    factory :wiki_page_event do
+      action { Event::CREATED }
+
+      transient do
+        wiki_page { create(:wiki_page, wiki: create(:project_wiki, project: project)) }
+      end
+
+      target do
+        WikiPageMeta.find_or_create(wiki_page.slug, wiki_page)
+      end
+    end
   end
 
   factory :push_event, class: 'PushEvent' do
