@@ -8,21 +8,19 @@ module MergeRequests
   #
   class PostMergeService < MergeRequests::BaseService
     def execute(merge_request)
-      # return if merge_request.merged? # nothing to do, this worker has already run at least once
-
       # These operations need to happen transactionally
       ActiveRecord::Base.transaction(requires_new: true) do
         merge_request.mark_as_merged
-        create_event(merge_request)
-        create_note(merge_request)
 
-        # TODO: Make sure these are async operations. If not, move them earlier
-        # Better to have duplicate notifications than no notifications.
+        # These options do not call external services and should be
+        # relatively quick enough to put in a Transaction
+        create_event(merge_request)
         todo_service.merge_merge_request(merge_request, current_user)
         notification_service.merge_mr(merge_request, current_user)
       end
 
       # These operations are idempotent so can be safely run multiple times
+      create_note(merge_request)
       close_issues(merge_request)
       invalidate_cache_counts(merge_request, users: merge_request.assignees)
       merge_request.update_project_counter_caches
