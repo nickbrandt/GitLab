@@ -606,12 +606,36 @@ describe WikiPage do
       expect(subject).to eq(subject)
     end
 
-    it 'returns false for updated wiki page' do
+    it 'returns true for updated wiki page' do
       subject.update(content: "Updated content")
-      updated_page = wiki.find_page('test page')
+      updated_page = wiki.find_page(existing_page.slug)
 
       expect(updated_page).not_to be_nil
-      expect(updated_page).not_to eq(subject)
+      expect(updated_page).to eq(subject)
+    end
+
+    it 'returns false for a completely different wiki page' do
+      other_page = create(:wiki_page)
+
+      expect(subject.slug).not_to eq(other_page.slug)
+      expect(subject.project).not_to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
+    end
+
+    it 'returns false for page with different slug on same project' do
+      other_page = create(:wiki_page, project: subject.project)
+
+      expect(subject.slug).not_to eq(other_page.slug)
+      expect(subject.project).to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
+    end
+
+    it 'returns false for page with the same slug on a different project' do
+      other_page = create(:wiki_page, title: existing_page.slug)
+
+      expect(subject.slug).to eq(other_page.slug)
+      expect(subject.project).not_to eq(other_page.project)
+      expect(subject).not_to eq(other_page)
     end
   end
 
@@ -637,6 +661,30 @@ describe WikiPage do
       subject.attributes[:content] = 'test![WikiPage_Image](/uploads/abc/WikiPage_Image.png)'
 
       expect(subject.hook_attrs['content']).to eq("test![WikiPage_Image](#{Settings.gitlab.url}/uploads/abc/WikiPage_Image.png)")
+    end
+  end
+
+  describe '#meta' do
+    it 'returns an appropriate metadata object' do
+      wiki_page = create(:wiki_page)
+
+      expect(wiki_page.meta).to have_attributes(
+        valid?: true,
+        canonical_slug: wiki_page.slug,
+        title: wiki_page.title,
+        project: wiki_page.project,
+        slugs: include(have_attributes(slug: wiki_page.slug))
+      )
+    end
+
+    it 'is up-to-date after updates' do
+      wiki_page = create(:wiki_page)
+      old_title = wiki_page.title
+      new_title = FFaker::Lorem.sentence
+
+      expect do
+        wiki_page.update(title: new_title)
+      end.to change { wiki_page.meta.title }.from(old_title).to(new_title)
     end
   end
 
