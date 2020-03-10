@@ -34,6 +34,13 @@ module Gitlab
                                         .join('GITLAB_SHELL_VERSION')).strip
       end
 
+      # Return GitLab shell version
+      #
+      # @return [String] version
+      def version
+        @version ||= File.read(gitlab_shell_version_file).chomp if File.readable?(gitlab_shell_version_file)
+      end
+
       # Return a SSH url for a given project path
       #
       # @param [String] full_path project path (URL)
@@ -43,6 +50,14 @@ module Gitlab
       end
 
       private
+
+      def gitlab_shell_path
+        File.expand_path(Gitlab.config.gitlab_shell.path)
+      end
+
+      def gitlab_shell_version_file
+        File.join(gitlab_shell_path, 'VERSION')
+      end
 
       # Create (if necessary) and link the secret token file
       def generate_and_link_secret_token
@@ -244,17 +259,6 @@ module Gitlab
       false
     end
 
-    # Return GitLab shell version
-    #
-    # @return [String] version
-    def version
-      gitlab_shell_version_file = "#{gitlab_shell_path}/VERSION"
-
-      if File.readable?(gitlab_shell_version_file)
-        File.read(gitlab_shell_version_file).chomp
-      end
-    end
-
     # Check if repository exists on disk
     #
     # @example Check if repository exists
@@ -270,10 +274,6 @@ module Gitlab
     end
 
     protected
-
-    def gitlab_shell_path
-      File.expand_path(Gitlab.config.gitlab_shell.path)
-    end
 
     def full_path(storage, dir_name)
       raise ArgumentError.new("Directory name can't be blank") if dir_name.blank?
