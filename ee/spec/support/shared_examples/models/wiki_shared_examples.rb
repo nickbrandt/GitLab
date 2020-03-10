@@ -1,15 +1,12 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+RSpec.shared_examples_for 'EE wiki model' do
+  let_it_be(:user) { create(:user) }
+  let(:wiki) { described_class.for_container(wiki_container, user) }
 
-describe ProjectWiki do
-  let(:user) { create(:user, :commit_email) }
-  let(:project) { create(:project, :wiki_repo, namespace: user.namespace) }
-  let(:project_wiki) { described_class.new(project, user) }
+  subject { wiki }
 
-  subject { project_wiki }
-
-  describe "#kerberos_url_to_repo" do
+  describe '#kerberos_url_to_repo' do
     it 'returns valid kerberos url for this repo' do
       gitlab_kerberos_url = Gitlab.config.build_gitlab_kerberos_url
       repo_kerberos_url = "#{gitlab_kerberos_url}/#{subject.full_path}.git"
