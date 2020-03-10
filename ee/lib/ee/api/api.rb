@@ -21,7 +21,6 @@ module EE
         mount ::API::ElasticsearchIndexedNamespaces
         mount ::API::FeatureFlags
         mount ::API::FeatureFlagScopes
-        mount ::API::ContainerRegistryEvent
         mount ::API::Geo
         mount ::API::GeoReplication
         mount ::API::GeoNodes

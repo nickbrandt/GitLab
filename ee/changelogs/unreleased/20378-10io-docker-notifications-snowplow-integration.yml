@@ -1,0 +1,5 @@
+---
+title: Add Snowplow tracking for Container Registry events
+merge_request: 27001
+author:
+type: added

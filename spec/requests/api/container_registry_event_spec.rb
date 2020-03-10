@@ -12,15 +12,21 @@ describe API::ContainerRegistryEvent do
       allow(Gitlab.config.registry).to receive(:notification_secret) { secret_token }
     end
 
-    it 'returns 200 status and events are passed to event handler' do
-      handler = spy(:handle)
-      allow(::ContainerRegistry::EventHandler).to receive(:new).with(events).and_return(handler)
-
+    subject do
       post api('/container_registry_event/events'),
            params: { events: events }.to_json,
            headers: registry_headers.merge('Authorization' => secret_token)
+    end
 
-      expect(handler).to have_received(:execute).once
+    it 'returns 200 status and events are passed to event handler' do
+      event = spy(:event)
+      allow(::ContainerRegistry::Event).to receive(:new).and_return(event)
+      expect(event).to receive(:supported?).and_return(true)
+
+      subject
+
+      expect(event).to have_received(:handle!).once
+      expect(event).to have_received(:track!).once
       expect(response.status).to eq 200
     end
 
