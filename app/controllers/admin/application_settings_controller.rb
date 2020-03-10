@@ -28,10 +28,12 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   end
 
   def integrations
-    perform_update if submitted?
+    if Feature.enabled?(:instance_level_integrations)
+      # TODO: Update this with actual integrations
+      @integrations = Project.first&.find_or_initialize_services&.sort_by(&:title)
+    end
 
-    # TODO: Update this with actual integrations
-    @integrations = Project.first.find_or_initialize_services.sort_by(&:title)
+    perform_update if submitted?
   end
 
   def update
