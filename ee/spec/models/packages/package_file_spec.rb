@@ -40,6 +40,17 @@ RSpec.describe Packages::PackageFile, type: :model do
     end
   end
 
+  describe '.with_conan_package_reference' do
+    let_it_be(:non_matching_package_file) { create(:package_file, :nuget) }
+    let_it_be(:package_file) { create(:conan_package_file, :conan_package) }
+    let_it_be(:reference) { package_file.conan_file_metadatum.conan_package_reference}
+
+    it 'returns matching packages' do
+      expect(described_class.with_conan_package_reference(reference))
+        .to eq([package_file])
+    end
+  end
+
   describe '#update_file_metadata callback' do
     let(:package_file) { build(:package_file, :nuget, file_store: 0, size: nil) }
 
