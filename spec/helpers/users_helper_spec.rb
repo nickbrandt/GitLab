@@ -183,15 +183,15 @@ describe UsersHelper do
     subject { helper.work_information(user) }
 
     context 'when both job_title and organization are present' do
-      let(:user) { create(:user, organization: 'GitLab', job_title: 'Frontend Engineer') }
+      let(:user) { build(:user, organization: 'GitLab', job_title: 'Frontend Engineer') }
 
-      it 'returns job title concatinated with organization' do
+      it 'returns job title concatenated with organization' do
         is_expected.to eq('Frontend Engineer at GitLab')
       end
     end
 
     context 'when only organization is present' do
-      let(:user) { create(:user, organization: 'GitLab') }
+      let(:user) { build(:user, organization: 'GitLab') }
 
       it "returns organization" do
         is_expected.to eq('GitLab')
@@ -199,7 +199,7 @@ describe UsersHelper do
     end
 
     context 'when only job_title is present' do
-      let(:user) { create(:user, job_title: 'Frontend Engineer') }
+      let(:user) { build(:user, job_title: 'Frontend Engineer') }
 
       it 'returns job title' do
         is_expected.to eq('Frontend Engineer')
