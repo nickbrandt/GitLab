@@ -5609,6 +5609,9 @@ msgstr ""
 msgid "Could not connect to FogBugz, check your URL"
 msgstr ""
 
+msgid "Could not connect to Sentry. Refresh the page to try again."
+msgstr ""
+
 msgid "Could not connect to Web IDE file mirror service."
 msgstr ""
 
