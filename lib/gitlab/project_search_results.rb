@@ -2,24 +2,23 @@
 
 module Gitlab
   class ProjectSearchResults < SearchResults
-    attr_reader :project, :repository_ref, :per_page
+    attr_reader :project, :repository_ref
 
-    def initialize(current_user, project, query, repository_ref = nil, per_page: 20)
+    def initialize(current_user, project, query, repository_ref = nil)
       @current_user = current_user
       @project = project
       @repository_ref = repository_ref.presence
       @query = query
-      @per_page = per_page
     end
 
-    def objects(scope, page = nil)
+    def objects(scope, page = nil, per_page = 20)
       case scope
       when 'notes'
         notes.page(page).per(per_page)
       when 'blobs'
-        paginated_blobs(blobs(page), page)
+        paginated_blobs(blobs(page, per_page), page, per_page)
       when 'wiki_blobs'
-        paginated_blobs(wiki_blobs, page)
+        paginated_blobs(wiki_blobs, page, per_page)
       when 'commits'
         Kaminari.paginate_array(commits).page(page).per(per_page)
       when 'users'
@@ -87,7 +86,7 @@ module Gitlab
 
     private
 
-    def paginated_blobs(blobs, page)
+    def paginated_blobs(blobs, page, per_page)
       results = Kaminari.paginate_array(blobs).page(page).per(per_page)
 
       Gitlab::Search::FoundBlob.preload_blobs(results)
@@ -95,16 +94,16 @@ module Gitlab
       results
     end
 
-    def limit_up_to_page(page)
+    def limit_up_to_page(page, per_page)
       current_page = page&.to_i || 1
       offset = per_page * (current_page - 1)
       count_limit + offset
     end
 
-    def blobs(page = 1)
+    def blobs(page, per_page)
       return [] unless Ability.allowed?(@current_user, :download_code, @project)
 
-      @blobs ||= Gitlab::FileFinder.new(project, repository_project_ref).find(query, content_match_cutoff: limit_up_to_page(page))
+      @blobs ||= Gitlab::FileFinder.new(project, repository_project_ref).find(query, content_match_cutoff: limit_up_to_page(page, per_page))
     end
 
     def wiki_blobs

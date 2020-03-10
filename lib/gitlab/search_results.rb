@@ -5,7 +5,7 @@ module Gitlab
     COUNT_LIMIT = 100
     COUNT_LIMIT_MESSAGE = "#{COUNT_LIMIT - 1}+"
 
-    attr_reader :current_user, :query, :per_page
+    attr_reader :current_user, :query
 
     # Limit search results by passed projects
     # It allows us to search only for projects user has access to
@@ -17,7 +17,7 @@ module Gitlab
     # query
     attr_reader :default_project_filter
 
-    def initialize(current_user, limit_projects, query, default_project_filter: false, per_page: 20)
+    def initialize(current_user, limit_projects, query, default_project_filter: false)
       @current_user = current_user
       @limit_projects = limit_projects || Project.all
       @query = query
@@ -25,7 +25,7 @@ module Gitlab
       @per_page = per_page
     end
 
-    def objects(scope, page = nil, without_count = true)
+    def objects(scope, page = nil, per_page = 20, without_count = true)
       collection = case scope
                    when 'projects'
                      projects

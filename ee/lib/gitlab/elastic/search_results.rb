@@ -22,7 +22,7 @@ module Gitlab
         @public_and_internal_projects = public_and_internal_projects
       end
 
-      def objects(scope, page = 1)
+      def objects(scope, page = 1, per_page = 20)
         page = (page || 1).to_i
 
         case scope
@@ -369,10 +369,6 @@ module Gitlab
 
       def default_scope
         'projects'
-      end
-
-      def per_page
-        20
       end
     end
   end

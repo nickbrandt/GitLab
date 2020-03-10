@@ -3,7 +3,7 @@
 module Gitlab
   module Elastic
     class SnippetSearchResults < Gitlab::Elastic::SearchResults
-      def objects(scope, page = 1)
+      def objects(scope, page = 1, per_page = 20)
         page = (page || 1).to_i
 
         case scope

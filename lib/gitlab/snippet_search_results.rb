@@ -11,12 +11,12 @@ module Gitlab
       @query = query
     end
 
-    def objects(scope, page = nil)
+    def objects(scope, page = nil, per_page = 20)
       case scope
       when 'snippet_titles'
-        paginated_objects(snippet_titles, page)
+        paginated_objects(snippet_titles, page, per_page)
       when 'snippet_blobs'
-        paginated_objects(snippet_blobs, page)
+        paginated_objects(snippet_blobs, page, per_page)
       else
         super(scope, nil, false)
       end
@@ -64,7 +64,7 @@ module Gitlab
       'snippet_blobs'
     end
 
-    def paginated_objects(relation, page)
+    def paginated_objects(relation, page, per_page)
       relation.page(page).per(per_page)
     end
 

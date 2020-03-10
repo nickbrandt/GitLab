@@ -19,7 +19,7 @@ module Gitlab
         @public_and_internal_projects = false
       end
 
-      def objects(scope, page = nil)
+      def objects(scope, page = nil, per_page = 20)
         case scope
         when 'notes'
           notes.page(page).per(per_page).records

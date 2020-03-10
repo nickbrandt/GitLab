@@ -6,6 +6,9 @@ class SearchService
   SEARCH_TERM_LIMIT = 64
   SEARCH_CHAR_LIMIT = 4096
 
+  DEFAULT_PER_PAGE = 20
+  MAX_PER_PAGE = 200
+
   def initialize(current_user, params = {})
     @current_user = current_user
     @params = params.dup
@@ -60,10 +63,18 @@ class SearchService
   end
 
   def search_objects
-    @search_objects ||= search_results.objects(scope, params[:page])
+    @search_objects ||= search_results.objects(scope, params[:page], per_page)
   end
 
   private
+
+  def per_page
+    per_page_param = params[:per_page].to_i
+
+    return DEFAULT_PER_PAGE unless per_page_param.positive?
+
+    [MAX_PER_PAGE, per_page_param].min
+  end
 
   def search_service
     @search_service ||=
