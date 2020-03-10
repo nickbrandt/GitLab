@@ -11,7 +11,7 @@ describe('WeightSelect', () => {
   const weightSelect = () => wrapper.find({ ref: 'weight-select' });
 
   const defaultProps = {
-    weights: ['Any Weight', 'No Weight', 1, 2, 3],
+    weights: ['Any', 'None', 1, 2, 3],
     board: {
       weight: null,
     },
@@ -37,7 +37,7 @@ describe('WeightSelect', () => {
     });
 
     it('displays "Any Weight"', () => {
-      expect(valueContainer().text()).toEqual('Any Weight');
+      expect(valueContainer().text()).toEqual('Any');
     });
 
     it('hides the weight dropdown', () => {
@@ -97,12 +97,12 @@ describe('WeightSelect', () => {
 
   describe('when a new weight value is selected', () => {
     it.each`
-      weight          | text
-      ${'Any Weight'} | ${'Any Weight'}
-      ${'No Weight'}  | ${'No Weight'}
-      ${0}            | ${'No Weight'}
-      ${-1}           | ${'Any Weight'}
-      ${1}            | ${'1'}
+      weight    | text
+      ${'Any'}  | ${'Any'}
+      ${'None'} | ${'None'}
+      ${0}      | ${'0'}
+      ${-1}     | ${'Any'}
+      ${1}      | ${'1'}
     `('$weight displays as "$text"', ({ weight, text }) => {
       createComponent({ board: { weight } });
       expect(valueContainer().text()).toEqual(text);

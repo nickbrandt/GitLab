@@ -509,7 +509,9 @@ describe 'Scoped issue boards', :js do
       if value.is_a?(Array)
         value.each { |value| click_link value }
       elsif filter == 'weight'
-        click_button value
+        page.within(".dropdown-menu") do
+          click_button value
+        end
       else
         click_link value
       end
@@ -538,7 +540,10 @@ describe 'Scoped issue boards', :js do
 
     page.within(".#{filter}") do
       click_button 'Edit'
-      filter == 'weight' ? click_button(value) : click_link(value)
+
+      page.within(".dropdown-menu") do
+        filter == 'weight' ? click_button(value) : click_link(value)
+      end
     end
 
     click_on_board_modal
