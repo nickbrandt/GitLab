@@ -24,14 +24,9 @@ describe Snippet do
 
   describe 'validation' do
     it { is_expected.to validate_presence_of(:author) }
-
     it { is_expected.to validate_presence_of(:title) }
     it { is_expected.to validate_length_of(:title).is_at_most(255) }
-
     it { is_expected.to validate_length_of(:file_name).is_at_most(255) }
-
-    it { is_expected.to validate_presence_of(:content) }
-
     it { is_expected.to validate_inclusion_of(:visibility_level).in_array(Gitlab::VisibilityLevel.values) }
 
     it do
@@ -760,6 +755,26 @@ describe Snippet do
       end
 
       it { is_expected.to be_falsy }
+    end
+  end
+
+  describe '#content' do
+    let(:snippet) { build(:personal_snippet, content: content) }
+
+    context 'when content is nil' do
+      let(:content) { nil }
+
+      it 'returns an empty string' do
+        expect(snippet.content).to eq ''
+      end
+    end
+
+    context 'when content is not nil' do
+      let(:content) { 'foobar' }
+
+      it 'returns the content' do
+        expect(snippet.content).to eq content
+      end
     end
   end
 end

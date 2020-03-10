@@ -107,7 +107,7 @@ shared_examples_for 'snippet editor' do
   end
 
   it 'validation fails for the first time' do
-    fill_in 'personal_snippet_title', with: 'My Snippet Title'
+    fill_in 'personal_snippet_title', with: FFaker::Lorem.characters(300)
     click_button('Create snippet')
 
     expect(page).to have_selector('#error_explanation')

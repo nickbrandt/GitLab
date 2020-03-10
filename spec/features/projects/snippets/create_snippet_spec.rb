@@ -77,7 +77,7 @@ shared_examples_for 'snippet editor' do
     end
 
     it 'creates a snippet when all required fields are filled in after validation failing' do
-      fill_in 'project_snippet_title', with: 'My Snippet Title'
+      fill_in 'project_snippet_title', with: FFaker::Lorem.characters(300)
       click_button('Create snippet')
 
       expect(page).to have_selector('#error_explanation')

@@ -132,7 +132,7 @@ describe Snippets::CreateService do
     end
 
     shared_examples 'an error service response when save fails' do
-      let(:extra_opts) { { content: nil } }
+      let(:extra_opts) { { title: nil } }
 
       it 'responds with an error' do
         expect(subject).to be_error
@@ -218,7 +218,7 @@ describe Snippets::CreateService do
       end
 
       context 'when snippet creation fails' do
-        let(:extra_opts) { { content: nil } }
+        let(:extra_opts) { { title: nil } }
 
         it 'does not create repository' do
           expect do

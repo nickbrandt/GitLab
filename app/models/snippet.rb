@@ -50,7 +50,6 @@ class Snippet < ApplicationRecord
   validates :file_name,
     length: { maximum: 255 }
 
-  validates :content, presence: true
   validates :content,
             length: {
               maximum: ->(_) { Gitlab::CurrentSettings.snippet_size_limit },
@@ -320,6 +319,10 @@ class Snippet < ApplicationRecord
 
   def versioned_enabled_for?(user)
     ::Feature.enabled?(:version_snippets, user) && repository_exists?
+  end
+
+  def content
+    read_attribute(:content).to_s
   end
 
   class << self
