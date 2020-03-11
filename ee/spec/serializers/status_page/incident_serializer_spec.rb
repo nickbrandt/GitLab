@@ -14,7 +14,7 @@ describe StatusPage::IncidentSerializer do
   describe '.represent_list' do
     let(:resource) { [issue] }
     let(:json_entity) do
-      subject.represent_list(resource).map(&:with_indifferent_access)
+      subject.represent_list(resource).with_indifferent_access
     end
 
     it_behaves_like 'valid JSON schema', schema: 'status_page/incident_list'
