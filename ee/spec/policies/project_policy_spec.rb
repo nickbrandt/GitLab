@@ -1022,6 +1022,53 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'publish_status_page' do
+    let(:feature) { :status_page }
+    let(:policy) { :publish_status_page }
+
+    context 'when feature is available' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:role, :allowed) do
+        :guest      | false
+        :reporter   | false
+        :developer  | false
+        :maintainer | true
+        :owner      | true
+        :admin      | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) }
+
+        before do
+          stub_feature_flags(feature => true)
+          stub_licensed_features(feature => true)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+
+        context 'when feature is not available' do
+          before do
+            stub_licensed_features(feature => false)
+          end
+
+          it { is_expected.to be_disallowed(policy) }
+        end
+
+        context 'when feature flag is disabled' do
+          before do
+            stub_feature_flags(feature => false)
+          end
+
+          it { is_expected.to be_disallowed(policy) }
+        end
+      end
+    end
+  end
+
   context 'support bot' do
     let(:current_user) { User.support_bot }
 

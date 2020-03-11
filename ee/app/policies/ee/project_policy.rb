@@ -124,6 +124,11 @@ module EE
         @subject.feature_available?(:code_review_analytics, @user)
       end
 
+      condition(:status_page_available) do
+        @subject.feature_available?(:status_page, @user) &&
+          @subject.beta_feature_available?(:status_page)
+      end
+
       condition(:group_timelogs_available) do
         @subject.feature_available?(:group_timelogs)
       end
@@ -234,6 +239,8 @@ module EE
       rule { license_scanning_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
 
       rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
+
+      rule { status_page_available & can?(:maintainer_access) }.enable :publish_status_page
 
       rule { auditor }.policy do
         enable :public_user_access
