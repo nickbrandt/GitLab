@@ -40,6 +40,7 @@ There are some high level differences between the products worth mentioning:
 - All jobs within a single stage always run in parallel, and all stages run in sequence. We are planning
   to allow certain jobs to break this sequencing as needed with our [directed acyclic graph](https://gitlab.com/gitlab-org/gitlab-foss/issues/47063)
   feature.
+- The [`parallel`](../yaml/README.md#parallel) keyword can automatically parallelize tasks, like tests that support parallelization.
 - The `.gitlab-ci.yml` file is checked in to the root of your repository, much like a Jenkinsfile, but
   is in the YAML format (see [complete reference](../yaml/README.md)) instead of a Groovy DSL. It's most
   analogous to the declarative Jenkinsfile format.
