@@ -1,8 +1,19 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'publish incidents' do
+  let_it_be(:status_page_setting) do
+    create(:status_page_setting, :enabled, project: project)
+  end
+
   before do
     stub_licensed_features(status_page: true)
+  end
+
+  shared_examples 'feature is not available' do
+    it 'returns feature not available error' do
+      expect(result).to be_error
+      expect(result.message).to eq('Feature not available')
+    end
   end
 
   context 'when upload succeeds' do
@@ -60,9 +71,22 @@ RSpec.shared_examples 'publish incidents' do
       stub_licensed_features(status_page: false)
     end
 
-    it 'returns feature not available error' do
-      expect(result).to be_error
-      expect(result.message).to eq('Feature not available')
+    it_behaves_like 'feature is not available'
+  end
+
+  context 'when status page setting is disabled' do
+    before do
+      status_page_setting.update!(enabled: false)
     end
+
+    it_behaves_like 'feature is not available'
+  end
+
+  context 'when feature flag is disabled' do
+    before do
+      stub_feature_flags(status_page: false)
+    end
+
+    it_behaves_like 'feature is not available'
   end
 end

@@ -35,6 +35,12 @@ class StatusPageSetting < ApplicationRecord
     '*' * 40
   end
 
+  def enabled?
+    super &&
+      project&.feature_available?(:status_page) &&
+      project&.beta_feature_available?(:status_page)
+  end
+
   private
 
   def check_secret_changes
