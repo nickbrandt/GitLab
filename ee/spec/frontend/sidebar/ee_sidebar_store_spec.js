@@ -37,11 +37,11 @@ describe('EE Sidebar store', () => {
 
   describe('setStatus', () => {
     it('sets status', () => {
-      expect(store.status).toEqual('');
+      expect(store.status).toBe('');
       const status = 'onTrack';
       store.setStatus(status);
 
-      expect(store.status).toEqual(status);
+      expect(store.status).toBe(status);
     });
   });
 

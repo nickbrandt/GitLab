@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { escape } from 'underscore';
 import ancestorsTree from 'ee/sidebar/components/ancestors_tree/ancestors_tree.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('AncestorsTreeContainer', () => {
   let vm;
@@ -29,50 +29,42 @@ describe('AncestorsTreeContainer', () => {
     );
   });
 
-  it('does not render timeline when fetching', done => {
+  it('does not render timeline when fetching', () => {
     vm.$props.isFetching = true;
-    vm.$nextTick()
-      .then(() => {
-        expect(vm.$el.querySelector('.vertical-timeline')).toBeNull();
-        expect(vm.$el.querySelector('.value')).toBeNull();
-      })
-      .then(done)
-      .catch(done.fail);
+
+    return vm.$nextTick().then(() => {
+      expect(vm.$el.querySelector('.vertical-timeline')).toBeNull();
+      expect(vm.$el.querySelector('.value')).toBeNull();
+    });
   });
 
-  it('render `None` when ancestors is an empty array', done => {
+  it('render `None` when ancestors is an empty array', () => {
     vm.$props.ancestors = [];
-    vm.$nextTick()
-      .then(() => {
-        expect(vm.$el.querySelector('.vertical-timeline')).toBeNull();
-        expect(vm.$el.querySelector('.value')).not.toBeNull();
-      })
-      .then(done)
-      .catch(done.fail);
+
+    return vm.$nextTick().then(() => {
+      expect(vm.$el.querySelector('.vertical-timeline')).toBeNull();
+      expect(vm.$el.querySelector('.value')).not.toBeNull();
+    });
   });
 
-  it('render loading icon when isFetching is true', done => {
+  it('render loading icon when isFetching is true', () => {
     vm.$props.isFetching = true;
-    vm.$nextTick()
-      .then(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeDefined();
-      })
-      .then(done)
-      .catch(done.fail);
+
+    return vm.$nextTick().then(() => {
+      expect(vm.$el.querySelector('.fa-spinner')).toBeDefined();
+    });
   });
 
-  it('escapes html in the tooltip', done => {
+  it('escapes html in the tooltip', () => {
     const title = '<script>alert(1);</script>';
     const escapedTitle = escape(title);
 
     vm.$props.ancestors = [{ id: 1, url: '', title, state: 'open' }];
-    vm.$nextTick()
-      .then(() => {
-        const tooltip = vm.$el.querySelector('.collapse-truncated-title');
 
-        expect(tooltip.innerText).toBe(escapedTitle);
-      })
-      .then(done)
-      .catch(done.fail);
+    return vm.$nextTick().then(() => {
+      const tooltip = vm.$el.querySelector('.collapse-truncated-title');
+
+      expect(tooltip.innerText).toBe(escapedTitle);
+    });
   });
 });
