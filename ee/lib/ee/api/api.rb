@@ -32,6 +32,7 @@ module EE
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
         mount ::API::NugetPackages
+        mount ::API::PypiPackages
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
