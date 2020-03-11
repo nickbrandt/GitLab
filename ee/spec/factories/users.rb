@@ -18,7 +18,7 @@ FactoryBot.modify do
     end
 
     trait :service_user do
-      user_type { :ServiceUser }
+      user_type { :service_user }
     end
   end
 

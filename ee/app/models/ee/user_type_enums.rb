@@ -9,12 +9,12 @@ module EE
 
       override :types
       def types
-        super.merge(ServiceUser: 4)
+        super.merge(service_user: 4)
       end
 
       override :bots
       def bots
-        super.merge(SupportBot: 1, VisualReviewBot: 3)
+        super.merge(support_bot: 1, visual_review_bot: 3)
       end
     end
   end

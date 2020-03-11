@@ -4431,9 +4431,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.index ["name"], name: "index_users_on_name_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["public_email"], name: "index_users_on_public_email", where: "((public_email)::text <> ''::text)"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["state", "user_type"], name: "index_users_on_state_and_user_type_internal", where: "(ghost IS NOT TRUE)"
     t.index ["state"], name: "index_users_on_state"
-    t.index ["state"], name: "index_users_on_state_and_internal", where: "(ghost IS NOT TRUE)"
-    t.index ["state"], name: "index_users_on_state_and_internal_ee", where: "((ghost IS NOT TRUE) AND (bot_type IS NULL))"
     t.index ["static_object_token"], name: "index_users_on_static_object_token", unique: true
     t.index ["unconfirmed_email"], name: "index_users_on_unconfirmed_email", where: "(unconfirmed_email IS NOT NULL)"
     t.index ["user_type"], name: "index_users_on_user_type"
