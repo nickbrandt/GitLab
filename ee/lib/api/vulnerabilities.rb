@@ -35,6 +35,7 @@ module API
       get ':id' do
         vulnerability = find_and_authorize_vulnerability!(:read_vulnerability)
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+
         render_vulnerability(vulnerability)
       end
 
@@ -44,6 +45,7 @@ module API
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+
         break not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
@@ -56,6 +58,7 @@ module API
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+
         break not_modified! if vulnerability.dismissed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
@@ -68,6 +71,7 @@ module API
       post ':id/confirm' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+
         break not_modified! if vulnerability.confirmed?
 
         vulnerability = ::Vulnerabilities::ConfirmService.new(current_user, vulnerability).execute
@@ -87,6 +91,7 @@ module API
       end
       get ':id/vulnerabilities' do
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
+
         authorize! :read_vulnerability, user_project
 
         vulnerabilities = paginate(
@@ -104,6 +109,7 @@ module API
       end
       post ':id/vulnerabilities' do
         break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
+
         authorize! :create_vulnerability, user_project
 
         vulnerability = ::Vulnerabilities::CreateService.new(
