@@ -45,6 +45,8 @@ There are some high level differences between the products worth mentioning:
 - Normally all jobs within a single stage run in parallel, and all stages run in sequence.
   There are different [pipeline architectures](../pipelines/pipeline_architectures.md)
   that allow you to change this behavior.
+- The new [`rules` syntax](../yaml/README.md#rules) is the recommended method of
+  controlling when different jobs run. It is more powerful than the `only/except` syntax.
 - The `.gitlab-ci.yml` file is checked in to the root of your repository, much like a Jenkinsfile, but
   is in the YAML format (see [complete reference](../yaml/README.md)) instead of a Groovy DSL. It's most
   analogous to the declarative Jenkinsfile format.
