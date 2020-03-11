@@ -138,4 +138,90 @@ describe('NoteHeader component', () => {
       expect(actions.setTargetNoteHash).toHaveBeenCalled();
     });
   });
+
+  describe('when author property `is_gitlab_employee` is `true`', () => {
+    it('renders the employee badge if `note-type` prop is `NoteableNote`', () => {
+      createComponent({
+        author: {
+          avatar_url: null,
+          id: 1,
+          name: 'Root',
+          path: '/root',
+          state: 'active',
+          username: 'root',
+          is_gitlab_employee: true,
+        },
+        noteType: 'NoteableNote',
+      });
+
+      expect(wrapper.find({ ref: 'gitLabEmployeeBadge' }).exists()).toBe(true);
+    });
+
+    it('does not render employee badge if `note-type` prop is null', () => {
+      createComponent({
+        author: {
+          avatar_url: null,
+          id: 1,
+          name: 'Root',
+          path: '/root',
+          state: 'active',
+          username: 'root',
+          is_gitlab_employee: true,
+        },
+        noteType: null,
+      });
+
+      expect(wrapper.find({ ref: 'gitLabEmployeeBadge' }).exists()).toBe(false);
+    });
+
+    it('does not render employee badge if `note-type` prop does not equal `NoteableNote` ', () => {
+      createComponent({
+        author: {
+          avatar_url: null,
+          id: 1,
+          name: 'Root',
+          path: '/root',
+          state: 'active',
+          username: 'root',
+          is_gitlab_employee: true,
+        },
+        noteType: 'SystemNote',
+      });
+
+      expect(wrapper.find({ ref: 'gitLabEmployeeBadge' }).exists()).toBe(false);
+    });
+  });
+
+  it('does not render employee badge if author property `is_gitlab_employee` is `false`', () => {
+    createComponent({
+      author: {
+        avatar_url: null,
+        id: 1,
+        name: 'Root',
+        path: '/root',
+        state: 'active',
+        username: 'root',
+        is_gitlab_employee: false,
+      },
+      noteType: 'NoteableNote',
+    });
+
+    expect(wrapper.find({ ref: 'gitLabEmployeeBadge' }).exists()).toBe(false);
+  });
+
+  it('does not render employee badge if author property `is_gitlab_employee` is undefined', () => {
+    createComponent({
+      author: {
+        avatar_url: null,
+        id: 1,
+        name: 'Root',
+        path: '/root',
+        state: 'active',
+        username: 'root',
+      },
+      noteType: 'NoteableNote',
+    });
+
+    expect(wrapper.find({ ref: 'gitLabEmployeeBadge' }).exists()).toBe(false);
+  });
 });

@@ -1,4 +1,5 @@
 export const DISCUSSION_NOTE = 'DiscussionNote';
+export const NOTEABLE_NOTE = 'NoteableNote';
 export const DIFF_NOTE = 'DiffNote';
 export const DISCUSSION = 'discussion';
 export const NOTE = 'note';

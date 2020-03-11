@@ -1,10 +1,14 @@
 <script>
 import { mapActions } from 'vuex';
 import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
+import { GlIcon, GlSprintf } from '@gitlab/ui';
+import { NOTEABLE_NOTE } from '../constants';
 
 export default {
   components: {
     timeAgoTooltip,
+    GlIcon,
+    GlSprintf,
   },
   props: {
     author: {
@@ -37,6 +41,11 @@ export default {
       required: false,
       default: true,
     },
+    noteType: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
     toggleChevronClass() {
@@ -47,6 +56,18 @@ export default {
     },
     hasAuthor() {
       return this.author && Object.keys(this.author).length;
+    },
+    showGitLabEmployeeBadge() {
+      return this.noteType === NOTEABLE_NOTE && this.hasAuthor && this.author.is_gitlab_employee;
+    },
+    noteHeadlineClasses() {
+      const classes = ['note-headline-light', 'note-headline-meta', 'align-middle'];
+
+      if (this.showGitLabEmployeeBadge) {
+        classes.push('mr-1');
+      }
+
+      return classes;
     },
   },
   methods: {
@@ -77,7 +98,7 @@ export default {
       v-if="hasAuthor"
       v-once
       :href="author.path"
-      class="js-user-link"
+      class="js-user-link align-middle"
       :data-user-id="author.id"
       :data-username="author.username"
     >
@@ -87,7 +108,7 @@ export default {
       <span class="note-headline-light">@{{ author.username }}</span>
     </a>
     <span v-else>{{ __('A deleted user') }}</span>
-    <span class="note-headline-light note-headline-meta">
+    <span :class="noteHeadlineClasses">
       <span class="system-note-message"> <slot></slot> </span>
       <template v-if="createdAt">
         <span ref="actionText" class="system-note-separator">
@@ -108,6 +129,16 @@ export default {
         :aria-label="__('Comment is being updated')"
         aria-hidden="true"
       ></i>
+    </span>
+    <span
+      v-if="showGitLabEmployeeBadge"
+      ref="gitLabEmployeeBadge"
+      class="cgray-700 align-middlShoulde text-nowrap"
+    >
+      <gl-icon name="work" :size="16" class="align-middle" />
+      <span class="align-middle">
+        <gl-sprintf :message="__('GitLab')" />
+      </span>
     </span>
   </div>
 </template>

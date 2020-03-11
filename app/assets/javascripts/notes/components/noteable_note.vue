@@ -15,9 +15,10 @@ import eventHub from '../event_hub';
 import noteable from '../mixins/noteable';
 import resolvable from '../mixins/resolvable';
 import httpStatusCodes from '~/lib/utils/http_status';
+import { NOTEABLE_NOTE } from '../constants';
 
 export default {
-  name: 'NoteableNote',
+  name: NOTEABLE_NOTE,
   components: {
     userAvatarLink,
     noteHeader,
@@ -255,7 +256,13 @@ export default {
     </div>
     <div class="timeline-content">
       <div class="note-header">
-        <note-header v-once :author="author" :created-at="note.created_at" :note-id="note.id">
+        <note-header
+          v-once
+          :author="author"
+          :created-at="note.created_at"
+          :note-id="note.id"
+          :note-type="$options.name"
+        >
           <slot slot="note-header-info" name="note-header-info"></slot>
           <span v-if="commit" v-html="actionText"></span>
           <span v-else class="d-none d-sm-inline">&middot;</span>
