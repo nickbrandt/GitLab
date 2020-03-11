@@ -46,7 +46,7 @@ module QA
       context 'Add SSH key' do
         before do
           sign_in
-          Resource::SSHKey.fabricate! do |resource|
+          Resource::SSHKey.fabricate_via_browser_ui! do |resource|
             resource.title = "key for instance audit event logs test #{Time.now.to_f}"
           end
         end
