@@ -24,6 +24,19 @@ can be a great resource.
 There are some high level differences between the products worth mentioning:
 
 - With GitLab you don't need a root `pipeline` keyword to wrap everything.
+- The way pipelines are triggered and [trigger other pipelines](../yaml/README.md#trigger)
+  is different than Jenkins. GitLab pipelines can be triggered:
+
+  - on push
+  - on [schedule](../pipelines/schedules.md)
+  - from the [GitLab UI](../pipelines.md#manually-executing-pipelines)
+  - by [API call](../triggers/README.md)
+  - by [webhook](../triggers/README.md#triggering-a-pipeline-from-a-webhook)
+  - by [ChatOps](../chatops/README.md)
+
+  You can control which jobs run in which cases, depending on how they are triggered,
+  with the [`rules` syntax](../yaml/README.md#rules).
+- GitLab [pipeline scheduling concepts](../pipelines/schedules.md) are also different than with Jenkins.
 - All jobs within a single stage always run in parallel, and all stages run in sequence. We are planning
   to allow certain jobs to break this sequencing as needed with our [directed acyclic graph](https://gitlab.com/gitlab-org/gitlab-foss/issues/47063)
   feature.
