@@ -3265,6 +3265,7 @@ ActiveRecord::Schema.define(version: 2020_03_09_195710) do
     t.integer "forking_access_level"
     t.index ["project_id"], name: "index_project_features_on_project_id", unique: true
     t.index ["project_id"], name: "index_project_features_on_project_id_bal_20", where: "(builds_access_level = 20)"
+    t.index ["project_id"], name: "index_project_features_on_project_id_ral_20", where: "(repository_access_level = 20)"
   end
 
   create_table "project_group_links", id: :serial, force: :cascade do |t|
