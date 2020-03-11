@@ -138,5 +138,11 @@ module Types
       resolve: -> (epic, args, ctx) do
         Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
       end
+
+    field :health_status, Types::EpicHealthStatusType, null: true, complexity: 10,
+      description: 'Current health status of the epic',
+      resolve: -> (epic, args, ctx) do
+        Epics::DescendantCountService.new(epic, ctx[:current_user])
+      end
   end
 end

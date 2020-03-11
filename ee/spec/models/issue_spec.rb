@@ -67,6 +67,16 @@ describe Issue do
       end
     end
 
+    describe '.counts_by_health_status' do
+      it 'returns counts grouped by health_status' do
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :on_track)
+        create(:issue, health_status: :at_risk)
+
+        expect(Issue.counts_by_health_status).to eq({ 'on_track' => 2, 'at_risk' => 1 } )
+      end
+    end
+
     context 'epics' do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }

@@ -11,12 +11,13 @@ describe Epics::DescendantCountService do
   let_it_be(:epic2) { create(:epic, group: subgroup, parent: parent_epic, state: :closed) }
 
   let_it_be(:project) { create(:project, :private, group: group)}
-  let_it_be(:issue1) { create(:issue, project: project, state: :opened) }
-  let_it_be(:issue2) { create(:issue, project: project, state: :closed) }
+  let_it_be(:issue1) { create(:issue, project: project, state: :opened, health_status: :on_track) }
+  let_it_be(:issue2) { create(:issue, project: project, state: :closed, health_status: :on_track) }
   let_it_be(:issue3) { create(:issue, project: project, state: :opened) }
-  let_it_be(:issue4) { create(:issue, project: project, state: :closed) }
-  let_it_be(:issue5) { create(:issue, :confidential, project: project, state: :opened) }
-  let_it_be(:issue6) { create(:issue, :confidential, project: project, state: :closed) }
+  let_it_be(:issue4) { create(:issue, project: project, state: :closed, health_status: :needs_attention) }
+  let_it_be(:issue5) { create(:issue, :confidential, project: project, state: :opened, health_status: :at_risk) }
+  let_it_be(:issue6) { create(:issue, :confidential, project: project, state: :closed, health_status: :at_risk) }
+
   let_it_be(:epic_issue1) { create(:epic_issue, epic: parent_epic, issue: issue1) }
   let_it_be(:epic_issue2) { create(:epic_issue, epic: parent_epic, issue: issue2) }
   let_it_be(:epic_issue3) { create(:epic_issue, epic: epic1, issue: issue3) }
@@ -50,5 +51,17 @@ describe Epics::DescendantCountService do
 
   describe '#closed_issues' do
     it_behaves_like 'descendants state count', :closed_issues, 3
+  end
+
+  describe '#issues_on_track' do
+    it_behaves_like 'descendants state count', :issues_on_track, 2
+  end
+
+  describe '#issues_needing_attention' do
+    it_behaves_like 'descendants state count', :issues_needing_attention, 1
+  end
+
+  describe '#issues_at_risk' do
+    it_behaves_like 'descendants state count', :issues_at_risk, 2
   end
 end
