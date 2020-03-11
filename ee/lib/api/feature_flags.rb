@@ -30,7 +30,9 @@ module API
             .new(user_project, current_user, declared_params(include_missing: false))
             .execute
 
-          present paginate(feature_flags), with: EE::API::Entities::FeatureFlag
+          present paginate(feature_flags),
+            with: EE::API::Entities::FeatureFlag,
+            feature_flags_new_version_enabled: feature_flags_new_version_enabled?
         end
 
         desc 'Create a new feature flag' do
@@ -49,15 +51,17 @@ module API
         post do
           authorize_create_feature_flag!
 
-          param = declared_params(include_missing: false)
-          param[:scopes_attributes] = param.delete(:scopes) if param.key?(:scopes)
+          attrs = declared_params(include_missing: false)
+          rename_key(attrs, :scopes, :scopes_attributes)
 
           result = ::FeatureFlags::CreateService
-            .new(user_project, current_user, param)
+            .new(user_project, current_user, attrs)
             .execute
 
           if result[:status] == :success
-            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+            present result[:feature_flag],
+              with: EE::API::Entities::FeatureFlag,
+              feature_flags_new_version_enabled: feature_flags_new_version_enabled?
           else
             render_api_error!(result[:message], result[:http_status])
           end
@@ -75,7 +79,9 @@ module API
         get do
           authorize_read_feature_flag!
 
-          present feature_flag, with: EE::API::Entities::FeatureFlag
+          present feature_flag,
+            with: EE::API::Entities::FeatureFlag,
+            feature_flags_new_version_enabled: feature_flags_new_version_enabled?
         end
 
         desc 'Enable a strategy for a feature flag on an environment' do
@@ -134,7 +140,9 @@ module API
             .execute(feature_flag)
 
           if result[:status] == :success
-            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+            present result[:feature_flag],
+              with: EE::API::Entities::FeatureFlag,
+              feature_flags_new_version_enabled: feature_flags_new_version_enabled?
           else
             render_api_error!(result[:message], result[:http_status])
           end
@@ -160,8 +168,20 @@ module API
       end
 
       def feature_flag
-        @feature_flag ||=
-          user_project.operations_feature_flags.find_by_name!(params[:name])
+        @feature_flag ||= if Feature.enabled?(:feature_flags_new_version, user_project)
+                            user_project.operations_feature_flags.find_by_name!(params[:name])
+                          else
+                            user_project.operations_feature_flags.legacy_flag.find_by_name!(params[:name])
+                          end
+      end
+
+      def feature_flags_new_version_enabled?
+        Feature.enabled?(:feature_flags_new_version, user_project)
+      end
+
+      def rename_key(hash, old_key, new_key)
+        hash[new_key] = hash.delete(old_key) if hash.key?(old_key)
+        hash
       end
     end
   end

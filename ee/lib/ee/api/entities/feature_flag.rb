@@ -6,9 +6,11 @@ module EE
       class FeatureFlag < Grape::Entity
         expose :name
         expose :description
+        expose :version, if: :feature_flags_new_version_enabled
         expose :created_at
         expose :updated_at
-        expose :scopes, using: FeatureFlag::Scope
+        expose :scopes, using: FeatureFlag::LegacyScope
+        expose :strategies, using: FeatureFlag::Strategy, if: :feature_flags_new_version_enabled
       end
     end
   end
