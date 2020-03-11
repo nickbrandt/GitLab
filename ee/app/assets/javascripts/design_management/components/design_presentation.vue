@@ -269,6 +269,10 @@ export default {
     @mousemove="onPresentationMousemove"
     @mouseup="onPresentationMouseup"
     @mouseleave="onPresentationMouseup"
+    @touchstart="onPresentationMousedown"
+    @touchmove="onPresentationMousemove"
+    @touchend="onPresentationMouseup"
+    @touchcancel="onPresentationMouseup"
   >
     <div
       ref="presentationContainer"
