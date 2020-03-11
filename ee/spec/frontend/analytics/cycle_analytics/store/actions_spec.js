@@ -1,5 +1,3 @@
-import * as commonUtils from '~/lib/utils/common_utils';
-import * as urlUtils from '~/lib/utils/url_utility';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
@@ -12,7 +10,6 @@ import {
 } from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
-import { toYmd } from 'ee/analytics/shared/utils';
 import {
   group,
   summaryData,
@@ -42,24 +39,7 @@ describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldSetUrlParams({ action, payload, result }) {
-    const store = {
-      state,
-      getters,
-      commit: jest.fn(),
-      dispatch: jest.fn(() => Promise.resolve()),
-    };
-
-    return actions[action](store, payload).then(() => {
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(result, window.location.href, true);
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  }
-
   beforeEach(() => {
-    commonUtils.historyPushState = jest.fn();
-    urlUtils.setUrlParams = jest.fn();
-
     state = {
       startDate,
       endDate,
@@ -99,61 +79,10 @@ describe('Cycle analytics actions', () => {
     );
   });
 
-  describe('setSelectedGroup', () => {
-    const payload = { full_path: 'someNewGroup' };
-    it('calls setUrlParams with the group params', () => {
-      actions.setSelectedGroup(
-        {
-          state,
-          getters: {
-            currentGroupPath: 'someNewGroup',
-            selectedProjectIds: [],
-          },
-          commit: jest.fn(),
-        },
-        payload,
-      );
-
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(
-        {
-          group_id: 'someNewGroup',
-          'project_ids[]': [],
-        },
-        window.location.href,
-        true,
-      );
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  });
-
-  describe('setSelectedProjects', () => {
-    const payload = [1, 2];
-    it('calls setUrlParams with the date params', () => {
-      actions.setSelectedProjects(
-        {
-          state,
-          getters: {
-            currentGroupPath: 'test-group',
-            selectedProjectIds: payload,
-          },
-          commit: jest.fn(),
-        },
-        payload,
-      );
-
-      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(
-        { 'project_ids[]': payload, group_id: 'test-group' },
-        window.location.href,
-        true,
-      );
-      expect(commonUtils.historyPushState).toHaveBeenCalled();
-    });
-  });
-
   describe('setDateRange', () => {
     const payload = { startDate, endDate };
 
-    it('sets the dates as expected and dispatches fetchCycleAnalyticsData', done => {
+    it('dispatches the fetchCycleAnalyticsData action', done => {
       testAction(
         actions.setDateRange,
         payload,
@@ -162,19 +91,6 @@ describe('Cycle analytics actions', () => {
         [{ type: 'fetchCycleAnalyticsData' }],
         done,
       );
-    });
-
-    it('calls setUrlParams with the date params', () => {
-      shouldSetUrlParams({
-        action: 'setDateRange',
-        payload,
-        result: {
-          group_id: getters.currentGroupPath,
-          'project_ids[]': getters.selectedProjectIds,
-          created_after: toYmd(payload.startDate),
-          created_before: toYmd(payload.endDate),
-        },
-      });
     });
   });
 
@@ -1600,8 +1516,6 @@ describe('Cycle analytics actions', () => {
     };
 
     beforeEach(() => {
-      commonUtils.historyPushState = jest.fn();
-      urlUtils.setUrlParams = jest.fn();
       mockDispatch = jest.fn(() => Promise.resolve());
       mockCommit = jest.fn();
       store = {
