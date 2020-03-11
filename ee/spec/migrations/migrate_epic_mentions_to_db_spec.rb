@@ -4,7 +4,7 @@ require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191115115043_migrate_epic_mentions_to_db')
 require Rails.root.join('db', 'post_migrate', '20200214174519_remigrate_epic_mentions_to_db')
 
-describe 'epic mentions migration' do
+describe 'epic mentions migration', migration: false do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }
