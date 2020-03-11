@@ -1,22 +1,24 @@
-import Vue from 'vue';
-import { mount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 
 import SidebarLabels from 'ee/epic/components/sidebar_items/sidebar_labels.vue';
 import createStore from 'ee/epic/store';
 
 import { mockEpicMeta, mockEpicData, mockLabels } from '../../mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('SidebarLabelsComponent', () => {
   let wrapper;
   let store;
 
   beforeEach(() => {
-    const Component = Vue.extend(SidebarLabels);
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
 
-    wrapper = mount(Component, {
+    wrapper = mount(SidebarLabels, {
       propsData: { canUpdate: false, sidebarCollapsed: false },
       store,
       stubs: {
@@ -63,7 +65,9 @@ describe('SidebarLabelsComponent', () => {
       it('calls `toggleSidebar` action only when `sidebarExpandedOnClick` prop is true', () => {
         jest.spyOn(wrapper.vm, 'toggleSidebar');
 
-        wrapper.vm.sidebarExpandedOnClick = true;
+        wrapper.setData({
+          sidebarExpandedOnClick: true,
+        });
 
         wrapper.vm.handleDropdownClose();
 
@@ -117,7 +121,7 @@ describe('SidebarLabelsComponent', () => {
 
   describe('template', () => {
     it('renders labels select element container', () => {
-      expect(wrapper.vm.$el.classList.contains('js-labels-block')).toBe(true);
+      expect(wrapper.classes('js-labels-block')).toBe(true);
     });
   });
 });

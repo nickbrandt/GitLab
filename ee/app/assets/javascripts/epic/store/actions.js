@@ -195,6 +195,47 @@ export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDa
 };
 
 /**
+ * Methods to handle Epic labels selection from sidebar
+ */
+export const requestEpicLabelsSelect = ({ commit }) => commit(types.REQUEST_EPIC_LABELS_SELECT);
+export const receiveEpicLabelsSelectSuccess = ({ commit }, labels) =>
+  commit(types.RECEIVE_EPIC_LABELS_SELECT_SUCCESS, labels);
+export const receiveEpicLabelsSelectFailure = ({ commit }) => {
+  commit(types.RECEIVE_EPIC_LABELS_SELECT_FAILURE);
+  flash(s__('Epics|An error occurred while updating labels.'));
+};
+export const updateEpicLabels = ({ dispatch, state }, labels) => {
+  const addLabelIds = labels.filter(label => label.set).map(label => label.id);
+  const removeLabelIds = labels.filter(label => !label.set).map(label => label.id);
+  const updateEpicInput = {
+    iid: `${state.epicIid}`,
+    groupPath: state.fullPath,
+    addLabelIds,
+    removeLabelIds,
+  };
+
+  dispatch('requestEpicLabelsSelect');
+  epicUtils.gqClient
+    .mutate({
+      mutation: updateEpic,
+      variables: {
+        updateEpicInput,
+      },
+    })
+    .then(({ data }) => {
+      if (!data?.updateEpic?.errors.length) {
+        dispatch('receiveEpicLabelsSelectSuccess', labels);
+      } else {
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        throw new Error('An error occurred while updating labels');
+      }
+    })
+    .catch(() => {
+      dispatch('receiveEpicLabelsSelectFailure');
+    });
+};
+
+/**
  * Methods to handle Epic subscription (AKA Notifications) toggle from sidebar
  */
 export const requestEpicSubscriptionToggle = ({ commit }) =>

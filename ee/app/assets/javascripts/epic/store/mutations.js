@@ -102,4 +102,20 @@ export default {
   [types.REQUEST_EPIC_CREATE_FAILURE](state) {
     state.epicCreateInProgress = false;
   },
+
+  [types.REQUEST_EPIC_LABELS_SELECT](state) {
+    state.epicLabelsSelectInProgress = true;
+  },
+  [types.RECEIVE_EPIC_LABELS_SELECT_SUCCESS](state, labels) {
+    const addedLabels = labels.filter(label => label.set);
+    const removeLabelIds = labels.filter(label => !label.set).map(label => label.id);
+    const updatedLabels = state.labels.filter(label => !removeLabelIds.includes(label.id));
+    updatedLabels.push(...addedLabels);
+
+    state.epicLabelsSelectInProgress = false;
+    state.labels = updatedLabels;
+  },
+  [types.RECEIVE_EPIC_LABELS_SELECT_FAILURE](state) {
+    state.epicLabelsSelectInProgress = false;
+  },
 };

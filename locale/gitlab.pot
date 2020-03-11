@@ -7795,6 +7795,9 @@ msgstr ""
 msgid "Epics|An error occurred while saving the %{epicDateType} date"
 msgstr ""
 
+msgid "Epics|An error occurred while updating labels."
+msgstr ""
+
 msgid "Epics|Are you sure you want to remove %{bStart}%{targetIssueTitle}%{bEnd} from %{bStart}%{parentEpicTitle}%{bEnd}?"
 msgstr ""
 
