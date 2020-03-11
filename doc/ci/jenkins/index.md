@@ -47,6 +47,11 @@ There are some high level differences between the products worth mentioning:
   that allow you to change this behavior.
 - The new [`rules` syntax](../yaml/README.md#rules) is the recommended method of
   controlling when different jobs run. It is more powerful than the `only/except` syntax.
+- One important difference is that jobs run independently of each other and have a
+  fresh environment in each job. Passing artifacts between jobs is controlled using the
+  [`artifacts`](../yaml/README.md#artifacts) and [`dependencies`](../yaml/README.md#dependencies)
+  keywords. When finished, the planned [Workspaces](https://gitlab.com/gitlab-org/gitlab/issues/29265)
+  feature will allow you to more easily persist a common workspace between serial jobs.
 - The `.gitlab-ci.yml` file is checked in to the root of your repository, much like a Jenkinsfile, but
   is in the YAML format (see [complete reference](../yaml/README.md)) instead of a Groovy DSL. It's most
   analogous to the declarative Jenkinsfile format.
