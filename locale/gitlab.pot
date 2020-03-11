@@ -20858,6 +20858,9 @@ msgstr ""
 msgid "Total issues"
 msgstr ""
 
+msgid "Total memory (GB)"
+msgstr ""
+
 msgid "Total test time for all commits/merges"
 msgstr ""
 
