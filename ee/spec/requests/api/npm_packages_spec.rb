@@ -6,6 +6,7 @@ describe API::NpmPackages do
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:project, reload: true) { create(:project, :public, namespace: group) }
+  let_it_be(:package) { create(:npm_package, project: project) }
   let_it_be(:token) { create(:oauth_access_token, scopes: 'api', resource_owner: user) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
   let_it_be(:job) { create(:ci_build, user: user) }
@@ -36,7 +37,6 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/packages/npm/*package_name' do
-    let_it_be(:package) { create(:npm_package, project: project) }
     let_it_be(:package_dependency_link1) { create(:packages_dependency_link, package: package, dependency_type: :dependencies) }
     let_it_be(:package_dependency_link2) { create(:packages_dependency_link, package: package, dependency_type: :devDependencies) }
     let_it_be(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
@@ -162,7 +162,6 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/npm/*package_name/-/*file_name' do
-    let_it_be(:package) { create(:npm_package, project: project) }
     let_it_be(:package_file) { package.package_files.first }
 
     shared_examples 'a package file that requires auth' do
@@ -398,7 +397,6 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/packages/npm/-/package/*package_name/dist-tags' do
-    let_it_be(:package) { create(:npm_package, project: project) }
     let_it_be(:package_tag1) { create(:packages_tag, package: package) }
     let_it_be(:package_tag2) { create(:packages_tag, package: package) }
 
