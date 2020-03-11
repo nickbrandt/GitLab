@@ -84,17 +84,6 @@ module Gitlab
         end
 
         def open_file(params, key)
-          allowed_paths = [
-            ::FileUploader.root,
-            Gitlab.config.uploads.storage_path,
-            File.join(Rails.root, 'public/uploads/tmp')
-          ]
-
-          packages_config = Gitlab.config.packages
-          if allow_packages_storage_path?(packages_config)
-            allowed_paths << File.join(packages_config.storage_path, 'tmp/uploads')
-          end
-
           ::UploadedFile.from_params(params, key, allowed_paths)
         end
 
@@ -114,12 +103,12 @@ module Gitlab
 
         private
 
-        def allow_packages_storage_path?(packages_config)
-          return unless packages_config.enabled
-          return unless packages_config['storage_path']
-          return if packages_config.object_store.enabled && packages_config.object_store.direct_upload
-
-          true
+        def allowed_paths
+          [
+            ::FileUploader.root,
+            Gitlab.config.uploads.storage_path,
+            File.join(Rails.root, 'public/uploads/tmp')
+          ]
         end
       end
 
@@ -140,3 +129,5 @@ module Gitlab
     end
   end
 end
+
+::Gitlab::Middleware::Multipart::Handler.prepend_if_ee('EE::Gitlab::Middleware::Multipart::Handler')

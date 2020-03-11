@@ -5,9 +5,7 @@ require 'spec_helper'
 require 'tempfile'
 
 describe Gitlab::Middleware::Multipart do
-  let(:app) { double(:app) }
-  let(:middleware) { described_class.new(app) }
-  let(:original_filename) { 'filename' }
+  include_context 'multipart middleware context'
 
   shared_examples_for 'multipart upload files' do
     it 'opens top-level files' do
@@ -82,102 +80,12 @@ describe Gitlab::Middleware::Multipart do
   end
 
   it 'allows files in uploads/tmp directory' do
-    Dir.mktmpdir do |dir|
-      uploads_dir = File.join(dir, 'public/uploads/tmp')
-      FileUtils.mkdir_p(uploads_dir)
-
-      allow(Rails).to receive(:root).and_return(dir)
-      allow(Dir).to receive(:tmpdir).and_return(File.join(Dir.tmpdir, 'tmpsubdir'))
-
-      Tempfile.open('top-level', uploads_dir) do |tempfile|
-        env = post_env({ 'file' => tempfile.path }, { 'file.name' => original_filename, 'file.path' => tempfile.path }, Gitlab::Workhorse.secret, 'gitlab-workhorse')
-
-        expect(app).to receive(:call) do |env|
-          expect(get_params(env)['file']).to be_a(::UploadedFile)
-        end
-
-        middleware.call(env)
-      end
-    end
-  end
-
-  context 'with packages storage' do
-    let(:storage_path) { 'shared/packages' }
-
-    RSpec.shared_examples 'allowing the upload' do
-      it 'allows files to be uploaded' do
-        Dir.mktmpdir do |dir|
-          packages_upload_dir = File.join(dir, storage_path, 'tmp/uploads')
-          FileUtils.mkdir_p(packages_upload_dir)
-
-          Tempfile.open('top-level', packages_upload_dir) do |tempfile|
-            env = post_env({ 'file' => tempfile.path }, { 'file.name' => original_filename, 'file.path' => tempfile.path }, Gitlab::Workhorse.secret, 'gitlab-workhorse')
-
-            expect(app).to receive(:call) do |env|
-              expect(get_params(env)['file']).to be_a(::UploadedFile)
-            end
-
-            middleware.call(env)
-          end
-        end
-      end
-    end
-
-    context 'with object storage disabled' do
-      before do
-        stub_config(packages: {
-          enabled: true,
-          object_store: {
-            enabled: false
-          },
-          storage_path: storage_path
-        })
+    with_tmp_dir('public/uploads/tmp') do |dir, env|
+      expect(app).to receive(:call) do |env|
+        expect(get_params(env)['file']).to be_a(::UploadedFile)
       end
 
-      it_behaves_like 'allowing the upload' do
-        before do
-          expect(Gitlab.config.packages).to receive(:storage_path).and_return(storage_path)
-        end
-      end
-    end
-
-    context 'with object storage enabled' do
-      context 'with direct upload enabled' do
-        before do
-          stub_config(packages: {
-            enabled: true,
-            object_store: {
-              enabled: true,
-              direct_upload: true
-            }
-          })
-        end
-
-        it_behaves_like 'allowing the upload' do
-          before do
-            expect(Gitlab.config.packages).not_to receive(:storage_path)
-          end
-        end
-      end
-
-      context 'with direct upload disabled' do
-        before do
-          stub_config(packages: {
-            enabled: true,
-            object_store: {
-              enabled: true,
-              direct_upload: false
-            },
-            storage_path: storage_path
-          })
-        end
-
-        it_behaves_like 'allowing the upload' do
-          before do
-            expect(Gitlab.config.packages).to receive(:storage_path).and_return(storage_path)
-          end
-        end
-      end
+      middleware.call(env)
     end
   end
 
@@ -206,23 +114,5 @@ describe Gitlab::Middleware::Multipart do
 
       middleware.call(env)
     end
-  end
-
-  # Rails 5 doesn't combine the GET/POST parameters in
-  # ActionDispatch::HTTP::Parameters if action_dispatch.request.parameters is set:
-  # https://github.com/rails/rails/blob/aea6423f013ca48f7704c70deadf2cd6ac7d70a1/actionpack/lib/action_dispatch/http/parameters.rb#L41
-  def get_params(env)
-    req = ActionDispatch::Request.new(env)
-    req.GET.merge(req.POST)
-  end
-
-  def post_env(rewritten_fields, params, secret, issuer)
-    token = JWT.encode({ 'iss' => issuer, 'rewritten_fields' => rewritten_fields }, secret, 'HS256')
-    Rack::MockRequest.env_for(
-      '/',
-      method: 'post',
-      params: params,
-      described_class::RACK_ENV_KEY => token
-    )
   end
 end
