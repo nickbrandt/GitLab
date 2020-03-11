@@ -1,24 +1,38 @@
 <script>
-import $ from 'jquery';
-import _ from 'underscore';
-import { GlButton, GlDropdownDivider, GlSegmentedControl } from '@gitlab/ui';
+import {
+  GlDropdownDivider,
+  GlSegmentedControl,
+  GlDropdown,
+  GlDropdownItem,
+  GlSearchBoxByType,
+  GlIcon,
+} from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
+import createFlash from '~/flash';
+import { removeFlash } from '../utils';
 import {
   TASKS_BY_TYPE_FILTERS,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   TASKS_BY_TYPE_SUBJECT_FILTER_OPTIONS,
+  TASKS_BY_TYPE_MAX_LABELS,
 } from '../constants';
 
 export default {
   name: 'TasksByTypeFilters',
   components: {
-    GlButton,
-    GlDropdownDivider,
     GlSegmentedControl,
-    Icon,
+    GlDropdownDivider,
+    GlIcon,
+    GlDropdown,
+    GlDropdownItem,
+    GlSearchBoxByType,
   },
   props: {
+    maxLabels: {
+      type: Number,
+      required: false,
+      default: TASKS_BY_TYPE_MAX_LABELS,
+    },
     labels: {
       type: Array,
       required: true,
@@ -37,6 +51,7 @@ export default {
     const { subjectFilter: selectedSubjectFilter } = this;
     return {
       selectedSubjectFilter,
+      labelsSearchTerm: '',
     };
   },
   computed: {
@@ -60,42 +75,48 @@ export default {
         },
       );
     },
-  },
-  mounted() {
-    $(this.$refs.labelsDropdown).glDropdown({
-      selectable: true,
-      multiSelect: true,
-      filterable: true,
-      search: {
-        fields: ['title'],
-      },
-      clicked: this.onClick.bind(this),
-      data: this.formatData.bind(this),
-      renderRow: group => this.rowTemplate(group),
-      text: label => label.title,
-    });
+    availableLabels() {
+      return this.labels.filter(({ name }) =>
+        name.toLowerCase().includes(this.labelsSearchTerm.toLowerCase()),
+      );
+    },
+    selectedLabelLimitText() {
+      const { selectedLabelIds, maxLabels } = this;
+      return sprintf(s__('CycleAnalytics|%{selectedLabelsCount} selected (%{maxLabels} max)'), {
+        selectedLabelsCount: selectedLabelIds.length,
+        maxLabels,
+      });
+    },
+    maxLabelsSelected() {
+      return this.selectedLabelIds.length >= this.maxLabels;
+    },
+    hasMatchingLabels() {
+      return this.availableLabels.length;
+    },
   },
   methods: {
-    onClick({ e, selectedObj }) {
-      e.preventDefault();
-      const { id: value } = selectedObj;
-      this.$emit('updateFilter', { filter: TASKS_BY_TYPE_FILTERS.LABEL, value });
+    canUpdateLabelFilters(value) {
+      // we can always remove a filter
+      return this.selectedLabelIds.includes(value) || !this.maxLabelsSelected;
     },
-    formatData(term, callback) {
-      callback(this.labels);
+    isLabelSelected(id) {
+      return this.selectedLabelIds.includes(id);
     },
-    rowTemplate(label) {
-      return `
-          <li>
-            <a href='#' class='dropdown-menu-link is-active'>
-              <span style="background-color: ${
-                label.color
-              };" class="d-inline-block dropdown-label-box">
-              </span>
-              ${_.escape(label.title)}
-            </a>
-          </li>
-        `;
+    isLabelDisabled(id) {
+      return this.maxLabelsSelected && !this.isLabelSelected(id);
+    },
+    handleLabelSelected(value) {
+      removeFlash('notice');
+      if (this.canUpdateLabelFilters(value)) {
+        this.$emit('updateFilter', { filter: TASKS_BY_TYPE_FILTERS.LABEL, value });
+      } else {
+        const { maxLabels } = this;
+        const message = sprintf(
+          s__('CycleAnalytics|Only %{maxLabels} labels can be selected at this time'),
+          { maxLabels },
+        );
+        createFlash(message, 'notice');
+      }
     },
   },
   TASKS_BY_TYPE_FILTERS,
@@ -111,42 +132,59 @@ export default {
       <p>{{ selectedFiltersText }}</p>
     </div>
     <div class="flex-column">
-      <div ref="labelsDropdown" class="dropdown dropdown-labels">
-        <gl-button
-          class="shadow-none bg-white btn-svg"
-          type="button"
-          data-toggle="dropdown"
-          aria-expanded="false"
-          :aria-label="__('CycleAnalytics|Display chart filters')"
-        >
-          <icon :size="16" name="settings" />
-          <icon :size="16" name="chevron-down" />
-        </gl-button>
-        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-right">
-          <div class="js-tasks-by-type-chart-filters-subject mb-3 mx-3">
-            <p class="font-weight-bold text-left mb-2">{{ s__('CycleAnalytics|Show') }}</p>
-            <gl-segmented-control
-              v-model="selectedSubjectFilter"
-              :options="subjectFilterOptions"
-              @input="
-                value =>
-                  $emit('updateFilter', { filter: $options.TASKS_BY_TYPE_FILTERS.SUBJECT, value })
-              "
+      <gl-dropdown
+        aria-expanded="false"
+        :aria-label="__('CycleAnalytics|Display chart filters')"
+        right
+      >
+        <template #button-content>
+          <gl-icon class="vertical-align-top" name="settings" />
+          <gl-icon name="chevron-down" />
+        </template>
+        <div class="mb-3 px-3">
+          <p class="font-weight-bold text-left mb-2">{{ s__('CycleAnalytics|Show') }}</p>
+          <gl-segmented-control
+            v-model="selectedSubjectFilter"
+            :options="subjectFilterOptions"
+            @input="
+              value =>
+                $emit('updateFilter', { filter: $options.TASKS_BY_TYPE_FILTERS.SUBJECT, value })
+            "
+          />
+        </div>
+        <gl-dropdown-divider />
+        <div class="mb-3 px-3">
+          <p class="font-weight-bold text-left my-2">
+            {{ s__('CycleAnalytics|Select labels') }}
+            <br /><small>{{ selectedLabelLimitText }}</small>
+          </p>
+          <gl-search-box-by-type v-model.trim="labelsSearchTerm" class="mb-2" />
+          <gl-dropdown-item
+            v-for="label in availableLabels"
+            :key="label.id"
+            :disabled="isLabelDisabled(label.id)"
+            :class="{
+              'pl-4': !isLabelSelected(label.id),
+              'cursor-not-allowed': isLabelDisabled(label.id),
+            }"
+            @click="() => handleLabelSelected(label.id)"
+          >
+            <gl-icon
+              v-if="isLabelSelected(label.id)"
+              class="text-gray-700 mr-1 vertical-align-middle"
+              name="mobile-issue-close"
             />
-          </div>
-          <gl-dropdown-divider />
-          <div class="js-tasks-by-type-chart-filters-labels mb-3 mx-3">
-            <p class="font-weight-bold text-left my-2">
-              {{ s__('CycleAnalytics|Select labels') }}
-            </p>
-            <div class="dropdown-input px-0">
-              <input class="dropdown-input-field" type="search" />
-              <icon name="search" class="dropdown-input-search" data-hidden="true" />
-            </div>
-            <div class="dropdown-content px-0"></div>
+            <span
+              :style="{ 'background-color': label.color }"
+              class="d-inline-block dropdown-label-box"
+            ></span>
+            {{ label.name }}
+          </gl-dropdown-item>
+          <div v-show="!hasMatchingLabels" class="text-secondary">
+            {{ __('No matching labels') }}
           </div>
         </div>
-      </div>
+      </gl-dropdown>
     </div>
   </div>
 </template>

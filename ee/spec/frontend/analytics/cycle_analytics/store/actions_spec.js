@@ -6,7 +6,10 @@ import testAction from 'helpers/vuex_action_helper';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { TASKS_BY_TYPE_FILTERS } from 'ee/analytics/cycle_analytics/constants';
+import {
+  TASKS_BY_TYPE_FILTERS,
+  TASKS_BY_TYPE_SUBJECT_ISSUE,
+} from 'ee/analytics/cycle_analytics/constants';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { toYmd } from 'ee/analytics/shared/utils';
@@ -24,6 +27,7 @@ import {
   transformedDurationMedianData,
   endpoints,
 } from '../mock_data';
+import { shouldFlashAMessage } from '../helpers';
 
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
@@ -37,10 +41,6 @@ const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stag
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
-
-  function shouldFlashAMessage(msg = flashErrorMessage) {
-    expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
-  }
 
   function shouldSetUrlParams({ action, payload, result }) {
     const store = {
@@ -332,6 +332,65 @@ describe('Cycle analytics actions', () => {
     });
   });
 
+  describe('fetchTopRankedGroupLabels', () => {
+    beforeEach(() => {
+      gon.api_version = 'v4';
+      state = { selectedGroup, tasksByType: { subject: TASKS_BY_TYPE_SUBJECT_ISSUE }, ...getters };
+    });
+
+    describe('succeeds', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.tasksByTypeTopLabelsData).replyOnce(200, groupLabels);
+      });
+
+      it('dispatches receiveTopRankedGroupLabelsSuccess if the request succeeds', () => {
+        return testAction(
+          actions.fetchTopRankedGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsSuccess', payload: groupLabels },
+          ],
+        );
+      });
+    });
+
+    describe('with an error', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.fetchTopRankedGroupLabels).replyOnce(404);
+      });
+
+      it('dispatches receiveTopRankedGroupLabelsError if the request fails', () => {
+        return testAction(
+          actions.fetchTopRankedGroupLabels,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestTopRankedGroupLabels' },
+            { type: 'receiveTopRankedGroupLabelsError', payload: error },
+          ],
+        );
+      });
+    });
+
+    describe('receiveTopRankedGroupLabelsError', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+      });
+
+      it('flashes an error message if the request fails', () => {
+        actions.receiveTopRankedGroupLabelsError({
+          commit: () => {},
+        });
+
+        shouldFlashAMessage('There was an error fetching the top labels for the selected group');
+      });
+    });
+  });
+
   describe('fetchCycleAnalyticsData', () => {
     function mockFetchCycleAnalyticsAction(overrides = {}) {
       const mocks = {
@@ -373,6 +432,7 @@ describe('Cycle analytics actions', () => {
         [
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchGroupLabels' },
+          { type: 'fetchTopRankedGroupLabels' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'fetchSummaryData' },
@@ -558,7 +618,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAMessage();
+        shouldFlashAMessage(flashErrorMessage);
       });
     });
   });
@@ -611,7 +671,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 
@@ -671,7 +731,7 @@ describe('Cycle analytics actions', () => {
         );
       });
 
-      shouldFlashAMessage();
+      shouldFlashAMessage(flashErrorMessage);
     });
   });
 

@@ -53,6 +53,8 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                        | ${true}
     ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                           | ${[]}
     ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                           | ${[]}
+    ${types.REQUEST_TOP_RANKED_GROUP_LABELS}       | ${'topRankedLabels'}                  | ${[]}
+    ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR} | ${'topRankedLabels'}                  | ${[]}
     ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                          | ${[]}
     ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                          | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                           | ${[]}
@@ -146,20 +148,15 @@ describe('Cycle analytics mutations', () => {
     });
   });
 
-  describe.each`
-    mutation                            | value
-    ${types.REQUEST_GROUP_LABELS}       | ${[]}
-    ${types.RECEIVE_GROUP_LABELS_ERROR} | ${[]}
-  `('$mutation', ({ mutation, value }) => {
-    it(`will set tasksByType.labelIds to ${value}`, () => {
-      state = { tasksByType: {} };
-      mutations[mutation](state);
+  describe(`${types.RECEIVE_GROUP_LABELS_SUCCESS}`, () => {
+    it('will set the labels state item with the camelCased group labels', () => {
+      mutations[types.RECEIVE_GROUP_LABELS_SUCCESS](state, groupLabels);
 
-      expect(state.tasksByType.labelIds).toEqual(value);
+      expect(state.labels).toEqual(groupLabels.map(convertObjectPropsToCamelCase));
     });
   });
 
-  describe(`${types.RECEIVE_GROUP_LABELS_SUCCESS}`, () => {
+  describe(`${types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS}`, () => {
     it('will set the labels state item with the camelCased group labels', () => {
       mutations[types.RECEIVE_GROUP_LABELS_SUCCESS](state, groupLabels);
 
@@ -306,17 +303,17 @@ describe('Cycle analytics mutations', () => {
       expect(state.tasksByType).toEqual({ subject: 'cool-subject' });
     });
 
-    it('will toggle the specified label id in the tasksByType.labelIds state key', () => {
+    it('will toggle the specified label id in the tasksByType.selectedLabelIds state key', () => {
       state = {
-        tasksByType: { labelIds: [10, 20, 30] },
+        tasksByType: { selectedLabelIds: [10, 20, 30] },
       };
       const labelFilter = { filter: TASKS_BY_TYPE_FILTERS.LABEL, value: 20 };
       mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
 
-      expect(state.tasksByType).toEqual({ labelIds: [10, 30] });
+      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30] });
 
       mutations[types.SET_TASKS_BY_TYPE_FILTERS](state, labelFilter);
-      expect(state.tasksByType).toEqual({ labelIds: [10, 30, 20] });
+      expect(state.tasksByType).toEqual({ selectedLabelIds: [10, 30, 20] });
     });
   });
 

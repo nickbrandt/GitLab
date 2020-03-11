@@ -25,6 +25,7 @@ export const endpoints = {
   stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
   baseStagesEndpoint: /analytics\/value_stream_analytics\/stages$/,
   tasksByTypeData: /analytics\/type_of_work\/tasks_by_type/,
+  tasksByTypeTopLabelsData: /analytics\/type_of_work\/tasks_by_type\/top_labels/,
 };
 
 export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(

@@ -28,6 +28,7 @@ export default () => ({
   stages: [],
   summary: [],
   labels: [],
+  topRankedLabels: [],
   medians: {},
 
   customStageFormEvents: [],
@@ -36,7 +37,7 @@ export default () => ({
 
   tasksByType: {
     subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
-    labelIds: [],
+    selectedLabelIds: [],
     data: [],
   },
 

@@ -30,6 +30,25 @@ describe('Cycle analytics getters', () => {
     });
   });
 
+  describe('selectedProjectIds', () => {
+    describe('with selectedProjects set', () => {
+      it('returns the ids of each project', () => {
+        state = {
+          selectedProjects,
+        };
+
+        expect(getters.selectedProjectIds(state)).toEqual([1, 2]);
+      });
+    });
+
+    describe('without selectedProjects set', () => {
+      it('will return an empty array', () => {
+        state = { selectedProjects: [] };
+        expect(getters.selectedProjectIds(state)).toEqual([]);
+      });
+    });
+  });
+
   describe('currentGroupPath', () => {
     describe('with selectedGroup set', () => {
       it('returns the `fullPath` value of the group', () => {

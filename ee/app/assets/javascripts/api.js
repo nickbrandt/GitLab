@@ -15,6 +15,7 @@ export default {
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
+  cycleAnalyticsTopLabelsPath: '/-/analytics/type_of_work/tasks_by_type/top_labels',
   cycleAnalyticsSummaryDataPath: '/-/analytics/value_stream_analytics/summary',
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/value_stream_analytics/stages',
   cycleAnalyticsStageEventsPath: '/-/analytics/value_stream_analytics/stages/:stage_id/records',
@@ -118,6 +119,11 @@ export default {
 
   cycleAnalyticsTasksByType(params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsTasksByTypePath);
+    return axios.get(url, { params });
+  },
+
+  cycleAnalyticsTopLabels(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsTopLabelsPath);
     return axios.get(url, { params });
   },
 

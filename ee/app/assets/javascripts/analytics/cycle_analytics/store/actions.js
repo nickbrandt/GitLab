@@ -3,19 +3,13 @@ import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import { historyPushState } from '~/lib/utils/common_utils';
 import { setUrlParams } from '~/lib/utils/url_utility';
-import createFlash, { hideFlash } from '~/flash';
+import createFlash from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
 import { toYmd } from '../../shared/utils';
-
-const removeError = () => {
-  const flashEl = document.querySelector('.flash-alert');
-  if (flashEl) {
-    hideFlash(flashEl);
-  }
-};
+import { removeFlash } from '../utils';
 
 const handleErrorOrRethrow = ({ action, error }) => {
   if (error?.response?.status === httpStatus.FORBIDDEN) {
@@ -167,11 +161,12 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
 };
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
-  removeError();
+  removeFlash();
 
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
     .then(() => dispatch('fetchGroupLabels'))
+    .then(() => dispatch('fetchTopRankedGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
@@ -181,12 +176,12 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 
 export const hideCustomStageForm = ({ commit }) => {
   commit(types.HIDE_CUSTOM_STAGE_FORM);
-  removeError();
+  removeFlash();
 };
 
 export const showCustomStageForm = ({ commit }) => {
   commit(types.SHOW_CUSTOM_STAGE_FORM);
-  removeError();
+  removeFlash();
 };
 
 export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}) => {
@@ -208,7 +203,7 @@ export const showEditCustomStageForm = ({ commit, dispatch }, selectedStage = {}
     endEventLabelId,
   });
   dispatch('setSelectedStage', selectedStage);
-  removeError();
+  removeFlash();
 };
 
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
@@ -264,6 +259,43 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     );
 };
 
+export const receiveTopRankedGroupLabelsSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
+
+export const receiveTopRankedGroupLabelsError = ({ commit }, error) => {
+  commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR, error);
+  createFlash(__('There was an error fetching the top labels for the selected group'));
+};
+
+export const requestTopRankedGroupLabels = ({ commit }) =>
+  commit(types.REQUEST_TOP_RANKED_GROUP_LABELS);
+
+export const fetchTopRankedGroupLabels = ({
+  dispatch,
+  state,
+  getters: {
+    currentGroupPath,
+    cycleAnalyticsRequestParams: { created_after, created_before },
+  },
+}) => {
+  dispatch('requestTopRankedGroupLabels');
+  const { subject } = state.tasksByType;
+
+  return Api.cycleAnalyticsTopLabels({
+    subject,
+    created_after,
+    created_before,
+    group_id: currentGroupPath,
+  })
+    .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
+    .catch(error =>
+      handleErrorOrRethrow({
+        error,
+        action: () => dispatch('receiveTopRankedGroupLabelsError', error),
+      }),
+    );
+};
+
 export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
   commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR, error);
   createFlash(__('There was an error fetching value stream analytics stages.'));
@@ -306,7 +338,7 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
 
 export const clearCustomStageFormErrors = ({ commit }) => {
   commit(types.CLEAR_CUSTOM_STAGE_FORM_ERRORS);
-  removeError();
+  removeFlash();
 };
 
 export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
@@ -372,18 +404,18 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   } = getters;
 
   const {
-    tasksByType: { labelIds, subject },
+    tasksByType: { subject, selectedLabelIds },
   } = state;
 
   // dont request if we have no labels selected...for now
-  if (labelIds.length) {
+  if (selectedLabelIds.length) {
     const params = {
       group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
       subject,
-      label_ids: labelIds,
+      label_ids: selectedLabelIds,
     };
 
     dispatch('requestTasksByTypeData');
