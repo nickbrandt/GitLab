@@ -638,6 +638,29 @@ describe WikiPage do
     end
   end
 
+  describe '#meta' do
+    it 'can can get an appropriate metadata object' do
+      wiki_page = create(:wiki_page)
+
+      expect(wiki_page.meta).to have_attributes(
+        canonical_slug: wiki_page.slug,
+        title: wiki_page.title,
+        project: wiki_page.wiki.project,
+        slugs: include(have_attributes(slug: wiki_page.slug))
+      )
+    end
+
+    it 'is up-to-date after updates' do
+      wiki_page = create(:wiki_page)
+      old_title = wiki_page.title
+      new_title = FFaker::Lorem.sentence
+
+      expect do
+        wiki_page.update(title: new_title)
+      end.to change { wiki_page.meta.title }.from(old_title).to(new_title)
+    end
+  end
+
   private
 
   def remove_temp_repo(path)

@@ -2,13 +2,20 @@
 
 require 'spec_helper'
 
-describe WikiPageMeta do
+describe WikiPage::Meta do
   let_it_be(:project) { create(:project) }
 
   describe 'Associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:slugs) }
     it { is_expected.to have_many(:events) }
+
+    it 'can find slugs' do
+      meta = described_class.create(title: any_title, project: project)
+      slugs = Array.new(3).map { WikiPage::Slug.create(wiki_page_meta: meta, slug: any_slug) }
+
+      expect(meta.slugs).to match_array(slugs)
+    end
   end
 
   describe 'Validations' do
@@ -220,5 +227,13 @@ describe WikiPageMeta do
         let(:query_limit) { 5 }
       end
     end
+  end
+
+  def any_title
+    FFaker::Lorem.sentence
+  end
+
+  def any_slug
+    FFaker::Lorem.characters(10)
   end
 end

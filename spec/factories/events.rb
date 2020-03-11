@@ -30,9 +30,7 @@ FactoryBot.define do
         wiki_page { create(:wiki_page, wiki: create(:project_wiki, project: project)) }
       end
 
-      target do
-        WikiPageMeta.find_or_create(wiki_page.slug, wiki_page)
-      end
+      target { wiki_page.meta }
     end
   end
 

@@ -40,12 +40,11 @@ Event:
 - updated_at
 - action
 - author_id
-WikiPageMeta:
+WikiPage::Meta:
 - id
-- canonical_slug
 - title
 - project_id
-WikiPageSlug:
+WikiPage::Slug:
 - id
 - wiki_page_meta_id
 - slug
