@@ -12,7 +12,7 @@ export const milestones = [
     start_date: '2019-08-31',
     web_url: 'http://0.0.0.0:3001/root/release-test/-/milestones/2',
     issue_stats: {
-      opened: 14,
+      total: 33,
       closed: 19,
     },
   },
@@ -29,7 +29,7 @@ export const milestones = [
     start_date: '2019-08-19',
     web_url: 'http://0.0.0.0:3001/root/release-test/-/milestones/1',
     issue_stats: {
-      opened: 18,
+      total: 21,
       closed: 3,
     },
   },
