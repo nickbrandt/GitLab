@@ -171,7 +171,9 @@ export const fetchSearchResultsNextPage = ({ state, dispatch, commit }) => {
   const searchOptions = { page: nextPage };
 
   return searchProjects(searchQuery, searchOptions)
-    .then(payload => commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, payload))
+    .then(payload => {
+      commit(types.RECEIVE_NEXT_PAGE_SUCCESS, payload);
+    })
     .catch(() => dispatch('receiveSearchResultsError'));
 };
 

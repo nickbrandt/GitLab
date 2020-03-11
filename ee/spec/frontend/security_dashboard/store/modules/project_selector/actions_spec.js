@@ -592,7 +592,7 @@ describe('EE projectSelector actions', () => {
           state,
           [
             {
-              type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
+              type: types.RECEIVE_NEXT_PAGE_SUCCESS,
               payload: { data: projects, headers: responseHeaders, pageInfo },
             },
           ],
