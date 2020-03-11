@@ -3,11 +3,11 @@
 module StatusPage
   module Storage
     def self.details_path(id)
-      "incident/#{id}.json"
+      "data/incident/#{id}.json"
     end
 
     def self.list_path
-      'list.json'
+      'data/list.json'
     end
 
     class Error < StandardError
