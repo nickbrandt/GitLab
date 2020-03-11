@@ -40,7 +40,7 @@ describe('Security Dashboard app', () => {
     setPipelineIdSpy = jest.fn();
   };
 
-  const createComponent = props => {
+  const createComponent = ({ props, options } = {}) => {
     store = createStore();
     wrapper = shallowMount(SecurityDashboardApp, {
       store,
@@ -58,6 +58,7 @@ describe('Security Dashboard app', () => {
         vulnerabilityFeedbackHelpPath: `${TEST_HOST}/vulnerabilities_feedback_help`,
         ...props,
       },
+      ...options,
     });
   };
 
@@ -124,7 +125,9 @@ describe('Security Dashboard app', () => {
     beforeEach(() => {
       setup();
       createComponent({
-        lockToProject: project,
+        props: {
+          lockToProject: project,
+        },
       });
     });
 
@@ -153,7 +156,9 @@ describe('Security Dashboard app', () => {
     beforeEach(() => {
       setup();
       createComponent({
-        [endpointProp]: '',
+        props: {
+          [endpointProp]: '',
+        },
       });
     });
 
@@ -175,7 +180,7 @@ describe('Security Dashboard app', () => {
     `('$description', ({ getParameterValuesReturnValue, expected }) => {
       getParameterValues.mockImplementation(() => getParameterValuesReturnValue);
       createComponent();
-      expect(wrapper.vm.$store.state.filters.hideDismissed).toBe(expected);
+      expect(store.state.filters.hideDismissed).toBe(expected);
     });
   });
 
@@ -202,11 +207,14 @@ describe('Security Dashboard app', () => {
 
   describe('with the first_class_vulnerabilities feature flag turned on', () => {
     beforeEach(() => {
-      gon.features = gon.features || {};
-      gon.features.firstClassVulnerabilities = true;
-
       setup();
-      createComponent();
+      createComponent({
+        options: {
+          provide: {
+            glFeatures: { firstClassVulnerabilities: true },
+          },
+        },
+      });
     });
 
     describe.each`
@@ -215,9 +223,9 @@ describe('Security Dashboard app', () => {
       ${DASHBOARD_TYPES.PROJECT}  | ${true}
       ${DASHBOARD_TYPES.GROUP}    | ${true}
       ${DASHBOARD_TYPES.INSTANCE} | ${true}
-    `('with a dashobard type of $dashboardType', ({ dashboardType, showVulnerabilityList }) => {
+    `('with a dashboard type of $dashboardType', ({ dashboardType, showVulnerabilityList }) => {
       beforeEach(() => {
-        wrapper.vm.$store.state.dashboardType = dashboardType;
+        store.state.dashboardType = dashboardType;
       });
 
       it(`should ${showVulnerabilityList ? '' : 'not '}show the vulnerability`, () => {
@@ -227,16 +235,28 @@ describe('Security Dashboard app', () => {
 
     describe('on the project dashboard', () => {
       beforeEach(() => {
-        wrapper.vm.$store.state.dashboardType = DASHBOARD_TYPES.PROJECT;
+        store.state.dashboardType = DASHBOARD_TYPES.PROJECT;
       });
 
       it('should not render the pagination', () => {
         expect(wrapper.find(PaginationLinks).exists()).toEqual(false);
       });
 
+      it('should pass the vulnerabilities to the vulnerability list', () => {
+        expect(wrapper.find(VulnerabilityList).props().vulnerabilities).toEqual(
+          store.state.vulnerabilities.vulnerabilities,
+        );
+      });
+
+      it('should pass the loading state to the vulnerability list', () => {
+        expect(wrapper.find(VulnerabilityList).props().isLoading).toEqual(
+          store.state.vulnerabilities.isLoadingVulnerabilities,
+        );
+      });
+
       describe('with more than one page of vulnerabilities', () => {
         beforeEach(() => {
-          wrapper.vm.$store.state.vulnerabilities.pageInfo = { total: 2 };
+          store.state.vulnerabilities.pageInfo = { total: 2 };
         });
 
         it('should render the pagination', () => {

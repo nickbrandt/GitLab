@@ -3,6 +3,7 @@ import { isUndefined } from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import VulnerabilityList from 'ee/vulnerabilities/components/vulnerability_list.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
@@ -25,6 +26,7 @@ export default {
     VulnerabilityList,
     VulnerabilitySeverity,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     vulnerabilitiesEndpoint: {
       type: String,
@@ -110,7 +112,7 @@ export default {
     shouldUseFirstClassVulnerabilities() {
       const { dashboardType } = this;
       return Boolean(
-        gon?.features?.firstClassVulnerabilities &&
+        this.glFeatures.firstClassVulnerabilities &&
           (dashboardType === DASHBOARD_TYPES.PROJECT ||
             dashboardType === DASHBOARD_TYPES.GROUP ||
             dashboardType === DASHBOARD_TYPES.INSTANCE),
