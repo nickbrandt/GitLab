@@ -14,6 +14,7 @@ module Gitlab
           @keys = Set.new
 
           mkdir_p(File.dirname(@path))
+          file.write('{}')
         end
 
         def close
@@ -64,11 +65,7 @@ module Gitlab
         private
 
         def file
-          @file ||= begin
-            file = File.open(@path, "wb")
-            file.write('{}')
-            file
-          end
+          @file ||= File.open(@path, "wb")
         end
       end
     end
