@@ -7,7 +7,7 @@ type: index, howto
 
 A lot of GitLab users have successfully migrated to GitLab CI/CD from Jenkins. To make this
 easier if you're just getting started, we've collected several resources here that you might find useful
-before diving in.
+before diving in. Think of this page as a "GitLab CI/CD for Jenkins Users" guide.
 
 First of all, our [Quick Start Guide](../quick_start/README.md) contains a good overview of how GitLab CI/CD works.
 You may also be interested in [Auto DevOps](../../topics/autodevops/index.md) which can potentially be used to build, test,
