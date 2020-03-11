@@ -63,7 +63,7 @@ describe Dashboard::Projects::CreateService do
       let(:output) { [] }
 
       it 'does not add invalid project ids' do
-        expect(result).to eq(expected_result(invalid_project_ids: input.map(&:to_s)))
+        expect(result).to eq(expected_result(invalid_project_ids: input)
       end
     end
   end
