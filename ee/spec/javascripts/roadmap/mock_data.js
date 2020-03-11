@@ -101,6 +101,10 @@ export const mockEpic = {
   groupFullName: 'Gitlab Org',
   startDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+  },
   webUrl: '/groups/gitlab-org/-/epics/1',
 };
 

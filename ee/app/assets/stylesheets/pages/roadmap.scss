@@ -249,145 +249,153 @@ html.group-epics-roadmap-html {
 
 .epics-list-section {
   height: calc(100% - 60px);
+}
 
-  .epics-list-item {
+.epics-list-item {
+  &:hover {
+    .epic-details-cell,
+    .epic-timeline-cell {
+      background-color: $gray-100;
+    }
+  }
+
+  &.epics-list-item-empty {
+    height: 100%;
+
     &:hover {
       .epic-details-cell,
       .epic-timeline-cell {
-        background-color: $gray-100;
-      }
-    }
-
-    &.epics-list-item-empty {
-      height: 100%;
-
-      &:hover {
-        .epic-details-cell,
-        .epic-timeline-cell {
-          background-color: $white-light;
-        }
-      }
-
-      .epic-details-cell,
-      .epic-details-cell::after,
-      .epic-timeline-cell {
-        height: 100%;
-      }
-    }
-
-    &.newly-added-epic {
-      .epic-details-cell {
-        animation: colorTransitionDetailsCell 3s;
+        background-color: $white-light;
       }
     }
 
     .epic-details-cell,
+    .epic-details-cell::after,
     .epic-timeline-cell {
-      box-sizing: border-box;
-      float: left;
-      height: $item-height;
-      border-bottom: $border-style;
-    }
-
-    .epic-details-cell {
-      position: sticky;
-      position: -webkit-sticky;
-      left: 0;
-      width: $details-cell-width;
-      padding: $gl-padding-8 $gl-padding;
-      font-size: $code-font-size;
-      background-color: $white-light;
-      z-index: 10;
-
-      &::after {
-        height: $item-height;
-      }
-
-      .epic-title,
-      .epic-group-timeframe {
-        will-change: contents;
-      }
-
-      .epic-title {
-        display: table;
-        table-layout: fixed;
-        width: 100%;
-
-        .epic-url {
-          display: table-cell;
-          color: $gray-900;
-          font-weight: 600;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
-
-      .epic-group-timeframe {
-        color: $gray-700;
-        width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .epic-group:hover {
-        cursor: pointer;
-      }
-    }
-
-    .epic-timeline-cell {
-      position: relative;
-      width: $timeline-cell-width;
-      background-color: transparent;
-      border-right: $border-style;
-
-      .current-day-indicator {
-        top: -1px;
-        width: 2px;
-        height: calc(100% + 1px);
-        background-color: $red-500;
-        pointer-events: none;
-      }
-
-      .timeline-bar-wrapper {
-        position: relative;
-      }
-
-      .timeline-bar {
-        position: absolute;
-        top: 12px;
-        height: 24px;
-        background-color: $blue-500;
-        border-radius: $border-radius-default;
-        opacity: 0.75;
-        will-change: width, left;
-        z-index: 5;
-
-        &:hover {
-          opacity: 1;
-        }
-
-        &.start-date-undefined {
-          background: linear-gradient(to right, $roadmap-gradient-gray 0%, $blue-200 50%, $blue-500 100%);
-        }
-
-        &.end-date-undefined {
-          background: linear-gradient(to right, $blue-500 0%, $blue-200 50%, $roadmap-gradient-gray 100%);
-        }
-      }
-
-      &:last-child {
-        border-right: 0;
-      }
+      height: 100%;
     }
   }
 
-  .scroll-bottom-shadow {
-    @include roadmap-scroll-mixin;
-    position: fixed;
-    bottom: 0;
-    background: $scroll-bottom-gradient;
-    z-index: 2;
+  &.newly-added-epic {
+    .epic-details-cell {
+      animation: colorTransitionDetailsCell 3s;
+    }
   }
 }
+
+.epic-details-cell,
+.epic-timeline-cell {
+  box-sizing: border-box;
+  float: left;
+  height: $item-height;
+  border-bottom: $border-style;
+}
+
+.epic-details-cell {
+  position: sticky;
+  position: -webkit-sticky;
+  left: 0;
+  width: $details-cell-width;
+  padding: $gl-padding-8 $gl-padding;
+  font-size: $code-font-size;
+  background-color: $white-light;
+  z-index: 10;
+
+  &::after {
+    height: $item-height;
+  }
+
+  .epic-title,
+  .epic-group-timeframe {
+    will-change: contents;
+  }
+
+  .epic-title {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+
+    .epic-url {
+      display: table-cell;
+      color: $gray-900;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .epic-group-timeframe {
+    color: $gray-700;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .epic-group:hover {
+    cursor: pointer;
+  }
+}
+
+.epic-timeline-cell {
+  position: relative;
+  width: $timeline-cell-width;
+  background-color: transparent;
+  border-right: $border-style;
+
+  .current-day-indicator {
+    top: -1px;
+    width: 2px;
+    height: calc(100% + 1px);
+    background-color: $red-500;
+    pointer-events: none;
+  }
+
+  &:last-child {
+    border-right: 0;
+  }
+}
+
+.epic-bar-wrapper {
+  position: relative;
+}
+
+.epic-bar {
+  position: absolute;
+  top: 5px;
+  height: 40px;
+  background-color: $blue-600;
+  border-radius: $border-radius-default;
+  will-change: width, left;
+  z-index: 5;
+
+  &:hover {
+    background-color: $blue-700;
+  }
+}
+
+.epic-bar-inner {
+  position: sticky;
+  position: -webkit-sticky;
+  left: $details-cell-width;
+  padding: $gl-padding-8;
+  color: $white-light;
+}
+
+.epic-bar-progress {
+  background-color: $blue-300;
+
+  .progress-bar {
+    background-color: $white-light;
+  }
+}
+
+.epic-scroll-bottom-shadow {
+  @include roadmap-scroll-mixin;
+  position: fixed;
+  bottom: 0;
+  background: $scroll-bottom-gradient;
+  z-index: 2;
+}
+

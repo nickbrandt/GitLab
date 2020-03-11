@@ -29,6 +29,10 @@ query groupEpics(
           webUrl
           startDate
           dueDate
+          descendantWeightSum {
+            closedIssues
+            openedIssues
+          }
           group {
             name
             fullName

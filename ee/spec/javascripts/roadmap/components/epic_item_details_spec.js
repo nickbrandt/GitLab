@@ -11,6 +11,7 @@ const createComponent = (epic = mockEpic, currentGroupId = mockGroupId) => {
   return mountComponent(Component, {
     epic,
     currentGroupId,
+    timeframeString: 'Jul 10, 2017 – Jun 2, 2018',
   });
 };
 
@@ -35,80 +36,6 @@ describe('EpicItemDetailsComponent', () => {
         vm = createComponent(mockEpicItem, 1);
 
         expect(vm.isEpicGroupDifferent).toBe(false);
-      });
-    });
-
-    describe('startDate', () => {
-      it('returns Epic.startDate when start date is within range', () => {
-        vm = createComponent(mockEpic);
-
-        expect(vm.startDate).toBe(mockEpic.startDate);
-      });
-
-      it('returns Epic.originalStartDate when start date is out of range', () => {
-        const mockStartDate = new Date(2018, 0, 1);
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDateOutOfRange: true,
-          originalStartDate: mockStartDate,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.startDate).toBe(mockStartDate);
-      });
-    });
-
-    describe('endDate', () => {
-      it('returns Epic.endDate when end date is within range', () => {
-        vm = createComponent(mockEpic);
-
-        expect(vm.endDate).toBe(mockEpic.endDate);
-      });
-
-      it('returns Epic.originalEndDate when end date is out of range', () => {
-        const mockEndDate = new Date(2018, 0, 1);
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          endDateOutOfRange: true,
-          originalEndDate: mockEndDate,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.endDate).toBe(mockEndDate);
-      });
-    });
-
-    describe('timeframeString', () => {
-      it('returns timeframe string correctly when both start and end dates are defined', () => {
-        vm = createComponent(mockEpic);
-
-        expect(vm.timeframeString).toBe('Jul 10, 2017 &ndash; Jun 2, 2018');
-      });
-
-      it('returns timeframe string correctly when only start date is defined', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          endDateUndefined: true,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('From Jul 10, 2017');
-      });
-
-      it('returns timeframe string correctly when only end date is defined', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDateUndefined: true,
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('Until Jun 2, 2018');
-      });
-
-      it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
-        const mockEpicItem = Object.assign({}, mockEpic, {
-          startDate: new Date(2018, 0, 1),
-          endDate: new Date(2018, 3, 1),
-        });
-        vm = createComponent(mockEpicItem);
-
-        expect(vm.timeframeString).toBe('Jan 1 &ndash; Apr 1, 2018');
       });
     });
   });

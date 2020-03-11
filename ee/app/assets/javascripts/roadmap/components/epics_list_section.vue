@@ -40,6 +40,7 @@ export default {
   },
   data() {
     return {
+      clientWidth: 0,
       offsetLeft: 0,
       emptyRowContainerStyles: {},
       showBottomShadow: false,
@@ -64,10 +65,12 @@ export default {
   },
   mounted() {
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
+    window.addEventListener('resize', this.syncClientWidth);
     this.initMounted();
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
+    window.removeEventListener('resize', this.syncClientWidth);
   },
   methods: {
     ...mapActions(['setBufferSize']),
@@ -91,6 +94,11 @@ export default {
           this.emptyRowContainerStyles = this.getEmptyRowContainerStyles();
         }
       });
+
+      this.syncClientWidth();
+    },
+    syncClientWidth() {
+      this.clientWidth = this.$root.$el?.clientWidth || 0;
     },
     getEmptyRowContainerStyles() {
       if (this.$refs.epicItems && this.$refs.epicItems.length) {
@@ -150,6 +158,7 @@ export default {
         :epic="epic"
         :timeframe="timeframe"
         :current-group-id="currentGroupId"
+        :client-width="clientWidth"
       />
     </template>
     <div
@@ -162,6 +171,10 @@ export default {
         <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
       </span>
     </div>
-    <div v-show="showBottomShadow" :style="shadowCellStyles" class="scroll-bottom-shadow"></div>
+    <div
+      v-show="showBottomShadow"
+      :style="shadowCellStyles"
+      class="epic-scroll-bottom-shadow"
+    ></div>
   </div>
 </template>

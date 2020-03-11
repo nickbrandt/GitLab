@@ -12,6 +12,12 @@ export const EPIC_HIGHLIGHT_REMOVE_AFTER = 3000;
 
 export const DAYS_IN_WEEK = 7;
 
+export const PERCENTAGE = 100;
+
+export const SMALL_TIMELINE_BAR = 100;
+
+export const VERY_SMALL_TIMELINE_BAR = 27;
+
 export const BUFFER_OVERLAP_SIZE = 20;
 
 export const PRESET_TYPES = {

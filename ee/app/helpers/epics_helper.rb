@@ -37,9 +37,9 @@ module EpicsHelper
 
       "#{epic.start_date.strftime(start_date_format)} – #{epic.end_date.strftime(long_format)}"
     elsif epic.start_date.present?
-      s_('GroupRoadmap|From %{dateWord}') % { dateWord: epic.start_date.strftime(long_format) }
+      s_('GroupRoadmap|%{dateWord} – No end date') % { dateWord: epic.start_date.strftime(long_format) }
     elsif epic.end_date.present?
-      s_("GroupRoadmap|Until %{dateWord}") % { dateWord: epic.end_date.strftime(long_format) }
+      s_("GroupRoadmap|No start date – %{dateWord}") % { dateWord: epic.end_date.strftime(long_format) }
     end
   end
 end

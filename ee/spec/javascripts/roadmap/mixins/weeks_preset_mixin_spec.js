@@ -23,6 +23,7 @@ const createComponent = ({
     timeframe,
     timeframeItem,
     epic,
+    timeframeString: '',
   });
 };
 
