@@ -25,7 +25,7 @@ module StatusPage
     end
 
     def feature_available?
-      project.feature_available?(:status_page)
+      project.status_page_setting&.enabled?
     end
 
     def upload(key, json)
