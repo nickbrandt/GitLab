@@ -16,6 +16,9 @@ and deploy your applications with little to no configuration needed at all.
 Otherwise, read on for important information that will help you get the ball rolling. Welcome
 to GitLab!
 
+If you have questions that are not answered here, the [GitLab community forum](https://forum.gitlab.com/)
+can be a great resource.
+
 ## Important differences
 
 There are some high level differences between the products worth mentioning:
@@ -29,6 +32,7 @@ There are some high level differences between the products worth mentioning:
   analogous to the declarative Jenkinsfile format.
 - GitLab comes with a [container registry](../../user/packages/container_registry/index.md), and we recommend using
   container images to set up your build environment.
+- Totally stuck and not sure where to turn for advice? The [GitLab community forum](https://forum.gitlab.com/) can be a great resource.
 
 ## Groovy vs. YAML
 
