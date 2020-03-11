@@ -32,23 +32,24 @@ describe WikiPageMeta do
     end
 
     def create_previous_version
-      meta = described_class.create!(
-        canonical_slug: last_known_slug,
+      described_class.create!(
         title: old_title,
-        project: project
+        project: project,
+        canonical_slug: last_known_slug
       )
-      meta.slugs.find_or_create_by(slug: last_known_slug)
     end
 
     shared_examples 'metadata examples' do
       it 'establishes the correct state', :aggregate_failures do
         meta = find_record
 
-        expect(meta.canonical_slug).to eq(wiki_page.slug)
-        expect(meta.title).to eq(wiki_page.title)
-        expect(meta.project).to eq(wiki_page.wiki.project)
+        expect(meta).to have_attributes(
+          canonical_slug: wiki_page.slug,
+          title: wiki_page.title,
+          project: wiki_page.wiki.project
+        )
         expect(meta.slugs.where(slug: last_known_slug)).to exist
-        expect(meta.slugs.where(slug: wiki_page.slug)).to exist
+        expect(meta.slugs.canonical.where(slug: wiki_page.slug)).to exist
       end
 
       it 'makes a reasonable number of DB queries' do
@@ -68,28 +69,34 @@ describe WikiPageMeta do
 
     context 'no existing record exists' do
       include_examples 'metadata examples' do
-        # The base case is 10 queries:
-        #  - 9 to set up the WikiPageMeta object. Of these:
-        #    - 4 for savepoints (start and release)
-        #    - 2 for uniqueness validation checks
-        #    - 1 for fetch before create
-        #    - 1 for create
-        #    - 1 for canonical_slug update
-        #  - 1 to insert slugs
+        # The base case is 7 queries:
+        #  - 1 to find the metadata object if it exists
+        #  - 1 to create it if it does not
+        #  - 2 for 1 savepoint
+        #  - 1 to insert last_known_slug and current_slug
+        #  - 1 to find the current slug
+        #  - 1 to set canonical status correctly
         #
         # (Log has been edited for clarity)
-        # 1. SELECT * FROM wiki_page_meta WHERE canonical_slug = ? AND project_id = ? LIMIT 1
-        # 2. SAVEPOINT active_record_2 /*application:test,correlation_id:54d4bb6f39422ed5a56096febb1cca03*/
-        # 3.  SELECT 1 AS one FROM wiki_page_meta WHERE canonical_slug = ? AND project_id = ?
-        # 4.  INSERT INTO wiki_page_meta (project_id, title, canonical_slug) VALUES (?, ?, ?) returning id
-        # 5. RELEASE SAVEPOINT active_record_2
-        # 6. SAVEPOINT active_record_2
-        # 7   SELECT 1 AS one FROM wiki_page_meta WHERE canonical_slug = ? AND id != ? AND project_id = ?
-        # 8.  UPDATE wiki_page_meta SET canonical_slug = ? WHERE id = ?
-        # 9. RELEASE SAVEPOINT active_record_2
-        # 10.INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug) VALUES (?, ?) (?, ?)
-        #        ON CONFLICT DO NOTHING RETURNING id
-        let(:query_limit) { 10 }
+        # SELECT * FROM wiki_page_meta
+        #   INNER JOIN wiki_page_slugs
+        #     ON wiki_page_slugs.wiki_page_meta_id = wiki_page_meta.id
+        #   WHERE wiki_page_meta.project_id = ?
+        #     AND wiki_page_slugs.canonical = TRUE
+        #     AND wiki_page_slugs.slug = ?
+        #   LIMIT 1
+        # SAVEPOINT active_record_2
+        # INSERT INTO wiki_page_meta (project_id, title) VALUES (?, ?) RETURNING id
+        # RELEASE SAVEPOINT active_record_2
+        # INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug)
+        #   VALUES (?, ?) (?, ?)
+        #   ON CONFLICT  DO NOTHING RETURNING id
+        # SELECT * FROM wiki_page_slugs
+        #   WHERE wiki_page_meta_id = ? AND slug = ? LIMIT 1
+        # UPDATE wiki_page_slugs
+        #   SET canonical = id in (?)
+        #   WHERE wiki_page_meta_id = ? AND id != 4
+        let(:query_limit) { 7 }
       end
     end
 
@@ -97,8 +104,8 @@ describe WikiPageMeta do
       let(:last_known_slug) { current_slug }
 
       include_examples 'metadata examples' do
-        # Same as the base case, without 6-9, which are no longer necessary
-        let(:query_limit) { 6 }
+        # Identical to the base case.
+        let(:query_limit) { 7 }
       end
     end
 
@@ -111,7 +118,16 @@ describe WikiPageMeta do
       end
 
       include_examples 'metadata examples' do
-        # Same as the base case, without 2-5 and 6-9, which are no longer necessary
+        # SELECT * FROM wiki_page_meta
+        #   INNER JOIN wiki_page_slugs
+        #     ON wiki_page_slugs.wiki_page_meta_id = wiki_page_meta.id
+        #   WHERE wiki_page_meta.project_id = ?
+        #     AND wiki_page_slugs.canonical = TRUE
+        #     AND wiki_page_slugs.slug = ?
+        #   LIMIT 1
+        #
+        # INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug,canonical)
+        #   VALUES (?, ?, ?) ON CONFLICT  DO NOTHING RETURNING id
         let(:query_limit) { 2 }
       end
     end
@@ -124,8 +140,27 @@ describe WikiPageMeta do
       end
 
       include_examples 'metadata examples' do
-        # Same as the base case, without 2-5 which are no longer necessary
-        let(:query_limit) { 6 }
+        # Same as minimal case, plus the additional queries needed to update the
+        # slug.
+        #
+        # SELECT * FROM wiki_page_meta
+        #   INNER JOIN wiki_page_slugs
+        #     ON wiki_page_slugs.wiki_page_meta_id = wiki_page_meta.id
+        #   WHERE wiki_page_meta.project_id = ?
+        #     AND wiki_page_slugs.canonical = TRUE
+        #     AND wiki_page_slugs.slug = ?
+        #   LIMIT 1
+        #
+        # INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug,canonical)
+        #   VALUES (?, ?, ?) ON CONFLICT  DO NOTHING RETURNING id
+        #
+        # SELECT * FROM wiki_page_slugs
+        #   WHERE wiki_page_slugs.wiki_page_meta_id = ?
+        #     AND wiki_page_slugs.slug = ?
+        #     LIMIT 1
+        #
+        # UPDATE wiki_page_slugs SET canonical = id in (?) WHERE wiki_page_meta_id = 2
+        let(:query_limit) { 4 }
       end
     end
 
@@ -137,8 +172,21 @@ describe WikiPageMeta do
       end
 
       include_examples 'metadata examples' do
-        # Same as the base case, without 2-5 which are no longer necessary
-        let(:query_limit) { 6 }
+        # Same as minimal case, plus one query to update the title.
+        #
+        # SELECT * FROM wiki_page_meta
+        #   INNER JOIN wiki_page_slugs
+        #     ON wiki_page_slugs.wiki_page_meta_id = wiki_page_meta.id
+        #   WHERE wiki_page_meta.project_id = ?
+        #     AND wiki_page_slugs.canonical = TRUE
+        #     AND wiki_page_slugs.slug = ?
+        #   LIMIT 1
+        #
+        # UPDATE wiki_page_meta SET title = ? WHERE id = ?
+        #
+        # INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug,canonical)
+        #   VALUES (?, ?, ?) ON CONFLICT  DO NOTHING RETURNING id
+        let(:query_limit) { 3 }
       end
     end
 
@@ -148,8 +196,28 @@ describe WikiPageMeta do
       end
 
       include_examples 'metadata examples' do
-        # Same as the base case, without 2-5 which are no longer necessary
-        let(:query_limit) { 6 }
+        # Same as minimal case, plus one for the title, and two for the slug
+        #
+        # SELECT * FROM wiki_page_meta
+        #   INNER JOIN wiki_page_slugs
+        #     ON wiki_page_slugs.wiki_page_meta_id = wiki_page_meta.id
+        #   WHERE wiki_page_meta.project_id = ?
+        #     AND wiki_page_slugs.canonical = TRUE
+        #     AND wiki_page_slugs.slug = ?
+        #   LIMIT 1
+        #
+        # UPDATE wiki_page_meta SET title = ? WHERE id = ?
+        #
+        # INSERT INTO wiki_page_slugs (wiki_page_meta_id,slug,canonical)
+        #   VALUES (?, ?, ?) ON CONFLICT  DO NOTHING RETURNING id
+        #
+        # SELECT * FROM wiki_page_slugs
+        #   WHERE wiki_page_slugs.wiki_page_meta_id = ?
+        #     AND wiki_page_slugs.slug = ?
+        #     LIMIT 1
+        #
+        # UPDATE wiki_page_slugs SET canonical = id in (?) WHERE wiki_page_meta_id = 2
+        let(:query_limit) { 5 }
       end
     end
   end

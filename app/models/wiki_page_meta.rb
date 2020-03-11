@@ -29,7 +29,7 @@ class WikiPageMeta < ApplicationRecord
     meta = find_by_canonical_slug(last_known_slug, project) || create(title: wiki_page.title, project_id: project.id)
 
     meta.update_wiki_page_attributes(wiki_page)
-    meta.insert_slugs([last_known_slug, wiki_page.slug])
+    meta.insert_slugs([last_known_slug, wiki_page.slug], wiki_page.slug)
     meta.canonical_slug = wiki_page.slug
 
     meta
@@ -39,37 +39,37 @@ class WikiPageMeta < ApplicationRecord
     update_column(:title, page.title) unless page.title == title
   end
 
-  def insert_slugs(strings)
+  def insert_slugs(strings, canonical)
     slug_attrs = strings.uniq.map do |slug|
-      { wiki_page_meta_id: id, slug: slug }
+      { wiki_page_meta_id: id, slug: slug, canonical: slug == canonical }
     end
     slugs.insert_all(slug_attrs)
   end
 
   def self.find_by_canonical_slug(canonical_slug, project)
-    slug = WikiPageSlug.canonical
-      .joins(:wiki_page_meta)
-      .find_by(slug: canonical_slug, wiki_page_meta: { project_id: project.id })
+    meta = joins(:slugs).find_by(project_id: project.id,
+                                 wiki_page_slugs: { canonical: true, slug: canonical_slug })
 
-    return unless slug.present?
-
-    meta = slug.wiki_page_meta
-    meta.set_attribute(:@canonical_slug, canonical_slug)
+    # Prevent queries for canonical_slug
+    meta.instance_variable_set(:@canonical_slug, canonical_slug) if meta
 
     meta
   end
 
   def canonical_slug
-    slug = strong_memoize(:canonical_slug) { slugs.canonical.first }
-    slug&.slug
+    strong_memoize(:canonical_slug) { slugs.canonical.first&.slug }
   end
 
   def canonical_slug=(slug)
-    return if canonical_slug == slug
+    return if @canonical_slug == slug
 
-    page_slug = slugs.find_or_create_by(slug: slug)
-    slugs.where.not(id: slug.id).update_all(canonical: false)
-    page_slug.update_column(:canonical, true)
-    @canonical_slug = page_slug
+    if persisted?
+      page_slug = slugs.find_or_create_by(slug: slug)
+      slugs.update_all(['canonical = id in (?)', [page_slug.id]])
+    else
+      slugs.new(slug: slug, canonical: true)
+    end
+
+    @canonical_slug = slug
   end
 end
