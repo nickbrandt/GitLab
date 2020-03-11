@@ -5,18 +5,20 @@
 
 = render 'import/shared/errors'
 
-- unless @project.import_state&.in_progress?
-  %h3.page-title
-    = icon 'issues', text: _('Import Issues From Jira')
+- if @project.import_state&.in_progress?
+  %h3.page-title.d-flex.align-items-center
+    = sprite_icon('issues', size: 16, css_class: 'mr-1')
+    = _('Import in progress')
+- else
+  %h3.page-title.d-flex.align-items-center
+    = sprite_icon('issues', size: 16, css_class: 'mr-1')
+    = _('Import issues from Jira')
 
   = form_tag import_project_import_jira_path(@project), method: :post do
     .form-group.row
-      = label_tag :jira_project_key, _('From Project'), class: 'col-form-label col-md-2'
+      = label_tag :jira_project_key, _('From project'), class: 'col-form-label col-md-2'
       .col-md-4
         = select_tag :jira_project_key, options_for_select(@jira_projects, ''), { class: 'select2' }
     .form-actions
-      = submit_tag _('Import Issues'), class: 'btn btn-success'
+      = submit_tag _('Import issues'), class: 'btn btn-success'
       = link_to _('Cancel'), project_issues_path(@project), class: 'btn btn-cancel'
-- else
-  %h3.page-title
-    = icon 'issues', text: _('Import in progress')

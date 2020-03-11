@@ -7,20 +7,16 @@ module Projects
       before_action :jira_integration_configured?
 
       def show
-        prev_imported_project_key = @project.import_data&.data&.dig("jira", "project", "key")
-        @jira_projects = [prev_imported_project_key].compact
-
-        unless @project.import_state&.in_progress? || prev_imported_project_key
+        unless @project.import_state&.in_progress?
           jira_client = @project.jira_service.client
-          @jira_projects = jira_client.Project.all.map { |p| ["#{p.name}(#{p.key})", p.key] }
+          @jira_projects = jira_client.Project.all.map { |p| ["#{p.name} (#{p.key})", p.key] }
         end
 
         flash[:notice] = _("Import %{status}") % { status: @project.import_state.status } if @project.import_state.present? && !@project.import_state.none?
       end
 
       def import
-        import_state = @project.import_state
-        import_state = @project.create_import_state unless import_state.present?
+        import_state = @project.import_state || @project.create_import_state
 
         schedule_import(jira_import_params) unless import_state.in_progress?
 
@@ -29,22 +25,29 @@ module Projects
 
       private
 
-      def jira_integration_configured?
-        unless @project.jira_service
-          flash[:notice] = _("Configure Jira Integration first at Settings > Integrations > Jira")
-          redirect_to project_issues_path(@project)
-        end
+      def jira_import_enabled?
+        return if Feature.enabled?(:jira_issue_import, @project)
+
+        redirect_to project_issues_path(@project)
       end
 
-      def jira_import_enabled?
-        redirect_to project_issues_path(@project) unless Feature.enabled?(:jira_issue_import, @project)
+      def jira_integration_configured?
+        return if @project.jira_service
+
+        flash[:notice] = _("Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page." %
+           { strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe })
+        redirect_to project_issues_path(@project)
       end
 
       def schedule_import(params)
-        return @project.import_state.schedule if @project.import_data
+        import_data = @project.create_or_update_import_data(data: {}).becomes(JiraImportData)
 
-        jira_data = { jira: { project: { key: params[:jira_project_key] } } }
-        @project.create_or_update_import_data(data: jira_data)
+        import_data << JiraImportData::JiraProjectDetails.new(
+          params[:jira_project_key],
+          Time.now.strftime('%Y-%m-%d %H:%M:%S'),
+          { user_id: current_user.id, name: current_user.name }
+        )
+
         @project.import_type = 'jira'
         @project.import_state.schedule if @project.save
       end

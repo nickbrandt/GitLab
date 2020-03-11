@@ -5115,9 +5115,6 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
-msgid "Configure Jira Integration first at Settings > Integrations > Jira"
-msgstr ""
-
 msgid "Configure Let's Encrypt"
 msgstr ""
 
@@ -5155,6 +5152,9 @@ msgid "Configure storage path settings."
 msgstr ""
 
 msgid "Configure the %{link} integration."
+msgstr ""
+
+msgid "Configure the Jira integration first on your project's %{strong_start} Settings > Integrations > Jira%{strong_end} page."
 msgstr ""
 
 msgid "Configure the way a user creates a new account."
@@ -8959,13 +8959,13 @@ msgstr ""
 msgid "From Google Code"
 msgstr ""
 
-msgid "From Project"
-msgstr ""
-
 msgid "From issue creation until deploy to production"
 msgstr ""
 
 msgid "From merge request merge until deploy to production"
+msgstr ""
+
+msgid "From project"
 msgstr ""
 
 msgid "From the Kubernetes cluster details view, install Runner from the applications list"
@@ -10620,13 +10620,7 @@ msgstr ""
 msgid "Import CSV"
 msgstr ""
 
-msgid "Import Issues"
-msgstr ""
-
-msgid "Import Issues From Jira"
-msgstr ""
-
-msgid "Import Jira Issues"
+msgid "Import Jira issues"
 msgstr ""
 
 msgid "Import Projects from Gitea"
@@ -10648,6 +10642,9 @@ msgid "Import in progress"
 msgstr ""
 
 msgid "Import issues"
+msgstr ""
+
+msgid "Import issues from Jira"
 msgstr ""
 
 msgid "Import members"
