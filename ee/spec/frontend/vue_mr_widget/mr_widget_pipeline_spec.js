@@ -1,58 +1,60 @@
-import Vue from 'vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import mockData from 'ee_spec/vue_mr_widget/mock_data';
-import { trimText } from 'spec/helpers/text_helper';
+import { mount } from '@vue/test-utils';
+import mockData from 'ee_jest/vue_mr_widget/mock_data';
+import { trimText } from 'jest/helpers/text_helper';
 import pipelineComponent from '~/vue_merge_request_widget/components/mr_widget_pipeline.vue';
 import mockLinkedPipelines from '../vue_shared/components/linked_pipelines_mock_data';
 
 describe('MRWidgetPipeline', () => {
-  let vm;
-  let Component;
+  let wrapper;
 
-  beforeEach(() => {
-    Component = Vue.extend(pipelineComponent);
-  });
+  function createComponent(pipeline) {
+    wrapper = mount(pipelineComponent, {
+      propsData: {
+        pipeline,
+        pipelineCoverageDelta: undefined,
+        hasCi: true,
+        ciStatus: 'success',
+        sourceBranchLink: undefined,
+        sourceBranch: undefined,
+        troubleshootingDocsPath: 'help',
+      },
+    });
+  }
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('computed', () => {
     describe('when upstream pipelines are passed', () => {
       beforeEach(() => {
-        vm = mountComponent(Component, {
-          pipeline: Object.assign({}, mockData.pipeline, {
-            triggered_by: mockLinkedPipelines.triggered_by,
-          }),
-          hasCi: true,
-          ciStatus: 'success',
-          troubleshootingDocsPath: 'help',
+        const pipeline = Object.assign({}, mockData.pipeline, {
+          triggered_by: mockLinkedPipelines.triggered_by,
         });
+
+        createComponent(pipeline);
       });
 
       it('should coerce triggeredBy into a collection', () => {
-        expect(vm.triggeredBy.length).toBe(1);
+        expect(wrapper.vm.triggeredBy).toHaveLength(1);
       });
 
       it('should render the linked pipelines mini list', () => {
-        expect(vm.$el.querySelector('.linked-pipeline-mini-list.is-upstream')).not.toBeNull();
+        expect(wrapper.find('.linked-pipeline-mini-list.is-upstream').exists()).toBe(true);
       });
     });
 
     describe('when downstream pipelines are passed', () => {
       beforeEach(() => {
-        vm = mountComponent(Component, {
-          pipeline: Object.assign({}, mockData.pipeline, {
-            triggered: mockLinkedPipelines.triggered,
-          }),
-          hasCi: true,
-          ciStatus: 'success',
-          troubleshootingDocsPath: 'help',
+        const pipeline = Object.assign({}, mockData.pipeline, {
+          triggered: mockLinkedPipelines.triggered,
         });
+
+        createComponent(pipeline);
       });
 
       it('should render the linked pipelines mini list', () => {
-        expect(vm.$el.querySelector('.linked-pipeline-mini-list.is-downstream')).not.toBeNull();
+        expect(wrapper.find('.linked-pipeline-mini-list.is-downstream').exists()).toBe(true);
       });
     });
   });
@@ -67,25 +69,15 @@ describe('MRWidgetPipeline', () => {
       pipeline.ref.branch = false;
     });
 
-    const factory = () => {
-      vm = mountComponent(Component, {
-        pipeline,
-        hasCi: true,
-        ciStatus: 'success',
-        troubleshootingDocsPath: 'help',
-        sourceBranchLink: mockData.source_branch_link,
-      });
-    };
-
     describe('for a merge train pipeline', () => {
       it('renders a pipeline widget that reads "Merge train pipeline <ID> <status> for <SHA>"', () => {
         pipeline.details.name = 'Merge train pipeline';
         pipeline.merge_request_event_type = 'merge_train';
 
-        factory();
+        createComponent(pipeline);
 
         const expected = `Merge train pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
-        const actual = trimText(vm.$el.querySelector('.js-pipeline-info-container').innerText);
+        const actual = trimText(wrapper.find('.js-pipeline-info-container').text());
 
         expect(actual).toBe(expected);
       });
@@ -96,10 +88,10 @@ describe('MRWidgetPipeline', () => {
         pipeline.details.name = 'Merged result pipeline';
         pipeline.merge_request_event_type = 'merged_result';
 
-        factory();
+        createComponent(pipeline);
 
         const expected = `Merged result pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
-        const actual = trimText(vm.$el.querySelector('.js-pipeline-info-container').innerText);
+        const actual = trimText(wrapper.find('.js-pipeline-info-container').text());
 
         expect(actual).toBe(expected);
       });
