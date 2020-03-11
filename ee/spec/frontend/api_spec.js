@@ -550,6 +550,42 @@ describe('Api', () => {
     });
   });
 
+  describe('GroupActivityAnalytics', () => {
+    const groupId = 'gitlab-org';
+
+    describe('groupActivityMergeRequestsCount', () => {
+      it('fetches the number of MRs created for a given group', () => {
+        const response = { merge_requests_count: 10 };
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/analytics/group_activity/merge_requests_count`;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).reply(200, response);
+
+        return Api.groupActivityMergeRequestsCount(groupId).then(({ data }) => {
+          expect(data).toEqual(response);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
+        });
+      });
+    });
+
+    describe('groupActivityIssuesCount', () => {
+      it('fetches the number of issues created for a given group', () => {
+        const response = { issues_count: 20 };
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/analytics/group_activity/issues_count`;
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, response);
+
+        return Api.groupActivityIssuesCount(groupId).then(({ data }) => {
+          expect(data).toEqual(response);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: { group_path: groupId } });
+        });
+      });
+    });
+  });
+
   describe('GeoReplicable', () => {
     let expectedUrl;
     let apiResponse;

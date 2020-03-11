@@ -8458,6 +8458,9 @@ msgstr ""
 msgid "Failed to load errors from Sentry. Error message: %{errorMessage}"
 msgstr ""
 
+msgid "Failed to load group activity metrics. Please try again."
+msgstr ""
+
 msgid "Failed to load groups & users."
 msgstr ""
 
@@ -10013,6 +10016,15 @@ msgid "Group: %{group_name}"
 msgstr ""
 
 msgid "Group: %{name}"
+msgstr ""
+
+msgid "GroupActivyMetrics|Issues created"
+msgstr ""
+
+msgid "GroupActivyMetrics|Merge Requests created"
+msgstr ""
+
+msgid "GroupActivyMetrics|Recent activity (last 90 days)"
 msgstr ""
 
 msgid "GroupRoadmap|%{dateWord} – No end date"
