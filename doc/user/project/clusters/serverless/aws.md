@@ -2,11 +2,10 @@
 
 GitLab allows users to easily deploy AWS Lambda functions and create rich serverless applications.
 
-GitLab supports deployment of functions to AWS Lambda using a combination of:
+GitLab supports deployment of AWS Lambda functions through GitLab CI/CD using the following Serverless frameworks:
 
 - [Serverless Framework with AWS](#serverless-framework)
 - [AWS' Serverless Application Model (SAM)](#aws-serverless-application-model)
-- GitLab CI/CD
 
 ## Serverless Framework
 
