@@ -362,7 +362,7 @@ sam init -h
 
 ### Setting up your AWS credentials with your GitLab account
 
-In order to interact with your AWS account, the GitLab CI/CD pipelines require both 
+In order to interact with your AWS account, the GitLab CI/CD pipelines require both
 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to be set in the project's CI/CD
 variables.
 
