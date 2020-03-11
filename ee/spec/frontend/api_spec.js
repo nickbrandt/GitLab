@@ -90,11 +90,45 @@ describe('Api', () => {
   describe('groupEpics', () => {
     it('calls `axios.get` using param `groupId`', done => {
       const groupId = 2;
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics?include_ancestor_groups=false&include_descendant_groups=true`;
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics`;
 
-      mock.onGet(expectedUrl).reply(200, mockEpics);
+      mock
+        .onGet(expectedUrl, {
+          params: {
+            include_ancestor_groups: false,
+            include_descendant_groups: true,
+          },
+        })
+        .reply(200, mockEpics);
 
       Api.groupEpics({ groupId })
+        .then(({ data }) => {
+          data.forEach((epic, index) => {
+            expect(epic.id).toBe(mockEpics[index].id);
+            expect(epic.iid).toBe(mockEpics[index].iid);
+            expect(epic.group_id).toBe(mockEpics[index].group_id);
+            expect(epic.title).toBe(mockEpics[index].title);
+          });
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` using param `search` when it is provided', done => {
+      const groupId = 2;
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics`;
+
+      mock
+        .onGet(expectedUrl, {
+          params: {
+            include_ancestor_groups: false,
+            include_descendant_groups: true,
+            search: 'foo',
+          },
+        })
+        .reply(200, mockEpics);
+
+      Api.groupEpics({ groupId, search: 'foo' })
         .then(({ data }) => {
           data.forEach((epic, index) => {
             expect(epic.id).toBe(mockEpics[index].id);

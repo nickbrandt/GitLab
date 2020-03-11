@@ -193,15 +193,19 @@ describe('EpicsSelect', () => {
             }),
           );
 
-          actions.fetchEpics({
-            state,
-            dispatch: () => {},
-          });
+          actions.fetchEpics(
+            {
+              state,
+              dispatch: () => {},
+            },
+            'foo',
+          );
 
           expect(Api.groupEpics).toHaveBeenCalledWith({
             groupId: state.groupId,
             includeDescendantGroups: false,
             includeAncestorGroups: true,
+            search: 'foo',
           });
         });
       });

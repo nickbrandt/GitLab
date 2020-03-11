@@ -8,8 +8,7 @@ export default {
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
-  groupEpicsPath:
-    '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
+  groupEpicsPath: '/api/:version/groups/:id/epics',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
@@ -64,13 +63,25 @@ export default {
     });
   },
 
-  groupEpics({ groupId, includeAncestorGroups = false, includeDescendantGroups = true }) {
-    const url = Api.buildUrl(this.groupEpicsPath)
-      .replace(':id', groupId)
-      .replace(':includeAncestorGroups', includeAncestorGroups)
-      .replace(':includeDescendantGroups', includeDescendantGroups);
+  groupEpics({
+    groupId,
+    includeAncestorGroups = false,
+    includeDescendantGroups = true,
+    search = '',
+  }) {
+    const url = Api.buildUrl(this.groupEpicsPath).replace(':id', groupId);
+    const params = {
+      include_ancestor_groups: includeAncestorGroups,
+      include_descendant_groups: includeDescendantGroups,
+    };
 
-    return axios.get(url);
+    if (search) {
+      params.search = search;
+    }
+
+    return axios.get(url, {
+      params,
+    });
   },
 
   addEpicIssue({ groupId, epicIid, issueId }) {

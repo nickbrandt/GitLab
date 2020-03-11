@@ -1,4 +1,5 @@
 <script>
+import { debounce } from 'lodash';
 import { GlButton } from '@gitlab/ui';
 
 import Icon from '~/vue_shared/components/icon.vue';
@@ -18,9 +19,9 @@ export default {
     };
   },
   methods: {
-    handleKeyUp() {
+    handleKeyUp: debounce(function debouncedKeyUp() {
       this.$emit('onSearchInput', this.query);
-    },
+    }, 300),
     handleInputClear() {
       this.query = '';
       this.handleKeyUp();
