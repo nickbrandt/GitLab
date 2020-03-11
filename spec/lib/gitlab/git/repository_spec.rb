@@ -2139,18 +2139,17 @@ describe Gitlab::Git::Repository, :seed_helper do
   end
 
   describe '#replicate' do
-    let(:second_storage_path) { 'tmp/tests/second_storage' }
     let(:new_repository) do
       Gitlab::Git::Repository.new('test_second_storage', TEST_REPO_PATH, '', 'group/project')
     end
-    let(:new_repository_path) { File.join(second_storage_path, new_repository.relative_path) }
+    let(:new_repository_path) { File.join(TestEnv::SECOND_STORAGE_PATH, new_repository.relative_path) }
 
     subject { new_repository.replicate(repository) }
 
     before do
       stub_storage_settings('test_second_storage' => {
         'gitaly_address' => Gitlab.config.repositories.storages.default.gitaly_address,
-        'path' => second_storage_path
+        'path' => TestEnv::SECOND_STORAGE_PATH
       })
       Gitlab::Shell.new.create_repository('test_second_storage', TEST_REPO_PATH, 'group/project')
     end

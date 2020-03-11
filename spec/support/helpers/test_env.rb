@@ -84,6 +84,7 @@ module TestEnv
 
   TMP_TEST_PATH = Rails.root.join('tmp', 'tests', '**')
   REPOS_STORAGE = 'default'.freeze
+  SECOND_STORAGE_PATH = Rails.root.join('tmp', 'tests', 'second_storage')
 
   # Test environment
   #
@@ -141,7 +142,7 @@ module TestEnv
     end
 
     FileUtils.mkdir_p(repos_path)
-    FileUtils.mkdir_p(Rails.root.join('tmp', 'tests', 'second_storage'))
+    FileUtils.mkdir_p(SECOND_STORAGE_PATH)
     FileUtils.mkdir_p(backup_path)
     FileUtils.mkdir_p(pages_path)
     FileUtils.mkdir_p(artifacts_path)
