@@ -4,11 +4,12 @@ require 'spec_helper'
 
 describe MergeRequest::Metrics do
   describe '#review_start_at' do
-    it 'is the earliest date from first_comment_at or first_approved_at' do
-      subject.first_approved_at = 1.day.ago
-      subject.first_comment_at = 1.hour.ago
+    it 'is the earliest date from first_comment_at, first_approved_at or first_reassigned_at' do
+      subject.first_approved_at = 1.hour.ago
+      subject.first_comment_at = 1.day.ago
+      subject.first_reassigned_at = 1.week.ago
 
-      expect(subject.review_start_at).to be_like_time(1.day.ago)
+      expect(subject.review_start_at).to be_like_time(1.week.ago)
     end
 
     context 'when all review start candidates are nil' do
@@ -20,6 +21,7 @@ describe MergeRequest::Metrics do
     context 'when one of review start candidates is nil' do
       it 'is earliest date from non-nil values' do
         subject.first_approved_at = 1.day.ago
+        subject.first_reassigned_at = 1.hour.ago
 
         expect(subject.review_start_at).to be_like_time(1.day.ago)
       end
