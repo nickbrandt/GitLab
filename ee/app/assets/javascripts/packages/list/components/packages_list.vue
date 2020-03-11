@@ -213,6 +213,7 @@ export default {
         :busy="isLoading"
         stacked="md"
         class="package-list-table"
+        data-qa-selector="packages-table"
       >
         <template #table-busy>
           <packages-list-loader :is-group="isGroupPage" />
@@ -246,7 +247,7 @@ export default {
             <gl-link
               v-gl-tooltip.hover
               :title="item.projectPathName"
-              :href="item.project_path"
+              :href="`/${item.project_path}`"
               class="flex-truncate-child"
             >
               {{ item.projectPathName }}

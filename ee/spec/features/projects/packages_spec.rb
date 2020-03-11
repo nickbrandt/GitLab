@@ -5,8 +5,8 @@ require 'spec_helper'
 describe 'Packages' do
   include SortingHelper
 
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
 
   before do
     sign_in(user)
@@ -162,15 +162,35 @@ describe 'Packages' do
     end
   end
 
-  context 'wtih vue_package_list ff enabled' do
+  context 'wtih vue_package_list ff enabled', :js do
     before do
-      stub_feature_flags(vue_package_list: true)
       visit_project_packages
     end
 
-    it 'load an empty placeholder' do
-      expect(page.has_selector?('#js-vue-packages-list')).to be_truthy
+    context 'when there are packages' do
+      let_it_be(:conan_package) { create(:conan_package, project: project) }
+      let_it_be(:maven_package) { create(:maven_package, project: project) }
+      let_it_be(:packages) { [maven_package, conan_package] }
+
+      it_behaves_like 'packages list'
+
+      it_behaves_like 'package details link'
+
+      context 'deleting a package' do
+        let_it_be(:project) { create(:project) }
+        let_it_be(:package) { create(:package, project: project) }
+
+        it 'allows you to delete a package' do
+          first('[title="Remove package"]').click
+          click_button('Delete package')
+
+          expect(page).to have_content 'Package deleted successfully'
+          expect(page).not_to have_content(package.name)
+        end
+      end
     end
+
+    it_behaves_like 'when there are no packages'
   end
 
   def visit_project_packages
