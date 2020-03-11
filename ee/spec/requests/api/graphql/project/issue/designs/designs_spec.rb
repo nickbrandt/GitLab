@@ -6,24 +6,33 @@ describe 'Getting designs related to an issue' do
   include GraphqlHelpers
   include DesignManagementTestHelpers
 
-  let_it_be(:design) { create(:design, :with_file, versions_count: 1) }
+  let_it_be(:design) { create(:design, :with_smaller_image_versions, versions_count: 1) }
   let_it_be(:current_user) { design.project.owner }
   let(:design_query) do
     <<~NODE
     designs {
       edges {
         node {
+          id
           filename
+          fullPath
+          event
+          image
+          imageV432x230
         }
       }
     }
     NODE
   end
-
   let(:issue) { design.issue }
   let(:project) { issue.project }
-
   let(:query) { make_query }
+  let(:design_collection) do
+    graphql_data_at(:project, :issue, :design_collection)
+  end
+  let(:design_response) do
+    design_collection.dig('designs', 'edges').first['node']
+  end
 
   def make_query(dq = design_query)
     designs_field = query_graphql_field(:design_collection, {}, dq)
@@ -32,12 +41,8 @@ describe 'Getting designs related to an issue' do
     graphql_query_for(:project, { fullPath: project.full_path }, issue_field)
   end
 
-  let(:design_collection) do
-    graphql_data_at(:project, :issue, :design_collection)
-  end
-
-  let(:design_response) do
-    design_collection.dig('designs', 'edges').first['node']
+  def design_image_url(design, ref: nil, size: nil)
+    Gitlab::UrlBuilder.build(design, ref: ref, size: size)
   end
 
   context 'when the feature is not available' do
@@ -64,10 +69,33 @@ describe 'Getting designs related to an issue' do
       enable_design_management
     end
 
-    it 'returns the design filename' do
+    it 'returns the design properties correctly' do
+      version_sha = design.versions.first.sha
+
       post_graphql(query, current_user: current_user)
 
-      expect(design_response['filename']).to eq(design.filename)
+      expect(design_response).to eq(
+        'id' => design.to_global_id.to_s,
+        'event' => 'CREATION',
+        'fullPath' => design.full_path,
+        'filename' => design.filename,
+        'image' => design_image_url(design, ref: version_sha),
+        'imageV432x230' => design_image_url(design, ref: version_sha, size: :v432x230)
+      )
+    end
+
+    context 'when the v432x230-sized design image has not been processed' do
+      before do
+        allow_next_instance_of(DesignManagement::DesignV432x230Uploader) do |uploader|
+          allow(uploader).to receive(:file).and_return(nil)
+        end
+      end
+
+      it 'returns nil for the v432x230-sized design image' do
+        post_graphql(query, current_user: current_user)
+
+        expect(design_response['imageV432x230']).to be_nil
+      end
     end
 
     describe 'pagination' do
@@ -152,7 +180,7 @@ describe 'Getting designs related to an issue' do
 
     describe 'viewing a design board at a particular version' do
       let_it_be(:issue) { design.issue }
-      let_it_be(:second_design) { create(:design, :with_file, issue: issue, versions_count: 1) }
+      let_it_be(:second_design, reload: true) { create(:design, :with_smaller_image_versions, issue: issue, versions_count: 1) }
       let_it_be(:deleted_design) { create(:design, :with_versions, issue: issue, deleted: true, versions_count: 1) }
       let(:all_versions) { issue.design_versions.ordered.reverse }
       let(:design_query) do
@@ -162,6 +190,7 @@ describe 'Getting designs related to an issue' do
             node {
               id
               image
+              imageV432x230
               event
               versions {
                 edges {
@@ -177,10 +206,6 @@ describe 'Getting designs related to an issue' do
       end
       let(:design_response) do
         design_collection['designs']['edges']
-      end
-
-      def image_url(design, sha = nil)
-        Gitlab::UrlBuilder.build(design, ref: sha)
       end
 
       def global_id(object)
@@ -214,9 +239,15 @@ describe 'Getting designs related to an issue' do
           )
         end
 
-        it 'returns the correct version of the design image' do
+        it 'returns the correct full-sized design image' do
           expect(design_nodes).to contain_exactly(
-            a_hash_including('image' => image_url(design, version.sha))
+            a_hash_including('image' => design_image_url(design, ref: version.sha))
+          )
+        end
+
+        it 'returns the correct v432x230-sized design image' do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including('imageV432x230' => design_image_url(design, ref: version.sha, size: :v432x230))
           )
         end
 
@@ -247,10 +278,17 @@ describe 'Getting designs related to an issue' do
           )
         end
 
-        it 'returns the correct versions of the design images' do
+        it 'returns the correct full-sized design images' do
           expect(design_nodes).to contain_exactly(
-            a_hash_including('image' => image_url(design, version.sha)),
-            a_hash_including('image' => image_url(second_design, version.sha))
+            a_hash_including('image' => design_image_url(design, ref: version.sha)),
+            a_hash_including('image' => design_image_url(second_design, ref: version.sha))
+          )
+        end
+
+        it 'returns the correct v432x230-sized design images' do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including('imageV432x230' => design_image_url(design, ref: version.sha, size: :v432x230)),
+            a_hash_including('imageV432x230' => design_image_url(second_design, ref: version.sha, size: :v432x230))
           )
         end
 
@@ -271,10 +309,11 @@ describe 'Getting designs related to an issue' do
 
       context 'viewing the last version, when one design was deleted and one was updated' do
         let(:version) { all_versions.last }
+        let!(:second_design_update) do
+          create(:design_action, :with_image_v432x230, design: second_design, version: version, event: 'modification')
+        end
 
         before do
-          second_design.actions.create!(version: version, event: 'modification')
-
           post_graphql(query, current_user: current_user)
         end
 
@@ -289,10 +328,17 @@ describe 'Getting designs related to an issue' do
           )
         end
 
-        it 'returns the correct versions of the design images' do
+        it 'returns the correct full-sized design images' do
           expect(design_nodes).to contain_exactly(
-            a_hash_including('image' => image_url(design, version.sha)),
-            a_hash_including('image' => image_url(second_design, version.sha))
+            a_hash_including('image' => design_image_url(design, ref: version.sha)),
+            a_hash_including('image' => design_image_url(second_design, ref: version.sha))
+          )
+        end
+
+        it 'returns the correct v432x230-sized design images' do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including('imageV432x230' => design_image_url(design, ref: version.sha, size: :v432x230)),
+            a_hash_including('imageV432x230' => design_image_url(second_design, ref: version.sha, size: :v432x230))
           )
         end
 
