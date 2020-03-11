@@ -374,7 +374,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         expect(Gitlab::ErrorTracking)
           .to receive(:track_exception)
           .with(
-            instance_of(Ci::CreateCrossProjectPipelineService::InvalidBridgeTransition),
+            instance_of(Ci::Bridge::InvalidTransitionError),
             bridge_id: bridge.id,
             downstream_pipeline_id: kind_of(Numeric))
 

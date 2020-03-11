@@ -33,7 +33,7 @@ describe Ci::PipelineBridgeStatusService do
           expect(Gitlab::ErrorTracking)
             .to receive(:track_exception)
             .with(
-              instance_of(StateMachines::InvalidTransition),
+              instance_of(Ci::Bridge::InvalidTransitionError),
               bridge_id: bridge.id,
               downstream_pipeline_id: pipeline.id)
 

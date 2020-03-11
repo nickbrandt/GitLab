@@ -6,7 +6,6 @@ module Ci
     include Gitlab::Utils::StrongMemoize
 
     DuplicateDownstreamPipelineError = Class.new(StandardError)
-    InvalidBridgeTransition = Class.new(StandardError)
 
     def execute(bridge)
       @bridge = bridge
@@ -55,7 +54,7 @@ module Ci
       end
     rescue StateMachines::InvalidTransition => e
       Gitlab::ErrorTracking.track_exception(
-        InvalidBridgeTransition.new(e.message),
+        Ci::Bridge::InvalidTransitionError.new(e.message),
         bridge_id: bridge.id,
         downstream_pipeline_id: pipeline.id)
     end
