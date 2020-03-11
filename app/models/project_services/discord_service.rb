@@ -3,6 +3,7 @@
 require "discordrb/webhooks"
 
 class DiscordService < ChatNotificationService
+  LINK_REGEX = /(\[[^\]]*\]\()([^\)]*)\)/.freeze
   def title
     s_("DiscordService|Discord Notifications")
   end
@@ -52,7 +53,7 @@ class DiscordService < ChatNotificationService
     client = Discordrb::Webhooks::Client.new(url: webhook)
 
     client.execute do |builder|
-      builder.content = message.pretext
+      builder.content = (message.pretext + "\n\n" + message.attachments.to_s).gsub(LINK_REGEX, "\\1<\\2>)")
     end
   end
 
