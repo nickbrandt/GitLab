@@ -235,6 +235,25 @@ describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_not_moc
       end
     end
 
+    context 'Integration page', :js do
+      before do
+        visit integrations_admin_application_settings_path
+      end
+
+      it 'allows user to dismiss deprecation notice' do
+        expect(page).to have_content('Some settings have moved')
+
+        click_button 'Dismiss'
+        wait_for_requests
+
+        expect(page).not_to have_content('Some settings have moved')
+
+        visit integrations_admin_application_settings_path
+
+        expect(page).not_to have_content('Some settings have moved')
+      end
+    end
+
     context 'CI/CD page' do
       it 'Change CI/CD settings' do
         visit ci_cd_admin_application_settings_path
