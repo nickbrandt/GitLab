@@ -26,6 +26,7 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
