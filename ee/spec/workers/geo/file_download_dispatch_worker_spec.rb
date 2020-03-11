@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
+describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_for_tracking_db do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -55,6 +55,30 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
 
     expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_1.id).once.and_return('123')
     expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_2.id).once.and_return('456')
+
+    subject.perform
+  end
+
+  it 'does not schedule duplicated jobs because of query cache' do
+    lfs_object_1 = create(:lfs_object, :with_file)
+    lfs_object_2 = create(:lfs_object, :with_file)
+    lfs_object_3 = create(:lfs_object, :with_file)
+    create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_1)
+    create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_2)
+    create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_3)
+
+    stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 3)
+    secondary.update!(files_max_capacity: 3)
+
+    expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_1.id).once do
+      Thread.new do
+        # Rails will invalidate the query cache if the update happens in the same thread
+        Geo::LfsObjectRegistry.update(success: true)
+      end
+    end
+
+    expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_2.id).once
+    expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_3.id).once
 
     subject.perform
   end

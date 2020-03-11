@@ -24,6 +24,16 @@ module EE
 
           ActiveRecord::Base.establish_connection(config)
         end
+
+        def geo_uncached_queries
+          raise 'No block given' unless block_given?
+
+          Geo::TrackingBase.uncached do
+            ActiveRecord::Base.uncached do
+              yield
+            end
+          end
+        end
       end
     end
   end
