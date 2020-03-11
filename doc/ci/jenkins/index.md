@@ -50,6 +50,9 @@ There are some high level differences between the products worth mentioning:
 - The `.gitlab-ci.yml` file is checked in to the root of your repository, much like a Jenkinsfile, but
   is in the YAML format (see [complete reference](../yaml/README.md)) instead of a Groovy DSL. It's most
   analogous to the declarative Jenkinsfile format.
+- Manual approvals or gates can be set up as [`when:manual` jobs](../yaml/README.md#whenmanual). These can
+  also leverage [`protected environments`](../yaml/README.md#protecting-manual-jobs-premium)
+  to control who is able to approve them.
 - GitLab comes with a [container registry](../../user/packages/container_registry/index.md), and we recommend using
   container images to set up your build environment.
 - Totally stuck and not sure where to turn for advice? The [GitLab community forum](https://forum.gitlab.com/) can be a great resource.
