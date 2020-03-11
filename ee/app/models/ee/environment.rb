@@ -77,10 +77,6 @@ module EE
       result || ::Gitlab::Kubernetes::RolloutStatus.loading
     end
 
-    def elastic_stack_available?
-      !!deployment_platform&.cluster&.application_elastic_stack&.available?
-    end
-
     private
 
     def rollout_status_available?
