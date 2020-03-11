@@ -4,9 +4,11 @@ module EE
   module API
     module Entities
       class FeatureFlag < Grape::Entity
-        class Scope < Grape::Entity
+        class Strategy < Grape::Entity
           expose :id
-          expose :environment_scope
+          expose :name
+          expose :parameters
+          expose :scopes, using: FeatureFlag::Scope
         end
       end
     end

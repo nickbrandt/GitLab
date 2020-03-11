@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 class FeatureFlagsFinder
-  attr_reader :project, :feature_flags, :params, :current_user
+  attr_reader :project, :params, :current_user
 
   def initialize(project, current_user, params = {})
     @project = project
     @current_user = current_user
-    @feature_flags = project.operations_feature_flags
     @params = params
   end
 
@@ -23,6 +22,14 @@ class FeatureFlagsFinder
   end
 
   private
+
+  def feature_flags
+    if Feature.enabled?(:feature_flags_new_version, project)
+      project.operations_feature_flags
+    else
+      project.operations_feature_flags.legacy_flag
+    end
+  end
 
   def by_scope(items)
     case params[:scope]
