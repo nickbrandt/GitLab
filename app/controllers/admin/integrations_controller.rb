@@ -3,7 +3,7 @@
 class Admin::IntegrationsController < Admin::ApplicationController
   include ServiceParams
 
-  before_action :set_integration, only: [:edit, :update, :test]
+  before_action :service, only: [:edit, :update, :test]
 
   def edit
   end
@@ -33,7 +33,7 @@ class Admin::IntegrationsController < Admin::ApplicationController
     Project.first
   end
 
-  def set_integration
+  def service
     @service ||= project.find_or_initialize_service(params[:id])
   end
 
