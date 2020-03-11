@@ -15,7 +15,7 @@ module QA
 
           QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new SSH key for the user
-            key = Resource::SSHKey.fabricate! do |resource|
+            key = Resource::SSHKey.fabricate_via_api! do |resource|
               resource.title = key_title
             end
 
@@ -105,7 +105,7 @@ module QA
 
           QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new SSH key for the user
-            key = Resource::SSHKey.fabricate! do |resource|
+            key = Resource::SSHKey.fabricate_via_api! do |resource|
               resource.title = key_title
             end
 
