@@ -188,7 +188,7 @@ module Gitlab
       end
 
       def apply_labels(issuable, raw)
-        return unless raw.labels.count > 0
+        return unless raw.labels.exists?
 
         label_ids = raw.labels
           .map { |attrs| @labels[attrs.name] }
