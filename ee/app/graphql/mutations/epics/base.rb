@@ -11,7 +11,7 @@ module Mutations
 
       argument :group_path, GraphQL::ID_TYPE,
                required: true,
-               description: 'The group the epic to mutate is in'
+               description: 'The group the epic to mutate belongs to'
 
       field :epic,
             Types::EpicType,
