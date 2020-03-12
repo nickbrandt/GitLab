@@ -1,0 +1,5 @@
+---
+title: Remove approval metric recalculation when approval was removed
+merge_request: 27071
+author:
+type: changed
