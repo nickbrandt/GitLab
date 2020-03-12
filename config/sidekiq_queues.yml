@@ -248,3 +248,5 @@
   - 1
 - - web_hook
   - 1
+- - x509_certificate_revoke
+  - 1
