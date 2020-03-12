@@ -11,4 +11,6 @@ export default () => ({
   hasError: false,
   iid: null,
   active: true,
+  strategies: [],
+  version: 1,
 });

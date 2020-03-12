@@ -20,6 +20,8 @@ export default {
     state.iid = response.iid;
     state.active = response.active;
     state.scopes = mapToScopesViewModel(response.scopes);
+    state.strategies = response.strategies || [];
+    state.version = response.version || 1;
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {
     state.isLoading = false;
