@@ -133,7 +133,7 @@ export default {
     <span
       v-if="showGitLabEmployeeBadge"
       ref="gitLabEmployeeBadge"
-      class="cgray-700 align-middlShoulde text-nowrap"
+      class="cgray-700 align-middle text-nowrap"
     >
       <gl-icon name="work" :size="16" class="align-middle" />
       <span class="align-middle">
