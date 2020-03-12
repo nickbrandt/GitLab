@@ -201,17 +201,24 @@ describe Namespace do
       expect(described_class.find_by_pages_host(host)).to eq(namespace)
     end
 
-    it 'finds correct namespace even if there is sub-namespace with same path' do
-      group = create(:group, path: 'pages')
-      subgroup = create(:group, :nested, path: 'pages')
-      host = "pages.#{Settings.pages.host.upcase}"
+    context 'when there is non-top-level group with searched name' do
+      before do
+        create(:group, :nested, path: 'pages')
+      end
 
-      # This is to ensure the method does the right thing
-      # becasue there is no way to be 100% sure which exact
-      # group will be returned by the database
-      expect(described_class).to receive(:where).with(parent_id: nil).and_call_original
+      it 'ignores this group' do
+        host = "pages.#{Settings.pages.host.upcase}"
 
-      expect(described_class.find_by_pages_host(host)).to eq(group)
+        expect(described_class.find_by_pages_host(host)).to be_nil
+      end
+
+      it 'finds right top level group' do
+        group = create(:group, path: 'pages')
+
+        host = "pages.#{Settings.pages.host.upcase}"
+
+        expect(described_class.find_by_pages_host(host)).to eq(group)
+      end
     end
 
     it "returns no result if the provided host is not subdomain of the Pages host" do
