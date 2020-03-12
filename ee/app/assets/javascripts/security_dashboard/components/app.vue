@@ -62,7 +62,14 @@ export default {
     },
   },
   computed: {
-    ...mapState('vulnerabilities', ['modal', 'pageInfo', 'loadingVulnerabilitiesErrorCode']),
+    ...mapState('vulnerabilities', [
+      'modal',
+      'pageInfo',
+      'loadingVulnerabilitiesErrorCode',
+      'isCreatingIssue',
+      'isDismissingVulnerability',
+      'isCreatingMergeRequest',
+    ]),
     ...mapGetters('filters', ['activeFilters']),
     ...mapGetters('vulnerabilities', ['loadingVulnerabilitiesFailedWithRecognizedErrorCode']),
     canCreateIssue() {
@@ -182,6 +189,9 @@ export default {
         :can-create-issue="canCreateIssue"
         :can-create-merge-request="canCreateMergeRequest"
         :can-dismiss-vulnerability="canDismissVulnerability"
+        :is-creating-issue="isCreatingIssue"
+        :is-dismissing-vulnerability="isDismissingVulnerability"
+        :is-creating-merge-request="isCreatingMergeRequest"
         @addDismissalComment="addDismissalComment({ vulnerability, comment: $event })"
         @editVulnerabilityDismissalComment="openDismissalCommentBox()"
         @showDismissalDeleteButtons="showDismissalDeleteButtons"

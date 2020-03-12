@@ -134,6 +134,9 @@ export default {
       'dependencyScanning',
       'summaryCounts',
       'modal',
+      'isCreatingIssue',
+      'isDismissingVulnerability',
+      'isCreatingMergeRequest',
     ]),
     ...mapGetters([
       'groupedSummaryText',
@@ -391,6 +394,9 @@ export default {
           :can-create-issue="canCreateIssue"
           :can-create-merge-request="canCreateMergeRequest"
           :can-dismiss-vulnerability="canDismissVulnerability"
+          :is-creating-issue="isCreatingIssue"
+          :is-dismissing-vulnerability="isDismissingVulnerability"
+          :is-creating-merge-request="isCreatingMergeRequest"
           @closeDismissalCommentBox="closeDismissalCommentBox()"
           @createMergeRequest="createMergeRequest"
           @createNewIssue="createNewIssue"
