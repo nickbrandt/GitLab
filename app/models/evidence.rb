@@ -10,6 +10,7 @@ class Evidence < ApplicationRecord
   default_scope { order(created_at: :asc) }
 
   sha_attribute :summary_sha
+  alias_attribute :collected_at, :created_at
 
   def milestones
     @milestones ||= release.milestones.includes(:issues)
@@ -28,10 +29,6 @@ class Evidence < ApplicationRecord
     end
 
     safe_summary
-  end
-
-  def collected_at
-    self.created_at
   end
 
   private
