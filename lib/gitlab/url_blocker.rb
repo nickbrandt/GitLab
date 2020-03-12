@@ -150,7 +150,7 @@ module Gitlab
       end
 
       def get_port(uri)
-        uri&.port || uri&.default_port
+        uri.port || uri.default_port
       end
 
       def validate_html_tags(uri)
