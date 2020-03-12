@@ -9,8 +9,12 @@ module QA
             module Show
               def self.prepended(page)
                 page.module_eval do
-                  view 'ee/app/views/projects/clusters/_prometheus_graphs.html.haml' do
+                  view 'ee/app/views/clusters/clusters/_health.html.haml' do
                     element :cluster_health_section
+                  end
+
+                  view 'ee/app/views/clusters/clusters/_health_tab.html.haml' do
+                    element :health, required: true
                   end
                 end
               end
@@ -21,10 +25,9 @@ module QA
                 end
               end
 
-              def has_cluster_health_title?
-                within_cluster_health_section do
-                  has_text?('Cluster health')
-                end
+              def open_health
+                has_element?(:health, wait: 30)
+                click_element :health
               end
 
               def has_cluster_health_graphs?
