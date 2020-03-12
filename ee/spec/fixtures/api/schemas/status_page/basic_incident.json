@@ -5,6 +5,7 @@
     "state",
     "title",
     "description",
+    "links",
     "updated_at",
     "created_at"
   ],
@@ -16,6 +17,13 @@
     },
     "title": { "type": "string" },
     "description": { "type": "string" },
+    "links": {
+      "type": "object",
+      "properties": {
+        "details": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
     "updated_at": { "type": "date" },
     "created_at": { "type": "date" }
   }

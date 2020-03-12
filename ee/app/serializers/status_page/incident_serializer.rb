@@ -5,7 +5,7 @@ module StatusPage
     entity IncidentEntity
 
     def represent_list(resource)
-      represent(resource, except: [:comments])
+      { incidents: represent(resource, except: [:comments]) }
     end
 
     def represent_details(resource, user_notes)

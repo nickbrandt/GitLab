@@ -8,11 +8,11 @@ module StatusPage
     MAX_COMMENTS = 100
 
     def self.details_path(id)
-      "incident/#{id}.json"
+      "data/incident/#{id}.json"
     end
 
     def self.list_path
-      'list.json'
+      'data/list.json'
     end
 
     class Error < StandardError

@@ -19,7 +19,8 @@ describe StatusPage::IncidentEntity do
       description: issue.description_html,
       updated_at: issue.updated_at,
       created_at: issue.created_at,
-      comments: []
+      comments: [],
+      links: { details: "data/incident/#{issue.iid}.json" }
     )
   end
 
