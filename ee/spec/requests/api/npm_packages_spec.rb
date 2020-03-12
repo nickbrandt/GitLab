@@ -3,11 +3,13 @@
 require 'spec_helper'
 
 describe API::NpmPackages do
-  let(:group)   { create(:group) }
-  let(:user)    { create(:user) }
-  let(:project) { create(:project, :public, namespace: group) }
-  let(:token)   { create(:oauth_access_token, scopes: 'api', resource_owner: user) }
-  let(:job) { create(:ci_build, user: user) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project, reload: true) { create(:project, :public, namespace: group) }
+  let_it_be(:package, reload: true) { create(:npm_package, project: project) }
+  let_it_be(:token) { create(:oauth_access_token, scopes: 'api', resource_owner: user) }
+  let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
+  let_it_be(:job) { create(:ci_build, user: user) }
 
   before do
     project.add_developer(user)
@@ -35,11 +37,10 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/packages/npm/*package_name' do
-    let(:package) { create(:npm_package, project: project) }
-    let!(:package_dependency_link1) { create(:packages_dependency_link, package: package, dependency_type: :dependencies) }
-    let!(:package_dependency_link2) { create(:packages_dependency_link, package: package, dependency_type: :devDependencies) }
-    let!(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
-    let!(:package_dependency_link4) { create(:packages_dependency_link, package: package, dependency_type: :peerDependencies) }
+    let_it_be(:package_dependency_link1) { create(:packages_dependency_link, package: package, dependency_type: :dependencies) }
+    let_it_be(:package_dependency_link2) { create(:packages_dependency_link, package: package, dependency_type: :devDependencies) }
+    let_it_be(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
+    let_it_be(:package_dependency_link4) { create(:packages_dependency_link, package: package, dependency_type: :peerDependencies) }
 
     shared_examples 'returning the npm package info' do
       it 'returns the package info' do
@@ -106,7 +107,9 @@ describe API::NpmPackages do
       end
 
       context 'project path with a dot' do
-        let(:project) { create(:project, :public, namespace: group, path: 'foo.bar') }
+        before do
+          project.update!(path: 'foo.bar')
+        end
 
         it_behaves_like 'returning the npm package info'
       end
@@ -159,8 +162,7 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/npm/*package_name/-/*file_name' do
-    let(:package) { create(:npm_package, project: project) }
-    let(:package_file) { package.package_files.first }
+    let_it_be(:package_file) { package.package_files.first }
 
     shared_examples 'a package file that requires auth' do
       it 'returns the file with an access token' do
@@ -395,11 +397,10 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/packages/npm/-/package/*package_name/dist-tags' do
-    let(:package) { create(:npm_package, project: project) }
-    let!(:package_tag1) { create(:packages_tag, package: package) }
-    let!(:package_tag2) { create(:packages_tag, package: package) }
+    let_it_be(:package_tag1) { create(:packages_tag, package: package) }
+    let_it_be(:package_tag2) { create(:packages_tag, package: package) }
+
     let(:package_name) { package.name }
-    let(:user) { create(:user) }
     let(:url) { "/packages/npm/-/package/#{package_name}/dist-tags" }
 
     subject { get api(url) }
@@ -411,7 +412,7 @@ describe API::NpmPackages do
 
       context 'with public project' do
         context 'with authenticated user' do
-          subject { get api(url, user) }
+          subject { get api(url, personal_access_token: personal_access_token) }
 
           it_behaves_like 'returns package tags', :maintainer
           it_behaves_like 'returns package tags', :developer
@@ -425,10 +426,12 @@ describe API::NpmPackages do
       end
 
       context 'with private project' do
-        let(:project) { create(:project, :private) }
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+        end
 
         context 'with authenticated user' do
-          subject { get api(url, user) }
+          subject { get api(url, personal_access_token: personal_access_token) }
 
           it_behaves_like 'returns package tags', :maintainer
           it_behaves_like 'returns package tags', :developer
@@ -452,10 +455,9 @@ describe API::NpmPackages do
   end
 
   describe 'PUT /api/v4/packages/npm/-/package/*package_name/dist-tags/:tag' do
-    let(:package) { create(:npm_package, project: project) }
+    let_it_be(:tag_name) { 'test' }
+
     let(:package_name) { package.name }
-    let(:user) { create(:user) }
-    let(:tag_name) { 'test' }
     let(:version) { package.version }
     let(:url) { "/packages/npm/-/package/#{package_name}/dist-tags/#{tag_name}" }
 
@@ -468,7 +470,7 @@ describe API::NpmPackages do
 
       context 'with public project' do
         context 'with authenticated user' do
-          subject { put api(url, user), env: { 'api.request.body': version } }
+          subject { put api(url, personal_access_token: personal_access_token), env: { 'api.request.body': version } }
 
           it_behaves_like 'create package tag', :maintainer
           it_behaves_like 'create package tag', :developer
@@ -482,10 +484,12 @@ describe API::NpmPackages do
       end
 
       context 'with private project' do
-        let(:project) { create(:project, :private) }
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+        end
 
         context 'with authenticated user' do
-          subject { put api(url, user), env: { 'api.request.body': version } }
+          subject { put api(url, personal_access_token: personal_access_token), env: { 'api.request.body': version } }
 
           it_behaves_like 'create package tag', :maintainer
           it_behaves_like 'create package tag', :developer
@@ -509,9 +513,8 @@ describe API::NpmPackages do
   end
 
   describe 'DELETE /api/v4/packages/npm/-/package/*package_name/dist-tags/:tag' do
-    let(:package) { create(:npm_package, project: project) }
-    let(:package_tag) { create(:packages_tag, package: package) }
-    let(:user) { create(:user) }
+    let_it_be(:package_tag) { create(:packages_tag, package: package) }
+
     let(:package_name) { package.name }
     let(:tag_name) { package_tag.name }
     let(:url) { "/packages/npm/-/package/#{package_name}/dist-tags/#{tag_name}" }
@@ -525,7 +528,7 @@ describe API::NpmPackages do
 
       context 'with public project' do
         context 'with authenticated user' do
-          subject { delete api(url, user) }
+          subject { delete api(url, personal_access_token: personal_access_token) }
 
           it_behaves_like 'delete package tag', :maintainer
           it_behaves_like 'rejects package tags access', :developer, :forbidden
@@ -539,10 +542,12 @@ describe API::NpmPackages do
       end
 
       context 'with private project' do
-        let(:project) { create(:project, :private) }
+        before do
+          project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+        end
 
         context 'with authenticated user' do
-          subject { delete api(url, user) }
+          subject { delete api(url, personal_access_token: personal_access_token) }
 
           it_behaves_like 'delete package tag', :maintainer
           it_behaves_like 'rejects package tags access', :developer, :forbidden
