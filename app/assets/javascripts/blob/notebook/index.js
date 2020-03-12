@@ -1,11 +1,10 @@
-/* eslint-disable no-new */
 import Vue from 'vue';
 import NotebookViewer from './notebook_viewer.vue';
 
 export default () => {
   const el = document.getElementById('js-notebook-viewer');
 
-  new Vue({
+  return new Vue({
     el,
     render(createElement) {
       return createElement(NotebookViewer, {
