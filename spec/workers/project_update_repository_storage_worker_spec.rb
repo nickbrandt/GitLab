@@ -15,11 +15,5 @@ describe ProjectUpdateRepositoryStorageWorker do
 
       subject.perform(project.id, 'new_storage')
     end
-
-    it 'catches and logs RepositoryAlreadyMoved' do
-      expect(Rails.logger).to receive(:info).with(/repository already moved/)
-
-      expect { subject.perform(project.id, project.repository_storage) }.not_to raise_error
-    end
   end
 end
