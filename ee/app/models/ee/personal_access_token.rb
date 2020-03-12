@@ -39,7 +39,7 @@ module EE
     private
 
     def personal_access_token_expiration_policy_enabled?
-      return false if user.group_managed_account?
+      return group_level_personal_access_token_expiration_policy_enabled? if user.group_managed_account?
 
       instance_level_personal_access_token_expiration_policy_enabled?
     end
@@ -49,6 +49,8 @@ module EE
     end
 
     def personal_access_token_max_expiry_date
+      return group_level_personal_access_token_max_expiry_date if user.group_managed_account?
+
       instance_level_personal_access_token_max_expiry_date
     end
 
@@ -66,6 +68,16 @@ module EE
 
     def personal_access_token_expiration_policy_licensed?
       License.feature_available?(:personal_access_token_expiration_policy)
+    end
+
+    def group_level_personal_access_token_expiration_policy_enabled?
+      group_level_personal_access_token_max_expiry_date && personal_access_token_expiration_policy_licensed?
+    end
+
+    def group_level_personal_access_token_max_expiry_date
+      strong_memoize(:group_level_personal_access_token_max_expiry_date) do
+        user.managing_group.max_personal_access_token_lifetime_from_now
+      end
     end
   end
 end

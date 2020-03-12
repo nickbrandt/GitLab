@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_10_135823) do
+ActiveRecord::Schema.define(version: 2020_03_12_062323) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -2777,6 +2777,7 @@ ActiveRecord::Schema.define(version: 2020_03_10_135823) do
     t.integer "max_artifacts_size"
     t.boolean "mentions_disabled"
     t.integer "default_branch_protection", limit: 2
+    t.integer "max_personal_access_token_lifetime"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"

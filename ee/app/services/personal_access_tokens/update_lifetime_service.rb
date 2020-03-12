@@ -8,11 +8,15 @@ module PersonalAccessTokens
 
     def execute
       try_obtain_lease do
-        ::PersonalAccessTokens::PolicyWorker.perform_in(DEFAULT_LEASE_TIMEOUT)
+        perform
       end
     end
 
     private
+
+    def perform
+      ::PersonalAccessTokens::PolicyWorker.perform_in(DEFAULT_LEASE_TIMEOUT)
+    end
 
     # Used by ExclusiveLeaseGuard
     def lease_timeout

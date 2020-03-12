@@ -395,6 +395,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: personal_access_tokens:personal_access_tokens_group_policy
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :urgency: :default
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: personal_access_tokens:personal_access_tokens_policy
   :feature_category: :authentication_and_authorization
   :has_external_dependencies: 

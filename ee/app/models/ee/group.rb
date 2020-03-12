@@ -56,7 +56,13 @@ module EE
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
+      validates :max_personal_access_token_lifetime,
+                allow_blank: true,
+                numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 365 }
+
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
+
+      after_commit :update_personal_access_tokens_lifetime, if: :saved_change_to_max_personal_access_token_lifetime?
 
       scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
       scope :with_deletion_schedule, -> { preload(deletion_schedule: :deleting_user) }
@@ -309,7 +315,25 @@ module EE
       ::Vulnerability.where(project: ::Project.for_group_and_its_subgroups(self))
     end
 
+    def max_personal_access_token_lifetime
+      return unless enforced_group_managed_accounts? # only available for GMA groups
+
+      super || Gitlab::CurrentSettings.max_personal_access_token_lifetime
+    end
+
+    def max_personal_access_token_lifetime_from_now
+      return unless max_personal_access_token_lifetime
+
+      max_personal_access_token_lifetime.days.from_now
+    end
+
     private
+
+    def update_personal_access_tokens_lifetime
+      return unless max_personal_access_token_lifetime.present? && License.feature_available?(:personal_access_token_expiration_policy)
+
+      ::PersonalAccessTokens::Group::UpdateLifetimeService.new(group: self).execute
+    end
 
     def custom_project_templates_group_allowed
       return if custom_project_templates_group_id.blank?
