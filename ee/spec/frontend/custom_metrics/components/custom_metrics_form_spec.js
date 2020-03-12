@@ -1,7 +1,5 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import CustomMetricsForm from 'ee/custom_metrics/components/custom_metrics_form.vue';
-
-const localVue = createLocalVue();
 
 describe('CustomMetricsForm', () => {
   let wrapper;
@@ -17,8 +15,7 @@ describe('CustomMetricsForm', () => {
       legend: '',
     },
   }) {
-    wrapper = shallowMount(localVue.extend(CustomMetricsForm), {
-      localVue,
+    wrapper = shallowMount(CustomMetricsForm, {
       propsData: {
         customMetricsPath: '',
         editProjectServicePath: '',
@@ -30,24 +27,22 @@ describe('CustomMetricsForm', () => {
   }
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-    }
+    wrapper.destroy();
   });
 
   describe('Computed', () => {
     it('Form button and title text indicate the custom metric is being edited', () => {
       mountComponent({ metricPersisted: true });
 
-      expect(wrapper.vm.saveButtonText).toEqual('Save Changes');
-      expect(wrapper.vm.titleText).toEqual('Edit metric');
+      expect(wrapper.vm.saveButtonText).toBe('Save Changes');
+      expect(wrapper.vm.titleText).toBe('Edit metric');
     });
 
     it('Form button and title text indicate the custom metric is being created', () => {
       mountComponent({ metricPersisted: false });
 
-      expect(wrapper.vm.saveButtonText).toEqual('Create metric');
-      expect(wrapper.vm.titleText).toEqual('New metric');
+      expect(wrapper.vm.saveButtonText).toBe('Create metric');
+      expect(wrapper.vm.titleText).toBe('New metric');
     });
   });
 });
