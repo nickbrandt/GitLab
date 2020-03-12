@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
@@ -80,7 +80,7 @@ export default {
      * @returns Boolean
      */
     shouldRenderCreateButton() {
-      return !_.isEmpty(this.filter) && !this.isLoading && !this.results.length;
+      return !isEmpty(this.filter) && !this.isLoading && !this.results.length;
     },
   },
   watch: {

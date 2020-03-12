@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { GlButton, GlTooltipDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -41,7 +41,7 @@ export default {
       return sprintf(
         s__('FeatureFlags|Delete %{name}?'),
         {
-          name: _.escape(this.deleteFeatureFlagName),
+          name: esc(this.deleteFeatureFlagName),
         },
         false,
       );
@@ -50,7 +50,7 @@ export default {
       return sprintf(
         s__('FeatureFlags|Feature flag %{name} will be removed. Are you sure?'),
         {
-          name: _.escape(this.deleteFeatureFlagName),
+          name: esc(this.deleteFeatureFlagName),
         },
         false,
       );
