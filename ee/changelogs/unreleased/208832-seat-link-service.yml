@@ -1,0 +1,5 @@
+---
+title: Add worker to sync paid seats info daily in the background.
+merge_request: 26467
+author:
+type: added
