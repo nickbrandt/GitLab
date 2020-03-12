@@ -72,6 +72,9 @@ export default {
       const dayDifference = getDayDifference(this.startDate, this.endDate);
       return this.includeSelectedDate ? dayDifference + OFFSET_DATE_BY_ONE : dayDifference;
     },
+    effectiveMaxDateRange() {
+      return this.includeSelectedDate ? this.maxDateRange - OFFSET_DATE_BY_ONE : this.maxDateRange;
+    },
   },
 };
 </script>
@@ -86,7 +89,7 @@ export default {
       :default-start-date="startDate"
       :default-end-date="endDate"
       :default-min-date="minDate"
-      :max-date-range="maxDateRange"
+      :max-date-range="effectiveMaxDateRange"
       :default-max-date="maxDate"
       theme="animate-picker"
       start-picker-class="js-daterange-picker-from d-flex flex-column flex-lg-row align-items-lg-center mr-lg-2 mb-2 mb-md-0"
