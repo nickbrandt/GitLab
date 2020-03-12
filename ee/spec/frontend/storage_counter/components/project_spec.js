@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import Project from 'ee/storage_counter/components/project.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
@@ -22,14 +22,11 @@ const data = {
   },
 };
 
-const localVue = createLocalVue();
-
 function factory(project) {
-  wrapper = shallowMount(localVue.extend(Project), {
+  wrapper = shallowMount(Project, {
     propsData: {
       project,
     },
-    localVue,
   });
 }
 

@@ -1,9 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import StorageApp from 'ee/storage_counter/components/app.vue';
 import Project from 'ee/storage_counter/components/project.vue';
 import { projects, withRootStorageStatistics } from '../data';
-
-const localVue = createLocalVue();
 
 describe('Storage counter app', () => {
   let wrapper;
@@ -17,10 +15,9 @@ describe('Storage counter app', () => {
       },
     };
 
-    wrapper = shallowMount(localVue.extend(StorageApp), {
+    wrapper = shallowMount(StorageApp, {
       propsData: { namespacePath: 'h5bp', helpPagePath: 'help' },
       mocks: { $apollo },
-      localVue,
     });
   }
 
