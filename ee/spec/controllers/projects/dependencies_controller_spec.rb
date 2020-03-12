@@ -117,7 +117,7 @@ describe Projects::DependenciesController do
 
                 it 'returns sorted list' do
                   expect(json_response['dependencies'].first['name']).to eq('nokogiri')
-                  expect(json_response['dependencies'].second['name']).to eq('mini_portile2')
+                  expect(json_response['dependencies'].second['name']).to eq('debug')
                 end
               end
             end
