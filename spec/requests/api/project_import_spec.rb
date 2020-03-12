@@ -304,6 +304,7 @@ describe API::ProjectImport do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+      expect(json_response['TempPath']).to eq(ImportExportUploader.workhorse_local_upload_path)
     end
 
     it 'rejects requests that bypassed gitlab-workhorse' do
