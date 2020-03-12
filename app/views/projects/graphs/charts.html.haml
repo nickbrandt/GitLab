@@ -13,6 +13,10 @@
 
   #js-languages-chart{ data: { chart_data: @languages.to_json.html_safe } }
 
+- if defined?(@daily_coverage_options)
+  .repo-charts
+    #js-code-coverage-chart{ data: { daily_coverage_options: @daily_coverage_options.to_json.html_safe } }
+
 .repo-charts
   .sub-header-block.border-top
 
