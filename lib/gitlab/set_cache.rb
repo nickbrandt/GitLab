@@ -14,8 +14,16 @@ module Gitlab
       "#{key}:set"
     end
 
-    def expire(key)
-      with { |redis| redis.del(cache_key(key)) }
+    def expire(*keys)
+      with do |redis|
+        keys = keys.map { |key| cache_key(key) }
+
+        if Feature.enabled?(:repository_set_cache_unlink, default_enabled: true)
+          redis.unlink(*keys)
+        else
+          redis.delete(*keys)
+        end
+      end
     end
 
     def exist?(key)
