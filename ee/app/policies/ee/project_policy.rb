@@ -240,8 +240,6 @@ module EE
 
       rule { prometheus_alerts_enabled & can?(:maintainer_access) }.enable :read_prometheus_alerts
 
-      rule { status_page_available & can?(:maintainer_access) }.enable :publish_status_page
-
       rule { auditor }.policy do
         enable :public_user_access
         prevent :request_access
@@ -373,6 +371,8 @@ module EE
       end
 
       rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end
 
     override :lookup_access_level!

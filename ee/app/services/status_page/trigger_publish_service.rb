@@ -23,7 +23,7 @@ module StatusPage
     attr_reader :user, :project
 
     def can_publish?
-      user.can?(:publish_status_page, project)
+      user&.can?(:publish_status_page, project)
     end
 
     def status_page_enabled?

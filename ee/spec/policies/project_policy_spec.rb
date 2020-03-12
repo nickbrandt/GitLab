@@ -1023,6 +1023,7 @@ describe ProjectPolicy do
   end
 
   describe 'publish_status_page' do
+    let(:anonymous) { nil }
     let(:feature) { :status_page }
     let(:policy) { :publish_status_page }
 
@@ -1030,16 +1031,17 @@ describe ProjectPolicy do
       using RSpec::Parameterized::TableSyntax
 
       where(:role, :allowed) do
+        :anonymous  | false
         :guest      | false
         :reporter   | false
-        :developer  | false
+        :developer  | true
         :maintainer | true
         :owner      | true
         :admin      | true
       end
 
       with_them do
-        let(:current_user) { public_send(role) }
+        let(:current_user) { public_send(role) if role }
 
         before do
           stub_feature_flags(feature => true)
