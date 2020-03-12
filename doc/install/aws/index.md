@@ -353,7 +353,7 @@ TIP: **Tip:** If you do not want to maintain bastion hosts, you can set up [AWS 
 1. Review all your settings and, if you're happy, click **Launch**.
 1. Acknowledge that you have access to an existing key pair or create a new one. Click **Launch Instance**.
 
-Confirm that you can SHH into the instance:
+Confirm that you can SSH into the instance:
 
 1. On the EC2 Dashboard, click on **Instances** in the left menu.
 1. Select **Bastion Host A** from your list of instances.
