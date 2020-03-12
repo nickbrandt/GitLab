@@ -70,10 +70,10 @@ export default {
   >
     <div id="merge-requests" class="card card-slim mt-3">
       <div class="card-header">
-        <div class="card-title mt-0 mb-0 h5 merge-requests-title">
+        <div class="card-title mt-0 mb-0 h5 merge-requests-title position-relative">
           <a
             id="user-content-related-merge-requests"
-            class="anchor"
+            class="anchor position-absolute text-decoration-none"
             href="#related-merge-requests"
             aria-hidden="true"
           ></a>
