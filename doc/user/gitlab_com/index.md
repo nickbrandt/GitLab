@@ -594,7 +594,7 @@ Service discovery:
 
 - [`gitlab-cookbooks` / `gitlab_consul` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_consul)
 
-### Haproxy
+### HAProxy
 
 High Performance TCP/HTTP Load Balancer:
 
