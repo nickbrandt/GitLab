@@ -20,33 +20,34 @@ watch [this 1 hour Q&A](https://www.youtube.com/watch?v=uCU8jdYzpac)
 with [John Northrup](https://gitlab.com/northrup), and live questions coming
 in from some of our customers.
 
-
 ## Maturity levels
 
 ### Level 1: Single-node Omnibus installation
 
-This solution is appropriate for many teams that have a single server at their disposal. With automatic backup of the GitLab repositories, configuration, and the database, this can be an optimal solution if you don't have strict availability requirements. 
+This solution is appropriate for many teams that have a single server at their disposal. With automatic backup of the GitLab repositories, configuration, and the database, this can be an optimal solution if you don't have strict availability requirements.
 
 This configuration is supported in [GitLab Starter, Premium and Ultimate](https://about.gitlab.com/pricing/).
 
 References:
- - [Installation Docs](https://docs.gitlab.com/ee/install/)
- - [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
+
+- [Installation Docs](https://docs.gitlab.com/ee/install/)
+- [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
 
 ### Level 2: Multiple application servers
 
 By separating components you can see a number of advantages compared to a single-node setup. Namely, you can:
 
- - Increase the number of users 
- - Enable zero-downtime upgrades 
- - Increase availability 
+- Increase the number of users 
+- Enable zero-downtime upgrades 
+- Increase availability 
 
 Additional application nodes will handle frontend traffic, with a load balancer in front to distribute traffic across those nodes. Meanwhile, each application node connects to a shared file server and database systems on the back end. This way, if one of the application servers fails, the workflow is not interrupted.
 
 This configuration is supported in [GitLab Starter, Premium and Ultimate](https://about.gitlab.com/pricing/).
 
 References:
- - [High Availability Reference Architectures](#reference-architectures), without HA components
+
+- [High Availability Reference Architectures](#reference-architectures), without HA components
 
 ### Level 3: Highly Available
 
@@ -56,7 +57,7 @@ This configuration is supported in [GitLab Premium and Ultimate](https://about.g
 
 References: 
 
- - [High Availability Reference Architectures](#reference-architectures)
+- [High Availability Reference Architectures](#reference-architectures)
 
 ### Level 4: GitLab Geo
 
@@ -66,8 +67,8 @@ This configuration is supported in [GitLab Premium and Ultimate](https://about.g
 
 References:
 
- - [Geo Documentation](http://docs.gitlab.com/ee/gitlab-geo/README.html)
- - [GitLab Geo with a highly available configuration](https://docs.gitlab.com/ee/administration/geo/replication/high_availability.html)
+- [Geo Documentation](http://docs.gitlab.com/ee/gitlab-geo/README.html)
+- [GitLab Geo with a highly available configuration](https://docs.gitlab.com/ee/administration/geo/replication/high_availability.html)
 
 ## Recommended setups based on number of users
 
