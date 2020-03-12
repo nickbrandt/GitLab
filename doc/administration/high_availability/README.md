@@ -30,7 +30,7 @@ This configuration is supported in [GitLab Starter, Premium and Ultimate](https:
 
 References:
 
-- [Installation Docs](../../install/)
+- [Installation Docs](../../install/README.html)
 - [Backup/Restore Docs](https://docs.gitlab.com/omnibus/settings/backups.html#backup-and-restore-omnibus-gitlab-configuration)
 
 ### Level 2: Multiple application servers
