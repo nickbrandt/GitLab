@@ -32,7 +32,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
     namespace :analytics do
-      resource :productivity_analytics, only: :show, constraints: -> (req) { Feature.enabled?(:group_level_productivity_analytics, default_enabled: true) && Gitlab::Analytics.productivity_analytics_enabled? }
+      resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
       resource :cycle_analytics, path: 'value_stream_analytics', only: :show, constraints: -> (req) { Feature.enabled?(:group_level_cycle_analytics) && Gitlab::Analytics.cycle_analytics_enabled? }
     end
 

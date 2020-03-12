@@ -38,7 +38,6 @@ module EE
     end
 
     def group_cycle_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless ::Feature.enabled?(:group_level_cycle_analytics)
       return unless group_sidebar_link?(:cycle_analytics)
 
@@ -50,8 +49,6 @@ module EE
     end
 
     def productivity_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
-      return unless ::Feature.enabled?(:group_level_productivity_analytics, default_enabled: true)
       return unless group_sidebar_link?(:productivity_analytics)
 
       navbar_sub_item(
@@ -62,7 +59,6 @@ module EE
     end
 
     def contribution_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:contribution_analytics)
 
       navbar_sub_item(
@@ -74,7 +70,6 @@ module EE
     end
 
     def group_insights_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:group_insights)
 
       navbar_sub_item(
@@ -86,7 +81,6 @@ module EE
     end
 
     def issues_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_group_analytics_sidebar, group, default_enabled: true)
       return unless group_sidebar_link?(:analytics)
 
       navbar_sub_item(
@@ -97,7 +91,6 @@ module EE
     end
 
     def insights_navbar_link(project, current_user)
-      return unless ::Feature.enabled?(:analytics_pages_under_project_analytics_sidebar, project, default_enabled: true)
       return unless project_nav_tab?(:project_insights)
 
       navbar_sub_item(

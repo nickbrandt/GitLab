@@ -6,19 +6,6 @@
           = sprite_icon('chart', size: 24)
         .sidebar-context-title= _('Analytics')
     %ul.sidebar-top-level-items
-      - if Feature.disabled?(:group_level_productivity_analytics, default_enabled: true) && Gitlab::Analytics.productivity_analytics_enabled?
-        = nav_link(controller: :productivity_analytics) do
-          = link_to analytics_productivity_analytics_path, class: 'qa-sidebar-productivity-analytics' do
-            .nav-icon-container
-              = sprite_icon('comment')
-            %span.nav-item-name
-              = _('Productivity')
-          %ul.sidebar-sub-level-items.is-fly-out-only
-            = nav_link(controller: :productivity_analytics, html_options: { class: "fly-out-top-item qa-sidebar-productivity-analytics-fly-out" } ) do
-              = link_to analytics_productivity_analytics_path do
-                %strong.fly-out-top-item-name
-                  = _('Productivity')
-
       - if Feature.disabled?(:group_level_cycle_analytics) && Gitlab::Analytics.cycle_analytics_enabled?
         = nav_link(controller: :cycle_analytics) do
           = link_to analytics_cycle_analytics_path, class: 'qa-sidebar-cycle-analytics' do

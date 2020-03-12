@@ -8,8 +8,6 @@ describe 'Groups > Contribution Analytics', :js do
   let(:empty_project) { create(:project, namespace: group) }
 
   before do
-    stub_feature_flags(analytics_pages_under_group_analytics_sidebar: { enabled: false, thing: group })
-
     group.add_owner(user)
     sign_in(user)
   end
@@ -18,7 +16,13 @@ describe 'Groups > Contribution Analytics', :js do
     it 'displays Contribution Analytics' do
       visit group_path(group)
 
-      find('a', text: 'Contribution').click
+      within('.nav-sidebar') do
+        find('a', text: 'Analytics').click
+
+        within('.sidebar-sub-level-items') do
+          find('a', text: 'Contribution').click
+        end
+      end
 
       expect(page).to have_content "Contribution analytics for issues, merge requests and push"
     end
