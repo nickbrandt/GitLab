@@ -2,6 +2,7 @@ image: "registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.5-golang-1.1
 
 stages:
   - sync
+  - precheck
   - prepare
   - fixtures
   - test
@@ -46,18 +47,18 @@ variables:
 include:
   - local: .gitlab/ci/cache-repo.gitlab-ci.yml
   - local: .gitlab/ci/cng.gitlab-ci.yml
+  - local: .gitlab/ci/dev-fixtures.gitlab-ci.yml
   - local: .gitlab/ci/docs.gitlab-ci.yml
   - local: .gitlab/ci/frontend.gitlab-ci.yml
   - local: .gitlab/ci/global.gitlab-ci.yml
   - local: .gitlab/ci/memory.gitlab-ci.yml
   - local: .gitlab/ci/pages.gitlab-ci.yml
+  - local: .gitlab/ci/precheck.gitlab-ci.yml
   - local: .gitlab/ci/qa.gitlab-ci.yml
-  - local: .gitlab/ci/reports.gitlab-ci.yml
   - local: .gitlab/ci/rails.gitlab-ci.yml
+  - local: .gitlab/ci/releases.gitlab-ci.yml
+  - local: .gitlab/ci/reports.gitlab-ci.yml
   - local: .gitlab/ci/review.gitlab-ci.yml
   - local: .gitlab/ci/rules.gitlab-ci.yml
   - local: .gitlab/ci/setup.gitlab-ci.yml
-  - local: .gitlab/ci/dev-fixtures.gitlab-ci.yml
   - local: .gitlab/ci/test-metadata.gitlab-ci.yml
-  - local: .gitlab/ci/yaml.gitlab-ci.yml
-  - local: .gitlab/ci/releases.gitlab-ci.yml

@@ -59,6 +59,7 @@ gitlab:assets:compile pull-cache:
   extends:
     - .gitlab:assets:compile-metadata
     - .frontend:rules:gitlab-assets-compile-pull-cache
+  needs: []
   cache:
     policy: pull
 
@@ -108,6 +109,7 @@ compile-assets pull-cache:
   extends:
     - .compile-assets-metadata
     - .frontend:rules:compile-assets-pull-cache
+  needs: []
   cache:
     policy: pull
 
@@ -116,6 +118,7 @@ compile-assets pull-cache as-if-foss:
     - .compile-assets-metadata
     - .frontend:rules:compile-assets-pull-cache-as-if-foss
     - .as-if-foss
+  needs: []
   cache:
     policy: pull
     key: "assets-compile:v9:foss"
@@ -129,10 +132,9 @@ compile-assets pull-cache as-if-foss:
     - .use-pg9
   stage: fixtures
   needs:
-    - job: "setup-test-env"
-      artifacts: true
-    - job: "compile-assets pull-cache"
-      artifacts: true
+    - job: danger-review
+    - job: setup-test-env
+    - job: compile-assets pull-cache
   script:
     - date
     - scripts/gitaly-test-spawn
@@ -295,7 +297,10 @@ webpack-dev-server:
     - .default-cache
     - .frontend:rules:default-frontend-jobs
   stage: test
-  needs: ["setup-test-env", "compile-assets pull-cache"]
+  needs:
+    - job: danger-review
+    - job: setup-test-env
+    - job: compile-assets pull-cache
   variables:
     WEBPACK_MEMORY_TEST: "true"
     WEBPACK_VENDOR_DLL: "true"

@@ -17,6 +17,9 @@ The current stages are:
 
 - `sync`: This stage is used to synchronize changes from <https://gitlab.com/gitlab-org/gitlab> to
   <https://gitlab.com/gitlab-org/gitlab-foss>.
+- `precheck`: This stage is used to act as "circuit breaker" or "fail fast" to
+  avoid running expensive jobs in the case the merge request doesn't comply to
+  our quality standards.
 - `prepare`: This stage includes jobs that prepare artifacts that are needed by
   jobs in subsequent stages.
 - `test`: This stage includes most of the tests, DB/migration jobs, and static analysis jobs.
@@ -147,9 +150,12 @@ execute jobs out of order for the following jobs:
 
 ```mermaid
 graph RL;
+  A1[danger-review];
   A[setup-test-env];
   B["gitlab:assets:compile pull-push-cache<br/>(canonical master only)"];
   C["gitlab:assets:compile pull-cache<br/>(canonical default refs only)"];
+  C2["review-cleanup<br/>(auto in master, manual in MRs)"];
+  C3["review-stop-failed-deployment<br/>(MRs only)"];
   D["cache gems<br/>(master and tags only)"];
   E[review-build-cng];
   F[build-qa-image];
@@ -160,10 +166,12 @@ graph RL;
   J2["compile-assets pull-push-cache as-if-foss<br/>(EE master only)"];
   K[compile-assets pull-cache];
   K2["compile-assets pull-cache as-if-foss<br/>(EE default refs only)"];
+  L["db:*, gitlab:setup, downtime_check"];
+  L2[graphql-docs-verify];
   U[frontend-fixtures];
   U2["frontend-fixtures-as-if-foss<br/>(EE default refs only)"];
   V["webpack-dev-server, static-analysis"];
-  M[coverage];
+  M[rspec:coverage];
   O[coverage-frontend];
   N["pages (master only)"];
   Q[package-and-qa];
@@ -171,71 +179,88 @@ graph RL;
   T[retrieve-tests-metadata];
   QA["qa:internal, qa:selectors"];
   QA2["qa:internal-as-if-foss, qa:selectors-as-if-foss<br/>(EE default refs only)"];
-  X["docs lint, code_quality, sast, dependency_scanning, danger-review"];
+  X["code_quality, sast, dependency_scanning,"];
+  X2["docs lint"];
+  X3["lint-ci-gitlab"];
+
+subgraph "`precheck` stage"
+  A1
+  X2
+  X3
+  end
 
 subgraph "`prepare` stage"
-    A
-    B
-    C
-    F
-    K
-    K2
-    J
-    J2
-    T
-    end
+  A
+  B --> |happens after| A1
+  C
+  C2 --> |happens after| A1
+  C3 --> |happens after| A1
+  F --> |happens after| A1
+  K
+  K2
+  J --> |happens after| A1
+  J2 --> |happens after| A1
+  T
+  end
 
 subgraph "`fixture` stage"
-    U -.-> |needs and depends on| A;
-    U -.-> |needs and depends on| K;
-    U2 -.-> |needs and depends on| A;
-    U2 -.-> |needs and depends on| K2;
-    end
+  U -.-> |needs| A;
+  U -.-> |needs| A1;
+  U -.-> |needs| K;
+  U2 -.-> |needs| A;
+  U2 -.-> |needs| A1;
+  U2 -.-> |needs| K2;
+  end
 
 subgraph "`test` stage"
-    D -.-> |needs| A;
-    I -.-> |needs and depends on| U;
-    I2 -.-> |needs and depends on| U2;
-    L -.-> |needs and depends on| A;
-    S -.-> |needs and depends on| A;
-    S -.-> |needs and depends on| K;
-    S -.-> |needs and depends on| T;
-    L["db:*, gitlab:setup, graphql-docs-verify, downtime_check"] -.-> |needs| A;
-    V -.-> |needs and depends on| K;
-    X -.-> |needs| T;
-    QA -.-> |needs| T;
-    QA2 -.-> |needs| T;
-    end
+  D -.-> |needs| A;
+  I -.-> |needs| U;
+  I2 -.-> |needs| U2;
+  S -.-> |needs| A;
+  S -.-> |needs| K;
+  S -.-> |needs| T;
+  L -.-> |needs| A;
+  L -.-> |needs| A1;
+  L -.-> |needs| C;
+  L2 -.-> |needs| A;
+  L2 -.-> |needs| A1;
+  V -.-> |needs| K;
+  V -.-> |needs| A1;
+  X -.-> |needs| T;
+  QA -.-> |needs| T;
+  QA2 -.-> |needs| T;
+  end
 
 subgraph "`post-test` stage"
-    M --> |happens after| S
-    O --> |needs `jest`| I
-    end
+  M --> |happens after| S
+  O --> |needs `jest`| I
+  end
 
 subgraph "`review-prepare` stage"
-    E -.-> |needs| C;
-    end
+  E -.-> |needs| C;
+  E -.-> |needs| A1;
+  end
 
 subgraph "`review` stage"
-    G -.-> |needs| E
-    end
+  G -.-> |needs| E
+  end
 
 subgraph "`qa` stage"
-    Q -.-> |needs| C;
-    Q -.-> |needs| F;
-    QA1["review-qa-smoke, review-qa-all, review-performance, dast"] -.-> |needs| G;
-    end
+  Q -.-> |needs| C;
+  Q -.-> |needs| F;
+  QA1["review-qa-smoke, review-qa-all, review-performance, dast"] -.-> |needs| G;
+  end
 
 subgraph "`post-qa` stage"
   PQA1["parallel-spec-reports"] -.-> |depends on `review-qa-all`| QA1;
   end
 
 subgraph "`pages` stage"
-    N -.-> |depends on| C;
-    N -.-> |depends on karma| I;
-    N -.-> |depends on| M;
-    N --> |happens after| PQA1
-    end
+  N -.-> |depends on| C;
+  N -.-> |depends on `karma`| I;
+  N -.-> |depends on| M;
+  N --> |happens after| PQA1
+  end
 ```
 
 ## Test jobs

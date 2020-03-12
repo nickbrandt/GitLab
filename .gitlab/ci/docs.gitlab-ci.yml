@@ -40,28 +40,6 @@ review-docs-cleanup:
   script:
     - ./scripts/trigger-build-docs cleanup
 
-docs lint:
-  extends:
-    - .default-tags
-    - .default-retry
-    - .docs:rules:docs-lint
-  image: "registry.gitlab.com/gitlab-org/gitlab-docs:lint"
-  stage: test
-  needs: []
-  script:
-    - scripts/lint-doc.sh
-    # Prepare docs for build
-    # The path must be 'ee/' because we have hardcoded links relying on it
-    # https://gitlab.com/gitlab-org/gitlab-docs/-/blob/887850752fc0e72856da6632db132f005ba77f16/content/index.erb#L44-63
-    - mv doc/ /tmp/gitlab-docs/content/ee
-    - cd /tmp/gitlab-docs
-    # Build HTML from Markdown
-    - bundle exec nanoc
-    # Check the internal links
-    - bundle exec nanoc check internal_links
-    # Check the internal anchor links
-    - bundle exec nanoc check internal_anchors
-
 graphql-reference-verify:
   extends:
     - .default-tags
@@ -71,7 +49,9 @@ graphql-reference-verify:
     - .docs:rules:graphql-reference-verify
     - .use-pg9
   stage: test
-  needs: ["setup-test-env"]
+  needs:
+    - job: danger-review
+    - job: setup-test-env
   script:
-    - bundle exec rake gitlab:graphql:check_docs
-    - bundle exec rake gitlab:graphql:check_schema
+    - bin/rake gitlab:graphql:check_docs
+    - bin/rake gitlab:graphql:check_schema

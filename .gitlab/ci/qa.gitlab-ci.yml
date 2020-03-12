@@ -3,7 +3,7 @@
     - .default-tags
     - .default-retry
   stage: test
-  needs: []
+  needs: [danger-review]
   cache:
     key: "qa-framework-jobs:v1"
     paths:
@@ -56,5 +56,9 @@ package-and-qa:
   extends:
     - .package-and-qa-base
     - .qa:rules:package-and-qa
-  needs: ["build-qa-image", "gitlab:assets:compile pull-cache"]
+  needs:
+    - job: build-qa-image
+      artifacts: false
+    - job: gitlab:assets:compile pull-cache
+      artifacts: false
   allow_failure: true

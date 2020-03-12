@@ -56,6 +56,7 @@ review-build-cng:
     - install_api_client_dependencies_with_apk
     - install_gitlab_gem
   needs:
+    - job: danger-review
     - job: gitlab:assets:compile pull-cache
       artifacts: false
   script:
@@ -241,18 +242,3 @@ parallel-spec-reports:
       - qa/gitlab-qa-run-*
     reports:
       junit: qa/gitlab-qa-run-*/**/rspec-*.xml
-
-danger-review:
-  extends:
-    - .default-tags
-    - .default-retry
-    - .default-cache
-    - .review:rules:danger
-  image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
-  stage: test
-  needs: []
-  script:
-    - git version
-    - node --version
-    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
-    - danger --fail-on-errors=true --verbose

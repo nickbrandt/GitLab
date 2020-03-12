@@ -1,0 +1,53 @@
+danger-review:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .default-cache
+    - .review:rules:danger
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
+  stage: precheck
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .yarn-cache/
+  script:
+    - git version
+    - node --version
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache --prefer-offline
+    - danger --fail-on-errors=true --verbose
+
+docs lint:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .docs:rules:docs-lint
+  image: "registry.gitlab.com/gitlab-org/gitlab-docs:lint"
+  stage: precheck
+  script:
+    - scripts/lint-doc.sh
+    # Prepare docs for build
+    # The path must be 'ee/' because we have hardcoded links relying on it
+    # https://gitlab.com/gitlab-org/gitlab-docs/-/blob/887850752fc0e72856da6632db132f005ba77f16/content/index.erb#L44-63
+    - mv doc/ /tmp/gitlab-docs/content/ee
+    - cd /tmp/gitlab-docs
+    # Build HTML from Markdown
+    - bundle exec nanoc
+    # Check the internal links
+    - bundle exec nanoc check internal_links
+    # Check the internal anchor links
+    - bundle exec nanoc check internal_anchors
+
+# Yamllint of *.yml for .gitlab-ci.yml.
+# This uses rules from project root `.yamllint`.
+lint-ci-gitlab:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .yaml:rules
+  image: sdesbure/yamllint:latest
+  stage: precheck
+  variables:
+    LINT_PATHS: .gitlab-ci.yml .gitlab/ci lib/gitlab/ci/templates changelogs
+  script:
+    - '[[ ! -d "ee/" ]] || export LINT_PATHS="$LINT_PATHS ee/changelogs"'
+    - yamllint $LINT_PATHS

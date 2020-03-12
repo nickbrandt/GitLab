@@ -1,9 +1,8 @@
 .rails:needs:setup-and-assets:
   needs:
+    - job: danger-review
     - job: setup-test-env
-      artifacts: true
     - job: compile-assets pull-cache
-      artifacts: true
 
 .rails-job-base:
   extends:
@@ -19,6 +18,7 @@ setup-test-env:
     - .rails-job-base
     - .rails:rules:default-refs-code-backstage-qa
     - .use-pg9
+  needs: []
   stage: prepare
   script:
     - bundle exec ruby -Ispec -e 'require "spec_helper" ; TestEnv.init'
@@ -65,12 +65,10 @@ downtime_check:
   extends: .rails-job-base
   stage: test
   needs:
+    - job: danger-review
     - job: setup-test-env
-      artifacts: true
     - job: retrieve-tests-metadata
-      artifacts: true
     - job: compile-assets pull-cache
-      artifacts: true
   script:
     - source scripts/rspec_helpers.sh
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
@@ -140,6 +138,7 @@ rspec fast_spec_helper:
     - .use-pg9
   stage: test
   needs:
+    - job: danger-review
     - job: setup-test-env
       artifacts: true
 
@@ -335,12 +334,10 @@ rspec-ee system pg10:
     - .as-if-foss
     - .use-pg9
   needs:
+    - job: danger-review
     - job: setup-test-env
-      artifacts: true
     - job: retrieve-tests-metadata
-      artifacts: true
     - job: compile-assets pull-cache as-if-foss
-      artifacts: true
 
 .rspec-ee-base-pg9:
   extends:

@@ -6,7 +6,9 @@
     - .default-before_script
     - .use-pg9
   stage: test
-  needs: ["setup-test-env"]
+  needs:
+    - job: danger-review
+    - job: setup-test-env
   variables:
     FIXTURE_PATH: "db/fixtures/development"
     SEED_CYCLE_ANALYTICS: "true"
@@ -21,7 +23,7 @@ run-dev-fixtures:
     - .dev-fixtures:rules:ee-and-foss
   script:
     - scripts/gitaly-test-spawn
-    - RAILS_ENV=test bundle exec rake db:seed_fu
+    - RAILS_ENV=test bin/rake db:seed_fu
 
 run-dev-fixtures-ee:
   extends:
@@ -31,4 +33,4 @@ run-dev-fixtures-ee:
   script:
     - scripts/gitaly-test-spawn
     - cp ee/db/fixtures/development/* $FIXTURE_PATH
-    - RAILS_ENV=test bundle exec rake db:seed_fu
+    - RAILS_ENV=test bin/rake db:seed_fu

@@ -20,6 +20,7 @@ retrieve-tests-metadata:
     - .tests-metadata-state
     - .test-metadata:rules:retrieve-tests-metadata
   stage: prepare
+  needs: []
   cache:
     policy: pull
   script:

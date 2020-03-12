@@ -10,7 +10,6 @@ cache gems:
   stage: test
   needs:
     - job: setup-test-env
-      artifacts: true
   variables:
     SETUP_DB: "false"
   script:
@@ -23,7 +22,8 @@ cache gems:
   extends:
     - .default-tags
     - .default-retry
-  needs: []
+  needs:
+    - job: danger-review
 
 gitlab_git_test:
   extends:
