@@ -560,6 +560,9 @@ msgstr ""
 msgid "(removed)"
 msgstr ""
 
+msgid "(revoked)"
+msgstr ""
+
 msgid "*"
 msgstr ""
 
