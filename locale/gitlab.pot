@@ -10892,6 +10892,9 @@ msgstr ""
 msgid "Invalid URL"
 msgstr ""
 
+msgid "Invalid cursor value provided"
+msgstr ""
+
 msgid "Invalid date"
 msgstr ""
 
