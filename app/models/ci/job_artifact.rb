@@ -31,7 +31,8 @@ module Ci
       metrics: 'metrics.txt',
       lsif: 'lsif.json',
       dotenv: '.env',
-      cobertura: 'cobertura-coverage.xml'
+      cobertura: 'cobertura-coverage.xml',
+      terraform: 'tfplan.json'
     }.freeze
 
     INTERNAL_TYPES = {
@@ -59,7 +60,8 @@ module Ci
       dast: :raw,
       license_management: :raw,
       license_scanning: :raw,
-      performance: :raw
+      performance: :raw,
+      terraform: :raw
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
@@ -129,7 +131,8 @@ module Ci
       network_referee: 14, ## runner referees
       lsif: 15, # LSIF data for code navigation
       dotenv: 16,
-      cobertura: 17
+      cobertura: 17,
+      terraform: 18 # Transformed json
     }
 
     enum file_format: {
