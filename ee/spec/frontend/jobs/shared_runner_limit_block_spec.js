@@ -1,21 +1,17 @@
-import component from 'ee/jobs/components/shared_runner_limit_block.vue';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import SharedRunnerLimitBlock from 'ee/jobs/components/shared_runner_limit_block.vue';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import { trimText } from 'spec/helpers/text_helper';
-
-const localVue = createLocalVue();
+import { trimText } from 'helpers/text_helper';
 
 describe('Shared Runner Limit Block', () => {
   let wrapper;
 
-  const Component = localVue.extend(component);
   const runnersPath = 'root/project/runners';
   const projectPath = 'h5bp/html5-boilerplate';
   const subscriptionsMoreMinutesUrl = 'https://customers.gitlab.com/buy_pipeline_minutes';
 
   const factory = (options = {}) => {
-    wrapper = shallowMount(Component, {
-      localVue,
+    wrapper = shallowMount(SharedRunnerLimitBlock, {
       ...options,
     });
   };
