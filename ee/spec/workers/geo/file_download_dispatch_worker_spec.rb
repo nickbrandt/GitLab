@@ -12,7 +12,9 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_f
   before do
     stub_current_geo_node(secondary)
     stub_exclusive_lease(renew: true)
-    allow_any_instance_of(described_class).to receive(:over_time?).and_return(false)
+    allow_next_instance_of(described_class) do |instance|
+      allow(instance).to receive(:over_time?).and_return(false)
+    end
 
     WebMock.stub_request(:get, /primary-geo-node/).to_return(status: 200, body: "", headers: {})
   end

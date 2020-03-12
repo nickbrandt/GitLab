@@ -68,7 +68,9 @@ describe Security::StoreReportsService do
       end
 
       it 'caches vulnerability history' do
-        expect_any_instance_of(Gitlab::Vulnerabilities::HistoryCache).to receive(:fetch)
+        expect_next_instance_of(Gitlab::Vulnerabilities::HistoryCache) do |instance|
+          expect(instance).to receive(:fetch)
+        end
 
         subject
       end

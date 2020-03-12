@@ -97,7 +97,9 @@ describe DesignManagement::DeleteDesignsService do
 
         it 'calls repository#log_geo_updated_event' do
           design_repository = EE::Gitlab::GlRepository::DESIGN.repository_resolver.call(project)
-          allow_any_instance_of(described_class).to receive(:repository).and_return(design_repository)
+          allow_next_instance_of(described_class) do |instance|
+            allow(instance).to receive(:repository).and_return(design_repository)
+          end
 
           expect(design_repository).to receive(:log_geo_updated_event)
 

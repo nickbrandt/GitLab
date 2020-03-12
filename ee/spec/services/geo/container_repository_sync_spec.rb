@@ -80,7 +80,9 @@ describe Geo::ContainerRepositorySync, :geo do
   describe 'execute' do
     it 'determines list of tags to sync and to remove correctly' do
       expect(container_repository).to receive(:delete_tag_by_digest).with('sha256:aaaaa')
-      expect_any_instance_of(described_class).to receive(:sync_tag).with('tag-to-sync').and_call_original
+      expect_next_instance_of(described_class) do |instance|
+        expect(instance).to receive(:sync_tag).with('tag-to-sync').and_call_original
+      end
 
       described_class.new(container_repository).execute
     end

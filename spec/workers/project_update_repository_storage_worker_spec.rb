@@ -9,8 +9,9 @@ describe ProjectUpdateRepositoryStorageWorker do
 
   describe "#perform" do
     it "calls the update repository storage service" do
-      expect_any_instance_of(Projects::UpdateRepositoryStorageService)
-        .to receive(:execute).with('new_storage')
+      expect_next_instance_of(Projects::UpdateRepositoryStorageService) do |instance|
+        expect(instance).to receive(:execute).with('new_storage')
+      end
 
       subject.perform(project.id, 'new_storage')
     end

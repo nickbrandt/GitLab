@@ -12,8 +12,9 @@ describe JiraConnect::SyncBranchWorker do
     subject { described_class.new.perform(project_id, branch_name, commit_shas) }
 
     def expect_jira_sync_service_execute(args)
-      expect_any_instance_of(JiraConnect::SyncService)
-        .to receive(:execute).with(args)
+      expect_next_instance_of(JiraConnect::SyncService) do |instance|
+        expect(instance).to receive(:execute).with(args)
+      end
     end
 
     it 'calls JiraConnect::SyncService#execute' do

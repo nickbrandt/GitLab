@@ -236,7 +236,9 @@ describe Projects::CreateService, '#execute' do
   context 'when importing Project by repo URL' do
     context 'and check namespace plan is enabled' do
       before do
-        allow_any_instance_of(EE::Project).to receive(:add_import_job)
+        allow_next_instance_of(EE::Project) do |instance|
+          allow(instance).to receive(:add_import_job)
+        end
         enable_namespace_license_check!
       end
 
