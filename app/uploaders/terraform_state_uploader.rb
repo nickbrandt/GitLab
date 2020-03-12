@@ -34,5 +34,9 @@ class TerraformStateUploader < GitlabUploader
     def proxy_download_enabled?
       true
     end
+
+    def default_store
+      object_store_enabled? ? ObjectStorage::Store::REMOTE : ObjectStorage::Store::LOCAL
+    end
   end
 end

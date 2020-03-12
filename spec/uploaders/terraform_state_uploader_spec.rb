@@ -61,4 +61,22 @@ describe TerraformStateUploader do
       expect(described_class.proxy_download_enabled?).to eq(true)
     end
   end
+
+  describe '.default_store' do
+    context 'when object storage is enabled' do
+      it 'returns REMOTE' do
+        expect(described_class.default_store).to eq(ObjectStorage::Store::REMOTE)
+      end
+    end
+
+    context 'when object storage is disabled' do
+      before do
+        stub_terraform_state_object_storage(enabled: false)
+      end
+
+      it 'returns LOCAL' do
+        expect(described_class.default_store).to eq(ObjectStorage::Store::LOCAL)
+      end
+    end
+  end
 end
