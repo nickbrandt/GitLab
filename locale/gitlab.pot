@@ -13013,6 +13013,9 @@ msgstr ""
 msgid "New project"
 msgstr ""
 
+msgid "New release"
+msgstr ""
+
 msgid "New runners registration token has been generated!"
 msgstr ""
 
@@ -13601,9 +13604,6 @@ msgid "Oops, are you sure?"
 msgstr ""
 
 msgid "Open"
-msgstr ""
-
-msgid "Open Documentation"
 msgstr ""
 
 msgid "Open Selection"
@@ -16260,6 +16260,9 @@ msgid "Releases are based on Git tags and mark specific points in a project's de
 msgstr ""
 
 msgid "Releases are based on Git tags. We recommend naming tags that fit within semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}."
+msgstr ""
+
+msgid "Releases documentation"
 msgstr ""
 
 msgid "Release|Something went wrong while getting the release details"
@@ -19271,7 +19274,7 @@ msgstr ""
 msgid "TagsPage|Optionally, add a message to the tag. Leaving this blank creates a %{link_start}lightweight tag.%{link_end}"
 msgstr ""
 
-msgid "TagsPage|Optionally, add release notes to the tag. They will be stored in the GitLab database and displayed on the tags page."
+msgid "TagsPage|Optionally, create a public Release of your project, based on this tag. Release notes are displayed on the %{releases_page_link_start}Releases%{link_end} page. %{docs_link_start}More information%{link_end}"
 msgstr ""
 
 msgid "TagsPage|Release notes"
