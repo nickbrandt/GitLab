@@ -59,7 +59,7 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
                         title_html: "epic title", description: 'simple description')
         end
         let!(:epic3) do
-          epics.create!(iid: 2, group_id: group.id, author_id: author.id, title: "epic title}",
+          epics.create!(iid: 3, group_id: group.id, author_id: author.id, title: "epic title}",
                         title_html: "epic title", description: 'description with an email@example.com and some other @ char here.')
         end
 
