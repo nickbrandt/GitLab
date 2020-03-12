@@ -335,7 +335,6 @@ describe API::ProjectImport do
         end
       end
 
-
       context 'when direct upload is disabled' do
         before do
           stub_uploads_object_storage(ImportExportUploader, enabled: false, direct_upload: true)
