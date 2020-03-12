@@ -21,4 +21,18 @@ class TerraformStateUploader < GitlabUploader
   def key
     OpenSSL::HMAC.digest('SHA256', Gitlab::Application.secrets.db_key_base, project_id.to_s)
   end
+
+  class << self
+    def direct_upload_enabled?
+      false
+    end
+
+    def background_upload_enabled?
+      false
+    end
+
+    def proxy_download_enabled?
+      true
+    end
+  end
 end
