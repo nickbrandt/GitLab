@@ -27,6 +27,8 @@ import {
   mockEpic1,
 } from '../mock_data';
 
+const mockProjects = getJSONFixture('static/projects.json');
+
 describe('RelatedItemTree', () => {
   describe('store', () => {
     describe('actions', () => {
@@ -801,6 +803,19 @@ describe('RelatedItemTree', () => {
         });
       });
 
+      describe('toggleCreateIssueForm', () => {
+        it('should set `state.showCreateIssueForm` to true and `state.showAddItemForm` to false', done => {
+          testAction(
+            actions.toggleCreateIssueForm,
+            {},
+            {},
+            [{ type: types.TOGGLE_CREATE_ISSUE_FORM, payload: {} }],
+            [],
+            done,
+          );
+        });
+      });
+
       describe('setPendingReferences', () => {
         it('should set param value to `state.pendingReference`', done => {
           testAction(
@@ -1325,6 +1340,52 @@ describe('RelatedItemTree', () => {
         });
       });
 
+      describe('receiveCreateIssueSuccess', () => {
+        it('should set `state.itemCreateInProgress` & `state.itemsFetchResultEmpty` to false', done => {
+          testAction(
+            actions.receiveCreateIssueSuccess,
+            { insertAt: 0, items: [] },
+            {},
+            [{ type: types.RECEIVE_CREATE_ITEM_SUCCESS, payload: { insertAt: 0, items: [] } }],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('receiveCreateIssueFailure', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it('should set `state.itemCreateInProgress` to false', done => {
+          testAction(
+            actions.receiveCreateIssueFailure,
+            {},
+            {},
+            [{ type: types.RECEIVE_CREATE_ITEM_FAILURE }],
+            [],
+            done,
+          );
+        });
+
+        it('should show flash error with message "Something went wrong while creating issue."', () => {
+          const message = 'Something went wrong while creating issue.';
+          actions.receiveCreateIssueFailure(
+            {
+              commit: () => {},
+            },
+            {
+              message,
+            },
+          );
+
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            message,
+          );
+        });
+      });
+
       describe('createNewIssue', () => {
         const issuesEndpoint = `${TEST_HOST}/issues`;
         const title = 'new issue title';
@@ -1382,6 +1443,8 @@ describe('RelatedItemTree', () => {
               .createNewIssue(context, payload)
               .then(() => {
                 expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+                expect(context.dispatch).toHaveBeenCalledWith('requestCreateItem');
+                expect(context.dispatch).toHaveBeenCalledWith('receiveCreateIssueSuccess', '');
                 expect(context.dispatch).toHaveBeenCalledWith(
                   'fetchItems',
                   jasmine.objectContaining({ parentItem }),
@@ -1405,12 +1468,118 @@ describe('RelatedItemTree', () => {
               .then(() => done.fail('expected action to throw error!'))
               .catch(() => {
                 expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
-                expect(context.dispatch).not.toHaveBeenCalled();
-                expect(flashSpy).toHaveBeenCalled();
+                expect(context.dispatch).toHaveBeenCalledWith('receiveCreateIssueFailure');
               })
               .then(done)
               .catch(done.fail);
           });
+        });
+      });
+
+      describe('requestProjects', () => {
+        it('should set `state.projectsFetchInProgress` to true', done => {
+          testAction(actions.requestProjects, {}, {}, [{ type: types.REQUEST_PROJECTS }], [], done);
+        });
+      });
+
+      describe('receiveProjectsSuccess', () => {
+        it('should set `state.projectsFetchInProgress` to false and set provided `projects` param to state', done => {
+          testAction(
+            actions.receiveProjectsSuccess,
+            mockProjects,
+            {},
+            [{ type: types.RECIEVE_PROJECTS_SUCCESS, payload: mockProjects }],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('receiveProjectsFailure', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it('should set `state.projectsFetchInProgress` to false', done => {
+          testAction(
+            actions.receiveProjectsFailure,
+            {},
+            {},
+            [{ type: types.RECIEVE_PROJECTS_FAILURE }],
+            [],
+            done,
+          );
+        });
+
+        it('should show flash error with message "Something went wrong while fetching projects."', () => {
+          const message = 'Something went wrong while fetching projects.';
+          actions.receiveProjectsFailure(
+            {
+              commit: () => {},
+            },
+            {
+              message,
+            },
+          );
+
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            message,
+          );
+        });
+      });
+
+      describe('fetchProjects', () => {
+        let mock;
+
+        beforeEach(() => {
+          mock = new MockAdapter(axios);
+          state.parentItem = mockParentItem;
+          state.issuableType = issuableTypesMap.EPIC;
+        });
+
+        afterEach(() => {
+          mock.restore();
+        });
+
+        it('should dispatch `requestProjects` and `receiveProjectsSuccess` actions on request success', done => {
+          mock.onGet(/(.*)/).replyOnce(200, mockProjects);
+
+          testAction(
+            actions.fetchProjects,
+            '',
+            state,
+            [],
+            [
+              {
+                type: 'requestProjects',
+              },
+              {
+                type: 'receiveProjectsSuccess',
+                payload: mockProjects,
+              },
+            ],
+            done,
+          );
+        });
+
+        it('should dispatch `requestProjects` and `receiveProjectsFailure` actions on request failure', done => {
+          mock.onGet(/(.*)/).replyOnce(500, {});
+
+          testAction(
+            actions.fetchProjects,
+            '',
+            state,
+            [],
+            [
+              {
+                type: 'requestProjects',
+              },
+              {
+                type: 'receiveProjectsFailure',
+              },
+            ],
+            done,
+          );
         });
       });
     });

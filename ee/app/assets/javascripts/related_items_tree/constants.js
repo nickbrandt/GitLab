@@ -39,4 +39,6 @@ export const RemoveItemModalProps = {
 
 export const OVERFLOW_AFTER = 5;
 
+export const SEARCH_DEBOUNCE = 500;
+
 export const itemRemoveModalId = 'item-remove-confirmation';
