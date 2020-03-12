@@ -15148,9 +15148,6 @@ msgstr ""
 msgid "Profiles|your account"
 msgstr ""
 
-msgid "Profile|%{jobTitle} at %{organization}"
-msgstr ""
-
 msgid "Profile|%{job_title} at %{organization}"
 msgstr ""
 

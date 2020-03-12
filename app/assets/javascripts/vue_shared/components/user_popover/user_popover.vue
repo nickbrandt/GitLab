@@ -56,8 +56,8 @@ export default {
 
       if (organization && jobTitle) {
         return {
-          message: s__('Profile|%{jobTitle} at %{organization}'),
-          placeholders: { organization, jobTitle },
+          message: s__('Profile|%{job_title} at %{organization}'),
+          placeholders: { job_title: jobTitle, organization },
         };
       } else if (organization) {
         return organization;
