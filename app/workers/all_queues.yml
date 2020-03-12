@@ -1294,7 +1294,7 @@
 - :name: x509_certificate_revoke
   :feature_category: :source_code_management
   :has_external_dependencies: 
-  :urgency: :default
+  :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: true
