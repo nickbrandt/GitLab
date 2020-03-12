@@ -192,7 +192,7 @@ module IssuablesHelper
     output = []
     output << "Opened #{time_ago_with_tooltip(issuable.created_at)} by ".html_safe
 
-    output << content_tag(:strong) do
+    output << content_tag(:strong, class: (issuable.author.gitlab_employee? ? 'mr-2' : nil)) do
       author_output = link_to_member(project, issuable.author, size: 24, mobile_classes: "d-none d-sm-inline")
       author_output << link_to_member(project, issuable.author, size: 24, by_username: true, avatar: false, mobile_classes: "d-inline d-sm-none")
 
@@ -201,6 +201,15 @@ module IssuablesHelper
       end
 
       author_output
+    end
+
+    if issuable.author.gitlab_employee?
+      output << content_tag(:span, id: 'js-employee-badge', class: 'gl-text-gray-700 text-nowrap') do
+        employee_badge = sprite_icon('work', size: 16, css_class: 'align-middle mr-1')
+        employee_badge << content_tag(:span, 'GitLab', class: 'align-middle')
+
+        employee_badge
+      end
     end
 
     output << content_tag(:span, (issuable_first_contribution_icon if issuable.first_contribution?), class: 'has-tooltip prepend-left-4', title: _('1st contribution!'))

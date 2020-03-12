@@ -13,7 +13,7 @@ describe 'projects/issues/show' do
     assign(:noteable, issue)
     stub_template 'shared/issuable/_sidebar' => ''
     stub_template 'projects/issues/_discussion' => ''
-    allow(view).to receive(:issuable_meta).and_return('')
+    allow(view).to receive(:user_status).and_return('')
   end
 
   context 'when the issue is closed' do
@@ -150,6 +150,16 @@ describe 'projects/issues/show' do
       render
 
       expect(rendered).not_to have_selector('#js-sentry-error-stack-trace')
+    end
+  end
+
+  context 'when issue is created by a GitLab employee' do
+    let(:user) { create(:user, email: 'test@gitlab.com') }
+
+    it 'renders an employee badge next to their username' do
+      render
+
+      expect(rendered).to have_selector('#js-employee-badge')
     end
   end
 end
