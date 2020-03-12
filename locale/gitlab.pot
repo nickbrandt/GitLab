@@ -5570,6 +5570,9 @@ msgstr ""
 msgid "Copy commit SHA"
 msgstr ""
 
+msgid "Copy evidence SHA"
+msgstr ""
+
 msgid "Copy file contents"
 msgstr ""
 
