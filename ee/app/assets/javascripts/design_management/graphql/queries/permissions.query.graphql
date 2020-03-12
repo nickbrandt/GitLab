@@ -1,4 +1,4 @@
-query permissions($fullPath: ID!, $iid: String!) {
+query permissions($fullPath: ID!, $iid: ID!) {
   project(fullPath: $fullPath) {
     id
     issue(iid: $iid) {
