@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { s__ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import {
@@ -52,7 +52,7 @@ export const getColumnChartData = state => chartKey => {
   return dataWithSelected;
 };
 
-export const chartHasData = state => chartKey => !_.isEmpty(state.charts[chartKey].data);
+export const chartHasData = state => chartKey => !isEmpty(state.charts[chartKey].data);
 
 export const getScatterPlotMainData = (state, getters, rootState) =>
   getScatterPlotData(
