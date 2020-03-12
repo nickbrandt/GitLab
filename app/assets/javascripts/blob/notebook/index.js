@@ -2,7 +2,7 @@ import Vue from 'vue';
 import NotebookViewer from './notebook_viewer.vue';
 
 export default () => {
-  const el = document.getElementById('js-notebook-viewer');
+  const el = document.getElementById('js-notebook-bogus');
 
   return new Vue({
     el,
