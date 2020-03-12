@@ -73,8 +73,7 @@ export default {
       return this.includeSelectedDate ? dayDifference + OFFSET_DATE_BY_ONE : dayDifference;
     },
     effectiveMaxDateRange() {
-      const { includeSelectedDate, maxDateRange } = this;
-      return includeSelectedDate ? maxDateRange - OFFSET_DATE_BY_ONE : maxDateRange;
+      return this.includeSelectedDate ? this.maxDateRange - OFFSET_DATE_BY_ONE : this.maxDateRange;
     },
   },
 };
