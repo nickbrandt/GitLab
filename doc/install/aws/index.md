@@ -367,6 +367,12 @@ Confirm that you can SHH into the instance:
    1. Under the **Add Tags** section, we’ll set `Key: Name` and `Value: Bastion Host B` so that we can easily identify our two instances.
    1. For the security group, select the existing `bastion-sec-group` we created above.
 
+### Use SSH Agent Forwarding
+
+EC2 instances running Linux use private key files for SSH authentication. You'll connect to your bastion host using an SSH client and the private key file stored on your client. Since the private key file is not present on the bastion host, you will not be able to connect to your instances in private subnets.
+
+Storing private key files on your bastion host is a bad idea. To get around this, use SSH agent forwarding on your client. See [Securely Connect to Linux Instances Running in a Private Amazon VPC](https://aws.amazon.com/blogs/security/securely-connect-to-linux-instances-running-in-a-private-amazon-vpc/) for a step-by-step guide on how to use SSH agent forwarding.
+
 ## Deploying GitLab inside an auto scaling group
 
 We'll use AWS's wizard to deploy GitLab and then SSH into the instance to
