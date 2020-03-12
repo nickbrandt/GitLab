@@ -53,6 +53,9 @@ describe('Design management large image component', () => {
   });
 
   describe('zoom', () => {
+    const baseImageWidth = 100;
+    const baseImageHeight = 100;
+
     beforeEach(() => {
       createComponent(
         {
@@ -62,22 +65,32 @@ describe('Design management large image component', () => {
         },
         {
           imageStyle: {
-            width: '100px',
-            height: '100px',
+            width: `${baseImageWidth}px`,
+            height: `${baseImageHeight}px`,
           },
           baseImageSize: {
-            width: 100,
-            height: 100,
+            width: baseImageWidth,
+            height: baseImageHeight,
           },
         },
       );
+
+      jest
+        .spyOn(wrapper.vm.$refs.contentImg, 'offsetWidth', 'get')
+        .mockImplementation(() => baseImageWidth);
+      jest
+        .spyOn(wrapper.vm.$refs.contentImg, 'offsetHeight', 'get')
+        .mockImplementation(() => baseImageHeight);
     });
 
     it('emits @resize event on zoom', () => {
-      wrapper.vm.zoom(2);
+      const zoomAmount = 2;
+      wrapper.vm.zoom(zoomAmount);
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('resize')).toEqual([[{ width: 200, height: 200 }]]);
+        expect(wrapper.emitted('resize')).toEqual([
+          [{ width: baseImageWidth * zoomAmount, height: baseImageHeight * zoomAmount }],
+        ]);
       });
     });
 
@@ -85,13 +98,19 @@ describe('Design management large image component', () => {
       wrapper.vm.zoom(1);
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('resize')).toEqual([[{ width: 100, height: 100 }]]);
+        expect(wrapper.emitted('resize')).toEqual([
+          [{ width: baseImageWidth, height: baseImageHeight }],
+        ]);
       });
     });
 
     it('sets image style when zoomed', () => {
-      wrapper.vm.zoom(2);
-      expect(wrapper.vm.imageStyle).toEqual({ width: '200px', height: '200px' });
+      const zoomAmount = 2;
+      wrapper.vm.zoom(zoomAmount);
+      expect(wrapper.vm.imageStyle).toEqual({
+        width: `${baseImageWidth * zoomAmount}px`,
+        height: `${baseImageHeight * zoomAmount}px`,
+      });
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.element).toMatchSnapshot();
       });

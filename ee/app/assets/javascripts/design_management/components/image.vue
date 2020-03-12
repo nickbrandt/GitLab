@@ -37,22 +37,17 @@ export default {
     this.onImgLoad();
 
     this.resizeThrottled = _.throttle(() => {
-      this.onWindowResize();
+      // NOTE: if imageStyle is set, then baseImageSize
+      // won't change due to resize. We must still emit a
+      // `resize` event so that the parent can handle
+      // resizes appropriately (e.g. for design_overlay)
+      this.setBaseImageSize();
     }, 400);
     window.addEventListener('resize', this.resizeThrottled, false);
   },
   methods: {
     onImgLoad() {
       requestIdleCallback(this.setBaseImageSize, { timeout: 1000 });
-    },
-    onWindowResize() {
-      const { contentImg } = this.$refs;
-      if (!contentImg) return;
-
-      this.onResize({
-        width: contentImg.offsetWidth,
-        height: contentImg.offsetHeight,
-      });
     },
     setBaseImageSize() {
       const { contentImg } = this.$refs;
@@ -68,6 +63,13 @@ export default {
       this.$emit('resize', { width, height });
     },
     zoom(amount) {
+      if (amount === 1) {
+        this.imageStyle = null;
+        this.$nextTick(() => {
+          this.setBaseImageSize();
+        });
+        return;
+      }
       const width = this.baseImageSize.width * amount;
       const height = this.baseImageSize.height * amount;
 
