@@ -60,7 +60,7 @@ describe LdapGroupLink do
       end
 
       it 'defaults to the first ldap server if empty' do
-        expect( klass.new.provider ).to eql Gitlab::Auth::LDAP::Config.providers.first
+        expect( klass.new.provider ).to eql Gitlab::Auth::Ldap::Config.providers.first
       end
     end
   end

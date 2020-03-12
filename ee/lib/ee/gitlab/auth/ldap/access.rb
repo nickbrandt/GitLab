@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Access
           extend ActiveSupport::Concern
           extend ::Gitlab::Utils::Override
@@ -27,7 +27,7 @@ module EE
             return found_user if found_user
 
             if ldap_identity
-              ::Gitlab::Auth::LDAP::Person.find_by_email(user.email, adapter)
+              ::Gitlab::Auth::Ldap::Person.find_by_email(user.email, adapter)
             end
           end
 

@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Sync
           class Groups
             attr_reader :provider, :proxy
@@ -13,7 +13,7 @@ module EE
               # and only the first provider or two get synced. This shuffles the order
               # so subsequent syncs should eventually get to all providers. Obviously
               # we should avoid failure, but this is an additional safeguard.
-              ::Gitlab::Auth::LDAP::Config.providers.shuffle.each do |provider|
+              ::Gitlab::Auth::Ldap::Config.providers.shuffle.each do |provider|
                 Sync::Proxy.open(provider) do |proxy|
                   group_sync = self.new(proxy)
                   group_sync.update_permissions

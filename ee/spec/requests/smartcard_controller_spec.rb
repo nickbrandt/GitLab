@@ -184,7 +184,7 @@ describe SmartcardController, type: :request do
     before do
       allow(Gitlab::Auth::Smartcard).to receive(:enabled?).and_return(true)
 
-      allow(Gitlab::Auth::Smartcard::LDAPCertificate).to(
+      allow(Gitlab::Auth::Smartcard::LdapCertificate).to(
         receive(:store).and_return(openssl_certificate_store))
       allow(openssl_certificate_store).to receive(:verify).and_return(true)
 

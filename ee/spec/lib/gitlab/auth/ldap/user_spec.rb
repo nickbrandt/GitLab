@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::LDAP::User do
+describe Gitlab::Auth::Ldap::User do
   include LdapHelpers
 
   let(:ldap_user) { described_class.new(auth_hash) }
@@ -28,7 +28,7 @@ describe Gitlab::Auth::LDAP::User do
   end
 
   it 'includes the EE module' do
-    expect(described_class).to include_module(EE::Gitlab::Auth::LDAP::User)
+    expect(described_class).to include_module(EE::Gitlab::Auth::Ldap::User)
   end
 
   describe '#initialize' do

@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Auth
-      module LDAP
+      module Ldap
         module Sync
           class Group
             attr_reader :provider, :group, :proxy
@@ -21,7 +21,7 @@ module EE
                   # and only the first provider or two get synced. This shuffles the order
                   # so subsequent syncs should eventually get to all providers. Obviously
                   # we should avoid failure, but this is an additional safeguard.
-                  ::Gitlab::Auth::LDAP::Config.providers.shuffle.each do |provider|
+                  ::Gitlab::Auth::Ldap::Config.providers.shuffle.each do |provider|
                     Sync::Proxy.open(provider) do |proxy|
                       new(group, proxy).update_permissions
                     end
@@ -29,7 +29,7 @@ module EE
 
                   group.finish_ldap_sync
                   Rails.logger.debug { "Finished syncing all providers for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
-                rescue ::Gitlab::Auth::LDAP::LDAPConnectionError
+                rescue ::Gitlab::Auth::Ldap::LdapConnectionError
                   Rails.logger.warn("Error syncing all providers for '#{group.name}' group") # rubocop:disable Gitlab/RailsLogger
                   group.fail_ldap_sync
                 end
@@ -48,7 +48,7 @@ module EE
 
                   group.finish_ldap_sync
                   Rails.logger.debug { "Finished syncing '#{proxy.provider}' provider for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
-                rescue ::Gitlab::Auth::LDAP::LDAPConnectionError
+                rescue ::Gitlab::Auth::Ldap::LdapConnectionError
                   Rails.logger.warn("Error syncing '#{proxy.provider}' provider for '#{group.name}' group") # rubocop:disable Gitlab/RailsLogger
                   group.fail_ldap_sync
                 end
@@ -174,7 +174,7 @@ module EE
             def update_existing_group_membership(group, access_levels)
               logger.debug { "Updating existing membership for '#{group.name}' group" }
 
-              multiple_ldap_providers = ::Gitlab::Auth::LDAP::Config.providers.count > 1
+              multiple_ldap_providers = ::Gitlab::Auth::Ldap::Config.providers.count > 1
               existing_members = select_and_preload_group_members(group)
               # For each existing group member, we'll need to look up its LDAP identity in the current LDAP provider.
               # It is much faster to resolve these at once than later for each member one by one.

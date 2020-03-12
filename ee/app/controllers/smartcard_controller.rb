@@ -13,7 +13,7 @@ class SmartcardController < ApplicationController
   end
 
   def ldap_auth
-    certificate = Gitlab::Auth::Smartcard::LDAPCertificate.new(params[:provider], certificate_header)
+    certificate = Gitlab::Auth::Smartcard::LdapCertificate.new(params[:provider], certificate_header)
     sign_in_with(certificate)
   end
 
