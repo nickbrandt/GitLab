@@ -152,7 +152,7 @@ module EE
                                          projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval, batch: false),
                                          merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                                          merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
-                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines, batch: false),
+                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active, batch: false),
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects, batch: false),
