@@ -9,7 +9,7 @@ class CreateDailyReportResults < ActiveRecord::Migration[6.0]
       t.bigint :project_id, null: false
       t.bigint :last_pipeline_id, null: false
       t.float :value, null: false
-      t.integer :param_type, limit: 2, null: false
+      t.integer :param_type, limit: 8, null: false
       t.string :ref_path, null: false # rubocop:disable Migration/AddLimitToStringColumns
       t.string :title, null: false # rubocop:disable Migration/AddLimitToStringColumns
 

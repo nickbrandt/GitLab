@@ -743,7 +743,7 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.bigint "project_id", null: false
     t.bigint "last_pipeline_id", null: false
     t.float "value", null: false
-    t.integer "param_type", limit: 2, null: false
+    t.bigint "param_type", null: false
     t.string "ref_path", null: false
     t.string "title", null: false
     t.index ["last_pipeline_id"], name: "index_ci_daily_report_results_on_last_pipeline_id"

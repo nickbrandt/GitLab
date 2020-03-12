@@ -3,139 +3,59 @@
 require 'spec_helper'
 
 describe Ci::DailyReportResult do
-  describe '::store_coverage' do
-    let!(:pipeline) { create(:ci_pipeline, created_at: '2020-02-06 00:01:10') }
-    let!(:rspec_job) { create(:ci_build, pipeline: pipeline, name: '3/3 rspec', coverage: 80) }
-    let!(:karma_job) { create(:ci_build, pipeline: pipeline, name: '2/2 karma', coverage: 90) }
-    let!(:extra_job) { create(:ci_build, pipeline: pipeline, name: 'extra', coverage: nil) }
-
-    it 'creates daily code coverage record for each job in the pipeline that has coverage value' do
-      described_class.store_coverage(pipeline)
-
-      Ci::DailyReportResult.find_by(title: 'rspec').tap do |coverage|
-        expect(coverage).to have_attributes(
-          project_id: pipeline.project.id,
-          last_pipeline_id: pipeline.id,
-          ref_path: pipeline.source_ref_path,
-          param_type: 'coverage',
-          title: rspec_job.group_name,
-          value: rspec_job.coverage,
-          date: pipeline.created_at.to_date
-        )
-      end
-
-      Ci::DailyReportResult.find_by(title: 'karma').tap do |coverage|
-        expect(coverage).to have_attributes(
-          project_id: pipeline.project.id,
-          last_pipeline_id: pipeline.id,
-          ref_path: pipeline.source_ref_path,
-          param_type: 'coverage',
-          title: karma_job.group_name,
-          value: karma_job.coverage,
-          date: pipeline.created_at.to_date
-        )
-      end
-
-      expect(Ci::DailyReportResult.find_by(title: 'extra')).to be_nil
+  describe '.upsert_reports' do
+    let!(:rspec_coverage) do
+      create(
+        :ci_daily_report_result,
+        title: 'rspec',
+        date: '2020-03-09',
+        value: 71.2
+      )
     end
+    let!(:new_pipeline) { create(:ci_pipeline) }
 
-    context 'when there is an existing daily code coverage for the matching date, project, ref_path, and group name' do
-      let!(:new_pipeline) do
-        create(
-          :ci_pipeline,
-          project: pipeline.project,
-          ref: pipeline.ref,
-          created_at: '2020-02-06 00:02:20'
-        )
-      end
-      let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, name: '4/4 rspec', coverage: 84) }
-      let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, name: '3/3 karma', coverage: 92) }
-
-      before do
-        # Create the existing daily code coverage records
-        described_class.store_coverage(pipeline)
-      end
-
-      it "updates the existing record's coverage value and last_pipeline_id" do
-        rspec_coverage = Ci::DailyReportResult.find_by(title: 'rspec')
-        karma_coverage = Ci::DailyReportResult.find_by(title: 'karma')
-
-        # Bump up the coverage values
-        described_class.store_coverage(new_pipeline)
-
-        rspec_coverage.reload
-        karma_coverage.reload
-
-        expect(rspec_coverage).to have_attributes(
+    it 'creates or updates matching report results' do
+      described_class.upsert_reports([
+        {
+          project_id: rspec_coverage.project_id,
+          ref_path: rspec_coverage.ref_path,
+          param_type: described_class.param_types[rspec_coverage.param_type],
           last_pipeline_id: new_pipeline.id,
-          value: new_rspec_job.coverage
-        )
-
-        expect(karma_coverage).to have_attributes(
+          date: rspec_coverage.date,
+          title: 'rspec',
+          value: 81.0
+        },
+        {
+          project_id: rspec_coverage.project_id,
+          ref_path: rspec_coverage.ref_path,
+          param_type: described_class.param_types[rspec_coverage.param_type],
           last_pipeline_id: new_pipeline.id,
-          value: new_karma_job.coverage
-        )
-      end
+          date: rspec_coverage.date,
+          title: 'karma',
+          value: 87.0
+        }
+      ])
+
+      rspec_coverage.reload
+
+      expect(rspec_coverage).to have_attributes(
+        last_pipeline_id: new_pipeline.id,
+        value: 81.0
+      )
+
+      expect(described_class.find_by_title('karma')).to have_attributes(
+        project_id: rspec_coverage.project_id,
+        ref_path: rspec_coverage.ref_path,
+        param_type: rspec_coverage.param_type,
+        last_pipeline_id: new_pipeline.id,
+        date: rspec_coverage.date,
+        value: 87.0
+      )
     end
 
-    context 'when the ID of the pipeline is older than the last_pipeline_id' do
-      let!(:new_pipeline) do
-        create(
-          :ci_pipeline,
-          project: pipeline.project,
-          ref: pipeline.ref,
-          created_at: '2020-02-06 00:02:20'
-        )
-      end
-      let!(:new_rspec_job) { create(:ci_build, pipeline: new_pipeline, name: '4/4 rspec', coverage: 84) }
-      let!(:new_karma_job) { create(:ci_build, pipeline: new_pipeline, name: '3/3 karma', coverage: 92) }
-
-      before do
-        # Create the existing daily code coverage records
-        # but in this case, for the newer pipeline first.
-        described_class.store_coverage(new_pipeline)
-      end
-
-      it 'updates the existing daily code coverage records' do
-        rspec_coverage = Ci::DailyReportResult.find_by(title: 'rspec')
-        karma_coverage = Ci::DailyReportResult.find_by(title: 'karma')
-
-        # Run another one but for the older pipeline.
-        # This simulates the scenario wherein the success worker
-        # of an older pipeline, for some network hiccup, was delayed
-        # and only got executed right after the newer pipeline's success worker.
-        # Ideally, we don't want to bump the coverage value with an older one
-        # but given this can be a rare edge case and can be remedied by re-running
-        # the pipeline we'll just let it be for now. In return, we are able to use
-        # Rails 6 shiny new method, upsert_all, and simplify the code a lot.
-        described_class.store_coverage(pipeline)
-
-        rspec_coverage.reload
-        karma_coverage.reload
-
-        expect(rspec_coverage).to have_attributes(
-          last_pipeline_id: pipeline.id,
-          value: rspec_job.coverage
-        )
-
-        expect(karma_coverage).to have_attributes(
-          last_pipeline_id: pipeline.id,
-          value: karma_job.coverage
-        )
-      end
-    end
-
-    context 'when pipeline has no builds with coverage' do
-      let!(:new_pipeline) do
-        create(
-          :ci_pipeline,
-          created_at: '2020-02-06 00:02:20'
-        )
-      end
-      let!(:some_job) { create(:ci_build, pipeline: new_pipeline, name: 'foo') }
-
+    context 'when given data is empty' do
       it 'does nothing' do
-        expect { described_class.store_coverage(new_pipeline) }.not_to raise_error
+        expect { described_class.upsert_reports([]) }.not_to raise_error
       end
     end
   end
