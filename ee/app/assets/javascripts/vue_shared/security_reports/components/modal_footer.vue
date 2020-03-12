@@ -48,6 +48,18 @@ export default {
       required: false,
       default: false,
     },
+    isCreatingIssue: {
+      type: Boolean,
+      required: true,
+    },
+    isDismissingVulnerability: {
+      type: Boolean,
+      required: true,
+    },
+    isCreatingMergeRequest: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
     actionButtons() {
@@ -55,13 +67,13 @@ export default {
       const issueButton = {
         name: s__('ciReport|Create issue'),
         tagline: s__('ciReport|Investigate this vulnerability by creating an issue'),
-        isLoading: this.modal.isCreatingNewIssue,
+        isLoading: this.isCreatingIssue,
         action: 'createNewIssue',
       };
       const MRButton = {
         name: s__('ciReport|Resolve with merge request'),
         tagline: s__('ciReport|Automatically apply the patch in a new branch'),
-        isLoading: this.modal.isCreatingMergeRequest,
+        isLoading: this.isCreatingMergeRequest,
         action: 'createMergeRequest',
       };
       const DownloadButton = {
@@ -96,7 +108,7 @@ export default {
 
     <dismiss-button
       v-if="canDismissVulnerability"
-      :is-dismissing="modal.isDismissingVulnerability"
+      :is-dismissing="isDismissingVulnerability"
       :is-dismissed="isDismissed"
       :disabled="disabled"
       @dismissVulnerability="$emit('dismissVulnerability')"
