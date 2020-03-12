@@ -372,15 +372,6 @@ NOTE: **Note:**
 The `SIDEKIQ_MEMORY_KILLER_MAX_RSS` setting is `16000000` on Sidekiq import
 nodes and Sidekiq export nodes.
 
-## Cron jobs
-
-Periodically executed jobs by Sidekiq, to self-heal GitLab, do external
-synchronizations, run scheduled pipelines, etc.:
-
-| Setting                     | GitLab.com   | Default      |
-|--------                     |------------- |------------- |
-| `pipeline_schedule_worker`  | `*/5 * * * *` | `19 * * * *` |
-
 ## PostgreSQL
 
 GitLab.com being a fairly large installation of GitLab means we have changed
