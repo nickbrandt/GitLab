@@ -5,7 +5,7 @@ import mockData, {
   baseIssues,
   parsedBaseIssues,
   parsedHeadIssues,
-} from 'ee_spec/vue_mr_widget/mock_data';
+} from 'ee_jest/vue_mr_widget/mock_data';
 import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
 
 describe('MergeRequestStore', () => {
@@ -18,7 +18,7 @@ describe('MergeRequestStore', () => {
   describe('compareCodeclimateMetrics', () => {
     beforeEach(() => {
       // mock worker response
-      spyOn(MergeRequestStore, 'doCodeClimateComparison').and.callFake(() =>
+      jest.spyOn(MergeRequestStore, 'doCodeClimateComparison').mockImplementation(() =>
         Promise.resolve({
           newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
           resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
