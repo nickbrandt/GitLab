@@ -28,7 +28,7 @@ describe('Issues Filtered Search Token Keys (EE)', () => {
     it('should return assignee as an array', () => {
       const assignee = tokenKeys.find(tokenKey => tokenKey.key === 'assignee');
 
-      expect(assignee.type).toEqual('array');
+      expect(assignee.type).toBe('array');
     });
   });
 
