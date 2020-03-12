@@ -32,8 +32,8 @@ describe('AdminLicenseManagementRow', () => {
   beforeEach(() => {
     actions = {
       setLicenseInModal: jest.fn(),
-      approveLicense: jest.fn(),
-      blacklistLicense: jest.fn(),
+      allowLicense: jest.fn(),
+      denyLicense: jest.fn(),
     };
 
     store = new Vuex.Store({
@@ -55,7 +55,7 @@ describe('AdminLicenseManagementRow', () => {
 
   describe('approved license', () => {
     beforeEach(done => {
-      vm.license = { ...approvedLicense, approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED };
+      vm.license = { ...approvedLicense, approvalStatus: LICENSE_APPROVAL_STATUS.ALLOWED };
       Vue.nextTick(done);
     });
 
@@ -90,7 +90,7 @@ describe('AdminLicenseManagementRow', () => {
 
   describe('blacklisted license', () => {
     beforeEach(done => {
-      vm.license = { ...approvedLicense, approvalStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED };
+      vm.license = { ...approvedLicense, approvalStatus: LICENSE_APPROVAL_STATUS.DENIED };
       Vue.nextTick(done);
     });
 
@@ -131,18 +131,18 @@ describe('AdminLicenseManagementRow', () => {
       expect(actions.setLicenseInModal).toHaveBeenCalled();
     });
 
-    it('triggering approveLicense by clicking the first dropdown option', () => {
+    it('triggering allowLicense by clicking the first dropdown option', () => {
       const linkEl = findNthDropdown(0);
       linkEl.click();
 
-      expect(actions.approveLicense).toHaveBeenCalled();
+      expect(actions.allowLicense).toHaveBeenCalled();
     });
 
-    it('triggering approveLicense blacklistLicense by clicking the second dropdown option', () => {
+    it('triggering allowLicense denyLicense by clicking the second dropdown option', () => {
       const linkEl = findNthDropdown(1);
       linkEl.click();
 
-      expect(actions.blacklistLicense).toHaveBeenCalled();
+      expect(actions.denyLicense).toHaveBeenCalled();
     });
   });
 
@@ -176,7 +176,7 @@ describe('AdminLicenseManagementRow', () => {
       expect(dropdownEl.innerText.trim()).toBe(vm.dropdownText);
     });
 
-    it('renders the dropdown with `Allowed` and `Denied` options', () => {
+    it('renders the dropdown with `Allow` and `Deny` options', () => {
       const dropdownEl = vm.$el.querySelector('.dropdown');
 
       expect(dropdownEl).not.toBeNull();
@@ -184,12 +184,12 @@ describe('AdminLicenseManagementRow', () => {
       const firstOption = findNthDropdown(0);
 
       expect(firstOption).not.toBeNull();
-      expect(firstOption.innerText.trim()).toBe('Allowed');
+      expect(firstOption.innerText.trim()).toBe('Allow');
 
       const secondOption = findNthDropdown(1);
 
       expect(secondOption).not.toBeNull();
-      expect(secondOption.innerText.trim()).toBe('Denied');
+      expect(secondOption.innerText.trim()).toBe('Deny');
     });
 
     it('does not show a loading icon and enables both the dropdown and the remove button by default', () => {

@@ -19,8 +19,8 @@ describe('SetApprovalModal', () => {
   beforeEach(() => {
     actions = {
       resetLicenseInModal: jest.fn(),
-      approveLicense: jest.fn(),
-      blacklistLicense: jest.fn(),
+      allowLicense: jest.fn(),
+      denyLicense: jest.fn(),
     };
 
     store = new Vuex.Store({
@@ -49,7 +49,7 @@ describe('SetApprovalModal', () => {
         licenseManagement: {
           currentLicenseInModal: {
             ...licenseReport[0],
-            approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+            approvalStatus: LICENSE_APPROVAL_STATUS.ALLOWED,
           },
           canManageLicenses: true,
         },
@@ -152,7 +152,7 @@ describe('SetApprovalModal', () => {
         licenseManagement: {
           currentLicenseInModal: {
             ...licenseReport[0],
-            approvalStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED,
+            approvalStatus: LICENSE_APPROVAL_STATUS.DENIED,
           },
           canManageLicenses: true,
         },
@@ -292,12 +292,12 @@ describe('SetApprovalModal', () => {
       });
     });
 
-    describe('triggering approveLicense on approving', () => {
+    describe('triggering allowLicense on approving', () => {
       it('by clicking the confirmation button', () => {
         const linkEl = vm.$el.querySelector('.js-modal-primary-action');
         linkEl.click();
 
-        expect(actions.approveLicense).toHaveBeenCalledWith(
+        expect(actions.allowLicense).toHaveBeenCalledWith(
           expect.any(Object),
           store.state.licenseManagement.currentLicenseInModal,
           undefined,
@@ -305,12 +305,12 @@ describe('SetApprovalModal', () => {
       });
     });
 
-    describe('triggering blacklistLicense on blacklisting', () => {
+    describe('triggering denyLicense on blacklisting', () => {
       it('by clicking the confirmation button', () => {
         const linkEl = vm.$el.querySelector('.js-modal-secondary-action');
         linkEl.click();
 
-        expect(actions.blacklistLicense).toHaveBeenCalledWith(
+        expect(actions.denyLicense).toHaveBeenCalledWith(
           expect.any(Object),
           store.state.licenseManagement.currentLicenseInModal,
           undefined,
@@ -328,7 +328,7 @@ describe('SetApprovalModal', () => {
         currentLicenseInModal: {
           ...licenseReport[0],
           url: badURL,
-          approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+          approvalStatus: LICENSE_APPROVAL_STATUS.ALLOWED,
         },
       },
     });
