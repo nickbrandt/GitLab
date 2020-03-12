@@ -126,18 +126,10 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
     subject(:blobs) { result.objects('blobs') }
 
-    it 'uses FileFinder instead of ES search' do
-      project.add_reporter(user)
-
-      expect_any_instance_of(Gitlab::FileFinder).to receive(:find).with('initial').and_return([])
-
-      _ = blobs
-    end
-
-    it 'respects project visibility' do
+    it 'always returns zero results' do
       expect_any_instance_of(Gitlab::FileFinder).to receive(:find).never
 
-      is_expected.to be_empty
+      expect(blobs).to be_empty
     end
   end
 

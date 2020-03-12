@@ -17,6 +17,23 @@ describe Search::ProjectService do
     let(:service) { described_class.new(scope, user, params) }
   end
 
+  context 'code search' do
+    let(:user) { scope.owner }
+    let(:scope) { create(:project) }
+    let(:service) { described_class.new(scope, user, params) }
+    let(:params) { { search: '*' } }
+
+    describe '#execute' do
+      subject { service.execute }
+
+      it 'returns ordinary results when searching non-default branch' do
+        expect(service).to receive(:default_branch?).and_return(false)
+
+        is_expected.to be_a(::Gitlab::ProjectSearchResults)
+      end
+    end
+  end
+
   context 'visibility', :elastic, :sidekiq_inline do
     include_context 'ProjectPolicyTable context'
 
