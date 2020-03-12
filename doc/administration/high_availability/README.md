@@ -37,9 +37,9 @@ References:
 
 By separating components you can see a number of advantages compared to a single-node setup. Namely, you can:
 
-- Increase the number of users 
-- Enable zero-downtime upgrades 
-- Increase availability 
+- Increase the number of users
+- Enable zero-downtime upgrades
+- Increase availability
 
 Additional application nodes will handle frontend traffic, with a load balancer in front to distribute traffic across those nodes. Meanwhile, each application node connects to a shared file server and database systems on the back end. This way, if one of the application servers fails, the workflow is not interrupted.
 
@@ -55,13 +55,13 @@ By adding automatic failover for database systems, we can enable higher uptime w
 
 This configuration is supported in [GitLab Premium and Ultimate](https://about.gitlab.com/pricing/).
 
-References: 
+References:
 
 - [High Availability Reference Architectures](#reference-architectures)
 
 ### Level 4: GitLab Geo
 
-GitLab Geo allows you to replicate your GitLab instance to other geographical locations as a read-only fully operational instance that can also be promoted in case of disaster. 
+GitLab Geo allows you to replicate your GitLab instance to other geographical locations as a read-only fully operational instance that can also be promoted in case of disaster.
 
 This configuration is supported in [GitLab Premium and Ultimate](https://about.gitlab.com/pricing/).
 
