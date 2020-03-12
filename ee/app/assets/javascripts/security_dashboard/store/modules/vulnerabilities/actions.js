@@ -121,6 +121,7 @@ export const createIssue = ({ dispatch }, { vulnerability, flashError }) => {
       vulnerability_feedback: {
         feedback_type: 'issue',
         category: vulnerability.report_type,
+        project_fingerprint: vulnerability.project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
           category: vulnerability.report_type,
