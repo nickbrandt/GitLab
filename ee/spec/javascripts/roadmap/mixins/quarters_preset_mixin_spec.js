@@ -15,7 +15,6 @@ const createComponent = ({
   timeframe = mockTimeframeQuarters,
   timeframeItem = mockTimeframeQuarters[0],
   epic = mockEpic,
-  timeframeString = '',
 }) => {
   const Component = Vue.extend(EpicItemTimelineComponent);
 
@@ -24,7 +23,6 @@ const createComponent = ({
     timeframe,
     timeframeItem,
     epic,
-    timeframeString,
   });
 };
 

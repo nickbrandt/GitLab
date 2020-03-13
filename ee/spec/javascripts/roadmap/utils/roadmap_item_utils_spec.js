@@ -2,7 +2,7 @@ import * as roadmapItemUtils from 'ee/roadmap/utils/roadmap_item_utils';
 
 import { parsePikadayDate } from '~/lib/utils/datetime_utility';
 
-import { rawEpics } from '../mock_data';
+import { rawEpics, mockGroupMilestonesQueryResponse } from '../mock_data';
 
 describe('processRoadmapItemDates', () => {
   const timeframeStartDate = new Date(2017, 0, 1);
@@ -111,5 +111,19 @@ describe('formatRoadmapItemDetails', () => {
     expect(epic.originalEndDate).toBeUndefined();
     expect(epic.startDateUndefined).toBe(true);
     expect(epic.endDateUndefined).toBe(true);
+  });
+});
+
+describe('extractGroupMilestones', () => {
+  it('returns array of epics with `edges->nodes` nesting removed', () => {
+    const { edges } = mockGroupMilestonesQueryResponse.data.group.milestones;
+    const extractedMilestones = roadmapItemUtils.extractGroupMilestones(edges);
+
+    expect(extractedMilestones.length).toBe(edges.length);
+    expect(extractedMilestones[0]).toEqual(
+      jasmine.objectContaining({
+        ...edges[0].node,
+      }),
+    );
   });
 });

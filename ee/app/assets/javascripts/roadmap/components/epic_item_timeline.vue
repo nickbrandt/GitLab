@@ -45,10 +45,6 @@ export default {
       type: Object,
       required: true,
     },
-    timeframeString: {
-      type: String,
-      required: true,
-    },
     clientWidth: {
       type: Number,
       required: false,
@@ -78,6 +74,27 @@ export default {
         time: endDate.getTime(),
       };
     },
+    /**
+     * In case Epic start date is out of range
+     * we need to use original date instead of proxy date
+     */
+    startDate() {
+      if (this.epic.startDateOutOfRange) {
+        return this.epic.originalStartDate;
+      }
+
+      return this.epic.startDate;
+    },
+    /**
+     * In case Epic end date is out of range
+     * we need to use original date instead of proxy date
+     */
+    endDate() {
+      if (this.epic.endDateOutOfRange) {
+        return this.epic.originalEndDate;
+      }
+      return this.epic.endDate;
+    },
     hasStartDate() {
       if (this.presetTypeQuarters) {
         return this.hasStartDateForQuarter();
@@ -87,30 +104,6 @@ export default {
         return this.hasStartDateForWeek();
       }
       return false;
-    },
-    timelineBarStyles() {
-      let barStyles = {};
-
-      if (this.hasStartDate) {
-        if (this.presetTypeQuarters) {
-          // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForQuarters(
-            this.epic,
-          )}px; ${this.getTimelineBarStartOffsetForQuarters(this.epic)}`;
-        } else if (this.presetTypeMonths) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths(
-            this.epic,
-          )}`;
-        } else if (this.presetTypeWeeks) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks(
-            this.epic,
-          )}`;
-        }
-      }
-      return barStyles;
     },
     epicBarInnerStyle() {
       return {
@@ -175,7 +168,7 @@ export default {
         v-if="hasStartDate"
         :id="`epic-bar-${epic.id}`"
         :href="epic.webUrl"
-        :style="timelineBarStyles"
+        :style="timelineBarStyles(epic)"
         class="epic-bar"
       >
         <div class="epic-bar-inner" :style="epicBarInnerStyle">
@@ -202,7 +195,7 @@ export default {
         triggers="hover focus"
         placement="right"
       >
-        <p class="text-secondary m-0">{{ timeframeString }}</p>
+        <p class="text-secondary m-0">{{ timeframeString(epic) }}</p>
         <p class="m-0">{{ popoverWeightText }}</p>
       </gl-popover>
     </div>

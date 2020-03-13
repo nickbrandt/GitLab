@@ -9,6 +9,7 @@ import * as epicUtils from 'ee/roadmap/utils/epic_utils';
 import * as roadmapItemUtils from 'ee/roadmap/utils/roadmap_item_utils';
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
+import groupMilestones from 'ee/roadmap/queries/groupMilestones.query.graphql';
 import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
 
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -27,6 +28,10 @@ import {
   mockSortedBy,
   mockGroupEpicsQueryResponse,
   mockEpicChildEpicsQueryResponse,
+  mockGroupMilestonesQueryResponse,
+  rawMilestones,
+  mockMilestone,
+  mockFormattedMilestone,
 } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
@@ -412,6 +417,182 @@ describe('Roadmap Vuex Actions', () => {
         10,
         state,
         [{ type: types.SET_BUFFER_SIZE, payload: 10 }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchGroupMilestones', () => {
+    let mockState;
+    let expectedVariables;
+
+    beforeEach(() => {
+      mockState = {
+        fullPath: 'gitlab-org',
+        milestonessState: 'active',
+        presetType: PRESET_TYPES.MONTHS,
+        timeframe: mockTimeframeMonths,
+      };
+
+      expectedVariables = {
+        fullPath: 'gitlab-org',
+        state: mockState.milestonessState,
+        startDate: '2017-11-1',
+        dueDate: '2018-6-30',
+      };
+    });
+
+    it('should fetch Group Milestones using GraphQL client when milestoneIid is not present in state', done => {
+      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+        Promise.resolve({
+          data: mockGroupMilestonesQueryResponse.data,
+        }),
+      );
+
+      actions
+        .fetchGroupMilestones(mockState)
+        .then(() => {
+          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+            query: groupMilestones,
+            variables: expectedVariables,
+          });
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('requestMilestones', () => {
+    it('should set `milestonesFetchInProgress` to true', done => {
+      testAction(actions.requestMilestones, {}, state, [{ type: 'REQUEST_MILESTONES' }], [], done);
+    });
+  });
+
+  describe('fetchMilestones', () => {
+    describe('success', () => {
+      it('should dispatch requestMilestones and receiveMilestonesSuccess when request is successful', done => {
+        spyOn(epicUtils.gqClient, 'query').and.returnValue(
+          Promise.resolve({
+            data: mockGroupMilestonesQueryResponse.data,
+          }),
+        );
+
+        testAction(
+          actions.fetchMilestones,
+          null,
+          state,
+          [],
+          [
+            {
+              type: 'requestMilestones',
+            },
+            {
+              type: 'receiveMilestonesSuccess',
+              payload: { rawMilestones },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('failure', () => {
+      it('should dispatch requestMilestones and receiveMilestonesFailure when request fails', done => {
+        testAction(
+          actions.fetchMilestones,
+          null,
+          state,
+          [],
+          [
+            {
+              type: 'requestMilestones',
+            },
+            {
+              type: 'receiveMilestonesFailure',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveMilestonesSuccess', () => {
+    it('should set formatted milestones array and milestoneId to IDs array in state based on provided milestones list', done => {
+      testAction(
+        actions.receiveMilestonesSuccess,
+        {
+          rawMilestones: [
+            Object.assign({}, mockMilestone, {
+              start_date: '2017-12-31',
+              end_date: '2018-2-15',
+            }),
+          ],
+        },
+        state,
+        [
+          { type: types.UPDATE_MILESTONE_IDS, payload: [mockMilestone.id] },
+          {
+            type: types.RECEIVE_MILESTONES_SUCCESS,
+            payload: [
+              Object.assign({}, mockFormattedMilestone, {
+                startDateOutOfRange: false,
+                endDateOutOfRange: false,
+                startDate: new Date(2017, 11, 31),
+                originalStartDate: new Date(2017, 11, 31),
+                endDate: new Date(2018, 1, 15),
+                originalEndDate: new Date(2018, 1, 15),
+              }),
+            ],
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveMilestonesFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('should set milestonesFetchInProgress to false and milestonesFetchFailure to true', done => {
+      testAction(
+        actions.receiveMilestonesFailure,
+        {},
+        state,
+        [{ type: types.RECEIVE_MILESTONES_FAILURE }],
+        [],
+        done,
+      );
+    });
+
+    it('should show flash error', () => {
+      actions.receiveMilestonesFailure({ commit: () => {} });
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'Something went wrong while fetching milestones',
+      );
+    });
+  });
+
+  describe('refreshMilestoneDates', () => {
+    it('should update milestones after refreshing milestone dates to match with updated timeframe', done => {
+      const milestones = rawMilestones.map(milestone =>
+        roadmapItemUtils.formatRoadmapItemDetails(
+          milestone,
+          state.timeframeStartDate,
+          state.timeframeEndDate,
+        ),
+      );
+
+      testAction(
+        actions.refreshMilestoneDates,
+        {},
+        { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), milestones },
+        [{ type: types.SET_MILESTONES, payload: milestones }],
         [],
         done,
       );
