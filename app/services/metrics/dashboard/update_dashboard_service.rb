@@ -21,14 +21,14 @@ module Metrics
       private
 
       def check_push_authorized(result)
-        return error(_(%q(You are not allowed to push into this branch. Create another branch or open a merge request.)), :forbidden) unless push_authorized?
+        return error("You are not allowed to push into this branch. Create another branch or open a merge request.", :forbidden) unless push_authorized?
 
         success(result)
       end
 
       def check_branch_name(result)
-        return error(_(%q(There was an error updating the dashboard, branch name is invalid.)), :bad_request) unless valid_branch_name?
-        return error(_('There was an error updating the dashboard, branch named: %{branch} already exists.') % { branch: params[:branch] }, :bad_request) unless new_or_default_branch?
+        return error("There was an error updating the dashboard, branch name is invalid.", :bad_request) unless valid_branch_name?
+        return error("There was an error updating the dashboard, branch named: #{branch} already exists.", :bad_request) unless new_or_default_branch?
 
         success(result)
       end
