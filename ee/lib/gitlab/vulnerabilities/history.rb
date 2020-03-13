@@ -29,7 +29,7 @@ module Gitlab
       end
 
       def cached_vulnerability_history
-        history = { undefined: {}, info: {}, unknown: {}, low: {}, medium: {}, high: {}, critical: {}, total: {} }
+        history = { info: {}, unknown: {}, low: {}, medium: {}, high: {}, critical: {}, total: {} }
 
         project_ids_to_fetch.each do |project_id|
           project_history = Gitlab::Vulnerabilities::HistoryCache.new(vulnerable, project_id).fetch(HISTORY_RANGE)
