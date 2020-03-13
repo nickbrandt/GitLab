@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe API::GroupPackages do
-  let(:group) { create(:group, :public) }
-  let(:project) { create(:project, :public, namespace: group, name: 'project A') }
+  let_it_be(:group) { create(:group, :public) }
+  let_it_be(:project) { create(:project, :public, namespace: group, name: 'project A') }
   let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
   let!(:package2) { create(:nuget_package, project: project, version: '2.0.4') }
   let(:user) { create(:user) }
@@ -127,6 +127,31 @@ describe API::GroupPackages do
         let!(:package4) { create(:npm_package, project: project) }
 
         it_behaves_like 'returns paginated packages'
+      end
+
+      context 'filtering on package_type' do
+        let_it_be(:package1) { create(:conan_package, project: project) }
+        let_it_be(:package2) { create(:maven_package, project: project) }
+        let_it_be(:package3) { create(:npm_package, project: project) }
+        let_it_be(:package4) { create(:nuget_package, project: project) }
+
+        context 'for each type' do
+          %w[conan maven npm nuget].each do |package_type|
+            it "returns #{package_type} packages" do
+              url = "/groups/#{group.id}/packages?package_type=#{package_type}"
+
+              get api(url)
+
+              expect(json_response.map { |package| package['package_type'] }).to eq([package_type])
+            end
+          end
+        end
+
+        context 'does not accept non supported package_type value' do
+          let(:url) { "/groups/#{group.id}/packages?package_type=foo" }
+
+          it_behaves_like 'returning response status', :bad_request
+        end
       end
     end
 
