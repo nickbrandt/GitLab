@@ -87,6 +87,17 @@ describe Gitlab::RepositorySetCache, :clean_gitlab_redis_cache do
         expect(cache.read(:bar)).to be_empty
       end
     end
+
+    context "unlink isn't supported" do
+      before do
+        allow_any_instance_of(Redis).to receive(:unlink) { raise ::Redis::CommandError }
+      end
+
+      it 'still deletes the given key' do
+        expect(cache.expire(:foo)).to eq(1)
+        expect(cache.read(:foo)).to be_empty
+      end
+    end
   end
 
   describe '#exist?' do
