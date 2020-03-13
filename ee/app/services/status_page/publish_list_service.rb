@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 module StatusPage
+  # Render a list of issues as incidents and publish them to CDN.
+  #
+  # This is an internal service which is part of
+  # +StatusPage::PublishIncidentService+ and is not meant to be called directly.
+  #
+  # Consider calling +StatusPage::PublishIncidentService+ instead.
   class PublishListService < PublishBaseService
     private
 

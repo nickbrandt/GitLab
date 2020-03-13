@@ -2,26 +2,42 @@
 
 module StatusPage
   class PublishBaseService
-    JSON_MAX_SIZE = 1.megabyte
+    include Gitlab::Utils::StrongMemoize
 
-    def initialize(project:, storage_client:, serializer:)
+    def initialize(project:)
       @project = project
-      @storage_client = storage_client
-      @serializer = serializer
     end
 
     def execute(*args)
       return error_feature_not_available unless feature_available?
+      return error_no_storage_client unless storage_client
 
       publish(*args)
     end
 
     private
 
-    attr_reader :project, :storage_client, :serializer
+    attr_reader :project
 
     def publish(*args)
       raise NotImplementedError
+    end
+
+    def storage_client
+      strong_memoize(:strong_memoize) do
+        project.status_page_setting&.storage_client
+      end
+    end
+
+    def serializer
+      strong_memoize(:serializer) do
+        # According to development/reusing_abstractions.html#abstractions
+        # serializers can only be used from controllers.
+        # For the Status Page however, we generate JSON in background jobs.
+        # rubocop: disable CodeReuse/Serializer
+        StatusPage::IncidentSerializer.new
+        # rubocop: enable CodeReuse/Serializer
+      end
     end
 
     def feature_available?
@@ -35,12 +51,12 @@ module StatusPage
       storage_client.upload_object(key, content)
 
       success(object_key: key)
-    rescue StatusPage::Storage::Error => e
-      error(e.message, error: e)
     end
 
     def limit_exceeded?(json)
-      !Gitlab::Utils::DeepSize.new(json, max_size: JSON_MAX_SIZE).valid?
+      !Gitlab::Utils::DeepSize
+        .new(json, max_size: Storage::JSON_MAX_SIZE)
+        .valid?
     end
 
     def error(message, payload = {})
@@ -53,6 +69,10 @@ module StatusPage
 
     def error_feature_not_available
       error('Feature not available')
+    end
+
+    def error_no_storage_client
+      error('No storage client available. Is the status page setting activated?')
     end
 
     def success(payload = {})

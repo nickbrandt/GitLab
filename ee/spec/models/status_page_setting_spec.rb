@@ -109,4 +109,27 @@ describe StatusPageSetting do
       it { is_expected.to eq(false) }
     end
   end
+
+  describe '#storage_client' do
+    let(:status_page_setting) { build(:status_page_setting, :enabled) }
+
+    before do
+      allow(status_page_setting)
+        .to receive(:enabled?).and_return(status_page_setting_enabled)
+    end
+
+    subject { status_page_setting.storage_client }
+
+    context 'when status page settings is enabled' do
+      let(:status_page_setting_enabled) { true }
+
+      it { is_expected.to be_instance_of(StatusPage::Storage::S3Client) }
+    end
+
+    context 'when not enabled' do
+      let(:status_page_setting_enabled) { false }
+
+      it { is_expected.to be_nil }
+    end
+  end
 end
