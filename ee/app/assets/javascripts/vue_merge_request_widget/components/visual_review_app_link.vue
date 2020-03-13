@@ -1,14 +1,26 @@
 <script>
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
+import {
+  GlButton,
+  GlDropdown,
+  GlDropdownItem,
+  GlModal,
+  GlSearchBoxByType,
+  GlModalDirective,
+} from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
+import ReviewAppLink from '~/vue_merge_request_widget/components/review_app_link.vue';
 import { s__, sprintf } from '~/locale';
 
 export default {
   components: {
     GlButton,
+    GlDropdown,
+    GlDropdownItem,
     GlModal,
+    GlSearchBoxByType,
     Icon,
+    ReviewAppLink,
     ModalCopyButton,
   },
   directives: {
@@ -19,6 +31,11 @@ export default {
       type: Object,
       required: true,
     },
+    changes: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
     cssClass: {
       type: String,
       required: false,
@@ -28,10 +45,15 @@ export default {
       type: String,
       required: true,
     },
+    viewAppDisplay: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
       modalId: 'visual-review-app-info',
+      changesSearchTerm: '',
     };
   },
   computed: {
@@ -55,6 +77,9 @@ export default {
       };
       /* eslint-enable no-useless-escape */
     },
+    filteredChanges() {
+      return this.changes.filter(change => change.path.includes(this.changesSearchTerm));
+    },
     instructionText() {
       return {
         intro: {
@@ -62,7 +87,7 @@ export default {
             'VisualReviewApp|Follow the steps below to enable Visual Reviews inside your application.',
           ),
           p2: s__(
-            'VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4, and 5 are performed by the reviewer each time they perform a review.',
+            'VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4 is performed by the reviewer each time they perform a review.',
           ),
         },
         step1: sprintf(
@@ -111,6 +136,20 @@ export default {
     modalTitle() {
       return s__('VisualReviewApp|Enable Visual Reviews');
     },
+    shouldShowChanges() {
+      return this.changes.length > 0;
+    },
+    isSearchEmpty() {
+      return this.filteredChanges.length === 0;
+    },
+  },
+  methods: {
+    cancel() {
+      this.$refs.modal.cancel();
+    },
+    ok() {
+      this.$refs.modal.ok();
+    },
   },
 };
 </script>
@@ -125,25 +164,14 @@ export default {
       {{ s__('VisualReviewApp|Review') }}
     </gl-button>
     <gl-modal
+      ref="modal"
       :modal-id="modalId"
       :title="modalTitle"
+      lazy
+      static
       size="lg"
       class="text-2 ws-normal"
-      ok-variant="success"
     >
-      <template slot="modal-ok">
-        <a
-          :href="link"
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-          class="text-white js-review-app-link"
-          data-track-event="open_review_app"
-          data-track-label="review_app"
-        >
-          {{ s__('VisualReviewApp|Open review app') }}
-          <icon class="fwhite" name="external-link" />
-        </a>
-      </template>
       <p v-html="instructionText.intro.p1"></p>
       <p v-html="instructionText.intro.p2"></p>
       <div>
@@ -169,6 +197,45 @@ export default {
         />
       </p>
       <p v-html="instructionText.step4"></p>
+      <template #modal-footer>
+        <gl-button @click="cancel">
+          {{ s__('VisualReviewApp|Cancel') }}
+        </gl-button>
+        <gl-dropdown
+          v-if="shouldShowChanges"
+          dropup
+          right
+          split
+          :split-href="link"
+          data-track-event="open_review_app"
+          data-track-label="review_app"
+          @click="ok"
+        >
+          <gl-search-box-by-type v-model.trim="changesSearchTerm" class="m-2" />
+          <template #button-content>
+            {{ s__('VisualReviewApp|Open review app') }}
+            <icon class="fgray" name="external-link" />
+          </template>
+          <gl-dropdown-item
+            v-for="change in filteredChanges"
+            :key="change.path"
+            :href="change.external_url"
+            data-track-event="open_review_app"
+            data-track-label="review_app"
+            >{{ change.path }}</gl-dropdown-item
+          >
+
+          <div v-show="isSearchEmpty" class="text-secondary p-2">
+            {{ s__('VisualReviewApp|No review app found or available.') }}
+          </div>
+        </gl-dropdown>
+        <review-app-link
+          v-else
+          :display="viewAppDisplay"
+          :link="link"
+          css-class="js-deploy-url deploy-link btn btn-default btn-sm inline"
+        />
+      </template>
     </gl-modal>
   </div>
 </template>
