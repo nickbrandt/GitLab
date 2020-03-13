@@ -52,13 +52,16 @@ export default {
         >
       </li>
       <li class="divider"></li>
-      <li v-for="epic in epics" :key="epic.id">
-        <gl-link
-          :class="{ 'is-active': isSelected(epic) }"
-          @click.prevent="handleItemClick(epic)"
-          >{{ epic.title }}</gl-link
-        >
-      </li>
+      <template v-if="epics.length">
+        <li v-for="epic in epics" :key="epic.id">
+          <gl-link
+            :class="{ 'is-active': isSelected(epic) }"
+            @click.prevent="handleItemClick(epic)"
+            >{{ epic.title }}</gl-link
+          >
+        </li>
+      </template>
+      <li v-else class="d-block text-center p-2">{{ __('No matches found') }}</li>
     </ul>
   </div>
 </template>

@@ -13,14 +13,7 @@ import DropdownContents from 'ee/vue_shared/components/sidebar/epics_select/drop
 
 import createDefaultStore from 'ee/vue_shared/components/sidebar/epics_select/store';
 
-import {
-  mockEpic1,
-  mockEpic2,
-  mockEpics,
-  mockAssignRemoveRes,
-  mockIssue,
-  noneEpic,
-} from '../mock_data';
+import { mockEpic1, mockEpic2, mockAssignRemoveRes, mockIssue, noneEpic } from '../mock_data';
 
 describe('EpicsSelect', () => {
   describe('Base', () => {
@@ -82,29 +75,32 @@ describe('EpicsSelect', () => {
           expect(wrapper.vm.$store.state.selectedEpic).toBe(mockEpic2);
         });
       });
-    });
 
-    describe('methods', () => {
-      describe('handleDropdownShown', () => {
-        it('should call `fetchEpics` when `groupEpics` does not return any epics', done => {
-          jest.spyOn(wrapper.vm, 'fetchEpics').mockReturnValue(
-            Promise.resolve({
-              data: mockEpics,
-            }),
-          );
+      describe('searchQuery', () => {
+        beforeEach(() => {
+          jest.spyOn(wrapper.vm, 'fetchEpics').mockImplementation(jest.fn());
+        });
 
-          store.dispatch('receiveEpicsSuccess', []);
+        it('should call action `fetchEpics` with `searchQuery` when value is set and `groupEpics` is empty', () => {
+          wrapper.vm.$store.dispatch('receiveEpicsSuccess', []);
+          wrapper.vm.$store.dispatch('setSearchQuery', 'foo');
 
-          wrapper.vm.$nextTick(() => {
-            wrapper.vm.handleDropdownShown();
+          return wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.fetchEpics).toHaveBeenCalledWith('foo');
+          });
+        });
 
-            expect(wrapper.vm.fetchEpics).toHaveBeenCalled();
+        it('should call action `fetchEpics` without any params when value is empty', () => {
+          wrapper.vm.$store.dispatch('setSearchQuery', '');
 
-            done();
+          return wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.fetchEpics).toHaveBeenCalledWith();
           });
         });
       });
+    });
 
+    describe('methods', () => {
       describe('handleDropdownHidden', () => {
         it('should set `showDropdown` to false', () => {
           wrapper.vm.handleDropdownHidden();

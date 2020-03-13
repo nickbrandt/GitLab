@@ -1,0 +1,5 @@
+---
+title: Add support for async search within Epics dropdown
+merge_request: 26980
+author:
+type: fixed

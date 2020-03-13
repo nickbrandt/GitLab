@@ -46,7 +46,9 @@ describe 'Epic in issue sidebar', :js do
 
           page.find('.dropdown-input-field').send_keys('Foo')
 
-          expect(page.all('.dropdown-content li a').length).to eq(2) # `No Epic` + 1 matching epic
+          wait_for_requests
+
+          expect(page).to have_selector('.dropdown-content li a', count: 2) # `No Epic` + 1 matching epic
         end
       end
 

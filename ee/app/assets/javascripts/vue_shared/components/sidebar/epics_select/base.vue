@@ -65,7 +65,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['epicSelectInProgress', 'epicsFetchInProgress', 'selectedEpic']),
+    ...mapState(['epicSelectInProgress', 'epicsFetchInProgress', 'selectedEpic', 'searchQuery']),
     ...mapGetters(['groupEpics']),
     dropdownSelectInProgress() {
       return this.initialEpicLoading || this.epicSelectInProgress;
@@ -95,6 +95,17 @@ export default {
     initialEpicLoading() {
       this.setSelectedEpic(this.initialEpic);
     },
+    /**
+     * Check if `searchQuery` presence has yielded any matching
+     * epics, if not, dispatch `fetchEpics` with search query.
+     */
+    searchQuery(value) {
+      if (value) {
+        if (!this.groupEpics.length) this.fetchEpics(this.searchQuery);
+      } else {
+        this.fetchEpics();
+      }
+    },
   },
   mounted() {
     this.setInitialData({
@@ -103,7 +114,7 @@ export default {
       selectedEpic: this.selectedEpic,
       selectedEpicIssueId: this.epicIssueId,
     });
-    $(this.$refs.dropdown).on('shown.bs.dropdown', this.handleDropdownShown);
+    $(this.$refs.dropdown).on('shown.bs.dropdown', () => this.fetchEpics());
     $(this.$refs.dropdown).on('hidden.bs.dropdown', this.handleDropdownHidden);
   },
   methods: {
@@ -130,9 +141,6 @@ export default {
           $(this.$refs.dropdownButton.$el).trigger('click');
         });
       });
-    },
-    handleDropdownShown() {
-      if (this.groupEpics.length === 0) this.fetchEpics();
     },
     handleDropdownHidden() {
       this.showDropdown = false;
