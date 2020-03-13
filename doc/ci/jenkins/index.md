@@ -83,6 +83,29 @@ There are some high level differences between the products worth mentioning:
   own environment, which will be slower and may be less consistent. We have extensive docs on [how to use the Container Registry](../../user/packages/container_registry/index.md).
 - Totally stuck and not sure where to turn for advice? The [GitLab community forum](https://forum.gitlab.com/) can be a great resource.
 
+## Agents vs. Runners
+
+Both Jenkins agents and GitLab Runners are the hosts that run jobs. To convert the
+Jenkins agent, simply uninstall it and then [install and register the runner](../runners/README.md).
+Runners do not require much overhead, so you can size them similarly to the Jenkins
+agents you were using.
+
+There are some important differences in the way Runners work in comparison to agents:
+
+- Runners can be set up as [shared across an instance, be added at the group level, or set up at the project level](../runners/README.md#shared-specific-and-group-runners).
+  They will self-select jobs from the scopes you've defined automatically.
+- You can also [use tags](../runners/README.md#using-tags) for finer control, and
+  associate runners with specific jobs. For example, you can use a tag for jobs that
+  require dedicated, more powerful, or specific hardware.
+- GitLab has [autoscaling for Runners](https://docs.gitlab.com/runner/configuration/autoscale.html)
+  which will let configure them to be provisioned as needed, and scaled down when not.
+  This is similar to ephemeral agents in Jenkins.
+
+If you are using `gitlab.com`, you can take advantage of our [shared Runner fleet](../../user/gitlab_com/index.md#shared-runners)
+to run jobs without provisioning your own Runners. We are investigating making them
+[available for self-managed instances](https://gitlab.com/gitlab-org/customers-gitlab-com/issues/414)
+as well.
+
 ## Groovy vs. YAML
 
 Jenkins Pipelines are based on [Groovy](https://groovy-lang.org/), so the pipeline specification is written as code.
