@@ -8,7 +8,7 @@ module Ci
   # issue: https://gitlab.com/gitlab-org/gitlab/issues/34224
   class CompareReportsBaseService < ::BaseService
     def execute(base_pipeline, head_pipeline)
-      comparer = comparer_class.new(get_report(base_pipeline), get_report(head_pipeline))
+      comparer = comparer_class.new(get_report(base_pipeline), get_report(head_pipeline), head_pipeline.security_scans)
       {
         status: :parsed,
         key: key(base_pipeline, head_pipeline),

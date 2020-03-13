@@ -12,10 +12,12 @@ module Security
       security_reports = @build.job_artifacts.security_reports
 
       ActiveRecord::Base.transaction do
-        security_reports.each do |report|
+        @build.each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob, artifact|
+          job_artifact_json = JSON.parse(blob)
           Security::Scan.safe_find_or_create_by!(
             build: @build,
-            scan_type: report.file_type
+            scan_type: file_type,
+            scanned_resources_count: job_artifact_json['scan']['scanned_resources'].length()
           )
         end
       end
