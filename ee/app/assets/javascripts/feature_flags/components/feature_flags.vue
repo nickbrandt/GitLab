@@ -1,6 +1,6 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
-import _ from 'underscore';
+import { isEmpty } from 'lodash';
 import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective, GlLink } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
@@ -148,7 +148,7 @@ export default {
       ];
     },
     hasNewPath() {
-      return !_.isEmpty(this.newFeatureFlagPath);
+      return !isEmpty(this.newFeatureFlagPath);
     },
     emptyStateTitle() {
       if (this.scope === this.$options.scopes.disabled) {

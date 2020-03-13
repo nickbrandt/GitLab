@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { property } from 'lodash';
 
 export const ROLLOUT_STRATEGY_ALL_USERS = 'default';
 export const ROLLOUT_STRATEGY_PERCENT_ROLLOUT = 'gradualRolloutUserId';
@@ -12,5 +12,5 @@ export const ALL_ENVIRONMENTS_NAME = '*';
 
 export const INTERNAL_ID_PREFIX = 'internal_';
 
-export const fetchPercentageParams = _.property(['parameters', 'percentage']);
-export const fetchUserIdParams = _.property(['parameters', 'userIds']);
+export const fetchPercentageParams = property(['parameters', 'percentage']);
+export const fetchUserIdParams = property(['parameters', 'userIds']);

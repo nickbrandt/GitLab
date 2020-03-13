@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue';
-import _ from 'underscore';
+import { memoize, isString } from 'lodash';
 import {
   GlButton,
   GlBadge,
@@ -134,7 +134,7 @@ export default {
      * @param {Object} scope
      */
     removeScope(scope) {
-      if (_.isString(scope.id) && scope.id.startsWith(INTERNAL_ID_PREFIX)) {
+      if (isString(scope.id) && scope.id.startsWith(INTERNAL_ID_PREFIX)) {
         this.formScopes = this.formScopes.filter(s => s !== scope);
       } else {
         Vue.set(scope, 'shouldBeDestroyed', true);
@@ -169,7 +169,7 @@ export default {
       return !this.permissionsFlag || scope.canUpdate;
     },
 
-    isRolloutPercentageInvalid: _.memoize(function isRolloutPercentageInvalid(percentage) {
+    isRolloutPercentageInvalid: memoize(function isRolloutPercentageInvalid(percentage) {
       return !this.$options.rolloutPercentageRegex.test(percentage);
     }),
 

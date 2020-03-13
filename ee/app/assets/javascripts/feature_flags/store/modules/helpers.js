@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { isEmpty, uniqueId, isString } from 'lodash';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
@@ -74,7 +74,7 @@ export const mapFromScopesViewModel = params => {
     }
 
     // Strip out any internal IDs
-    const id = _.isString(s.id) && s.id.startsWith(INTERNAL_ID_PREFIX) ? undefined : s.id;
+    const id = isString(s.id) && s.id.startsWith(INTERNAL_ID_PREFIX) ? undefined : s.id;
 
     const strategies = [
       {
@@ -83,7 +83,7 @@ export const mapFromScopesViewModel = params => {
       },
     ];
 
-    if (!_.isEmpty(userIdParameters)) {
+    if (!isEmpty(userIdParameters)) {
       strategies.push({ name: ROLLOUT_STRATEGY_USER_ID, parameters: userIdParameters });
     }
 
@@ -123,7 +123,7 @@ export const createNewEnvironmentScope = (overrides = {}, featureFlagPermissions
   const defaultScope = {
     environmentScope: '',
     active: false,
-    id: _.uniqueId(INTERNAL_ID_PREFIX),
+    id: uniqueId(INTERNAL_ID_PREFIX),
     rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
     rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
     rolloutUserIds: '',
