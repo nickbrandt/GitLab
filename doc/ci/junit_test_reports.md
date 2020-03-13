@@ -9,7 +9,7 @@ Requires GitLab Runner 11.2 and above.
 
 ## Overview
 
-It is very common that a [CI/CD pipeline](pipelines.md) contains a
+It is very common that a [CI/CD pipeline](pipelines/index.md) contains a
 test job that will verify your code.
 If the tests fail, the pipeline fails and users get notified. The person that
 works on the merge request will have to check the job logs and see where the
