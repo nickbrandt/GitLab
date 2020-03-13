@@ -9,7 +9,6 @@ FactoryBot.modify do
 
     trait :on_design do
       noteable { create(:design, :with_file, issue: create(:issue, project: project)) }
-      project { noteable.project }
     end
 
     trait :with_review do
