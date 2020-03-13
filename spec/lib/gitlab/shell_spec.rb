@@ -9,7 +9,6 @@ describe Gitlab::Shell do
   let(:gitlab_shell) { described_class.new }
 
   it { is_expected.to respond_to :remove_repository }
-  it { is_expected.to respond_to :fork_repository }
 
   describe '.url_to_repo' do
     let(:full_path) { 'diaspora/disaspora-rails' }
@@ -93,28 +92,6 @@ describe Gitlab::Shell do
       it 'returns false when the command fails' do
         expect(gitlab_shell.mv_repository(project2.repository_storage, project2.disk_path, '')).to be_falsy
         expect(TestEnv.storage_dir_exists?(project2.repository_storage, "#{project2.disk_path}.git")).to be(true)
-      end
-    end
-
-    describe '#fork_repository' do
-      let(:target_project) { create(:project) }
-
-      subject do
-        gitlab_shell.fork_repository(project, target_project)
-      end
-
-      it 'returns true when the command succeeds' do
-        expect_any_instance_of(Gitlab::GitalyClient::RepositoryService).to receive(:fork_repository)
-          .with(repository.raw_repository) { :gitaly_response_object }
-
-        is_expected.to be_truthy
-      end
-
-      it 'return false when the command fails' do
-        expect_any_instance_of(Gitlab::GitalyClient::RepositoryService).to receive(:fork_repository)
-          .with(repository.raw_repository) { raise GRPC::BadStatus, 'bla' }
-
-        is_expected.to be_falsy
       end
     end
   end

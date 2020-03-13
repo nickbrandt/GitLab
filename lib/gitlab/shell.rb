@@ -98,17 +98,6 @@ module Gitlab
       false
     end
 
-    # Fork repository to new path
-    #
-    # @param [Project] source_project forked-from Project
-    # @param [Project] target_project forked-to Project
-    def fork_repository(source_project, target_project)
-      forked_from_relative_path = "#{source_project.disk_path}.git"
-      fork_args = [target_project.repository_storage, "#{target_project.disk_path}.git", target_project.full_path]
-
-      GitalyGitlabProjects.new(source_project.repository_storage, forked_from_relative_path, source_project.full_path).fork_repository(*fork_args)
-    end
-
     # Removes a repository from file system, using rm_diretory which is an alias
     # for rm_namespace. Given the underlying implementation removes the name
     # passed as second argument on the passed storage.
@@ -211,31 +200,6 @@ module Gitlab
       # Old Popen code returns [Error, output] to the caller, so we
       # need to do the same here...
       raise Error, e
-    end
-
-    class GitalyGitlabProjects
-      attr_reader :shard_name, :repository_relative_path, :output, :gl_project_path
-
-      def initialize(shard_name, repository_relative_path, gl_project_path)
-        @shard_name = shard_name
-        @repository_relative_path = repository_relative_path
-        @output = ''
-        @gl_project_path = gl_project_path
-      end
-
-      def fork_repository(new_shard_name, new_repository_relative_path, new_project_name)
-        target_repository = Gitlab::Git::Repository.new(new_shard_name, new_repository_relative_path, nil, new_project_name)
-        raw_repository = Gitlab::Git::Repository.new(shard_name, repository_relative_path, nil, gl_project_path)
-
-        Gitlab::GitalyClient::RepositoryService.new(target_repository).fork_repository(raw_repository)
-      rescue GRPC::BadStatus => e
-        logger.error "fork-repository failed: #{e.message}"
-        false
-      end
-
-      def logger
-        Rails.logger # rubocop:disable Gitlab/RailsLogger
-      end
     end
   end
 end
