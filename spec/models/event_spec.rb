@@ -112,17 +112,18 @@ describe Event do
     end
 
     context 'for an issue' do
-      let(:issue) { create(:issue, project: project) }
+      let(:title) { generate(:title) }
+      let(:issue) { create(:issue, title: title, project: project) }
       let(:target) { issue }
 
       it 'delegates to issue title' do
-        expect(event.target_title).to eq(issue.title)
+        expect(event.target_title).to eq(title)
       end
     end
 
     context 'for a wiki page' do
-      let(:wiki) { create(:project_wiki, project: project) }
-      let(:wiki_page) { create(:wiki_page, wiki: wiki) }
+      let(:title) { generate(:wiki_page_title) }
+      let(:wiki_page) { create(:wiki_page, title: title, project: project) }
       let(:event) { create(:wiki_page_event, project: project, wiki_page: wiki_page) }
 
       it 'delegates to issue title' do
@@ -484,16 +485,10 @@ describe Event do
 
   describe '#wiki_page and #wiki_page?' do
     let_it_be(:project) { create(:project, :repository) }
-    let_it_be(:title) { FFaker::Lorem.sentence }
 
     context 'for a wiki page event' do
-      let(:wiki) { create(:project_wiki, project: project) }
       let(:wiki_page) do
-        wiki.create_page(title, FFaker::Lorem.sentence)
-        page_title, page_dir = wiki.page_title_and_dir(title)
-        page = wiki.wiki.page(title: page_title, dir: page_dir, version: nil)
-
-        WikiPage.new(wiki, page)
+        create(:wiki_page, :with_real_page, project: project)
       end
 
       subject(:event) { create(:wiki_page_event, project: project, wiki_page: wiki_page) }

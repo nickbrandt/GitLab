@@ -30,6 +30,16 @@ FactoryBot.define do
     to_create do |page|
       page.create
     end
+
+    trait :with_real_page do
+      project { create(:project, :repository) }
+
+      page do
+        wiki.create_page(title, content)
+        page_title, page_dir = wiki.page_title_and_dir(title)
+        wiki.wiki.page(title: page_title, dir: page_dir, version: nil)
+      end
+    end
   end
 
   factory :wiki_page_meta, class: 'WikiPage::Meta' do

@@ -81,7 +81,7 @@ class Event < ApplicationRecord
   scope :recent, -> { reorder(id: :desc) }
   scope :code_push, -> { where(action: PUSHED) }
   scope :merged, -> { where(action: MERGED) }
-  scope :for_wiki_page, -> { where(target_type: 'WikiPage::Meta') }
+  scope :for_wiki_page, -> { where(target_type: WikiPage::Meta.name) }
 
   scope :with_associations, -> do
     # We're using preload for "push_event_payload" as otherwise the association
@@ -229,7 +229,7 @@ class Event < ApplicationRecord
   end
 
   def wiki_page?
-    target_type == "WikiPage::Meta"
+    target_type == WikiPage::Meta.name
   end
 
   def milestone

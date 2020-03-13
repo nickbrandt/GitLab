@@ -25,7 +25,7 @@ describe WikiPage::Slug do
 
       context 'there are some non-canonical slugs' do
         before do
-          create_list(:wiki_page_slug, 3)
+          create(:wiki_page_slug)
         end
 
         it { is_expected.to be_empty }
@@ -33,7 +33,7 @@ describe WikiPage::Slug do
 
       context 'there is at least one canonical slugs' do
         before do
-          create(:wiki_page_slug, canonical: true)
+          create(:wiki_page_slug, :canonical)
         end
 
         it { is_expected.not_to be_empty }
@@ -64,7 +64,7 @@ describe WikiPage::Slug do
 
       context 'there are other slugs, but they are not canonical' do
         before do
-          create_list(:wiki_page_slug, 3, wiki_page_meta: meta)
+          create(:wiki_page_slug, wiki_page_meta: meta)
         end
 
         it { is_expected.to be_valid }
