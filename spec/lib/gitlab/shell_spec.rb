@@ -117,30 +117,6 @@ describe Gitlab::Shell do
         is_expected.to be_falsy
       end
     end
-
-    describe '#import_repository' do
-      let(:import_url) { 'https://gitlab.com/gitlab-org/gitlab-foss.git' }
-
-      context 'with gitaly' do
-        it 'returns true when the command succeeds' do
-          expect_any_instance_of(Gitlab::GitalyClient::RepositoryService).to receive(:import_repository).with(import_url)
-
-          result = gitlab_shell.import_repository(project.repository_storage, project.disk_path, import_url, project.full_path)
-
-          expect(result).to be_truthy
-        end
-
-        it 'raises an exception when the command fails' do
-          expect_any_instance_of(Gitlab::GitalyClient::RepositoryService).to receive(:import_repository)
-            .with(import_url) { raise GRPC::BadStatus, 'bla' }
-          expect_any_instance_of(Gitlab::Shell::GitalyGitlabProjects).to receive(:output) { 'error'}
-
-          expect do
-            gitlab_shell.import_repository(project.repository_storage, project.disk_path, import_url, project.full_path)
-          end.to raise_error(Gitlab::Shell::Error, "error")
-        end
-      end
-    end
   end
 
   describe 'namespace actions' do

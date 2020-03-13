@@ -77,47 +77,6 @@ module Gitlab
       end
     end
 
-    # Import wiki repository from external service
-    #
-    # @param [Project] project
-    # @param [Gitlab::LegacyGithubImport::WikiFormatter, Gitlab::BitbucketImport::WikiFormatter] wiki_formatter
-    # @return [Boolean] whether repository could be imported
-    def import_wiki_repository(project, wiki_formatter)
-      import_repository(project.repository_storage, wiki_formatter.disk_path, wiki_formatter.import_url, project.wiki.full_path)
-    end
-
-    # Import project repository from external service
-    #
-    # @param [Project] project
-    # @return [Boolean] whether repository could be imported
-    def import_project_repository(project)
-      import_repository(project.repository_storage, project.disk_path, project.import_url, project.full_path)
-    end
-
-    # Import repository
-    #
-    # @example Import a repository
-    #   import_repository("nfs-file06", "gitlab/gitlab-ci", "https://gitlab.com/gitlab-org/gitlab-test.git", "gitlab/gitlab-ci")
-    #
-    # @param [String] storage  project's storage name
-    # @param [String] disk_path project path on disk
-    # @param [String] url from external resource to import from
-    # @param [String] gl_project_path project name
-    # @return [Boolean] whether repository could be imported
-    def import_repository(storage, disk_path, url, gl_project_path)
-      if url.start_with?('.', '/')
-        raise Error.new("don't use disk paths with import_repository: #{url.inspect}")
-      end
-
-      relative_path = "#{disk_path}.git"
-      cmd = GitalyGitlabProjects.new(storage, relative_path, gl_project_path)
-
-      success = cmd.import_project(url, git_timeout)
-      raise Error, cmd.output unless success
-
-      success
-    end
-
     # Move or rename a repository
     #
     # @example Move/rename a repository
@@ -262,16 +221,6 @@ module Gitlab
         @repository_relative_path = repository_relative_path
         @output = ''
         @gl_project_path = gl_project_path
-      end
-
-      def import_project(source, _timeout)
-        raw_repository = Gitlab::Git::Repository.new(shard_name, repository_relative_path, nil, gl_project_path)
-
-        Gitlab::GitalyClient::RepositoryService.new(raw_repository).import_repository(source)
-        true
-      rescue GRPC::BadStatus => e
-        @output = e.message
-        false
       end
 
       def fork_repository(new_shard_name, new_repository_relative_path, new_project_name)
