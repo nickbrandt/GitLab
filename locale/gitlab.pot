@@ -106,13 +106,18 @@ msgid_plural "%d contributions"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d error"
+msgid_plural "%d errors"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d exporter"
 msgid_plural "%d exporters"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d failed/error test result"
-msgid_plural "%d failed/error test results"
+msgid "%d failed"
+msgid_plural "%d failed"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -16578,7 +16583,7 @@ msgstr ""
 msgid "Reporting"
 msgstr ""
 
-msgid "Reports|%{failedString} and %{resolvedString}"
+msgid "Reports|%{combinedString} and %{resolvedString}"
 msgstr ""
 
 msgid "Reports|Actions"
