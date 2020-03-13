@@ -20,6 +20,10 @@ export default class SidebarStore extends CESidebarStore {
     this.status = data?.project?.issue?.healthStatus;
   }
 
+  setStatus(status) {
+    this.status = status;
+  }
+
   setWeightData({ weight }) {
     this.isFetching.weight = false;
     this.weight = typeof weight === 'number' ? Number(weight) : null;
