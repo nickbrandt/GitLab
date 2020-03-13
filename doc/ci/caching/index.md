@@ -329,6 +329,31 @@ rspec:
   - rspec spec
 ```
 
+### Caching Go dependencies
+
+Assuming your project is using [Go Modules](https://github.com/golang/go/wiki/Modules) to install
+the Go dependencies, the following example defines `cache` globally so that
+all jobs inherit it. Go modules are installed in `vendor/` and
+are cached per-branch:
+
+```yaml
+
+image: golang:1.13
+
+# Cache libraries in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - vendor/
+
+before_script:
+- go mod vendor
+
+test:
+  script:
+  - go test -mod vendor ./... -v -short
+```
+
 ## Availability of the cache
 
 Caching is an optimization, but isn't guaranteed to always work, so you need to
