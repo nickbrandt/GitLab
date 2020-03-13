@@ -28,7 +28,7 @@ module Metrics
 
       def check_branch_name(result)
         return error(_(%q(There was an error updating the dashboard, branch name is invalid.)), :bad_request) unless valid_branch_name?
-        return error(_('There was an error updating the dashboard, branch named: %{branch} already exists.') % { branch: params[:branch] }, :bad_request) unless new_or_default_branch?
+        return error(_(%q(There was an error updating the dashboard, branch named: %{branch} already exists.)) % { branch: params[:branch] }, :bad_request) unless new_or_default_branch?
 
         success(result)
       end
