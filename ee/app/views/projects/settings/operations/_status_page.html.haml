@@ -1,4 +1,4 @@
-- return unless @project.feature_available?(:status_page, current_user)
+- return unless @project.feature_available?(:status_page, current_user) && @project.beta_feature_available?(:status_page)
 
 - setting = status_page_settings_data(@project.status_page_setting)
 
