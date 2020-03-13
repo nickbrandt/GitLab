@@ -15,13 +15,7 @@ exports[`Design management upload button component renders inverted upload desig
     <!---->
   </gl-button-stub>
    
-  <input
-    accept="image/*"
-    class="hide"
-    multiple="multiple"
-    name="design_file"
-    type="file"
-  />
+  <design-input-stub />
 </div>
 `;
 
@@ -45,13 +39,7 @@ exports[`Design management upload button component renders loading icon 1`] = `
     />
   </gl-button-stub>
    
-  <input
-    accept="image/*"
-    class="hide"
-    multiple="multiple"
-    name="design_file"
-    type="file"
-  />
+  <design-input-stub />
 </div>
 `;
 
@@ -68,12 +56,6 @@ exports[`Design management upload button component renders upload design button 
     <!---->
   </gl-button-stub>
    
-  <input
-    accept="image/*"
-    class="hide"
-    multiple="multiple"
-    name="design_file"
-    type="file"
-  />
+  <design-input-stub />
 </div>
 `;

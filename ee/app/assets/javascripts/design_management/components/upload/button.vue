@@ -1,10 +1,12 @@
 <script>
 import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import DesignInput from './design_input.vue';
 
 export default {
   components: {
     GlButton,
     GlLoadingIcon,
+    DesignInput,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -17,10 +19,10 @@ export default {
   },
   methods: {
     openFileUpload() {
-      this.$refs.fileUpload.click();
+      this.$refs.fileUpload.$el.click();
     },
-    onFileUploadChange() {
-      this.$emit('upload', this.$refs.fileUpload.files);
+    onFileUploadChange(e) {
+      this.$emit('upload', e.target.files);
     },
   },
 };
@@ -42,14 +44,7 @@ export default {
       {{ s__('DesignManagement|Add designs') }}
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
     </gl-button>
-    <input
-      ref="fileUpload"
-      type="file"
-      name="design_file"
-      accept="image/*"
-      class="hide"
-      multiple
-      @change="onFileUploadChange"
-    />
+
+    <design-input ref="fileUpload" @change="onFileUploadChange" />
   </div>
 </template>
