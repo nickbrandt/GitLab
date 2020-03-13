@@ -46,6 +46,8 @@ var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, 
 var listenUmask = flag.Int("listenUmask", 0, "Umask for Unix socket")
 var authBackend = flag.String("authBackend", upstream.DefaultBackend.String(), "Authentication/authorization backend")
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
+var cableBackend = flag.String("cableBackend", upstream.DefaultBackend.String(), "ActionCable backend")
+var cableSocket = flag.String("cableSocket", "", "Optional: Unix domain socket to dial cableBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
 var proxyHeadersTimeout = flag.Duration("proxyHeadersTimeout", 5*time.Minute, "How long to wait for response headers when proxying the request")
@@ -89,6 +91,11 @@ func main() {
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {
 		log.WithError(err).Fatal("Invalid authBackend")
+	}
+
+	cableBackendURL, err := parseAuthBackend(*cableBackend)
+	if err != nil {
+		log.WithError(err).Fatal("Invalid cableBackend")
 	}
 
 	log.WithField("version", Version).WithField("build_time", BuildTime).Print("Starting")
@@ -137,7 +144,9 @@ func main() {
 	secret.SetPath(*secretPath)
 	cfg := config.Config{
 		Backend:                  backendURL,
+		CableBackend:             cableBackendURL,
 		Socket:                   *authSocket,
+		CableSocket:              *cableSocket,
 		Version:                  Version,
 		DocumentRoot:             *documentRoot,
 		DevelopmentMode:          *developmentMode,

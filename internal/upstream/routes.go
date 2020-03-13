@@ -162,7 +162,7 @@ func (u *upstream) configureRoutes() {
 
 	static := &staticpages.Static{DocumentRoot: u.DocumentRoot}
 	proxy := buildProxy(u.Backend, u.Version, u.RoundTripper)
-	simpleProxy := proxypkg.NewProxy(u.Backend, u.Version, u.RoundTripper)
+	cableProxy := proxypkg.NewProxy(u.CableBackend, u.Version, u.CableRoundTripper)
 
 	signingTripper := secret.NewRoundTripper(u.RoundTripper, u.Version)
 	signingProxy := buildProxy(u.Backend, u.Version, signingTripper)
@@ -193,7 +193,7 @@ func (u *upstream) configureRoutes() {
 		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy))),
 
 		// ActionCable websocket
-		wsRoute(`^/-/cable\z`, simpleProxy),
+		wsRoute(`^/-/cable\z`, cableProxy),
 
 		// Terminal websocket
 		wsRoute(projectPattern+`-/environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),

@@ -32,9 +32,10 @@ var (
 
 type upstream struct {
 	config.Config
-	URLPrefix    urlprefix.Prefix
-	Routes       []routeEntry
-	RoundTripper http.RoundTripper
+	URLPrefix         urlprefix.Prefix
+	Routes            []routeEntry
+	RoundTripper      http.RoundTripper
+	CableRoundTripper http.RoundTripper
 }
 
 func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
@@ -44,7 +45,14 @@ func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
 	if up.Backend == nil {
 		up.Backend = DefaultBackend
 	}
+	if up.CableBackend == nil {
+		up.CableBackend = up.Backend
+	}
+	if up.CableSocket == "" {
+		up.CableSocket = up.Socket
+	}
 	up.RoundTripper = roundtripper.NewBackendRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
+	up.CableRoundTripper = roundtripper.NewBackendRoundTripper(up.CableBackend, up.CableSocket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
 	up.configureURLPrefix()
 	up.configureRoutes()
 
