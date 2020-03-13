@@ -5,6 +5,7 @@ require 'spec_helper'
 describe StatusPage::PublishIncidentWorker do
   include ExclusiveLeaseHelpers
 
+  let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let_it_be(:issue) { create(:issue, project: project) }
 
@@ -15,17 +16,17 @@ describe StatusPage::PublishIncidentWorker do
 
   before do
     allow(StatusPage::PublishIncidentService)
-      .to receive(:new).with(project: project, issue_id: issue.id)
+      .to receive(:new).with(user: user, project: project, issue_id: issue.id)
       .and_return(service)
     allow(service).to receive(:execute)
       .and_return(service_result)
   end
 
   describe '#perform' do
-    subject { worker.perform(project.id, issue.id) }
+    subject { worker.perform(user.id, project.id, issue.id) }
 
     it_behaves_like 'an idempotent worker' do
-      let(:job_args) { [project.id, issue.id] }
+      let(:job_args) { [user.id, project.id, issue.id] }
 
       context 'when service succeeds' do
         it 'execute the service' do

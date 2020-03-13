@@ -29,11 +29,13 @@ describe StatusPage::TriggerPublishService do
       stub_feature_flags(status_page: true)
       stub_licensed_features(status_page: true)
 
-      allow(worker).to receive(:perform_async).with(project.id, issue.id)
+      allow(worker).to receive(:perform_async)
+        .with(user.id, project.id, issue.id)
     end
 
     it 'schedules a job' do
-      expect(worker).to receive(:perform_async).with(project.id, issue.id)
+      expect(worker).to receive(:perform_async)
+        .with(user.id, project.id, issue.id)
 
       subject
     end

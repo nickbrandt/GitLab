@@ -3,17 +3,24 @@
 require 'spec_helper'
 
 describe StatusPage::PublishIncidentService do
+  let_it_be(:user) { create(:user) }
   let_it_be(:project, refind: true) { create(:project) }
   let_it_be(:issue) { create(:issue, project: project) }
   let_it_be(:settings) { create(:status_page_setting, :enabled, project: project) }
+  let(:user_can_publish) { true }
 
-  let(:service) { described_class.new(project: project, issue_id: issue.id) }
+  let(:service) do
+    described_class.new(user: user, project: project, issue_id: issue.id)
+  end
 
   subject(:result) { service.execute }
 
   describe '#execute' do
     before do
       stub_licensed_features(status_page: true)
+
+      allow(user).to receive(:can?).with(:publish_status_page, project)
+        .and_return(user_can_publish)
     end
 
     context 'when publishing succeeds' do
@@ -48,6 +55,15 @@ describe StatusPage::PublishIncidentService do
       it 'returns error issue not found' do
         expect(result).to be_error
         expect(result.message).to eq('Issue not found')
+      end
+    end
+
+    context 'when user cannot publish' do
+      let(:user_can_publish) { false }
+
+      it 'returns error missing publish permission' do
+        expect(result).to be_error
+        expect(result.message).to eq('No publish permission')
       end
     end
   end
