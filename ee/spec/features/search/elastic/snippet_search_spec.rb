@@ -8,6 +8,7 @@ describe 'Snippet elastic search', :js, :elastic, :aggregate_failures, :sidekiq_
   let(:authorized_project) { create(:project, namespace: authorized_user.namespace) }
 
   before do
+    skip('Snippet content search will be disabled indefinitely')
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
     authorized_project.add_maintainer(authorized_user)
