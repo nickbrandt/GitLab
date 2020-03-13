@@ -1,5 +1,4 @@
 <script>
-import _ from 'underscore';
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { redirectTo } from '~/lib/utils/url_utility';
 import Tracking from '~/tracking';
@@ -111,7 +110,7 @@ export default {
         const { selector, text, placement } = this.actionPopover;
 
         // immediately show the action popover if there's not helpContent for this step
-        const showPopover = !this.helpContent && !_.isUndefined(selector);
+        const showPopover = !this.helpContent && selector !== undefined;
 
         actionPopoverUtils.renderPopover(selector, text, placement, showPopover);
       }
@@ -161,7 +160,7 @@ export default {
       }
 
       // dismiss popover if necessary
-      if (_.isUndefined(dismissPopover) || dismissPopover === true) {
+      if (dismissPopover === undefined || dismissPopover === true) {
         this.dismissPopover = true;
       }
 
@@ -172,7 +171,7 @@ export default {
       }
 
       // switch to the next tour part
-      if (!_.isUndefined(nextPart)) {
+      if (nextPart !== undefined) {
         this.switchTourPart(nextPart);
         this.initActionPopover();
         return;
