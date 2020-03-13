@@ -11,10 +11,10 @@ module Gitlab
       end
 
       def match?(requested_domain, requested_port = nil)
-        return false unless @domain == requested_domain
-        return true if @port.nil?
+        return false unless domain == requested_domain
+        return true if port.nil?
 
-        @port == requested_port.to_i
+        port == requested_port
       end
     end
   end
