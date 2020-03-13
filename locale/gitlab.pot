@@ -9937,19 +9937,10 @@ msgstr ""
 msgid "Group: %{name}"
 msgstr ""
 
-msgid "GroupRoadmap|%{dateWord} - No end date"
-msgstr ""
-
 msgid "GroupRoadmap|%{dateWord} – No end date"
 msgstr ""
 
-msgid "GroupRoadmap|%{startDateInWords} - %{endDateInWords}"
-msgstr ""
-
 msgid "GroupRoadmap|%{startDateInWords} – %{endDateInWords}"
-msgstr ""
-
-msgid "GroupRoadmap|No start date - %{dateWord}"
 msgstr ""
 
 msgid "GroupRoadmap|No start date – %{dateWord}"

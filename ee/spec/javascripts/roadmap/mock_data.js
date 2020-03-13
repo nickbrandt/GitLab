@@ -100,6 +100,7 @@ export const mockEpic = {
   groupName: 'Gitlab Org',
   groupFullName: 'Gitlab Org',
   startDate: new Date('2017-07-10'),
+  originalStartDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
   descendantWeightSum: {
     closedIssues: 3,
