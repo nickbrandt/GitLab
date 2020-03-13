@@ -612,7 +612,7 @@ class User < ApplicationRecord
     # owns records previously belonging to deleted users.
     def ghost
       email = 'ghost%s@example.com'
-      unique_internal(where(ghost: true), 'ghost', email) do |u|
+      unique_internal(where(ghost: true, user_type: :ghost), 'ghost', email) do |u|
         u.bio = _('This is a "Ghost User", created to hold all issues authored by users that have since been deleted. This user cannot be removed.')
         u.name = 'Ghost User'
       end
@@ -648,6 +648,13 @@ class User < ApplicationRecord
 
   def internal?
     ghost? || bot?
+  end
+
+  # We are transitioning from ghost boolean column to user_type
+  # so we need to read from old column for now
+  # @see https://gitlab.com/gitlab-org/gitlab/-/issues/210025
+  def ghost?
+    ghost
   end
 
   def self.internal
