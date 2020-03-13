@@ -2,9 +2,8 @@
 
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191115115043_migrate_epic_mentions_to_db')
-require Rails.root.join('db', 'post_migrate', '20200214174519_remigrate_epic_mentions_to_db')
 
-describe 'epic mentions migration', migration: false do
+describe MigrateEpicMentionsToDb, :migration do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }
@@ -25,11 +24,5 @@ describe 'epic mentions migration', migration: false do
   # this epic has no mentions so should be filtered out
   let!(:resource5) { epics.create!(iid: 5, title: "title5", title_html: 'title5', description: 'epic description with no mention', group_id: group.id, author_id: user.id) }
 
-  describe MigrateEpicMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, false
-  end
-
-  describe RemigrateEpicMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, false
-  end
+  it_behaves_like 'schedules resource mentions migration', Epic, false
 end

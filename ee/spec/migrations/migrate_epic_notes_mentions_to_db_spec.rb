@@ -2,9 +2,8 @@
 
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191115115522_migrate_epic_notes_mentions_to_db')
-require Rails.root.join('db', 'post_migrate', '20200214174607_remigrate_epic_notes_mentions_to_db')
 
-describe 'epic notes mentions migration', migration: false do
+describe MigrateEpicNotesMentionsToDb, :migration do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:epics) { table(:epics) }
@@ -27,11 +26,5 @@ describe 'epic notes mentions migration', migration: false do
   # this note points to an inexistent noteable record
   let!(:resource5) { notes.create!(note: 'note3 for @root to check', noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic') }
 
-  describe MigrateEpicNotesMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, true
-  end
-
-  describe RemigrateEpicNotesMentionsToDb, :migration do
-    it_behaves_like 'schedules resource mentions migration', Epic, true
-  end
+  it_behaves_like 'schedules resource mentions migration', Epic, true
 end
