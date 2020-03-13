@@ -14,9 +14,10 @@ describe Gitlab::UrlBlockers::UrlWhitelist do
 
   describe '#domain_whitelisted?' do
     let(:whitelist) { ['www.example.com', 'example.com'] }
-    let(:not_whitelisted) { ['subdomain.example.com', 'example.org'] }
 
     it 'returns true if domains present in whitelist' do
+      not_whitelisted = ['subdomain.example.com', 'example.org']
+
       aggregate_failures do
         whitelist.each do |domain|
           expect(described_class).to be_domain_whitelisted(domain)
@@ -34,15 +35,14 @@ describe Gitlab::UrlBlockers::UrlWhitelist do
 
     context 'with ports' do
       let(:whitelist) { ['example.io:3000'] }
-      let(:parsed_whitelist) { [['example.io', { port: 3000 }]] }
-      let(:not_whitelisted) do
-        [
+
+      it 'returns true if domain and ports present in whitelist' do
+        parsed_whitelist = [['example.io', { port: 3000 }]]
+        not_whitelisted = [
           'example.io',
           ['example.io', { port: 3001 }]
         ]
-      end
 
-      it 'returns true if domain and ports present in whitelist' do
         aggregate_failures do
           parsed_whitelist.each do |domain_and_port|
             expect(described_class).to be_domain_whitelisted(*domain_and_port)
@@ -136,22 +136,19 @@ describe Gitlab::UrlBlockers::UrlWhitelist do
 
     context 'with ports' do
       let(:whitelist) { ['127.0.0.9:3000', '[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443'] }
-      let(:parsed_whitelist) do
-        [
+
+      it 'returns true if ip and ports present in whitelist' do
+        parsed_whitelist = [
           ['127.0.0.9', { port: 3000 }],
           ['[2001:db8:85a3:8d3:1319:8a2e:370:7348]', { port: 443 }]
         ]
-      end
-      let(:not_whitelisted) do
-        [
+        not_whitelisted = [
           '127.0.0.9',
           ['127.0.0.9', { port: 3001 }],
           '[2001:db8:85a3:8d3:1319:8a2e:370:7348]',
           ['[2001:db8:85a3:8d3:1319:8a2e:370:7348]', { port: 3001 }]
         ]
-      end
 
-      it 'returns true if ip and ports present in whitelist' do
         aggregate_failures do
           parsed_whitelist.each do |ip_and_port|
             expect(described_class).to be_ip_whitelisted(*ip_and_port)
