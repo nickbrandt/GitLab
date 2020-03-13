@@ -337,7 +337,7 @@ describe API::ProjectImport do
 
       context 'when direct upload is disabled' do
         before do
-          stub_uploads_object_storage(ImportExportUploader, enabled: false, direct_upload: true)
+          stub_uploads_object_storage(ImportExportUploader, enabled: true, direct_upload: false)
         end
 
         it 'handles as a local file' do
