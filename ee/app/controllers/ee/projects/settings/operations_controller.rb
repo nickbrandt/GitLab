@@ -42,7 +42,8 @@ module EE
           end
 
           def has_status_page_license?
-            project.feature_available?(:status_page, current_user)
+            project.feature_available?(:status_page, current_user) &&
+            project.beta_feature_available?(:status_page)
           end
 
           def track_tracing_external_url

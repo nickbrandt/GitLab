@@ -288,11 +288,21 @@ describe Projects::Settings::OperationsController do
           project.add_maintainer(user)
         end
 
-        it 'creates a status page setting' do
+        subject(:status_page_setting) do
           valid_attributes = attributes_for(:status_page_setting).except(:enabled)
           update_project(project, status_page_params: valid_attributes )
-          expect(project.status_page_setting).not_to eq(nil)
-          expect(project.status_page_setting).to be_a(StatusPageSetting)
+
+          project.status_page_setting
+        end
+
+        it { is_expected.to be_a(StatusPageSetting) }
+
+        context 'when feature flag is disabled' do
+          before do
+            stub_feature_flags(status_page: false)
+          end
+
+          it { is_expected.to be_nil }
         end
       end
 
