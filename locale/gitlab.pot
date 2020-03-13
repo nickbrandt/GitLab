@@ -4249,9 +4249,6 @@ msgstr ""
 msgid "ClusterIntegration|Enable Cloud Run for Anthos"
 msgstr ""
 
-msgid "ClusterIntegration|Enable Web Application Firewall"
-msgstr ""
-
 msgid "ClusterIntegration|Enable or disable GitLab's connection to your Kubernetes cluster."
 msgstr ""
 
@@ -4429,9 +4426,6 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}."
 msgstr ""
 
-msgid "ClusterIntegration|Learn more about %{linkStart}ModSecurity%{linkEnd}"
-msgstr ""
-
 msgid "ClusterIntegration|Learn more about %{startLink}Regions %{externalLinkIcon}%{endLink}."
 msgstr ""
 
@@ -4562,6 +4556,9 @@ msgid "ClusterIntegration|RBAC-enabled cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Read our %{link_start}help page%{link_end} on Kubernetes cluster integration."
+msgstr ""
+
+msgid "ClusterIntegration|Real-time web application monitoring, logging and access control. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
 msgid "ClusterIntegration|Region"
@@ -4711,13 +4708,13 @@ msgstr ""
 msgid "ClusterIntegration|Something went wrong while installing %{title}"
 msgstr ""
 
+msgid "ClusterIntegration|Something went wrong while trying to save your settings. Please try again."
+msgstr ""
+
 msgid "ClusterIntegration|Something went wrong while uninstalling %{title}"
 msgstr ""
 
 msgid "ClusterIntegration|Something went wrong while updating Knative domain name."
-msgstr ""
-
-msgid "ClusterIntegration|Something went wrong while updating the Web Application Firewall."
 msgstr ""
 
 msgid "ClusterIntegration|Specifying a domain will allow you to use Auto Review Apps and Auto Deploy stages for %{auto_devops_start}Auto DevOps%{auto_devops_end}. The domain should have a wildcard DNS configured matching the domain."
