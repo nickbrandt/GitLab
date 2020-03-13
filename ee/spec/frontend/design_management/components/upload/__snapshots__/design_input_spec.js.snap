@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Design management upload button component renders design input 1`] = `
+<input
+  accept="image/*"
+  class="hide"
+  multiple="multiple"
+  name="design_file"
+  type="file"
+/>
+`;

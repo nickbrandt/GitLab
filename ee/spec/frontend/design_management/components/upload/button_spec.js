@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import UploadButton from 'ee/design_management/components/upload/button.vue';
+import DesignInput from 'ee/design_management/components/upload/design_input.vue';
 
 describe('Design management upload button component', () => {
   let wrapper;
@@ -39,11 +40,7 @@ describe('Design management upload button component', () => {
     it('emits upload event', () => {
       createComponent();
 
-      jest
-        .spyOn(wrapper.find({ ref: 'fileUpload' }).element, 'files', 'get')
-        .mockReturnValue('test');
-
-      wrapper.vm.onFileUploadChange('test');
+      wrapper.vm.onFileUploadChange({ target: { files: 'test' } });
 
       expect(wrapper.emitted().upload[0]).toEqual(['test']);
     });
@@ -53,7 +50,7 @@ describe('Design management upload button component', () => {
     it('triggers click on input', () => {
       createComponent();
 
-      const clickSpy = jest.spyOn(wrapper.find({ ref: 'fileUpload' }).element, 'click');
+      const clickSpy = jest.spyOn(wrapper.find(DesignInput).element, 'click');
 
       wrapper.vm.openFileUpload();
 
