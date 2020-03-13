@@ -30,6 +30,14 @@ const ALL_DESIGNS_SKIPPED_MESSAGE = `${DESIGN_UPLOAD_SKIPPED_MESSAGE} ${s__(
   'The designs you tried uploading did not change.',
 )}`;
 
+export const EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE = __(
+  'You can only upload one design when dropping onto an existing design.',
+);
+
+export const EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE = __(
+  'You must upload a file with the same file name when dropping onto an existing design.',
+);
+
 const MAX_SKIPPED_FILES_LISTINGS = 5;
 
 const oneDesignSkippedMessage = filename =>

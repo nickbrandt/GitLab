@@ -32,7 +32,7 @@ export default {
     isValidDragDataType({ dataTransfer }) {
       return Boolean(dataTransfer && dataTransfer.types.some(t => t === VALID_DATA_TRANSFER_TYPE));
     },
-    ondrop({ dataTransfer }) {
+    ondrop({ dataTransfer = {} }) {
       this.dragCounter = 0;
       // User already had feedback when dropzone was active, so bail here
       if (!this.isDragDataValid) {
@@ -45,7 +45,7 @@ export default {
         return;
       }
 
-      this.$emit('upload', files);
+      this.$emit('change', files);
     },
     ondragenter(e) {
       this.dragCounter += 1;
@@ -58,7 +58,7 @@ export default {
       this.$refs.fileUpload.$el.click();
     },
     onDesignInputChange(e) {
-      this.$emit('upload', e.target.files);
+      this.$emit('change', e.target.files);
     },
   },
   uploadDesignMutation,
