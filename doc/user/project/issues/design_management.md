@@ -46,6 +46,7 @@ Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`,
 
 Support for [SVG files](https://gitlab.com/gitlab-org/gitlab/issues/12771)
 and [PDFs](https://gitlab.com/gitlab-org/gitlab/issues/32811) is planned for a future release.
+
 ## Limitations
 
 - Design uploads are limited to 10 files at a time.

@@ -420,6 +420,12 @@ GFM will recognize the following:
 | repository file references      | `[README](doc/README)`     |                                         |                                |
 | repository file line references | `[README](doc/README#L13)` |                                         |                                |
 
+In addition to this, links to some objects are also recognized and formatted. Some examples of these are:
+
+- Comments on issues: `"https://gitlab.com/gitlab-org/gitlab/-/issues/1234#note_101075757"`, which will be rendered as `#1234 (note1)`
+- The issues designs tab: `"https://gitlab.com/gitlab-org/gitlab/issues/1234/designs"`, which will be rendered as `#1234 (designs)`.
+  **(PREMIUM)**
+
 ### Task lists
 
 > If this is not rendered correctly, [view it in GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md#task-lists).
