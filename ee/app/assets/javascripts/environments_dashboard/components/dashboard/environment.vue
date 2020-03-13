@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc, isEmpty } from 'lodash';
 import { GlTooltipDirective, GlLink, GlBadge } from '@gitlab/ui';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
@@ -61,21 +61,21 @@ export default {
       };
     },
     user() {
-      return this.lastDeployment && !_.isEmpty(this.lastDeployment.user)
+      return this.lastDeployment && !isEmpty(this.lastDeployment.user)
         ? this.lastDeployment.user
         : null;
     },
     lastPipeline() {
-      return !_.isEmpty(this.environment.last_pipeline) ? this.environment.last_pipeline : null;
+      return !isEmpty(this.environment.last_pipeline) ? this.environment.last_pipeline : null;
     },
     lastDeployment() {
-      return !_.isEmpty(this.environment.last_deployment) ? this.environment.last_deployment : null;
+      return !isEmpty(this.environment.last_deployment) ? this.environment.last_deployment : null;
     },
     deployable() {
       return this.lastDeployment ? this.lastDeployment.deployable : null;
     },
     commit() {
-      return !_.isEmpty(this.lastDeployment.commit) ? this.lastDeployment.commit : {};
+      return !isEmpty(this.lastDeployment.commit) ? this.lastDeployment.commit : {};
     },
     jobTooltip() {
       return this.deployable
@@ -83,7 +83,7 @@ export default {
         : s__('EnvironmentDashboard|Created through the Deployment API');
     },
     commitRef() {
-      return this.lastDeployment && !_.isEmpty(this.lastDeployment.commit)
+      return this.lastDeployment && !isEmpty(this.lastDeployment.commit)
         ? {
             ...this.lastDeployment.commit,
             ...this.lastDeployment.ref,
@@ -95,7 +95,7 @@ export default {
       return (
         this.commit.author || {
           avatar_url: this.commit.author_gravatar_url,
-          path: `mailto:${_.escape(this.commit.author_email)}`,
+          path: `mailto:${esc(this.commit.author_email)}`,
           username: this.commit.author_name,
         }
       );
