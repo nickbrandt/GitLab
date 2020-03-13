@@ -867,6 +867,10 @@ CAUTION: **Warning:**
 There are some points to be aware of when
 [using this feature with new branches or tags *without* pipelines for merge requests](#using-onlychanges-without-pipelines-for-merge-requests).
 
+CAUTION: **Warning:**
+There are some points to be aware of when
+[using this feature with scheduled pipelines](#using-onlychanges-with-scheduled-pipelines).
+
 ##### Using `only:changes` with pipelines for merge requests
 
 With [pipelines for merge requests](../merge_request_pipelines/index.md),
@@ -930,6 +934,12 @@ This could result in some unexpected behavior, including:
 - When pushing a new branch or a new tag to GitLab, the policy always evaluates to true.
 - When pushing a new commit, the changed files are calculated using the previous commit
   as the base SHA.
+
+##### Using `only:changes` with scheduled pipelines
+
+`only:changes` always evaluates as "true" in [Scheduled pipelines](../pipelines/schedules.md).
+All files are considered to have "changed" when a scheduled pipeline
+runs.
 
 ### `rules`
 
