@@ -2291,6 +2291,7 @@ ActiveRecord::Schema.define(version: 2020_03_11_165635) do
     t.boolean "public", default: false, null: false
     t.datetime "last_used_at"
     t.binary "fingerprint_sha256"
+    t.datetime_with_timezone "expires_at"
     t.index ["fingerprint"], name: "index_keys_on_fingerprint", unique: true
     t.index ["fingerprint_sha256"], name: "index_keys_on_fingerprint_sha256"
     t.index ["id", "type"], name: "index_on_deploy_keys_id_and_type_and_public", unique: true, where: "(public = true)"

@@ -43,7 +43,7 @@ module EE
       end
 
       override :check_for_console_messages
-      def check_for_console_messages(cmd)
+      def check_for_console_messages
         super.push(
           *current_replication_lag_message
         )

@@ -8,7 +8,7 @@ module Gitlab
         check_can_create_design!
       end
 
-      success_result(cmd)
+      success_result
     end
 
     private
