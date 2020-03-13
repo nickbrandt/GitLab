@@ -1,4 +1,4 @@
-import { propertyOf } from 'underscore';
+import { propertyOf } from 'lodash';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import projectQuery from '../graphql/queries/project.query.graphql';

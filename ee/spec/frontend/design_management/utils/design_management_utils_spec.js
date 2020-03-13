@@ -1,4 +1,3 @@
-import underscore from 'underscore';
 import {
   extractCurrentDiscussion,
   extractDiscussions,
@@ -7,6 +6,8 @@ import {
   updateImageDiffNoteOptimisticResponse,
   isValidDesignFile,
 } from 'ee/design_management/utils/design_management_utils';
+
+jest.mock('lodash/uniqueId', () => () => 1);
 
 describe('extractCurrentDiscussion', () => {
   let discussions;
@@ -75,7 +76,6 @@ describe('version parser', () => {
 
 describe('optimistic responses', () => {
   it('correctly generated for designManagementUpload', () => {
-    jest.spyOn(underscore, 'uniqueId').mockImplementation(() => 1);
     const expectedResponse = {
       __typename: 'Mutation',
       designManagementUpload: {
