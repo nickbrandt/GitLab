@@ -55,13 +55,13 @@ describe('GCP Cluster Dropdown Store Getters', () => {
 
     describe('hasNetwork', () => {
       it('should return true when network is selected', () => {
-        expect(getters.hasNetwork(state)).toEqual(true);
+        expect(hasNetwork(state)).toEqual(true);
       });
     });
 
     describe('hasSubnetwork', () => {
       it('should return true when subnetwork is selected', () => {
-        expect(getters.hasSubnetwork(state)).toEqual(true);
+        expect(hasSubnetwork(state)).toEqual(true);
       });
     });
   });
@@ -128,13 +128,13 @@ describe('GCP Cluster Dropdown Store Getters', () => {
 
     describe('hasNetwork', () => {
       it('should return true when subnetwork is selected', () => {
-        expect(getters.hasNetwork(state)).toEqual(false);
+        expect(hasNetwork(state)).toEqual(false);
       });
     });
 
     describe('hasSubnetwork', () => {
       it('should return true when subnetwork is selected', () => {
-        expect(getters.hasSubnetwork(state)).toEqual(false);
+        expect(hasSubnetwork(state)).toEqual(false);
       });
     });
   });

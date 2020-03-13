@@ -20,6 +20,8 @@ describe('GCP Cluster Dropdown Store Mutations', () => {
     ${types.SET_PROJECT}                       | ${'selectedProject'}            | ${gapiProjectsResponseMock.projects[0]}
     ${types.SET_PROJECT_BILLING_STATUS}        | ${'projectHasBillingEnabled'}   | ${true}
     ${types.SET_IS_VALIDATING_PROJECT_BILLING} | ${'isValidatingProjectBilling'} | ${true}
+    ${types.SET_NETWORK}                       | ${'selectedNetwork'}            | ${selectedNetworkMock}
+    ${types.SET_SUBNETWORK}                    | ${'selectedSubnetwork'}         | ${selectedSubnetworkMock}
   `('$mutation', ({ mutation, stateProperty, mockData }) => {
     it(`should set the mutation payload to the ${stateProperty} state property`, () => {
       const state = createState();
