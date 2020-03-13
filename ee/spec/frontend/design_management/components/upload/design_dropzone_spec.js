@@ -101,7 +101,7 @@ describe('Design management dropzone component', () => {
           return wrapper.vm.$nextTick();
         })
         .then(() => {
-          expect(wrapper.emitted().upload[0]).toEqual([[mockFile]]);
+          expect(wrapper.emitted().change[0]).toEqual([[mockFile]]);
         });
     });
   });
@@ -117,7 +117,7 @@ describe('Design management dropzone component', () => {
         const mockEvent = mockDragEvent({ files: [mockFile] });
 
         wrapper.vm.ondrop(mockEvent);
-        expect(wrapper.emitted().upload[0]).toEqual([[mockFile]]);
+        expect(wrapper.emitted().change[0]).toEqual([[mockFile]]);
       });
 
       it('calls createFlash when files are invalid', () => {

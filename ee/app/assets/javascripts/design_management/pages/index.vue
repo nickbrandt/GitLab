@@ -14,6 +14,8 @@ import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
 import {
   UPLOAD_DESIGN_ERROR,
+  EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
+  EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
   designUploadSkippedWarning,
   designDeletionError,
 } from '../utils/error_messages';
@@ -197,6 +199,21 @@ export default {
       const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });
       createFlash(errorMessage);
     },
+    onExistingDesignDropzoneChange(files, existingDesignFilename) {
+      const filesArr = Array.from(files);
+
+      if (filesArr.length > 1) {
+        createFlash(EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE);
+        return;
+      }
+
+      if (!filesArr.some(({ name }) => existingDesignFilename === name)) {
+        createFlash(EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE);
+        return;
+      }
+
+      this.onUploadDesign(files);
+    },
   },
   beforeRouteUpdate(to, from, next) {
     this.selectedDesigns = [];
@@ -248,10 +265,12 @@ export default {
       </div>
       <ol v-else class="list-unstyled row">
         <li class="col-md-6 col-lg-4 mb-3">
-          <design-dropzone class="design-list-item" @upload="onUploadDesign" />
+          <design-dropzone class="design-list-item" @change="onUploadDesign" />
         </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)" />
+          <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
+            ><design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)"
+          /></design-dropzone>
 
           <input
             v-if="canSelectDesign(design.filename)"
