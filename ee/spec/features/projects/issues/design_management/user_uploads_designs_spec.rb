@@ -29,7 +29,7 @@ describe 'User uploads new design', :js do
 
       expect(page).to have_selector('.js-design-list-item', count: 1)
 
-      within first('#designs-tab .card') do
+      within first('#designs-tab .js-design-list-item') do
         expect(page).to have_content('dk.png')
       end
 

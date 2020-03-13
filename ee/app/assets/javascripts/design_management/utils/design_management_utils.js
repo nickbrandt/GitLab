@@ -1,4 +1,8 @@
 import { uniqueId } from 'underscore';
+import { VALID_DESIGN_FILE_MIMETYPE } from '../constants';
+
+export const isValidDesignFile = ({ type }) =>
+  (type.match(VALID_DESIGN_FILE_MIMETYPE.regex) || []).length > 0;
 
 /**
  * Returns formatted array that doesn't contain
