@@ -9,7 +9,7 @@ describe Mutations::DesignManagement::Upload do
   let(:project) { issue.project }
 
   subject(:mutation) do
-    described_class.new(object: nil, context: { current_user: user })
+    described_class.new(object: nil, context: { current_user: user }, field: nil)
   end
 
   describe "#resolve" do

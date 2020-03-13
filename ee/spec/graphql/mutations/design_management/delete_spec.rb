@@ -16,10 +16,10 @@ describe Mutations::DesignManagement::Delete do
   let(:design_c) { create(:design, :with_file, issue: issue) }
   let(:filenames) { [design_a, design_b, design_c].map(&:filename) }
 
-  let(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
+  let(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
   def run_mutation
-    mutation = described_class.new(object: nil, context: { current_user: user })
+    mutation = described_class.new(object: nil, context: { current_user: user }, field: nil)
     mutation.resolve(project_path: project.full_path, iid: issue.iid, filenames: filenames)
   end
 

@@ -3,7 +3,7 @@
 RSpec.shared_examples 'updating health status' do
   let(:resource_klass) { resource.class }
   let(:mutated_resource) { subject[resource_klass.underscore.to_sym] }
-  let(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
+  let(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
   let(:params) do
     { iid: resource.iid, health_status: resource_klass.health_statuses[:at_risk] }.tap do |args|
       if resource.is_a?(Epic)
