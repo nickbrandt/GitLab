@@ -68,6 +68,11 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "%d changed file"
+msgid_plural "%d changed files"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d code quality issue"
 msgid_plural "%d code quality issues"
 msgstr[0] ""
@@ -186,18 +191,8 @@ msgid_plural "%d shards selected"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d staged change"
-msgid_plural "%d staged changes"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d tag"
 msgid_plural "%d tags"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "%d unstaged change"
-msgid_plural "%d unstaged changes"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -429,9 +424,6 @@ msgid "%{spanStart}at line%{spanEnd} %{errorLine}%{errorColumn}"
 msgstr ""
 
 msgid "%{spanStart}in%{spanEnd} %{errorFn}"
-msgstr ""
-
-msgid "%{staged} staged and %{unstaged} unstaged changes"
 msgstr ""
 
 msgid "%{start} to %{end}"
@@ -775,9 +767,6 @@ msgid "<no scopes selected>"
 msgstr ""
 
 msgid "<strong>%{group_name}</strong> group members"
-msgstr ""
-
-msgid "<strong>%{stagedFilesLength} staged</strong> and <strong>%{changedFilesLength} unstaged</strong> changes"
 msgstr ""
 
 msgid "<strong>Deletes</strong> source branch"
@@ -6884,13 +6873,10 @@ msgstr ""
 msgid "Disabled mirrors can only be enabled by instance owners. It is recommended that you delete them."
 msgstr ""
 
-msgid "Discard"
-msgstr ""
-
 msgid "Discard all changes"
 msgstr ""
 
-msgid "Discard all unstaged changes?"
+msgid "Discard all changes?"
 msgstr ""
 
 msgid "Discard changes"
@@ -12736,6 +12722,9 @@ msgid "Modal|Cancel"
 msgstr ""
 
 msgid "Modal|Close"
+msgstr ""
+
+msgid "Modified"
 msgstr ""
 
 msgid "Modified in this version"
@@ -18656,19 +18645,10 @@ msgstr ""
 msgid "Stage & Commit"
 msgstr ""
 
-msgid "Stage all changes"
-msgstr ""
-
 msgid "Stage data updated"
 msgstr ""
 
 msgid "Stage removed"
-msgstr ""
-
-msgid "Staged"
-msgstr ""
-
-msgid "Staged %{type}"
 msgstr ""
 
 msgid "Star a label to make it a priority label. Order the prioritized labels to change their relative priority, by dragging."
@@ -19827,6 +19807,9 @@ msgstr ""
 msgid "There are no archived projects yet"
 msgstr ""
 
+msgid "There are no changes"
+msgstr ""
+
 msgid "There are no charts configured for this page"
 msgstr ""
 
@@ -19861,12 +19844,6 @@ msgid "There are no packages yet"
 msgstr ""
 
 msgid "There are no projects shared with this group yet"
-msgstr ""
-
-msgid "There are no staged changes"
-msgstr ""
-
-msgid "There are no unstaged changes"
 msgstr ""
 
 msgid "There is a limit of %{ci_project_subscriptions_limit} subscriptions from or to a project."
@@ -21278,18 +21255,6 @@ msgid "UnscannedProjects|Your projects are up do date! Nice job!"
 msgstr ""
 
 msgid "Unschedule job"
-msgstr ""
-
-msgid "Unstage"
-msgstr ""
-
-msgid "Unstage all changes"
-msgstr ""
-
-msgid "Unstaged"
-msgstr ""
-
-msgid "Unstaged %{type}"
 msgstr ""
 
 msgid "Unstar"
@@ -22955,7 +22920,7 @@ msgstr ""
 msgid "You will lose all changes you've made to this file. This action cannot be undone."
 msgstr ""
 
-msgid "You will lose all the unstaged changes you've made in this project. This action cannot be undone."
+msgid "You will lose all uncommitted changes you've made in this project. This action cannot be undone."
 msgstr ""
 
 msgid "You will need to update your local repositories to point to the new location."
