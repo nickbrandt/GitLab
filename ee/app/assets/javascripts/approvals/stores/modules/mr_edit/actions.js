@@ -61,14 +61,22 @@ export const receiveRulesError = () => {
   createFlash(__('An error occurred fetching the approval rules.'));
 };
 
-export const fetchRules = ({ rootState, dispatch }) => {
+export const fetchRules = ({ rootState, dispatch }, targetBranch = '') => {
   dispatch('requestRules');
 
   const { mrSettingsPath, projectSettingsPath } = rootState.settings;
   const path = mrSettingsPath || projectSettingsPath;
 
+  const params = targetBranch
+    ? {
+        params: {
+          target_branch: targetBranch,
+        },
+      }
+    : null;
+
   return axios
-    .get(path)
+    .get(path, params)
     .then(response => mapMRApprovalSettingsResponse(response.data))
     .then(settings => ({
       ...settings,

@@ -38,6 +38,16 @@ describe('EE Approvals MRRules', () => {
       .find(UserAvatarList)
       .props('items');
   const findRuleControls = () => wrapper.find('td.js-controls').find(RuleControls);
+  const setTargetBranchInputValue = () => {
+    const value = 'new value';
+    const element = document.querySelector('#merge_request_target_branch');
+    element.value = value;
+    return value;
+  };
+  const callTargetBranchHandler = MutationObserverSpy => {
+    const onTargetBranchMutationHandler = MutationObserverSpy.mock.calls[0][0];
+    return onTargetBranchMutationHandler();
+  };
 
   beforeEach(() => {
     store = createStoreOptions(MREditModule());
@@ -53,6 +63,66 @@ describe('EE Approvals MRRules', () => {
     wrapper = null;
     store = null;
     approvalRules = null;
+  });
+
+  describe('when editing a MR', () => {
+    const initialTargetBranch = 'master';
+    let targetBranchInputElement;
+    let MutationObserverSpy;
+
+    beforeEach(() => {
+      MutationObserverSpy = jest.spyOn(global, 'MutationObserver');
+
+      targetBranchInputElement = document.createElement('input');
+      targetBranchInputElement.id = 'merge_request_target_branch';
+      targetBranchInputElement.value = initialTargetBranch;
+      document.body.appendChild(targetBranchInputElement);
+
+      store.modules.approvals.actions = {
+        fetchRules: jest.fn(),
+        addEmptyRule: jest.fn(),
+        setEmptyRule: jest.fn(),
+      };
+      store.state.settings.mrSettingsPath = 'some/path';
+      store.state.settings.eligibleApproversDocsPath = 'some/path';
+      store.state.settings.allowMultiRule = true;
+    });
+
+    afterEach(() => {
+      targetBranchInputElement.parentNode.removeChild(targetBranchInputElement);
+      MutationObserverSpy.mockClear();
+    });
+
+    it('sets the target branch data to be the same value as the target branch dropdown', () => {
+      factory();
+
+      expect(wrapper.vm.targetBranch).toBe(initialTargetBranch);
+    });
+
+    it('updates the target branch data when the target branch dropdown is changed', () => {
+      factory();
+      const newValue = setTargetBranchInputValue();
+      callTargetBranchHandler(MutationObserverSpy);
+      expect(wrapper.vm.targetBranch).toBe(newValue);
+    });
+
+    it('re-fetches rules when target branch has changed', () => {
+      factory();
+      setTargetBranchInputValue();
+      callTargetBranchHandler(MutationObserverSpy);
+      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalled();
+    });
+
+    it('disconnects MutationObserver when component gets destroyed', () => {
+      const mockDisconnect = jest.fn();
+      MutationObserverSpy.mockImplementation(() => ({
+        disconnect: mockDisconnect,
+        observe: jest.fn(),
+      }));
+      factory();
+      wrapper.destroy();
+      expect(mockDisconnect).toHaveBeenCalled();
+    });
   });
 
   describe('when allow multiple rules', () => {
