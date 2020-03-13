@@ -65,13 +65,11 @@ class DiscordService < ChatNotificationService
     super(data).merge(markdown: true)
   end
 
-  def wrap_array object
-    if object.nil?
-      []
-    elsif object.respond_to?(:to_ary)
-      object.to_ary || [object]
-    else
-      [object]
+  def wrap_array(object)
+    case(object)
+    when nil then []
+    when object.respond_to?(:to_a) then object.to_a
+    else [object]
     end
   end
 end
