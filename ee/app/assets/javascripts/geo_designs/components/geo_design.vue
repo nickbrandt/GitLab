@@ -66,7 +66,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['initiateDesignSync']),
+    ...mapActions(['initiateReplicableSync']),
   },
   actionTypes: ACTION_TYPES,
 };
@@ -78,7 +78,7 @@ export default {
       <gl-link class="font-weight-bold" :href="`/${name}`" target="_blank">{{ name }}</gl-link>
       <div class="ml-auto">
         <gl-button
-          @click="initiateDesignSync({ projectId, name, action: $options.actionTypes.RESYNC })"
+          @click="initiateReplicableSync({ projectId, name, action: $options.actionTypes.RESYNC })"
           >{{ __('Resync') }}</gl-button
         >
       </div>

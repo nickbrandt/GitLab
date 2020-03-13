@@ -14,7 +14,7 @@ describe('GeoDesignsApp', () => {
   const mockDesign = MOCK_BASIC_FETCH_DATA_MAP.data[0];
 
   const actionSpies = {
-    initiateDesignSync: jest.fn(),
+    initiateReplicableSync: jest.fn(),
   };
 
   const propsData = {
@@ -75,7 +75,7 @@ describe('GeoDesignsApp', () => {
 
       it('calls initiateDesignSyncs when clicked', () => {
         findGlButton().trigger('click');
-        expect(actionSpies.initiateDesignSync).toHaveBeenCalledWith({
+        expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith({
           projectId: propsData.projectId,
           name: propsData.name,
           action: ACTION_TYPES.RESYNC,

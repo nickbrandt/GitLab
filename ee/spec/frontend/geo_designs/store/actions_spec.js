@@ -64,7 +64,7 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('fetchDesigns', () => {
+  describe('fetchReplicableItems', () => {
     describe('on success', () => {
       beforeEach(() => {
         jest.spyOn(Api, 'getGeoReplicableItems').mockResolvedValue(MOCK_BASIC_FETCH_RESPONSE);
@@ -79,7 +79,7 @@ describe('GeoDesigns Store Actions', () => {
 
         it('should call getGeoReplicableItems with default queryParams', () => {
           testAction(
-            actions.fetchDesigns,
+            actions.fetchReplicableItems,
             {},
             state,
             [],
@@ -106,7 +106,7 @@ describe('GeoDesigns Store Actions', () => {
 
         it('should call getGeoReplicableItems with default queryParams', () => {
           testAction(
-            actions.fetchDesigns,
+            actions.fetchReplicableItems,
             {},
             state,
             [],
@@ -133,7 +133,7 @@ describe('GeoDesigns Store Actions', () => {
 
       it('should dispatch the request and error actions', done => {
         testAction(
-          actions.fetchDesigns,
+          actions.fetchReplicableItems,
           {},
           state,
           [],
@@ -158,13 +158,13 @@ describe('GeoDesigns Store Actions', () => {
   });
 
   describe('receiveInitiateAllReplicableSyncsSuccess', () => {
-    it('should commit mutation RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS and call fetchDesigns and toast', () => {
+    it('should commit mutation RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS and call fetchReplicableItems and toast', () => {
       testAction(
         actions.receiveInitiateAllReplicableSyncsSuccess,
         { action: ACTION_TYPES.RESYNC },
         state,
         [{ type: types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS }],
-        [{ type: 'fetchDesigns' }],
+        [{ type: 'fetchReplicableItems' }],
         () => {
           expect(toast).toHaveBeenCalledTimes(1);
           toast.mockClear();
@@ -188,7 +188,7 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('initiateAllDesignSyncs', () => {
+  describe('initiateAllReplicableSyncs', () => {
     let action;
 
     describe('on success', () => {
@@ -201,7 +201,7 @@ describe('GeoDesigns Store Actions', () => {
 
       it('should dispatch the request with correct replicable param and success actions', () => {
         testAction(
-          actions.initiateAllDesignSyncs,
+          actions.initiateAllReplicableSyncs,
           action,
           state,
           [],
@@ -227,7 +227,7 @@ describe('GeoDesigns Store Actions', () => {
 
       it('should dispatch the request and error actions', done => {
         testAction(
-          actions.initiateAllDesignSyncs,
+          actions.initiateAllReplicableSyncs,
           action,
           state,
           [],
@@ -255,13 +255,13 @@ describe('GeoDesigns Store Actions', () => {
   });
 
   describe('receiveInitiateReplicableSyncSuccess', () => {
-    it('should commit mutation RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS and call fetchDesigns and toast', () => {
+    it('should commit mutation RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS and call fetchReplicableItems and toast', () => {
       testAction(
         actions.receiveInitiateReplicableSyncSuccess,
         { action: ACTION_TYPES.RESYNC, projectName: 'test' },
         state,
         [{ type: types.RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS }],
-        [{ type: 'fetchDesigns' }],
+        [{ type: 'fetchReplicableItems' }],
         () => {
           expect(toast).toHaveBeenCalledTimes(1);
           toast.mockClear();
@@ -285,7 +285,7 @@ describe('GeoDesigns Store Actions', () => {
     });
   });
 
-  describe('initiateDesignSync', () => {
+  describe('initiateReplicableSync', () => {
     let action;
     let projectId;
     let name;
@@ -300,7 +300,7 @@ describe('GeoDesigns Store Actions', () => {
 
       it('should dispatch the request with correct replicable param and success actions', () => {
         testAction(
-          actions.initiateDesignSync,
+          actions.initiateReplicableSync,
           { projectId, name, action },
           state,
           [],
@@ -328,7 +328,7 @@ describe('GeoDesigns Store Actions', () => {
 
       it('should dispatch the request and error actions', done => {
         testAction(
-          actions.initiateDesignSync,
+          actions.initiateReplicableSync,
           { projectId, name, action },
           state,
           [],
