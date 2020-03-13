@@ -333,6 +333,9 @@ msgstr ""
 msgid "%{level_name} is not allowed since the fork source project has lower visibility."
 msgstr ""
 
+msgid "%{lineOneStart}Drag and drop to upload your designs%{lineOneEnd} or %{linkStart}click to upload%{linkEnd}."
+msgstr ""
+
 msgid "%{link_start}Read more%{link_end} about role permissions"
 msgstr ""
 
@@ -5660,6 +5663,9 @@ msgstr ""
 msgid "Could not save prometheus manual configuration"
 msgstr ""
 
+msgid "Could not upload your designs as one or more files uploaded are not supported."
+msgstr ""
+
 msgid "Country"
 msgstr ""
 
@@ -6791,13 +6797,7 @@ msgstr ""
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 
-msgid "DesignManagement|The one place for your designs"
-msgstr ""
-
 msgid "DesignManagement|To enable design management, you'll need to  %{requirements_link_start}meet the requirements%{requirements_link_end}. If you need help, reach out to our %{support_link_start}support team%{support_link_end} for assistance."
-msgstr ""
-
-msgid "DesignManagement|Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
 msgstr ""
 
 msgid "DesignManagement|Upload skipped."
@@ -7115,6 +7115,9 @@ msgid "Downstream"
 msgstr ""
 
 msgid "Downvotes"
+msgstr ""
+
+msgid "Drop your designs to start your upload."
 msgstr ""
 
 msgid "Due date"
@@ -10773,6 +10776,9 @@ msgstr ""
 msgid "Incoming email"
 msgstr ""
 
+msgid "Incoming!"
+msgstr ""
+
 msgid "Incompatible Project"
 msgstr ""
 
@@ -13515,6 +13521,9 @@ msgid "October"
 msgstr ""
 
 msgid "OfSearchInADropdown|Filter"
+msgstr ""
+
+msgid "Oh no!"
 msgstr ""
 
 msgid "Ok let's go"
@@ -22704,6 +22713,9 @@ msgid "You are on a read-only GitLab instance."
 msgstr ""
 
 msgid "You are receiving this message because you are a GitLab administrator for %{url}."
+msgstr ""
+
+msgid "You are trying to upload something other than an image. Please upload a .png, .jpg, .jpeg, .gif, .bmp, .tiff or .ico."
 msgstr ""
 
 msgid "You can %{linkStart}view the blob%{linkEnd} instead."

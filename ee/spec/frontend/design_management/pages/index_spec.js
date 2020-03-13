@@ -6,7 +6,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
-import UploadButton from 'ee/design_management/components/upload/button.vue';
+import DesignDropzone from 'ee/design_management/components/upload/design_dropzone.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
 import { DESIGNS_ROUTE_NAME } from 'ee/design_management/router/constants';
 import createFlash from '~/flash';
@@ -63,7 +63,7 @@ describe('Design management index page', () => {
   const findSelectAllButton = () => wrapper.find('.js-select-all');
   const findToolbar = () => wrapper.find('.qa-selector-toolbar');
   const findDeleteButton = () => wrapper.find(DeleteButton);
-  const findUploadButton = () => wrapper.find(UploadButton);
+  const findDropzone = () => wrapper.find(DesignDropzone);
 
   function createComponent({
     loading = false,
@@ -225,7 +225,7 @@ describe('Design management index page', () => {
       };
 
       return wrapper.vm.$nextTick().then(() => {
-        findUploadButton().vm.$emit('upload', [{ name: 'test' }]);
+        findDropzone().vm.$emit('upload', [{ name: 'test' }]);
         expect(mutate).toHaveBeenCalledWith(mutationVariables);
         expect(wrapper.vm.filesToBeSaved).toEqual([{ name: 'test' }]);
         expect(wrapper.vm.isSaving).toBeTruthy();

@@ -16,6 +16,10 @@ export const UPLOAD_DESIGN_ERROR = s__(
   'DesignManagement|Error uploading a new design. Please try again.',
 );
 
+export const UPLOAD_DESIGN_INVALID_FILETYPE_ERROR = __(
+  'Could not upload your designs as one or more files uploaded are not supported.',
+);
+
 export const DESIGN_NOT_FOUND_ERROR = __('Could not find design');
 
 export const DESIGN_NOT_EXIST_ERROR = __('Requested design version does not exist');

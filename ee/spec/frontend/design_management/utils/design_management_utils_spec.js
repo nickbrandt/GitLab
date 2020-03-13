@@ -5,6 +5,7 @@ import {
   findVersionId,
   designUploadOptimisticResponse,
   updateImageDiffNoteOptimisticResponse,
+  isValidDesignFile,
 } from 'ee/design_management/utils/design_management_utils';
 
 describe('extractCurrentDiscussion', () => {
@@ -132,5 +133,27 @@ describe('optimistic responses', () => {
     expect(updateImageDiffNoteOptimisticResponse(mockNote, { position: mockPosition })).toEqual(
       expectedResponse,
     );
+  });
+});
+
+describe('isValidDesignFile', () => {
+  // test every filetype that Design Management supports
+  // https://docs.gitlab.com/ee/user/project/issues/design_management.html#limitations
+  it.each`
+    mimetype                      | isValid
+    ${'image/svg'}                | ${true}
+    ${'image/png'}                | ${true}
+    ${'image/jpg'}                | ${true}
+    ${'image/jpeg'}               | ${true}
+    ${'image/gif'}                | ${true}
+    ${'image/bmp'}                | ${true}
+    ${'image/tiff'}               | ${true}
+    ${'image/ico'}                | ${true}
+    ${'image/svg'}                | ${true}
+    ${'video/mpeg'}               | ${false}
+    ${'audio/midi'}               | ${false}
+    ${'application/octet-stream'} | ${false}
+  `('returns $valid for file type $mimetype', ({ mimetype, isValid }) => {
+    expect(isValidDesignFile({ type: mimetype })).toBe(isValid);
   });
 });

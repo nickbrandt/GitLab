@@ -13,6 +13,14 @@ exports[`Design management index page designs does not render toolbar when there
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
+        <design-dropzone-stub
+          class="design-list-item"
+        />
+      </li>
+       
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
         <design-stub
           event="NONE"
           filename="design-1-name"
@@ -102,6 +110,14 @@ exports[`Design management index page designs renders designs list and header wi
     <ol
       class="list-unstyled row"
     >
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
+        <design-dropzone-stub
+          class="design-list-item"
+        />
+      </li>
+       
       <li
         class="col-md-6 col-lg-4 mb-3"
       >
@@ -208,10 +224,18 @@ exports[`Design management index page when has no designs renders empty text 1`]
   <div
     class="mt-4"
   >
-    <gl-empty-state-stub
-      description="Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
-      title="The one place for your designs"
-    />
+    <ol
+      class="list-unstyled row"
+    >
+      <li
+        class="col-md-6 col-lg-4 mb-3"
+      >
+        <design-dropzone-stub
+          class="design-list-item"
+        />
+      </li>
+       
+    </ol>
   </div>
    
   <router-view-stub
