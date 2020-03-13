@@ -1,0 +1,5 @@
+---
+title: Sets the new_variables_ui feature flag to be enabled by default.
+merge_request: 26901
+author:
+type: added
