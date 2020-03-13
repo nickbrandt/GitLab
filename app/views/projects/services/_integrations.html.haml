@@ -17,7 +17,7 @@
         %td{ role: 'cell', 'aria-colindex': 1 }
           = boolean_to_icon integration.activated?
         %td{ role: 'cell', 'aria-colindex': 2 }
-          = link_to '#' do
+          = link_to edit_integration_path(integration) do
             %strong= integration.title
         %td.d-none.d-sm-block{ role: 'cell', 'aria-colindex': 3 }
           = integration.description
