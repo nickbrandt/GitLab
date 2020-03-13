@@ -3,7 +3,7 @@
 module Ci
   class DailyReportResultService
     def execute(pipeline)
-      return unless Feature.enabled?(:ci_daily_code_coverage, default_enabled: true)
+      return unless Feature.enabled?(:ci_daily_code_coverage, pipeline.project, default_enabled: true)
 
       DailyReportResult.upsert_reports(coverage_reports(pipeline))
     end
