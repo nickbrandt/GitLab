@@ -179,27 +179,5 @@ module Gitlab
     rescue GRPC::Internal
       false
     end
-
-    protected
-
-    def full_path(storage, dir_name)
-      raise ArgumentError.new("Directory name can't be blank") if dir_name.blank?
-
-      File.join(Gitlab.config.repositories.storages[storage].legacy_disk_path, dir_name)
-    end
-
-    private
-
-    def git_timeout
-      Gitlab.config.gitlab_shell.git_timeout
-    end
-
-    def wrapped_gitaly_errors
-      yield
-    rescue GRPC::NotFound, GRPC::BadStatus => e
-      # Old Popen code returns [Error, output] to the caller, so we
-      # need to do the same here...
-      raise Error, e
-    end
   end
 end
