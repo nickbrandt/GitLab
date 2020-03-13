@@ -108,53 +108,5 @@ describe 'Epic aggregates (count and weight)' do
         )
       end
     end
-
-    context 'with feature flag disabled' do
-      before do
-        stub_feature_flags(unfiltered_epic_aggregates: false)
-      end
-
-      context 'when requesting counts' do
-        let(:epic_aggregates_query) do
-          <<~QUERY
-          nodes {
-            descendantCounts {
-              openedEpics
-              closedEpics
-              openedIssues
-              closedIssues
-            }
-          }
-          QUERY
-        end
-
-        it 'uses the DescendantCountService' do
-          expect(Epics::DescendantCountService).to receive(:new)
-
-          post_graphql(query, current_user: current_user)
-        end
-
-        it_behaves_like 'counts properly'
-      end
-
-      context 'when requesting weights' do
-        let(:epic_aggregates_query) do
-          <<~QUERY
-          nodes {
-            descendantWeightSum {
-              openedIssues
-              closedIssues
-            }
-          }
-          QUERY
-        end
-
-        it 'returns an error' do
-          post_graphql(query, current_user: current_user)
-
-          expect_graphql_errors_to_include /Field 'descendantWeightSum' doesn't exist on type 'Epic/
-        end
-      end
-    end
   end
 end
