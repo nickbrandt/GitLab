@@ -1,14 +1,13 @@
 <script>
 import { mapActions } from 'vuex';
 import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
-import { GlIcon, GlSprintf } from '@gitlab/ui';
+import { GlIcon } from '@gitlab/ui';
 import { NOTEABLE_NOTE } from '../constants';
 
 export default {
   components: {
     timeAgoTooltip,
     GlIcon,
-    GlSprintf,
   },
   props: {
     author: {
@@ -58,7 +57,7 @@ export default {
       return this.author && Object.keys(this.author).length;
     },
     showGitLabEmployeeBadge() {
-      return this.noteType === NOTEABLE_NOTE && this.hasAuthor && this.author.is_gitlab_employee;
+      return this.noteType === NOTEABLE_NOTE && this.author?.is_gitlab_employee;
     },
     noteHeadlineClasses() {
       const classes = ['note-headline-light', 'note-headline-meta', 'align-middle'];
@@ -133,12 +132,12 @@ export default {
     <span
       v-if="showGitLabEmployeeBadge"
       ref="gitLabEmployeeBadge"
-      class="cgray-700 align-middle text-nowrap"
+      class="gl-text-gray-700 align-middle text-nowrap"
     >
       <gl-icon name="work" :size="16" class="align-middle" />
-      <span class="align-middle">
-        <gl-sprintf :message="__('GitLab')" />
-      </span>
+      <!-- `GitLab` does not need to be translated -->
+      <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings -->
+      <span class="align-middle">GitLab</span>
     </span>
   </div>
 </template>
