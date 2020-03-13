@@ -7,6 +7,8 @@ import RuleControls from '../rule_controls.vue';
 import EmptyRule from './empty_rule.vue';
 import RuleInput from './rule_input.vue';
 
+let targetBranchMutationObserver;
+
 export default {
   components: {
     UserAvatarList,
@@ -14,6 +16,11 @@ export default {
     RuleControls,
     EmptyRule,
     RuleInput,
+  },
+  data() {
+    return {
+      targetBranch: '',
+    };
   },
   computed: {
     ...mapState(['settings']),
@@ -33,6 +40,9 @@ export default {
     canEdit() {
       return this.settings.canEdit;
     },
+    isEditPath() {
+      return this.settings.mrSettingsPath;
+    },
   },
   watch: {
     rules: {
@@ -50,8 +60,39 @@ export default {
       immediate: true,
     },
   },
+  mounted() {
+    if (this.isEditPath) {
+      this.mergeRequestTargetBranchElement = document.querySelector('#merge_request_target_branch');
+
+      this.targetBranch = this.mergeRequestTargetBranchElement?.value;
+
+      if (this.targetBranch) {
+        targetBranchMutationObserver = new MutationObserver(this.onTargetBranchMutation);
+        targetBranchMutationObserver.observe(this.mergeRequestTargetBranchElement, {
+          attributes: true,
+          childList: false,
+          subtree: false,
+          attributeFilter: ['value'],
+        });
+      }
+    }
+  },
+  beforeDestroy() {
+    if (this.isEditPath && targetBranchMutationObserver) {
+      targetBranchMutationObserver.disconnect();
+      targetBranchMutationObserver = null;
+    }
+  },
   methods: {
-    ...mapActions(['setEmptyRule', 'addEmptyRule']),
+    ...mapActions(['setEmptyRule', 'addEmptyRule', 'fetchRules']),
+    onTargetBranchMutation() {
+      const selectedTargetBranchValue = this.mergeRequestTargetBranchElement.value;
+
+      if (this.targetBranch !== selectedTargetBranchValue) {
+        this.targetBranch = selectedTargetBranchValue;
+        this.fetchRules(this.targetBranch);
+      }
+    },
   },
 };
 </script>

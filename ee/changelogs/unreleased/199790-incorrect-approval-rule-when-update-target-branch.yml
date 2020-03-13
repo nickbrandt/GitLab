@@ -1,0 +1,5 @@
+---
+title: Display correct approval rules based on target branch in Edit MR form
+merge_request: 26053
+author:
+type: added
