@@ -3,7 +3,8 @@
 require "discordrb/webhooks"
 
 class DiscordService < ChatNotificationService
-  LINK_REGEX = /(\[[^\]]*\]\()([^\)]*)\)/.freeze
+  ATTACHMENT_REGEX = /: (?<entry>.*?)\n - (?<name>.*)\n*/.freeze
+
   def title
     s_("DiscordService|Discord Notifications")
   end
@@ -34,10 +35,10 @@ class DiscordService < ChatNotificationService
     # No-op.
   end
 
-  def self.supported_events
-    %w[push issue confidential_issue merge_request note confidential_note tag_push
-       pipeline wiki_page]
-  end
+#  def self.supported_events
+#    %w[push issue confidential_issue merge_request note confidential_note tag_push
+#       pipeline wiki_page]
+#  end
 
   def default_fields
     [
@@ -53,11 +54,24 @@ class DiscordService < ChatNotificationService
     client = Discordrb::Webhooks::Client.new(url: webhook)
 
     client.execute do |builder|
-      builder.content = (message.pretext + "\n\n" + message.attachments.to_s).gsub(LINK_REGEX, "\\1<\\2>)")
+      builder.add_embed do |embed|
+        embed.author = Discordrb::Webhooks::EmbedAuthor.new(name: message.user_name, icon_url: message.user_avatar)
+        embed.description = (message.pretext + "\n" + wrap_array(message.attachments).join("\n")).gsub(ATTACHMENT_REGEX, " \\k<entry> - \\k<name>\n")
+      end
     end
   end
 
   def custom_data(data)
     super(data).merge(markdown: true)
+  end
+
+  def wrap_array object
+    if object.nil?
+      []
+    elsif object.respond_to?(:to_ary)
+      object.to_ary || [object]
+    else
+      [object]
+    end
   end
 end
