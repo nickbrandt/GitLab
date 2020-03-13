@@ -22140,6 +22140,9 @@ msgstr ""
 msgid "VisualReviewApp|%{stepStart}Step 4%{stepEnd}. Leave feedback in the Review App."
 msgstr ""
 
+msgid "VisualReviewApp|Cancel"
+msgstr ""
+
 msgid "VisualReviewApp|Copy merge request ID"
 msgstr ""
 
@@ -22152,13 +22155,16 @@ msgstr ""
 msgid "VisualReviewApp|Follow the steps below to enable Visual Reviews inside your application."
 msgstr ""
 
+msgid "VisualReviewApp|No review app found or available."
+msgstr ""
+
 msgid "VisualReviewApp|Open review app"
 msgstr ""
 
 msgid "VisualReviewApp|Review"
 msgstr ""
 
-msgid "VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4, and 5 are performed by the reviewer each time they perform a review."
+msgid "VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4 is performed by the reviewer each time they perform a review."
 msgstr ""
 
 msgid "Vulnerabilities"
