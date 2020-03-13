@@ -46,7 +46,6 @@ export default {
         height: 0,
       },
       initialLoad: true,
-      mousedown: false,
       lastDragPosition: null,
       isDraggingDesign: false,
     };
@@ -234,7 +233,6 @@ export default {
       const { scrollLeft, scrollTop } = presentationViewport;
       const deltaX = this.lastDragPosition.x - clientX;
       const deltaY = this.lastDragPosition.y - clientY;
-
       presentationViewport.scrollTo(scrollLeft + deltaX, scrollTop + deltaY);
 
       this.lastDragPosition = {
@@ -244,7 +242,6 @@ export default {
     },
     onPresentationMouseup() {
       this.lastDragPosition = null;
-      this.mousedown = null;
       this.isDraggingDesign = false;
     },
     isDesignOverflowing() {
