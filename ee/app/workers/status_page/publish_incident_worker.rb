@@ -30,10 +30,7 @@ module StatusPage
         .new(user: user, project: project, issue_id: issue_id)
         .execute
 
-      log_error(result.message) if result.error?
-    rescue => e
-      log_error(e.message)
-      raise
+      log_info(result.message) if result.error?
     end
 
     def user
@@ -44,9 +41,8 @@ module StatusPage
       strong_memoize(:project) { Project.find_by_id(project_id) }
     end
 
-    def log_error(message)
-      preamble = "Failed to publish incident for project_id=#{project_id}, issue_id=#{issue_id}"
-      logger.error("#{preamble}: #{message}")
+    def log_info(message)
+      logger.info(structured_payload(message: message))
     end
   end
 end

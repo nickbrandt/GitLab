@@ -50,9 +50,10 @@ describe StatusPage::PublishIncidentWorker do
         let(:error_message) { 'some message' }
         let(:service_result) { ServiceResponse.error(message: error_message) }
 
-        it 'succeeds and logs the errors' do
+        it 'succeeds and logs the error' do
           expect(logger)
-            .to receive(:error).with(/#{error_message}/)
+            .to receive(:info)
+            .with(a_hash_including('message' => error_message))
             .exactly(worker_exec_times).times
 
           subject
@@ -64,10 +65,9 @@ describe StatusPage::PublishIncidentWorker do
       let(:error_message) { 'some exception' }
       let(:exception) { StandardError.new(error_message) }
 
-      it 'logs and re-raises exception' do
+      it 're-raises exception' do
         allow(service).to receive(:execute).and_raise(exception)
 
-        expect(logger).to receive(:error).with(/#{error_message}/)
         expect { subject }.to raise_error(exception)
       end
     end
