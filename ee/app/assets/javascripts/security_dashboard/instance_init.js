@@ -3,6 +3,7 @@ import createRouter from './store/router';
 import projectSelector from './store/plugins/project_selector';
 import syncWithRouter from './store/plugins/sync_with_router';
 import createStore from './store';
+import { DASHBOARD_TYPES } from './store/constants';
 import InstanceSecurityDashboard from './components/instance_security_dashboard.vue';
 
 export default () => {
@@ -19,7 +20,10 @@ export default () => {
     vulnerableProjectsEndpoint,
   } = el.dataset;
   const router = createRouter();
-  const store = createStore({ plugins: [projectSelector, syncWithRouter(router)] });
+  const store = createStore({
+    dashboardType: DASHBOARD_TYPES.INSTANCE,
+    plugins: [projectSelector, syncWithRouter(router)],
+  });
 
   return new Vue({
     el,
