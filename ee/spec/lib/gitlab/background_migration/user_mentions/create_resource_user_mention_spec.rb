@@ -3,8 +3,6 @@
 require 'spec_helper'
 require './db/post_migrate/20191115115043_migrate_epic_mentions_to_db'
 require './db/post_migrate/20191115115522_migrate_epic_notes_mentions_to_db'
-require './db/post_migrate/20200214174519_remigrate_epic_mentions_to_db'
-require './db/post_migrate/20200214174607_remigrate_epic_notes_mentions_to_db'
 require './db/post_migrate/20200124110831_migrate_design_notes_mentions_to_db'
 
 describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, schema: :latest do
@@ -67,7 +65,6 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
         let(:resource) { epic }
 
         it_behaves_like 'resource mentions migration', MigrateEpicMentionsToDb, Epic
-        it_behaves_like 'resource mentions migration', RemigrateEpicMentionsToDb, Epic
 
         context 'mentions in epic notes' do
           let!(:note1) { notes.create!(noteable_id: epic.id, noteable_type: 'Epic', author_id: author.id, note: description_mentions) }
@@ -79,7 +76,6 @@ describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention, s
           let!(:note5) { notes.create!(noteable_id: epics.maximum(:id) + 10, noteable_type: 'Epic', author_id: author.id, note: description_mentions, project_id: project.id) }
 
           it_behaves_like 'resource notes mentions migration', MigrateEpicNotesMentionsToDb, Epic
-          it_behaves_like 'resource notes mentions migration', RemigrateEpicNotesMentionsToDb, Epic
         end
       end
     end
