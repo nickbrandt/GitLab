@@ -49,7 +49,7 @@ module Geo
       return [] unless lfs_objects_object_store_enabled?
 
       lfs_objects_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(:lfs))
-                        .pluck(:id)
+                        .pluck(Geo::Fdw::LfsObject.arel_table[:id])
                         .map { |id| ['lfs', id] }
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -59,7 +59,7 @@ module Geo
       return [] unless attachments_object_store_enabled?
 
       attachments_finder.find_migrated_local(batch_size: batch_size, except_ids: scheduled_file_ids(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES))
-                        .pluck(:uploader, :id)
+                        .pluck(Geo::Fdw::Upload.arel_table[:uploader], Geo::Fdw::Upload.arel_table[:id])
                         .map { |uploader, id| [uploader.sub(/Uploader\z/, '').underscore, id] }
     end
     # rubocop: enable CodeReuse/ActiveRecord
