@@ -407,10 +407,7 @@ msgstr ""
 msgid "%{screenreaderOnlyStart}Keyboard shorcuts%{screenreaderOnlyEnd} Enabled"
 msgstr ""
 
-msgid "%{service_title} activated."
-msgstr ""
-
-msgid "%{service_title} settings saved, but not activated."
+msgid "%{service_title} %{message}."
 msgstr ""
 
 msgid "%{size} GiB"
@@ -23239,6 +23236,9 @@ msgid_plural "about %d hours"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "activated"
+msgstr ""
+
 msgid "added %{created_at_timeago}"
 msgstr ""
 
@@ -24292,6 +24292,9 @@ msgid "score"
 msgstr ""
 
 msgid "security Reports|There was an error creating the merge request"
+msgstr ""
+
+msgid "settings saved, but not activated"
 msgstr ""
 
 msgid "severity|Critical"
