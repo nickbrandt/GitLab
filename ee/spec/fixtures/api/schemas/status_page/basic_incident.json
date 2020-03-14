@@ -2,7 +2,7 @@
   "type": "object",
   "required": [
     "id",
-    "state",
+    "status",
     "title",
     "description",
     "links",
@@ -11,7 +11,7 @@
   ],
   "properties": {
     "id": { "type": "integer" },
-    "state": {
+    "status": {
       "type": "string",
       "enum": ["opened", "closed"]
     },

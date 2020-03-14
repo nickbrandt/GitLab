@@ -14,7 +14,7 @@ describe StatusPage::IncidentEntity do
   it 'exposes JSON fields' do
     expect(json).to eq(
       id: issue.iid,
-      state: issue.state,
+      status: issue.state,
       title: issue.title_html,
       description: issue.description_html,
       updated_at: issue.updated_at,
