@@ -39,19 +39,54 @@ describe('Diff File Row component', () => {
     );
   });
 
-  it('renders ChangedFileIcon component', () => {
-    createComponent({
-      level: 4,
-      file: {},
-      hideFileStats: false,
+  describe('ChangedFileIcon component', () => {
+    const fileObject = (file = {}) => {
+      return {
+        changed: true,
+        ...file,
+      };
+    };
+    const componentProps = file => {
+      return {
+        level: 4,
+        file,
+        hideFileStats: false,
+      };
+    };
+
+    it('renders component with showTooltip', () => {
+      const file = fileObject();
+      createComponent(componentProps(file));
+      expect(wrapper.find(ChangedFileIcon).props()).toEqual(
+        expect.objectContaining({
+          file,
+          size: 16,
+          showTooltip: true,
+        }),
+      );
     });
 
-    expect(wrapper.find(ChangedFileIcon).props()).toEqual(
-      expect.objectContaining({
-        file: {},
-        size: 16,
-      }),
-    );
+    it.each`
+      message      | file          | desc
+      ${'Deleted'} | ${'deleted'}  | ${'shows "Deleted" tooltip if file has been deleted'}
+      ${'Added'}   | ${'tempFile'} | ${'shows "Added" tooltip if file has been added'}
+    `('$desc', ({ message, file }) => {
+      createComponent(
+        componentProps(
+          fileObject({
+            [file]: true,
+          }),
+        ),
+      );
+      expect(wrapper.find(ChangedFileIcon).props('tooltipTitle')).toBe(message);
+    });
+
+    it('shows "Modified" tooltip if file has been modified', () => {
+      const file = fileObject({ deleted: false, tempFile: false });
+
+      createComponent(componentProps(file));
+      expect(wrapper.find(ChangedFileIcon).props('tooltipTitle')).toBe('Modified');
+    });
   });
 
   describe('FileRowStats components', () => {

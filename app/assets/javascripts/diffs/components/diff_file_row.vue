@@ -6,6 +6,7 @@
 import FileRow from '~/vue_shared/components/file_row.vue';
 import FileRowStats from './file_row_stats.vue';
 import ChangedFileIcon from '~/vue_shared/components/changed_file_icon.vue';
+import { __ } from '~/locale';
 
 export default {
   name: 'DiffFileRow',
@@ -28,6 +29,19 @@ export default {
     showFileRowStats() {
       return !this.hideFileStats && this.file.type === 'blob';
     },
+    tooltipTitle() {
+      if (!this.file.changed) return undefined;
+
+      if (this.file.deleted) {
+        return __('Deleted');
+      }
+
+      if (this.file.tempFile) {
+        return __('Added');
+      }
+
+      return __('Modified');
+    },
   },
 };
 </script>
@@ -35,6 +49,6 @@ export default {
 <template>
   <file-row :file="file" v-bind="$attrs" v-on="$listeners">
     <file-row-stats v-if="showFileRowStats" :file="file" class="mr-1" />
-    <changed-file-icon :file="file" :size="16" />
+    <changed-file-icon :file="file" :size="16" :show-tooltip="true" :tooltip-title="tooltipTitle" />
   </file-row>
 </template>

@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { n__ } from '~/locale';
+import { n__, __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import ChangedFileIcon from '~/vue_shared/components/changed_file_icon.vue';
@@ -60,6 +60,11 @@ export default {
     showChangedFileIcon() {
       return !this.isTree && this.isModified;
     },
+    tooltipTitle() {
+      if (!this.file.changed) return undefined;
+
+      return this.file.tempFile ? __('Added') : __('Modified');
+    },
   },
 };
 </script>
@@ -84,6 +89,7 @@ export default {
       :file="file"
       :show-tooltip="true"
       :show-staged-icon="false"
+      :tooltip-title="tooltipTitle"
     />
     <new-dropdown
       :type="file.type"

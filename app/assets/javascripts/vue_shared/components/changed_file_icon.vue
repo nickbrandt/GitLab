@@ -1,7 +1,6 @@
 <script>
 import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { __ } from '~/locale';
 import { getCommitIconMap } from '~/ide/utils';
 
 export default {
@@ -36,6 +35,11 @@ export default {
       required: false,
       default: true,
     },
+    tooltipTitle: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
     changedIcon() {
@@ -48,10 +52,10 @@ export default {
     changedIconClass() {
       return `${this.changedIcon} float-left d-block`;
     },
-    tooltipTitle() {
-      if (!this.showTooltip || !this.file.changed) return undefined;
+    changedTooltipTitle() {
+      if (!this.showTooltip) return undefined;
 
-      return this.file.tempFile ? __('Added') : __('Modified');
+      return this.tooltipTitle;
     },
     showIcon() {
       return (
@@ -69,7 +73,7 @@ export default {
 <template>
   <span
     v-gl-tooltip.right
-    :title="tooltipTitle"
+    :title="changedTooltipTitle"
     :class="{ 'ml-auto': isCentered }"
     class="file-changed-icon d-inline-block"
   >
