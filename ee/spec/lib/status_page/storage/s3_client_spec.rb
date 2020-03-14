@@ -41,6 +41,29 @@ describe StatusPage::Storage::S3Client, :aws_s3 do
     end
   end
 
+  describe '#delete_object' do
+    let(:key) { 'key' }
+
+    subject(:result) { client.delete_object(key) }
+
+    it 'returns true' do
+      stub_responses(:delete_object)
+
+      expect(result).to eq(true)
+    end
+
+    context 'when failed' do
+      let(:aws_error) { 'SomeError' }
+
+      it 'raises an error' do
+        stub_responses(:delete_object, aws_error)
+
+        msg = error_message(aws_error, key: key)
+        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+      end
+    end
+  end
+
   private
 
   def stub_responses(*args)

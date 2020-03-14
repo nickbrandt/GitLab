@@ -10,7 +10,7 @@ module StatusPage
   class PublishDetailsService < PublishBaseService
     private
 
-    def publish(issue, user_notes)
+    def process(issue, user_notes)
       json = serialize(issue, user_notes)
       key = object_key(json)
       return error('Missing object key') unless key

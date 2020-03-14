@@ -10,10 +10,10 @@
 #
 #     finder = StatusPage::IncidentsFinder.new(project_id: project_id)
 #
-#     # A single issue
-#     issue, user_notes = finder.find_by_id(issue_id)
+#     # A single issue (including confidential issue)
+#     issue = finder.find_by_id(issue_id)
 #
-#     # Most recent 20 issues
+#     # Most recent 20 non-confidential issues
 #     issues = finder.all
 #
 module StatusPage
@@ -25,23 +25,22 @@ module StatusPage
     end
 
     def find_by_id(issue_id)
-      execute.find_by_id(issue_id)
+      execute(include_confidential: true)
+        .find_by_id(issue_id)
     end
 
     def all
-      @sorted = true
-
-      execute
+      execute(sorted: true)
         .limit(MAX_LIMIT) # rubocop: disable CodeReuse/ActiveRecord
     end
 
     private
 
-    attr_reader :project_id, :with_user_notes, :sorted
+    attr_reader :project_id
 
-    def execute
+    def execute(sorted: false, include_confidential: false)
       issues = init_collection
-      issues = public_only(issues)
+      issues = public_only(issues) unless include_confidential
       issues = by_project(issues)
       issues = reverse_chronological(issues) if sorted
       issues

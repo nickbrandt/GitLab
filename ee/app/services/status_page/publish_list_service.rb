@@ -10,7 +10,7 @@ module StatusPage
   class PublishListService < PublishBaseService
     private
 
-    def publish(issues)
+    def process(issues)
       json = serialize(issues)
 
       upload(object_key, json)

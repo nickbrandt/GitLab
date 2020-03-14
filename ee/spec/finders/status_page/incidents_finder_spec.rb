@@ -28,7 +28,7 @@ describe StatusPage::IncidentsFinder do
     context 'for confidential issue' do
       let(:issue) { issues.fetch(:confidential) }
 
-      it { is_expected.to be_nil }
+      it { is_expected.to eq(issue) }
     end
 
     context 'for unrelated issue' do
@@ -40,6 +40,7 @@ describe StatusPage::IncidentsFinder do
 
   describe '#all' do
     let(:sorted_issues) { public_issues.sort_by(&:created_at).reverse }
+    let(:limit) { public_issues.size }
 
     subject { finder.all }
 
@@ -57,6 +58,14 @@ describe StatusPage::IncidentsFinder do
       let(:limit) { public_issues.size - 1 }
 
       it { is_expected.to eq(sorted_issues.first(1)) }
+    end
+
+    context 'when combined with other finder methods' do
+      before do
+        finder.find_by_id(public_issues.first.id)
+      end
+
+      it { is_expected.to eq(sorted_issues) }
     end
   end
 end
