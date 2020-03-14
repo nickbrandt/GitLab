@@ -56,7 +56,7 @@ describe Ci::CreateWebIdeTerminalService do
             <<-EOS
               terminal:
                 image:
-                  name: ruby:2.2
+                  name: ruby:2.7
                   ports:
                     - 80
                 script: rspec

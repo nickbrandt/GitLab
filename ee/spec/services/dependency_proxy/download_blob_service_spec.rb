@@ -6,7 +6,7 @@ describe DependencyProxy::DownloadBlobService do
 
   let(:image) { 'alpine' }
   let(:token) { Digest::SHA256.hexdigest('123') }
-  let(:blob_sha) { Digest::SHA256.hexdigest('ruby:2.3.9') }
+  let(:blob_sha) { Digest::SHA256.hexdigest('ruby:2.7.0') }
 
   subject { described_class.new(image, blob_sha, token).execute }
 

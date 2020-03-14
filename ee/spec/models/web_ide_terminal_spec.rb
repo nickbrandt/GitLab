@@ -41,7 +41,7 @@ describe WebIdeTerminal do
 
     context 'when image does not have an alias' do
       let(:config) do
-        { image: 'ruby:2.1' }.merge(services_with_aliases)
+        { image: 'ruby:2.7' }.merge(services_with_aliases)
       end
 
       it 'returns services aliases' do
@@ -51,7 +51,7 @@ describe WebIdeTerminal do
 
     context 'when both image and services have aliases' do
       let(:config) do
-        { image: { name: 'ruby:2.1', alias: 'ruby' } }.merge(services_with_aliases)
+        { image: { name: 'ruby:2.7', alias: 'ruby' } }.merge(services_with_aliases)
       end
 
       it 'returns all aliases' do
@@ -61,7 +61,7 @@ describe WebIdeTerminal do
 
     context 'when image and services does not have any alias' do
       let(:config) do
-        { image: 'ruby:2.1', services: ['postgres'] }
+        { image: 'ruby:2.7', services: ['postgres'] }
       end
 
       it 'returns an empty array' do
