@@ -5557,7 +5557,8 @@ CREATE TABLE public.security_scans (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     build_id bigint NOT NULL,
-    scan_type smallint NOT NULL
+    scan_type smallint NOT NULL,
+    scanned_resources_count integer
 );
 
 CREATE SEQUENCE public.security_scans_id_seq
@@ -12823,6 +12824,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200312163407
 20200313101649
 20200313123934
+20200314060834
 20200316111759
 20200316162648
 20200316173312
