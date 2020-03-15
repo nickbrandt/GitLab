@@ -20,7 +20,7 @@ module EE
         issues_analytics_navbar_link(group, current_user, 1),
         contribution_analytics_navbar_link(group, current_user, 2),
         group_insights_navbar_link(group, current_user, 3),
-        productivity_analytics_navbar_link(group, current_user, 4),
+        productivity_analytics_navbar_link(group, current_user, 4)
       ].compact
     end
 
