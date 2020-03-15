@@ -66,7 +66,7 @@ class CommitStatus < ApplicationRecord
     # it expects that items are an array of attributes to match
     # each hash needs to have `id` and `lock_version`
     slice.inject(self) do |relation, item|
-      match = CommitStatus.where(item.slice(:id, :lock_version))
+      match = CommitStatus.unscoped.where(item.slice(:id, :lock_version))
       relation.or(match)
     end
   end
