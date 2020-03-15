@@ -117,7 +117,7 @@
 
       = render_if_exists 'groups/sidebar/packages'
 
-      = render 'layouts/nav/sidebar/analytics_links', links: group_analytics_navbar_links(@group, current_user)
+      = render 'layouts/nav/sidebar/analytics_links', navbar_links: group_analytics_navbar_links(@group, current_user)
 
       - if group_sidebar_link?(:group_members)
         = nav_link(path: 'group_members#index') do
