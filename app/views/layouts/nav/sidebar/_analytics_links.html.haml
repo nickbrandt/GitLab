@@ -1,3 +1,4 @@
+- navbar_links = links.sort_by { |link| [link.link_to_options.fetch(:data, {}).fetch(:index, 0), link.title] }
 - all_paths = navbar_links.map(&:path)
 
 - if navbar_links.any?
