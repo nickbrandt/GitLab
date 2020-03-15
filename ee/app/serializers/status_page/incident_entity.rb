@@ -3,7 +3,7 @@
 module StatusPage
   class IncidentEntity < Grape::Entity
     expose :iid, as: :id
-    expose :state
+    expose :state, as: :status
     expose :title_html, as: :title
     expose :description_html, as: :description
     expose :updated_at
