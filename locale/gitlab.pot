@@ -12792,7 +12792,13 @@ msgstr ""
 msgid "Missing commit signatures endpoint!"
 msgstr ""
 
-msgid "MissingSSHKeyWarningLink|add an SSH key"
+msgid "MissingSSHKeyWarningLink|Add SSH key"
+msgstr ""
+
+msgid "MissingSSHKeyWarningLink|Don't show again"
+msgstr ""
+
+msgid "MissingSSHKeyWarningLink|You won't be able to pull or push project code via SSH until you add an SSH key to your profile"
 msgstr ""
 
 msgid "Modal|Cancel"
@@ -23079,9 +23085,6 @@ msgid "You will receive notifications only for comments in which you were @menti
 msgstr ""
 
 msgid "You won't be able to pull or push project code via %{protocol} until you %{set_password_link} on your account"
-msgstr ""
-
-msgid "You won't be able to pull or push project code via SSH until you %{add_ssh_key_link} to your profile"
 msgstr ""
 
 msgid "You won't be able to pull or push project code via SSH until you add an SSH key to your profile"
