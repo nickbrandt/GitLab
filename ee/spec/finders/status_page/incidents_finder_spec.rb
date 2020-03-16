@@ -17,24 +17,38 @@ describe StatusPage::IncidentsFinder do
   let(:finder) { described_class.new(project_id: project.id) }
 
   describe '#find_by_id' do
-    subject { finder.find_by_id(issue.id) }
+    subject { finder.find_by_id(issue.id, **params) }
 
-    context 'for public issue' do
-      let(:issue) { public_issues.first }
+    context 'without params' do
+      let(:params) { {} }
 
-      it { is_expected.to eq(issue) }
+      context 'for public issue' do
+        let(:issue) { public_issues.first }
+
+        it { is_expected.to eq(issue) }
+      end
+
+      context 'for confidential issue' do
+        let(:issue) { issues.fetch(:confidential) }
+
+        it { is_expected.to eq(issue) }
+      end
+
+      context 'for unrelated issue' do
+        let(:issue) { issues.fetch(:unrelated) }
+
+        it { is_expected.to be_nil }
+      end
     end
 
-    context 'for confidential issue' do
-      let(:issue) { issues.fetch(:confidential) }
+    context 'with include_confidential' do
+      let(:params) { { include_confidential: false } }
 
-      it { is_expected.to eq(issue) }
-    end
+      context 'for confidential issue' do
+        let(:issue) { issues.fetch(:confidential) }
 
-    context 'for unrelated issue' do
-      let(:issue) { issues.fetch(:unrelated) }
-
-      it { is_expected.to be_nil }
+        it { is_expected.to be_nil }
+      end
     end
   end
 
