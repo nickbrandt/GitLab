@@ -55,6 +55,10 @@ describe ScimFinder do
           it 'allows lookup by userName' do
             expect(finder.search(filter: "userName eq \"#{id.user.username}\"").first).to eq id
           end
+
+          it 'allows lookup by userName when userName is an email address' do
+            expect(finder.search(filter: "userName eq #{id.user.email}").first).to eq id
+          end
         end
 
         context 'when scim_identities is disabled' do

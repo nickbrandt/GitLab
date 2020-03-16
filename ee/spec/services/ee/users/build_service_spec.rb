@@ -23,6 +23,23 @@ describe Users::BuildService do
 
           it 'sets all allowed attributes' do
             expect(Identity).to receive(:new).with(hash_including(identity_params)).and_call_original
+            expect(ScimIdentity).not_to receive(:new)
+
+            service.execute
+          end
+        end
+
+        context 'with scim identity' do
+          before do
+            params.merge!(scim_identity_params)
+          end
+          let_it_be(:scim_identity_params) { { extern_uid: 'uid', provider: 'group_scim', group_id: 1 } }
+
+          it 'passes allowed attributes to scim identity' do
+            scim_identity_params.delete(:provider)
+
+            expect(ScimIdentity).to receive(:new).with(hash_including(scim_identity_params)).and_call_original
+            expect(Identity).not_to receive(:new)
 
             service.execute
           end
