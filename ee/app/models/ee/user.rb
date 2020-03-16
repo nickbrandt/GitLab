@@ -16,6 +16,8 @@ module EE
     MAX_USERNAME_SUGGESTION_ATTEMPTS = 15
 
     prepended do
+      include UsageStatistics
+
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
 
       # We aren't using the `auditor?` method for the `if` condition here

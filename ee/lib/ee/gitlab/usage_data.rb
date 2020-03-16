@@ -243,7 +243,8 @@ module EE
             events: distinct_count(::Event.where(time_period), :author_id),
             groups: distinct_count(::GroupMember.where(time_period), :user_id),
             ldap_keys: distinct_count(::LDAPKey.where(time_period), :user_id),
-            ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id)
+            ldap_users: distinct_count(::GroupMember.of_ldap_type.where(time_period), :user_id),
+            users_created: count(::User.where(time_period))
           }
         end
 
