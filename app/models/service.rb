@@ -46,6 +46,7 @@ class Service < ApplicationRecord
   scope :active, -> { where(active: true) }
   scope :without_defaults, -> { where(default: false) }
   scope :by_type, -> (type) { where(type: type) }
+  scope :templates, -> { where(template: true) }
 
   scope :push_hooks, -> { where(push_events: true, active: true) }
   scope :tag_push_hooks, -> { where(tag_push_events: true, active: true) }
@@ -259,6 +260,27 @@ class Service < ApplicationRecord
     self.category == :issue_tracker
   end
 
+  # Find all service templates; if some of them do not exist, create them
+  # within a transaction to perform the lowest possible SQL queries.
+  def self.find_or_create_templates
+    if templates.size == available_services_types.size
+      templates
+    else
+      create_nonexistent_templates
+      templates.reset
+    end
+  end
+
+  private_class_method def self.create_nonexistent_templates
+    nonexistent_services = available_services_types - templates.map(&:type)
+
+    transaction do
+      nonexistent_services.each do |service_type|
+        service_type.constantize.create(template: true)
+      end
+    end
+  end
+
   def self.available_services_names
     service_names = %w[
       alerts
@@ -299,6 +321,10 @@ class Service < ApplicationRecord
     end
 
     service_names.sort_by(&:downcase)
+  end
+
+  def self.available_services_types
+    available_services_names.map { |service_name| "#{service_name}_service".camelize }
   end
 
   def self.build_from_template(project_id, template)

@@ -9,22 +9,37 @@ describe Admin::ServicesController do
     sign_in(admin)
   end
 
-  describe 'GET #edit' do
-    let!(:project) { create(:project) }
+  describe 'GET #index' do
+    it 'avoids N+1 queries' do
+      query_count = ActiveRecord::QueryRecorder.new { get :index }.count
 
-    Service.available_services_names.each do |service_name|
-      context "#{service_name}" do
-        let!(:service) do
-          service_template = "#{service_name}_service".camelize.constantize
-          service_template.where(template: true).first_or_create
-        end
+      expect(query_count).to be <= 80
+    end
 
-        it 'successfully displays the template' do
-          get :edit, params: { id: service.id }
-
-          expect(response).to have_gitlab_http_status(:ok)
-        end
+    context 'with all existing templates' do
+      before do
+        Service.insert_all(
+          Service.available_services_types.map { |type| { template: true, type: type } }
+        )
       end
+
+      it 'avoids N+1 queries' do
+        query_count = ActiveRecord::QueryRecorder.new { get :index }.count
+
+        expect(query_count).to eq(6)
+      end
+    end
+  end
+
+  describe 'GET #edit' do
+    let!(:service) do
+      create(:jira_service, :template)
+    end
+
+    it 'successfully displays the template' do
+      get :edit, params: { id: service.id }
+
+      expect(response).to have_gitlab_http_status(:ok)
     end
   end
 

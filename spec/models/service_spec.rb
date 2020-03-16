@@ -149,8 +149,36 @@ describe Service do
     end
   end
 
-  describe "Template" do
+  describe 'template' do
     let(:project) { create(:project) }
+
+    describe '.find_or_create_templates' do
+      it 'creates service templates' do
+        expect { Service.find_or_create_templates }.to change { Service.count }.from(0).to(Service.available_services_names.size)
+      end
+
+      context 'with all existing templates' do
+        before do
+          Service.insert_all(
+            Service.available_services_types.map { |type| { template: true, type: type } }
+          )
+        end
+
+        it 'does not create service templates' do
+          expect { Service.find_or_create_templates }.to change { Service.count }.by(0)
+        end
+      end
+
+      context 'with a few existing templates' do
+        before do
+          JiraService.create(template: true)
+        end
+
+        it 'creates the rest of the service templates' do
+          expect { Service.find_or_create_templates }.to change { Service.count }.from(1).to(Service.available_services_names.size)
+        end
+      end
+    end
 
     describe '.build_from_template' do
       context 'when template is invalid' do
