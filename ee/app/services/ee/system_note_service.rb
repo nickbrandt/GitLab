@@ -159,9 +159,5 @@ module EE
     def abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, reason)
       EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).abort_add_when_pipeline_succeeds(reason)
     end
-
-    def auto_resolve_prometheus_alert(noteable, project, author)
-      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).auto_resolve_prometheus_alert
-    end
   end
 end
