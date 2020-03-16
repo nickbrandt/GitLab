@@ -3757,7 +3757,7 @@ input IssueSetConfidentialInput {
   """
   The iid of the issue to mutate
   """
-  iid: ID!
+  iid: String!
 
   """
   The project the issue to mutate is in
@@ -3802,7 +3802,7 @@ input IssueSetDueDateInput {
   """
   The iid of the issue to mutate
   """
-  iid: ID!
+  iid: String!
 
   """
   The project the issue to mutate is in
@@ -3842,7 +3842,7 @@ input IssueSetWeightInput {
   """
   The iid of the issue to mutate
   """
-  iid: ID!
+  iid: String!
 
   """
   The project the issue to mutate is in
@@ -8112,7 +8112,7 @@ input UpdateIssueInput {
   """
   The iid of the issue to mutate
   """
-  iid: ID!
+  iid: String!
 
   """
   The project the issue to mutate is in
