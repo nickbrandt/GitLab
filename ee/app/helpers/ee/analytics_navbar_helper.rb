@@ -38,7 +38,7 @@ module EE
     end
 
     def group_cycle_analytics_navbar_link(group, current_user)
-      return unless ::Feature.enabled?(:group_level_cycle_analytics)
+      return unless ::Feature.enabled?(:group_level_cycle_analytics, default_enabled: true)
       return unless group_sidebar_link?(:cycle_analytics)
 
       navbar_sub_item(
