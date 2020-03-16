@@ -1,0 +1,5 @@
+---
+title: Allow multipart uploads for packages
+merge_request: 26387
+author:
+type: fixed
