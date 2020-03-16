@@ -240,7 +240,8 @@ describe API::ConanPackages do
           .with(
             'aa/bb@%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) },
             user,
-            project
+            project,
+            any_args
           ).and_return(presenter)
         allow(presenter).to receive(:recipe_snapshot) { {} }
         allow(presenter).to receive(:package_snapshot) { {} }
@@ -296,7 +297,7 @@ describe API::ConanPackages do
 
     before do
       allow(::Packages::Conan::PackagePresenter).to receive(:new)
-        .with(package.conan_recipe, user, package.project)
+        .with(package.conan_recipe, user, package.project, any_args)
         .and_return(presenter)
     end
 
