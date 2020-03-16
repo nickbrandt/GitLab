@@ -4,7 +4,7 @@ module Elastic
   module Latest
     class SnippetClassProxy < ApplicationClassProxy
       def elastic_search(query, options: {})
-        query_hash = basic_query_hash(%w(title file_name), query)
+        query_hash = basic_query_hash(%w(title description file_name), query)
         query_hash = filter(query_hash, options)
 
         search(query_hash, options)
