@@ -15,6 +15,7 @@ Rails.autoloaders.each do |autoloader|
   autoloader.ignore(Rails.root.join('lib/gitlab/graphql/docs'))
 
   autoloader.inflector.inflect(
+    'authenticates_2fa_for_admin_mode' => 'Authenticates2FAForAdminMode',
     'api' => 'API',
     'api_guard' => 'APIGuard',
     'group_api_compatibility' => 'GroupAPICompatibility',
