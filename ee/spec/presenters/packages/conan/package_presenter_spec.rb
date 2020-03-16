@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe ::Packages::Conan::PackagePresenter do
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:conan_package_reference) { '123456789'}
 
   describe '#recipe_urls' do
     subject { described_class.new(recipe, user, project).recipe_urls }
@@ -55,7 +56,13 @@ describe ::Packages::Conan::PackagePresenter do
   end
 
   describe '#package_urls' do
-    subject { described_class.new(recipe, user, project).package_urls }
+    let(:reference) { conan_package_reference }
+
+    subject do
+      described_class.new(
+        recipe, user, project, conan_package_reference: reference
+      ).package_urls
+    end
 
     context 'no existing package' do
       let(:recipe) { "my-pkg/v1.0.0/#{project.full_path}/stable" }
@@ -69,18 +76,62 @@ describe ::Packages::Conan::PackagePresenter do
 
       let(:expected_result) do
         {
-          "conaninfo.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conaninfo.txt",
-          "conanmanifest.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conanmanifest.txt",
-          "conan_package.tgz" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conan_package.tgz"
+          "conaninfo.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{conan_package_reference}/0/conaninfo.txt",
+          "conanmanifest.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{conan_package_reference}/0/conanmanifest.txt",
+          "conan_package.tgz" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{conan_package_reference}/0/conan_package.tgz"
         }
       end
 
       it { is_expected.to eq(expected_result) }
+
+      context 'multiple packages with different references' do
+        let(:info_file) { create(:conan_package_file, :conan_package_info, package: package) }
+        let(:manifest_file) { create(:conan_package_file, :conan_package_manifest, package: package) }
+        let(:package_file) { create(:conan_package_file, :conan_package, package: package) }
+        let(:alternative_reference) { 'abcdefghi' }
+
+        before do
+          [info_file, manifest_file, package_file].each do |file|
+            file.conan_file_metadatum.conan_package_reference = alternative_reference
+            file.save
+          end
+        end
+
+        it { is_expected.to eq(expected_result) }
+
+        context 'requesting the alternative reference' do
+          let(:reference) { alternative_reference }
+
+          let(:expected_result) do
+            {
+              "conaninfo.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{alternative_reference}/0/conaninfo.txt",
+              "conanmanifest.txt" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{alternative_reference}/0/conanmanifest.txt",
+              "conan_package.tgz" => "#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/#{alternative_reference}/0/conan_package.tgz"
+            }
+          end
+
+          it { is_expected.to eq(expected_result) }
+        end
+
+        it 'returns empty if the reference does not exist' do
+          result = described_class.new(
+            recipe, user, project, conan_package_reference: 'doesnotexist'
+          ).package_urls
+
+          expect(result).to eq({})
+        end
+      end
     end
   end
 
   describe '#package_snapshot' do
-    subject { described_class.new(recipe, user, project).package_snapshot }
+    let(:reference) { conan_package_reference }
+
+    subject do
+      described_class.new(
+        recipe, user, project, conan_package_reference: reference
+      ).package_snapshot
+    end
 
     context 'no existing package' do
       let(:recipe) { "my-pkg/v1.0.0/#{project.full_path}/stable" }
@@ -101,6 +152,12 @@ describe ::Packages::Conan::PackagePresenter do
       end
 
       it { is_expected.to eq(expected_result) }
+
+      context 'when requested with invalid reference' do
+        let(:reference) { 'invalid' }
+
+        it { is_expected.to eq({}) }
+      end
     end
   end
 end

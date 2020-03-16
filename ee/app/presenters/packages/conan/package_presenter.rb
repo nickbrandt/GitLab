@@ -6,10 +6,13 @@ module Packages
       include API::Helpers::RelatedResourcesHelpers
       include Gitlab::Utils::StrongMemoize
 
-      def initialize(recipe, user, project)
+      attr_reader :params
+
+      def initialize(recipe, user, project, params = {})
         @recipe = recipe
         @user = user
         @project = project
+        @params = params
       end
 
       def recipe_urls
@@ -26,13 +29,17 @@ module Packages
 
       def package_urls
         map_package_files do |package_file|
-          build_package_file_url(package_file) if package_file.conan_file_metadatum.package_file?
+          next unless package_file.conan_file_metadatum.package_file? && matching_reference?(package_file)
+
+          build_package_file_url(package_file)
         end
       end
 
       def package_snapshot
         map_package_files do |package_file|
-          package_file.file_md5 if package_file.conan_file_metadatum.package_file?
+          next unless package_file.conan_file_metadatum.package_file? && matching_reference?(package_file)
+
+          package_file.file_md5
         end
       end
 
@@ -88,6 +95,14 @@ module Packages
 
           @project.packages.with_name(name).with_version(version).order_created.last
         end
+      end
+
+      def matching_reference?(package_file)
+        package_file.conan_file_metadatum.conan_package_reference == conan_package_reference
+      end
+
+      def conan_package_reference
+        params[:conan_package_reference]
       end
     end
   end

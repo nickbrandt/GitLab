@@ -97,11 +97,19 @@ module API
         desc 'Package Snapshot' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
+        end
         route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference' do
           authorize!(:read_package, project)
 
-          presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
+          presenter = ::Packages::Conan::PackagePresenter.new(
+            recipe,
+            current_user,
+            project,
+            conan_package_reference: params[:conan_package_reference]
+          )
 
           present presenter, with: EE::API::Entities::ConanPackage::ConanPackageSnapshot
         end
@@ -126,6 +134,9 @@ module API
         desc 'Package Digest' do
           detail 'This feature was introduced in GitLab 12.5'
         end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
+        end
         route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference/digest' do
           present_package_download_urls
@@ -147,6 +158,9 @@ module API
         # where the url is the download url for the file
         desc 'Package Download Urls' do
           detail 'This feature was introduced in GitLab 12.5'
+        end
+        params do
+          requires :conan_package_reference, type: String, desc: 'Conan package ID'
         end
         route_setting :authentication, job_token_allowed: true
         get 'packages/:conan_package_reference/download_urls' do

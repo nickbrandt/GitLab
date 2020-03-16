@@ -8,7 +8,12 @@ module API
           def present_download_urls(entity)
             authorize!(:read_package, project)
 
-            presenter = ::Packages::Conan::PackagePresenter.new(recipe, current_user, project)
+            presenter = ::Packages::Conan::PackagePresenter.new(
+              recipe,
+              current_user,
+              project,
+              conan_package_reference: params[:conan_package_reference]
+            )
 
             render_api_error!("No recipe manifest found", 404) if yield(presenter).empty?
 
