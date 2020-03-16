@@ -9657,7 +9657,7 @@ CREATE INDEX index_projects_on_name_and_id ON public.projects USING btree (name,
 
 CREATE INDEX index_projects_on_name_trigram ON public.projects USING gin (name public.gin_trgm_ops);
 
-CREATE INDEX index_projects_on_namespace_id ON public.projects USING btree (namespace_id);
+CREATE INDEX index_projects_on_namespace_id_and_id ON public.projects USING btree (namespace_id, id);
 
 CREATE INDEX index_projects_on_path_and_id ON public.projects USING btree (path, id);
 
@@ -12702,6 +12702,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200313101649'),
 ('20200313123934'),
 ('20200316111759'),
+('20200316162648'),
 ('20200316173312'),
 ('20200317142110'),
 ('20200318152134'),
