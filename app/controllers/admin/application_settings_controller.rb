@@ -31,7 +31,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     if Feature.enabled?(:instance_level_integrations)
       # TODO: Update this with actual integrations
       # To be fixed with https://gitlab.com/gitlab-org/gitlab/-/issues/199388
-      @integrations = Project.first&.find_or_initialize_services&.sort_by(&:title)
+      @integrations = []
     end
 
     perform_update if submitted?
