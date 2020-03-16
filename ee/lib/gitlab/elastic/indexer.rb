@@ -84,6 +84,7 @@ module Gitlab
           'GITALY_CONNECTION_INFO'  => gitaly_connection_info,
           'FROM_SHA'                => from_sha,
           'TO_SHA'                  => to_sha,
+          'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
           'SSL_CERT_FILE'           => OpenSSL::X509::DEFAULT_CERT_FILE,
           'SSL_CERT_DIR'            => OpenSSL::X509::DEFAULT_CERT_DIR
         }
