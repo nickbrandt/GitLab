@@ -337,7 +337,6 @@ all jobs inherit it. Go modules are installed in `vendor/` and
 are cached per-branch:
 
 ```yaml
-
 image: golang:1.13
 
 # Cache libraries in between jobs
