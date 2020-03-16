@@ -1,13 +1,19 @@
 import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
-import pollUntilComplete from '~/lib/utils/poll_until_complete';
-import httpStatusCodes from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import * as types from './mutation_types';
-import createState from './state';
-import { getTimeWindowParams } from './utils';
 
-export const setEndpoints = ({ commit }, endpoints) => commit(types.SET_ENDPOINTS, endpoints);
+export const setEndpoints = ({ commit }, endpoints) => {
+  commit(types.SET_ENDPOINT, endpoints.environmentsEndpoint);
+  commit(`threatMonitoringWaf/${types.SET_ENDPOINT}`, endpoints.wafStatisticsEndpoint, {
+    root: true,
+  });
+  commit(
+    `threatMonitoringNetworkPolicy/${types.SET_ENDPOINT}`,
+    endpoints.networkPolicyStatisticsEndpoint,
+    { root: true },
+  );
+};
 
 export const requestEnvironments = ({ commit }) => commit(types.REQUEST_ENVIRONMENTS);
 export const receiveEnvironmentsSuccess = ({ commit }, environments) =>
@@ -50,45 +56,18 @@ export const fetchEnvironments = ({ state, dispatch }) => {
 
 export const setCurrentEnvironmentId = ({ commit, dispatch }, environmentId) => {
   commit(types.SET_CURRENT_ENVIRONMENT_ID, environmentId);
-  return dispatch('fetchWafStatistics');
+  dispatch(`threatMonitoringWaf/fetchStatistics`, null, { root: true });
+
+  if (window.gon.features?.networkPolicyUi) {
+    dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, { root: true });
+  }
 };
 
 export const setCurrentTimeWindow = ({ commit, dispatch }, timeWindow) => {
   commit(types.SET_CURRENT_TIME_WINDOW, timeWindow);
-  return dispatch('fetchWafStatistics');
-};
+  dispatch(`threatMonitoringWaf/fetchStatistics`, null, { root: true });
 
-export const requestWafStatistics = ({ commit }) => commit(types.REQUEST_WAF_STATISTICS);
-export const receiveWafStatisticsSuccess = ({ commit }, statistics) =>
-  commit(types.RECEIVE_WAF_STATISTICS_SUCCESS, statistics);
-export const receiveWafStatisticsError = ({ commit }) => {
-  commit(types.RECEIVE_WAF_STATISTICS_ERROR);
-  createFlash(s__('ThreatMonitoring|Something went wrong, unable to fetch WAF statistics'));
-};
-
-export const fetchWafStatistics = ({ state, dispatch }) => {
-  if (!state.wafStatisticsEndpoint) {
-    return dispatch('receiveWafStatisticsError');
+  if (window.gon.features?.networkPolicyUi) {
+    dispatch(`threatMonitoringNetworkPolicy/fetchStatistics`, null, { root: true });
   }
-
-  dispatch('requestWafStatistics');
-
-  return pollUntilComplete(state.wafStatisticsEndpoint, {
-    params: {
-      environment_id: state.currentEnvironmentId,
-      ...getTimeWindowParams(state.currentTimeWindow, Date.now()),
-    },
-  })
-    .then(({ data }) => dispatch('receiveWafStatisticsSuccess', data))
-    .catch(error => {
-      // A NOT_FOUND resonse from the endpoint means that there is no data for
-      // the given parameters. There are various reasons *why* there could be
-      // no data, but we can't distinguish between them, yet. So, just render
-      // no data.
-      if (error.response.status === httpStatusCodes.NOT_FOUND) {
-        dispatch('receiveWafStatisticsSuccess', createState().wafStatistics);
-      } else {
-        dispatch('receiveWafStatisticsError');
-      }
-    });
 };

@@ -6,10 +6,6 @@ import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringApp from 'ee/threat_monitoring/components/app.vue';
 import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
-import WafLoadingSkeleton from 'ee/threat_monitoring/components/waf_loading_skeleton.vue';
-import WafStatisticsHistory from 'ee/threat_monitoring/components/waf_statistics_history.vue';
-import WafStatisticsSummary from 'ee/threat_monitoring/components/waf_statistics_summary.vue';
-import { mockWafStatisticsResponse } from '../mock_data';
 
 const defaultEnvironmentId = 3;
 const documentationPath = '/docs';
@@ -17,6 +13,7 @@ const chartEmptyStateSvgPath = '/chart-svgs';
 const emptyStateSvgPath = '/svgs';
 const environmentsEndpoint = `${TEST_HOST}/environments`;
 const wafStatisticsEndpoint = `${TEST_HOST}/waf`;
+const networkPolicyStatisticsEndpoint = `${TEST_HOST}/network_policy`;
 const userCalloutId = 'threat_monitoring_info';
 const userCalloutsPath = `${TEST_HOST}/user_callouts`;
 
@@ -24,11 +21,12 @@ describe('ThreatMonitoringApp component', () => {
   let store;
   let wrapper;
 
-  const factory = ({ propsData, state } = {}) => {
+  const factory = ({ propsData, state, options } = {}) => {
     store = createStore();
     Object.assign(store.state.threatMonitoring, {
       environmentsEndpoint,
       wafStatisticsEndpoint,
+      networkPolicyStatisticsEndpoint,
       ...state,
     });
 
@@ -46,16 +44,15 @@ describe('ThreatMonitoringApp component', () => {
         ...propsData,
       },
       store,
+      ...options,
     });
   };
 
   const findAlert = () => wrapper.find(GlAlert);
   const findFilters = () => wrapper.find(ThreatMonitoringFilters);
-  const findWafLoadingSkeleton = () => wrapper.find(WafLoadingSkeleton);
-  const findWafStatisticsHistory = () => wrapper.find(WafStatisticsHistory);
-  const findWafStatisticsSummary = () => wrapper.find(WafStatisticsSummary);
+  const findWafSection = () => wrapper.find({ ref: 'wafSection' });
+  const findNetworkPolicySection = () => wrapper.find({ ref: 'networkPolicySection' });
   const findEmptyState = () => wrapper.find({ ref: 'emptyState' });
-  const findChartEmptyState = () => wrapper.find({ ref: 'chartEmptyState' });
 
   afterEach(() => {
     wrapper.destroy();
@@ -89,11 +86,7 @@ describe('ThreatMonitoringApp component', () => {
 
   describe('given there is a default environment with data', () => {
     beforeEach(() => {
-      factory({
-        state: {
-          wafStatistics: mockWafStatisticsResponse,
-        },
-      });
+      factory();
     });
 
     it('dispatches the setCurrentEnvironmentId and fetchEnvironments actions', () => {
@@ -111,13 +104,30 @@ describe('ThreatMonitoringApp component', () => {
       expect(findFilters().exists()).toBe(true);
     });
 
-    it('shows the summary and history statistics', () => {
-      expect(findWafStatisticsSummary().exists()).toBe(true);
-      expect(findWafStatisticsHistory().exists()).toBe(true);
+    it('renders the waf section', () => {
+      expect(findWafSection().element).toMatchSnapshot();
     });
 
-    it('does not show the loading skeleton', () => {
-      expect(findWafLoadingSkeleton().exists()).toBe(false);
+    it('does not render the network policy section', () => {
+      expect(findNetworkPolicySection().exists()).toBe(false);
+    });
+
+    describe('given the networkPolicyUi feature flag is enabled', () => {
+      beforeEach(() => {
+        factory({
+          options: {
+            provide: {
+              glFeatures: {
+                networkPolicyUi: true,
+              },
+            },
+          },
+        });
+      });
+
+      it('renders the network policy section', () => {
+        expect(findNetworkPolicySection().element).toMatchSnapshot();
+      });
     });
 
     describe('dismissing the alert', () => {
@@ -156,40 +166,6 @@ describe('ThreatMonitoringApp component', () => {
 
     it('does not render the alert', () => {
       expect(findAlert().exists()).toBe(false);
-    });
-
-    describe('given the statistics are loading', () => {
-      beforeEach(() => {
-        store.state.threatMonitoring.isLoadingWafStatistics = true;
-      });
-
-      it('does not show the summary or history statistics', () => {
-        expect(findWafStatisticsSummary().exists()).toBe(false);
-        expect(findWafStatisticsHistory().exists()).toBe(false);
-      });
-
-      it('displays the loading skeleton', () => {
-        expect(findWafLoadingSkeleton().exists()).toBe(true);
-      });
-    });
-  });
-
-  describe('given there is a default environment with no data to display', () => {
-    beforeEach(() => {
-      factory();
-    });
-
-    it('shows the filter bar', () => {
-      expect(findFilters().exists()).toBe(true);
-    });
-
-    it('does not show the summary or history statistics', () => {
-      expect(findWafStatisticsSummary().exists()).toBe(false);
-      expect(findWafStatisticsHistory().exists()).toBe(false);
-    });
-
-    it('shows the chart empty state', () => {
-      expect(findChartEmptyState().exists()).toBe(true);
     });
   });
 });

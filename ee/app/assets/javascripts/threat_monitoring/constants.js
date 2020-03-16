@@ -27,7 +27,7 @@ export const TIME_WINDOWS = {
   sevenDays: {
     name: __('7 days'),
     durationInMilliseconds: 7 * 24 * 60 * 60 * 1000,
-    interval: INTERVALS.hour,
+    interval: INTERVALS.day,
   },
   thirtyDays: {
     name: __('30 days'),

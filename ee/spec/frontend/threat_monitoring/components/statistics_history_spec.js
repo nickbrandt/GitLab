@@ -1,9 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
-import createStore from 'ee/threat_monitoring/store';
-import WafStatisticsHistory from 'ee/threat_monitoring/components/waf_statistics_history.vue';
+import StatisticsHistory from 'ee/threat_monitoring/components/statistics_history.vue';
 import { TOTAL_REQUESTS, ANOMALOUS_REQUESTS } from 'ee/threat_monitoring/components/constants';
-import { mockWafStatisticsResponse } from '../mock_data';
+import { mockNominalHistory, mockAnomalousHistory } from '../mock_data';
 
 let resizeCallback = null;
 const MockResizeObserverDirective = {
@@ -24,17 +23,21 @@ const MockResizeObserverDirective = {
 const localVue = createLocalVue();
 localVue.directive('gl-resize-observer-directive', MockResizeObserverDirective);
 
-describe('WafStatisticsHistory component', () => {
-  let store;
+describe('StatisticsHistory component', () => {
   let wrapper;
 
-  const factory = ({ state, options } = {}) => {
-    store = createStore();
-    Object.assign(store.state.threatMonitoring, state);
-
-    wrapper = shallowMount(WafStatisticsHistory, {
+  const factory = ({ options } = {}) => {
+    wrapper = shallowMount(StatisticsHistory, {
       localVue,
-      store,
+      propsData: {
+        data: {
+          anomalous: { title: 'Anomoulous', values: mockAnomalousHistory },
+          nominal: { title: 'Total', values: mockNominalHistory },
+          from: 'foo',
+          to: 'bar',
+        },
+        yLegend: 'Requests',
+      },
       ...options,
     });
   };
@@ -47,18 +50,29 @@ describe('WafStatisticsHistory component', () => {
 
   describe('the data passed to the chart', () => {
     beforeEach(() => {
-      factory({
-        state: {
-          wafStatistics: {
-            history: mockWafStatisticsResponse.history,
-          },
-        },
-      });
+      factory();
     });
 
     it('is structured correctly', () => {
-      const { nominal, anomalous } = mockWafStatisticsResponse.history;
-      expect(findChart().props('data')).toMatchObject([{ data: anomalous }, { data: nominal }]);
+      expect(findChart().props('data')).toMatchObject([
+        { data: mockAnomalousHistory },
+        { data: mockNominalHistory },
+      ]);
+    });
+  });
+
+  describe('the options passed to the chart', () => {
+    beforeEach(() => {
+      factory();
+    });
+
+    it('sets the xAxis range', () => {
+      expect(findChart().props('option')).toMatchObject({
+        xAxis: {
+          min: 'foo',
+          max: 'bar',
+        },
+      });
     });
   });
 
@@ -96,17 +110,15 @@ describe('WafStatisticsHistory component', () => {
 
   describe('chart tooltip', () => {
     beforeEach(() => {
-      const mockTotalSeriesDatum = mockWafStatisticsResponse.history.nominal[0];
-      const mockAnomalousSeriesDatum = mockWafStatisticsResponse.history.anomalous[0];
       const mockParams = {
         seriesData: [
           {
             seriesName: ANOMALOUS_REQUESTS,
-            value: mockAnomalousSeriesDatum,
+            value: mockAnomalousHistory[0],
           },
           {
             seriesName: TOTAL_REQUESTS,
-            value: mockTotalSeriesDatum,
+            value: mockNominalHistory[0],
           },
         ],
       };
