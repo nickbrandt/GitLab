@@ -3,7 +3,7 @@
 class ApprovalMergeRequestRule < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include ApprovalRuleLike
-  include EE::UsageStatistics # rubocop: disable Cop/InjectEnterpriseEditionModule
+  include UsageStatistics
 
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
