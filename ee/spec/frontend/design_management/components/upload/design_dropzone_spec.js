@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import DesignDropzone from 'ee/design_management/components/upload/design_dropzone.vue';
-import DesignInput from 'ee/design_management/components/upload/design_input.vue';
 import createFlash from '~/flash';
 
 jest.mock('~/flash');
@@ -48,7 +47,7 @@ describe('Design management dropzone component', () => {
 
     it('triggers click event on file input element when clicked', () => {
       createComponent();
-      const clickSpy = jest.spyOn(wrapper.find(DesignInput).element, 'click');
+      const clickSpy = jest.spyOn(wrapper.find('input').element, 'click');
 
       findDropzoneCard().trigger('click');
       expect(clickSpy).toHaveBeenCalled();

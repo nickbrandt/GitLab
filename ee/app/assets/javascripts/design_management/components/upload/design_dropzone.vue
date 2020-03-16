@@ -1,18 +1,16 @@
 <script>
 import { GlIcon, GlLink, GlSprintf } from '@gitlab/ui';
 import createFlash from '~/flash';
-import DesignInput from './design_input.vue';
 import uploadDesignMutation from '../../graphql/mutations/uploadDesign.mutation.graphql';
 import { UPLOAD_DESIGN_INVALID_FILETYPE_ERROR } from '../../utils/error_messages';
 import { isValidDesignFile } from '../../utils/design_management_utils';
-import { VALID_DATA_TRANSFER_TYPE } from '../../constants';
+import { VALID_DATA_TRANSFER_TYPE, VALID_DESIGN_FILE_MIMETYPE } from '../../constants';
 
 export default {
   components: {
     GlIcon,
     GlLink,
     GlSprintf,
-    DesignInput,
   },
   data() {
     return {
@@ -55,13 +53,14 @@ export default {
       this.dragCounter -= 1;
     },
     openFileUpload() {
-      this.$refs.fileUpload.$el.click();
+      this.$refs.fileUpload.click();
     },
     onDesignInputChange(e) {
       this.$emit('change', e.target.files);
     },
   },
   uploadDesignMutation,
+  VALID_DESIGN_FILE_MIMETYPE,
 };
 </script>
 
@@ -102,7 +101,15 @@ export default {
         </div>
       </button>
 
-      <design-input ref="fileUpload" @change="onDesignInputChange" />
+      <input
+        ref="fileUpload"
+        type="file"
+        name="design_file"
+        :accept="$options.VALID_DESIGN_FILE_MIMETYPE.mimetype"
+        class="hide"
+        multiple
+        @change="onDesignInputChange"
+      />
     </slot>
     <transition name="design-dropzone-fade">
       <div
