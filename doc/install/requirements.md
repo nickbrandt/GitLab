@@ -197,7 +197,7 @@ If you have a 2GB machine we recommend to configure only one Puma worker to prev
 By default each Puma worker runs with 4 threads. We do not recommend setting more,
 due to how [Ruby MRI multi-threading](https://en.wikipedia.org/wiki/Global_interpreter_lock) works.
 
-For cases when you have to use [Legacy Rugged code](https://docs.gitlab.com/ee/development/gitaly.html#legacy-rugged-code) it is recommended to set number of threads to 1.
+For cases when you have to use [Legacy Rugged code](../development/gitaly.html#legacy-rugged-code) it is recommended to set number of threads to 1.
 
 As long as you have enough available CPU and memory capacity, it's okay to increase the number of Puma workers and this will usually help to reduce the response time of the applications and increase the ability to handle parallel requests.
 
