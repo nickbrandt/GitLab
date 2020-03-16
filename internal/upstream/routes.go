@@ -50,6 +50,7 @@ const (
 	projectPattern       = `^/([^/]+/){1,}[^/]+/`
 	snippetUploadPattern = `^/uploads/personal_snippet`
 	userUploadPattern    = `^/uploads/user`
+	importPattern        = `^/import/`
 )
 
 func compileRegexp(regexpStr string) *regexp.Regexp {
@@ -217,6 +218,9 @@ func (u *upstream) configureRoutes() {
 		route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
 		route("POST", apiPattern+`v4/groups/import`, upload.Accelerate(api, signingProxy)),
 		route("POST", apiPattern+`v4/projects/import`, upload.Accelerate(api, signingProxy)),
+
+		// Project Import via UI upload acceleration
+		route("POST", importPattern+`gitlab_project`, upload.Accelerate(api, signingProxy)),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
