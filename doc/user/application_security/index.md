@@ -240,6 +240,15 @@ An approval is optional when a license report:
 - Contains no software license violations.
 - Contains only new licenses that are `approved` or unknown.
 
+## Working in an offline environment
+
+It is possible to run most of the GitLab security scanners when not
+connected to the internet, in what is sometimes known as an offline,
+limited connectivity, Local Area Network (LAN), Intranet, or "air-gap"
+environment.
+
+Read how to [operate the Secure scanners in an offline environment](offline_deployments/index.md).
+
 ## Outdated security reports
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4913) in GitLab 12.7.
