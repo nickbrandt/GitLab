@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ThreatMonitoringApp component given there is a default environment with data given the networkPolicyUi feature flag is enabled renders the network policy section 1`] = `
+exports[`ThreatMonitoringApp component given there is a default environment with data renders the network policy section 1`] = `
 <threat-monitoring-section-stub
   anomaloustitle="Dropped Packets"
   chartemptystatesvgpath="/network-policy-no-data-svg"
