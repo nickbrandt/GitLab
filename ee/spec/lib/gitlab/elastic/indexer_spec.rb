@@ -143,6 +143,7 @@ describe Gitlab::Elastic::Indexer do
           'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
           'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
+          'CORRELATION_ID'          => Labkit::Correlation::CorrelationId.current_id,
           'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => to_sha
         )
