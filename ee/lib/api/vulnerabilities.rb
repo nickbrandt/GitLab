@@ -34,7 +34,7 @@ module API
       end
       get ':id' do
         vulnerability = find_and_authorize_vulnerability!(:read_vulnerability)
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
 
         render_vulnerability(vulnerability)
       end
@@ -44,9 +44,9 @@ module API
       end
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
 
-        break not_modified! if vulnerability.resolved?
+        not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
@@ -57,9 +57,9 @@ module API
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
 
-        break not_modified! if vulnerability.dismissed?
+        not_modified! if vulnerability.dismissed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
@@ -70,9 +70,9 @@ module API
       end
       post ':id/confirm' do
         vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, vulnerability.project)
 
-        break not_modified! if vulnerability.confirmed?
+        not_modified! if vulnerability.confirmed?
 
         vulnerability = ::Vulnerabilities::ConfirmService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
@@ -86,12 +86,13 @@ module API
       desc 'Get a list of project vulnerabilities' do
         success EE::API::Entities::Vulnerability
       end
+      before do
+        not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
+      end
       params do
         use :pagination
       end
       get ':id/vulnerabilities' do
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
-
         authorize! :read_vulnerability, user_project
 
         vulnerabilities = paginate(
@@ -108,8 +109,6 @@ module API
         requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
       end
       post ':id/vulnerabilities' do
-        break not_found! unless Feature.enabled?(:first_class_vulnerabilities, user_project)
-
         authorize! :create_vulnerability, user_project
 
         vulnerability = ::Vulnerabilities::CreateService.new(
