@@ -14,7 +14,7 @@ RSpec.shared_examples 'packages list' do |check_project_name: false|
   end
 
   def package_table_row(index)
-    page.all(packages_table_selector)[index].text
+    page.all("#{packages_table_selector} tbody tr")[index].text
   end
 end
 
@@ -46,5 +46,5 @@ RSpec.shared_examples 'when there are no packages' do
 end
 
 def packages_table_selector
-  '[data-qa-selector="packages-table"] tbody tr'
+  '[data-qa-selector="packages-table"]'
 end
