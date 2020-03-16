@@ -7,6 +7,7 @@ export default () => {
   const el = document.querySelector('#js-threat-monitoring-app');
   const {
     wafStatisticsEndpoint,
+    networkPolicyStatisticsEndpoint,
     environmentsEndpoint,
     chartEmptyStateSvgPath,
     emptyStateSvgPath,
@@ -20,6 +21,7 @@ export default () => {
   const store = createStore();
   store.dispatch('threatMonitoring/setEndpoints', {
     wafStatisticsEndpoint,
+    networkPolicyStatisticsEndpoint,
     environmentsEndpoint,
   });
 

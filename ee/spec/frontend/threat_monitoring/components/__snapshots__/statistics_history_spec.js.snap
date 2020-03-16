@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WafStatisticsHistory component chart tooltip renders the title and series data correctly 1`] = `
+exports[`StatisticsHistory component chart tooltip renders the title and series data correctly 1`] = `
 <div
   data="[object Object],[object Object]"
   option="[object Object]"

@@ -1,5 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ThreatMonitoringApp component given there is a default environment with data given the networkPolicyUi feature flag is enabled renders the network policy section 1`] = `
+<threat-monitoring-section-stub
+  anomaloustitle="Dropped Packets"
+  chartemptystatesvgpath="/chart-svgs"
+  chartemptystatetext="While it's rare to have no traffic coming to your application, it can happen. In any event, we ask that you double check your settings to make sure you've set up the Network Policies correctly."
+  documentationpath="/docs"
+  nominaltitle="Total Packets"
+  storenamespace="threatMonitoringNetworkPolicy"
+  subtitle="Packet Activity"
+  title="Container Network Policy"
+  ylegend="Operations Per Second"
+/>
+`;
+
+exports[`ThreatMonitoringApp component given there is a default environment with data renders the waf section 1`] = `
+<threat-monitoring-section-stub
+  anomaloustitle="Anomalous Requests"
+  chartemptystatesvgpath="/chart-svgs"
+  chartemptystatetext="While it's rare to have no traffic coming to your application, it can happen. In any event, we ask that you double check your settings to make sure you've set up the WAF correctly."
+  documentationpath="/docs"
+  nominaltitle="Total Requests"
+  storenamespace="threatMonitoringWaf"
+  subtitle="Requests"
+  title="Web Application Firewall"
+  ylegend="Requests"
+/>
+`;
+
 exports[`ThreatMonitoringApp component given there is a default environment with data shows the alert 1`] = `
 <gl-alert-stub
   class="my-3"

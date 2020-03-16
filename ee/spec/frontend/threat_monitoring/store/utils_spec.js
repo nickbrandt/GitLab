@@ -1,7 +1,4 @@
-import {
-  getTimeWindowConfig,
-  getTimeWindowParams,
-} from 'ee/threat_monitoring/store/modules/threat_monitoring/utils';
+import { getTimeWindowConfig, getTimeWindowParams } from 'ee/threat_monitoring/store/utils';
 import { DEFAULT_TIME_WINDOW, TIME_WINDOWS } from 'ee/threat_monitoring/constants';
 
 describe('threatMonitoring module utils', () => {
@@ -25,7 +22,7 @@ describe('threatMonitoring module utils', () => {
       ${'thirtyMinutes'}   | ${'2020-01-01T09:30:00.000Z'} | ${'minute'}
       ${'oneHour'}         | ${'2020-01-01T09:00:00.000Z'} | ${'minute'}
       ${'twentyFourHours'} | ${'2019-12-31T10:00:00.000Z'} | ${'hour'}
-      ${'sevenDays'}       | ${'2019-12-25T10:00:00.000Z'} | ${'hour'}
+      ${'sevenDays'}       | ${'2019-12-25T10:00:00.000Z'} | ${'day'}
       ${'thirtyDays'}      | ${'2019-12-02T10:00:00.000Z'} | ${'day'}
       ${'foo'}             | ${'2019-12-02T10:00:00.000Z'} | ${'day'}
     `(

@@ -8,12 +8,23 @@ import * as actions from 'ee/threat_monitoring/store/modules/threat_monitoring/a
 import * as types from 'ee/threat_monitoring/store/modules/threat_monitoring/mutation_types';
 import getInitialState from 'ee/threat_monitoring/store/modules/threat_monitoring/state';
 
-import { mockEnvironmentsResponse, mockWafStatisticsResponse } from '../../../mock_data';
+import { mockEnvironmentsResponse } from '../../../mock_data';
 
 jest.mock('~/flash', () => jest.fn());
 
 const environmentsEndpoint = 'environmentsEndpoint';
 const wafStatisticsEndpoint = 'wafStatisticsEndpoint';
+const networkPolicyStatisticsEndpoint = 'networkPolicyStatisticsEndpoint';
+
+const stubFeatureFlags = features => {
+  beforeEach(() => {
+    window.gon.features = features;
+  });
+
+  afterEach(() => {
+    delete window.gon.features;
+  });
+};
 
 describe('Threat Monitoring actions', () => {
   let state;
@@ -27,15 +38,23 @@ describe('Threat Monitoring actions', () => {
   });
 
   describe('setEndpoints', () => {
-    it('commits the SET_ENDPOINTS mutation', () =>
+    it('commits the SET_ENDPOINT mutation', () =>
       testAction(
         actions.setEndpoints,
-        { environmentsEndpoint, wafStatisticsEndpoint },
+        { environmentsEndpoint, wafStatisticsEndpoint, networkPolicyStatisticsEndpoint },
         state,
         [
           {
-            type: types.SET_ENDPOINTS,
-            payload: { environmentsEndpoint, wafStatisticsEndpoint },
+            type: types.SET_ENDPOINT,
+            payload: environmentsEndpoint,
+          },
+          {
+            type: `threatMonitoringWaf/${types.SET_ENDPOINT}`,
+            payload: wafStatisticsEndpoint,
+          },
+          {
+            type: `threatMonitoringNetworkPolicy/${types.SET_ENDPOINT}`,
+            payload: networkPolicyStatisticsEndpoint,
           },
         ],
         [],
@@ -189,178 +208,57 @@ describe('Threat Monitoring actions', () => {
   describe('setCurrentEnvironmentId', () => {
     const environmentId = 1;
 
-    it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches fetchWafStatistics', () =>
+    it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF fetch action', () =>
       testAction(
         actions.setCurrentEnvironmentId,
         environmentId,
         state,
         [{ type: types.SET_CURRENT_ENVIRONMENT_ID, payload: environmentId }],
-        [{ type: 'fetchWafStatistics' }],
+        [{ type: 'threatMonitoringWaf/fetchStatistics', payload: null }],
       ));
+
+    describe('given the networkPolicyUi feature flag is enabled', () => {
+      stubFeatureFlags({ networkPolicyUi: true });
+
+      it('commits the SET_CURRENT_ENVIRONMENT_ID mutation and dispatches WAF and Network Policy fetch actions', () =>
+        testAction(
+          actions.setCurrentEnvironmentId,
+          environmentId,
+          state,
+          [{ type: types.SET_CURRENT_ENVIRONMENT_ID, payload: environmentId }],
+          [
+            { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
+            { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
+          ],
+        ));
+    });
   });
 
   describe('setCurrentTimeWindow', () => {
     const timeWindow = 'foo';
 
-    it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches fetchWafStatistics', () =>
+    it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF fetch action', () =>
       testAction(
         actions.setCurrentTimeWindow,
         timeWindow,
         state,
         [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow }],
-        [{ type: 'fetchWafStatistics' }],
+        [{ type: 'threatMonitoringWaf/fetchStatistics', payload: null }],
       ));
-  });
 
-  describe('requestWafStatistics', () => {
-    it('commits the REQUEST_WAF_STATISTICS mutation', () =>
-      testAction(
-        actions.requestWafStatistics,
-        undefined,
-        state,
-        [
-          {
-            type: types.REQUEST_WAF_STATISTICS,
-          },
-        ],
-        [],
-      ));
-  });
+    describe('given the networkPolicyUi feature flag is enabled', () => {
+      stubFeatureFlags({ networkPolicyUi: true });
 
-  describe('receiveWafStatisticsSuccess', () => {
-    it('commits the RECEIVE_WAF_STATISTICS_SUCCESS mutation', () =>
-      testAction(
-        actions.receiveWafStatisticsSuccess,
-        mockWafStatisticsResponse,
-        state,
-        [
-          {
-            type: types.RECEIVE_WAF_STATISTICS_SUCCESS,
-            payload: mockWafStatisticsResponse,
-          },
-        ],
-        [],
-      ));
-  });
-
-  describe('receiveWafStatisticsError', () => {
-    it('commits the RECEIVE_WAF_STATISTICS_ERROR mutation', () =>
-      testAction(
-        actions.receiveWafStatisticsError,
-        undefined,
-        state,
-        [
-          {
-            type: types.RECEIVE_WAF_STATISTICS_ERROR,
-          },
-        ],
-        [],
-      ).then(() => {
-        expect(createFlash).toHaveBeenCalled();
-      }));
-  });
-
-  describe('fetchWafStatistics', () => {
-    let mock;
-    const currentEnvironmentId = 3;
-
-    beforeEach(() => {
-      state.wafStatisticsEndpoint = wafStatisticsEndpoint;
-      state.currentEnvironmentId = currentEnvironmentId;
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
-    describe('on success', () => {
-      beforeEach(() => {
-        jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(2019, 0, 31).getTime());
-
-        mock
-          .onGet(wafStatisticsEndpoint, {
-            params: {
-              environment_id: currentEnvironmentId,
-              from: '2019-01-01T00:00:00.000Z',
-              to: '2019-01-31T00:00:00.000Z',
-              interval: 'day',
-            },
-          })
-          .replyOnce(httpStatus.OK, mockWafStatisticsResponse);
-      });
-
-      it('should dispatch the request and success actions', () =>
+      it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF and Network Policy fetch actions', () =>
         testAction(
-          actions.fetchWafStatistics,
-          undefined,
+          actions.setCurrentTimeWindow,
+          timeWindow,
           state,
-          [],
+          [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow }],
           [
-            { type: 'requestWafStatistics' },
-            {
-              type: 'receiveWafStatisticsSuccess',
-              payload: mockWafStatisticsResponse,
-            },
+            { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
+            { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
           ],
-        ));
-    });
-
-    describe('on NOT_FOUND', () => {
-      beforeEach(() => {
-        mock.onGet(wafStatisticsEndpoint).replyOnce(httpStatus.NOT_FOUND);
-      });
-
-      it('should dispatch the request and success action with empty data', () =>
-        testAction(
-          actions.fetchWafStatistics,
-          undefined,
-          state,
-          [],
-          [
-            { type: 'requestWafStatistics' },
-            {
-              type: 'receiveWafStatisticsSuccess',
-              payload: expect.objectContaining({
-                totalTraffic: 0,
-                anomalousTraffic: 0,
-                history: {
-                  nominal: [],
-                  anomalous: [],
-                },
-              }),
-            },
-          ],
-        ));
-    });
-
-    describe('on error', () => {
-      beforeEach(() => {
-        mock.onGet(wafStatisticsEndpoint).replyOnce(500);
-      });
-
-      it('should dispatch the request and error actions', () =>
-        testAction(
-          actions.fetchWafStatistics,
-          undefined,
-          state,
-          [],
-          [{ type: 'requestWafStatistics' }, { type: 'receiveWafStatisticsError' }],
-        ));
-    });
-
-    describe('with an empty endpoint', () => {
-      beforeEach(() => {
-        state.wafStatisticsEndpoint = '';
-      });
-
-      it('should dispatch receiveWafStatisticsError', () =>
-        testAction(
-          actions.fetchWafStatistics,
-          undefined,
-          state,
-          [],
-          [{ type: 'receiveWafStatisticsError' }],
         ));
     });
   });
