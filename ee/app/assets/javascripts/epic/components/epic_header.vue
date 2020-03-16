@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlIcon } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -19,6 +19,7 @@ export default {
   },
   components: {
     Icon,
+    GlIcon,
     GlButton,
     LoadingButton,
     UserAvatarLink,
@@ -89,7 +90,7 @@ export default {
         {{ __('Opened') }}
         <timeago-tooltip :time="created" />
         {{ __('by') }}
-        <strong>
+        <strong :class="[author.isGitlabEmployee ? 'mr-2' : '']">
           <user-avatar-link
             :link-href="author.url"
             :img-src="author.src"
@@ -99,6 +100,16 @@ export default {
             img-css-classes="avatar-inline"
           />
         </strong>
+        <span
+          v-if="author.isGitlabEmployee"
+          ref="gitLabEmployeeBadge"
+          class="gl-text-gray-700 text-nowrap"
+        >
+          <gl-icon name="work" :size="16" class="align-middle" />
+          <!-- `GitLab` does not need to be translated -->
+          <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings -->
+          <span class="align-middle">GitLab</span>
+        </span>
       </div>
     </div>
     <div v-if="canUpdate" class="detail-page-header-actions js-issuable-actions">

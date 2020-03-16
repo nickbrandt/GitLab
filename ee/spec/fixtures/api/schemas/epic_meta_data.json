@@ -26,7 +26,8 @@
         "name",
         "url",
         "username",
-        "src"
+        "src",
+        "is_gitlab_employee"
       ],
       "properties": {
         "name": {
@@ -40,6 +41,9 @@
         },
         "src": {
           "type": "string"
+        },
+        "is_gitlab_employee": {
+          "type": "boolean"
         }
       }
     },

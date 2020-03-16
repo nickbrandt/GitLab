@@ -132,5 +132,13 @@ describe('EpicHeaderComponent', () => {
       expect(toggleButtonEl.classList.contains('d-sm-none')).toBe(true);
       expect(toggleButtonEl.classList.contains('gutter-toggle')).toBe(true);
     });
+
+    it('renders employee badge when `author.isGitlabEmployee` is `true`', () => {
+      vm.$store.state.author.isGitlabEmployee = true;
+
+      return vm.$nextTick().then(() => {
+        expect(vm.$refs.gitLabEmployeeBadge).not.toBeUndefined();
+      });
+    });
   });
 });
