@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import UploadButton from 'ee/design_management/components/upload/button.vue';
-import DesignInput from 'ee/design_management/components/upload/design_input.vue';
 
 describe('Design management upload button component', () => {
   let wrapper;
@@ -50,7 +49,7 @@ describe('Design management upload button component', () => {
     it('triggers click on input', () => {
       createComponent();
 
-      const clickSpy = jest.spyOn(wrapper.find(DesignInput).element, 'click');
+      const clickSpy = jest.spyOn(wrapper.find('input').element, 'click');
 
       wrapper.vm.openFileUpload();
 

@@ -1,12 +1,11 @@
 <script>
 import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
-import DesignInput from './design_input.vue';
+import { VALID_DESIGN_FILE_MIMETYPE } from '../../constants';
 
 export default {
   components: {
     GlButton,
     GlLoadingIcon,
-    DesignInput,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -19,12 +18,13 @@ export default {
   },
   methods: {
     openFileUpload() {
-      this.$refs.fileUpload.$el.click();
+      this.$refs.fileUpload.click();
     },
     onFileUploadChange(e) {
       this.$emit('upload', e.target.files);
     },
   },
+  VALID_DESIGN_FILE_MIMETYPE,
 };
 </script>
 
@@ -45,6 +45,14 @@ export default {
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
     </gl-button>
 
-    <design-input ref="fileUpload" @change="onFileUploadChange" />
+    <input
+      ref="fileUpload"
+      type="file"
+      name="design_file"
+      :accept="$options.VALID_DESIGN_FILE_MIMETYPE.mimetype"
+      class="hide"
+      multiple
+      @change="onFileUploadChange"
+    />
   </div>
 </template>
