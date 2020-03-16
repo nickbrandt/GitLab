@@ -4335,4 +4335,22 @@ describe User, :do_not_mock_admin_mode do
       it { expect(user.user_detail).to be_persisted }
     end
   end
+
+  describe '#gitlab_employee?' do
+    context 'when user is a gitlab employee' do
+      it 'returns true' do
+        user = build(:user, email: 'test@gitlab.com')
+
+        expect(user.gitlab_employee?).to be true
+      end
+    end
+
+    context 'when user is not a gitlab employee' do
+      it 'returns false' do
+        user = build(:user, email: 'test@example.com')
+
+        expect(user.gitlab_employee?).to be false
+      end
+    end
+  end
 end
