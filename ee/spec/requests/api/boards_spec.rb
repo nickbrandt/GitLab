@@ -54,6 +54,10 @@ RSpec.describe API::Boards do
       it 'includes max_issue_weight' do
         all_lists_in_response(include: 'max_issue_weight')
       end
+
+      it 'includes limit_metric' do
+        all_lists_in_response(include: 'limit_metric')
+      end
     end
 
     context 'without WIP limits license' do
@@ -69,6 +73,10 @@ RSpec.describe API::Boards do
 
       it 'does not include max_issue_count' do
         all_lists_in_response(do_not_include: 'max_issue_count')
+      end
+
+      it 'does not include limit_metric' do
+        all_lists_in_response(do_not_include: 'limit_metric')
       end
     end
 
