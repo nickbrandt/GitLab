@@ -15,7 +15,7 @@ describe 'PackageFiles' do
 
   context 'user with master role' do
     before do
-      project.add_master(user)
+      project.add_maintainer(user)
     end
 
     it 'allows direct download by url' do

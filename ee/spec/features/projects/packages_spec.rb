@@ -8,7 +8,7 @@ describe 'Packages' do
 
   before do
     sign_in(user)
-    project.add_master(user)
+    project.add_maintainer(user)
     stub_licensed_features(packages: true)
   end
 

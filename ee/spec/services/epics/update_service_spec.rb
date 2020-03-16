@@ -10,7 +10,7 @@ describe Epics::UpdateService do
   describe '#execute' do
     before do
       stub_licensed_features(epics: true)
-      group.add_master(user)
+      group.add_maintainer(user)
     end
 
     def find_note(starting_with)
