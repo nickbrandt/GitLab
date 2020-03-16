@@ -1,6 +1,7 @@
 import { FILTER_STATES } from './constants';
 
-const createState = () => ({
+const createState = replicableType => ({
+  replicableType,
   isLoading: false,
 
   designs: [],

@@ -26,10 +26,6 @@ export default {
       type: String,
       required: true,
     },
-    designManagementLink: {
-      type: String,
-      required: true,
-    },
   },
   computed: {
     ...mapState(['isLoading', 'totalDesigns']),

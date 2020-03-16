@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { debounce } from 'underscore';
 import { GlTabs, GlTab, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import { DEFAULT_SEARCH_DELAY, ACTION_TYPES } from '../store/constants';
 
@@ -16,7 +17,7 @@ export default {
     Icon,
   },
   computed: {
-    ...mapState(['currentFilterIndex', 'filterOptions', 'searchFilter']),
+    ...mapState(['currentFilterIndex', 'filterOptions', 'searchFilter', 'replicableType']),
     search: {
       get() {
         return this.searchFilter;
@@ -25,6 +26,9 @@ export default {
         this.setSearch(newVal);
         this.fetchDesigns();
       }, DEFAULT_SEARCH_DELAY),
+    },
+    resyncText() {
+      return sprintf(__('Resync all %{replicableType}'), { replicableType: this.replicableType });
     },
   },
   methods: {
@@ -57,9 +61,9 @@ export default {
               <icon name="chevron-down" />
             </span>
           </template>
-          <gl-dropdown-item @click="initiateAllDesignSyncs($options.actionTypes.RESYNC)">{{
-            __('Resync all designs')
-          }}</gl-dropdown-item>
+          <gl-dropdown-item @click="initiateAllDesignSyncs($options.actionTypes.RESYNC)">
+            {{ resyncText }}
+          </gl-dropdown-item>
         </gl-dropdown>
       </div>
     </template>

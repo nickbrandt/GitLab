@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlEmptyState } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
@@ -18,6 +19,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['replicableType']),
     linkText() {
       return sprintf(
         s__(
@@ -35,7 +37,10 @@ export default {
 </script>
 
 <template>
-  <gl-empty-state :title="__('No Design Repositories match this filter')" :svg-path="issuesSvgPath">
+  <gl-empty-state
+    :title="sprintf(__('No %{replicableType} match this filter'), { replicableType })"
+    :svg-path="issuesSvgPath"
+  >
     <template #description>
       <div class="text-center">
         <p>{{ __('Adjust your filters/search criteria above.') }}</p>

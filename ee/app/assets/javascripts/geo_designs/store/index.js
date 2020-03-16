@@ -6,10 +6,10 @@ import createState from './state';
 
 Vue.use(Vuex);
 
-const createStore = () =>
+const createStore = replicableType =>
   new Vuex.Store({
     actions,
     mutations,
-    state: createState(),
+    state: createState(replicableType),
   });
 export default createStore;

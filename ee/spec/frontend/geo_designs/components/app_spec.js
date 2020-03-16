@@ -10,7 +10,6 @@ import {
   MOCK_GEO_SVG_PATH,
   MOCK_ISSUES_SVG_PATH,
   MOCK_GEO_TROUBLESHOOTING_LINK,
-  MOCK_DESIGN_MANAGEMENT_LINK,
   MOCK_BASIC_FETCH_DATA_MAP,
 } from '../mock_data';
 
@@ -24,7 +23,6 @@ describe('GeoDesignsApp', () => {
     geoSvgPath: MOCK_GEO_SVG_PATH,
     issuesSvgPath: MOCK_ISSUES_SVG_PATH,
     geoTroubleshootingLink: MOCK_GEO_TROUBLESHOOTING_LINK,
-    designManagementLink: MOCK_DESIGN_MANAGEMENT_LINK,
   };
 
   const actionSpies = {

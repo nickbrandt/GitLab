@@ -7,23 +7,23 @@ Vue.use(Translate);
 
 export default () => {
   const el = document.getElementById('js-geo-designs');
+  const { replicableType } = el.dataset;
 
   return new Vue({
     el,
-    store: createStore(),
+    store: createStore(replicableType),
     components: {
       GeoDesignsApp,
     },
     data() {
       const {
-        dataset: { geoSvgPath, issuesSvgPath, geoTroubleshootingLink, designManagementLink },
+        dataset: { geoSvgPath, issuesSvgPath, geoTroubleshootingLink },
       } = this.$options.el;
 
       return {
         geoSvgPath,
         issuesSvgPath,
         geoTroubleshootingLink,
-        designManagementLink,
       };
     },
 
@@ -33,7 +33,6 @@ export default () => {
           geoSvgPath: this.geoSvgPath,
           issuesSvgPath: this.issuesSvgPath,
           geoTroubleshootingLink: this.geoTroubleshootingLink,
-          designManagementLink: this.designManagementLink,
         },
       });
     },
