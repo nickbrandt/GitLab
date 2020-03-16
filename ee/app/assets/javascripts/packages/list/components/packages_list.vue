@@ -12,12 +12,8 @@ import {
 import Tracking from '~/tracking';
 import { s__, sprintf } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import {
-  LIST_KEY_PROJECT,
-  LIST_KEY_ACTIONS,
-  LIST_LABEL_ACTIONS,
-  TABLE_HEADER_FIELDS,
-} from '../constants';
+import { LIST_KEY_ACTIONS, LIST_LABEL_ACTIONS } from '../constants';
+import getTableHeaders from '../utils';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import PackageTags from '../../shared/components/package_tags.vue';
@@ -66,18 +62,13 @@ export default {
       return !this.isGroupPage;
     },
     headerFields() {
-      const fields = TABLE_HEADER_FIELDS.filter(
-        f => f.key !== LIST_KEY_PROJECT || this.isGroupPage,
-      );
+      const fields = getTableHeaders(this.isGroupPage);
 
       if (this.showActions) {
-        const actions = {
+        fields.push({
           key: LIST_KEY_ACTIONS,
           label: LIST_LABEL_ACTIONS,
-          tdClass: ['text-right'],
-        };
-
-        return [...fields, actions];
+        });
       }
 
       fields[fields.length - 1].class = ['text-right'];

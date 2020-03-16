@@ -68,7 +68,7 @@ export default {
 </script>
 
 <template>
-  <gl-tabs active-tab-class="js-package-active-tab" @input="tabChanged">
+  <gl-tabs @input="tabChanged">
     <template #tabs-end>
       <div class="align-self-center ml-auto">
         <package-sort @sort:changed="requestPackagesList" />

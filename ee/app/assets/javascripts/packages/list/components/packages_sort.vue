@@ -1,11 +1,7 @@
 <script>
 import { GlSorting, GlSortingItem } from '@gitlab/ui';
-import {
-  LIST_KEY_PROJECT,
-  ASCENDING_ODER,
-  DESCENDING_ORDER,
-  TABLE_HEADER_FIELDS,
-} from '../constants';
+import { ASCENDING_ODER, DESCENDING_ORDER } from '../constants';
+import getTableHeaders from '../utils';
 import { mapState, mapActions } from 'vuex';
 
 export default {
@@ -25,8 +21,7 @@ export default {
       return field ? field.label : '';
     },
     sortableFields() {
-      // This list is filtered in the case of the project page, and the project column is removed
-      return TABLE_HEADER_FIELDS.filter(f => f.key !== LIST_KEY_PROJECT || this.isGroupPage);
+      return getTableHeaders(this.isGroupPage);
     },
     isSortAscending() {
       return this.sort === ASCENDING_ODER;

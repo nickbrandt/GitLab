@@ -41,7 +41,7 @@ describe('packages_list_app', () => {
         config: {
           resourceId: 'project_id',
           emptyListIllustration: 'helpSvg',
-          emptyListHelpUrl: 'helpUrl',
+          emptyListHelpUrl,
         },
       },
     });
@@ -62,9 +62,14 @@ describe('packages_list_app', () => {
     it('generate the correct empty list link', () => {
       const link = findListComponent().find('a');
 
-      expect(link.html()).toMatchInlineSnapshot(
-        `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
-      );
+      expect(link.element).toMatchInlineSnapshot(`
+        <a
+          href="${emptyListHelpUrl}"
+          target="_blank"
+        >
+          publish and share your packages
+        </a>
+      `);
     });
 
     it('includes the right content on the default tab', () => {
