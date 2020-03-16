@@ -265,8 +265,8 @@ class Service < ApplicationRecord
       asana
       assembla
       bamboo
-      buildkite
       bugzilla
+      buildkite
       campfire
       custom_issue_tracker
       discord
@@ -278,20 +278,20 @@ class Service < ApplicationRecord
       hipchat
       irker
       jira
-      mattermost_slash_commands
       mattermost
+      mattermost_slash_commands
+      microsoft_teams
       packagist
       pipelines_email
       pivotaltracker
       prometheus
       pushover
       redmine
-      youtrack
-      slack_slash_commands
       slack
+      slack_slash_commands
       teamcity
-      microsoft_teams
       unify_circuit
+      youtrack
     ]
 
     if Rails.env.development?
