@@ -11,9 +11,9 @@ module Gitlab
       delegate :users, to: :generic_search_results
       delegate :limited_users_count, to: :generic_search_results
 
-      def initialize(current_user, query, project_id, repository_ref = nil)
+      def initialize(current_user, query, project, repository_ref = nil)
         @current_user = current_user
-        @project = Project.find(project_id)
+        @project = project
         @repository_ref = repository_ref.presence || project.default_branch
         @query = query
         @public_and_internal_projects = false

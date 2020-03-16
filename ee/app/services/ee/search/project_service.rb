@@ -13,7 +13,7 @@ module EE
         ::Gitlab::Elastic::ProjectSearchResults.new(
           current_user,
           params[:search],
-          project.id,
+          project,
           repository_ref
         )
       end
