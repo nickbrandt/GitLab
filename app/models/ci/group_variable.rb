@@ -5,7 +5,7 @@ module Ci
     extend Gitlab::Ci::Model
     include HasVariable
     include Presentable
-    include Maskable
+    include Ci::Maskable
 
     belongs_to :group, class_name: "::Group"
 
