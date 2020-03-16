@@ -150,27 +150,6 @@ describe('IDE extra file row component', () => {
         done();
       });
     });
-
-    it('shows "Added" tooltip if file has been added', done => {
-      vm.file.changed = true;
-      vm.file.tempFile = true;
-
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.file-changed-icon').getAttribute('title')).toBe('Added');
-
-        done();
-      });
-    });
-
-    it('shows "Modified" tooltip if file has been modified', done => {
-      vm.file.changed = true;
-
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.file-changed-icon').getAttribute('title')).toBe('Modified');
-
-        done();
-      });
-    });
   });
 
   describe('merge request icon', () => {

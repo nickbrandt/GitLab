@@ -73,6 +73,16 @@ describe('Changed file icon', () => {
     });
   });
 
+  it('shows "Deleted" tooltip if file has been deleted', () => {
+    factory({
+      file: {
+        deleted: true,
+      },
+    });
+
+    expect(findTooltipText()).toBe('Deleted');
+  });
+
   describe('with file unchanged', () => {
     beforeEach(() => {
       factory({
