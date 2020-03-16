@@ -1,0 +1,6 @@
+---
+title: Geo - Fix ambiguous reference column while loading migrated local files to
+  clean up
+merge_request: 27252
+author:
+type: fixed
