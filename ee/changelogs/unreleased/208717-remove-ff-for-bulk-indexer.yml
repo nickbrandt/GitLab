@@ -1,0 +1,5 @@
+---
+title: Remove feature flag elastic_bulk_incremental_updates
+merge_request: 27293
+author:
+type: performance
