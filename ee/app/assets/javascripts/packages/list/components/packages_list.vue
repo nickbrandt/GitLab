@@ -1,11 +1,9 @@
 <script>
-import { mapState, mapActions, mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import {
   GlTable,
   GlPagination,
   GlButton,
-  GlSorting,
-  GlSortingItem,
   GlModal,
   GlLink,
   GlIcon,
@@ -14,23 +12,8 @@ import {
 import Tracking from '~/tracking';
 import { s__, sprintf } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import {
-  LIST_KEY_NAME,
-  LIST_KEY_PROJECT,
-  LIST_KEY_VERSION,
-  LIST_KEY_PACKAGE_TYPE,
-  LIST_KEY_CREATED_AT,
-  LIST_KEY_ACTIONS,
-  LIST_LABEL_NAME,
-  LIST_LABEL_PROJECT,
-  LIST_LABEL_VERSION,
-  LIST_LABEL_PACKAGE_TYPE,
-  LIST_LABEL_CREATED_AT,
-  LIST_LABEL_ACTIONS,
-  LIST_ORDER_BY_PACKAGE_TYPE,
-  ASCENDING_ODER,
-  DESCENDING_ORDER,
-} from '../constants';
+import { LIST_KEY_ACTIONS, LIST_LABEL_ACTIONS } from '../constants';
+import getTableHeaders from '../utils';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
 import PackageTags from '../../shared/components/package_tags.vue';
@@ -40,8 +23,6 @@ export default {
   components: {
     GlTable,
     GlPagination,
-    GlSorting,
-    GlSortingItem,
     GlButton,
     GlLink,
     TimeAgoTooltip,
@@ -63,8 +44,6 @@ export default {
       totalItems: state => state.pagination.total,
       page: state => state.pagination.page,
       isGroupPage: state => state.config.isGroupPage,
-      orderBy: state => state.sorting.orderBy,
-      sort: state => state.sorting.sort,
       isLoading: 'isLoading',
     }),
     ...mapGetters({ list: 'getList' }),
@@ -76,61 +55,24 @@ export default {
         this.$emit('page:changed', value);
       },
     },
-    sortText() {
-      const field = this.sortableFields.find(s => s.orderBy === this.orderBy);
-      return field ? field.label : '';
-    },
-    isSortAscending() {
-      return this.sort === ASCENDING_ODER;
-    },
     isListEmpty() {
       return !this.list || this.list.length === 0;
     },
     showActions() {
       return !this.isGroupPage;
     },
-    sortableFields() {
-      // This list is filtered in the case of the project page, and the project column is removed
-      return [
-        {
-          key: LIST_KEY_NAME,
-          label: LIST_LABEL_NAME,
-          orderBy: LIST_KEY_NAME,
-          class: ['text-left'],
-        },
-        {
-          key: LIST_KEY_PROJECT,
-          label: LIST_LABEL_PROJECT,
-          orderBy: LIST_KEY_PROJECT,
-          class: ['text-left'],
-        },
-        {
-          key: LIST_KEY_VERSION,
-          label: LIST_LABEL_VERSION,
-          orderBy: LIST_KEY_VERSION,
-          class: ['text-center'],
-        },
-        {
-          key: LIST_KEY_PACKAGE_TYPE,
-          label: LIST_LABEL_PACKAGE_TYPE,
-          orderBy: LIST_ORDER_BY_PACKAGE_TYPE,
-          class: ['text-center'],
-        },
-        {
-          key: LIST_KEY_CREATED_AT,
-          label: LIST_LABEL_CREATED_AT,
-          orderBy: LIST_KEY_CREATED_AT,
-          class: this.showActions ? ['text-center'] : ['text-right'],
-        },
-      ].filter(f => f.key !== LIST_KEY_PROJECT || this.isGroupPage);
-    },
     headerFields() {
-      const actions = {
-        key: LIST_KEY_ACTIONS,
-        label: LIST_LABEL_ACTIONS,
-        tdClass: ['text-right'],
-      };
-      return this.showActions ? [...this.sortableFields, actions] : this.sortableFields;
+      const fields = getTableHeaders(this.isGroupPage);
+
+      if (this.showActions) {
+        fields.push({
+          key: LIST_KEY_ACTIONS,
+          label: LIST_LABEL_ACTIONS,
+        });
+      }
+
+      fields[fields.length - 1].class = ['text-right'];
+      return fields;
     },
     modalAction() {
       return s__('PackageRegistry|Delete package');
@@ -157,16 +99,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['setSorting']),
-    onDirectionChange() {
-      const sort = this.isSortAscending ? DESCENDING_ORDER : ASCENDING_ODER;
-      this.setSorting({ sort });
-      this.$emit('sort:changed');
-    },
-    onSortItemClick(item) {
-      this.setSorting({ orderBy: item });
-      this.$emit('sort:changed');
-    },
     setItemToBeDeleted(item) {
       this.itemToBeDeleted = { ...item };
       this.track(TrackingActions.REQUEST_DELETE_PACKAGE);
@@ -190,22 +122,6 @@ export default {
     <slot v-if="isListEmpty && !isLoading" name="empty-state"></slot>
 
     <template v-else>
-      <gl-sorting
-        class="my-3 align-self-end"
-        :text="sortText"
-        :is-ascending="isSortAscending"
-        @sortDirectionChange="onDirectionChange"
-      >
-        <gl-sorting-item
-          v-for="item in sortableFields"
-          ref="packageListSortItem"
-          :key="item.key"
-          @click="onSortItemClick(item.orderBy)"
-        >
-          {{ item.label }}
-        </gl-sorting-item>
-      </gl-sorting>
-
       <gl-table
         :items="list"
         :fields="headerFields"

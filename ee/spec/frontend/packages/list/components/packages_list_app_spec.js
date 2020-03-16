@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
 const localVue = createLocalVue();
@@ -18,6 +18,7 @@ describe('packages_list_app', () => {
 
   const emptyListHelpUrl = 'helpUrl';
   const findListComponent = () => wrapper.find(PackageList);
+  const findTabComponent = (index = 0) => wrapper.findAll(GlTab).at(index);
 
   const mountComponent = () => {
     wrapper = shallowMount(PackageListApp, {
@@ -27,6 +28,8 @@ describe('packages_list_app', () => {
         GlEmptyState,
         GlLoadingIcon,
         PackageList,
+        GlTab,
+        GlTabs,
       },
     });
   };
@@ -38,7 +41,7 @@ describe('packages_list_app', () => {
         config: {
           resourceId: 'project_id',
           emptyListIllustration: 'helpSvg',
-          emptyListHelpUrl: 'helpUrl',
+          emptyListHelpUrl,
         },
       },
     });
@@ -55,13 +58,25 @@ describe('packages_list_app', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('generate the correct empty list link', () => {
-    const emptyState = findListComponent();
-    const link = emptyState.find('a');
+  describe('empty state', () => {
+    it('generate the correct empty list link', () => {
+      const link = findListComponent().find('a');
 
-    expect(link.html()).toMatchInlineSnapshot(
-      `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
-    );
+      expect(link.element).toMatchInlineSnapshot(`
+        <a
+          href="${emptyListHelpUrl}"
+          target="_blank"
+        >
+          publish and share your packages
+        </a>
+      `);
+    });
+
+    it('includes the right content on the default tab', () => {
+      const heading = findListComponent().find('h4');
+
+      expect(heading.text()).toBe('There are no packages yet');
+    });
   });
 
   it('call requestPackagesList on page:changed', () => {
@@ -80,5 +95,19 @@ describe('packages_list_app', () => {
     const list = findListComponent();
     list.vm.$emit('sort:changed');
     expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+  });
+
+  describe('tab change', () => {
+    it('calls requestPackagesList when all tab is clicked', () => {
+      findTabComponent().trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
+
+    it('calls requestPackagesList when a package type tab is clicked', () => {
+      findTabComponent(1).trigger('click');
+
+      expect(store.dispatch).toHaveBeenCalledWith('requestPackagesList');
+    });
   });
 });
