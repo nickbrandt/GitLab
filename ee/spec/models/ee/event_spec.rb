@@ -90,8 +90,7 @@ describe Event do
       context 'the event refers to a design on a confidential issue' do
         let(:project) { create(:project, :public) }
         let(:issue) { create(:issue, :confidential, project: project) }
-        let(:design) { create(:design, issue: issue) }
-        let(:note) { create(:note, :on_design, noteable: design) }
+        let(:note) { create(:note, :on_design, issue: issue) }
         let(:event) { create(:event, project: project, target: note) }
 
         let(:assignees) do

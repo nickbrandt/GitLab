@@ -12,7 +12,7 @@ describe DiffNote do
 
   context 'diff files' do
     let(:design) { create(:design, :with_file, versions_count: 2) }
-    let(:diff_note) { create(:diff_note_on_design, noteable: design, project: design.project) }
+    let(:diff_note) { create(:diff_note_on_design, noteable: design) }
 
     describe '#latest_diff_file' do
       it 'does not return a diff file' do

@@ -77,7 +77,6 @@ describe Notify do
     let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
-         project: design.project,
          note: "Hello #{recipient.to_reference}")
     end
 

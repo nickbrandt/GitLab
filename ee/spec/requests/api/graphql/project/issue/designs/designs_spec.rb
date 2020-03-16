@@ -318,7 +318,7 @@ describe 'Getting designs related to an issue' do
     end
 
     describe 'a design with note annotations' do
-      let_it_be(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
+      let_it_be(:note) { create(:diff_note_on_design, noteable: design) }
 
       let(:design_query) do
         <<~NODE
