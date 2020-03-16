@@ -106,7 +106,7 @@ module EE
 
       with_scope :subject
       condition(:threat_monitoring_enabled) do
-        @subject.beta_feature_available?(:threat_monitoring)
+        @subject.feature_available?(:threat_monitoring)
       end
 
       with_scope :subject
