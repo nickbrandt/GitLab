@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlButton, GlIcon } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -9,6 +9,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import EmployeeBadge from '~/vue_shared/components/employee_badge.vue';
 
 import epicUtils from '../utils/epic_utils';
 import { statusType } from '../constants';
@@ -19,9 +20,9 @@ export default {
   },
   components: {
     Icon,
-    GlIcon,
     GlButton,
     LoadingButton,
+    EmployeeBadge,
     UserAvatarLink,
     TimeagoTooltip,
   },
@@ -100,16 +101,7 @@ export default {
             img-css-classes="avatar-inline"
           />
         </strong>
-        <span
-          v-if="author.isGitlabEmployee"
-          ref="gitLabEmployeeBadge"
-          class="gl-text-gray-700 text-nowrap"
-        >
-          <gl-icon name="work" :size="16" class="align-middle" />
-          <!-- `GitLab` does not need to be translated -->
-          <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings -->
-          <span class="align-middle">GitLab</span>
-        </span>
+        <employee-badge v-if="author.isGitlabEmployee" ref="gitLabEmployeeBadge" />
       </div>
     </div>
     <div v-if="canUpdate" class="detail-page-header-actions js-issuable-actions">
