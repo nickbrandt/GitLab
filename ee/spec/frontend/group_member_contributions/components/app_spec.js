@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 import AppComponent from 'ee/group_member_contributions/components/app.vue';
 import GroupMemberStore from 'ee/group_member_contributions/store/group_member_store';
@@ -30,7 +30,7 @@ describe('AppComponent', () => {
   describe('methods', () => {
     describe('handleColumnClick', () => {
       it('calls store.sortMembers with columnName param', () => {
-        spyOn(vm.store, 'sortMembers');
+        jest.spyOn(vm.store, 'sortMembers').mockImplementation(() => {});
 
         const columnName = 'fullname';
         vm.handleColumnClick(columnName);
@@ -49,29 +49,25 @@ describe('AppComponent', () => {
       expect(vm.$el.querySelector('h3').innerText.trim()).toBe('Contributions per group member');
     });
 
-    it('shows loading icon when isLoading prop is true', done => {
+    it('shows loading icon when isLoading prop is true', () => {
       vm.store.state.isLoading = true;
-      vm.$nextTick()
-        .then(() => {
-          const loadingEl = vm.$el.querySelector('.loading-animation');
 
-          expect(loadingEl).not.toBeNull();
-          expect(loadingEl.querySelector('span').getAttribute('aria-label')).toBe(
-            'Loading contribution stats for group members',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      return vm.$nextTick().then(() => {
+        const loadingEl = vm.$el.querySelector('.loading-animation');
+
+        expect(loadingEl).not.toBeNull();
+        expect(loadingEl.querySelector('span').getAttribute('aria-label')).toBe(
+          'Loading contribution stats for group members',
+        );
+      });
     });
 
-    it('renders table container element', done => {
+    it('renders table container element', () => {
       vm.store.state.isLoading = false;
-      vm.$nextTick()
-        .then(() => {
-          expect(vm.$el.querySelector('table.table.gl-sortable')).not.toBeNull();
-        })
-        .then(done)
-        .catch(done.fail);
+
+      return vm.$nextTick().then(() => {
+        expect(vm.$el.querySelector('table.table.gl-sortable')).not.toBeNull();
+      });
     });
   });
 });
