@@ -135,7 +135,9 @@ module Types
     field :descendant_weight_sum, Types::EpicDescendantWeightSumType, null: true, complexity: 10,
       description: "Total weight of open and closed issues in the epic and its descendants",
       resolve: -> (epic, args, ctx) do
-        Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
+        if Feature.enabled?(:unfiltered_epic_aggregates, epic.group, default_enabled: true)
+          Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(ctx, epic.id, WEIGHT_SUM)
+        end
       end
 
     field :health_status, Types::EpicHealthStatusType, null: true, complexity: 10,
