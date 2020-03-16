@@ -4669,6 +4669,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
 
   create_table "wiki_page_meta", id: :serial, force: :cascade do |t|
     t.bigint "project_id", null: false
+    t.datetime_with_timezone "created_at", default: -> { "now()" }, null: false
+    t.datetime_with_timezone "updated_at", default: -> { "now()" }, null: false
     t.string "title", limit: 255, null: false
     t.index ["project_id"], name: "index_wiki_page_meta_on_project_id"
   end
@@ -4676,6 +4678,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
   create_table "wiki_page_slugs", id: :serial, force: :cascade do |t|
     t.boolean "canonical", default: false, null: false
     t.bigint "wiki_page_meta_id", null: false
+    t.datetime_with_timezone "created_at", default: -> { "now()" }, null: false
+    t.datetime_with_timezone "updated_at", default: -> { "now()" }, null: false
     t.string "slug", limit: 2048, null: false
     t.index ["slug", "wiki_page_meta_id"], name: "index_wiki_page_slugs_on_slug_and_wiki_page_meta_id", unique: true
     t.index ["wiki_page_meta_id"], name: "index_wiki_page_slugs_on_wiki_page_meta_id"
