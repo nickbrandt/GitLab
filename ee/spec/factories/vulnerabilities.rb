@@ -29,6 +29,18 @@ FactoryBot.define do
       confirmed_at { Time.current }
     end
 
+    ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.each do |severity_level|
+      trait severity_level do
+        severity { severity_level }
+      end
+    end
+
+    ::Vulnerabilities::Occurrence::REPORT_TYPES.keys.each do |report_type|
+      trait report_type do
+        report_type { report_type }
+      end
+    end
+
     trait :with_findings do
       after(:build) do |vulnerability|
         vulnerability.findings = build_list(
