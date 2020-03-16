@@ -298,9 +298,6 @@ RSpec/AnyInstanceOf:
 RSpec/ImplicitSubject:
   Enabled: false
 
-RSpec/LeakyConstantDeclaration:
-  Enabled: false
-
 RSpec/EmptyLineAfterHook:
   Enabled: false
 
