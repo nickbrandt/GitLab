@@ -3,14 +3,16 @@
 module Projects
   module ImportExport
     class ProjectExportPresenter < Gitlab::View::Presenter::Delegated
+      include ActiveModel::Serializers::JSON
+
       presents :project
 
       def project_members
         super + converted_group_members
       end
 
-      def as_json(*_args)
-        self.respond_to?(:override_description) ? super.merge("description" => override_description) : super
+      def description
+        self.respond_to?(:override_description) ? override_description : super
       end
 
       private
