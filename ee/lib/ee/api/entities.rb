@@ -262,32 +262,6 @@ module EE
         end
       end
 
-      class ProjectApprovalRule < ApprovalRule
-        expose :protected_branches, using: ::API::Entities::ProtectedBranch, if: -> (rule, _) { rule.project.multiple_approval_rules_available? }
-      end
-
-      class MergeRequestApprovalRule < ApprovalRule
-        class SourceRule < Grape::Entity
-          expose :approvals_required
-        end
-
-        expose :source_rule, using: SourceRule
-      end
-
-      class MergeRequestApprovalStateRule < MergeRequestApprovalRule
-        expose :code_owner
-        expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
-        expose :approved?, as: :approved
-      end
-
-      class MergeRequestApprovalState < Grape::Entity
-        expose :approval_rules_overwritten do |approval_state|
-          approval_state.approval_rules_overwritten?
-        end
-
-        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalStateRule
-      end
-
       # Being used in private project-level approvals API.
       # This overrides the `eligible_approvers` to be exposed as `approvers`.
       #
