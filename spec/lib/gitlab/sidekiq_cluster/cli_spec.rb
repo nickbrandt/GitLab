@@ -157,7 +157,7 @@ describe Gitlab::SidekiqCluster::CLI do
                   .with([['chat_notification'], ['project_export']], default_options)
                   .and_return([])
 
-          cli.run(%w(--experimental-queue-selector feature_category=chatops&urgency=high resource_boundary=memory&feature_category=importers))
+          cli.run(%w(--experimental-queue-selector feature_category=chatops&has_external_dependencies=true resource_boundary=memory&feature_category=importers))
         end
 
         it 'allows the special * selector' do
