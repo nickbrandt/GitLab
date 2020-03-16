@@ -1,5 +1,5 @@
 <script>
-import { uniqueId } from 'underscore';
+import { uniqueId } from 'lodash';
 
 import { GlButton, GlLink, GlModal, GlModalDirective, GlIntersperse } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
