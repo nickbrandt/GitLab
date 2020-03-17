@@ -12,6 +12,7 @@ module Projects
         dast: _('Analyze a review version of your web application.'),
         dependency_scanning: _('Analyze your dependencies for known vulnerabilities.'),
         license_management: _('Search your project dependencies for their licenses and apply policies.'),
+        license_scanning: _('Search your project dependencies for their licenses and apply policies.'),
         sast: _('Analyze your source code for known vulnerabilities.')
       }.freeze
 
@@ -20,6 +21,7 @@ module Projects
         dast: 'user/application_security/dast/index',
         dependency_scanning: 'user/application_security/dependency_scanning/index',
         license_management: 'user/application_security/license_compliance/index',
+        license_scanning: 'user/application_security/license_compliance/index',
         sast: 'user/application_security/sast/index'
       }.freeze
 
@@ -27,7 +29,8 @@ module Projects
         container_scanning: _('Container Scanning'),
         dast: _('Dynamic Application Security Testing (DAST)'),
         dependency_scanning: _('Dependency Scanning'),
-        license_management: _('License Compliance'),
+        license_management: 'License Management',
+        license_scanning: _('License Compliance'),
         sast: _('Static Application Security Testing (SAST)')
       }.freeze
 
@@ -44,7 +47,7 @@ module Projects
       private
 
       def features
-        scan_types.map do |scan_type|
+        scans = scan_types.map do |scan_type|
           if auto_devops_source?
             scan(scan_type, configured: true)
           elsif latest_builds_reports.include?(scan_type)
@@ -53,6 +56,9 @@ module Projects
             scan(scan_type, configured: false)
           end
         end
+
+        # TODO: remove this line with #8912
+        license_compliance_substitute(scans)
       end
 
       def latest_builds_reports
@@ -82,6 +88,25 @@ module Projects
         return help_page_path('ci/pipelines') unless latest_default_branch_pipeline
 
         project_pipeline_path(self, latest_default_branch_pipeline)
+      end
+
+      # In this method we define if License Compliance feature is configured
+      # by looking into `license_scanning` and `license_management` reports
+      # in 13.0 support for `license_management` report type is scheduled to be dropped.
+      # With this change we won't need this method anymore.
+      def license_compliance_substitute(scans)
+        license_management = scans.find { |scan_type| scan_type[:name] == SCAN_NAMES[:license_management] }
+        license_compliance_config = license_management.fetch(:configured, false)
+
+        scans.delete(license_management)
+
+        if license_compliance_config
+          scans.map do |scan_type|
+            scan_type[:configured] = true if scan_type[:name] == _('License Compliance')
+          end
+        end
+
+        scans
       end
 
       def scan(type, configured: false)
