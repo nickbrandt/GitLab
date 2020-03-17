@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { isFunction } from 'lodash';
 import dateFormat from 'dateformat';
 import { GlResizeObserverDirective } from '@gitlab/ui';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
@@ -88,7 +88,7 @@ export default {
       this.chartInstance = chartInstance;
     },
     onResize() {
-      if (_.isFunction(this.chartInstance?.resize)) {
+      if (isFunction(this.chartInstance?.resize)) {
         this.chartInstance.resize();
       }
     },
