@@ -139,6 +139,7 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"POST", `/api/v4/groups/import`, true},
 		{"POST", `/api/v4/projects/import`, true},
 		{"POST", `/import/gitlab_project`, true},
+		{"PUT", `/api/v4/projects/9001/packages/pypi/v1/files`, true},
 	}
 
 	for _, tt := range tests {

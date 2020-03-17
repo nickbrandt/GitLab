@@ -211,6 +211,9 @@ func (u *upstream) configureRoutes() {
 		// NuGet Artifact Repository
 		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, signingProxy)),
 
+		// PyPI Artifact Repository
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/pypi/`, upload.Accelerate(api, signingProxy)),
+
 		// We are porting API to disk acceleration
 		// we need to declare each routes until we have fixed all the routes on the rails codebase.
 		// Overall status can be seen at https://gitlab.com/groups/gitlab-org/-/epics/1802#current-status
