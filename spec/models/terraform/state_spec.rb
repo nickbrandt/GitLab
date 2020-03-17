@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe TerraformState do
+describe Terraform::State do
   subject { create(:terraform_state, :with_file) }
 
   it { is_expected.to belong_to(:project) }
@@ -10,14 +10,14 @@ describe TerraformState do
   it { is_expected.to validate_presence_of(:project_id) }
 
   before do
-    stub_terraform_state_object_storage(TerraformStateUploader)
+    stub_terraform_state_object_storage(Terraform::StateUploader)
   end
 
   describe '#file_store' do
     context 'when no value is set' do
       it 'returns the default store of the uploader' do
         [ObjectStorage::Store::LOCAL, ObjectStorage::Store::REMOTE].each do |store|
-          expect(TerraformStateUploader).to receive(:default_store).and_return(store)
+          expect(Terraform::StateUploader).to receive(:default_store).and_return(store)
           expect(described_class.new.file_store).to eq(store)
         end
       end

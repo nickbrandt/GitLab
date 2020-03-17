@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-describe TerraformStateUploader do
+describe Terraform::StateUploader do
   subject { terraform_state.file }
 
-  let(:terraform_state) { create(:terraform_state, file: fixture_file_upload('spec/fixtures/terraform.tfstate')) }
+  let(:terraform_state) { create(:terraform_state, file: fixture_file_upload('spec/fixtures/terraform/terraform.tfstate')) }
 
   before do
     stub_terraform_state_object_storage
@@ -36,11 +36,11 @@ describe TerraformStateUploader do
 
   describe 'encryption' do
     it 'encrypts the stored file' do
-      expect(subject.file.read).not_to eq(fixture_file('terraform.tfstate'))
+      expect(subject.file.read).not_to eq(fixture_file('terraform/terraform.tfstate'))
     end
 
     it 'decrypts the file when reading' do
-      expect(subject.read).to eq(fixture_file('terraform.tfstate'))
+      expect(subject.read).to eq(fixture_file('terraform/terraform.tfstate'))
     end
   end
 
