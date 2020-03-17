@@ -1,20 +1,26 @@
 # frozen_string_literal: true
 
 module StatusPage
-  # Delegate work to more specific publishing services.
+  # Publishes content to status page by delegating to specific
+  # publishing services.
   #
-  # Use this service for publishing an incident to CDN which calls:
+  # Use this service for publishing an incident to CDN synchronously.
+  # To publish asynchronously use +StatusPage::TriggerPublishService+ instead.
+  #
+  # This services calls:
   # * StatusPage::PublishDetailsService
   # * StatusPage::PublishListService
   class PublishIncidentService
     include Gitlab::Utils::StrongMemoize
 
-    def initialize(project:, issue_id:)
+    def initialize(user:, project:, issue_id:)
+      @user = user
       @project = project
       @issue_id = issue_id
     end
 
     def execute
+      return error_permission_denied unless can_publish?
       return error_issue_not_found unless issue
 
       response = publish_details
@@ -25,7 +31,7 @@ module StatusPage
 
     private
 
-    attr_reader :project, :issue_id
+    attr_reader :user, :project, :issue_id
 
     def publish_details
       PublishDetailsService.new(project: project).execute(issue, user_notes)
@@ -55,8 +61,20 @@ module StatusPage
       end
     end
 
+    def can_publish?
+      user.can?(:publish_status_page, project)
+    end
+
+    def error_permission_denied
+      error('No publish permission')
+    end
+
     def error_issue_not_found
-      ServiceResponse.error(message: 'Issue not found')
+      error('Issue not found')
+    end
+
+    def error(message)
+      ServiceResponse.error(message: message)
     end
   end
 end
