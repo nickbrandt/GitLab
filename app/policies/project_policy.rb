@@ -445,6 +445,8 @@ class ProjectPolicy < BasePolicy
     (can?(:read_project_for_iids) & issues_visible_to_user) | can?(:read_issue)
   end.enable :read_issue_iid
 
+  rule { can?(:maintainer_access) }.enable :read_prometheus_alerts
+
   rule do
     (~guest & can?(:read_project_for_iids) & merge_requests_visible_to_user) | can?(:read_merge_request)
   end.enable :read_merge_request_iid
