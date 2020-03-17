@@ -9,7 +9,7 @@ module CiVariablesHelper
     if entity.is_a?(Group)
       create_deploy_token_group_settings_ci_cd_path(entity, opts)
     else
-      create_deploy_token_project_settings_repository_path(entity, opts)
+      create_deploy_token_project_settings_ci_cd_path(entity, opts)
     end
   end
 
