@@ -1,10 +1,10 @@
 <script>
 import { isUndefined } from 'lodash';
 import { GlEmptyState, GlSprintf } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import ReportsNotConfigured from './empty_states/reports_not_configured.vue';
 import SecurityDashboard from './security_dashboard_vuex.vue';
 
 export default {
@@ -12,21 +12,17 @@ export default {
   components: {
     GlEmptyState,
     GlSprintf,
-    UserAvatarLink,
     Icon,
-    TimeagoTooltip,
+    ReportsNotConfigured,
     SecurityDashboard,
+    TimeagoTooltip,
+    UserAvatarLink,
   },
   props: {
     hasPipelineData: {
       type: Boolean,
       required: false,
       default: false,
-    },
-    emptyStateIllustrationPath: {
-      type: String,
-      required: false,
-      default: null,
     },
     securityDashboardHelpPath: {
       type: String,
@@ -82,15 +78,6 @@ export default {
       type: String,
       required: false,
       default: null,
-    },
-  },
-  computed: {
-    emptyStateDescription() {
-      return s__(
-        `SecurityDashboard|
-         The security dashboard displays the latest security report.
-         Use it to find and fix vulnerabilities.`,
-      ).trim();
     },
   },
 };
@@ -157,13 +144,10 @@ export default {
         </template>
       </security-dashboard>
     </template>
-    <gl-empty-state
+    <reports-not-configured
       v-else
-      :title="s__('SecurityDashboard|Monitor vulnerabilities in your code')"
-      :svg-path="emptyStateIllustrationPath"
-      :description="emptyStateDescription"
-      :primary-button-link="securityDashboardHelpPath"
-      :primary-button-text="__('Learn more')"
+      :svg-path="emptyStateSvgPath"
+      :help-path="securityDashboardHelpPath"
     />
   </div>
 </template>

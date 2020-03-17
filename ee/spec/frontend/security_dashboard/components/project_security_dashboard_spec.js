@@ -24,7 +24,7 @@ describe('Project Security Dashboard component', () => {
       stubs: ['security-dashboard-table'],
       propsData: {
         hasPipelineData: true,
-        emptyStateIllustrationPath: `${TEST_HOST}/img`,
+        emptyStateSvgPath: `${TEST_HOST}/img`,
         securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
         commit: {
           id: '1234adf',

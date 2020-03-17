@@ -1,28 +1,41 @@
 <script>
+import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
+import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
 import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import VulnerabilitiesCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
-import ProjectVulnerabilitiesApp from 'ee/vulnerabilities/components/project_vulnerabilities_app.vue';
 
 export default {
   components: {
-    SecurityDashboardLayout,
     ProjectVulnerabilitiesApp,
+    ReportsNotConfigured,
+    SecurityDashboardLayout,
     VulnerabilitiesCountList,
     Filters,
   },
   props: {
-    dashboardDocumentation: {
+    emptyStateSvgPath: {
       type: String,
       required: true,
     },
-    emptyStateSvgPath: {
+    securityDashboardHelpPath: {
       type: String,
       required: true,
     },
     projectFullPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
+    },
+    dashboardDocumentation: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    hasPipelineData: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -39,16 +52,25 @@ export default {
 </script>
 
 <template>
-  <security-dashboard-layout>
-    <template #header>
-      <vulnerabilities-count-list :project-full-path="projectFullPath" />
-      <filters @filterChange="handleFilterChange" />
+  <div>
+    <template v-if="hasPipelineData">
+      <security-dashboard-layout>
+        <template #header>
+          <vulnerabilities-count-list :project-full-path="projectFullPath" />
+          <filters @filterChange="handleFilterChange" />
+        </template>
+        <project-vulnerabilities-app
+          :dashboard-documentation="dashboardDocumentation"
+          :empty-state-svg-path="emptyStateSvgPath"
+          :project-full-path="projectFullPath"
+          :filters="filters"
+        />
+      </security-dashboard-layout>
     </template>
-    <project-vulnerabilities-app
-      :dashboard-documentation="dashboardDocumentation"
-      :empty-state-svg-path="emptyStateSvgPath"
-      :project-full-path="projectFullPath"
-      :filters="filters"
+    <reports-not-configured
+      v-else
+      :svg-path="emptyStateSvgPath"
+      :help-path="securityDashboardHelpPath"
     />
-  </security-dashboard-layout>
+  </div>
 </template>
