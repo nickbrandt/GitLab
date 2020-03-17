@@ -1,8 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
-import { INVALID_CURRENT_ENVIRONMENT_NAME, TIME_WINDOWS } from 'ee/threat_monitoring/constants';
+import { INVALID_CURRENT_ENVIRONMENT_NAME } from 'ee/threat_monitoring/constants';
 import { mockEnvironmentsResponse } from '../mock_data';
+import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
+import { timeRanges, defaultTimeRange } from '~/vue_shared/constants';
 
 const mockEnvironments = mockEnvironmentsResponse.environments;
 
@@ -23,8 +25,7 @@ describe('ThreatMonitoringFilters component', () => {
 
   const findEnvironmentsDropdown = () => wrapper.find({ ref: 'environmentsDropdown' });
   const findEnvironmentsDropdownItems = () => wrapper.findAll({ ref: 'environmentsDropdownItem' });
-  const findShowLastDropdown = () => wrapper.find({ ref: 'showLastDropdown' });
-  const findShowLastDropdownItems = () => wrapper.findAll({ ref: 'showLastDropdownItem' });
+  const findShowLastDropdown = () => wrapper.find(DateTimePicker);
 
   afterEach(() => {
     wrapper.destroy();
@@ -92,22 +93,15 @@ describe('ThreatMonitoringFilters component', () => {
     });
 
     it('has text set to the current time window name', () => {
-      const currentTimeWindowName = store.getters['threatMonitoring/currentTimeWindowName'];
-      expect(findShowLastDropdown().attributes().text).toBe(currentTimeWindowName);
+      expect(findShowLastDropdown().vm.value.label).toBe(defaultTimeRange.label);
     });
 
     it('has dropdown items for each time window', () => {
-      const dropdownItems = findShowLastDropdownItems();
-
-      Object.entries(TIME_WINDOWS).forEach(([timeWindow, config], i) => {
-        const dropdownItem = dropdownItems.at(i);
-        expect(dropdownItem.text()).toBe(config.name);
-
-        dropdownItem.vm.$emit('click');
-        expect(store.dispatch).toHaveBeenCalledWith(
-          'threatMonitoring/setCurrentTimeWindow',
-          timeWindow,
-        );
+      const dropdownOptions = findShowLastDropdown().props('options');
+      Object.entries(timeRanges).forEach(([index, timeWindow]) => {
+        const dropdownOption = dropdownOptions[index];
+        expect(dropdownOption.interval).toBe(timeWindow.interval);
+        expect(dropdownOption.duration.seconds).toBe(timeWindow.duration.seconds);
       });
     });
   });

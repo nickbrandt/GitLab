@@ -13,7 +13,7 @@ import {
   fetchMoreLogsPrepend,
 } from '~/logs/stores/actions';
 
-import { defaultTimeRange } from '~/monitoring/constants';
+import { defaultTimeRange } from '~/vue_shared/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';

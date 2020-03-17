@@ -13,7 +13,7 @@ import {
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
 import LogControlButtons from './log_control_buttons.vue';
 
-import { timeRanges, defaultTimeRange } from '~/monitoring/constants';
+import { timeRanges, defaultTimeRange } from '~/vue_shared/constants';
 import { timeRangeFromUrl } from '~/monitoring/utils';
 import { formatDate } from '../utils';
 
