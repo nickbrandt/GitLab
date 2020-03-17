@@ -77,12 +77,6 @@ describe Projects::Security::VulnerabilitiesController do
         expect(response.body).to have_text(vulnerability.title)
       end
 
-      it 'renders the time pipeline ran' do
-        show_vulnerability
-
-        expect(response.body).to have_css("#js-pipeline-created")
-      end
-
       it 'renders the solution card' do
         show_vulnerability
 
@@ -93,16 +87,12 @@ describe Projects::Security::VulnerabilitiesController do
     context "when there's no attached pipeline" do
       let_it_be(:finding) { create(:vulnerabilities_occurrence, vulnerability: vulnerability) }
 
-      it 'renders the time the vulnerability was created' do
+      it 'renders the vulnerability page' do
         show_vulnerability
 
-        expect(response.body).to have_css("#js-vulnerability-created")
-      end
-
-      it 'renders the solution card' do
-        show_vulnerability
-
-        expect(response.body).to have_css("#js-vulnerability-solution")
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to render_template(:show)
+        expect(response.body).to have_text(vulnerability.title)
       end
     end
 
