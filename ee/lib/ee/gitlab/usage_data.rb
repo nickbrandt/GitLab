@@ -129,7 +129,7 @@ module EE
 
         def operations_dashboard_usage
           users_with_ops_dashboard_as_default = count(::User.active.with_dashboard('operations'))
-          users_with_projects_added = count(UsersOpsDashboardProject.distinct_users(::User.active), batch: false)
+          users_with_projects_added = distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active), :user_id) # rubocop:disable CodeReuse/ActiveRecord
 
           {
             operations_dashboard_default_dashboard: users_with_ops_dashboard_as_default,
@@ -154,7 +154,7 @@ module EE
                                          merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
                                          projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-                                         projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
+                                         projects_with_packages: distinct_count(::Packages::Package, :project_id),
                                          projects_with_prometheus_alerts: distinct_count(PrometheusAlert, :project_id),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting),
                                          template_repositories: count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
@@ -253,7 +253,7 @@ module EE
             clusters: distinct_count(::Clusters::Cluster.where(time_period), :user_id),
             clusters_applications_prometheus: ::Clusters::Applications::Prometheus.where(time_period).distinct_by_user,
             operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period)),
-            operations_dashboard_users_with_projects_added: count(UsersOpsDashboardProject.distinct_users(::User.active).where(time_period), batch: false),
+            operations_dashboard_users_with_projects_added: distinct_count(UsersOpsDashboardProject.joins(:user).merge(::User.active).where(time_period), :user_id),
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
             projects_with_error_tracking_enabled: distinct_count(::Project.with_enabled_error_tracking.where(time_period), :creator_id),
             projects_with_tracing_enabled: distinct_count(::Project.with_tracing_enabled.where(time_period), :creator_id)
