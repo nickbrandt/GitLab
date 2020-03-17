@@ -494,13 +494,108 @@ Below we describe the different pathing that HTTP vs. SSH Git requests will take
 
 ### Web Request (80/443)
 
-When you make a Git request over HTTP, the request first takes the same steps as a web HTTP request
-through NGINX and GitLab Workhorse. However, the GitLab Workhorse then diverts the request towards
-Gitaly, which processes it directly.
+Git operations over HTTP use the stateless "smart" protocol described in the
+[Git documentation](https://git-scm.com/docs/http-protocol), but responsibility
+for handling these operations is split across several GitLab components.
+
+Here is a sequence diagram for `git fetch`. Note that all requests pass through
+NGINX as well as any other HTTP load balancers, but are not transformed in any
+way by them. All paths are presented relative to a `/namespace/project.git` URL.
+
+```mermaid
+sequenceDiagram
+    participant Git on client
+    participant NGINX
+    participant Workhorse
+    participant Rails
+    participant Gitaly
+    participant Git on server
+
+    Note left of Git on client: git fetch<br/>info-refs
+    Git on client->>+Workhorse: GET /info/refs?service=git-upload-pack
+    Workhorse->>+Rails: GET /info/refs?service=git-upload-pack
+    Note right of Rails: Auth check
+    Rails-->>-Workhorse: Gitlab::Workhorse.git_http_ok
+    Workhorse->>+Gitaly: SmartHTTPService.InfoRefsUploadPack request
+    Gitaly->>+Git on server: git upload-pack --stateless-rpc --advertise-refs
+    Git on server-->>-Gitaly: git upload-pack response
+    Gitaly-->>-Workhorse: SmartHTTPService.InfoRefsUploadPack response
+    Workhorse-->>-Git on client: 200 OK
+
+    Note left of Git on client: git fetch<br/>fetch-pack
+    Git on client->>+Workhorse: POST /git-upload-pack
+    Workhorse->>+Rails: POST /git-upload-pack
+    Note right of Rails: Auth check
+    Rails-->>-Workhorse: Gitlab::Workhorse.git_http_ok
+    Workhorse->>+Gitaly: SmartHTTPService.PostUploadPack request
+    Gitaly->>+Git on server: git upload-pack --stateless-rpc
+    Git on server-->>-Gitaly: git upload-pack response
+    Gitaly-->>-Workhorse: SmartHTTPService.PostUploadPack response
+    Workhorse-->>-Git on client: 200 OK
+```
+
+The sequence is similar for `git push`, except `git-receive-pack` is used
+instead of `git-upload-pack`.
 
 ### SSH Request (22)
 
-TODO
+Git operations over SSH can use the stateful protocol described in the
+[Git documentation](https://git-scm.com/docs/pack-protocol#_ssh_transport), but
+responsibility for handling them is split across several GitLab components.
+
+No GitLab components speak SSH directly - all SSH connections are made between
+Git on the client machine and the SSH server, which terminates the connection.
+To the SSH server, all connections are authenticated as the `git` user; GitLab
+users are differentiated by the SSH key presented by the client.
+
+Here is a sequence diagram for `git fetch`, assuming [Fast SSH key lookup](../administration/operations/fast_ssh_key_lookup.md)
+is enabled. Note that `AuthorizedKeysCommand` is an executable provided by
+[GitLab Shell](#gitlab-shell):
+
+```mermaid
+sequenceDiagram
+    participant Git on client
+    participant SSH server
+    participant AuthorizedKeysCommand
+    participant GitLab Shell
+    participant Rails
+    participant Gitaly
+    participant Git on server
+
+    Note left of Git on client: git fetch
+    Git on client->>SSH server: git fetch-pack
+    SSH server-->>AuthorizedKeysCommand: gitlab-shell-authorized-keys-check git AAAA...
+    AuthorizedKeysCommand-->>Rails: GET /internal/api/authorized_keys?key=AAAA...
+    Note right of Rails: Lookup key ID
+    Rails-->>SSH server: 200 OK, command="gitlab-shell upload-pack key_id=1"
+    SSH server-->>GitLab Shell: gitlab-shell upload-pack key_id=1
+    GitLab Shell-->>Rails: GET /internal/api/allowed?action=upload_pack&key_id=1
+    Note right of Rails: Auth check
+    Rails-->>GitLab Shell: 200 OK, { gitaly: ... }
+    GitLab Shell-->>Gitaly: SSHService.SSHUploadPack bidirectional request
+    Gitaly-->>Git on server: git upload-pack
+    Git on server->>Git on client: SSHService.SSHUploadPack bidirectional response
+```
+
+The `git push` operation is very similar, except `git receive-pack` is used
+instead of `git upload-pack`.
+
+If fast SSH key lookups are not enabled, the SSH server reads from the
+`~git/.ssh/authorized_keys` file to determine what command to run for a given
+SSH session. This is kept up to date by an [`AuthorizedKeysWorker`](https://gitlab.com/gitlab-org/gitlab/blob/master/app/workers/authorized_keys_worker.rb)
+in Rails, scheduled to run whenever an SSH key is modified by a user.
+
+[SSH certificates](../administration/operations/ssh_certificates.md) may be used
+instead of keys. In this case, `AuthorizedKeysCommand` is replaced with an
+`AuthorizedPrincipalsCommand`. This extracts a username from the certificate
+without using the Rails internal API, which is used instead of `key_id` in the
+`/api/internal/allowed` call later.
+
+GitLab Shell also has a few operations that do not involve Gitaly, such as
+resetting two-factor authentication codes. These are handled in the same way,
+except there is no round-trip into Gitaly - Rails performs the action as part
+of the [internal API](internal_api.md) call, and GitLab Shell streams the
+response back to the user directly.
 
 ## System Layout
 
