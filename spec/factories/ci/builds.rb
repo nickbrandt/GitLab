@@ -361,6 +361,8 @@ FactoryBot.define do
       options { {} }
     end
 
+    # TODO: move Security traits to ee_ci_build
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/210486
     trait :dast do
       options do
         {
@@ -397,6 +399,14 @@ FactoryBot.define do
       options do
         {
             artifacts: { reports: { license_management: 'gl-license-management-report.json' } }
+        }
+      end
+    end
+
+    trait :license_scanning do
+      options do
+        {
+          artifacts: { reports: { license_management: 'gl-license-scanning-report.json' } }
         }
       end
     end
