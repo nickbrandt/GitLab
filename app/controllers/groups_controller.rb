@@ -177,7 +177,7 @@ class GroupsController < Groups::ApplicationController
   end
 
   def group_params_attributes
-    params = [
+    [
       :avatar,
       :description,
       :emails_disabled,
@@ -198,10 +198,6 @@ class GroupsController < Groups::ApplicationController
       :subgroup_creation_level,
       :default_branch_protection
     ]
-
-    params << :max_personal_access_token_lifetime if group.enforced_group_managed_accounts?
-
-    params
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

@@ -315,16 +315,9 @@ module EE
       ::Vulnerability.where(project: ::Project.for_group_and_its_subgroups(self))
     end
 
-    def max_personal_access_token_lifetime
-      return unless enforced_group_managed_accounts? # only available for GMA groups
-
-      super || Gitlab::CurrentSettings.max_personal_access_token_lifetime
-    end
-
     def max_personal_access_token_lifetime_from_now
-      return unless max_personal_access_token_lifetime
-
-      max_personal_access_token_lifetime.days.from_now
+      max_personal_access_token_lifetime&.days&.from_now ||
+        Gitlab::CurrentSettings.max_personal_access_token_lifetime_from_now
     end
 
     private

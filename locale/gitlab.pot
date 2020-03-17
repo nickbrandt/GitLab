@@ -11581,6 +11581,9 @@ msgstr ""
 msgid "Leave Admin Mode"
 msgstr ""
 
+msgid "Leave blank for enforcing the limit set by the instance admin. Once set, existing personal access tokens for users in this group may be revoked."
+msgstr ""
+
 msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked."
 msgstr ""
 
