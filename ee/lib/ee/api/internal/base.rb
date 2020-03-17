@@ -18,6 +18,7 @@ module EE
 
             override :ee_post_receive_response_hook
             def ee_post_receive_response_hook(response)
+              response.add_basic_message(geo_redirect_to_primary_message) if display_geo_redirect_to_primary_message?
               response.add_basic_message(geo_secondary_lag_message) if geo_display_secondary_lag_message?
             end
 
@@ -38,6 +39,19 @@ module EE
             def geo_referred_node
               strong_memoize(:geo_referred_node) do
                 ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
+              end
+            end
+
+            def display_geo_redirect_to_primary_message?
+              ::Gitlab::Geo.primary? && geo_redirect_to_primary_message
+            end
+
+            def geo_redirect_to_primary_message
+              return unless geo_referred_node
+
+              @geo_redirect_to_primary_message ||= begin
+                url = "#{::Gitlab::Geo.current_node.url.chomp('/')}/#{project.full_path}.git"
+                ::Gitlab::Geo.redirecting_push_to_primary_message(url)
               end
             end
 
