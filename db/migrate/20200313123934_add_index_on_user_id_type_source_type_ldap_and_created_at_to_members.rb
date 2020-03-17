@@ -4,12 +4,12 @@ class AddIndexOnUserIdTypeSourceTypeLdapAndCreatedAtToMembers < ActiveRecord::Mi
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
-  INDEX_NAME = 'index_members_on_user_id_type_source_type_ldap_and_created_at'
+  INDEX_NAME = 'index_members_on_user_id_created_at'
 
   disable_ddl_transaction!
 
   def up
-    add_concurrent_index :members, [:user_id, :type, :source_type, :ldap, :created_at], where: "ldap = TRUE AND type = 'GroupMember' AND source_type = 'Namespace'", name: INDEX_NAME
+    add_concurrent_index :members, [:user_id, :created_at], where: "ldap = TRUE AND type = 'GroupMember' AND source_type = 'Namespace'", name: INDEX_NAME
   end
 
   def down
