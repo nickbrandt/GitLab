@@ -398,20 +398,20 @@ describe DesignManagement::Design do
     # Note: Cache invalidation tests are in `design_user_notes_count_service_spec.rb`
 
     it 'returns a count of user-generated notes' do
-      create(:diff_note_on_design, noteable: design, project: design.project)
+      create(:diff_note_on_design, noteable: design)
 
       is_expected.to eq(1)
     end
 
     it 'does not count notes on other designs' do
       second_design = create(:design, :with_file)
-      create(:diff_note_on_design, noteable: second_design, project: second_design.project)
+      create(:diff_note_on_design, noteable: second_design)
 
       is_expected.to eq(0)
     end
 
     it 'does not count system notes' do
-      create(:diff_note_on_design, system: true, noteable: design, project: design.project)
+      create(:diff_note_on_design, system: true, noteable: design)
 
       is_expected.to eq(0)
     end

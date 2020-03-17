@@ -19,7 +19,6 @@ describe EE::NotificationService, :mailer do
     let_it_be(:note) do
       create(:diff_note_on_design,
          noteable: design,
-         project: project,
          note: "Hello #{dev.to_reference}, G'day #{stranger.to_reference}")
     end
 
