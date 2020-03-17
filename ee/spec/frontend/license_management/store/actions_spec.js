@@ -320,14 +320,14 @@ describe('License store actions', () => {
     });
   });
 
-  describe('approveLicense', () => {
-    const newStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+  describe('allowLicense', () => {
+    const newStatus = LICENSE_APPROVAL_STATUS.ALLOWED;
 
     it('dispatches setLicenseApproval for un-approved licenses', done => {
       const license = { name: 'FOO' };
 
       testAction(
-        actions.approveLicense,
+        actions.allowLicense,
         license,
         state,
         [],
@@ -341,7 +341,7 @@ describe('License store actions', () => {
       const license = blacklistedLicense;
 
       testAction(
-        actions.approveLicense,
+        actions.allowLicense,
         license,
         state,
         [],
@@ -352,20 +352,20 @@ describe('License store actions', () => {
     });
 
     it('does not dispatch setLicenseApproval for approved licenses', done => {
-      testAction(actions.approveLicense, approvedLicense, state, [], [])
+      testAction(actions.allowLicense, approvedLicense, state, [], [])
         .then(done)
         .catch(done.fail);
     });
   });
 
-  describe('blacklistLicense', () => {
-    const newStatus = LICENSE_APPROVAL_STATUS.BLACKLISTED;
+  describe('denyLicense', () => {
+    const newStatus = LICENSE_APPROVAL_STATUS.DENIED;
 
     it('dispatches setLicenseApproval for un-approved licenses', done => {
       const license = { name: 'FOO' };
 
       testAction(
-        actions.blacklistLicense,
+        actions.denyLicense,
         license,
         state,
         [],
@@ -379,7 +379,7 @@ describe('License store actions', () => {
       const license = approvedLicense;
 
       testAction(
-        actions.blacklistLicense,
+        actions.denyLicense,
         license,
         state,
         [],
@@ -390,7 +390,7 @@ describe('License store actions', () => {
     });
 
     it('does not dispatch setLicenseApproval for blacklisted licenses', done => {
-      testAction(actions.blacklistLicense, blacklistedLicense, state, [], [])
+      testAction(actions.denyLicense, blacklistedLicense, state, [], [])
         .then(done)
         .catch(done.fail);
     });
@@ -448,7 +448,7 @@ describe('License store actions', () => {
     });
 
     it('dispatches requestManagedLicenses and receiveManagedLicensesSuccess for successful response', done => {
-      const payload = [{ name: 'foo', approval_status: LICENSE_APPROVAL_STATUS.BLACKLISTED }];
+      const payload = [{ name: 'foo', approval_status: LICENSE_APPROVAL_STATUS.DENIED }];
       endpointMock.replyOnce(() => [200, payload]);
 
       testAction(
