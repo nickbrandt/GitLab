@@ -7,9 +7,11 @@ exports[`Sast Issue Body matches snapshot 1`] = `
   <div
     class="report-block-list-issue-description-text"
   >
-    
-    Medium:
-    
+    <severity-badge-stub
+      class="d-inline-block"
+      severity="Medium"
+    />
+     
     <modal-open-name-stub
       issue="[object Object]"
       status="failed"
