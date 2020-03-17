@@ -756,8 +756,6 @@ module EE
     private
 
     def group_hooks
-      return group.hooks unless ::Feature.enabled?(:sub_group_webhooks, self)
-
       GroupHook.where(group_id: group.self_and_ancestors)
     end
 
