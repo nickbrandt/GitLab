@@ -332,7 +332,7 @@ module EE
     def update_personal_access_tokens_lifetime
       return unless max_personal_access_token_lifetime.present? && License.feature_available?(:personal_access_token_expiration_policy)
 
-      ::PersonalAccessTokens::Group::UpdateLifetimeService.new(group: self).execute
+      ::PersonalAccessTokens::Group::UpdateLifetimeService.new(self).execute
     end
 
     def custom_project_templates_group_allowed
