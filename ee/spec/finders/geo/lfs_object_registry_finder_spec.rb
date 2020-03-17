@@ -340,14 +340,14 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
 
       context 'unused tracked IDs' do
         context 'with an orphaned registry' do
-          let!(:orphaned) { create(:geo_lfs_object_registry, lfs_object_id: 1234567) }
+          let!(:orphaned) { create(:geo_lfs_object_registry, lfs_object_id: non_existing_record_id) }
 
           it 'includes tracked IDs that do not exist in the model table' do
-            range = 1234567..1234567
+            range = non_existing_record_id..non_existing_record_id
 
             _, unused_tracked_ids = subject.find_registry_differences(range)
 
-            expect(unused_tracked_ids).to match_array([1234567])
+            expect(unused_tracked_ids).to match_array([non_existing_record_id])
           end
 
           it 'excludes IDs outside the ID range' do

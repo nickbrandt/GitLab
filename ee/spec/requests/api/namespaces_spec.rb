@@ -145,7 +145,7 @@ describe API::Namespaces do
 
     context 'when namespace not found' do
       it 'returns 404' do
-        put api("/namespaces/12345", admin), params: { plan: 'silver' }
+        put api("/namespaces/#{non_existing_record_id}", admin), params: { plan: 'silver' }
 
         expect(response).to have_gitlab_http_status(:not_found)
         expect(json_response).to eq('message' => '404 Namespace Not Found')

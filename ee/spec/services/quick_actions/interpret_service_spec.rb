@@ -874,7 +874,7 @@ describe QuickActions::InterpretService do
 
           context 'relate a non-existing issue' do
             let(:issues_related) { [] }
-            let(:content) { "/relate imaginary#1234" }
+            let(:content) { "/relate imaginary##{non_existing_record_iid}" }
 
             it_behaves_like 'relate command'
           end

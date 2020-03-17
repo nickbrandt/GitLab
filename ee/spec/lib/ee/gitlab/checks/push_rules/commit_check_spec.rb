@@ -70,7 +70,7 @@ describe EE::Gitlab::Checks::PushRules::CommitCheck do
 
       context 'with private commit email' do
         it 'returns error if private commit email was not associated to a user' do
-          user_email = "#{User.maximum(:id).next}-foo@#{::Gitlab::CurrentSettings.current_application_settings.commit_email_hostname}"
+          user_email = "#{non_existing_record_id}-foo@#{::Gitlab::CurrentSettings.current_application_settings.commit_email_hostname}"
 
           allow_any_instance_of(Commit).to receive(:author_email).and_return(user_email)
 
@@ -185,7 +185,7 @@ describe EE::Gitlab::Checks::PushRules::CommitCheck do
           end
 
           it 'raises an error when using an unknown private commit email' do
-            user_email = "#{User.maximum(:id).next}-foobar@users.noreply.gitlab.com"
+            user_email = "#{non_existing_record_id}-foobar@users.noreply.gitlab.com"
 
             allow_any_instance_of(Commit).to receive(:committer_email).and_return(user_email)
 

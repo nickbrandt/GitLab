@@ -268,7 +268,7 @@ describe SubscriptionsController do
       context 'when selecting a non existing group' do
         let(:params) do
           {
-            selected_group: 999,
+            selected_group: non_existing_record_id,
             customer: { country: 'NL' },
             subscription: { plan_id: 'x', quantity: 1 }
           }
