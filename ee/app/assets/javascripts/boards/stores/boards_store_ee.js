@@ -96,7 +96,7 @@ class BoardsStoreEE {
 
     let { milestoneTitle } = this.store.boardConfig;
     if (this.store.boardConfig.milestoneId === 0) {
-      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      /* eslint-disable-next-line @gitlab/require-i18n-strings */
       milestoneTitle = 'No+Milestone';
     } else {
       milestoneTitle = encodeURIComponent(milestoneTitle);
@@ -109,7 +109,7 @@ class BoardsStoreEE {
     let { weight } = this.store.boardConfig;
     if (weight !== -1) {
       if (weight === 0) {
-        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+        /* eslint-disable-next-line @gitlab/require-i18n-strings */
         weight = 'No+Weight';
       }
       updateFilterPath('weight', weight);

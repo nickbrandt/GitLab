@@ -182,7 +182,7 @@ export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDa
           newDate,
         });
       } else {
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        // eslint-disable-next-line @gitlab/require-i18n-strings
         throw new Error('An error occurred while saving the date');
       }
     })
@@ -226,7 +226,7 @@ export const updateEpicLabels = ({ dispatch, state }, labels) => {
       if (!data?.updateEpic?.errors.length) {
         dispatch('receiveEpicLabelsSelectSuccess', labels);
       } else {
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        // eslint-disable-next-line @gitlab/require-i18n-strings
         throw new Error('An error occurred while updating labels');
       }
     })
@@ -269,7 +269,7 @@ export const toggleEpicSubscription = ({ state, dispatch }) => {
           subscribed: !state.subscribed,
         });
       } else {
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        // eslint-disable-next-line @gitlab/require-i18n-strings
         throw new Error('An error occurred while toggling to notifications.');
       }
     })

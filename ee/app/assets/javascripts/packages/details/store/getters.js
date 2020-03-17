@@ -25,12 +25,12 @@ export const packageTypeDisplay = ({ packageEntity }) => {
 export const conanInstallationCommand = ({ packageEntity }) => {
   const recipe = generateConanRecipe(packageEntity);
 
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   return `conan install ${recipe} --remote=gitlab`;
 };
 
 export const conanSetupCommand = ({ conanPath }) =>
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   `conan remote add gitlab ${conanPath}`;
 
 export const mavenInstallationXml = ({ packageEntity = {} }) => {
@@ -77,7 +77,7 @@ export const mavenSetupXml = ({ mavenPath }) => `<repositories>
 </distributionManagement>`;
 
 export const npmInstallationCommand = ({ packageEntity }) => (type = NpmManager.NPM) => {
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   const instruction = type === NpmManager.NPM ? 'npm i' : 'yarn add';
 
   return `${instruction} ${packageEntity.name}`;
