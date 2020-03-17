@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import { GlButton } from '@gitlab/ui';
 
 import Draggable from 'vuedraggable';
@@ -20,6 +21,7 @@ import {
 const { epic } = mockQueryResponse.data.group;
 
 const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = ({
   parentItem = mockParentItem,
@@ -46,7 +48,7 @@ const createComponent = ({
     pageInfo: issuesPageInfo,
   });
 
-  return shallowMount(localVue.extend(TreeRoot), {
+  return shallowMount(TreeRoot, {
     localVue,
     store,
     stubs: {
@@ -106,7 +108,7 @@ describe('RelatedItemsTree', () => {
           describe('treeRootOptions', () => {
             it('should return object containing Vue.Draggable config extended from `defaultSortableConfig` when userSignedIn prop is true', () => {
               expect(wrapper.vm.treeRootOptions).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   animation: 200,
                   forceFallback: true,
                   fallbackClass: 'is-dragging',
@@ -128,7 +130,7 @@ describe('RelatedItemsTree', () => {
                 userSignedIn: false,
               });
 
-              expect(wrapper.vm.treeRootOptions).toEqual(jasmine.objectContaining({}));
+              expect(wrapper.vm.treeRootOptions).toEqual(expect.objectContaining({}));
             });
           });
         });
@@ -156,7 +158,7 @@ describe('RelatedItemsTree', () => {
                   newIndex,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   id: mockEpic1.id,
                 }),
               );
@@ -167,7 +169,7 @@ describe('RelatedItemsTree', () => {
                   newIndex,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   id: mockIssue2.epicIssueId,
                 }),
               );
@@ -182,7 +184,7 @@ describe('RelatedItemsTree', () => {
                   newIndex: 0,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   adjacentReferenceId: mockEpic1.id,
                 }),
               );
@@ -193,7 +195,7 @@ describe('RelatedItemsTree', () => {
                   newIndex: 2,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   adjacentReferenceId: mockIssue2.epicIssueId,
                 }),
               );
@@ -208,7 +210,7 @@ describe('RelatedItemsTree', () => {
                   newIndex: 0,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   relativePosition: 'after',
                 }),
               );
@@ -223,7 +225,7 @@ describe('RelatedItemsTree', () => {
                   newIndex: wrapper.vm.children.length - 1,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   relativePosition: 'before',
                 }),
               );
@@ -238,7 +240,7 @@ describe('RelatedItemsTree', () => {
                   newIndex: 2,
                 }),
               ).toEqual(
-                jasmine.objectContaining({
+                expect.objectContaining({
                   relativePosition: 'after',
                 }),
               );
@@ -257,7 +259,7 @@ describe('RelatedItemsTree', () => {
 
           describe('handleDragOnEnd', () => {
             it('removes class `is-dragging` from document body', () => {
-              spyOn(wrapper.vm, 'reorderItem').and.stub();
+              jest.spyOn(wrapper.vm, 'reorderItem').mockImplementation(() => {});
               document.body.classList.add('is-dragging');
 
               wrapper.vm.handleDragOnEnd({
@@ -269,7 +271,7 @@ describe('RelatedItemsTree', () => {
             });
 
             it('does not call `reorderItem` action when newIndex is same as oldIndex', () => {
-              spyOn(wrapper.vm, 'reorderItem').and.stub();
+              jest.spyOn(wrapper.vm, 'reorderItem').mockImplementation(() => {});
 
               wrapper.vm.handleDragOnEnd({
                 oldIndex: 0,
@@ -280,7 +282,7 @@ describe('RelatedItemsTree', () => {
             });
 
             it('calls `reorderItem` action when newIndex is different from oldIndex', () => {
-              spyOn(wrapper.vm, 'reorderItem').and.stub();
+              jest.spyOn(wrapper.vm, 'reorderItem').mockImplementation(() => {});
 
               wrapper.vm.handleDragOnEnd({
                 oldIndex: 1,
@@ -288,8 +290,8 @@ describe('RelatedItemsTree', () => {
               });
 
               expect(wrapper.vm.reorderItem).toHaveBeenCalledWith(
-                jasmine.objectContaining({
-                  treeReorderMutation: jasmine.any(Object),
+                expect.objectContaining({
+                  treeReorderMutation: expect.any(Object),
                   parentItem: wrapper.vm.parentItem,
                   targetItem: wrapper.vm.children[1],
                   oldIndex: 1,
@@ -330,13 +332,15 @@ describe('RelatedItemsTree', () => {
     describe('methods', () => {
       describe('handleShowMoreClick', () => {
         it('sets `fetchInProgress` to true and calls `fetchNextPageItems` action with parentItem as param', () => {
-          spyOn(wrapper.vm, 'fetchNextPageItems').and.callFake(() => new Promise(() => {}));
+          jest
+            .spyOn(wrapper.vm, 'fetchNextPageItems')
+            .mockImplementation(() => new Promise(() => {}));
 
           wrapper.vm.handleShowMoreClick();
 
           expect(wrapper.vm.fetchInProgress).toBe(true);
           expect(wrapper.vm.fetchNextPageItems).toHaveBeenCalledWith(
-            jasmine.objectContaining({
+            expect.objectContaining({
               parentItem: mockParentItem,
             }),
           );
@@ -354,7 +358,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('calls `handleShowMoreClick` when `Show more` link is clicked', () => {
-        spyOn(wrapper.vm, 'handleShowMoreClick');
+        jest.spyOn(wrapper.vm, 'handleShowMoreClick').mockImplementation(() => {});
 
         wrapper.find(GlButton).vm.$emit('click');
 

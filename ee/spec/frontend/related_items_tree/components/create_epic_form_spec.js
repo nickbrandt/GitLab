@@ -1,13 +1,10 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
 import CreateEpicForm from 'ee/related_items_tree/components/create_epic_form.vue';
 
-const localVue = createLocalVue();
-
 const createComponent = (isSubmitting = false) =>
-  mount(localVue.extend(CreateEpicForm), {
-    localVue,
+  shallowMount(CreateEpicForm, {
     propsData: {
       isSubmitting,
     },
@@ -31,31 +28,29 @@ describe('RelatedItemsTree', () => {
           expect(wrapper.vm.isSubmitButtonDisabled).toBe(true);
         });
 
-        it('returns false when either `inputValue` prop is non-empty or `isSubmitting` prop is false', done => {
+        it('returns false when either `inputValue` prop is non-empty or `isSubmitting` prop is false', () => {
           const wrapperWithInput = createComponent(false);
 
           wrapperWithInput.setData({
             inputValue: 'foo',
           });
 
-          wrapperWithInput.vm.$nextTick(() => {
+          return wrapperWithInput.vm.$nextTick(() => {
             expect(wrapperWithInput.vm.isSubmitButtonDisabled).toBe(false);
 
             wrapperWithInput.destroy();
-            done();
           });
         });
       });
 
       describe('buttonLabel', () => {
-        it('returns string "Creating epic" when `isSubmitting` prop is true', done => {
+        it('returns string "Creating epic" when `isSubmitting` prop is true', () => {
           const wrapperSubmitting = createComponent(true);
 
-          wrapperSubmitting.vm.$nextTick(() => {
+          return wrapperSubmitting.vm.$nextTick(() => {
             expect(wrapperSubmitting.vm.buttonLabel).toBe('Creating epic');
 
             wrapperSubmitting.destroy();
-            done();
           });
         });
 

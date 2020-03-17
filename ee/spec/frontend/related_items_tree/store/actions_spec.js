@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
-
+import createFlash from '~/flash';
 import createDefaultState from 'ee/related_items_tree/store/state';
-import actionsModule, * as actions from 'ee/related_items_tree/store/actions';
+import * as actions from 'ee/related_items_tree/store/actions';
 import * as types from 'ee/related_items_tree/store/mutation_types';
 
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
@@ -12,7 +12,7 @@ import {
   PathIdSeparator,
 } from 'ee/related_issues/constants';
 
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'spec/test_constants';
 
@@ -29,7 +29,13 @@ import {
 
 const mockProjects = getJSONFixture('static/projects.json');
 
+jest.mock('~/flash');
+
 describe('RelatedItemTree', () => {
+  afterEach(() => {
+    createFlash.mockClear();
+  });
+
   describe('store', () => {
     describe('actions', () => {
       let state;
@@ -42,44 +48,41 @@ describe('RelatedItemTree', () => {
       });
 
       describe('setInitialConfig', () => {
-        it('should set initial config on state', done => {
+        it('should set initial config on state', () => {
           testAction(
             actions.setInitialConfig,
             mockInitialConfig,
             {},
             [{ type: types.SET_INITIAL_CONFIG, payload: mockInitialConfig }],
             [],
-            done,
           );
         });
       });
 
       describe('setInitialParentItem', () => {
-        it('should set initial parentItem on state', done => {
+        it('should set initial parentItem on state', () => {
           testAction(
             actions.setInitialParentItem,
             mockParentItem,
             {},
             [{ type: types.SET_INITIAL_PARENT_ITEM, payload: mockParentItem }],
             [],
-            done,
           );
         });
       });
 
       describe('setChildrenCount', () => {
-        it('should set initial descendantCounts on state', done => {
+        it('should set initial descendantCounts on state', () => {
           testAction(
             actions.setChildrenCount,
             mockParentItem.descendantCounts,
             {},
             [{ type: types.SET_CHILDREN_COUNT, payload: mockParentItem.descendantCounts }],
             [],
-            done,
           );
         });
 
-        it('should persist non overwritten descendantCounts state', done => {
+        it('should persist non overwritten descendantCounts state', () => {
           const descendantCounts = { openedEpics: 9 };
           testAction(
             actions.setChildrenCount,
@@ -92,7 +95,6 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
       });
@@ -110,7 +112,7 @@ describe('RelatedItemTree', () => {
           }),
         );
 
-        it('should update openedEpics, by incrementing it', done => {
+        it('should update openedEpics, by incrementing it', () => {
           testAction(
             actions.updateChildrenCount,
             { item: mockEpicsWithType[0], isRemoved: false },
@@ -122,11 +124,10 @@ describe('RelatedItemTree', () => {
                 payload: { openedEpics: mockParentItem.descendantCounts.openedEpics + 1 },
               },
             ],
-            done,
           );
         });
 
-        it('should update openedIssues, by incrementing it', done => {
+        it('should update openedIssues, by incrementing it', () => {
           testAction(
             actions.updateChildrenCount,
             { item: mockIssuesWithType[0], isRemoved: false },
@@ -138,11 +139,10 @@ describe('RelatedItemTree', () => {
                 payload: { openedIssues: mockParentItem.descendantCounts.openedIssues + 1 },
               },
             ],
-            done,
           );
         });
 
-        it('should update openedEpics, by decrementing it', done => {
+        it('should update openedEpics, by decrementing it', () => {
           testAction(
             actions.updateChildrenCount,
             { item: mockEpicsWithType[0], isRemoved: true },
@@ -154,11 +154,10 @@ describe('RelatedItemTree', () => {
                 payload: { openedEpics: mockParentItem.descendantCounts.openedEpics - 1 },
               },
             ],
-            done,
           );
         });
 
-        it('should update openedIssues, by decrementing it', done => {
+        it('should update openedIssues, by decrementing it', () => {
           testAction(
             actions.updateChildrenCount,
             { item: mockIssuesWithType[0], isRemoved: true },
@@ -170,33 +169,24 @@ describe('RelatedItemTree', () => {
                 payload: { openedIssues: mockParentItem.descendantCounts.openedIssues - 1 },
               },
             ],
-            done,
           );
         });
       });
 
       describe('expandItem', () => {
-        it('should set `itemExpanded` to true on state.childrenFlags', done => {
-          testAction(
-            actions.expandItem,
-            {},
-            {},
-            [{ type: types.EXPAND_ITEM, payload: {} }],
-            [],
-            done,
-          );
+        it('should set `itemExpanded` to true on state.childrenFlags', () => {
+          testAction(actions.expandItem, {}, {}, [{ type: types.EXPAND_ITEM, payload: {} }], []);
         });
       });
 
       describe('collapseItem', () => {
-        it('should set `itemExpanded` to false on state.childrenFlags', done => {
+        it('should set `itemExpanded` to false on state.childrenFlags', () => {
           testAction(
             actions.collapseItem,
             {},
             {},
             [{ type: types.COLLAPSE_ITEM, payload: {} }],
             [],
-            done,
           );
         });
       });
@@ -209,7 +199,7 @@ describe('RelatedItemTree', () => {
           append: false,
         };
 
-        it('should set provided `children` values on state.children with provided parentItem.reference key', done => {
+        it('should set provided `children` values on state.children with provided parentItem.reference key', () => {
           testAction(
             actions.setItemChildren,
             mockPayload,
@@ -221,11 +211,10 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
 
-        it('should set provided `children` values on state.children with provided parentItem.reference key and also dispatch action `expandItem` when isSubItem param is true', done => {
+        it('should set provided `children` values on state.children with provided parentItem.reference key and also dispatch action `expandItem` when isSubItem param is true', () => {
           mockPayload.isSubItem = true;
 
           testAction(
@@ -244,26 +233,24 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: mockPayload.parentItem },
               },
             ],
-            done,
           );
         });
       });
 
       describe('setItemChildrenFlags', () => {
-        it('should set `state.childrenFlags` for every item in provided children param', done => {
+        it('should set `state.childrenFlags` for every item in provided children param', () => {
           testAction(
             actions.setItemChildrenFlags,
             { children: [{ reference: '&1' }] },
             {},
             [{ type: types.SET_ITEM_CHILDREN_FLAGS, payload: { children: [{ reference: '&1' }] } }],
             [],
-            done,
           );
         });
       });
 
       describe('setEpicPageInfo', () => {
-        it('should set `epicEndCursor` and `hasMoreEpics` to `state.childrenFlags`', done => {
+        it('should set `epicEndCursor` and `hasMoreEpics` to `state.childrenFlags`', () => {
           const { pageInfo } = mockQueryResponse.data.group.epic.children;
 
           testAction(
@@ -277,13 +264,12 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
       });
 
       describe('setIssuePageInfo', () => {
-        it('should set `issueEndCursor` and `hasMoreIssues` to `state.childrenFlags`', done => {
+        it('should set `issueEndCursor` and `hasMoreIssues` to `state.childrenFlags`', () => {
           const { pageInfo } = mockQueryResponse.data.group.epic.issues;
 
           testAction(
@@ -297,50 +283,42 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
       });
 
       describe('requestItems', () => {
-        it('should set `state.itemsFetchInProgress` to true', done => {
+        it('should set `state.itemsFetchInProgress` to true', () => {
           testAction(
             actions.requestItems,
             {},
             {},
             [{ type: types.REQUEST_ITEMS, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('receiveItemsSuccess', () => {
-        it('should set `state.itemsFetchInProgress` to false', done => {
+        it('should set `state.itemsFetchInProgress` to false', () => {
           testAction(
             actions.receiveItemsSuccess,
             {},
             {},
             [{ type: types.RECEIVE_ITEMS_SUCCESS, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('receiveItemsFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it('should set `state.itemsFetchInProgress` to false', done => {
+        it('should set `state.itemsFetchInProgress` to false', () => {
           testAction(
             actions.receiveItemsFailure,
             {},
             {},
             [{ type: types.RECEIVE_ITEMS_FAILURE, payload: {} }],
             [],
-            done,
           );
         });
 
@@ -353,14 +331,12 @@ describe('RelatedItemTree', () => {
             {},
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
       describe('fetchItems', () => {
-        it('should dispatch `requestItems` action', done => {
+        it('should dispatch `requestItems` action', () => {
           testAction(
             actions.fetchItems,
             { parentItem: mockParentItem, isSubItem: false },
@@ -372,12 +348,11 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: mockParentItem, isSubItem: false },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `receiveItemsSuccess`, `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', done => {
-          spyOn(epicUtils.gqClient, 'query').and.returnValue(
+        it('should dispatch `receiveItemsSuccess`, `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
             Promise.resolve({
               data: mockQueryResponse.data,
             }),
@@ -442,12 +417,11 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `receiveItemsFailure` on request failure', done => {
-          spyOn(epicUtils.gqClient, 'query').and.returnValue(Promise.reject());
+        it('should dispatch `receiveItemsFailure` on request failure', () => {
+          jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(Promise.reject());
 
           testAction(
             actions.fetchItems,
@@ -467,16 +441,11 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
       });
 
       describe('receiveNextPageItemsFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
         it('should show flash error with message "Something went wrong while fetching child epics."', () => {
           const message = 'Something went wrong while fetching child epics.';
           actions.receiveNextPageItemsFailure(
@@ -486,15 +455,13 @@ describe('RelatedItemTree', () => {
             {},
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
       describe('fetchNextPageItems', () => {
-        it('should dispatch `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', done => {
-          spyOn(epicUtils.gqClient, 'query').and.returnValue(
+        it('should dispatch `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(
             Promise.resolve({
               data: mockQueryResponse.data,
             }),
@@ -540,12 +507,11 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `receiveNextPageItemsFailure` on request failure', done => {
-          spyOn(epicUtils.gqClient, 'query').and.returnValue(Promise.reject());
+        it('should dispatch `receiveNextPageItemsFailure` on request failure', () => {
+          jest.spyOn(epicUtils.gqClient, 'query').mockReturnValue(Promise.reject());
 
           testAction(
             actions.fetchNextPageItems,
@@ -560,7 +526,6 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
       });
@@ -572,7 +537,7 @@ describe('RelatedItemTree', () => {
           },
         };
 
-        it('should dispatch `fetchItems` when a parent item is not expanded and does not have children present in state', done => {
+        it('should dispatch `fetchItems` when a parent item is not expanded and does not have children present in state', () => {
           state.childrenFlags[data.parentItem.reference] = {
             itemExpanded: false,
           };
@@ -588,11 +553,10 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: data.parentItem, isSubItem: true },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `expandItem` when a parent item is not expanded but does have children present in state', done => {
+        it('should dispatch `expandItem` when a parent item is not expanded but does have children present in state', () => {
           state.childrenFlags[data.parentItem.reference] = {
             itemExpanded: false,
           };
@@ -609,11 +573,10 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: data.parentItem },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `collapseItem` when a parent item is expanded', done => {
+        it('should dispatch `collapseItem` when a parent item is expanded', () => {
           state.childrenFlags[data.parentItem.reference] = {
             itemExpanded: true,
           };
@@ -629,46 +592,42 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: data.parentItem },
               },
             ],
-            done,
           );
         });
       });
 
       describe('setRemoveItemModalProps', () => {
-        it('should set values on `state.removeItemModalProps` for initializing modal', done => {
+        it('should set values on `state.removeItemModalProps` for initializing modal', () => {
           testAction(
             actions.setRemoveItemModalProps,
             {},
             {},
             [{ type: types.SET_REMOVE_ITEM_MODAL_PROPS, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('requestRemoveItem', () => {
-        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to true', done => {
+        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to true', () => {
           testAction(
             actions.requestRemoveItem,
             {},
             {},
             [{ type: types.REQUEST_REMOVE_ITEM, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('receiveRemoveItemSuccess', () => {
-        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to false', done => {
+        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to false', () => {
           testAction(
             actions.receiveRemoveItemSuccess,
             {},
             {},
             [{ type: types.RECEIVE_REMOVE_ITEM_SUCCESS, payload: {} }],
             [],
-            done,
           );
         });
       });
@@ -678,7 +637,7 @@ describe('RelatedItemTree', () => {
           setFixtures('<div class="flash-container"></div>');
         });
 
-        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to false', done => {
+        it('should set `state.childrenFlags[ref].itemRemoveInProgress` to false', () => {
           testAction(
             actions.receiveRemoveItemFailure,
             { item: { type: ChildType.Epic } },
@@ -690,7 +649,6 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
 
@@ -704,9 +662,7 @@ describe('RelatedItemTree', () => {
             },
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'An error occurred while removing epics.',
-          );
+          expect(createFlash).toHaveBeenCalledWith('An error occurred while removing epics.');
         });
       });
 
@@ -728,7 +684,7 @@ describe('RelatedItemTree', () => {
           mock.restore();
         });
 
-        it('should dispatch `requestRemoveItem` and `receiveRemoveItemSuccess` actions on request success', done => {
+        it('should dispatch `requestRemoveItem` and `receiveRemoveItemSuccess` actions on request success', () => {
           mock.onDelete(data.item.relationPath).replyOnce(200, {});
 
           testAction(
@@ -750,11 +706,10 @@ describe('RelatedItemTree', () => {
                 payload: { item: data.item, isRemoved: true },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `requestRemoveItem` and `receiveRemoveItemFailure` actions on request failure', done => {
+        it('should dispatch `requestRemoveItem` and `receiveRemoveItemFailure` actions on request failure', () => {
           mock.onDelete(data.item.relationPath).replyOnce(500, {});
 
           testAction(
@@ -772,110 +727,102 @@ describe('RelatedItemTree', () => {
                 payload: { item: data.item, status: undefined },
               },
             ],
-            done,
           );
         });
       });
 
       describe('toggleAddItemForm', () => {
-        it('should set `state.showAddItemForm` to true', done => {
+        it('should set `state.showAddItemForm` to true', () => {
           testAction(
             actions.toggleAddItemForm,
             {},
             {},
             [{ type: types.TOGGLE_ADD_ITEM_FORM, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('toggleCreateEpicForm', () => {
-        it('should set `state.showCreateEpicForm` to true', done => {
+        it('should set `state.showCreateEpicForm` to true', () => {
           testAction(
             actions.toggleCreateEpicForm,
             {},
             {},
             [{ type: types.TOGGLE_CREATE_EPIC_FORM, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('toggleCreateIssueForm', () => {
-        it('should set `state.showCreateIssueForm` to true and `state.showAddItemForm` to false', done => {
+        it('should set `state.showCreateIssueForm` to true and `state.showAddItemForm` to false', () => {
           testAction(
             actions.toggleCreateIssueForm,
             {},
             {},
             [{ type: types.TOGGLE_CREATE_ISSUE_FORM, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('setPendingReferences', () => {
-        it('should set param value to `state.pendingReference`', done => {
+        it('should set param value to `state.pendingReference`', () => {
           testAction(
             actions.setPendingReferences,
             {},
             {},
             [{ type: types.SET_PENDING_REFERENCES, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('addPendingReferences', () => {
-        it('should add param value to `state.pendingReference`', done => {
+        it('should add param value to `state.pendingReference`', () => {
           testAction(
             actions.addPendingReferences,
             {},
             {},
             [{ type: types.ADD_PENDING_REFERENCES, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('removePendingReference', () => {
-        it('should remove param value to `state.pendingReference`', done => {
+        it('should remove param value to `state.pendingReference`', () => {
           testAction(
             actions.removePendingReference,
             {},
             {},
             [{ type: types.REMOVE_PENDING_REFERENCE, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('setItemInputValue', () => {
-        it('should set param value to `state.itemInputValue`', done => {
+        it('should set param value to `state.itemInputValue`', () => {
           testAction(
             actions.setItemInputValue,
             {},
             {},
             [{ type: types.SET_ITEM_INPUT_VALUE, payload: {} }],
             [],
-            done,
           );
         });
       });
 
       describe('requestAddItem', () => {
-        it('should set `state.itemAddInProgress` to true', done => {
-          testAction(actions.requestAddItem, {}, {}, [{ type: types.REQUEST_ADD_ITEM }], [], done);
+        it('should set `state.itemAddInProgress` to true', () => {
+          testAction(actions.requestAddItem, {}, {}, [{ type: types.REQUEST_ADD_ITEM }], []);
         });
       });
 
       describe('receiveAddItemSuccess', () => {
-        it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', done => {
+        it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', () => {
           state.issuableType = issuableTypesMap.EPIC;
           state.isEpic = true;
 
@@ -925,13 +872,12 @@ describe('RelatedItemTree', () => {
                 payload: { toggleState: false },
               },
             ],
-            done,
           );
         });
       });
 
       describe('receiveAddItemFailure', () => {
-        it('should set `state.itemAddInProgress` to false', done => {
+        it('should set `state.itemAddInProgress` to false', () => {
           testAction(
             actions.receiveAddItemFailure,
             {
@@ -949,11 +895,10 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
 
-        it('should set `state.itemAddInProgress` to false, no payload', done => {
+        it('should set `state.itemAddInProgress` to false, no payload', () => {
           testAction(
             actions.receiveAddItemFailure,
             undefined,
@@ -965,7 +910,6 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
       });
@@ -981,7 +925,7 @@ describe('RelatedItemTree', () => {
           mock.restore();
         });
 
-        it('should dispatch `requestAddItem` and `receiveAddItemSuccess` actions on request success', done => {
+        it('should dispatch `requestAddItem` and `receiveAddItemSuccess` actions on request success', () => {
           state.issuableType = issuableTypesMap.EPIC;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
@@ -1003,11 +947,10 @@ describe('RelatedItemTree', () => {
                 payload: { rawItems: [mockEpic1] },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `requestAddItem` and `receiveAddItemFailure` actions on request failure', done => {
+        it('should dispatch `requestAddItem` and `receiveAddItemFailure` actions on request failure', () => {
           state.issuableType = issuableTypesMap.EPIC;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
@@ -1030,26 +973,18 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
       });
 
       describe('requestCreateItem', () => {
-        it('should set `state.itemCreateInProgress` to true', done => {
-          testAction(
-            actions.requestCreateItem,
-            {},
-            {},
-            [{ type: types.REQUEST_CREATE_ITEM }],
-            [],
-            done,
-          );
+        it('should set `state.itemCreateInProgress` to true', () => {
+          testAction(actions.requestCreateItem, {}, {}, [{ type: types.REQUEST_CREATE_ITEM }], []);
         });
       });
 
       describe('receiveCreateItemSuccess', () => {
-        it('should set `state.itemCreateInProgress` to false', done => {
+        it('should set `state.itemCreateInProgress` to false', () => {
           const createdEpic = Object.assign({}, mockEpics[0], {
             id: `gid://gitlab/Epic/${mockEpics[0].id}`,
             reference: `${mockEpics[0].group.fullPath}${mockEpics[0].reference}`,
@@ -1085,24 +1020,18 @@ describe('RelatedItemTree', () => {
                 payload: { toggleState: false },
               },
             ],
-            done,
           );
         });
       });
 
       describe('receiveCreateItemFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it('should set `state.itemCreateInProgress` to false', done => {
+        it('should set `state.itemCreateInProgress` to false', () => {
           testAction(
             actions.receiveCreateItemFailure,
             {},
             {},
             [{ type: types.RECEIVE_CREATE_ITEM_FAILURE }],
             [],
-            done,
           );
         });
 
@@ -1118,9 +1047,7 @@ describe('RelatedItemTree', () => {
             },
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
@@ -1137,7 +1064,7 @@ describe('RelatedItemTree', () => {
           mock.restore();
         });
 
-        it('should dispatch `requestCreateItem` and `receiveCreateItemSuccess` actions on request success', done => {
+        it('should dispatch `requestCreateItem` and `receiveCreateItemSuccess` actions on request success', () => {
           mock.onPost(/(.*)/).replyOnce(200, mockEpic1);
 
           testAction(
@@ -1160,11 +1087,10 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `requestCreateItem` and `receiveCreateItemFailure` actions on request failure', done => {
+        it('should dispatch `requestCreateItem` and `receiveCreateItemFailure` actions on request failure', () => {
           mock.onPost(/(.*)/).replyOnce(500, {});
 
           testAction(
@@ -1180,24 +1106,18 @@ describe('RelatedItemTree', () => {
                 type: 'receiveCreateItemFailure',
               },
             ],
-            done,
           );
         });
       });
 
       describe('receiveReorderItemFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it('should revert reordered item back to its original position via REORDER_ITEM mutation', done => {
+        it('should revert reordered item back to its original position via REORDER_ITEM mutation', () => {
           testAction(
             actions.receiveReorderItemFailure,
             {},
             {},
             [{ type: types.REORDER_ITEM, payload: {} }],
             [],
-            done,
           );
         });
 
@@ -1212,15 +1132,13 @@ describe('RelatedItemTree', () => {
             },
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
       describe('reorderItem', () => {
-        it('should perform REORDER_ITEM mutation before request and do nothing on request success', done => {
-          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+        it('should perform REORDER_ITEM mutation before request and do nothing on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
             Promise.resolve({
               data: mockReorderMutationResponse,
             }),
@@ -1248,12 +1166,11 @@ describe('RelatedItemTree', () => {
               },
             ],
             [],
-            done,
           );
         });
 
-        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` when request response has errors on request success', done => {
-          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` when request response has errors on request success', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(
             Promise.resolve({
               data: {
                 epicTreeReorder: {
@@ -1296,12 +1213,11 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
 
-        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` on request failure', done => {
-          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(Promise.reject());
+        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` on request failure', () => {
+          jest.spyOn(epicUtils.gqClient, 'mutate').mockReturnValue(Promise.reject());
 
           testAction(
             actions.reorderItem,
@@ -1335,37 +1251,30 @@ describe('RelatedItemTree', () => {
                 },
               },
             ],
-            done,
           );
         });
       });
 
       describe('receiveCreateIssueSuccess', () => {
-        it('should set `state.itemCreateInProgress` & `state.itemsFetchResultEmpty` to false', done => {
+        it('should set `state.itemCreateInProgress` & `state.itemsFetchResultEmpty` to false', () => {
           testAction(
             actions.receiveCreateIssueSuccess,
             { insertAt: 0, items: [] },
             {},
             [{ type: types.RECEIVE_CREATE_ITEM_SUCCESS, payload: { insertAt: 0, items: [] } }],
             [],
-            done,
           );
         });
       });
 
       describe('receiveCreateIssueFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it('should set `state.itemCreateInProgress` to false', done => {
+        it('should set `state.itemCreateInProgress` to false', () => {
           testAction(
             actions.receiveCreateIssueFailure,
             {},
             {},
             [{ type: types.RECEIVE_CREATE_ITEM_FAILURE }],
             [],
-            done,
           );
         });
 
@@ -1380,9 +1289,7 @@ describe('RelatedItemTree', () => {
             },
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
@@ -1393,14 +1300,13 @@ describe('RelatedItemTree', () => {
         const parentItem = {
           id: `gid://gitlab/Epic/${epicId}`,
         };
-        const expectedRequest = jasmine.objectContaining({
+        const expectedRequest = expect.objectContaining({
           data: JSON.stringify({
             epic_id: epicId,
             title,
           }),
         });
 
-        let flashSpy;
         let axiosMock;
         let requestSpy;
         let context;
@@ -1415,16 +1321,14 @@ describe('RelatedItemTree', () => {
         });
 
         beforeEach(() => {
-          flashSpy = spyOnDependency(actionsModule, 'flash');
-
-          requestSpy = jasmine.createSpy('request');
+          requestSpy = jest.fn();
           axiosMock.onPost(issuesEndpoint).replyOnce(config => requestSpy(config));
 
           context = {
             state: {
               parentItem,
             },
-            dispatch: jasmine.createSpy('dispatch'),
+            dispatch: jest.fn(),
           };
 
           payload = {
@@ -1435,79 +1339,68 @@ describe('RelatedItemTree', () => {
 
         describe('for successful request', () => {
           beforeEach(() => {
-            requestSpy.and.returnValue([201, '']);
+            requestSpy.mockReturnValue([201, '']);
           });
 
-          it('dispatches fetchItems', done => {
-            actions
-              .createNewIssue(context, payload)
-              .then(() => {
-                expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
-                expect(context.dispatch).toHaveBeenCalledWith('requestCreateItem');
-                expect(context.dispatch).toHaveBeenCalledWith('receiveCreateIssueSuccess', '');
-                expect(context.dispatch).toHaveBeenCalledWith(
-                  'fetchItems',
-                  jasmine.objectContaining({ parentItem }),
-                );
+          it('dispatches fetchItems', () => {
+            return actions.createNewIssue(context, payload).then(() => {
+              expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+              expect(context.dispatch).toHaveBeenCalledWith('requestCreateItem');
+              expect(context.dispatch).toHaveBeenCalledWith('receiveCreateIssueSuccess', '');
+              expect(context.dispatch).toHaveBeenCalledWith(
+                'fetchItems',
+                expect.objectContaining({ parentItem }),
+              );
 
-                expect(flashSpy).not.toHaveBeenCalled();
-              })
-              .then(done)
-              .catch(done.fail);
+              expect(createFlash).not.toHaveBeenCalled();
+            });
           });
         });
 
         describe('for failed request', () => {
           beforeEach(() => {
-            requestSpy.and.returnValue([500, '']);
+            requestSpy.mockReturnValue([500, '']);
           });
 
           it('fails and shows flash message', done => {
-            actions
+            return actions
               .createNewIssue(context, payload)
               .then(() => done.fail('expected action to throw error!'))
               .catch(() => {
                 expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
                 expect(context.dispatch).toHaveBeenCalledWith('receiveCreateIssueFailure');
-              })
-              .then(done)
-              .catch(done.fail);
+                done();
+              });
           });
         });
       });
 
       describe('requestProjects', () => {
-        it('should set `state.projectsFetchInProgress` to true', done => {
-          testAction(actions.requestProjects, {}, {}, [{ type: types.REQUEST_PROJECTS }], [], done);
+        it('should set `state.projectsFetchInProgress` to true', () => {
+          testAction(actions.requestProjects, {}, {}, [{ type: types.REQUEST_PROJECTS }], []);
         });
       });
 
       describe('receiveProjectsSuccess', () => {
-        it('should set `state.projectsFetchInProgress` to false and set provided `projects` param to state', done => {
+        it('should set `state.projectsFetchInProgress` to false and set provided `projects` param to state', () => {
           testAction(
             actions.receiveProjectsSuccess,
             mockProjects,
             {},
             [{ type: types.RECIEVE_PROJECTS_SUCCESS, payload: mockProjects }],
             [],
-            done,
           );
         });
       });
 
       describe('receiveProjectsFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
-        it('should set `state.projectsFetchInProgress` to false', done => {
+        it('should set `state.projectsFetchInProgress` to false', () => {
           testAction(
             actions.receiveProjectsFailure,
             {},
             {},
             [{ type: types.RECIEVE_PROJECTS_FAILURE }],
             [],
-            done,
           );
         });
 
@@ -1522,9 +1415,7 @@ describe('RelatedItemTree', () => {
             },
           );
 
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
-          );
+          expect(createFlash).toHaveBeenCalledWith(message);
         });
       });
 
@@ -1541,7 +1432,7 @@ describe('RelatedItemTree', () => {
           mock.restore();
         });
 
-        it('should dispatch `requestProjects` and `receiveProjectsSuccess` actions on request success', done => {
+        it('should dispatch `requestProjects` and `receiveProjectsSuccess` actions on request success', () => {
           mock.onGet(/(.*)/).replyOnce(200, mockProjects);
 
           testAction(
@@ -1558,11 +1449,10 @@ describe('RelatedItemTree', () => {
                 payload: mockProjects,
               },
             ],
-            done,
           );
         });
 
-        it('should dispatch `requestProjects` and `receiveProjectsFailure` actions on request failure', done => {
+        it('should dispatch `requestProjects` and `receiveProjectsFailure` actions on request failure', () => {
           mock.onGet(/(.*)/).replyOnce(500, {});
 
           testAction(
@@ -1578,7 +1468,6 @@ describe('RelatedItemTree', () => {
                 type: 'receiveProjectsFailure',
               },
             ],
-            done,
           );
         });
       });

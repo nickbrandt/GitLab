@@ -3,11 +3,7 @@ import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { PathIdSeparator } from 'ee/related_issues/constants';
 import { ChildType } from 'ee/related_items_tree/constants';
 
-import {
-  mockQueryResponse2,
-  mockEpic1,
-  mockIssue1,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockQueryResponse2, mockEpic1, mockIssue1 } from '../mock_data';
 
 describe('RelatedItemsTree', () => {
   describe('epicUtils', () => {
