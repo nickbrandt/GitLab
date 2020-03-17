@@ -27,7 +27,7 @@
 - :name: cronjob:elastic_index_bulk_cron
   :feature_category: :global_search
   :has_external_dependencies: 
-  :urgency: :low
+  :urgency: :throttled
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: true
@@ -482,7 +482,7 @@
 - :name: elastic_commit_indexer
   :feature_category: :global_search
   :has_external_dependencies: 
-  :urgency: :low
+  :urgency: :throttled
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
@@ -496,7 +496,7 @@
 - :name: elastic_indexer
   :feature_category: :global_search
   :has_external_dependencies: 
-  :urgency: :low
+  :urgency: :throttled
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
