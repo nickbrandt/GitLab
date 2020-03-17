@@ -87,6 +87,11 @@ class TeamcityService < CiService
     response = get_path("httpAuth/app/rest/builds/branch:unspecified:any,revision:#{sha}")
 
     { build_page: read_build_page(response), commit_status: read_commit_status(response) }
+
+  rescue Errno::ECONNREFUSED => e
+    Gitlab::ErrorTracking.log_exception(e, project_id: project_id)
+
+    { build_page: teamcity_url, commit_status: :error }
   end
 
   def execute(data)
