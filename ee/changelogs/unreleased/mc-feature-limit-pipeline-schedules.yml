@@ -1,0 +1,5 @@
+---
+title: Add application limits for Ci::PipelineSchedule.
+merge_request: 27004
+author:
+type: changed
