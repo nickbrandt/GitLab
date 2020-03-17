@@ -10,40 +10,38 @@ export default () => {
   const securityTab = document.getElementById('js-security-report-app');
 
   const {
-    hasPipelineData,
-    userPath,
-    userAvatarPath,
-    pipelineCreated,
-    pipelinePath,
-    userName,
     commitId,
     commitPath,
-    refId,
-    refPath,
-    pipelineId,
-    projectId,
-    projectName,
     dashboardDocumentation,
     emptyStateSvgPath,
+    hasPipelineData,
+    pipelineCreated,
+    pipelineId,
+    pipelinePath,
+    projectId,
+    projectName,
+    refId,
+    refPath,
+    securityDashboardHelpPath,
+    userAvatarPath,
+    userName,
+    userPath,
     vulnerabilitiesEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
-    securityDashboardHelpPath,
-    emptyStateIllustrationPath,
   } = securityTab.dataset;
 
   const parsedPipelineId = parseInt(pipelineId, 10);
   const parsedHasPipelineData = parseBoolean(hasPipelineData);
 
   let props = {
-    hasPipelineData: parsedHasPipelineData,
     dashboardDocumentation,
     emptyStateSvgPath,
+    hasPipelineData: parsedHasPipelineData,
+    securityDashboardHelpPath,
     vulnerabilitiesEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
-    securityDashboardHelpPath,
-    emptyStateIllustrationPath,
   };
   if (parsedHasPipelineData) {
     props = {

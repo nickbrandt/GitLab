@@ -17826,9 +17826,6 @@ msgstr ""
 msgid "SecurityConfiguration|Status"
 msgstr ""
 
-msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
-msgstr ""
-
 msgid "SecurityDashboard|%{firstProject} and %{secondProject}"
 msgstr ""
 
@@ -17887,6 +17884,9 @@ msgid "SecurityDashboard|Status"
 msgstr ""
 
 msgid "SecurityDashboard|The security dashboard displays the latest security findings for projects you wish to monitor. Select \"Edit dashboard\" to add and remove projects."
+msgstr ""
+
+msgid "SecurityDashboard|The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
 msgstr ""
 
 msgid "SecurityDashboard|Unable to add %{invalidProjects}"

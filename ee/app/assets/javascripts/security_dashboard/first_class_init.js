@@ -20,10 +20,17 @@ export default (
   const apolloProvider = new VueApollo({
     defaultClient: createDefaultClient(),
   });
-  const { dashboardDocumentation, emptyStateSvgPath } = el.dataset;
+  const {
+    dashboardDocumentation,
+    emptyStateSvgPath,
+    hasPipelineData,
+    securityDashboardHelpPath,
+  } = el.dataset;
   const props = {
     emptyStateSvgPath,
     dashboardDocumentation,
+    hasPipelineData: Boolean(hasPipelineData),
+    securityDashboardHelpPath,
   };
   let component;
 
