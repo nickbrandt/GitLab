@@ -2,6 +2,7 @@
 
 class Evidence < ApplicationRecord
   include ShaAttribute
+  #include Presentable
 
   belongs_to :release
 

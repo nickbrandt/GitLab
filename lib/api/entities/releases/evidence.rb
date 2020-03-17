@@ -12,7 +12,7 @@ module API
           release = object.release
           project = release.project
 
-          Gitlab::Routing.url_helpers.namespace_project_evidence_url(
+          Gitlab::Routing.url_helpers.project_evidence_url(
             namespace_id: project.namespace,
             project_id: project,
             tag: release,
