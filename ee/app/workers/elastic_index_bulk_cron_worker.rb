@@ -10,6 +10,7 @@ class ElasticIndexBulkCronWorker
 
   feature_category :global_search
   idempotent!
+  urgency :throttled
 
   def perform
     in_lock(self.class.name.underscore, ttl: 10.minutes, retries: 10, sleep_sec: 1) do
