@@ -16,11 +16,11 @@ module EE
     override :group_analytics_navbar_links
     def group_analytics_navbar_links(group, current_user)
       super + [
-          group_cycle_analytics_navbar_link(group, current_user, -1),
-          contribution_analytics_navbar_link(group, current_user),
-          group_insights_navbar_link(group, current_user),
-          issues_analytics_navbar_link(group, current_user),
-          productivity_analytics_navbar_link(group, current_user)
+        group_cycle_analytics_navbar_link(group, current_user, -1),
+        contribution_analytics_navbar_link(group, current_user),
+        group_insights_navbar_link(group, current_user),
+        issues_analytics_navbar_link(group, current_user),
+        productivity_analytics_navbar_link(group, current_user)
       ].compact
     end
 
