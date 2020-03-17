@@ -52,6 +52,7 @@ module EE
         mount ::API::Dependencies
         mount ::API::VisualReviewDiscussions
         mount ::API::Analytics::CodeReviewAnalytics
+        mount ::API::Analytics::GroupActivityAnalytics
         mount ::API::ProtectedEnvironments
 
         version 'v3', using: :path do

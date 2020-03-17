@@ -420,6 +420,16 @@ module EE
             # rubocop: enable CodeReuse/ActiveRecord
           end
         end
+
+        module GroupActivity
+          class IssuesCount < Grape::Entity
+            expose :issues_count
+          end
+
+          class MergeRequestsCount < Grape::Entity
+            expose :merge_requests_count
+          end
+        end
       end
 
       module UserDetailsWithAdmin
