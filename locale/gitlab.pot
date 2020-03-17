@@ -10446,6 +10446,9 @@ msgstr ""
 msgid "Help page text and support page url."
 msgstr ""
 
+msgid "Help shape the future of Serverless at GitLab"
+msgstr ""
+
 msgid "Helps prevent bots from brute-force attacks."
 msgstr ""
 
@@ -17954,6 +17957,9 @@ msgstr ""
 msgid "Serverless|No functions available"
 msgstr ""
 
+msgid "Serverless|Sign up for First Look"
+msgstr ""
+
 msgid "Serverless|The deploy job has not finished."
 msgstr ""
 
@@ -17961,6 +17967,9 @@ msgid "Serverless|The functions listed in the %{startTag}serverless.yml%{endTag}
 msgstr ""
 
 msgid "Serverless|There is currently no function data available from Knative. This could be for a variety of reasons including:"
+msgstr ""
+
+msgid "Serverless|We are continually striving to improve our Serverless functionality. As a Knative user, we would love to hear how we can make this experience better for you. Sign up for GitLab First Look today and we will be in touch shortly."
 msgstr ""
 
 msgid "Serverless|Your %{startTag}.gitlab-ci.yml%{endTag} file is not properly configured."

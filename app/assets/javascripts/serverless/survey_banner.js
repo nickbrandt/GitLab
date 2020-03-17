@@ -22,7 +22,6 @@ export default function initServerlessSurveyBanner() {
       SURVEY_URL_BASE,
     );
 
-    // eslint-disable-next-line no-new
     bannerInstance = new Vue({
       el,
       render(createElement) {

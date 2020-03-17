@@ -2,22 +2,26 @@
 import Cookies from 'js-cookie';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { GlBanner } from '@gitlab/ui';
-import { s__ } from '../locale';
 
 export default {
   components: {
     GlBanner,
-  },
-  data() {
-    return {
-      visible: true,
-    };
   },
   props: {
     surveyUrl: {
       type: String,
       required: true,
     },
+  },
+  data() {
+    return {
+      visible: true,
+    };
+  },
+  created() {
+    if (parseBoolean(Cookies.get('hide_serverless_survey'))) {
+      this.visible = false;
+    }
   },
   methods: {
     handleClose() {
@@ -27,11 +31,6 @@ export default {
       });
       this.visible = false;
     },
-  },
-  beforeMount() {
-    if (parseBoolean(Cookies.get('hide_serverless_survey'))) {
-      this.visible = false;
-    }
   },
 };
 </script>
