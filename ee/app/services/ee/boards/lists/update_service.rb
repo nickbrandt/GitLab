@@ -18,13 +18,25 @@ module EE
         end
 
         def update_max_limits(list)
-          return unless max_limits_update_possible?(list)
+          return unless list.wip_limits_available? && can_admin?(list)
 
-          list.update(list_max_limit_attributes_by_params)
+          attrs = max_limit_settings_by_params
+          list.update(attrs) unless attrs.empty?
         end
 
-        def max_limits_update_possible?(list)
-          max_limits_provided? && list.wip_limits_available? && can_admin?(list)
+        def max_limit_settings_by_params
+          {}.tap do |attrs|
+            attrs.merge!(list_max_limit_attributes_by_params) if max_limits_provided?
+            attrs.merge!(limit_metric_by_params) if limit_metric_provided?
+          end
+        end
+
+        def limit_metric_by_params
+          { limit_metric: params[:limit_metric] }
+        end
+
+        def limit_metric_provided?
+          params.key?(:limit_metric)
         end
       end
     end

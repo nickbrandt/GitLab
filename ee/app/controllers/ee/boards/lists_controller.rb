@@ -9,7 +9,7 @@ module EE
         before_action :push_wip_limits
       end
 
-      EE_MAX_LIMITS_PARAMS = %i[max_issue_count max_issue_weight].freeze
+      EE_MAX_LIMITS_PARAMS = %i[max_issue_count max_issue_weight limit_metric].freeze
 
       override :list_creation_attrs
       def list_creation_attrs
