@@ -1,0 +1,17 @@
+- return unless Feature.enabled?(:requirements_management, project)
+
+= nav_link(path: 'requirements#index') do
+  = link_to project_requirements_path(project), class: 'qa-project-requirements-link' do
+    .nav-icon-container
+      = sprite_icon('list-task')
+    %span.nav-item-name
+      = _('Requirements')
+  %ul.sidebar-sub-level-items
+    = nav_link(path: 'requirements#index', html_options: { class: "fly-out-top-item" } ) do
+      = link_to project_requirements_path(project) do
+        %strong.fly-out-top-item-name= _('Requirements')
+        %span.badge.badge-pill.count.requirements_counter.fly-out-badge
+    %li.divider.fly-out-top-item
+    = nav_link(path: 'requirements#index', html_options: { class: 'home' }) do
+      = link_to project_requirements_path(project), title: 'List' do
+        %span= _('List')
