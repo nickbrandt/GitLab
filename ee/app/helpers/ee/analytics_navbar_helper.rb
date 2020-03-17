@@ -16,11 +16,11 @@ module EE
     override :group_analytics_navbar_links
     def group_analytics_navbar_links(group, current_user)
       super + [
-        group_cycle_analytics_navbar_link(group, current_user, 0),
-        issues_analytics_navbar_link(group, current_user, 1),
-        contribution_analytics_navbar_link(group, current_user, 2),
-        group_insights_navbar_link(group, current_user, 3),
-        productivity_analytics_navbar_link(group, current_user, 4)
+          group_cycle_analytics_navbar_link(group, current_user, -1),
+          contribution_analytics_navbar_link(group, current_user),
+          group_insights_navbar_link(group, current_user),
+          issues_analytics_navbar_link(group, current_user),
+          productivity_analytics_navbar_link(group, current_user)
       ].compact
     end
 
@@ -37,58 +37,58 @@ module EE
       )
     end
 
-    def group_cycle_analytics_navbar_link(group, current_user, index = 0)
+    def group_cycle_analytics_navbar_link(group, current_user, priority = 0)
       return unless group_sidebar_link?(:cycle_analytics)
 
       navbar_sub_item(
         title: _('Value Stream'),
         path: 'groups/analytics/cycle_analytics#show',
         link: group_analytics_cycle_analytics_path(group),
-        link_to_options: { data: { index: index } }
+        link_to_options: { data: { priority: priority } }
       )
     end
 
-    def productivity_analytics_navbar_link(group, current_user, index = 0)
+    def productivity_analytics_navbar_link(group, current_user, priority = 0)
       return unless group_sidebar_link?(:productivity_analytics)
 
       navbar_sub_item(
         title: _('Productivity'),
         path: 'groups/analytics/productivity_analytics#show',
         link: group_analytics_productivity_analytics_path(group),
-        link_to_options: { data: { index: index } }
+        link_to_options: { data: { priority: priority } }
       )
     end
 
-    def contribution_analytics_navbar_link(group, current_user, index = 0)
+    def contribution_analytics_navbar_link(group, current_user, priority = 0)
       return unless group_sidebar_link?(:contribution_analytics)
 
       navbar_sub_item(
         title: _('Contribution'),
         path: 'groups/contribution_analytics#show',
         link: group_contribution_analytics_path(group),
-        link_to_options: { data: { placement: 'right', qa_selector: 'contribution_analytics_link', index: index } }
+        link_to_options: { data: { placement: 'right', qa_selector: 'contribution_analytics_link', priority: priority } }
       )
     end
 
-    def group_insights_navbar_link(group, current_user, index = 0)
+    def group_insights_navbar_link(group, current_user, priority = 0)
       return unless group_sidebar_link?(:group_insights)
 
       navbar_sub_item(
         title: _('Insights'),
         path: 'groups/insights#show',
         link:  group_insights_path(group),
-        link_to_options: { class: 'shortcuts-group-insights', data: { qa_selector: 'group_insights_link', index: index } }
+        link_to_options: { class: 'shortcuts-group-insights', data: { qa_selector: 'group_insights_link', priority: priority } }
       )
     end
 
-    def issues_analytics_navbar_link(group, current_user, index = 0)
+    def issues_analytics_navbar_link(group, current_user, priority = 0)
       return unless group_sidebar_link?(:analytics)
 
       navbar_sub_item(
         title: _('Issues'),
         path: 'issues_analytics#show',
         link: group_issues_analytics_path(group),
-        link_to_options: { data: { index: index } }
+        link_to_options: { data: { priority: priority } }
       )
     end
 
@@ -108,7 +108,7 @@ module EE
 
       navbar_sub_item(
         title: _('Code Review'),
-        path: 'projects/analytics/code_reviews#index',
+        path: 'projects/analytics/code_reviews#priority',
         link: project_analytics_code_reviews_path(project)
       )
     end
