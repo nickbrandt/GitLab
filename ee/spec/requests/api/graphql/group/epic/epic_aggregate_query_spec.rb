@@ -149,10 +149,10 @@ describe 'Epic aggregates (count and weight)' do
           QUERY
         end
 
-        it 'returns an error' do
+        it 'returns nil' do
           post_graphql(query, current_user: current_user)
 
-          expect_graphql_errors_to_include /Field 'descendantWeightSum' doesn't exist on type 'Epic/
+          expect(subject).to include(a_hash_including('descendantWeightSum' => nil))
         end
       end
     end
