@@ -15,13 +15,13 @@ module EE
 
     override :limit_exceeded?
     def limit_exceeded?
-      project.above_size_limit? || objects_exceed_repo_limit?
+      size_checker.above_size_limit? || objects_exceed_repo_limit?
     end
 
     def render_size_error
       render(
         json: {
-          message: ::Gitlab::RepositorySizeError.new(project).push_error(@exceeded_limit), # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          message: size_checker.error_message.push_error(@exceeded_limit), # rubocop:disable Gitlab/ModuleWithInstanceVariables
           documentation_url: help_url
         },
         content_type: ::LfsRequest::CONTENT_TYPE,
@@ -31,16 +31,18 @@ module EE
 
     # rubocop: disable CodeReuse/ActiveRecord
     def objects_exceed_repo_limit?
-      return false unless project.size_limit_enabled?
+      return false unless size_checker.enabled?
 
       strong_memoize(:limit_exceeded) do
         lfs_push_size = objects.sum { |o| o[:size] }
-        size_with_lfs_push = project.repository_and_lfs_size + lfs_push_size
-
-        @exceeded_limit = size_with_lfs_push - project.actual_size_limit # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        @exceeded_limit = size_checker.exceeded_size(lfs_push_size) # rubocop:disable Gitlab/ModuleWithInstanceVariables
         @exceeded_limit > 0 # rubocop:disable Gitlab/ModuleWithInstanceVariables
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def size_checker
+      project.repository_size_checker
+    end
   end
 end

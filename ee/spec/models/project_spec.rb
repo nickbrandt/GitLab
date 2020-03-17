@@ -969,48 +969,6 @@ describe Project do
     end
   end
 
-  describe '#size_limit_enabled?' do
-    let(:project) { create(:project) }
-
-    context 'when repository_size_limit is not configured' do
-      it 'is disabled' do
-        expect(project.size_limit_enabled?).to be_falsey
-      end
-    end
-
-    context 'when repository_size_limit is configured' do
-      before do
-        project.update(repository_size_limit: 1024)
-      end
-
-      context 'with an EES license' do
-        let!(:license) { create(:license, plan: License::STARTER_PLAN) }
-
-        it 'is enabled' do
-          expect(project.size_limit_enabled?).to be_truthy
-        end
-      end
-
-      context 'with an EEP license' do
-        let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
-
-        it 'is enabled' do
-          expect(project.size_limit_enabled?).to be_truthy
-        end
-      end
-
-      context 'without a License' do
-        before do
-          License.destroy_all # rubocop: disable DestroyAll
-        end
-
-        it 'is disabled' do
-          expect(project.size_limit_enabled?).to be_falsey
-        end
-      end
-    end
-  end
-
   describe '#service_desk_enabled?' do
     let!(:license) { create(:license, plan: License::PREMIUM_PLAN) }
     let(:namespace) { create(:namespace) }
@@ -2121,77 +2079,71 @@ describe Project do
     end
   end
 
-  describe 'repository size restrictions' do
+  describe '#repository_size_checker' do
     let(:project) { build(:project) }
+    let(:checker) { project.repository_size_checker }
 
-    before do
-      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
-    end
+    describe '#current_size' do
+      let(:project) { create(:project) }
 
-    describe '#changes_will_exceed_size_limit?' do
-      before do
-        allow(project).to receive(:repository_and_lfs_size).and_return(49)
-      end
-      it 'returns true when changes go over' do
-        expect(project.changes_will_exceed_size_limit?(5)).to be_truthy
+      it 'returns the total repository and lfs size' do
+        allow(project.statistics).to receive(:total_repository_size).and_return(80)
+
+        expect(checker.current_size).to eq(80)
       end
     end
 
-    describe '#actual_size_limit' do
-      it 'returns the limit set in the application settings' do
-        expect(project.actual_size_limit).to eq(50)
+    describe '#limit' do
+      it 'returns the value set in the namespace when available' do
+        allow(project.namespace).to receive(:actual_size_limit).and_return(100)
+
+        expect(checker.limit).to eq(100)
       end
 
-      it 'returns the value set in the group' do
-        group = create(:group, repository_size_limit: 100)
-        project.update_attribute(:namespace_id, group.id)
+      it 'returns the value set locally when available' do
+        project.repository_size_limit = 200
 
-        expect(project.actual_size_limit).to eq(100)
-      end
-
-      it 'returns the value set locally' do
-        project.update_attribute(:repository_size_limit, 75)
-
-        expect(project.actual_size_limit).to eq(75)
+        expect(checker.limit).to eq(200)
       end
     end
 
-    describe '#size_limit_enabled?' do
-      it 'returns false when disabled' do
-        project.update_attribute(:repository_size_limit, 0)
+    describe '#enabled?' do
+      it 'returns true when not equal to zero' do
+        project.repository_size_limit = 1
 
-        expect(project.size_limit_enabled?).to be_falsey
+        expect(checker.enabled?).to be_truthy
       end
 
-      it 'returns true when a limit is set' do
-        project.update_attribute(:repository_size_limit, 75)
+      it 'returns false when equals to zero' do
+        project.repository_size_limit = 0
 
-        expect(project.size_limit_enabled?).to be_truthy
-      end
-    end
-
-    describe '#above_size_limit?' do
-      let(:project) do
-        create(:project,
-               statistics: build(:project_statistics))
+        expect(checker.enabled?).to be_falsey
       end
 
-      it 'returns true when above the limit' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+      context 'when repository_size_limit is configured' do
+        before do
+          project.repository_size_limit = 1
+        end
 
-        expect(project.above_size_limit?).to be_truthy
-      end
+        context 'when license feature enabled' do
+          before do
+            stub_licensed_features(repository_size_limit: true)
+          end
 
-      it 'returns false when not over the limit' do
-        expect(project.above_size_limit?).to be_falsey
-      end
-    end
+          it 'is enabled' do
+            expect(checker.enabled?).to be_truthy
+          end
+        end
 
-    describe '#size_to_remove' do
-      it 'returns the correct value' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
+        context 'when license feature disabled' do
+          before do
+            stub_licensed_features(repository_size_limit: false)
+          end
 
-        expect(project.size_to_remove).to eq(50)
+          it 'is disabled' do
+            expect(checker.enabled?).to be_falsey
+          end
+        end
       end
     end
   end
@@ -2279,19 +2231,6 @@ describe Project do
 
         expect(projects).to contain_exactly(project1, project2)
       end
-    end
-  end
-
-  describe '#repository_and_lfs_size' do
-    let(:project) { create(:project, :repository) }
-    let(:size) { 50 }
-
-    before do
-      allow(project.statistics).to receive(:total_repository_size).and_return(size)
-    end
-
-    it 'returns the total repository and lfs size' do
-      expect(project.repository_and_lfs_size).to eq(size)
     end
   end
 
