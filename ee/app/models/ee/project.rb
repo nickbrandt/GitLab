@@ -222,12 +222,6 @@ module EE
       all_pipelines.newest_first(ref: default_branch).with_reports(reports).take
     end
 
-    def environments_for_scope(scope)
-      quoted_scope = ::Gitlab::SQL::Glob.q(scope)
-
-      environments.where("name LIKE (#{::Gitlab::SQL::Glob.to_like(quoted_scope)})") # rubocop:disable GitlabSecurity/SqlInjection
-    end
-
     def ensure_external_webhook_token
       return if external_webhook_token.present?
 
