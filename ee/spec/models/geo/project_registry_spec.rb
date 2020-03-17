@@ -1014,4 +1014,22 @@ describe Geo::ProjectRegistry do
       expect(registry.synchronization_state).to eq(:synced)
     end
   end
+
+  describe 'repository_has_successfully_synced?' do
+    context 'when repository has never successfully synced' do
+      it 'returns false' do
+        registry = create(:geo_project_registry, last_repository_successful_sync_at: nil)
+
+        expect(registry.repository_has_successfully_synced?).to be_falsey
+      end
+    end
+
+    context 'when repository has successfully synced' do
+      it 'returns true' do
+        registry = create(:geo_project_registry, last_repository_successful_sync_at: Time.now)
+
+        expect(registry.repository_has_successfully_synced?).to be_truthy
+      end
+    end
+  end
 end
