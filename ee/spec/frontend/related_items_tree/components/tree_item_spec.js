@@ -1,4 +1,5 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 
 import TreeItem from 'ee/related_items_tree/components/tree_item.vue';
@@ -12,16 +13,15 @@ import { PathIdSeparator } from 'ee/related_issues/constants';
 
 import Icon from '~/vue_shared/components/icon.vue';
 
-import {
-  mockParentItem,
-  mockQueryResponse,
-  mockEpic1,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
 
 const mockItem = Object.assign({}, mockEpic1, {
   type: ChildType.Epic,
   pathIdSeparator: PathIdSeparator.Epic,
 });
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
@@ -44,6 +44,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   });
 
   return shallowMount(TreeItem, {
+    localVue,
     store,
     stubs: {
       'tree-root': TreeRoot,
@@ -158,18 +159,16 @@ describe('RelatedItemsTree', () => {
         expect(collapsedIcon.props('name')).toBe('chevron-right');
       });
 
-      it('renders loading icon when item expand is in progress', done => {
+      it('renders loading icon when item expand is in progress', () => {
         wrapper.vm.$store.dispatch('requestItems', {
           parentItem: mockItem,
           isSubItem: true,
         });
 
-        wrapper.vm.$nextTick(() => {
+        return wrapper.vm.$nextTick(() => {
           const loadingIcon = wrapper.find(GlLoadingIcon);
 
           expect(loadingIcon.isVisible()).toBe(true);
-
-          done();
         });
       });
 
