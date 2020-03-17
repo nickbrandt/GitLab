@@ -16,10 +16,10 @@ module MergeRequests
         # relatively quick enough to put in a Transaction
         create_event(merge_request)
         todo_service.merge_merge_request(merge_request, current_user)
-        notification_service.merge_mr(merge_request, current_user)
       end
 
       # These operations are idempotent so can be safely run multiple times
+      notification_service.merge_mr(merge_request, current_user)
       create_note(merge_request)
       close_issues(merge_request)
       invalidate_cache_counts(merge_request, users: merge_request.assignees)
