@@ -55,7 +55,8 @@ module EE
           'lfs_locks_api' => %w{create unlock verify}
         }.freeze
 
-        def initialize(controller_name, action_name, service)
+        def initialize(project, controller_name, action_name, service)
+          @project = project
           @controller_name = controller_name
           @action_name = action_name
           @service = service
@@ -67,12 +68,20 @@ module EE
 
         def redirect?
           !!CONTROLLER_AND_ACTIONS_TO_REDIRECT[controller_name]&.include?(action_name) ||
-            git_receive_pack_request?
+            git_receive_pack_request? ||
+            redirect_to_avoid_enumeration? ||
+            not_yet_replicated_redirect?
+        end
+
+        def not_yet_replicated_redirect?
+          return false unless project
+
+          git_upload_pack_request? && !::Geo::ProjectRegistry.repository_replicated_for?(project.id)
         end
 
         private
 
-        attr_reader :service
+        attr_reader :project, :service
 
         # Examples:
         #
@@ -96,17 +105,36 @@ module EE
 
         # Matches:
         #
+        # GET /repo.git/info/refs?service=git-upload-pack
+        #
+        def git_upload_pack_request?
+          service_or_action_name == 'git-upload-pack'
+        end
+
+        # Matches:
+        #
         # GET /repo.git/info/refs
         #
         def info_refs_request?
           action_name == 'info_refs'
+        end
+
+        # The purpose of the #redirect_to_avoid_enumeration? method is to avoid
+        # a scenario where an authenticated user uses the HTTP responses as a
+        # way of enumerating private projects.  Without this check, an attacker
+        # could determine if a project exists or not by looking at the initial
+        # HTTP response code for 401 (doesn't exist) vs 302. (exists).
+        #
+        def redirect_to_avoid_enumeration?
+          project.nil?
         end
       end
 
       class GeoGitLFSHelper
         MINIMUM_GIT_LFS_VERSION = '2.4.2'.freeze
 
-        def initialize(geo_route_helper, operation, current_version)
+        def initialize(project, geo_route_helper, operation, current_version)
+          @project = project
           @geo_route_helper = geo_route_helper
           @operation = operation
           @current_version = current_version
@@ -122,6 +150,7 @@ module EE
 
         def redirect?
           return true if batch_upload?
+          return true if not_yet_replicated_redirect?
 
           false
         end
@@ -134,7 +163,7 @@ module EE
 
         private
 
-        attr_reader :geo_route_helper, :operation, :current_version
+        attr_reader :project, :geo_route_helper, :operation, :current_version
 
         def incorrect_version_message
           translation = _("You need git-lfs version %{min_git_lfs_version} (or greater) to continue. Please visit https://git-lfs.github.com")
@@ -149,18 +178,32 @@ module EE
           batch_request? && operation == 'upload'
         end
 
+        def batch_download?
+          batch_request? && operation == 'download'
+        end
+
+        def transfer_download?
+          geo_route_helper.match?('lfs_storage', 'download')
+        end
+
+        def not_yet_replicated_redirect?
+          return false unless project
+
+          (batch_download? || transfer_download?) && !::Geo::ProjectRegistry.repository_replicated_for?(project.id)
+        end
+
         def wanted_version
           ::Gitlab::VersionInfo.parse(MINIMUM_GIT_LFS_VERSION)
         end
       end
 
       def geo_route_helper
-        @geo_route_helper ||= GeoRouteHelper.new(controller_name, action_name, params[:service])
+        @geo_route_helper ||= GeoRouteHelper.new(project, controller_name, action_name, params[:service])
       end
 
       def geo_git_lfs_helper
         # params[:operation] explained: https://github.com/git-lfs/git-lfs/blob/master/docs/api/batch.md#requests
-        @geo_git_lfs_helper ||= GeoGitLFSHelper.new(geo_route_helper, params[:operation], request.headers['User-Agent'])
+        @geo_git_lfs_helper ||= GeoGitLFSHelper.new(project, geo_route_helper, params[:operation], request.headers['User-Agent'])
       end
 
       def geo_request_fullpath_for_primary
@@ -169,7 +212,13 @@ module EE
       end
 
       def geo_primary_full_url
-        path = File.join(geo_secondary_referrer_path_prefix, geo_request_fullpath_for_primary)
+        path = if geo_route_helper.not_yet_replicated_redirect?
+                 # git clone/pull
+                 geo_request_fullpath_for_primary
+               else
+                 # git push
+                 File.join(geo_secondary_referrer_path_prefix, geo_request_fullpath_for_primary)
+               end
 
         ::Gitlab::Utils.append_path(::Gitlab::Geo.primary_node.internal_url, path)
       end
