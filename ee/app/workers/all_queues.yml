@@ -199,20 +199,6 @@
   :resource_boundary: :unknown
   :weight: 2
   :idempotent: 
-- :name: gcp_cluster:cluster_update_app
-  :feature_category: :kubernetes_management
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: 
-- :name: gcp_cluster:cluster_wait_for_app_update
-  :feature_category: :kubernetes_management
-  :has_external_dependencies: 
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: 
 - :name: geo:geo_batch_project_registry
   :feature_category: :geo_replication
   :has_external_dependencies: 
