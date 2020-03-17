@@ -111,12 +111,12 @@ The following metrics can be controlled by feature flags:
 | `gitlab_method_call_duration_seconds`                          | `prometheus_metrics_method_instrumentation`                        |
 | `gitlab_view_rendering_duration_seconds`                       | `prometheus_metrics_view_instrumentation`                          |
 
-## Sidekiq Metrics
+## Sidekiq metrics
 
 Sidekiq jobs may also gather metrics, and these metrics can be accessed if the
-Sidekiq exporter is enabled (e.g. via the `monitoring.sidekiq_exporter`
+Sidekiq exporter is enabled (for example, using the `monitoring.sidekiq_exporter`
 configuration option in `gitlab.yml`. These metrics are served from the
-`/metrics` path on configured the port.
+`/metrics` path on the configured port.
 
 | Metric                                         | Type    | Since | Description | Labels |
 |:---------------------------------------------- |:------- |:----- |:----------- |:------ |
@@ -153,6 +153,7 @@ configuration option in `gitlab.yml`. These metrics are served from the
 | `geo_repositories_checked_failed_count`        | Gauge   | 11.1  | Number of repositories that have a failure from `git fsck` | url |
 | `geo_repositories_retrying_verification_count` | Gauge   | 11.2  | Number of repositories verification failures that Geo is actively trying to correct on secondary  | url |
 | `geo_wikis_retrying_verification_count`        | Gauge   | 11.2  | Number of wikis verification failures that Geo is actively trying to correct on secondary | url |
+| `global_search_bulk_cron_queue_size`           | Gauge   | 12.10 | Number of database records waiting to be synchronized to Elasticsearch | |
 
 ## Database load balancing metrics **(PREMIUM ONLY)**
 
