@@ -209,6 +209,12 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(id: start..finish)
   end
 
+  def self.repository_replicated_for?(project_id)
+    return true unless ::Gitlab::Geo.secondary_with_primary?
+
+    where(project_id: project_id).where.not(last_repository_successful_sync_at: nil).exists?
+  end
+
   # Must be run before fetching the repository to avoid a race condition
   #
   # @param [String] type must be one of the values in TYPES
