@@ -7,9 +7,9 @@ module EE
     override :project_analytics_navbar_links
     def project_analytics_navbar_links(project, current_user)
       super + [
-        project_issues_analytics_navbar_link(project, current_user, 1),
-        insights_navbar_link(project, current_user, 2),
-        code_review_analytics_navbar_link(project, current_user, 4)
+        insights_navbar_link(project, current_user),
+        code_review_analytics_navbar_link(project, current_user),
+        project_issues_analytics_navbar_link(project, current_user)
       ].compact
     end
 
@@ -26,7 +26,7 @@ module EE
 
     private
 
-    def project_issues_analytics_navbar_link(project, current_user, index = 0)
+    def project_issues_analytics_navbar_link(project, current_user, priority = 0)
       return unless ::Feature.enabled?(:project_level_issues_analytics, project, default_enabled: true)
       return unless project_nav_tab?(:issues_analytics)
 
@@ -34,7 +34,7 @@ module EE
         title: _('Issues'),
         path: 'issues_analytics#show',
         link: project_analytics_issues_analytics_path(project),
-        link_to_options: { data: { index: index } }
+        link_to_options: { data: { priority: priority } }
       )
     end
 
@@ -90,25 +90,25 @@ module EE
       )
     end
 
-    def insights_navbar_link(project, current_user, index = 0)
+    def insights_navbar_link(project, current_user, priority = 0)
       return unless project_nav_tab?(:project_insights)
 
       navbar_sub_item(
         title: _('Insights'),
         path: 'insights#show',
         link: project_insights_path(project),
-        link_to_options: { class: 'shortcuts-project-insights', data: { qa_selector: 'project_insights_link', index: index } }
+        link_to_options: { class: 'shortcuts-project-insights', data: { qa_selector: 'project_insights_link', priority: priority } }
       )
     end
 
-    def code_review_analytics_navbar_link(project, current_user, index = 0)
+    def code_review_analytics_navbar_link(project, current_user, priority = 0)
       return unless project_nav_tab?(:code_review)
 
       navbar_sub_item(
         title: _('Code Review'),
-        path: 'projects/analytics/code_reviews#index',
+        path: 'projects/analytics/code_reviews#priority',
         link: project_analytics_code_reviews_path(project),
-        link_to_options: { data: { index: index } }
+        link_to_options: { data: { priority: priority } }
       )
     end
   end
