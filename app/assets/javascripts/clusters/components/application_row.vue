@@ -95,6 +95,7 @@ export default {
     updateable: {
       type: Boolean,
       default: true,
+      required: false,
     },
     updateSuccessful: {
       type: Boolean,

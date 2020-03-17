@@ -31,7 +31,7 @@ export default {
     },
     minDate: {
       type: Date,
-      rerquired: false,
+      required: false,
       default: null,
     },
     maxDate: {

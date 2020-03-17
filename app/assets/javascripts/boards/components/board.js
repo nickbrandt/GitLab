@@ -36,6 +36,7 @@ export default Vue.extend({
     list: {
       type: Object,
       default: () => ({}),
+      required: false,
     },
     disabled: {
       type: Boolean,
