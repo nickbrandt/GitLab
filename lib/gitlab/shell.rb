@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
-# Gitaly note: SSH key operations are not part of Gitaly so will never be migrated.
-
 require 'securerandom'
 
 module Gitlab
+  # This class is an artifact of a time when common repository operations were
+  # performed by calling out to scripts in the gitlab-shell project. Now, these
+  # operations are all performed by Gitaly, and are mostly accessible through
+  # the Repository class. Prefer using a Repository to functionality here.
+  #
+  # Legacy code relating to namespaces still relies on Gitlab::Shell; it can be
+  # converted to a module once https://gitlab.com/groups/gitlab-org/-/epics/2320
+  # is completed. https://gitlab.com/gitlab-org/gitlab/-/issues/25095 tracks it.
   class Shell
     Error = Class.new(StandardError)
 
@@ -86,6 +92,8 @@ module Gitlab
     # @param [String] disk_path current project path on disk
     # @param [String] new_disk_path new project path on disk
     # @return [Boolean] whether repository could be moved/renamed on disk
+    #
+    # @deprecated
     def mv_repository(storage, disk_path, new_disk_path)
       return false if disk_path.empty? || new_disk_path.empty?
 
@@ -107,6 +115,8 @@ module Gitlab
     #
     # @param [String] storage project's storage path
     # @param [String] disk_path current project path on disk
+    #
+    # @deprecated
     def remove_repository(storage, disk_path)
       return false if disk_path.empty?
 
@@ -127,6 +137,8 @@ module Gitlab
     #
     # @param [String] storage project's storage path
     # @param [String] name namespace name
+    #
+    # @deprecated
     def add_namespace(storage, name)
       Gitlab::GitalyClient.allow_n_plus_1_calls do
         Gitlab::GitalyClient::NamespaceService.new(storage).add(name)
@@ -143,6 +155,8 @@ module Gitlab
     #
     # @param [String] storage project's storage path
     # @param [String] name namespace name
+    #
+    # @deprecated
     def rm_namespace(storage, name)
       Gitlab::GitalyClient::NamespaceService.new(storage).remove(name)
     rescue GRPC::InvalidArgument => e
@@ -158,6 +172,8 @@ module Gitlab
     # @param [String] storage project's storage path
     # @param [String] old_name current namespace name
     # @param [String] new_name new namespace name
+    #
+    # @deprecated
     def mv_namespace(storage, old_name, new_name)
       Gitlab::GitalyClient::NamespaceService.new(storage).rename(old_name, new_name)
     rescue GRPC::InvalidArgument => e
@@ -174,6 +190,8 @@ module Gitlab
     # @return [Boolean] whether repository exists or not
     # @param [String] storage project's storage path
     # @param [Object] dir_name repository dir name
+    #
+    # @deprecated
     def repository_exists?(storage, dir_name)
       Gitlab::Git::Repository.new(storage, dir_name, nil, nil).exists?
     rescue GRPC::Internal
