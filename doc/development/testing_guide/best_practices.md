@@ -78,6 +78,10 @@ FDOC=1 bin/rspec spec/[path]/[to]/[spec].rb
 - Use `focus: true` to isolate parts of the specs you want to run.
 - Use [`:aggregate_failures`](https://relishapp.com/rspec/rspec-core/docs/expectation-framework-integration/aggregating-failures) when there is more than one expectation in a test.
 - For [empty test description blocks](https://github.com/rubocop-hq/rspec-style-guide#it-and-specify), use `specify` rather than `it do` if the test is self-explanatory.
+- Use `non_existing_record_id`/`non_existing_record_iid`/`non_existing_record_access_level`
+  when you need an ID/IID/access level that doesn't actually exists. Using 123, 1234,
+  or even 999 is brittle as these IDs could actually exist in the database in the
+  context of a CI run.
 
 ### Coverage
 
