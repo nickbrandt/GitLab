@@ -30,7 +30,6 @@
 
 .right-sidebar-collapsed {
   padding-right: 0;
-  width: fit-content;
 
   @include media-breakpoint-up(sm) {
     &:not(.wiki-sidebar):not(.build-sidebar):not(.issuable-bulk-update-sidebar) .content-wrapper {
@@ -83,8 +82,16 @@
   }
 }
 
+@mixin sidebar-container {
+  width: calc(100% + 100px);
+}
+
 .right-sidebar {
   border-left: 1px solid $border-color;
+
+  .sidebar-container {
+    @include sidebar-container;
+  }
 }
 
 .with-performance-bar .right-sidebar.affix {
