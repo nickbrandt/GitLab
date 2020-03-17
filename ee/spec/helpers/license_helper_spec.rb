@@ -13,9 +13,13 @@ describe LicenseHelper do
 
     context 'license installed' do
       let(:license) { double(:license) }
+      let(:expired_date) { Time.utc(2020, 3, 9, 10) }
+      let(:today) { Time.utc(2020, 3, 7, 10) }
 
       before do
         allow(License).to receive(:current).and_return(license)
+        allow(license).to receive(:plan).and_return('ultimate')
+        allow(license).to receive(:expires_at).and_return(expired_date)
       end
 
       context 'license is notify admins' do
@@ -27,108 +31,76 @@ describe LicenseHelper do
           let(:signed_in) { true }
           let(:is_admin) { true }
 
-          context 'license is trial' do
+          context 'license expired' do
+            let(:expired_date) { Time.utc(2020, 3, 9).to_date }
+
             before do
-              allow(license).to receive(:trial?).and_return(true)
+              allow(license).to receive(:expired?).and_return(true)
+              allow(license).to receive(:expires_at).and_return(expired_date)
             end
 
-            context 'license expired' do
-              let(:expired_date) { Date.parse('2020-03-09') }
-
+            context 'and it will block changes when it expires' do
               before do
-                allow(license).to receive(:expired?).and_return(true)
-                allow(license).to receive(:expires_at).and_return(expired_date)
+                allow(license).to receive(:will_block_changes?).and_return(true)
               end
 
-              it 'has a nice subject' do
-                allow(license).to receive(:will_block_changes?).and_return(false)
-
-                regex = /Your trial license expired on 2020-03-09\. <a href=\'https?:\/\/.*\/plans\' target=\'_blank\' rel=\'noopener\'>Buy now!<\/a>/
-
-                expect(subject).to match(regex)
-              end
-
-              context 'and it will block changes when it expires' do
+              context 'and its currently blocking changes' do
                 before do
-                  allow(license).to receive(:will_block_changes?).and_return(true)
+                  allow(license).to receive(:block_changes?).and_return(true)
+                  allow(license).to receive(:block_changes_at).and_return(expired_date)
                 end
 
-                context 'and its currently blocking changes' do
-                  before do
-                    allow(license).to receive(:block_changes?).and_return(true)
-                  end
+                it 'has a nice subject' do
+                  allow(license).to receive(:will_block_changes?).and_return(false)
 
-                  it 'has an expiration blocking message' do
-                    regex = <<~HEREDOC.chomp
-                      Pushing code and creation of issues and merge requests has been disabled. Upload a new license in the admin area to restore service.
-                    HEREDOC
-
-                    expect(subject).to match(regex)
-                  end
-
-                  context 'not admin' do
-                    let(:is_admin) { false }
-
-                    it 'has an expiration blocking message' do
-                      allow(license).to receive(:notify_users?).and_return(true)
-
-                      regex = <<~HEREDOC.chomp
-                        Pushing code and creation of issues and merge requests has been disabled. Ask an admin to upload a new license to restore service.
-                      HEREDOC
-
-                      expect(subject).to match(regex)
-                    end
-                  end
+                  expect(subject).to have_text('Your subscription has been downgraded')
                 end
 
-                context 'and its NOT currently blocking changes' do
-                  it 'has an expiration blocking message' do
-                    allow(license).to receive(:block_changes?).and_return(false)
-                    allow(license).to receive(:block_changes_at).and_return(expired_date)
-
-                    regex = <<~HEREDOC.chomp
-                      Pushing code and creation of issues and merge requests will be disabled on 2020-03-09. Upload a new license in the admin area to ensure uninterrupted service.
-                    HEREDOC
-
-                    expect(subject).to match(regex)
+                it 'has an expiration blocking message' do
+                  Timecop.freeze(today) do
+                    expect(subject).to have_text("You didn't renew your Ultimate subscription so it was downgraded to the GitLab Core Plan")
                   end
                 end
               end
-            end
 
-            context 'license NOT expired' do
-              it 'has a nice subject' do
-                allow(license).to receive(:expired?).and_return(false)
-                allow(license).to receive(:remaining_days).and_return(4)
-                allow(license).to receive(:will_block_changes?).and_return(false)
+              context 'and its NOT currently blocking changes' do
+                before do
+                  allow(license).to receive(:block_changes?).and_return(false)
+                end
 
-                regex = /Your trial license will expire in 4 days\. <a href=\'https?:\/\/.*\/plans\' target=\'_blank\' rel=\'noopener\'>Buy now!<\/a>/
+                it 'has a nice subject' do
+                  allow(license).to receive(:will_block_changes?).and_return(false)
 
-                expect(subject).to match(regex)
+                  expect(subject).to have_text('Your subscription expired!')
+                end
+
+                it 'has an expiration blocking message' do
+                  allow(license).to receive(:block_changes_at).and_return(expired_date)
+
+                  Timecop.freeze(today) do
+                    expect(subject).to have_text('No worries, you can still use all the Ultimate features for now. You have 2 days to renew your subscription.')
+                  end
+                end
               end
             end
           end
 
-          context 'license is NOT trial' do
-            let(:expired_date) { Date.parse('2020-03-09') }
-
+          context 'license NOT expired' do
             before do
-              allow(license).to receive(:trial?).and_return(false)
-              allow(license).to receive(:expired?).and_return(true)
-              allow(license).to receive(:expires_at).and_return(expired_date)
-              allow(license).to receive(:will_block_changes?).and_return(false)
+              allow(license).to receive(:expired?).and_return(false)
+              allow(license).to receive(:remaining_days).and_return(4)
+              allow(license).to receive(:will_block_changes?).and_return(true)
+              allow(license).to receive(:block_changes_at).and_return(expired_date)
             end
 
             it 'has a nice subject' do
-              regex = <<~HEREDOC.chomp
-                Your license expired on 2020-03-09. For renewal instructions <a href='https://docs.gitlab.com/ee/subscriptions/#renew-your-subscription' target='_blank' rel='noopener'>view our Licensing FAQ.</a>
-              HEREDOC
-
-              expect(subject).to match(regex)
+              expect(subject).to have_text('Your subscription will expire in 4 days')
             end
 
-            it 'does not have buy now link' do
-              expect(subject).not_to include('Buy now!')
+            it 'has an expiration blocking message' do
+              Timecop.freeze(today) do
+                expect(subject).to have_text('Your Ultimate subscription will expire on 2020-03-09. After that, you will not to be able to create issues or merge requests as well as many other features.')
+              end
             end
           end
         end

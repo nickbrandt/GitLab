@@ -217,9 +217,6 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
-msgid "%{buy_now_link_start}Buy now!%{link_end}"
-msgstr ""
-
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -2407,12 +2404,6 @@ msgid "AsanaService|User Personal Access Token. User must have access to task, a
 msgstr ""
 
 msgid "Ascending"
-msgstr ""
-
-msgid "Ask an admin to upload a new license to ensure uninterrupted service."
-msgstr ""
-
-msgid "Ask an admin to upload a new license to restore service."
 msgstr ""
 
 msgid "Ask your group maintainer to set up a group Runner."
@@ -8962,9 +8953,6 @@ msgstr ""
 msgid "For public projects, anyone can view pipelines and access job details (output logs and artifacts)"
 msgstr ""
 
-msgid "For renewal instructions %{link_start}view our Licensing FAQ.%{link_end}"
-msgstr ""
-
 msgid "Forgot your password?"
 msgstr ""
 
@@ -13379,6 +13367,9 @@ msgstr ""
 msgid "No webhooks found, add one in the form above."
 msgstr ""
 
+msgid "No worries, you can still use all the %{strong}%{plan_name}%{strong_close} features for now. You have %{remaining_days} to renew your subscription."
+msgstr ""
+
 msgid "No, directly import the existing email addresses and usernames."
 msgstr ""
 
@@ -16175,12 +16166,6 @@ msgid "Pushed"
 msgstr ""
 
 msgid "Pushes"
-msgstr ""
-
-msgid "Pushing code and creation of issues and merge requests has been disabled."
-msgstr ""
-
-msgid "Pushing code and creation of issues and merge requests will be disabled on %{disabled_on}."
 msgstr ""
 
 msgid "PushoverService|%{user_name} deleted branch \"%{ref}\"."
@@ -21618,12 +21603,6 @@ msgstr ""
 msgid "Upload a certificate for your domain with all intermediates"
 msgstr ""
 
-msgid "Upload a new license in the admin area to ensure uninterrupted service."
-msgstr ""
-
-msgid "Upload a new license in the admin area to restore service."
-msgstr ""
-
 msgid "Upload a private key for your certificate"
 msgstr ""
 
@@ -23017,6 +22996,9 @@ msgstr ""
 msgid "You could not create a new trigger."
 msgstr ""
 
+msgid "You didn't renew your %{strong}%{plan_name}%{strong_close} subscription so it was downgraded to the GitLab Core Plan."
+msgstr ""
+
 msgid "You do not have any subscriptions yet"
 msgstr ""
 
@@ -23236,6 +23218,9 @@ msgstr ""
 msgid "YouTube"
 msgstr ""
 
+msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features."
+msgstr ""
+
 msgid "Your Commit Email will be used for web based operations, such as edits and merges."
 msgstr ""
 
@@ -23356,13 +23341,7 @@ msgstr ""
 msgid "Your issues will be imported in the background. Once finished, you'll get a confirmation email."
 msgstr ""
 
-msgid "Your license expired on %{expires_at}."
-msgstr ""
-
 msgid "Your license is valid from"
-msgstr ""
-
-msgid "Your license will expire in %{remaining_days}."
 msgstr ""
 
 msgid "Your message here"
@@ -23395,10 +23374,13 @@ msgstr ""
 msgid "Your request for access has been queued for review."
 msgstr ""
 
-msgid "Your trial license expired on %{expires_at}."
+msgid "Your subscription expired!"
 msgstr ""
 
-msgid "Your trial license will expire in %{remaining_days}."
+msgid "Your subscription has been downgraded"
+msgstr ""
+
+msgid "Your subscription will expire in %{remaining_days}"
 msgstr ""
 
 msgid "Zoom meeting added"
