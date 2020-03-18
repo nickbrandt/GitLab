@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 describe Geo::ProjectRegistry do
+  include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
   set(:project) { create(:project, description: 'kitten mittens') }
@@ -207,6 +208,72 @@ describe Geo::ProjectRegistry do
         repository_retry_at: nil
 
       )
+    end
+  end
+
+  describe '.repository_replicated_for?' do
+    context 'for a non-Geo setup' do
+      it 'returns true' do
+        expect(described_class.repository_replicated_for?(project.id)).to be_truthy
+      end
+    end
+
+    context 'for a Geo setup' do
+      before do
+        stub_current_geo_node(current_node)
+      end
+
+      context 'for a Geo Primary' do
+        let(:current_node) { create(:geo_node, :primary) }
+
+        it 'returns true' do
+          expect(described_class.repository_replicated_for?(project.id)).to be_truthy
+        end
+      end
+
+      context 'for a Geo secondary' do
+        let(:current_node) { create(:geo_node) }
+
+        context 'where Primary node is not configured' do
+          it 'returns true' do
+            expect(described_class.repository_replicated_for?(project.id)).to be_truthy
+          end
+        end
+
+        context 'where Primary node is configured' do
+          before do
+            create(:geo_node, :primary)
+          end
+
+          context 'where project_registry entry does not exist' do
+            it 'returns false' do
+              project_without_registry = create(:project)
+
+              expect(described_class.repository_replicated_for?(project_without_registry.id)).to be_falsey
+            end
+          end
+
+          context 'where project_registry entry does exist' do
+            context 'where last_repository_successful_sync_at is not set' do
+              it 'returns false' do
+                project_with_failed_registry = create(:project)
+                create(:geo_project_registry, :repository_sync_failed, project: project_with_failed_registry)
+
+                expect(described_class.repository_replicated_for?(project_with_failed_registry.id)).to be_falsey
+              end
+            end
+
+            context 'where last_repository_successful_sync_at is set' do
+              it 'returns true' do
+                project_with_synced_registry = create(:project)
+                create(:geo_project_registry, :synced, project: project_with_synced_registry)
+
+                expect(described_class.repository_replicated_for?(project_with_synced_registry.id)).to be_truthy
+              end
+            end
+          end
+        end
+      end
     end
   end
 
@@ -1012,6 +1079,24 @@ describe Geo::ProjectRegistry do
       registry = create(:geo_project_registry, :synced, :repository_verified)
 
       expect(registry.synchronization_state).to eq(:synced)
+    end
+  end
+
+  describe 'repository_has_successfully_synced?' do
+    context 'when repository has never successfully synced' do
+      it 'returns false' do
+        registry = create(:geo_project_registry, last_repository_successful_sync_at: nil)
+
+        expect(registry.repository_has_successfully_synced?).to be_falsey
+      end
+    end
+
+    context 'when repository has successfully synced' do
+      it 'returns true' do
+        registry = create(:geo_project_registry, last_repository_successful_sync_at: Time.now)
+
+        expect(registry.repository_has_successfully_synced?).to be_truthy
+      end
     end
   end
 end
