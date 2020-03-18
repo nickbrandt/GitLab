@@ -43,6 +43,8 @@ module EE
           params.delete(:insight_attributes) unless group_projects.exists?(insight_project_id) # rubocop:disable CodeReuse/ActiveRecord
         end
 
+        params.delete(:max_personal_access_token_lifetime) unless group.enforced_group_managed_accounts?
+
         super
       end
 

@@ -66,6 +66,10 @@ module EE
                  as: :file_template_project_id,
                  if: ->(group, options) { group.feature_available?(:custom_file_templates_for_namespace) }
           expose :marked_for_deletion_on, if: ->(group, _) { group.feature_available?(:adjourned_deletion_for_projects_and_groups) }
+          expose :max_personal_access_token_lifetime, if: ->(group, _) do
+            group.feature_available?(:personal_access_token_expiration_policy) &&
+              group.enforced_group_managed_accounts?
+          end
         end
       end
 
