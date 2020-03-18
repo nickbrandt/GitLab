@@ -21,7 +21,7 @@ describe Gitlab::Checks::DiffCheck do
     describe "#validate_code_owners" do
       let!(:code_owner) { create(:user, username: "owner-1") }
       let(:project) { create(:project, :repository) }
-      let(:codeowner_content) { "*.rb @#{code_owner.username}\ndocs/CODEOWNERS @owner-1" }
+      let(:codeowner_content) { "*.rb @#{code_owner.username}\ndocs/CODEOWNERS @owner-1\n*.js.coffee @owner-1" }
       let(:codeowner_blob) { fake_blob(path: "CODEOWNERS", data: codeowner_content) }
       let(:codeowner_blob_ref) { fake_blob(path: "CODEOWNERS", data: codeowner_content) }
       let(:codeowner_lookup_ref) { merge_request.target_branch }
@@ -39,6 +39,40 @@ describe Gitlab::Checks::DiffCheck do
         allow(project.repository).to receive(:code_owners_blob)
           .with(ref: codeowner_lookup_ref)
           .and_return(codeowner_blob)
+      end
+
+      context 'the MR contains a renamed file matching a file path' do
+        let(:diff_check) { described_class.new(change_access) }
+        let(:protected_branch) { build(:protected_branch, name: 'master', project: project) }
+
+        before do
+          expect(project).to receive(:branch_requires_code_owner_approval?)
+            .at_least(:once).and_return(true)
+
+          # This particular commit renames a file:
+          allow(project.repository).to receive(:new_commits).and_return(
+            [project.repository.commit('6907208d755b60ebeacb2e9dfea74c92c3449a1f')]
+          )
+        end
+
+        context 'and the user is not listed as a codeowner' do
+          it "returns an error message" do
+            expect { diff_check.validate! }.to raise_error do |error|
+              expect(error).to be_a(Gitlab::GitAccess::ForbiddenError)
+              expect(error.message).to include("CODEOWNERS` were matched:\n- *.js.coffee")
+            end
+          end
+        end
+
+        context 'and the user is listed as a codeowner' do
+          # `user` is set as the owner of the incoming change by the shared
+          #   context found in 'push rules checks context'
+          let(:codeowner_content) { "* @#{user.username}" }
+
+          it "does not return an error message" do
+            expect { diff_check.validate! }.not_to raise_error
+          end
+        end
       end
 
       context "the MR contains a matching file path" do
