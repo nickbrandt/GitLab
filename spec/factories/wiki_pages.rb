@@ -51,7 +51,14 @@ FactoryBot.define do
         wiki_page { create(:wiki_page, project: project) }
       end
 
-      initialize_with { wiki_page.meta }
+      project { @overrides[:wiki_page]&.project || create(:project) }
+      title { wiki_page.title }
+
+      initialize_with do
+        raise 'Metadata only available for valid pages' unless wiki_page.valid?
+
+        WikiPage::Meta.find_or_create(wiki_page.slug, wiki_page)
+      end
     end
   end
 
