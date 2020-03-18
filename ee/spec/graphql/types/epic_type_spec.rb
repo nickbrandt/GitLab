@@ -23,7 +23,7 @@ describe GitlabSchema.types['Epic'] do
 
   it { expect(described_class).to have_graphql_fields(fields) }
 
-  it { is_expected.to have_graphql_field(:subscribed, complexity: 5) }
+  it { expect(described_class).to have_graphql_field(:subscribed, complexity: 5) }
 
-  it { is_expected.to have_graphql_field(:participants, complexity: 5) }
+  it { expect(described_class).to have_graphql_field(:participants, complexity: 5) }
 end
