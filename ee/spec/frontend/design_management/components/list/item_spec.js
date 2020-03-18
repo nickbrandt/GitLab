@@ -20,6 +20,7 @@ describe('Design management list item component', () => {
     notesCount = 0,
     event = DESIGN_VERSION_EVENT.NO_CHANGE,
     isLoading = false,
+    imageLoading = false,
   } = {}) {
     wrapper = shallowMount(Item, {
       localVue,
@@ -32,6 +33,11 @@ describe('Design management list item component', () => {
         event,
         notesCount,
         updatedAt: '01-01-2019',
+      },
+      data() {
+        return {
+          imageLoading,
+        };
       },
       stubs: ['router-link'],
     });

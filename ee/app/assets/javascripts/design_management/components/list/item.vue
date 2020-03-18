@@ -43,6 +43,11 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      imageLoading: true,
+    };
+  },
   computed: {
     icon() {
       const normalizedEvent = this.event.toLowerCase();
@@ -69,6 +74,14 @@ export default {
     notesLabel() {
       return n__('%d comment', '%d comments', this.notesCount);
     },
+    showLoadingSpinner() {
+      return this.imageLoading || this.isUploading;
+    },
+  },
+  methods: {
+    onImageLoad() {
+      this.imageLoading = false;
+    },
   },
   DESIGN_ROUTE_NAME,
 };
@@ -89,13 +102,14 @@ export default {
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
-      <gl-loading-icon v-if="isLoading" size="md" />
+      <gl-loading-icon v-show="showLoadingSpinner" size="md" />
       <img
-        v-else
+        v-show="!showLoadingSpinner"
         :src="image"
         :alt="filename"
         class="block ml-auto mr-auto mw-100 mh-100 design-img"
         data-qa-selector="design_image"
+        @load="onImageLoad"
       />
     </div>
     <div class="card-footer d-flex w-100">
