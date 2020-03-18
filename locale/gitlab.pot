@@ -7651,6 +7651,9 @@ msgstr ""
 msgid "EnvironmentsDashboard|This dashboard displays a maximum of 7 projects and 3 environments per project. %{readMoreLink}"
 msgstr ""
 
+msgid "Environments|All pods"
+msgstr ""
+
 msgid "Environments|An error occurred while canceling the auto stop, please try again"
 msgstr ""
 
@@ -7732,7 +7735,7 @@ msgstr ""
 msgid "Environments|No deployments yet"
 msgstr ""
 
-msgid "Environments|No pods to display"
+msgid "Environments|No pod selected"
 msgstr ""
 
 msgid "Environments|Note that this action will stop the environment, but it will %{emphasisStart}not%{emphasisEnd} have an effect on any existing deployment due to no “stop environment action” being defined in the %{ciConfigLinkStart}.gitlab-ci.yml%{ciConfigLinkEnd} file."
