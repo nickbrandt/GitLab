@@ -101,7 +101,7 @@
       - else
         = f.text_field :location, label: s_('Profiles|Location'), class: 'input-lg', placeholder: s_("Profiles|City, country")
       = f.text_field :job_title, class: 'input-md'
-      - if @user.gitlab_employee?
+      - if Feature.enabled?(:gitlab_employee_badge) && @user.gitlab_employee?
         = f.text_field :organization, readonly: true, value: 'GitLab', label: s_('Profiles|Organization'), class: 'input-md', help: s_("Profiles|Who you represent or work for")
       - else
         = f.text_field :organization, label: s_('Profiles|Organization'), class: 'input-md', help: s_("Profiles|Who you represent or work for")
