@@ -145,20 +145,6 @@ describe Gitlab::UsageData do
     end
   end
 
-  describe 'License edition names' do
-    let(:ultimate) { create(:license, plan: 'ultimate') }
-    let(:premium) { create(:license, plan: 'premium') }
-    let(:starter) { create(:license, plan: 'starter') }
-    let(:old) { create(:license, plan: 'other') }
-
-    it 'have expected values' do
-      expect(ultimate.edition).to eq('EEU')
-      expect(premium.edition).to eq('EEP')
-      expect(starter.edition).to eq('EES')
-      expect(old.edition).to eq('EE')
-    end
-  end
-
   describe '#license_usage_data' do
     subject { described_class.license_usage_data }
 
