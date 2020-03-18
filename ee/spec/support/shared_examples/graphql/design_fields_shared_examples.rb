@@ -16,6 +16,7 @@ RSpec.shared_examples 'a GraphQL type with design fields' do
       filename
       full_path
       image
+      image_v432x230
       diff_refs
       event
       notes_count
