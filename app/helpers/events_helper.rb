@@ -70,10 +70,10 @@ module EventsHelper
   def event_preposition(event)
     if event.wiki_page?
       _("Events|in the wiki for")
-    elsif event.push_action? || event.commented_action? || event.target
-      "at"
     elsif event.milestone?
       "in"
+    elsif event.push_action? || event.commented_action? || event.target
+      "at"
     end
   end
 

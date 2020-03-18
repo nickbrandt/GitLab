@@ -121,8 +121,7 @@ describe EventsHelper do
       end
     end
 
-    # This branch appears to be unreachable
-    context 'for milestone events', :pending do
+    context 'for milestone events' do
       let(:event) { create(:event, target: create(:milestone)) }
 
       it 'returns a suitable phrase' do
@@ -156,10 +155,11 @@ describe EventsHelper do
 
     it 'produces a suitable title chunk' do
       url = helper.event_wiki_page_target_url(event)
+      title = event.target_title
       html = [
         "<span class=\"event-target-type append-right-4\">wiki page</span>",
-        "<a title=\"Title.with.dot\" class=\"has-tooltip event-target-link append-right-4\" href=\"#{url}\">",
-        event.target.title,
+        "<a title=\"#{title}\" class=\"has-tooltip event-target-link append-right-4\" href=\"#{url}\">",
+        title,
         "</a>"
       ].join
 
