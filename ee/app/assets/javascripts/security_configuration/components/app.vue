@@ -18,10 +18,6 @@ export default {
       type: String,
       required: true,
     },
-    pipelinesHelpPagePath: {
-      type: String,
-      required: true,
-    },
     autoDevopsHelpPagePath: {
       type: String,
       required: true,
@@ -44,15 +40,7 @@ export default {
       return sprintf(body, { wordBreakOpportunity }, false);
     },
     callOutLink() {
-      if (this.autoDevopsEnabled) {
-        return this.autoDevopsHelpPagePath;
-      }
-
-      if (this.latestPipelinePath) {
-        return this.latestPipelinePath;
-      }
-
-      return this.pipelinesHelpPagePath;
+      return this.autoDevopsEnabled ? this.autoDevopsHelpPagePath : this.latestPipelinePath;
     },
     calloutContent() {
       const bodyDefault = __(`The configuration status of the table below only applies to the default branch and

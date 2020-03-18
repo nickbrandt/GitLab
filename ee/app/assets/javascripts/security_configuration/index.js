@@ -9,7 +9,6 @@ export default function init() {
     features,
     helpPagePath,
     latestPipelinePath,
-    pipelinesHelpPagePath,
   } = el.dataset;
 
   return new Vue({
@@ -25,7 +24,6 @@ export default function init() {
           features: JSON.parse(features),
           helpPagePath,
           latestPipelinePath,
-          pipelinesHelpPagePath,
         },
       });
     },
