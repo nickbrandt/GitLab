@@ -5,7 +5,7 @@ module Ci
     extend Gitlab::Ci::Model
     include Ci::HasVariable
     include Presentable
-    include Maskable
+    include Ci::Maskable
     prepend HasEnvironmentScope
 
     belongs_to :project
