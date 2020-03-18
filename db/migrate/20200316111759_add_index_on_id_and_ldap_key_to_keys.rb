@@ -9,10 +9,10 @@ class AddIndexOnIdAndLdapKeyToKeys < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_concurrent_index :keys, [:id, :type], where: "type = 'LDAPKey'", name: INDEX_NAME
+    add_concurrent_index :keys, [:id], where: "type = 'LDAPKey'", name: INDEX_NAME
   end
 
   def down
-    remove_concurrent_index :keys, INDEX_NAME
+    remove_concurrent_index_by_name :keys, INDEX_NAME
   end
 end
