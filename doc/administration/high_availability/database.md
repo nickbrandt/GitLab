@@ -899,6 +899,7 @@ after it has been restored to service.
   ```shell
   gitlab-ctl repmgr standby unregister --node=959789412
   ```
+  
 ##### Add a node as a standby server
 
   From the stnadby node, run:
@@ -913,8 +914,8 @@ after it has been restored to service.
   If there are any clients that are still attempting to write to the old master,
   this will cause a split, and the old master will need to be resynced from
   scratch by performing a `gitlab-ctl repmgr standby setup NEW_MASTER`.
- 
-##### Add a failed master back into the cluster as a standby node 
+
+##### Add a failed master back into the cluster as a standby node
   
   Once `repmgrd` and PostgreSQL are runnning, the node will need to follow the new
   as a standby node.
