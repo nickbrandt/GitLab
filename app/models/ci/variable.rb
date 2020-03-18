@@ -3,7 +3,7 @@
 module Ci
   class Variable < ApplicationRecord
     extend Gitlab::Ci::Model
-    include HasVariable
+    include Ci::HasVariable
     include Presentable
     include Maskable
     prepend HasEnvironmentScope
