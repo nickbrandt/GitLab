@@ -77,6 +77,14 @@ func AssertResponseWriterHeader(t *testing.T, w http.ResponseWriter, header stri
 	assertHeaderExists(t, header, actual, expected)
 }
 
+func AssertAbsentResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string) {
+	actual := w.Header()[http.CanonicalHeaderKey(header)]
+
+	if len(actual) != 0 {
+		t.Fatalf("for HTTP request expected not to receive the header %q, got %+v", header, actual)
+	}
+}
+
 func AssertResponseHeader(t *testing.T, w interface{}, header string, expected ...string) {
 	var actual []string
 

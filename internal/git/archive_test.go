@@ -68,6 +68,9 @@ func TestSetArchiveHeaders(t *testing.T) {
 		w.Header().Set("Content-Length", "test")
 		w.Header().Set("Content-Disposition", "test")
 
+		// This should be deleted
+		w.Header().Set("Set-Cookie", "test")
+
 		// This should be preserved
 		w.Header().Set("Cache-Control", "public, max-age=3600")
 
@@ -77,5 +80,6 @@ func TestSetArchiveHeaders(t *testing.T) {
 		testhelper.AssertResponseWriterHeader(t, w, "Content-Length")
 		testhelper.AssertResponseWriterHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
 		testhelper.AssertResponseWriterHeader(t, w, "Cache-Control", "public, max-age=3600")
+		testhelper.AssertAbsentResponseWriterHeader(t, w, "Set-Cookie")
 	}
 }

@@ -160,6 +160,10 @@ func handleArchiveWithGitaly(r *http.Request, params archiveParams, format gital
 func setArchiveHeaders(w http.ResponseWriter, format gitalypb.GetArchiveRequest_Format, archiveFilename string) {
 	w.Header().Del("Content-Length")
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
+	// Caching proxies usually don't cache responses with Set-Cookie header
+	// present because it implies user-specific data, which is not the case
+	// for repository archives.
+	w.Header().Del("Set-Cookie")
 	if format == gitalypb.GetArchiveRequest_ZIP {
 		w.Header().Set("Content-Type", "application/zip")
 	} else {
