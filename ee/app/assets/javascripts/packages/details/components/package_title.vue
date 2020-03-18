@@ -60,7 +60,13 @@ export default {
 
       <div v-if="packagePipeline" class="d-flex align-items-center append-right-default">
         <gl-icon name="branch" class="text-secondary append-right-8" />
-        <span ref="package-ref" class="font-weight-bold">{{ packagePipeline.ref }}</span>
+        <span
+          ref="package-ref"
+          v-gl-tooltip
+          class="font-weight-bold text-truncate mw-xs"
+          :title="packagePipeline.ref"
+          >{{ packagePipeline.ref }}</span
+        >
       </div>
 
       <div class="d-flex align-items-center append-right-default">
