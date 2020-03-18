@@ -93,18 +93,15 @@ describe 'layouts/nav/sidebar/_admin' do
   end
 
   context 'on settings' do
-    it 'includes General link' do
+    before do
       render
+    end
 
+    it 'includes General link' do
       expect(rendered).to have_link('General', href: general_admin_application_settings_path)
     end
 
-    context 'when templates partial is not present' do
-      before do
-        allow(view).to receive(:template_exists?).and_call_original
-        allow(view).to receive(:template_exists?).with('admin/application_settings/templates') { false }
-      end
-
+    context 'when GitLab FOSS' do
       it 'does not include Templates link' do
         expect(rendered).not_to have_link('Templates', href: '/admin/application_settings/templates')
       end
