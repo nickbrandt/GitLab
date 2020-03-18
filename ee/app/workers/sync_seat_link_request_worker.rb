@@ -12,12 +12,12 @@ class SyncSeatLinkRequestWorker
 
   RequestError = Class.new(StandardError)
 
-  def perform(date, license_key, max_historical_user_count)
+  def perform(date, license_key, max_historical_user_count, active_users)
     response = Gitlab::HTTP.post(
       URI_PATH,
       base_uri: EE::SUBSCRIPTIONS_URL,
       headers: request_headers,
-      body: request_body(date, license_key, max_historical_user_count)
+      body: request_body(date, license_key, max_historical_user_count, active_users)
     )
 
     raise RequestError, request_error_message(response) unless response.success?
@@ -25,11 +25,12 @@ class SyncSeatLinkRequestWorker
 
   private
 
-  def request_body(date, license_key, max_historical_user_count)
+  def request_body(date, license_key, max_historical_user_count, active_users)
     {
       date: date,
       license_key: license_key,
-      max_historical_user_count: max_historical_user_count
+      max_historical_user_count: max_historical_user_count,
+      active_users: active_users
     }.to_json
   end
 
