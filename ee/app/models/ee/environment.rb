@@ -7,8 +7,6 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
-      has_many :self_managed_prometheus_alert_events, inverse_of: :environment
-
       # Returns environments where its latest deployment is to a cluster
       scope :deployed_to_cluster, -> (cluster) do
         environments = model.arel_table
