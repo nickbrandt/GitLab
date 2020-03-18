@@ -738,6 +738,18 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.index ["build_id"], name: "index_ci_builds_runner_session_on_build_id", unique: true
   end
 
+  create_table "ci_daily_report_results", force: :cascade do |t|
+    t.date "date", null: false
+    t.bigint "project_id", null: false
+    t.bigint "last_pipeline_id", null: false
+    t.float "value", null: false
+    t.bigint "param_type", null: false
+    t.string "ref_path", null: false
+    t.string "title", null: false
+    t.index ["last_pipeline_id"], name: "index_ci_daily_report_results_on_last_pipeline_id"
+    t.index ["project_id", "ref_path", "param_type", "date", "title"], name: "index_daily_report_results_unique_columns", unique: true
+  end
+
   create_table "ci_group_variables", id: :serial, force: :cascade do |t|
     t.string "key", null: false
     t.text "value"
@@ -4765,6 +4777,8 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
   add_foreign_key "ci_builds_metadata", "ci_builds", column: "build_id", on_delete: :cascade
   add_foreign_key "ci_builds_metadata", "projects", on_delete: :cascade
   add_foreign_key "ci_builds_runner_session", "ci_builds", column: "build_id", on_delete: :cascade
+  add_foreign_key "ci_daily_report_results", "ci_pipelines", column: "last_pipeline_id", on_delete: :cascade
+  add_foreign_key "ci_daily_report_results", "projects", on_delete: :cascade
   add_foreign_key "ci_group_variables", "namespaces", column: "group_id", name: "fk_33ae4d58d8", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "ci_builds", column: "job_id", on_delete: :cascade
   add_foreign_key "ci_job_artifacts", "projects", on_delete: :cascade
