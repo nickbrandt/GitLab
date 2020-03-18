@@ -114,6 +114,12 @@ module Prometheus
     end
 
     def filter_params(params, path)
+      start_time = params[:start_time]
+      end_time = params[:end_time]
+
+      params['start'] = start_time if start_time
+      params['end']   = end_time if end_time
+
       params.slice(*PROXY_SUPPORT.dig(path, :params))
     end
 

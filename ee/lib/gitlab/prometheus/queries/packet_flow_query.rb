@@ -21,7 +21,7 @@ module Gitlab
           )
 
           {
-            ops_rate:  transform_rate_result(client_query_range(rate_query, start: from, stop: to)),
+            ops_rate:  transform_rate_result(client_query_range(rate_query, start_time: from, end_time: to)),
             ops_total: transform_sum_result(client_query(total_query, time: to))
           }
         end

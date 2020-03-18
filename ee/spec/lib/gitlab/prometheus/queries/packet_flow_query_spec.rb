@@ -82,7 +82,7 @@ describe Gitlab::Prometheus::Queries::PacketFlowQuery do
 
     context 'ops_rate query' do
       it 'sets query time range' do
-        expect(client).to receive(:query_range).with(anything, start: from, stop: to)
+        expect(client).to receive(:query_range).with(anything, start_time: from, end_time: to)
         subject.query(namespace, from: from, to: to)
       end
     end
