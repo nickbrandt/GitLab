@@ -1,16 +1,22 @@
 import MockAdapter from 'axios-mock-adapter';
-
+import createFlash from '~/flash';
 import GroupMemberStore from 'ee/group_member_contributions/store/group_member_store';
 import defaultColumns from 'ee/group_member_contributions/constants';
 import axios from '~/lib/utils/axios_utils';
 
 import { rawMembers, contributionsPath } from '../mock_data';
 
+jest.mock('~/flash');
+
 describe('GroupMemberStore', () => {
   let store;
 
   beforeEach(() => {
     store = new GroupMemberStore(contributionsPath);
+  });
+
+  afterEach(() => {
+    createFlash.mockClear();
   });
 
   describe('setColumns', () => {
@@ -58,7 +64,6 @@ describe('GroupMemberStore', () => {
 
     beforeEach(() => {
       mock = new MockAdapter(axios);
-      setFixtures('<div class="flash-container"></div>');
     });
 
     afterEach(() => {
@@ -67,8 +72,8 @@ describe('GroupMemberStore', () => {
 
     it('calls service.getContributedMembers and sets response to the store on success', done => {
       mock.onGet(contributionsPath).reply(200, rawMembers);
-      spyOn(store, 'setColumns');
-      spyOn(store, 'setMembers');
+      jest.spyOn(store, 'setColumns').mockImplementation(() => {});
+      jest.spyOn(store, 'setMembers').mockImplementation(() => {});
 
       store
         .fetchContributedMembers()
@@ -92,7 +97,7 @@ describe('GroupMemberStore', () => {
         .catch(e => {
           expect(e.message).toBe('Request failed with status code 500');
           expect(store.isLoading).toBe(false);
-          expect(document.querySelector('.flash-text').innerText.trim()).toBe(
+          expect(createFlash).toHaveBeenCalledWith(
             'Something went wrong while fetching group member contributions',
           );
         })

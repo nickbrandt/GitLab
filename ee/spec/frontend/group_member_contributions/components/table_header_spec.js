@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 import TableHeaderComponent from 'ee/group_member_contributions/components/table_header.vue';
 import defaultColumns from 'ee/group_member_contributions/constants';
@@ -66,14 +66,14 @@ describe('TableHeaderComponent', () => {
 
     describe('onColumnClick', () => {
       it('emits `onColumnClick` event with columnName param on component instance', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit').mockImplementation(() => {});
         vm.onColumnClick(columnName);
 
         expect(vm.$emit).toHaveBeenCalledWith('onColumnClick', columnName);
       });
 
       it('updates columnIconMeta prop for provided columnName', () => {
-        spyOn(vm, 'getColumnIconMeta');
+        jest.spyOn(vm, 'getColumnIconMeta');
         vm.onColumnClick(columnName);
 
         expect(vm.getColumnIconMeta).toHaveBeenCalledWith(columnName, vm.sortOrders);

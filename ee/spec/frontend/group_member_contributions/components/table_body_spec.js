@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 import TableBodyComponent from 'ee/group_member_contributions/components/table_body.vue';
 import GroupMemberStore from 'ee/group_member_contributions/store/group_member_store';
