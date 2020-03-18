@@ -346,9 +346,19 @@ module EE
     def add_import_job
       return if gitlab_custom_project_template_import?
 
-      if import? && !repository_exists?
-        super
-      elsif mirror?
+      # Historically this was intended ensure `super` is only called
+      # when a project is imported(usually on project creation only) so `repository_exists?`
+      # check was added so that it does not stop mirroring if later on mirroring option is added to the project.
+      #
+      # With jira importer we need to allow to run the import multiple times on same project,
+      # which can conflict with scheduled mirroring(if that project had or will have mirroring enabled),
+      # so we are checking if its a jira reimport then we trigger that and skip mirroring even if mirroring
+      # should have been started. When we run into race condition with mirroring on a jira imported project
+      # the mirroring would still be picked up 1 minute later, based on `Gitlab::Mirror::SCHEDULER_CRON` and
+      # `ProjectUpdateState#mirror_update_due?``
+      return super if jira_force_import? || import? && !repository_exists?
+
+      if mirror?
         ::Gitlab::Metrics.add_event(:mirrors_scheduled)
         job_id = RepositoryUpdateMirrorWorker.perform_async(self.id)
 

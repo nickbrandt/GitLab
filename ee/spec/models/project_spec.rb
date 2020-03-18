@@ -1763,11 +1763,52 @@ describe Project do
   describe '#add_import_job' do
     let(:project) { create(:project) }
 
-    context 'when import_type is gitlab_custom_project_template_import' do
-      it 'does not create import job' do
-        project.import_type = 'gitlab_custom_project_template_import'
+    before do
+      stub_licensed_features(custom_project_templates: true)
+    end
 
+    context 'when import_type is gitlab_custom_project_template' do
+      it 'does not create import job' do
+        project.import_type = 'gitlab_custom_project_template'
+
+        expect(project.gitlab_custom_project_template_import?).to be true
         expect(project.add_import_job).to be_nil
+      end
+    end
+
+    context 'when mirror true on a jira imported project' do
+      let(:user) { create(:user) }
+      let(:symbol_keys_project) do
+        { key: 'AA', scheduled_at: 2.days.ago.strftime('%Y-%m-%d %H:%M:%S'), scheduled_by: { 'user_id' => 1, 'name' => 'tester1' } }
+      end
+      let(:project) { create(:project, :repository, import_type: 'jira', mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+
+      context 'when jira import is forced' do
+        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project], JiraImportData::FORCE_IMPORT_KEY => true } }) }
+
+        it 'does not trigger mirror update' do
+          expect(RepositoryUpdateMirrorWorker).not_to receive(:perform_async)
+          expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async)
+          expect(project.mirror).to be true
+          expect(project.jira_import?).to be true
+          expect(project.jira_force_import?).to be true
+
+          project.add_import_job
+        end
+      end
+
+      context 'when jira import is not forced' do
+        let(:import_data) { JiraImportData.new(data: { jira: { projects: [symbol_keys_project] } }) }
+
+        it 'does trigger mirror update' do
+          expect(RepositoryUpdateMirrorWorker).to receive(:perform_async)
+          expect(Gitlab::JiraImport::Stage::StartImportWorker).not_to receive(:perform_async)
+          expect(project.mirror).to be true
+          expect(project.jira_import?).to be true
+          expect(project.jira_force_import?).to be false
+
+          project.add_import_job
+        end
       end
     end
   end
@@ -2585,6 +2626,21 @@ describe Project do
         end
 
         it { is_expected.to eq(true) }
+      end
+    end
+  end
+
+  describe '#remove_import_data' do
+    let(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
+
+    context 'when mirror' do
+      let(:user) { create(:user) }
+      let!(:project) { create(:project, mirror: true, import_url: 'http://some_url.com', mirror_user_id: user.id, import_data: import_data) }
+
+      it 'does not remove import data' do
+        expect(project.mirror?).to be true
+        expect(project.jira_import?).to be false
+        expect { project.remove_import_data }.not_to change { ProjectImportData.count }
       end
     end
   end
