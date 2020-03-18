@@ -262,41 +262,6 @@ module EE
         end
       end
 
-      # Being used in private project-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers`.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class ProjectApprovalSettingRule < ProjectApprovalRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
-      end
-
-      # Being used in private project-level approvals API.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class ProjectApprovalSettings < Grape::Entity
-        expose :rules, using: ProjectApprovalSettingRule do |project, options|
-          project.visible_approval_rules(target_branch: options[:target_branch])
-        end
-
-        expose :min_fallback_approvals, as: :fallback_approvals_required
-      end
-
-      # Being used in private MR-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers`.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class MergeRequestApprovalSettingRule < MergeRequestApprovalStateRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
-      end
-
-      # Being used in private MR-level approvals API.
-      # This overrides the `rules` to be exposed using MergeRequestApprovalSettingRule.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class MergeRequestApprovalSettings < MergeRequestApprovalState
-        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule, override: true
-      end
-
       module ConanPackage
         class ConanPackageManifest < Grape::Entity
           expose :package_urls, merge: true
