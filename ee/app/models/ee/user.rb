@@ -243,7 +243,10 @@ module EE
     end
 
     def managed_free_namespaces
-      manageable_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
+      manageable_groups
+        .left_joins(:gitlab_subscription)
+        .merge(GitlabSubscription.left_joins(:hosted_plan).where(plans: { name: [nil, *Plan::DEFAULT_PLANS] }))
+        .order(:name)
     end
 
     override :has_current_license?
