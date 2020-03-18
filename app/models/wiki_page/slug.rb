@@ -14,5 +14,13 @@ class WikiPage
     }
 
     scope :canonical, -> { where(canonical: true) }
+
+    def update_columns(attrs = {})
+      super(attrs.reverse_merge(updated_at: Time.now.utc))
+    end
+
+    def self.update_all(attrs = {})
+      super(attrs.reverse_merge(updated_at: Time.now.utc))
+    end
   end
 end

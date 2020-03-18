@@ -74,9 +74,9 @@ class WikiPage
 
       if persisted?
         transaction do
-          slugs.canonical.update_all(updated_at: Time.now, canonical: false)
+          slugs.canonical.update_all(canonical: false)
           page_slug = slugs.create_with(canonical: true).find_or_create_by(slug: slug)
-          page_slug.update_columns(canonical: true, updated_at: Time.now) unless page_slug.canonical?
+          page_slug.update_columns(canonical: true) unless page_slug.canonical?
         end
       else
         slugs.new(slug: slug, canonical: true)
@@ -91,21 +91,30 @@ class WikiPage
       self.canonical_slug = wiki_page.slug
     end
 
+    def update_columns(attrs = {})
+      super(attrs.reverse_merge(updated_at: Time.now.utc))
+    end
+
+    def self.update_all(attrs = {})
+      super(attrs.reverse_merge(updated_at: Time.now.utc))
+    end
+
     private
 
     def update_wiki_page_attributes(page)
-      update_columns(title: page.title, updated_at: Time.now) unless page.title == title
+      update_columns(title: page.title) unless page.title == title
     end
 
     def insert_slugs(strings, is_new, canonical_slug)
-      creation = Time.now
+      creation = Time.now.utc
 
       slug_attrs = strings.map do |slug|
         {
           wiki_page_meta_id: id,
           slug: slug,
           canonical: (is_new && slug == canonical_slug),
-          created_at: creation
+          created_at: creation,
+          updated_at: creation
         }
       end
       slugs.insert_all(slug_attrs) unless !is_new && slug_attrs.size == 1
