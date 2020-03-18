@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { createStore } from 'ee/batch_comments/stores';
-import { keyboardDownEvent } from 'spec/issue_show/helpers';
-import { noteableDataMock, discussionMock, notesDataMock } from 'spec/notes/mock_data';
+import { keyboardDownEvent } from 'jest/issue_show/helpers';
+import { noteableDataMock, discussionMock, notesDataMock } from 'jest/notes/mock_data';
 import diffsModule from '~/diffs/store/modules';
 import notesModule from '~/notes/stores/modules';
 import issueNoteForm from '~/notes/components/note_form.vue';
@@ -45,7 +45,7 @@ describe('issue_note_form component', () => {
 
     describe('on enter', () => {
       it('should add comment when cmd+enter is pressed', () => {
-        spyOn(vm, 'handleUpdate').and.callThrough();
+        jest.spyOn(vm, 'handleUpdate');
         vm.$el.querySelector('textarea').value = 'Foo';
         vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, true));
 
@@ -53,7 +53,7 @@ describe('issue_note_form component', () => {
       });
 
       it('should add comment when ctrl+enter is pressed', () => {
-        spyOn(vm, 'handleUpdate').and.callThrough();
+        jest.spyOn(vm, 'handleUpdate');
         vm.$el.querySelector('textarea').value = 'Foo';
         vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, false, true));
 
@@ -63,12 +63,8 @@ describe('issue_note_form component', () => {
   });
 
   describe('with batch comments', () => {
-    beforeEach(done => {
-      store
-        .dispatch('batchComments/enableBatchComments')
-        .then(vm.$nextTick)
-        .then(done)
-        .catch(done.fail);
+    beforeEach(() => {
+      return store.dispatch('batchComments/enableBatchComments').then(vm.$nextTick);
     });
 
     it('shows resolve checkbox', () => {
@@ -77,21 +73,19 @@ describe('issue_note_form component', () => {
       ).not.toBe(null);
     });
 
-    it('hides actions for commits', done => {
+    it('hides actions for commits', () => {
       vm.discussion.for_commit = true;
 
-      vm.$nextTick(() => {
+      return vm.$nextTick(() => {
         expect(vm.$el.querySelector('.note-form-actions').textContent).not.toContain(
           'Start a review',
         );
-
-        done();
       });
     });
 
     describe('on enter', () => {
       it('should start review or add to review when cmd+enter is pressed', () => {
-        spyOn(vm, 'handleAddToReview').and.callThrough();
+        jest.spyOn(vm, 'handleAddToReview');
         vm.$el.querySelector('textarea').value = 'Foo';
         vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, true));
 
@@ -99,7 +93,7 @@ describe('issue_note_form component', () => {
       });
 
       it('should start review or add to review when ctrl+enter is pressed', () => {
-        spyOn(vm, 'handleAddToReview').and.callThrough();
+        jest.spyOn(vm, 'handleAddToReview');
         vm.$el.querySelector('textarea').value = 'Foo';
         vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, false, true));
 
