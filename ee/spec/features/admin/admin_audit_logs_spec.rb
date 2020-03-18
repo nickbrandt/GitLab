@@ -112,11 +112,27 @@ describe 'Admin::AuditLogs', :js do
       let_it_be(:audit_event_2) { create(:user_audit_event, created_at: 3.days.ago) }
       let_it_be(:audit_event_3) { create(:user_audit_event, created_at: 1.day.ago) }
 
-      before do
-        visit admin_audit_logs_path
+      it 'shows only 2 days old events' do
+        visit admin_audit_logs_path(created_after: 4.days.ago.to_date, created_before: 2.days.ago.to_date)
+
+        expect(page).to have_content(audit_event_2.present.date)
+        expect(page).not_to have_content(audit_event_1.present.date)
+        expect(page).not_to have_content(audit_event_3.present.date)
       end
 
-      it_behaves_like 'audit events filter'
+      it 'shows only yesterday events' do
+        visit admin_audit_logs_path(created_after: 2.days.ago.to_date)
+
+        expect(page).to have_content(audit_event_3.present.date)
+        expect(page).not_to have_content(audit_event_1.present.date)
+        expect(page).not_to have_content(audit_event_2.present.date)
+      end
+
+      it 'shows a message if provided date is invalid' do
+        visit admin_audit_logs_path(created_after: '12-345-6789')
+
+        expect(page).to have_content('Invalid date format. Please use UTC format as YYYY-MM-DD')
+      end
     end
   end
 
