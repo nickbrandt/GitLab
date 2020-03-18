@@ -13,6 +13,30 @@ RSpec.describe AuditEvent, type: :model do
     it { is_expected.to validate_presence_of(:entity_type) }
   end
 
+  describe '.order_by' do
+    let_it_be(:event_1) { create(:audit_event) }
+    let_it_be(:event_2) { create(:audit_event) }
+    let_it_be(:event_3) { create(:audit_event) }
+
+    subject(:event) { described_class.order_by(method) }
+
+    context 'when sort by created_at in ascending order' do
+      let(:method) { 'created_asc' }
+
+      it 'sorts results by id in ascending order' do
+        expect(event).to eq([event_1, event_2, event_3])
+      end
+    end
+
+    context 'when it is default' do
+      let(:method) { nil }
+
+      it 'sorts results by id in descending order' do
+        expect(event).to eq([event_3, event_2, event_1])
+      end
+    end
+  end
+
   describe '#author_name' do
     context 'when user exists' do
       let(:user) { create(:user, name: 'John Doe') }
