@@ -3,7 +3,7 @@ import CESidebarMediator from '~/sidebar/sidebar_mediator';
 import CESidebarStore from '~/sidebar/stores/sidebar_store';
 import SidebarService from '~/sidebar/services/sidebar_service';
 import Mock from './ee_mock_data';
-import waitForPromises from 'spec/helpers/wait_for_promises';
+import waitForPromises from 'helpers/wait_for_promises';
 
 describe('EE Sidebar mediator', () => {
   let mediator;
@@ -31,7 +31,7 @@ describe('EE Sidebar mediator', () => {
   it('updates status when updateStatus is called', () => {
     const healthStatus = 'onTrack';
 
-    spyOn(mediator.service, 'updateWithGraphQl').and.returnValue(
+    jest.spyOn(mediator.service, 'updateWithGraphQl').mockReturnValue(
       Promise.resolve({
         data: {
           updateIssue: {
