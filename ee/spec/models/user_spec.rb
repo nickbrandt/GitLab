@@ -91,11 +91,24 @@ describe User do
       let_it_be(:user1) { create(:user, :external) }
       let_it_be(:user2) { create(:user, state: 'blocked') }
       let_it_be(:user3) { create(:user, ghost: true) }
-      let_it_be(:user4) { create(:user, bot_type: 'support_bot') }
-      let_it_be(:user5) { create(:user, state: 'blocked', bot_type: 'support_bot') }
+      let_it_be(:user4) { create(:user, user_type: :support_bot) }
+      let_it_be(:user5) { create(:user, state: 'blocked', user_type: :support_bot) }
 
       it 'returns all active users including active bots but ghost users' do
         expect(described_class.active_without_ghosts).to match_array([user1, user4])
+      end
+    end
+
+    describe '.non_internal' do
+      let!(:user) { create(:user) }
+      let!(:service_user) { create(:user, user_type: :service_user) }
+      let!(:ghost) { described_class.ghost }
+      let!(:alert_bot) { described_class.alert_bot }
+      let!(:non_internal) { [user, service_user] }
+
+      it 'returns users without ghosts and bots' do
+        expect(described_class.non_internal).to match_array(non_internal)
+        expect(non_internal.all?(&:internal?)).to eq(false)
       end
     end
   end
@@ -600,13 +613,13 @@ describe User do
       context 'when user is internal' do
         using RSpec::Parameterized::TableSyntax
 
-        where(:bot_type) do
-          User.bot_types.keys
+        where(:bot_user_type) do
+          UserTypeEnums.bots.keys
         end
 
         with_them do
           context 'when user is a bot' do
-            let(:user) { create(:user, bot_type: bot_type) }
+            let(:user) { create(:user, user_type: bot_user_type) }
 
             it 'returns false' do
               expect(user.using_license_seat?).to eq false

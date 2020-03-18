@@ -92,7 +92,7 @@ module EE
       def support_bot
         email_pattern = "support%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
+        unique_internal(where(user_type: :support_bot), 'support-bot', email_pattern) do |u|
           u.bio = 'The GitLab support bot used for Service Desk'
           u.name = 'GitLab Support Bot'
         end
@@ -101,7 +101,7 @@ module EE
       def visual_review_bot
         email_pattern = "visual_review%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
+        unique_internal(where(user_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
           u.bio = 'The Gitlab Visual Review feedback bot'
           u.name = 'Gitlab Visual Review Bot'
         end
