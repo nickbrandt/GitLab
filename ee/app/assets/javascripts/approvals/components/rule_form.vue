@@ -28,6 +28,7 @@ export default {
     isMrEdit: {
       type: Boolean,
       default: true,
+      required: false,
     },
   },
   data() {

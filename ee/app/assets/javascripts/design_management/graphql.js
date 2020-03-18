@@ -13,7 +13,7 @@ const defaultClient = createDefaultClient(
   {
     cacheConfig: {
       dataIdFromObject: object => {
-        // eslint-disable-next-line no-underscore-dangle, @gitlab/i18n/no-non-i18n-strings
+        // eslint-disable-next-line no-underscore-dangle, @gitlab/require-i18n-strings
         if (object.__typename === 'Design') {
           return object.id && object.image ? `${object.id}-${object.image}` : _.uniqueId();
         }

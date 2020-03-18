@@ -74,7 +74,7 @@ export default {
     </div>
 
     <div class="settings-content">
-      <!-- eslint-disable @gitlab/vue-i18n/no-bare-attribute-strings -->
+      <!-- eslint-disable @gitlab/vue-require-i18n-attribute-strings -->
       <p>
         <gl-sprintf :message="$options.i18n.introText">
           <template #docsLink>

@@ -24,6 +24,7 @@ export default {
     hideGroupDropDown: {
       type: Boolean,
       default: false,
+      required: false,
     },
   },
   data() {
