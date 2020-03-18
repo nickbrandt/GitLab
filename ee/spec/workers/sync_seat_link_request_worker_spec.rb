@@ -5,7 +5,7 @@ require 'spec_helper'
 describe SyncSeatLinkRequestWorker, type: :worker do
   describe '#perform' do
     subject do
-      described_class.new.perform('2020-01-01', '123', 5)
+      described_class.new.perform('2020-01-01', '123', 5, 4)
     end
 
     let(:seat_link_url) { [EE::SUBSCRIPTIONS_URL, '/api/v1/seat_links'].join }
@@ -20,7 +20,8 @@ describe SyncSeatLinkRequestWorker, type: :worker do
         body: {
           date: '2020-01-01',
           license_key: '123',
-          max_historical_user_count: 5
+          max_historical_user_count: 5,
+          active_users: 4
         }.to_json
       )
     end

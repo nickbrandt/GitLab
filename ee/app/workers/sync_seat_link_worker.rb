@@ -18,7 +18,8 @@ class SyncSeatLinkWorker # rubocop:disable Scalability/IdempotentWorker
     SyncSeatLinkRequestWorker.perform_async(
       report_date.to_s,
       License.current.data,
-      max_historical_user_count
+      max_historical_user_count,
+      HistoricalData.at(report_date)&.active_user_count
     )
   end
 
