@@ -46,7 +46,7 @@ class Service < ApplicationRecord
   scope :active, -> { where(active: true) }
   scope :without_defaults, -> { where(default: false) }
   scope :by_type, -> (type) { where(type: type) }
-  scope :templates, -> { where(template: true) }
+  scope :templates, -> { where(template: true, type: available_services_types) }
 
   scope :push_hooks, -> { where(push_events: true, active: true) }
   scope :tag_push_hooks, -> { where(tag_push_events: true, active: true) }
@@ -263,16 +263,13 @@ class Service < ApplicationRecord
   # Find all service templates; if some of them do not exist, create them
   # within a transaction to perform the lowest possible SQL queries.
   def self.find_or_create_templates
-    if templates.size == available_services_types.size
-      templates
-    else
-      create_nonexistent_templates
-      templates.reset
-    end
+    create_nonexistent_templates
+    templates
   end
 
   private_class_method def self.create_nonexistent_templates
-    nonexistent_services = available_services_types - templates.map(&:type)
+    nonexistent_services = available_services_types - templates.pluck(:type)
+    return if nonexistent_services.empty?
 
     transaction do
       nonexistent_services.each do |service_type|

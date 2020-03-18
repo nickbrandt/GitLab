@@ -13,7 +13,7 @@ describe Admin::ServicesController do
     it 'avoids N+1 queries' do
       query_count = ActiveRecord::QueryRecorder.new { get :index }.count
 
-      expect(query_count).to be <= 80
+      expect(query_count).to be <= 79
     end
 
     context 'with all existing templates' do

@@ -157,6 +157,10 @@ describe Service do
         expect { Service.find_or_create_templates }.to change { Service.count }.from(0).to(Service.available_services_names.size)
       end
 
+      it 'returns the available service templates' do
+        expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
+      end
+
       context 'with all existing templates' do
         before do
           Service.insert_all(
@@ -167,6 +171,21 @@ describe Service do
         it 'does not create service templates' do
           expect { Service.find_or_create_templates }.to change { Service.count }.by(0)
         end
+
+        it 'returns the available service templates' do
+          expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
+        end
+
+        context 'with a previous existing service (Previous) and a new service (Asana)' do
+          before do
+            Service.insert(type: 'PreviousService', template: true)
+            Service.delete_by(type: 'AsanaService', template: true)
+          end
+
+          it 'returns the available service templates' do
+            expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
+          end
+        end
       end
 
       context 'with a few existing templates' do
@@ -176,6 +195,10 @@ describe Service do
 
         it 'creates the rest of the service templates' do
           expect { Service.find_or_create_templates }.to change { Service.count }.from(1).to(Service.available_services_names.size)
+        end
+
+        it 'returns the available service templates' do
+          expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
         end
       end
     end
