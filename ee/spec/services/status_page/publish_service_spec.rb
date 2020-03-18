@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::PublishIncidentService do
+describe StatusPage::PublishService do
   let_it_be(:user) { create(:user) }
   let_it_be(:project, refind: true) { create(:project) }
   let_it_be(:issue) { create(:issue, project: project) }

@@ -11,7 +11,7 @@ module StatusPage
   # * StatusPage::PublishDetailsService
   # * StatusPage::UnpublishDetailsService
   # * StatusPage::PublishListService
-  class PublishIncidentService
+  class PublishService
     include Gitlab::Utils::StrongMemoize
 
     def initialize(user:, project:, issue_id:)

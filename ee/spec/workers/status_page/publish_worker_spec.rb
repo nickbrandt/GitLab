@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe StatusPage::PublishIncidentWorker do
+describe StatusPage::PublishWorker do
   include ExclusiveLeaseHelpers
 
   let_it_be(:user) { create(:user) }
@@ -11,11 +11,11 @@ describe StatusPage::PublishIncidentWorker do
 
   let(:worker) { described_class.new }
   let(:logger) { worker.send(:logger) }
-  let(:service) { instance_double(StatusPage::PublishIncidentService) }
+  let(:service) { instance_double(StatusPage::PublishService) }
   let(:service_result) { ServiceResponse.success }
 
   before do
-    allow(StatusPage::PublishIncidentService)
+    allow(StatusPage::PublishService)
       .to receive(:new).with(user: user, project: project, issue_id: issue.id)
       .and_return(service)
     allow(service).to receive(:execute)
@@ -40,7 +40,7 @@ describe StatusPage::PublishIncidentWorker do
         let(:project) { build(:project) }
 
         it 'does not execute the service' do
-          expect(StatusPage::PublishIncidentService).not_to receive(:execute)
+          expect(StatusPage::PublishService).not_to receive(:execute)
 
           subject
         end

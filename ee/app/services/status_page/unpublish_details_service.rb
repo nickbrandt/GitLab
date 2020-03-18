@@ -6,9 +6,9 @@ module StatusPage
   # Example: An issue becomes confidential so it must be removed from CDN.
   #
   # This is an internal service which is part of
-  # +StatusPage::PublishIncidentService+ and is not meant to be called directly.
+  # +StatusPage::PublishService+ and is not meant to be called directly.
   #
-  # Consider calling +StatusPage::PublishIncidentService+ instead.
+  # Consider calling +StatusPage::PublishService+ instead.
   class UnpublishDetailsService < PublishBaseService
     private
 

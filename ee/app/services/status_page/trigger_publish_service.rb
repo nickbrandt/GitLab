@@ -15,8 +15,7 @@ module StatusPage
       return unless can_publish?
       return unless status_page_enabled?
 
-      StatusPage::PublishIncidentWorker
-        .perform_async(user.id, project.id, issue_id)
+      StatusPage::PublishWorker.perform_async(user.id, project.id, issue_id)
     end
 
     private

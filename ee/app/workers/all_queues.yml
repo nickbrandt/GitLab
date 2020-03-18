@@ -33,7 +33,7 @@
   :idempotent: true
 - :name: cronjob:elastic_metrics_update
   :feature_category: :global_search
-  :has_external_dependencies:
+  :has_external_dependencies: 
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
@@ -577,7 +577,7 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
-- :name: status_page_publish_incident
+- :name: status_page_publish
   :feature_category: :status_page
   :has_external_dependencies: true
   :urgency: :low

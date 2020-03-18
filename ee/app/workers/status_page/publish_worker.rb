@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module StatusPage
-  class PublishIncidentWorker
+  class PublishWorker
     include ApplicationWorker
     include Gitlab::Utils::StrongMemoize
 
@@ -26,7 +26,7 @@ module StatusPage
     attr_reader :user_id, :project_id, :issue_id
 
     def publish
-      result = PublishIncidentService
+      result = PublishService
         .new(user: user, project: project, issue_id: issue_id)
         .execute
 
