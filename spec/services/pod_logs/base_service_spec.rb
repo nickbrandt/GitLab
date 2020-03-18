@@ -9,11 +9,14 @@ describe ::PodLogs::BaseService do
   let(:namespace) { 'autodevops-deploy-9-production' }
 
   let(:pod_name) { 'pod-1' }
+  let(:pod_name_2) { 'pod-2' }
   let(:container_name) { 'container-0' }
+  let(:container_name_2) { 'foo-0' }
   let(:params) { {} }
   let(:raw_pods) do
     JSON.parse([
-      kube_pod(name: pod_name)
+      kube_pod(name: pod_name),
+      kube_pod(name: pod_name_2, container_name: container_name_2)
     ].to_json, object_class: OpenStruct)
   end
 
@@ -147,7 +150,7 @@ describe ::PodLogs::BaseService do
       result = subject.send(:get_pod_names, raw_pods: raw_pods)
 
       expect(result[:status]).to eq(:success)
-      expect(result[:pods]).to eq([pod_name])
+      expect(result[:pods]).to eq([pod_name, pod_name_2])
     end
   end
 
@@ -195,12 +198,12 @@ describe ::PodLogs::BaseService do
 
     it 'returns success if container_name was not specified and there are containers' do
       result = subject.send(:check_container_name,
-        pod_name: pod_name,
+        pod_name: pod_name_2,
         raw_pods: raw_pods
       )
 
       expect(result[:status]).to eq(:success)
-      expect(result[:container_name]).to eq(container_name)
+      expect(result[:container_name]).to eq(container_name_2)
     end
 
     it 'returns error if container_name was not specified and there are no containers on the pod' do
