@@ -22,6 +22,7 @@ describe SyncSeatLinkWorker, type: :worker do
         HistoricalData.create!(date: '2020-02-12'.to_date, active_user_count: 10)
         HistoricalData.create!(date: '2020-02-13'.to_date, active_user_count: 15)
 
+        HistoricalData.create!(date: '2020-03-11'.to_date, active_user_count: 10)
         HistoricalData.create!(date: '2020-03-12'.to_date, active_user_count: 20)
         HistoricalData.create!(date: '2020-03-15'.to_date, active_user_count: 25)
         allow(SyncSeatLinkRequestWorker).to receive(:perform_async).and_return(true)
@@ -35,7 +36,8 @@ describe SyncSeatLinkWorker, type: :worker do
             .with(
               '2020-03-11',
               License.current.data,
-              15
+              15,
+              10
             )
         end
       end
@@ -55,7 +57,8 @@ describe SyncSeatLinkWorker, type: :worker do
               .with(
                 '2020-03-11',
                 License.current.data,
-                15
+                15,
+                10
               )
           end
         end
@@ -75,7 +78,8 @@ describe SyncSeatLinkWorker, type: :worker do
                 .with(
                   '2020-03-11',
                   License.current.data,
-                  15
+                  15,
+                  10
                 )
             end
           end
