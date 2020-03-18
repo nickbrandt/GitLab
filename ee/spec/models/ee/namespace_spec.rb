@@ -310,6 +310,7 @@ describe Namespace do
 
       before do
         stub_application_setting_on_object(group, should_check_namespace_plan: true)
+        stub_feature_flags(promo_ci_cd_projects: true)
       end
 
       it 'returns true when the feature is available globally' do

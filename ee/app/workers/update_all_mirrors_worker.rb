@@ -142,7 +142,6 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
   end
 
   def check_mirror_plans_in_query?
-    ::Gitlab::CurrentSettings.should_check_namespace_plan? &&
-      !::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
+    ::Gitlab::CurrentSettings.should_check_namespace_plan?
   end
 end

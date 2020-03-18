@@ -187,13 +187,6 @@ class License < ApplicationRecord
     'GitLab_ServiceDesk' => :service_desk
   }.freeze
 
-  # Features added here are available for all namespaces.
-  ANY_PLAN_FEATURES = %i[
-    ci_cd_projects
-    github_project_service_integration
-    repository_mirrors
-  ].freeze
-
   # Global features that cannot be restricted to only a subset of projects or namespaces.
   # Use `License.feature_available?(:feature)` to check if these features are available.
   # For all other features, use `project.feature_available?` or `namespace.feature_available?` when possible.
@@ -299,9 +292,7 @@ class License < ApplicationRecord
     end
 
     def promo_feature_available?(feature)
-      return false unless ::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
-
-      ANY_PLAN_FEATURES.include?(feature)
+      ::Feature.enabled?("promo_#{feature}", default_enabled: false)
     end
 
     def history
