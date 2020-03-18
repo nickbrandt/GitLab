@@ -551,14 +551,6 @@ describe Ci::Build do
 
           it { is_expected.to be_empty }
         end
-
-        context 'when feature is disabled' do
-          before do
-            stub_feature_flags(cross_project_need_artifacts: false)
-          end
-
-          it { is_expected.to be_empty }
-        end
       end
 
       context 'without permissions to other_project' do
