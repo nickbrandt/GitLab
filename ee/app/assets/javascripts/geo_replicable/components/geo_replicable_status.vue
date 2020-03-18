@@ -3,7 +3,7 @@ import { STATUS_ICON_NAMES, STATUS_ICON_CLASS, DEFAULT_STATUS } from '../store/c
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
-  name: 'GeoDesignStatus',
+  name: 'GeoReplicableStatus',
   components: {
     Icon,
   },

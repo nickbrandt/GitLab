@@ -1,6 +1,6 @@
-import mutations from 'ee/geo_designs/store/mutations';
-import createState from 'ee/geo_designs/store/state';
-import * as types from 'ee/geo_designs/store/mutation_types';
+import mutations from 'ee/geo_replicable/store/mutations';
+import createState from 'ee/geo_replicable/store/state';
+import * as types from 'ee/geo_replicable/store/mutation_types';
 import { MOCK_BASIC_FETCH_DATA_MAP } from '../mock_data';
 
 describe('GeoReplicable Store Mutations', () => {
@@ -76,12 +76,12 @@ describe('GeoReplicable Store Mutations', () => {
       expect(state.isLoading).toEqual(false);
     });
 
-    it('sets designs array with data', () => {
+    it('sets replicableItems array with data', () => {
       mutations[types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, mockData);
       expect(state.replicableItems).toBe(mockData.data);
     });
 
-    it('sets pageSize and totalDesigns', () => {
+    it('sets pageSize and totalReplicableItems', () => {
       mutations[types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, mockData);
       expect(state.pageSize).toEqual(mockData.perPage);
       expect(state.totalReplicableItems).toEqual(mockData.total);
@@ -102,7 +102,7 @@ describe('GeoReplicable Store Mutations', () => {
       expect(state.isLoading).toEqual(false);
     });
 
-    it('resets designs array', () => {
+    it('resets replicableItems array', () => {
       state.replicableItems = mockData.data;
 
       mutations[types.RECEIVE_REPLICABLE_ITEMS_ERROR](state);

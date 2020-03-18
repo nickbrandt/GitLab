@@ -1,14 +1,14 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlTabs, GlTab, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import GeoDesignsFilterBar from 'ee/geo_designs/components/geo_designs_filter_bar.vue';
-import store from 'ee/geo_designs/store';
-import { DEFAULT_SEARCH_DELAY } from 'ee/geo_designs/store/constants';
+import GeoReplicableFilterBar from 'ee/geo_replicable/components/geo_replicable_filter_bar.vue';
+import store from 'ee/geo_replicable/store';
+import { DEFAULT_SEARCH_DELAY } from 'ee/geo_replicable/store/constants';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignsFilterBar', () => {
+describe('GeoReplicableFilterBar', () => {
   let wrapper;
 
   const actionSpies = {
@@ -19,7 +19,7 @@ describe('GeoDesignsFilterBar', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesignsFilterBar, {
+    wrapper = mount(GeoReplicableFilterBar, {
       localVue,
       store,
       methods: {

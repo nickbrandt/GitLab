@@ -1,13 +1,13 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { GlPagination } from '@gitlab/ui';
-import GeoDesign from './geo_design.vue';
+import GeoReplicableItem from './geo_replicable_item.vue';
 
 export default {
-  name: 'GeoDesigns',
+  name: 'GeoReplicable',
   components: {
     GlPagination,
-    GeoDesign,
+    GeoReplicableItem,
   },
   computed: {
     ...mapState(['replicableItems', 'currentPage', 'pageSize', 'totalReplicableItems']),
@@ -32,7 +32,7 @@ export default {
 
 <template>
   <section>
-    <geo-design
+    <geo-replicable-item
       v-for="item in replicableItems"
       :key="item.id"
       :name="item.name"

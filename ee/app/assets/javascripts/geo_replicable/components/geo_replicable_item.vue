@@ -3,16 +3,16 @@ import { mapActions } from 'vuex';
 import { GlLink, GlDeprecatedButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { ACTION_TYPES } from '../store/constants';
-import GeoDesignStatus from './geo_design_status.vue';
-import GeoDesignTimeAgo from './geo_design_time_ago.vue';
+import GeoReplicableStatus from './geo_replicable_status.vue';
+import GeoReplicableTimeAgo from './geo_replicable_time_ago.vue';
 
 export default {
-  name: 'GeoDesign',
+  name: 'GeoReplicableItem',
   components: {
     GlLink,
     GlDeprecatedButton,
-    GeoDesignTimeAgo,
-    GeoDesignStatus,
+    GeoReplicableTimeAgo,
+    GeoReplicableStatus,
   },
   props: {
     name: {
@@ -87,9 +87,9 @@ export default {
       <div class="d-flex flex-column flex-md-row">
         <div class="flex-grow-1">
           <label class="text-muted">{{ __('Status') }}</label>
-          <geo-design-status :status="syncStatus" />
+          <geo-replicable-status :status="syncStatus" />
         </div>
-        <geo-design-time-ago
+        <geo-replicable-time-ago
           v-for="(timeAgo, index) in timeAgoArray"
           :key="index"
           class="flex-grow-1"

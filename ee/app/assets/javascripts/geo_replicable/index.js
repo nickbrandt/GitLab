@@ -1,19 +1,19 @@
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import createStore from './store';
-import GeoDesignsApp from './components/app.vue';
+import GeoReplicableApp from './components/app.vue';
 
 Vue.use(Translate);
 
 export default () => {
-  const el = document.getElementById('js-geo-designs');
+  const el = document.getElementById('js-geo-replicable');
   const { replicableType } = el.dataset;
 
   return new Vue({
     el,
     store: createStore(replicableType),
     components: {
-      GeoDesignsApp,
+      GeoReplicableApp,
     },
     data() {
       const {
@@ -28,7 +28,7 @@ export default () => {
     },
 
     render(createElement) {
-      return createElement('geo-designs-app', {
+      return createElement('geo-replicable-app', {
         props: {
           geoSvgPath: this.geoSvgPath,
           issuesSvgPath: this.issuesSvgPath,

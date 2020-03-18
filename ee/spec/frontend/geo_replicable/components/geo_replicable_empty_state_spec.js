@@ -1,14 +1,14 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
-import store from 'ee/geo_designs/store';
-import GeoDesignsEmptyState from 'ee/geo_designs/components/geo_designs_empty_state.vue';
+import store from 'ee/geo_replicable/store';
+import GeoReplicableEmptyState from 'ee/geo_replicable/components/geo_replicable_empty_state.vue';
 import { MOCK_ISSUES_SVG_PATH, MOCK_GEO_TROUBLESHOOTING_LINK } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignsEmptyState', () => {
+describe('GeoReplicableEmptyState', () => {
   let wrapper;
 
   const propsData = {
@@ -17,7 +17,7 @@ describe('GeoDesignsEmptyState', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesignsEmptyState, {
+    wrapper = mount(GeoReplicableEmptyState, {
       localVue,
       store,
       propsData,

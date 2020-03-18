@@ -1,13 +1,13 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import store from 'ee/geo_designs/store';
-import GeoDesignTimeAgo from 'ee/geo_designs/components/geo_design_time_ago.vue';
+import store from 'ee/geo_replicable/store';
+import GeoReplicableTimeAgo from 'ee/geo_replicable/components/geo_replicable_time_ago.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('GeoDesignTimeAgo', () => {
+describe('GeoReplicableTimeAgo', () => {
   let wrapper;
 
   const propsData = {
@@ -17,7 +17,7 @@ describe('GeoDesignTimeAgo', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoDesignTimeAgo, {
+    wrapper = mount(GeoReplicableTimeAgo, {
       localVue,
       store,
       propsData,
@@ -28,17 +28,17 @@ describe('GeoDesignTimeAgo', () => {
     wrapper.destroy();
   });
 
-  const findGeoDesignTimeAgo = () => wrapper.find(GeoDesignTimeAgo);
-  const findTimeAgo = () => findGeoDesignTimeAgo().find(TimeAgo);
-  const findDefaultText = () => findGeoDesignTimeAgo().find('span');
+  const findGeoReplicableTimeAgo = () => wrapper.find(GeoReplicableTimeAgo);
+  const findTimeAgo = () => findGeoReplicableTimeAgo().find(TimeAgo);
+  const findDefaultText = () => findGeoReplicableTimeAgo().find('span');
 
   describe('template', () => {
     beforeEach(() => {
       createComponent();
     });
 
-    it('renders GeoDesignTimeAgo container', () => {
-      expect(findGeoDesignTimeAgo().exists()).toBe(true);
+    it('renders GeoReplicableTimeAgo container', () => {
+      expect(findGeoReplicableTimeAgo().exists()).toBe(true);
     });
 
     describe('when dateString exists', () => {
