@@ -432,6 +432,7 @@ describe('Cycle Analytics component', () => {
       mockFetchStageMedian = true,
       mockFetchDurationData = true,
       mockFetchTasksByTypeData = true,
+      mockFetchTopRankedGroupLabels = true,
     }) => {
       const defaultStatus = 200;
       const defaultRequests = {
@@ -453,9 +454,11 @@ describe('Cycle Analytics component', () => {
         ...overrides,
       };
 
-      mock
-        .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
-        .reply(defaultStatus, mockData.groupLabels);
+      if (mockFetchTopRankedGroupLabels) {
+        mock
+          .onGet(mockData.endpoints.tasksByTypeTopLabelsData)
+          .reply(defaultStatus, mockData.groupLabels);
+      }
 
       if (mockFetchTasksByTypeData) {
         mock
@@ -563,6 +566,16 @@ describe('Cycle Analytics component', () => {
       });
 
       return selectGroupAndFindError('There was an error fetching data for the selected stage');
+    });
+
+    it('will display an error if the fetchTopRankedGroupLabels request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({ mockFetchTopRankedGroupLabels: false });
+
+      return selectGroupAndFindError(
+        'There was an error fetching the top labels for the selected group',
+      );
     });
 
     it('will display an error if the fetchTasksByTypeData request fails', () => {
