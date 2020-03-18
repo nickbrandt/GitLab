@@ -1,4 +1,4 @@
-import { uniqueId } from 'underscore';
+import { uniqueId } from 'lodash';
 import { VALID_DESIGN_FILE_MIMETYPE } from '../constants';
 
 export const isValidDesignFile = ({ type }) =>
