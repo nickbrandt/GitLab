@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlBadge } from '@gitlab/ui';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
@@ -57,8 +57,9 @@ describe('AlertWidget', () => {
     });
   };
   const findWidgetForm = () => wrapper.find({ ref: 'widgetForm' });
-  const findAlertErrorMessage = () => wrapper.find('.alert-error-message');
-  const findCurrentSettings = () => wrapper.find('.alert-current-setting');
+  const findAlertErrorMessage = () => wrapper.find({ ref: 'alertErrorMessage' });
+  const findCurrentSettings = () => wrapper.find({ ref: 'alertCurrentSetting' });
+  const findBadge = () => wrapper.find(GlBadge);
 
   afterEach(() => {
     wrapper.destroy();
@@ -105,6 +106,13 @@ describe('AlertWidget', () => {
     createComponent(propsWithAlertData);
 
     expect(wrapper.text()).toContain('alert-label > 42');
+  });
+
+  it('displays a warning icon and matches snapshopt', () => {
+    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+    createComponent(propsWithAlertData);
+
+    expect(findBadge().element).toMatchSnapshot();
   });
 
   it('displays a combined alert summary when there are multiple alerts', () => {
