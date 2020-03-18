@@ -136,7 +136,7 @@ export default {
     >
       <gl-icon name="work" :size="16" class="align-middle" />
       <!-- `GitLab` does not need to be translated -->
-      <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings -->
+      <!-- eslint-disable-next-line @gitlab/vue-require-i18n-strings -->
       <span class="align-middle">GitLab</span>
     </span>
   </div>
