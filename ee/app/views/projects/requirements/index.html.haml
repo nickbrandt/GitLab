@@ -1,4 +1,21 @@
 - page_title _('Requirements')
+- type = :requirements
+- page_context_word = type.to_s.humanize(capitalize: false)
 
--# haml-lint:disable NoPlainNodes
-%h1 Hello World from Requirements!
+.top-area
+  %ul.nav-links.mobile-separator.requirements-state-filters
+    %li{ class: active_when(params[:state].nil? || params[:state] == 'opened') }>
+      = link_to page_filter_path(state: 'opened'), id: 'state-opened', title: (_("Filter by %{issuable_type} that are currently opened.") % { issuable_type: page_context_word }), data: { state: 'opened' } do
+        = _('Open')
+
+    %li{ class: active_when(params[:state] == 'archived') }>
+      = link_to page_filter_path(state: 'archived'), id: 'state-archived', title: (_("Filter by %{issuable_type} that are currently archived.") % { issuable_type: page_context_word }), data: { state: 'archived' } do
+        = _('Archived')
+
+    = render 'shared/issuable/nav_links/all', page_context_word: page_context_word, counter: _('All')
+
+  .nav-controls
+    %button.btn.btn-success.js-new-requirement.qa-new-requirement-button{ type: 'button' }
+      = _('New requirement')
+
+#js-requirements-app{ data: { filter_by: params[:state] } }
