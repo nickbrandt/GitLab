@@ -24,6 +24,7 @@ describe ::Packages::Detail::PackagePresenter do
       created_at: pipeline.created_at,
       id: pipeline.id,
       sha: pipeline.sha,
+      ref: pipeline.ref,
       git_commit_message: pipeline.git_commit_message,
       user: user_info
     }

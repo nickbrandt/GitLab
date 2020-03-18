@@ -39,6 +39,7 @@ module Packages
           created_at: pipeline_info.created_at,
           id: pipeline_info.id,
           sha: pipeline_info.sha,
+          ref: pipeline_info.ref,
           git_commit_message: pipeline_info.git_commit_message,
           user: build_user_info(pipeline_info.user)
         }

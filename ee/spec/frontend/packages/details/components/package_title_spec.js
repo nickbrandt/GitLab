@@ -27,6 +27,7 @@ describe('PackageTitle', () => {
       },
       getters: {
         packageTypeDisplay: ({ packageEntity: { package_type: type } }) => type,
+        packagePipeline: ({ packageEntity: { pipeline = null } }) => pipeline,
       },
     });
 
@@ -38,6 +39,7 @@ describe('PackageTitle', () => {
 
   const packageType = () => wrapper.find({ ref: 'package-type' });
   const packageSize = () => wrapper.find({ ref: 'package-size' });
+  const packageRef = () => wrapper.find({ ref: 'package-ref' });
   const packageTags = () => wrapper.find(PackageTags);
 
   afterEach(() => {
@@ -100,6 +102,20 @@ describe('PackageTitle', () => {
       createComponent();
 
       expect(packageTags().exists()).toBe(false);
+    });
+  });
+
+  describe('package ref', () => {
+    it('does not display the ref if missing', () => {
+      createComponent();
+
+      expect(packageRef().exists()).toBe(false);
+    });
+
+    it('correctly shows the package ref if there is one', () => {
+      createComponent(npmPackage);
+
+      expect(packageRef().text()).toBe(npmPackage.pipeline.ref);
     });
   });
 });
