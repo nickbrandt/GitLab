@@ -64,7 +64,7 @@ export const setCurrentEnvironmentId = ({ commit, dispatch }, environmentId) => 
 };
 
 export const setCurrentTimeWindow = ({ commit, dispatch }, timeWindow) => {
-  commit(types.SET_CURRENT_TIME_WINDOW, timeWindow);
+  commit(types.SET_CURRENT_TIME_WINDOW, timeWindow.name);
   dispatch(`threatMonitoringWaf/fetchStatistics`, null, { root: true });
 
   if (window.gon.features?.networkPolicyUi) {

@@ -235,14 +235,14 @@ describe('Threat Monitoring actions', () => {
   });
 
   describe('setCurrentTimeWindow', () => {
-    const timeWindow = 'foo';
+    const timeWindow = { name: 'foo' };
 
     it('commits the SET_CURRENT_TIME_WINDOW mutation and dispatches WAF fetch action', () =>
       testAction(
         actions.setCurrentTimeWindow,
         timeWindow,
         state,
-        [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow }],
+        [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow.name }],
         [{ type: 'threatMonitoringWaf/fetchStatistics', payload: null }],
       ));
 
@@ -254,7 +254,7 @@ describe('Threat Monitoring actions', () => {
           actions.setCurrentTimeWindow,
           timeWindow,
           state,
-          [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow }],
+          [{ type: types.SET_CURRENT_TIME_WINDOW, payload: timeWindow.name }],
           [
             { type: 'threatMonitoringWaf/fetchStatistics', payload: null },
             { type: 'threatMonitoringNetworkPolicy/fetchStatistics', payload: null },
