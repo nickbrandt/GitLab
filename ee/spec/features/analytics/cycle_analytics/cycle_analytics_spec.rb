@@ -402,6 +402,7 @@ describe 'Group Value Stream Analytics', :js do
     let(:params) { { name: custom_stage_name, start_event_identifier: start_event_identifier, end_event_identifier: end_event_identifier } }
     let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
     let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage_name).ancestor(".stage-nav-item") }
+    let(:nav) { page.find(stage_nav_selector) }
 
     def create_custom_stage
       Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
@@ -632,8 +633,6 @@ describe 'Group Value Stream Analytics', :js do
 
       context 'Stage table' do
         context 'default stages' do
-          let(:nav) { page.find(stage_nav_selector) }
-
           def open_recover_stage_dropdown
             find(add_stage_button).click
 
@@ -739,6 +738,47 @@ describe 'Group Value Stream Analytics', :js do
 
             expect(page.find('.flash-notice')).to have_text 'Stage removed'
             expect(nav).not_to have_text(custom_stage_name)
+          end
+        end
+      end
+
+      context 'Duration chart' do
+        let(:duration_chart_dropdown) { page.find('.dropdown-stages') }
+
+        default_stages = %w[Issue Plan Code Test Review Staging Total].freeze
+
+        def duration_chart_stages
+          duration_chart_dropdown.all('.dropdown-menu-link').collect(&:text)
+        end
+
+        def toggle_duration_chart_dropdown
+          duration_chart_dropdown.click
+        end
+
+        before do
+          select_group
+        end
+
+        it 'has all the default stages' do
+          toggle_duration_chart_dropdown
+
+          expect(duration_chart_stages).to eq(default_stages)
+        end
+
+        context 'hidden stage' do
+          before do
+            toggle_more_options(first_default_stage)
+
+            click_button "Hide stage"
+
+            # wait for the stage list to laod
+            expect(nav).to have_content("Plan")
+          end
+
+          it 'will not appear in the duration chart dropdown' do
+            toggle_duration_chart_dropdown
+
+            expect(duration_chart_stages).not_to include("Issue")
           end
         end
       end
