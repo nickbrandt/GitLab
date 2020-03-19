@@ -73,7 +73,7 @@ module EE
               current_user.can?(:create_epic, project.group)
           end
           command :promote do
-            Epics::IssuePromoteService.new(quick_action_target.project, current_user).execute(quick_action_target)
+            @updates[:promote_to_epic] = true
 
             @execution_message[:promote] = if quick_action_target.confidential?
                                              _('Promoted confidential issue to a non-confidential epic. Information in this issue is no longer confidential as epics are public to group members.')
