@@ -1,8 +1,7 @@
 # Elasticsearch integration **(STARTER ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/109 "Elasticsearch Merge Request") in GitLab [Starter](https://about.gitlab.com/pricing/) 8.4. Support
-> for [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html) was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1305) in GitLab
-> [Starter](https://about.gitlab.com/pricing/) 9.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/109 "Elasticsearch Merge Request") in GitLab [Starter](https://about.gitlab.com/pricing/) 8.4.
+> - Support for [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html) was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1305) in GitLab [Starter](https://about.gitlab.com/pricing/) 9.0.
 
 This document describes how to set up Elasticsearch with GitLab. Once enabled,
 you'll have the benefit of fast search response times and the advantage of two

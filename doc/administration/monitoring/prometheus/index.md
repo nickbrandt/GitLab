@@ -302,8 +302,8 @@ The GitLab exporter allows you to measure various GitLab metrics, pulled from Re
 
 ## Configuring Prometheus to monitor Kubernetes
 
-> Introduced in GitLab 9.0.
-> Pod monitoring introduced in GitLab 9.4.
+> - Introduced in GitLab 9.0.
+> - Pod monitoring introduced in GitLab 9.4.
 
 If your GitLab server is running within Kubernetes, Prometheus will collect metrics from the Nodes and [annotated Pods](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config) in the cluster, including performance data on each container. This is particularly helpful if your CI/CD environments run in the same cluster, as you can use the [Prometheus project integration][prometheus integration] to monitor them.
 
