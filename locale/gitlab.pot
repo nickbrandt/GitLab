@@ -8164,9 +8164,6 @@ msgstr ""
 msgid "Events in %{project_path}"
 msgstr ""
 
-msgid "Events|in the wiki for"
-msgstr ""
-
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
 msgstr ""
 

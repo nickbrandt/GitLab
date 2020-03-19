@@ -93,7 +93,7 @@ describe EventsHelper do
       let(:event) { create(:wiki_page_event) }
 
       it 'returns a suitable phrase' do
-        expect(helper.event_preposition(event)).to eq('Events|in the wiki for')
+        expect(helper.event_preposition(event)).to eq('in the wiki for')
       end
     end
 
