@@ -18,7 +18,7 @@ export default {
   mixins: [timeagoMixin],
   computed: {
     ...mapState(['packageEntity', 'packageFiles']),
-    ...mapGetters(['packageTypeDisplay']),
+    ...mapGetters(['packageTypeDisplay', 'packagePipeline']),
     hasTagsToDisplay() {
       return Boolean(this.packageEntity.tags && this.packageEntity.tags.length);
     },
@@ -56,6 +56,20 @@ export default {
 
       <div v-if="hasTagsToDisplay" class="d-flex align-items-center append-right-default">
         <package-tags :tag-display-limit="1" :tags="packageEntity.tags" />
+      </div>
+
+      <div
+        v-if="packagePipeline"
+        ref="package-ref"
+        class="d-flex align-items-center append-right-default"
+      >
+        <gl-icon name="branch" class="text-secondary append-right-8" />
+        <span
+          v-gl-tooltip
+          class="font-weight-bold text-truncate mw-xs"
+          :title="packagePipeline.ref"
+          >{{ packagePipeline.ref }}</span
+        >
       </div>
 
       <div class="d-flex align-items-center append-right-default">

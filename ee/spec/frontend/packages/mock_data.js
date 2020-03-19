@@ -53,10 +53,7 @@ export const npmPackage = {
   updated_at: '2015-12-10',
   version: '',
   _links,
-  build_info: {
-    pipeline_id: 1,
-    pipeline: mockPipelineInfo,
-  },
+  pipeline: mockPipelineInfo,
 };
 
 export const npmFiles = [
