@@ -268,7 +268,7 @@ class Service < ApplicationRecord
   end
 
   private_class_method def self.create_nonexistent_templates
-    nonexistent_services = available_services_types - templates.pluck(:type)
+    nonexistent_services = available_services_types - templates.map(&:type)
     return if nonexistent_services.empty?
 
     transaction do
