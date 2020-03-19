@@ -315,25 +315,25 @@ describe API::Epics do
       end
 
       it 'returns an array of epics with any label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_ANY }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_ANY }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with any label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_ANY] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_ANY] }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with no label' do
-        get api(url), params: { labels: IssuesFinder::FILTER_NONE }
+        get api(url), params: { labels: IssuableFinder::Params::FILTER_NONE }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label with labels param as array' do
-        get api(url), params: { labels: [IssuesFinder::FILTER_NONE] }
+        get api(url), params: { labels: [IssuableFinder::Params::FILTER_NONE] }
 
         expect_paginated_array_response(epic.id)
       end
