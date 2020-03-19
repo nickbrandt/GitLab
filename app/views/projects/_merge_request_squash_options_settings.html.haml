@@ -1,0 +1,36 @@
+- form = local_assigns.fetch(:form)
+
+.form-group
+  %b= s_('ProjectSettings|Squash options')
+  %p.text-secondary= s_('ProjectSettings|This determines what kind of squashing is available or enforced')
+  .form-check.mb-2
+    = form.radio_button :squash_option, :never, class: "js-squash-option-radio form-check-input"
+    = label_tag :project_squash_option_never, class: 'form-check-label' do
+      = s_('ProjectSettings|Never')
+      .text-secondary
+        = s_('ProjectSettings|Do not allow squashing ever')
+
+  .form-check.mb-2
+    = form.radio_button :squash_option, :allow, class: "js-squash-option-radio form-check-input"
+    = label_tag :project_squash_option_allow, class: 'form-check-label' do
+      = s_('ProjectSettings|Allow')
+      .text-secondary
+        = s_('ProjectSettings|Squash is allowed')
+        %br
+        = s_('ProjectSettings|Squash is disabled by default')
+
+  .form-check.mb-2
+    = form.radio_button :squash_option, :enabled, class: "js-squash-option-radio qa-radio-button-merge-ff form-check-input"
+    = label_tag :project_squash_option_enabled, class: 'form-check-label' do
+      = s_('ProjectSettings|Enabled')
+      .text-secondary
+        = s_('ProjectSettings|Squash is allowed')
+        %br
+        = s_('ProjectSettings|Squash is enabled by default')
+
+  .form-check.mb-2
+    = form.radio_button :squash_option, :always, class: "js-squash-option-radio form-check-input"
+    = label_tag :project_squash_option_always, class: 'form-check-label' do
+      = s_('ProjectSettings|Allows')
+      .text-secondary
+        = s_('ProjectSettings|Enforce squashing for all')

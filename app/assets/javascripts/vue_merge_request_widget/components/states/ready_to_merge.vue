@@ -109,6 +109,14 @@ export default {
       const { commitsCount, enableSquashBeforeMerge } = this.mr;
       return enableSquashBeforeMerge && commitsCount > 1;
     },
+    isSquashButtonSelected() {
+      return this.mr.squashValueDefault;
+    },
+    isSquashButtonDisabled() {
+      console.log(this.mr.squashValueReadonly);
+      console.log(this.mr);
+      return this.isMergeButtonDisabled || this.mr.squashValueReadonly;
+    },
     shouldShowMergeControls() {
       return this.mr.isMergeAllowed || this.isAutoMergeAvailable;
     },
@@ -344,7 +352,7 @@ export default {
                 v-if="shouldShowSquashBeforeMerge"
                 v-model="squashBeforeMerge"
                 :help-path="mr.squashBeforeMergeHelpPath"
-                :is-disabled="isMergeButtonDisabled"
+                :is-disabled="isSquashButtonDisabled"
               />
             </template>
             <template v-else>

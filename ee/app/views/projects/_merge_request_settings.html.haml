@@ -8,6 +8,8 @@
 
 = render 'projects/merge_request_merge_suggestions_settings', project: @project, form: form
 
+= render_ce 'projects/merge_request_squash_options_settings', project: @project, form: form
+
 - if @project.feature_available?(:issuable_default_templates)
   .form-group
     = form.label :merge_requests_template, class: 'label-bold' do

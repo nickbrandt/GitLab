@@ -2202,6 +2202,18 @@ class Project < ApplicationRecord
     end
   end
 
+  def squash_option
+    :always
+  end
+
+  def squash_value_default
+    squash_option == :always || squash_option == :enabled
+  end
+
+  def squash_value_readonly
+    squash_option == :always || squash_option == :never
+  end
+
   def merge_method=(method)
     case method.to_s
     when "ff"

@@ -74,6 +74,14 @@ class MergeRequestPollCachedWidgetEntity < IssuableEntity
     diffs_project_merge_request_path(merge_request.project, merge_request)
   end
 
+  expose :squash_value_default do |merge_request|
+    presenter(merge_request).project.squash_value_default
+  end
+
+  expose :squash_value_readonly do |merge_request|
+    presenter(merge_request).project.squash_value_readonly
+  end
+
   private
 
   delegate :current_user, to: :request
