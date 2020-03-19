@@ -1,0 +1,5 @@
+---
+title: Improve error reporting in project import
+merge_request: 27114
+author:
+type: fixed

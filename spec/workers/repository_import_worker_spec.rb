@@ -83,6 +83,21 @@ describe RepositoryImportWorker do
       end
     end
 
+    context 'when an exception is raised' do
+      before do
+        import_service = instance_double(Projects::ImportService, execute: {}, async?: false)
+        allow(Projects::ImportService).to receive(:new).and_return(import_service)
+
+        allow(Project).to receive(:find).and_return(project)
+        allow(project).to receive(:after_import).and_raise('test error')
+      end
+
+      it 'tracks the exception' do
+        expect(Gitlab::ErrorTracking).to receive(:track_and_raise_exception).and_call_original
+        expect { subject.perform(project.id) }.to raise_error(RuntimeError, 'test error')
+      end
+    end
+
     context 'when using an asynchronous importer' do
       it 'does not mark the import process as finished' do
         service = double(:service)
