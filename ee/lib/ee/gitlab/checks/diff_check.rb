@@ -65,7 +65,11 @@ module EE
 
         def path_locks_validation
           lambda do |diff|
-            path = diff.new_path || diff.old_path
+            path = if diff.renamed_file?
+                     diff.old_path
+                   else
+                     diff.new_path || diff.old_path
+                   end
 
             lock_info = project.find_path_lock(path)
 
