@@ -3,7 +3,7 @@ import { mapActions, mapState } from 'vuex';
 import { GlButton, GlEmptyState, GlLink, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectManager from './project_manager.vue';
-import SecurityDashboard from './app.vue';
+import SecurityDashboard from './security_dashboard.vue';
 
 export default {
   name: 'InstanceSecurityDashboard',
