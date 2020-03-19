@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { GlEmptyState, GlTab, GlTabs } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
+import PackageFilter from './packages_filter.vue';
 import PackageList from './packages_list.vue';
 import PackageSort from './packages_sort.vue';
 import { PACKAGE_REGISTRY_TABS } from '../constants';
@@ -11,6 +12,7 @@ export default {
     GlEmptyState,
     GlTab,
     GlTabs,
+    PackageFilter,
     PackageList,
     PackageSort,
   },
@@ -70,7 +72,8 @@ export default {
 <template>
   <gl-tabs @input="tabChanged">
     <template #tabs-end>
-      <div class="align-self-center ml-auto">
+      <div class="d-flex align-self-center ml-auto">
+        <package-filter class="mr-1" @filter="requestPackagesList" />
         <package-sort @sort:changed="requestPackagesList" />
       </div>
     </template>

@@ -350,8 +350,12 @@ exports[`packages_list_app renders 1`] = `
   </template>
   <template>
     <div
-      class="align-self-center ml-auto"
+      class="d-flex align-self-center ml-auto"
     >
+      <package-filter-stub
+        class="mr-1"
+      />
+       
       <package-sort-stub />
     </div>
   </template>

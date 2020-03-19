@@ -228,4 +228,17 @@ describe('Actions Package list store', () => {
       );
     });
   });
+
+  describe('setFilter', () => {
+    it('should commit SET_FILTER', done => {
+      testAction(
+        actions.setFilter,
+        'foo',
+        null,
+        [{ type: types.SET_FILTER, payload: 'foo' }],
+        [],
+        done,
+      );
+    });
+  });
 });

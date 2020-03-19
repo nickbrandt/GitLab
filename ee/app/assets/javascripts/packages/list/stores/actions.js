@@ -15,6 +15,7 @@ export const setInitialState = ({ commit }, data) => commit(types.SET_INITIAL_ST
 export const setLoading = ({ commit }, data) => commit(types.SET_MAIN_LOADING, data);
 export const setSorting = ({ commit }, data) => commit(types.SET_SORTING, data);
 export const setSelectedType = ({ commit }, data) => commit(types.SET_SELECTED_TYPE, data);
+export const setFilter = ({ commit }, data) => commit(types.SET_FILTER, data);
 
 export const receivePackagesListSuccess = ({ commit }, { data, headers }) => {
   commit(types.SET_PACKAGE_LIST_SUCCESS, data);
@@ -26,12 +27,17 @@ export const requestPackagesList = ({ dispatch, state }, params = {}) => {
 
   const { page = DEFAULT_PAGE, per_page = DEFAULT_PAGE_SIZE } = params;
   const { sort, orderBy } = state.sorting;
+
   const type = state.selectedType?.type?.toLowerCase();
   const packageType = { package_type: type };
+
+  const nameFilter = state.filterQuery?.toLowerCase();
+  const packageName = { package_name: nameFilter };
+
   const apiMethod = state.config.isGroupPage ? 'groupPackages' : 'projectPackages';
 
   return Api[apiMethod](state.config.resourceId, {
-    params: { page, per_page, sort, order_by: orderBy, ...packageType },
+    params: { page, per_page, sort, order_by: orderBy, ...packageType, ...packageName },
   })
     .then(({ data, headers }) => {
       dispatch('receivePackagesListSuccess', { data, headers });

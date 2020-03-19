@@ -13966,6 +13966,9 @@ msgstr ""
 msgid "PackageRegistry|Delete package"
 msgstr ""
 
+msgid "PackageRegistry|Filter by name"
+msgstr ""
+
 msgid "PackageRegistry|For more information on the Conan registry, %{linkStart}see the documentation%{linkEnd}."
 msgstr ""
 
