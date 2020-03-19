@@ -214,6 +214,12 @@ Style/ReturnNil:
 Performance/RegexpMatch:
   Enabled: false
 
+Performance/AvoidReadFile:
+  Enable: true
+  Exclude:
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+
 ActiveRecordAssociationReload:
   Enabled: true
   Exclude:
