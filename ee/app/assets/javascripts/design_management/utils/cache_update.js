@@ -4,7 +4,6 @@ import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
   UPDATE_IMAGE_DIFF_NOTE_ERROR,
   ADD_DISCUSSION_COMMENT_ERROR,
-  UPLOAD_DESIGN_ERROR,
   designDeletionError,
 } from './error_messages';
 
@@ -292,7 +291,7 @@ export const updateStoreAfterUpdateImageDiffNote = (store, data, query, queryVar
 
 export const updateStoreAfterUploadDesign = (store, data, query) => {
   if (hasErrors(data)) {
-    onError(data, UPLOAD_DESIGN_ERROR);
+    onError(data, data.errors[0]);
   } else {
     addNewDesignToStore(store, data, query);
   }
