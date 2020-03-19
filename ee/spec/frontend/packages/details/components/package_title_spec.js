@@ -115,6 +115,7 @@ describe('PackageTitle', () => {
     it('correctly shows the package ref if there is one', () => {
       createComponent(npmPackage);
 
+      expect(packageRef().contains('gl-icon-stub')).toBe(true);
       expect(packageRef().text()).toBe(npmPackage.pipeline.ref);
     });
   });

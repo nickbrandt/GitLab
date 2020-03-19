@@ -58,10 +58,13 @@ export default {
         <package-tags :tag-display-limit="1" :tags="packageEntity.tags" />
       </div>
 
-      <div v-if="packagePipeline" class="d-flex align-items-center append-right-default">
+      <div
+        v-if="packagePipeline"
+        ref="package-ref"
+        class="d-flex align-items-center append-right-default"
+      >
         <gl-icon name="branch" class="text-secondary append-right-8" />
         <span
-          ref="package-ref"
           v-gl-tooltip
           class="font-weight-bold text-truncate mw-xs"
           :title="packagePipeline.ref"
