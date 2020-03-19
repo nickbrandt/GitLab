@@ -50,7 +50,7 @@ describe 'Environment > Pod Logs', :js do
       page.within('.js-pods-dropdown') do
         find(".dropdown-menu-toggle:not([disabled])").click
 
-        dropdown_items = find(".dropdown-menu").all(".dropdown-item")
+        dropdown_items = find(".dropdown-menu").all(".dropdown-item:not([disabled])")
         expect(dropdown_items.size).to eq(1)
 
         dropdown_items.each_with_index do |item, i|
