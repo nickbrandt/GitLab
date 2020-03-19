@@ -7,7 +7,7 @@ describe StatusPage::TriggerPublishService do
   let_it_be(:project, refind: true) { create(:project) }
   let_it_be(:issue) { create(:issue, project: project) }
   let(:service) { described_class.new(user: user, project: project) }
-  let(:worker) { StatusPage::PublishIncidentWorker }
+  let(:worker) { StatusPage::PublishWorker }
 
   let_it_be(:status_page_setting) do
     create(:status_page_setting, :enabled, project: project)

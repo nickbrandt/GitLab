@@ -9,8 +9,9 @@ module StatusPage
   #
   # This services calls:
   # * StatusPage::PublishDetailsService
+  # * StatusPage::UnpublishDetailsService
   # * StatusPage::PublishListService
-  class PublishIncidentService
+  class PublishService
     include Gitlab::Utils::StrongMemoize
 
     def initialize(user:, project:, issue_id:)
@@ -23,22 +24,34 @@ module StatusPage
       return error_permission_denied unless can_publish?
       return error_issue_not_found unless issue
 
-      response = publish_details
+      response = process_details
       return response if response.error?
 
-      publish_list
+      process_list
     end
 
     private
 
     attr_reader :user, :project, :issue_id
 
+    def process_details
+      if issue.confidential?
+        unpublish_details
+      else
+        publish_details
+      end
+    end
+
+    def process_list
+      PublishListService.new(project: project).execute(issues)
+    end
+
     def publish_details
       PublishDetailsService.new(project: project).execute(issue, user_notes)
     end
 
-    def publish_list
-      PublishListService.new(project: project).execute(issues)
+    def unpublish_details
+      UnpublishDetailsService.new(project: project).execute(issue)
     end
 
     def issue

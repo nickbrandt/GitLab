@@ -4,13 +4,13 @@ module StatusPage
   # Render an issue as incident details and publish them to CDN.
   #
   # This is an internal service which is part of
-  # +StatusPage::PublishIncidentService+ and is not meant to be called directly.
+  # +StatusPage::PublishService+ and is not meant to be called directly.
   #
-  # Consider calling +StatusPage::PublishIncidentService+ instead.
+  # Consider calling +StatusPage::PublishService+ instead.
   class PublishDetailsService < PublishBaseService
     private
 
-    def publish(issue, user_notes)
+    def process(issue, user_notes)
       json = serialize(issue, user_notes)
       key = object_key(json)
       return error('Missing object key') unless key
