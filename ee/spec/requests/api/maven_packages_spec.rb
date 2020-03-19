@@ -29,6 +29,54 @@ describe API::MavenPackages do
     end
   end
 
+  shared_examples 'processing HEAD requests' do
+    subject { head api(url) }
+
+    before do
+      allow_any_instance_of(::Packages::PackageFileUploader).to receive(:fog_credentials).and_return(object_storage_credentials)
+      stub_package_file_object_storage(enabled: object_storage_enabled)
+    end
+
+    context 'with object storage enabled' do
+      let(:object_storage_enabled) { true }
+
+      before do
+        allow_any_instance_of(::Packages::PackageFileUploader).to receive(:file_storage?).and_return(false)
+      end
+
+      context 'non AWS provider' do
+        let(:object_storage_credentials) { { provider: 'Google' } }
+
+        it 'does not generated a signed url for head' do
+          expect_any_instance_of(Fog::AWS::Storage::Files).not_to receive(:head_url)
+
+          subject
+        end
+      end
+
+      context 'with AWS provider' do
+        let(:object_storage_credentials) { { provider: 'AWS', aws_access_key_id: 'test', aws_secret_access_key: 'test' } }
+
+        it 'generates a signed url for head' do
+          expect_any_instance_of(Fog::AWS::Storage::Files).to receive(:head_url).and_call_original
+
+          subject
+        end
+      end
+    end
+
+    context 'with object storage disabled' do
+      let(:object_storage_enabled) { false }
+      let(:object_storage_credentials) { {} }
+
+      it 'does not generate a signed url for head' do
+        expect_any_instance_of(Fog::AWS::Storage::Files).not_to receive(:head_url)
+
+        subject
+      end
+    end
+  end
+
   describe 'GET /api/v4/packages/maven/*path/:file_name' do
     let(:package) { create(:maven_package, project: project, name: project.full_path) }
 
@@ -149,6 +197,15 @@ describe API::MavenPackages do
     end
   end
 
+  describe 'HEAD /api/v4/packages/maven/*path/:file_name' do
+    let_it_be(:project) { create(:project, :public) }
+    let_it_be(:package) { create(:maven_package, project: project, name: project.full_path) }
+    let_it_be(:package_file) { package.package_files.where('file_name like ?', '%.xml').first }
+    let(:url) { "/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
+  end
+
   describe 'GET /api/v4/groups/:id/-/packages/maven/*path/:file_name' do
     before do
       project.team.truncate
@@ -262,6 +319,16 @@ describe API::MavenPackages do
     end
   end
 
+  describe 'HEAD /api/v4/groups/:id/-/packages/maven/*path/:file_name' do
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project) { create(:project, :public, namespace: group) }
+    let_it_be(:package) { create(:maven_package, project: project, name: project.full_path) }
+    let_it_be(:package_file) { package.package_files.where('file_name like ?', '%.xml').first }
+    let(:url) { "/groups/#{group.id}/-/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
+  end
+
   describe 'GET /api/v4/projects/:id/packages/maven/*path/:file_name' do
     context 'a public project' do
       subject { download_file(package_file.file_name) }
@@ -338,6 +405,15 @@ describe API::MavenPackages do
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
       download_file(file_name, params, request_headers)
     end
+  end
+
+  describe 'HEAD /api/v4/projects/:id/packages/maven/*path/:file_name' do
+    let_it_be(:project) { create(:project, :public) }
+    let_it_be(:package) { create(:maven_package, project: project, name: project.full_path) }
+    let_it_be(:package_file) { package.package_files.where('file_name like ?', '%.xml').first }
+    let(:url) { "/projects/#{project.id}/packages/maven/#{package.maven_metadatum.path}/#{package_file.file_name}" }
+
+    it_behaves_like 'processing HEAD requests'
   end
 
   describe 'PUT /api/v4/projects/:id/packages/maven/*path/:file_name/authorize' do

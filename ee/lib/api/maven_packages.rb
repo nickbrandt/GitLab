@@ -50,6 +50,31 @@ module API
       def jar_file?(format)
         format == 'jar'
       end
+
+      def present_carrierwave_file_with_head_support!(file, supports_direct_download: true)
+        if head_request_on_aws_file?(file, supports_direct_download) && !file.file_storage?
+          return redirect(signed_head_url(file))
+        end
+
+        present_carrierwave_file!(file, supports_direct_download: supports_direct_download)
+      end
+
+      def signed_head_url(file)
+        fog_storage = ::Fog::Storage.new(file.fog_credentials)
+        fog_dir = fog_storage.directories.new(key: file.fog_directory)
+        fog_file = fog_dir.files.new(key: file.path)
+        expire_at = ::Fog::Time.now + file.fog_authenticated_url_expiration
+
+        fog_file.collection.head_url(fog_file.key, expire_at)
+      end
+
+      def head_request_on_aws_file?(file, supports_direct_download)
+        Gitlab.config.packages.object_store.enabled &&
+          supports_direct_download &&
+          file.class.direct_download_enabled? &&
+          request.head? &&
+          file.fog_credentials[:provider] == 'AWS'
+      end
     end
 
     desc 'Download the maven package file at instance level' do
@@ -85,8 +110,7 @@ module API
         package_file.file_sha1
       else
         track_event('pull_package') if jar_file?(format)
-
-        present_carrierwave_file!(package_file.file)
+        present_carrierwave_file_with_head_support!(package_file.file)
       end
     end
 
@@ -126,7 +150,7 @@ module API
         else
           track_event('pull_package') if jar_file?(format)
 
-          present_carrierwave_file!(package_file.file)
+          present_carrierwave_file_with_head_support!(package_file.file)
         end
       end
     end
@@ -166,7 +190,7 @@ module API
         else
           track_event('pull_package') if jar_file?(format)
 
-          present_carrierwave_file!(package_file.file)
+          present_carrierwave_file_with_head_support!(package_file.file)
         end
       end
 
