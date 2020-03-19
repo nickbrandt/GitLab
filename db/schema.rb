@@ -2425,6 +2425,7 @@ ActiveRecord::Schema.define(version: 2020_03_13_123934) do
     t.integer "milestone_id"
     t.integer "max_issue_count", default: 0, null: false
     t.integer "max_issue_weight", default: 0, null: false
+    t.string "limit_metric", limit: 20
     t.index ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true
     t.index ["label_id"], name: "index_lists_on_label_id"
     t.index ["list_type"], name: "index_lists_on_list_type"

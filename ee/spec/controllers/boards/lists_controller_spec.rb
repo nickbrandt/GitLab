@@ -3,10 +3,11 @@
 require 'spec_helper'
 
 describe Boards::ListsController do
-  let(:group) { create(:group, :private) }
-  let(:board)   { create(:board, group: group) }
-  let(:user)    { create(:user) }
-  let(:guest)   { create(:user) }
+  let_it_be(:group)  { create(:group, :private) }
+  let_it_be(:board)  { create(:board, group: group) }
+  let_it_be(:user)   { create(:user) }
+  let_it_be(:guest)  { create(:user) }
+  let_it_be(:label)  { create(:group_label, group: group, name: 'Development') }
 
   before do
     group.add_maintainer(user)
@@ -51,8 +52,6 @@ describe Boards::ListsController do
 
   describe 'POST create' do
     context 'with valid params' do
-      let(:label) { create(:group_label, group: group, name: 'Development') }
-
       it 'returns a successful 200 response' do
         create_board_list user: user, board: board, label_id: label.id
 
@@ -67,8 +66,6 @@ describe Boards::ListsController do
     end
 
     context 'with max issue count' do
-      let(:label) { create(:group_label, group: group, name: 'Development') }
-
       context 'with licensed wip limits' do
         it 'returns the created list' do
           create_board_list user: user, board: board, label_id: label.id, params: { max_issue_count: 2 }
@@ -93,8 +90,6 @@ describe Boards::ListsController do
     end
 
     context 'with max issue weight' do
-      let(:label) { create(:group_label, group: group, name: 'Development') }
-
       context 'with licensed wip limits' do
         it 'returns the created list' do
           create_board_list user: user, board: board, label_id: label.id, params: { max_issue_weight: 3 }
@@ -114,6 +109,58 @@ describe Boards::ListsController do
 
           expect(response).to match_response_schema('list', dir: 'ee')
           expect(json_response).not_to include('max_issue_weight')
+        end
+      end
+    end
+
+    context 'with limit metric' do
+      shared_examples 'a limit metric response' do
+        it 'returns the created list with expected limit_metric' do
+          create_board_list user: user, board: board, label_id: label.id, params: { limit_metric: limit_metric }
+
+          expect(response).to match_response_schema('list', dir: 'ee')
+          expect(json_response).to include('limit_metric' => limit_metric.to_s)
+        end
+      end
+
+      context 'with licensed wip limits' do
+        it_behaves_like 'a limit metric response' do
+          let(:limit_metric) { :issue_weights }
+        end
+
+        it_behaves_like 'a limit metric response' do
+          let(:limit_metric) { :issue_count }
+        end
+
+        it_behaves_like 'a limit metric response' do
+          let(:limit_metric) { :all_metrics }
+        end
+
+        it_behaves_like 'a limit metric response' do
+          let(:limit_metric) { '' }
+        end
+
+        it_behaves_like 'a limit metric response' do
+          let(:limit_metric) { nil }
+        end
+
+        it 'fails with an unknown limit metric' do
+          create_board_list user: user, board: board, label_id: label.id, params: { limit_metric: 'foo' }
+
+          expect(response).to have_gitlab_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'without licensed wip limits' do
+        before do
+          stub_feature_flags(wip_limits: false)
+        end
+
+        it 'ignores limit metric setting' do
+          create_board_list user: user, board: board, label_id: label.id, params: { limit_metric: 'issue_weights' }
+
+          expect(response).to match_response_schema('list', dir: 'ee')
+          expect(json_response).not_to include('limit_metric')
         end
       end
     end
@@ -140,8 +187,6 @@ describe Boards::ListsController do
 
     context 'with unauthorized user' do
       it 'returns a forbidden 403 response' do
-        label = create(:group_label, group: group, name: 'Development')
-
         create_board_list user: guest, board: board, label_id: label.id
 
         expect(response).to have_gitlab_http_status(:forbidden)
@@ -202,7 +247,7 @@ describe Boards::ListsController do
       end
 
       context 'multiple fields update behavior' do
-        shared_examples 'field updates' do
+        shared_examples 'a list update request' do
           it 'updates fields as expected' do
             params = update_params_with_list_params(update_params)
 
@@ -215,88 +260,148 @@ describe Boards::ListsController do
             expect(reloaded_list.preferences_for(user).collapsed).to eq(expected_collapsed)
             expect(reloaded_list.max_issue_count).to eq(expected_max_issue_count)
             expect(reloaded_list.max_issue_weight).to eq(expected_max_issue_weight)
+            expect(reloaded_list.limit_metric).to eq(expected_limit_metric)
           end
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_count: 99, position: 0, collapsed: true } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { true }
           let(:expected_max_issue_count) { 99 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { position: 0, collapsed: true } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { true }
           let(:expected_max_issue_count) { 0 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { position: 0 } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { nil }
           let(:expected_max_issue_count) { 0 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_count: 42 } }
 
           let(:expected_position) { 1 }
           let(:expected_collapsed) { nil }
           let(:expected_max_issue_count) { 42 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { collapsed: true } }
 
           let(:expected_position) { 1 }
           let(:expected_collapsed) { true }
           let(:expected_max_issue_count) { 0 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_count: 42, collapsed: true } }
 
           let(:expected_position) { 1 }
           let(:expected_collapsed) { true }
           let(:expected_max_issue_count) { 42 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_count: 42, position: 0 } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { nil }
           let(:expected_max_issue_count) { 42 }
           let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_weight: 42, position: 0 } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { nil }
           let(:expected_max_issue_count) { 0 }
           let(:expected_max_issue_weight) { 42 }
+          let(:expected_limit_metric) { nil }
         end
 
-        it_behaves_like 'field updates' do
+        it_behaves_like 'a list update request' do
           let(:update_params) { { max_issue_count: 99, max_issue_weight: 42, position: 0 } }
 
           let(:expected_position) { 0 }
           let(:expected_collapsed) { nil }
           let(:expected_max_issue_count) { 99 }
           let(:expected_max_issue_weight) { 42 }
+          let(:expected_limit_metric) { nil }
+        end
+
+        it_behaves_like 'a list update request' do
+          let(:update_params) { { max_issue_weight: 42 } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 0 }
+          let(:expected_max_issue_weight) { 42 }
+          let(:expected_limit_metric) { nil }
+        end
+
+        it_behaves_like 'a list update request' do
+          let(:update_params) { { max_issue_weight: 42, limit_metric: 'issue_weights' } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 0 }
+          let(:expected_max_issue_weight) { 42 }
+          let(:expected_limit_metric) { 'issue_weights' }
+        end
+
+        it_behaves_like 'a list update request' do
+          let(:update_params) { { limit_metric: 'issue_weights' } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 0 }
+          let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { 'issue_weights' }
+        end
+
+        it_behaves_like 'a list update request' do
+          let(:update_params) { { limit_metric: 'issue_count' } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 0 }
+          let(:expected_max_issue_weight) { 0 }
+          let(:expected_limit_metric) { 'issue_count' }
+        end
+
+        it_behaves_like 'a list update request' do
+          let(:update_params) { { limit_metric: 'issue_count', max_issue_count: 100, max_issue_weight: 10 } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 100 }
+          let(:expected_max_issue_weight) { 10 }
+          let(:expected_limit_metric) { 'issue_count' }
         end
       end
 

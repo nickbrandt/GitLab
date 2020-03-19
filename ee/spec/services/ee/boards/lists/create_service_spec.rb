@@ -55,24 +55,30 @@ describe Boards::Lists::CreateService do
             stub_feature_flags(wip_limits: wip_limits_enabled)
           end
 
-          where(:params, :expected_max_issue_count, :expected_max_issue_weight) do
+          where(:params, :expected_max_issue_count, :expected_max_issue_weight, :expected_limit_metric) do
             [
-              [{ max_issue_count: 0 }, 0, 0],
-              [{ max_issue_count: nil }, 0, 0],
-              [{ max_issue_count: 1 }, 1, 0],
+              [{ max_issue_count: 0 }, 0, 0, nil],
+              [{ max_issue_count: nil }, 0, 0, nil],
+              [{ max_issue_count: 1 }, 1, 0, nil],
 
-              [{ max_issue_weight: 0 }, 0, 0],
-              [{ max_issue_weight: nil }, 0, 0],
-              [{ max_issue_weight: 1 }, 0, 1],
+              [{ max_issue_weight: 0 }, 0, 0, nil],
+              [{ max_issue_weight: nil }, 0, 0, nil],
+              [{ max_issue_weight: 1 }, 0, 1, nil],
 
-              [{ max_issue_count: 1, max_issue_weight: 0 }, 1, 0],
-              [{ max_issue_count: 0, max_issue_weight: 1 }, 0, 1],
-              [{ max_issue_count: 1, max_issue_weight: 1 }, 1, 1],
+              [{ max_issue_count: 1, max_issue_weight: 0 }, 1, 0, nil],
+              [{ max_issue_count: 0, max_issue_weight: 1 }, 0, 1, nil],
+              [{ max_issue_count: 1, max_issue_weight: 1 }, 1, 1, nil],
 
-              [{ max_issue_count: nil, max_issue_weight: 1 }, 0, 1],
-              [{ max_issue_count: 1, max_issue_weight: nil }, 1, 0],
+              [{ max_issue_count: nil, max_issue_weight: 1 }, 0, 1, nil],
+              [{ max_issue_count: 1, max_issue_weight: nil }, 1, 0, nil],
 
-              [{ max_issue_count: nil, max_issue_weight: nil }, 0, 0]
+              [{ max_issue_count: nil, max_issue_weight: nil }, 0, 0, nil],
+
+              [{ limit_metric: 'all_metrics' }, 0, 0, 'all_metrics'],
+              [{ limit_metric: 'issue_count' }, 0, 0, 'issue_count'],
+              [{ limit_metric: 'issue_weights' }, 0, 0, 'issue_weights'],
+              [{ limit_metric: '' }, 0, 0, ''],
+              [{ limit_metric: nil }, 0, 0, nil]
             ]
           end
 
@@ -83,9 +89,11 @@ describe Boards::Lists::CreateService do
               attrs = service.create_list_attributes(nil, nil, nil)
 
               if wip_limits_enabled
-                expect(attrs).to include(max_issue_count: expected_max_issue_count, max_issue_weight: expected_max_issue_weight)
+                expect(attrs).to include(max_issue_count: expected_max_issue_count,
+                                         max_issue_weight: expected_max_issue_weight,
+                                         limit_metric: expected_limit_metric)
               else
-                expect(attrs).to include(max_issue_count: 0, max_issue_weight: 0)
+                expect(attrs).not_to include(max_issue_count: 0, max_issue_weight: 0, limit_metric: nil)
               end
             end
           end
