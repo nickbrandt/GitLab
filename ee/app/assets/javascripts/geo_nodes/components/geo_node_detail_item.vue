@@ -74,11 +74,6 @@ export default {
       required: false,
       default: false,
     },
-    helpInfo: {
-      type: [Boolean, Object],
-      required: false,
-      default: false,
-    },
     featureDisabled: {
       type: Boolean,
       required: false,
@@ -101,26 +96,6 @@ export default {
     isCustomTypeSync() {
       return this.customType === CUSTOM_TYPE.SYNC;
     },
-    popoverConfig() {
-      return {
-        html: true,
-        trigger: 'click',
-        placement: 'top',
-        template: `
-            <div class="popover geo-node-detail-popover" role="tooltip">
-              <div class="arrow"></div>
-              <p class="popover-header"></p>
-              <div class="popover-body"></div>
-            </div>
-          `,
-        title: this.helpInfo.title,
-        content: `
-            <a href="${this.helpInfo.url}">
-              ${this.helpInfo.urlText}
-            </a>
-          `,
-      };
-    },
   },
 };
 </script>
@@ -129,13 +104,6 @@ export default {
   <div v-if="!featureDisabled" class="mt-2 ml-2 node-detail-item">
     <div class="d-flex align-items-center text-secondary-700">
       <span class="node-detail-title">{{ itemTitle }}</span>
-      <icon
-        v-if="hasHelpInfo"
-        v-popover="popoverConfig"
-        :size="12"
-        class="text-primary-600 ml-1 node-detail-help-text"
-        name="question"
-      />
     </div>
     <div v-if="isValueTypePlain" :class="cssClass" class="mt-1 node-detail-value">
       {{ itemValue }}
