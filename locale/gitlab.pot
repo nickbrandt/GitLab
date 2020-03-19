@@ -14017,6 +14017,9 @@ msgstr ""
 msgid "PackageRegistry|Remove package"
 msgstr ""
 
+msgid "PackageRegistry|Sorry, your filter produced no results"
+msgstr ""
+
 msgid "PackageRegistry|There are no %{packageType} packages yet"
 msgstr ""
 
@@ -14024,6 +14027,9 @@ msgid "PackageRegistry|There are no packages yet"
 msgstr ""
 
 msgid "PackageRegistry|There was a problem fetching the details for this package."
+msgstr ""
+
+msgid "PackageRegistry|To widen your search, change or remove the filters above."
 msgstr ""
 
 msgid "PackageRegistry|Unable to load package"
