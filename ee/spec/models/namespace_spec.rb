@@ -310,10 +310,10 @@ describe Namespace do
         expect(subject).to be_kind_of(PlanLimits)
       end
 
-      it 'has all limits disabled' do
+      it 'has all limits defined' do
         limits = subject.attributes.except('id', 'plan_id')
         limits.each do |_attribute, limit|
-          expect(limit).to be_zero
+          expect(limit).not_to be_nil
         end
       end
     end

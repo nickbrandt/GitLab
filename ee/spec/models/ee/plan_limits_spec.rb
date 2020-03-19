@@ -45,4 +45,30 @@ describe PlanLimits do
       end
     end
   end
+
+  context 'validates default values' do
+    let(:columns_with_zero) do
+      %w[
+        ci_active_pipelines
+        ci_pipeline_size
+        ci_active_jobs
+      ]
+    end
+
+    it "has positive values for enabled limits" do
+      attributes = plan_limits.attributes
+      attributes = attributes.except(described_class.primary_key)
+      attributes = attributes.except(described_class.reflections.values.map(&:foreign_key))
+      attributes = attributes.except(*columns_with_zero)
+
+      expect(attributes).to all(include(be_positive))
+    end
+
+    it "has zero values for disabled limits" do
+      attributes = plan_limits.attributes
+      attributes = attributes.slice(*columns_with_zero)
+
+      expect(attributes).to all(include(be_zero))
+    end
+  end
 end
