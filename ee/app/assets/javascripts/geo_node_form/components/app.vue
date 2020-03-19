@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import GeoNodeForm from './geo_node_form.vue';
 
 export default {
@@ -21,12 +22,17 @@ export default {
       default: null,
     },
   },
+  computed: {
+    pageTitle() {
+      return this.node ? __('Edit Geo Node') : __('New Geo Node');
+    },
+  },
 };
 </script>
 
 <template>
   <article class="geo-node-form-container">
-    <h3 class="page-title">{{ node ? __('Edit Geo Node') : __('New Geo Node') }}</h3>
+    <h3 class="page-title">{{ pageTitle }}</h3>
     <geo-node-form v-bind="$props" />
   </article>
 </template>
