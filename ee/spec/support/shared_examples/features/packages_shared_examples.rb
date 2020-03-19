@@ -45,6 +45,65 @@ RSpec.shared_examples 'when there are no packages' do
   end
 end
 
+RSpec.shared_examples 'correctly sorted packages list' do |order_by, ascending: false|
+  context "ordered by #{order_by} and ascending #{ascending}" do
+    before do
+      click_sort_option(order_by, ascending)
+    end
+
+    it_behaves_like 'packages list'
+  end
+end
+
+RSpec.shared_examples 'shared package sorting' do
+  it_behaves_like 'correctly sorted packages list', 'Type' do
+    let(:packages) { [package_two, package_one] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Type', ascending: true do
+    let(:packages) { [package_one, package_two] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Name' do
+    let(:packages) { [package_two, package_one] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Name', ascending: true do
+    let(:packages) { [package_one, package_two] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Version' do
+    let(:packages) { [package_one, package_two] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Version', ascending: true do
+    let(:packages) { [package_two, package_one] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Created' do
+    let(:packages) { [package_two, package_one] }
+  end
+
+  it_behaves_like 'correctly sorted packages list', 'Created', ascending: true do
+    let(:packages) { [package_one, package_two] }
+  end
+end
+
 def packages_table_selector
   '[data-qa-selector="packages-table"]'
+end
+
+def click_sort_option(option, ascending)
+  page.within('.gl-sorting') do
+    # Reset the sort direction
+    click_button 'Sort direction' if page.has_selector?('svg[aria-label="Sorting Direction: Ascending"]', wait: 0)
+
+    find('button.dropdown-menu-toggle').click
+
+    page.within('.dropdown-menu') do
+      click_button option
+    end
+
+    click_button 'Sort direction' if ascending
+  end
 end

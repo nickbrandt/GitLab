@@ -6,10 +6,6 @@ module EE
       "#{request.path}?#{options.to_param}"
     end
 
-    def vue_package_list_enabled_for?(subject)
-      ::Feature.enabled?(:vue_package_list, subject)
-    end
-
     def nuget_package_registry_url(project_id)
       expose_url(api_v4_projects_packages_nuget_index_path(id: project_id, format: '.json'))
     end
