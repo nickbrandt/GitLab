@@ -18,7 +18,7 @@ cache:
     - .terraform
 
 before_script:
-  - alias convert_report="jq '([.resource_changes[].change.actions] | flatten) | {\"create\": (map(select(. == \"create\")) | length),\"update\":(map(select(. == \"update\")) | length),\"delete\": (map(select(. == \"delete\")) | length)}'"
+  - alias convert_report="jq -r '([.resource_changes[].change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
   - terraform --version
   - terraform init
 
