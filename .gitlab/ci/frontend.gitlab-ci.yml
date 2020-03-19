@@ -226,6 +226,8 @@ coverage-frontend:
     expire_in: 31d
     paths:
       - coverage-frontend/
+    reports:
+      cobertura: coverage-frontend/cobertura-coverage.xml
 
 .qa-frontend-node:
   extends:
