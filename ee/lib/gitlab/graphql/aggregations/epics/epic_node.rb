@@ -50,10 +50,10 @@ module Gitlab
 
           def to_s
             {
-                epic_id: @epic_id,
-                parent_id: @parent_id,
-                children: children,
-                object_id: object_id
+              epic_id: @epic_id,
+              parent_id: @parent_id,
+              children: children,
+              object_id: object_id
             }.to_s
           end
 
@@ -68,6 +68,12 @@ module Gitlab
             end
 
             @sums[key] = direct_sum + sum_from_children
+          end
+
+          def has_issues?
+            [CLOSED_ISSUE_STATE, OPENED_ISSUE_STATE].any? do |state|
+              value_from_records(COUNT, state, ISSUE_TYPE) > 0
+            end
           end
 
           private

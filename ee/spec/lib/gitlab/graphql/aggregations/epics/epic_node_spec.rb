@@ -39,6 +39,12 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
       allow(subject).to receive(:epic_info_flat_list).and_return(flat_info)
     end
 
+    shared_examples 'has_issues?' do |expected_result|
+      it "returns #{expected_result}" do
+        expect(subject.has_issues?).to eq expected_result
+      end
+    end
+
     context 'an epic with no child epics' do
       context 'with no child issues', :aggregate_results do
         let(:flat_info) { [] }
@@ -52,6 +58,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, OPENED_EPIC_STATE, 0)
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 0)
         end
+
+        it_behaves_like 'has_issues?', false
       end
 
       context 'with an issue with 0 weight', :aggregate_results do
@@ -70,9 +78,11 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, OPENED_EPIC_STATE, 0)
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 0)
         end
+
+        it_behaves_like 'has_issues?', true
       end
 
-      context 'with an issue with nonzero weight' do
+      context 'with an open issue with nonzero weight' do
         let(:flat_info) do
           [
               record_for(epic_id: epic_id, parent_id: nil, epic_state_id: CLOSED_EPIC_STATE, issues_state_id: OPENED_ISSUE_STATE, issues_count: 1, issues_weight_sum: 2)
@@ -88,6 +98,18 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, OPENED_EPIC_STATE, 0)
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 0)
         end
+
+        it_behaves_like 'has_issues?', true
+      end
+
+      context 'with a closed issue with nonzero weight' do
+        let(:flat_info) do
+          [
+              record_for(epic_id: epic_id, parent_id: nil, epic_state_id: CLOSED_EPIC_STATE, issues_state_id: CLOSED_ISSUE_STATE, issues_count: 1, issues_weight_sum: 2)
+          ]
+        end
+
+        it_behaves_like 'has_issues?', true
       end
     end
 
@@ -119,6 +141,8 @@ describe Gitlab::Graphql::Aggregations::Epics::EpicNode do
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, OPENED_EPIC_STATE, 1)
           expect(subject).to have_aggregate(EPIC_TYPE, COUNT, CLOSED_EPIC_STATE, 0)
         end
+
+        it_behaves_like 'has_issues?', false
       end
     end
   end
