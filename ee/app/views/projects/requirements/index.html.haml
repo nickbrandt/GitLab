@@ -1,6 +1,7 @@
 - page_title _('Requirements')
 - type = :requirements
 - page_context_word = type.to_s.humanize(capitalize: false)
+- @content_class = 'requirements-container'
 
 .top-area
   %ul.nav-links.mobile-separator.requirements-state-filters
@@ -18,4 +19,8 @@
     %button.btn.btn-success.js-new-requirement.qa-new-requirement-button{ type: 'button' }
       = _('New requirement')
 
-#js-requirements-app{ data: { filter_by: params[:state] } }
+#js-requirements-app{ data: { filter_by: params[:state],
+  project_path: @project.full_path,
+  empty_state_path: image_path('illustrations/empty-state/empty-requirements-lg.svg') } }
+  .gl-spinner-container.mt-3
+    %span.align-text-bottom.gl-spinner.gl-spinner-orange.gl-spinner-md{ aria: { label: _('Loading'), hidden: 'true' } }

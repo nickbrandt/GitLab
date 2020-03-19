@@ -32,7 +32,6 @@ module EE
 
         field :requirements, ::Types::RequirementType.connection_type, null: true,
               description: 'Find requirements. Available only when feature flag `requirements_management` is enabled.',
-              max_page_size: 2000,
               resolver: ::Resolvers::RequirementsResolver
 
         field :requirement_states_count, ::Types::RequirementStatesCountType, null: true,

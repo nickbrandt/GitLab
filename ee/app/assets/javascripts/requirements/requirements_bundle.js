@@ -1,8 +1,12 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
+import createDefaultClient from '~/lib/graphql';
 
 import RequirementsRoot from './components/requirements_root.vue';
 
 import { FilterState } from './constants';
+
+Vue.use(VueApollo);
 
 export default () => {
   const btnNewRequirement = document.querySelector('.js-new-requirement');
@@ -12,15 +16,25 @@ export default () => {
     return false;
   }
 
+  const apolloProvider = new VueApollo({
+    defaultClient: createDefaultClient(),
+  });
+
   return new Vue({
     el,
+    apolloProvider,
     components: {
       RequirementsRoot,
     },
     data() {
+      const { filterBy, projectPath, emptyStatePath } = el.dataset;
+      const stateFilterBy = filterBy ? FilterState[filterBy] : FilterState.opened;
+
       return {
         showCreateRequirement: false,
-        filterBy: el?.dataset?.filterBy || FilterState.Open,
+        filterBy: stateFilterBy,
+        emptyStatePath,
+        projectPath,
       };
     },
     mounted() {
@@ -37,8 +51,10 @@ export default () => {
     render(createElement) {
       return createElement('requirements-root', {
         props: {
+          projectPath: this.projectPath,
           filterBy: this.filterBy,
           showCreateRequirement: this.showCreateRequirement,
+          emptyStatePath: this.emptyStatePath,
         },
       });
     },
