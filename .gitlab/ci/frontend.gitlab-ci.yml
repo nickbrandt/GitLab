@@ -159,6 +159,7 @@ karma:
       - tmp/tests/frontend/
     reports:
       junit: junit_karma.xml
+      cobertura: coverage-javascript/cobertura-coverage.xml
 
 karma-as-if-foss:
   extends:
