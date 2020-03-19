@@ -8,9 +8,13 @@ describe CsvBuilder do
   let(:subject) { described_class.new(fake_relation, 'Q & A' => :question, 'Reversed' => -> (o) { o.question.to_s.reverse }) }
   let(:csv_data) { subject.render }
 
-  class FakeRelation < Array
-    def find_each(&block)
-      each(&block)
+  before do
+    stub_const('FakeRelation', Array)
+
+    FakeRelation.class_eval do
+      def find_each(&block)
+        each(&block)
+      end
     end
   end
 

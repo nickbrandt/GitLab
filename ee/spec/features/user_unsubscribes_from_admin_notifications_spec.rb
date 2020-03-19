@@ -7,14 +7,14 @@ describe "Admin unsubscribes from notification" do
   let_it_be(:urlsafe_email) { Base64.urlsafe_encode64(user.email) }
 
   before do
+    stub_const('NOTIFICATION_TEXT', 'You have been unsubscribed from receiving GitLab administrator notifications.'.freeze)
+
     sign_in(user)
 
     visit(unsubscribe_path(urlsafe_email))
   end
 
   it "unsubscribes from notifications" do
-    NOTIFICATION_TEXT = "You have been unsubscribed from receiving GitLab administrator notifications.".freeze
-
     perform_enqueued_jobs do
       click_button("Unsubscribe")
     end
