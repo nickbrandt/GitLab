@@ -32,8 +32,16 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 		return
 	}
 
+	setBlobHeaders(w)
 	if err := blobClient.SendBlob(ctx, w, &params.GetBlobRequest); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("blob.GetBlob: %v", err))
 		return
 	}
+}
+
+func setBlobHeaders(w http.ResponseWriter) {
+	// Caching proxies usually don't cache responses with Set-Cookie header
+	// present because it implies user-specific data, which is not the case
+	// for blobs.
+	w.Header().Del("Set-Cookie")
 }
