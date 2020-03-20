@@ -1,5 +1,0 @@
----
-title: 'Geo: Make the LFS registry the SSOT to optimize query performance'
-merge_request: 27154
-author:
-type: performance

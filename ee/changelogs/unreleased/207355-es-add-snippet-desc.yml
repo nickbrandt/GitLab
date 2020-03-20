@@ -1,5 +1,0 @@
----
-title: Include snippet description as part of snippet title search (advanced search, Elasticsearch reindexing required).
-merge_request: 26870
-author:
-type: added
