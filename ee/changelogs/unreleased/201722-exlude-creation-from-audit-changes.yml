@@ -1,5 +1,0 @@
----
-title: Exclude creation event from audit changes
-merge_request: 26140
-author:
-type: fixed

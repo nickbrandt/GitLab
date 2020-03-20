@@ -1,5 +1,0 @@
----
-title: Refactor WeightSelect to use gitlab-ui dropdown
-merge_request: 20770
-author:
-type: change
