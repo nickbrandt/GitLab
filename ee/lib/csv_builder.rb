@@ -32,18 +32,20 @@ class CsvBuilder
 
   # Renders the csv to a string
   def render(truncate_after_bytes = nil)
-    tempfile = Tempfile.new('csv_export')
-    csv = CSV.new(tempfile)
+    Tempfile.open(['csv']) do |tempfile|
+      csv = CSV.new(tempfile)
 
-    write_csv csv, until_condition: -> do
-      truncate_after_bytes && tempfile.size > truncate_after_bytes
+      write_csv csv, until_condition: -> do
+        truncate_after_bytes && tempfile.size > truncate_after_bytes
+      end
+
+      if block_given?
+        yield tempfile
+      else
+        tempfile.rewind
+        tempfile.read
+      end
     end
-
-    tempfile.rewind
-    tempfile.read
-  ensure
-    tempfile.close
-    tempfile.unlink
   end
 
   def truncated?
