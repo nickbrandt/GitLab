@@ -159,6 +159,7 @@ export default {
     },
     onDatazoom({ start, end }) {
       this.zoomedTimeRange = { start, end };
+      this.$emit('timerange', { start, end });
     },
   },
 };

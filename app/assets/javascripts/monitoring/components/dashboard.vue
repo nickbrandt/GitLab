@@ -19,7 +19,12 @@ import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { mergeUrlParams, redirectTo, refreshCurrentPage } from '~/lib/utils/url_utility';
+import {
+  mergeUrlParams,
+  redirectTo,
+  refreshCurrentPage,
+  updateHistory,
+} from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
 import Icon from '~/vue_shared/components/icon.vue';
 import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_picker.vue';
@@ -356,6 +361,13 @@ export default {
     refreshDashboard() {
       refreshCurrentPage();
     },
+
+    onTimeRange({ start, end }) {
+      updateHistory({
+        url: mergeUrlParams({ start, end }, window.location.href),
+        title: document.title,
+      });
+    },
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -577,6 +589,7 @@ export default {
                 :alerts-endpoint="alertsEndpoint"
                 :prometheus-alerts-available="prometheusAlertsAvailable"
                 :index="`${index}-${graphIndex}`"
+                @timerange="onTimeRange"
               />
             </div>
           </div>
