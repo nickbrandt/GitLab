@@ -1,0 +1,5 @@
+---
+title: Separate conan package entities into own class files
+merge_request: 27642
+author: Rajendra Kadam
+type: added
