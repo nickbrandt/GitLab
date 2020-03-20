@@ -10,10 +10,10 @@ describe Admin::ServicesController do
   end
 
   describe 'GET #index' do
-    it 'avoids N+1 queries' do
+    it 'uses less than 100 SQL queries limit' do
       query_count = ActiveRecord::QueryRecorder.new { get :index }.count
 
-      expect(query_count).to be <= 79
+      expect(query_count).to be < 100
     end
 
     context 'with all existing templates' do
