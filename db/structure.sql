@@ -4449,7 +4449,8 @@ CREATE TABLE public.pages_domains (
     certificate_source smallint DEFAULT 0 NOT NULL,
     wildcard boolean DEFAULT false NOT NULL,
     usage smallint DEFAULT 0 NOT NULL,
-    scope smallint DEFAULT 2 NOT NULL
+    scope smallint DEFAULT 2 NOT NULL,
+    auto_ssl_failed boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE public.pages_domains_id_seq
@@ -12750,6 +12751,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200318175008'),
 ('20200319123041'),
 ('20200319203901'),
+('20200320123839'),
 ('20200323075043'),
 ('20200323122201'),
 ('20200324115359');
