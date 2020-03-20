@@ -26,7 +26,7 @@ module Gitlab
       end
 
       def source
-        @source ||= File.read(@file)
+        @source ||= File.read(@file) # rubocop:disable Performance/AvoidReadFile
       end
     end
   end

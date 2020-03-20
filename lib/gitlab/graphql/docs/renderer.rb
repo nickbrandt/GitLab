@@ -19,7 +19,7 @@ module Gitlab
         def initialize(schema, output_dir:, template:)
           @output_dir = output_dir
           @template = template
-          @layout = Haml::Engine.new(File.read(template))
+          @layout = Haml::Engine.new(File.read(template)) # rubocop:disable Performance/AvoidReadFile
           @parsed_schema = GraphQLDocs::Parser.new(schema, {}).parse
         end
 

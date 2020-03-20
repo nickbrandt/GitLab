@@ -24,7 +24,7 @@ module Gitlab
 
       def secret
         strong_memoize(:secret) do
-          Base64.strict_decode64(File.read(secret_path).chomp).tap do |bytes|
+          Base64.strict_decode64(File.read(secret_path).chomp).tap do |bytes| # rubocop:disable Performance/AvoidReadFile
             raise "#{secret_path} does not contain #{SECRET_LENGTH} bytes" if bytes.length != SECRET_LENGTH
           end
         end

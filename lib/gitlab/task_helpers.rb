@@ -32,6 +32,7 @@ module Gitlab
     #
     # It will primarily use lsb_relase to determine the OS.
     # It has fallbacks to Debian, SuSE, OS X and systems running systemd.
+    # rubocop:disable Performance/AvoidReadFile
     def os_name
       os_name = run_command(%w(lsb_release -irs))
       os_name ||=
@@ -49,6 +50,7 @@ module Gitlab
 
       os_name.try(:squish)
     end
+    # rubocop:enable Performance/AvoidReadFile
 
     # Prompt the user to input something
     #

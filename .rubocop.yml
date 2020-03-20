@@ -216,9 +216,20 @@ Performance/RegexpMatch:
 
 Performance/AvoidReadFile:
   Enable: true
+  Include:
+    - '/**/*.rb'
   Exclude:
+    - 'config/**/*'
+    - 'danger/**/*'
     - 'spec/**/*.rb'
     - 'ee/spec/**/*.rb'
+    - 'ee/db/fixtures/**/*'
+    - 'qa/**/*'
+    - 'scripts/**/*'
+    - 'lib/gitlab.rb'
+    - 'lib/gitlab/markdown_cache/redis/**/*'
+    - 'lib/gitlab/redis/**/*'
+    - 'lib/system_check/**/*'
 
 ActiveRecordAssociationReload:
   Enabled: true

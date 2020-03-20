@@ -74,7 +74,7 @@ module Gitlab
       return @certs if @certs
 
       @certs = stub_cert_paths.flat_map do |cert_file|
-        File.read(cert_file).scan(PEM_REGEX).map do |cert|
+        File.read(cert_file).scan(PEM_REGEX).map do |cert| # rubocop:disable Performance/AvoidReadFile
           OpenSSL::X509::Certificate.new(cert).to_pem
         rescue OpenSSL::OpenSSLError => e
           Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e, cert_file: cert_file)
@@ -460,7 +460,7 @@ module Gitlab
     end
 
     def self.filesystem_id_from_disk(storage)
-      metadata_file = File.read(storage_metadata_file_path(storage))
+      metadata_file = File.read(storage_metadata_file_path(storage)) # rubocop:disable Performance/AvoidReadFile
       metadata_hash = JSON.parse(metadata_file)
       metadata_hash['gitaly_filesystem_id']
     rescue Errno::ENOENT, Errno::EACCES, JSON::ParserError

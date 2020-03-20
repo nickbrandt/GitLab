@@ -21,7 +21,7 @@ module Gitlab
           end
 
           def read_hash
-            ActiveSupport::JSON.decode(IO.read(@path))
+            ActiveSupport::JSON.decode(IO.read(@path)) # rubocop:disable Performance/AvoidReadFile
           rescue => e
             Gitlab::ErrorTracking.log_exception(e)
             raise Gitlab::ImportExport::Error.new('Incorrect JSON format')

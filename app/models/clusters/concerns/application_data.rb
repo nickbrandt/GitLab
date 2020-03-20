@@ -16,7 +16,7 @@ module Clusters
       end
 
       def values
-        File.read(chart_values_file)
+        File.read(chart_values_file) # rubocop:disable Performance/AvoidReadFile
       end
 
       def files

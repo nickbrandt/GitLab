@@ -24,12 +24,14 @@ module Gitlab
         [\u{2600}-\u{26FF}]
       )}x.freeze
 
+      # rubocop:disable Performance/AvoidReadFile
       def initialize
         names = JSON.parse(File.read(DIGESTS)).keys +
           JSON.parse(File.read(ALIASES)).keys
 
         @emoji = names.map { |name| ":#{name}:" }
       end
+      # rubocop:enable Performance/AvoidReadFile
 
       def includes_text_emoji?(text)
         return false unless text.match?(LIKELY_EMOJI)

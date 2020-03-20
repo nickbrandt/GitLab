@@ -19,7 +19,7 @@ module Gitlab
             def each_blob
               stream.seek(0)
 
-              yield(stream.read, 'raw') unless stream.eof?
+              yield(stream.read, 'raw') unless stream.eof? # rubocop:disable Performance/AvoidReadFile
             end
           end
         end

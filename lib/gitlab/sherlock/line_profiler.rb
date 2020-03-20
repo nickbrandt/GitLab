@@ -62,7 +62,7 @@ module Gitlab
         samples = []
 
         lineprof_stats.each do |(file, stats)|
-          source_lines = File.read(file).each_line.to_a
+          source_lines = File.read(file).each_line.to_a # rubocop:disable Performance/AvoidReadFile
           line_samples = []
 
           total_duration = microsec_to_millisec(stats[0][0])

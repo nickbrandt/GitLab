@@ -71,7 +71,7 @@ module Gitlab
 
         @lfs_json ||=
           begin
-            json = IO.read(lfs_json_path)
+            json = IO.read(lfs_json_path) # rubocop:disable Performance/AvoidReadFile
             ActiveSupport::JSON.decode(json)
           rescue
             raise Gitlab::ImportExport::Error.new('Incorrect JSON format')
