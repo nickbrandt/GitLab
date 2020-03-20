@@ -65,7 +65,7 @@ describe Mutations::DesignManagement::Delete do
         end
 
         it 'fails with an argument error' do
-          expect { run_mutation }.to raise_error(Errors::ArgumentError)
+          expect { run_mutation }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
         end
       end
 
