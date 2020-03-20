@@ -11,10 +11,10 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
 
     NAMESPACE_PLANS_TO_LICENSE_PLANS = {
-      Plan::BRONZE        => License::STARTER_PLAN,
-      Plan::SILVER        => License::PREMIUM_PLAN,
-      Plan::GOLD          => License::ULTIMATE_PLAN,
-      Plan::EARLY_ADOPTER => License::EARLY_ADOPTER_PLAN
+      ::Plan::BRONZE        => License::STARTER_PLAN,
+      ::Plan::SILVER        => License::PREMIUM_PLAN,
+      ::Plan::GOLD          => License::ULTIMATE_PLAN,
+      ::Plan::EARLY_ADOPTER => License::EARLY_ADOPTER_PLAN
     }.freeze
 
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
@@ -47,7 +47,7 @@ module EE
 
       scope :with_feature_available_in_plan, -> (feature) do
         plans = plans_with_feature(feature)
-        matcher = Plan.where(name: plans)
+        matcher = ::Plan.where(name: plans)
           .joins(:hosted_subscriptions)
           .where("gitlab_subscriptions.namespace_id = namespaces.id")
           .select('1')
@@ -210,30 +210,20 @@ module EE
       available_features[feature]
     end
 
+    override :actual_plan
     def actual_plan
       strong_memoize(:actual_plan) do
         if parent_id
           root_ancestor.actual_plan
         else
           subscription = find_or_create_subscription
-          subscription&.hosted_plan || Plan.free || Plan.default
+          subscription&.hosted_plan
         end
-      end
-    end
-
-    def actual_limits
-      # We default to PlanLimits.new otherwise a lot of specs would fail
-      # On production each plan should already have associated limits record
-      # https://gitlab.com/gitlab-org/gitlab/issues/36037
-      actual_plan&.limits || PlanLimits.new
-    end
-
-    def actual_plan_name
-      actual_plan&.name || Plan::FREE
+      end || super
     end
 
     def plan_name_for_upgrading
-      return Plan::FREE if trial_active?
+      return ::Plan::FREE if trial_active?
 
       actual_plan_name
     end
@@ -302,9 +292,9 @@ module EE
     def plans
       @plans ||=
         if parent_id
-          Plan.hosted_plans_for_namespaces(self_and_ancestors.select(:id))
+          ::Plan.hosted_plans_for_namespaces(self_and_ancestors.select(:id))
         else
-          Plan.hosted_plans_for_namespaces(self)
+          ::Plan.hosted_plans_for_namespaces(self)
         end
     end
 
@@ -328,7 +318,7 @@ module EE
       ::Gitlab.com? &&
         parent_id.nil? &&
         trial_ends_on.blank? &&
-        [Plan::EARLY_ADOPTER, Plan::FREE].include?(actual_plan_name)
+        [::Plan::EARLY_ADOPTER, ::Plan::FREE].include?(actual_plan_name)
     end
 
     def trial_active?
@@ -342,7 +332,7 @@ module EE
     def trial_expired?
       trial_ends_on.present? &&
         trial_ends_on < Date.today &&
-        actual_plan_name == Plan::FREE
+        actual_plan_name == ::Plan::FREE
     end
 
     # A namespace may not have a file template project
@@ -362,23 +352,23 @@ module EE
     end
 
     def free_plan?
-      actual_plan_name == Plan::FREE
+      actual_plan_name == ::Plan::FREE
     end
 
     def early_adopter_plan?
-      actual_plan_name == Plan::EARLY_ADOPTER
+      actual_plan_name == ::Plan::EARLY_ADOPTER
     end
 
     def bronze_plan?
-      actual_plan_name == Plan::BRONZE
+      actual_plan_name == ::Plan::BRONZE
     end
 
     def silver_plan?
-      actual_plan_name == Plan::SILVER
+      actual_plan_name == ::Plan::SILVER
     end
 
     def gold_plan?
-      actual_plan_name == Plan::GOLD
+      actual_plan_name == ::Plan::GOLD
     end
 
     def use_elasticsearch?

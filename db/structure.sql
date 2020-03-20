@@ -9825,7 +9825,7 @@ CREATE INDEX index_personal_access_tokens_on_user_id ON public.personal_access_t
 
 CREATE UNIQUE INDEX index_plan_limits_on_plan_id ON public.plan_limits USING btree (plan_id);
 
-CREATE INDEX index_plans_on_name ON public.plans USING btree (name);
+CREATE UNIQUE INDEX index_plans_on_name ON public.plans USING btree (name);
 
 CREATE UNIQUE INDEX index_pool_repositories_on_disk_path ON public.pool_repositories USING btree (disk_path);
 
@@ -13199,6 +13199,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200409211607
 20200410232012
 20200414144547
+20200415153154
 20200415160722
 20200415161021
 20200415161206

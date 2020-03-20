@@ -9,6 +9,10 @@ describe Gitlab::ApplicationContext do
     let(:namespace) { create(:group) }
     let(:subgroup) { create(:group, parent: namespace) }
 
+    before do
+      allow(Gitlab).to receive(:com?).and_return(true)
+    end
+
     def result(context)
       context.to_lazy_hash.transform_values { |v| v.respond_to?(:call) ? v.call : v }
     end

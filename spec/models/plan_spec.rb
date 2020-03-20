@@ -3,18 +3,10 @@
 require 'spec_helper'
 
 describe Plan do
-  describe '#paid?' do
-    subject { plan.paid? }
+  describe '#default?' do
+    subject { plan.default? }
 
     Plan.default_plans.each do |plan|
-      context "when '#{plan}'" do
-        let(:plan) { build("#{plan}_plan".to_sym) }
-
-        it { is_expected.to be_falsey }
-      end
-    end
-
-    Plan::PAID_HOSTED_PLANS.each do |plan|
       context "when '#{plan}'" do
         let(:plan) { build("#{plan}_plan".to_sym) }
 
