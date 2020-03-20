@@ -11,7 +11,8 @@ module Gitlab
       Attribute.new(:project, Project),
       Attribute.new(:namespace, Namespace),
       Attribute.new(:user, User),
-      Attribute.new(:caller_id, String)
+      Attribute.new(:caller_id, String),
+      Attribute.new(:related_class, String)
     ].freeze
 
     def self.with_context(args, &block)
@@ -39,6 +40,7 @@ module Gitlab
         hash[:project] = -> { project_path } if set_values.include?(:project)
         hash[:root_namespace] = -> { root_namespace_path } if include_namespace?
         hash[:caller_id] = caller_id if set_values.include?(:caller_id)
+        hash[:related_class] = related_class if set_values.include?(:related_class)
       end
     end
 
