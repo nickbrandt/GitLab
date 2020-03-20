@@ -5,7 +5,7 @@ module Gitlab
   class ApplicationContext
     include Gitlab::Utils::LazyAttributes
 
-    Attribute = Struct.new(:name, :type, :evaluation)
+    Attribute = Struct.new(:name, :type)
 
     APPLICATION_ATTRIBUTES = [
       Attribute.new(:project, Project),
