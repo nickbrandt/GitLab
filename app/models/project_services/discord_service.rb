@@ -56,20 +56,12 @@ class DiscordService < ChatNotificationService
     client.execute do |builder|
       builder.add_embed do |embed|
         embed.author = Discordrb::Webhooks::EmbedAuthor.new(name: message.user_name, icon_url: message.user_avatar)
-        embed.description = (message.pretext + "\n" + wrap_array(message.attachments).join("\n")).gsub(ATTACHMENT_REGEX, " \\k<entry> - \\k<name>\n")
+        embed.description = (message.pretext + "\n" + Array.wrap(message.attachments).join("\n")).gsub(ATTACHMENT_REGEX, " \\k<entry> - \\k<name>\n")
       end
     end
   end
 
   def custom_data(data)
     super(data).merge(markdown: true)
-  end
-
-  def wrap_array(object)
-    case(object)
-    when nil then []
-    when object.respond_to?(:to_a) then object.to_a
-    else [object]
-    end
   end
 end
