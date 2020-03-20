@@ -304,9 +304,9 @@ export default {
           <div class="mt-3 d-flex">
             <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
             <stage-dropdown-filter
-              v-if="stages.length"
+              v-if="activeStages.length"
               class="ml-auto"
-              :stages="stages"
+              :stages="activeStages"
               @selected="onDurationStageSelect"
             />
           </div>
