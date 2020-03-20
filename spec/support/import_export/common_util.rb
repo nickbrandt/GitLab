@@ -26,6 +26,23 @@ module ImportExport
       "tmp/tests/gitlab-test/import_export"
     end
 
+    def saved_relations(path, exportable_path, key, ndjson_enabled)
+      if ndjson_enabled == true
+        json = if key == :projects
+                 consume_attributes(path, exportable_path)
+               else
+                 consume_relations(path, exportable_path, key)
+               end
+
+        json = json.first if key == :project_feature
+      else
+        json = project_json(path)
+        json = json[key.to_s] unless key == :projects
+      end
+
+      json
+    end
+
     def restore_then_save_project(project, import_path:, export_path:)
       project_restorer = get_project_restorer(project, import_path)
       project_saver = get_project_saver(project, export_path)
@@ -49,6 +66,31 @@ module ImportExport
       instance_double(Gitlab::ImportExport::Shared).tap do |shared|
         allow(shared).to receive(:export_path).and_return(path)
       end
+    end
+
+    def consume_attributes(dir_path, exportable_path)
+      path = File.join(dir_path, "#{exportable_path}.json")
+      return unless File.exist?(path)
+
+      ActiveSupport::JSON.decode(IO.read(path))
+    end
+
+    def consume_relations(dir_path, exportable_path, key)
+      path = File.join(dir_path, exportable_path, "#{key}.ndjson")
+      return unless File.exist?(path)
+
+      relations = []
+
+      File.foreach(path) do |line|
+        json = ActiveSupport::JSON.decode(line)
+        relations << json
+      end
+
+      relations.flatten
+    end
+
+    def project_json(filename)
+      ::JSON.parse(IO.read(filename))
     end
   end
 end
