@@ -111,7 +111,7 @@ module Clusters
       end
 
       def cluster_issuer_content
-        YAML.safe_load(File.read(cluster_issuer_file_path)) # rubocop:disable Performance/AvoidReadFile
+        YAML.safe_load(File.read(cluster_issuer_file_path)) # rubocop:disable Performance/AvoidIoRead
       end
 
       def cluster_issue_overlay

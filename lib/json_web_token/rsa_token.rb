@@ -20,7 +20,7 @@ module JSONWebToken
     private
 
     def key_data
-      @key_data ||= File.read(key_file) # rubocop:disable Performance/AvoidReadFile
+      @key_data ||= File.read(key_file) # rubocop:disable Performance/AvoidIoRead
     end
 
     def key

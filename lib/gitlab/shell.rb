@@ -20,7 +20,7 @@ module Gitlab
       # @return [String] secret token
       def secret_token
         @secret_token ||= begin
-          File.read(Gitlab.config.gitlab_shell.secret_file).chomp # rubocop:disable Performance/AvoidReadFile
+          File.read(Gitlab.config.gitlab_shell.secret_file).chomp # rubocop:disable Performance/AvoidIoRead
         end
       end
 
@@ -44,7 +44,7 @@ module Gitlab
       #
       # @return [String] version
       def version
-        @version ||= File.read(gitlab_shell_version_file).chomp if File.readable?(gitlab_shell_version_file) # rubocop:disable Performance/AvoidReadFile
+        @version ||= File.read(gitlab_shell_version_file).chomp if File.readable?(gitlab_shell_version_file) # rubocop:disable Performance/AvoidIoRead
       end
 
       # Return a SSH url for a given project path

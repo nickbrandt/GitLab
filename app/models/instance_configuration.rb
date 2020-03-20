@@ -60,7 +60,7 @@ class InstanceConfiguration
     file = ssh_algorithm_file(algorithm)
     return unless File.exist?(file)
 
-    File.read(file) # rubocop:disable Performance/AvoidReadFile
+    File.read(file) # rubocop:disable Performance/AvoidIoRead
   end
 
   def ssh_algorithm_md5(ssh_file_content)

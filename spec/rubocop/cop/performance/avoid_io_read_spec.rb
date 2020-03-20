@@ -3,9 +3,9 @@
 require 'fast_spec_helper'
 # require 'rubocop'
 require_relative '../../../support/helpers/expect_offense'
-require_relative '../../../../rubocop/cop/performance/avoid_read_file'
+require_relative '../../../../rubocop/cop/performance/avoid_io_read'
 
-describe RuboCop::Cop::Performance::AvoidReadFile do
+describe RuboCop::Cop::Performance::AvoidIoRead do
   include CopHelper
   include ExpectOffense
 

@@ -29,7 +29,7 @@ module Gitlab
 
       def draw_route(path)
         if File.exist?(path)
-          instance_eval(File.read(path)) # rubocop:disable Performance/AvoidReadFile
+          instance_eval(File.read(path)) # rubocop:disable Performance/AvoidIoRead
           true
         else
           false

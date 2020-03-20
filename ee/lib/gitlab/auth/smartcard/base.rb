@@ -14,7 +14,7 @@ module Gitlab
           @store ||= OpenSSL::X509::Store.new.tap do |store|
             store.add_cert(
               OpenSSL::X509::Certificate.new(
-                File.read(Gitlab.config.smartcard.ca_file))) # rubocop:disable Performance/AvoidReadFile
+                File.read(Gitlab.config.smartcard.ca_file))) # rubocop:disable Performance/AvoidIoRead
           end
         rescue Errno::ENOENT => ex
           logger.error(message: 'Failed to open Gitlab.config.smartcard.ca_file',

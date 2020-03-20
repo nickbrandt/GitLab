@@ -7,7 +7,7 @@ module Gitlab
     # This module relies on the /proc filesystem being available. If /proc is
     # not available the methods of this module will be stubbed.
     module System
-      # rubocop:disable Performance/AvoidReadFile
+      # rubocop:disable Performance/AvoidIoRead
       if File.exist?('/proc')
         # Returns the current process' memory usage in bytes.
         def self.memory_usage
@@ -45,7 +45,7 @@ module Gitlab
           0
         end
       end
-      # rubocop:enable Performance/AvoidReadFile
+      # rubocop:enable Performance/AvoidIoRead
 
       def self.cpu_time
         Process

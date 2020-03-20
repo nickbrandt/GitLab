@@ -15,7 +15,7 @@ module RspecFlaky
     attr_reader :flaky_examples
 
     def self.load(file_path)
-      load_json(File.read(file_path)) # rubocop:disable Performance/AvoidReadFile
+      load_json(File.read(file_path)) # rubocop:disable Performance/AvoidIoRead
     end
 
     def self.load_json(json)

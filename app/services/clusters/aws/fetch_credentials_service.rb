@@ -56,7 +56,7 @@ module Clusters
       # creation form).
       def session_policy
         if provider.nil?
-          File.read(read_only_policy) # rubocop:disable Performance/AvoidReadFile
+          File.read(read_only_policy) # rubocop:disable Performance/AvoidIoRead
         end
       end
 

@@ -3,8 +3,9 @@
 module RuboCop
   module Cop
     module Performance
-      class AvoidReadFile < RuboCop::Cop::Cop
-        MESSAGE = 'dont use this'
+      class AvoidIoRead < RuboCop::Cop::Cop
+        MESSAGE = 'Avoid `IO.read[lines]`, since contents are read into memory in full. ' \
+          'Prefer by-line processing via `readline` or `gets` or specify read length in bytes.'
 
         def_node_matcher :full_file_read_via_class?, <<~PATTERN
           (send

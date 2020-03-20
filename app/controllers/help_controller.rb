@@ -31,7 +31,7 @@ class HelpController < ApplicationController
 
         if File.exist?(path)
           # Remove YAML frontmatter so that it doesn't look weird
-          @markdown = File.read(path).gsub(YAML_FRONT_MATTER_REGEXP, '') # rubocop:disable Performance/AvoidReadFile
+          @markdown = File.read(path).gsub(YAML_FRONT_MATTER_REGEXP, '') # rubocop:disable Performance/AvoidIoRead
 
           render 'show.html.haml'
         else

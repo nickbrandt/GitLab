@@ -42,7 +42,7 @@ module Clusters
       end
 
       def files
-        super.merge('wait-for-elasticsearch.sh': File.read("#{Rails.root}/vendor/elastic_stack/wait-for-elasticsearch.sh")) # rubocop:disable Performance/AvoidReadFile
+        super.merge('wait-for-elasticsearch.sh': File.read("#{Rails.root}/vendor/elastic_stack/wait-for-elasticsearch.sh")) # rubocop:disable Performance/AvoidIoRead
       end
 
       def elasticsearch_client

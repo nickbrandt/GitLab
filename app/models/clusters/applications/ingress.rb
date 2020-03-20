@@ -150,7 +150,7 @@ module Clusters
       end
 
       def modsecurity_config_content
-        File.read(modsecurity_config_file_path) # rubocop:disable Performance/AvoidReadFile
+        File.read(modsecurity_config_file_path) # rubocop:disable Performance/AvoidIoRead
       end
 
       def modsecurity_config_file_path

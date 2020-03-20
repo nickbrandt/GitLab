@@ -21,7 +21,7 @@ module Gitlab
         end
 
         def self.from_files(key_path, cert_path)
-          from_strings(File.read(key_path), File.read(cert_path)) # rubocop:disable Performance/AvoidReadFile
+          from_strings(File.read(key_path), File.read(cert_path)) # rubocop:disable Performance/AvoidIoRead
         end
 
         def initialize(key, cert)

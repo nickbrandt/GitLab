@@ -14,7 +14,7 @@ module Gitlab
         end
 
         def read(path)
-          File.read(path) # rubocop:disable Performance/AvoidReadFile
+          File.read(path) # rubocop:disable Performance/AvoidIoRead
         end
 
         def find(key)

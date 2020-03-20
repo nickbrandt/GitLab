@@ -25,7 +25,7 @@ module Gitlab
       def to_s
         offset, length = read_offset_and_length
 
-        trace.read do |stream| # rubocop:disable Performance/AvoidReadFile
+        trace.read do |stream| # rubocop:disable Performance/AvoidIoRead
           stream.seek(offset)
 
           output = stream

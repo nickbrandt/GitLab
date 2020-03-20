@@ -59,7 +59,7 @@ module Gitlab
           if last_lines.to_i > 0
             read_last_lines(last_lines)
           else
-            stream.read # rubocop:disable Performance/AvoidReadFile
+            stream.read # rubocop:disable Performance/AvoidIoRead
           end.force_encoding(Encoding.default_external)
         end
 
