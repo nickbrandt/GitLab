@@ -15,12 +15,13 @@ class Geo::BaseRegistry < Geo::TrackingBase
     where.not(self::MODEL_FOREIGN_KEY => ids)
   end
 
-  # TODO: Investigate replacing this with bulk insert (there was an obstacle).
-  #       https://gitlab.com/gitlab-org/gitlab/issues/197310
   def self.insert_for_model_ids(ids)
-    ids.map do |id|
-      registry = create(self::MODEL_FOREIGN_KEY => id)
-      registry.id
-    end.compact
+    inserts = ids.map do |id|
+      { self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now }
+    end
+
+    ActiveRecord::InsertAll
+      .new(self, inserts, on_duplicate: :skip, returning: [:id])
+      .execute
   end
 end

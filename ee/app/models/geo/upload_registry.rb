@@ -28,13 +28,15 @@ class Geo::UploadRegistry < Geo::BaseRegistry
     false
   end
 
-  # TODO: Investigate replacing this with bulk insert (there was an obstacle).
-  #       https://gitlab.com/gitlab-org/gitlab/issues/197310
   def self.insert_for_model_ids(attrs)
-    attrs.map do |file_id, file_type|
-      registry = create(file_id: file_id, file_type: file_type)
-      registry.id
-    end.compact
+    inserts = attrs.map do |file_id, file_type|
+      { file_id: file_id, file_type: file_type, created_at: Time.zone.now }
+    end
+
+    ActiveRecord::InsertAll
+      .new(self, inserts, on_duplicate: :skip, returning: [:id])
+      .execute
+      .pluck('id')
   end
 
   def self.with_search(query)
