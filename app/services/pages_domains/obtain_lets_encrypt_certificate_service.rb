@@ -37,7 +37,7 @@ module PagesDomains
         save_certificate(acme_order.private_key, api_order)
         acme_order.destroy!
       when 'invalid'
-        save_order_error(acme_order)
+        save_order_error(acme_order, api_order)
       end
     end
 
@@ -48,11 +48,27 @@ module PagesDomains
       pages_domain.update!(gitlab_provided_key: private_key, gitlab_provided_certificate: certificate)
     end
 
-    def save_order_error(acme_order)
+    def save_order_error(acme_order, api_order)
+      log_error(api_order)
+
       return unless Feature.enabled?(:pages_letsencrypt_errors, pages_domain.project)
 
-      acme_order.pages_domain.update_column(:auto_ssl_failed, true)
+      pages_domain.assign_attributes(auto_ssl_failed: true)
+      pages_domain.save!(validate: false)
+
       acme_order.destroy!
+    end
+
+    def log_error(api_order)
+      Gitlab::AppLogger.error(
+        message: "Failed to obtain Let's Encrypt certificate",
+        acme_error: api_order.challenge_error,
+        project_id: pages_domain.project_id,
+        pages_domain: pages_domain.domain
+      )
+    rescue => e
+      # getting authorizations is an additional network request which can raise errors
+      Gitlab::ErrorTracking.track_exception(e)
     end
   end
 end
