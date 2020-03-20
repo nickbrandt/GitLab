@@ -32,15 +32,19 @@ module RuboCop
         # Tests whether the given path argument points to a file within the application
         # root, in which case we consider it safe to load.
         def external_path?(path)
-          is_rails_root =
-            path.type == :str && path.value&.include?("Rails.root") ||
-              argument_nodes(path).any? { |node| node&.const_name == 'Rails' }
-          !is_rails_root
+          !(rails_root_string?(path) || rails_root_call?(path))
         end
 
-        def argument_nodes(path)
-          path_arg = path.descendants.first
-          [path_arg&.receiver] + (path_arg&.receiver&.descendants || [])
+        def rails_root_string?(path)
+          path.type == :str && path.value&.include?("Rails.root")
+        end
+
+        def rails_root_call?(path)
+          all_calls = path.descendants
+          first_call = all_calls.first
+          all_receivers = [first_call&.receiver] + (first_call&.receiver&.descendants || [])
+          all_receivers.any? { |node| node&.const_name == 'Rails' } &&
+            all_calls.any? { |node| node&.method_name == :root }
         end
       end
     end
