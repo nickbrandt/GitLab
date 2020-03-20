@@ -529,7 +529,7 @@ Interested in contributing a new GitLab managed app? Visit the
 [development guidelines page](../../development/kubernetes.md#gitlab-managed-apps)
 to get started.
 
-## Install using GitLab CI (alpha)
+## Install using GitLab CI/CD (alpha)
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20822) in GitLab 12.6.
 
