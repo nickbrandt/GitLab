@@ -7,7 +7,7 @@ module Metrics
         def valid_params?(params)
           [
             params[:cluster],
-            params[:embedded] == 'true',
+            embedded?(params[:embedded]),
             params[:group].present?,
             params[:title].present?,
             params[:y_label].present?
