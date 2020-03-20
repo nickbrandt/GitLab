@@ -219,13 +219,61 @@ describe Gitlab::Checks::DiffCheck do
     end
 
     context 'file lock rules' do
-      let(:project) { create(:project, :repository) }
+      let_it_be(:push_rule) { create(:push_rule) }
+      let_it_be(:owner) { create(:user) }
       let(:path_lock) { create(:path_lock, path: 'README', project: project) }
 
-      it 'returns an error if the changes update a path locked by another user' do
-        path_lock
+      before do
+        project.add_developer(owner)
+      end
 
-        expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, "The path 'README' is locked by #{path_lock.user.name}")
+      shared_examples 'a locked file' do
+        let!(:path_lock) { create(:path_lock, path: filename, project: project, user: owner) }
+
+        before do
+          allow(project.repository).to receive(:new_commits).and_return(
+            [project.repository.commit(sha)]
+          )
+        end
+
+        context 'and path is locked by another user' do
+          it 'returns an error' do
+            path_lock
+
+            expect { subject.validate! }.to raise_error(Gitlab::GitAccess::ForbiddenError, "The path '#{filename}' is locked by #{path_lock.user.name}")
+          end
+        end
+
+        context 'and path is locked by current user' do
+          let(:user) { owner }
+
+          it 'is allows changes' do
+            path_lock
+
+            expect { subject.validate! }.not_to raise_error
+          end
+        end
+      end
+
+      context 'when file has changes' do
+        let_it_be(:filename) { 'files/ruby/popen.rb' }
+        let_it_be(:sha) { '570e7b2abdd848b95f2f578043fc23bd6f6fd24d' }
+
+        it_behaves_like 'a locked file'
+      end
+
+      context 'when file is renamed' do
+        let_it_be(:filename) { 'files/js/commit.js.coffee' }
+        let_it_be(:sha) { '6907208d755b60ebeacb2e9dfea74c92c3449a1f' }
+
+        it_behaves_like 'a locked file'
+      end
+
+      context 'when file is deleted' do
+        let_it_be(:filename) { 'files/js/commit.js.coffee' }
+        let_it_be(:sha) { 'd59c60028b053793cecfb4022de34602e1a9218e' }
+
+        it_behaves_like 'a locked file'
       end
 
       it 'memoizes the validate_path_locks? call' do
