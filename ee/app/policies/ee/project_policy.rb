@@ -198,6 +198,7 @@ module EE
       rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
         enable :create_vulnerability
+        enable :create_vulnerability_export
         enable :admin_vulnerability
         enable :admin_vulnerability_issue_link
       end

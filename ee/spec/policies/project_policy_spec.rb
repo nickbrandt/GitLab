@@ -36,7 +36,7 @@ describe ProjectPolicy do
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
-        read_vulnerability create_vulnerability admin_vulnerability
+        read_vulnerability create_vulnerability create_vulnerability_export admin_vulnerability
         admin_vulnerability_issue_link read_merge_train
       ]
     end
@@ -527,6 +527,7 @@ describe ProjectPolicy do
 
         it { is_expected.to be_disallowed(:create_vulnerability) }
         it { is_expected.to be_disallowed(:admin_vulnerability) }
+        it { is_expected.to be_disallowed(:create_vulnerability_export) }
       end
     end
   end

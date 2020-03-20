@@ -542,4 +542,12 @@ describe Vulnerabilities::Occurrence do
       end
     end
   end
+
+  describe '#scanner_name' do
+    let(:vulnerabilities_occurrence) { create(:vulnerabilities_occurrence) }
+
+    subject(:scanner_name) { vulnerabilities_occurrence.scanner_name }
+
+    it { is_expected.to eq(vulnerabilities_occurrence.scanner.name) }
+  end
 end

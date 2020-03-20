@@ -591,3 +591,17 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: true
+- :name: vulnerability_exports_export
+  :feature_category: :vulnerability_management
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :cpu
+  :weight: 1
+  :idempotent: true
+- :name: vulnerability_exports_export_deletion
+  :feature_category: :vulnerability_management
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true

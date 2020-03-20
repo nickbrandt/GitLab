@@ -78,6 +78,8 @@ module Vulnerabilities
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
 
+    delegate :name, to: :scanner, prefix: true, allow_nil: true
+
     scope :report_type, -> (type) { where(report_type: report_types[type]) }
     scope :ordered, -> { order(severity: :desc, confidence: :desc, id: :asc) }
 
