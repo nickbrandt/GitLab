@@ -1,25 +1,15 @@
+<script>
 import { mapActions } from 'vuex';
-import boardPromotionState from 'ee/boards/components/board_promotion_state';
-import { GlTooltip } from '@gitlab/ui';
-import Board from '~/boards/components/board';
+import BoardColumnFoss from '~/boards/components/board_column.vue';
 import { __, sprintf, s__ } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
 
-/**
- * Please have a look at:
- * ./board_column.vue
- * https://gitlab.com/gitlab-org/gitlab/-/issues/212300
- * @deprecated
- */
-export default Board.extend({
+export default {
+  extends: BoardColumnFoss,
   data() {
     return {
       weightFeatureAvailable: boardsStore.weightFeatureAvailable,
     };
-  },
-  components: {
-    GlTooltip,
-    boardPromotionState,
   },
   computed: {
     issuesTooltip() {
@@ -33,7 +23,7 @@ export default Board.extend({
       }
 
       // TODO: Remove this pattern.
-      return Board.options.computed.issuesTooltip.call(this);
+      return BoardColumnFoss.computed.issuesTooltip.call(this);
     },
     weightCountToolTip() {
       const { totalWeight } = this.list;
@@ -51,4 +41,5 @@ export default Board.extend({
       this.setActiveListId(this.list.id);
     },
   },
-});
+};
+</script>
