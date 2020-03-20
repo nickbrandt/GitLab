@@ -24,7 +24,7 @@ export default {
       },
       set: debounce(function debounceSearch(newVal) {
         this.setSearch(newVal);
-        this.fetchDesigns();
+        this.fetchReplicableItems();
       }, DEFAULT_SEARCH_DELAY),
     },
     resyncText() {
@@ -32,10 +32,10 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['setFilter', 'setSearch', 'fetchDesigns', 'initiateAllDesignSyncs']),
+    ...mapActions(['setFilter', 'setSearch', 'fetchReplicableItems', 'initiateAllReplicableSyncs']),
     filterChange(filterIndex) {
       this.setFilter(filterIndex);
-      this.fetchDesigns();
+      this.fetchReplicableItems();
     },
   },
   actionTypes: ACTION_TYPES,
@@ -61,7 +61,7 @@ export default {
               <icon name="chevron-down" />
             </span>
           </template>
-          <gl-dropdown-item @click="initiateAllDesignSyncs($options.actionTypes.RESYNC)">
+          <gl-dropdown-item @click="initiateAllReplicableSyncs($options.actionTypes.RESYNC)">
             {{ resyncText }}
           </gl-dropdown-item>
         </gl-dropdown>

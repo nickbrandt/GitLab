@@ -14,8 +14,8 @@ describe('GeoDesignsFilterBar', () => {
   const actionSpies = {
     setSearch: jest.fn(),
     setFilter: jest.fn(),
-    fetchDesigns: jest.fn(),
-    initiateAllDesignSyncs: jest.fn(),
+    fetchReplicableItems: jest.fn(),
+    initiateAllReplicableSyncs: jest.fn(),
   };
 
   const createComponent = () => {
@@ -71,10 +71,10 @@ describe('GeoDesignsFilterBar', () => {
         expect(findGlDropdownItem().exists()).toBe(true);
       });
 
-      it('calls initiateAllDesignSyncs when clicked', () => {
+      it('calls initiateAllReplicableSyncs when clicked', () => {
         const innerButton = findGlDropdownItem().find('button');
         innerButton.trigger('click');
-        expect(actionSpies.initiateAllDesignSyncs).toHaveBeenCalled();
+        expect(actionSpies.initiateAllReplicableSyncs).toHaveBeenCalled();
       });
     });
   });
@@ -82,7 +82,7 @@ describe('GeoDesignsFilterBar', () => {
   describe('when search changes', () => {
     beforeEach(() => {
       createComponent();
-      actionSpies.fetchDesigns.mockClear(); // Will get called on init
+      actionSpies.fetchReplicableItems.mockClear(); // Will get called on init
       wrapper.vm.search = 'test search';
     });
 
@@ -93,11 +93,11 @@ describe('GeoDesignsFilterBar', () => {
       expect(actionSpies.setSearch).toHaveBeenCalledWith('test search');
     });
 
-    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling fetchDesigns`, () => {
-      expect(actionSpies.fetchDesigns).not.toHaveBeenCalled();
+    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling fetchReplicableItems`, () => {
+      expect(actionSpies.fetchReplicableItems).not.toHaveBeenCalled();
 
       jest.runAllTimers(); // Debounce
-      expect(actionSpies.fetchDesigns).toHaveBeenCalled();
+      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 
@@ -113,8 +113,8 @@ describe('GeoDesignsFilterBar', () => {
       expect(actionSpies.setFilter).toHaveBeenCalledWith(testValue);
     });
 
-    it('should call fetchDesigns', () => {
-      expect(actionSpies.fetchDesigns).toHaveBeenCalled();
+    it('should call fetchReplicableItems', () => {
+      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 });

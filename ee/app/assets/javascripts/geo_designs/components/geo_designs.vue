@@ -10,22 +10,22 @@ export default {
     GeoDesign,
   },
   computed: {
-    ...mapState(['designs', 'currentPage', 'pageSize', 'totalDesigns']),
+    ...mapState(['replicableItems', 'currentPage', 'pageSize', 'totalReplicableItems']),
     page: {
       get() {
         return this.currentPage;
       },
       set(newVal) {
         this.setPage(newVal);
-        this.fetchDesigns();
+        this.fetchReplicableItems();
       },
     },
-    hasDesigns() {
-      return this.totalDesigns > 0;
+    hasReplicableItems() {
+      return this.totalReplicableItems > 0;
     },
   },
   methods: {
-    ...mapActions(['setPage', 'fetchDesigns']),
+    ...mapActions(['setPage', 'fetchReplicableItems']),
   },
 };
 </script>
@@ -33,20 +33,20 @@ export default {
 <template>
   <section>
     <geo-design
-      v-for="design in designs"
-      :key="design.id"
-      :name="design.name"
-      :project-id="design.projectId"
-      :sync-status="design.state"
-      :last-synced="design.lastSyncedAt"
-      :last-verified="design.lastVerifiedAt"
-      :last-checked="design.lastCheckedAt"
+      v-for="item in replicableItems"
+      :key="item.id"
+      :name="item.name"
+      :project-id="item.projectId"
+      :sync-status="item.state"
+      :last-synced="item.lastSyncedAt"
+      :last-verified="item.lastVerifiedAt"
+      :last-checked="item.lastCheckedAt"
     />
     <gl-pagination
-      v-if="hasDesigns"
+      v-if="hasReplicableItems"
       v-model="page"
       :per-page="pageSize"
-      :total-items="totalDesigns"
+      :total-items="totalReplicableItems"
       align="center"
     />
   </section>
