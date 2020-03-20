@@ -29,6 +29,19 @@ describe RuboCop::Cop::Performance::AvoidReadFile do
             expect(cop.offenses).to be_empty
           end
         end
+
+        context 'and the path is in Rails.root' do
+          it 'passes' do
+            inspect_source "contents = #{klass}.read(Rails.root.join('path', 'to', 'file'))"
+            expect(cop.offenses).to be_empty
+
+            inspect_source "contents = #{klass}.read(Rails.root.join(path).to_s)"
+            expect(cop.offenses).to be_empty
+
+            inspect_source "contents = #{klass} " + '.read("\#{Rails.root}/path")'
+            expect(cop.offenses).to be_empty
+          end
+        end
       end
 
       context "via #{klass}.readlines" do
