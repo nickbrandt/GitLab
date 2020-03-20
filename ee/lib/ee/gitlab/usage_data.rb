@@ -155,7 +155,7 @@ module EE
                                          projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id'), batch: false),
-                                         projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects, batch: false),
+                                         projects_with_prometheus_alerts: distinct_count(PrometheusAlert, :project_id),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting),
                                          template_repositories: count(::Project.with_repos_templates, batch: false) + count(::Project.with_groups_level_repos_templates, batch: false)
                                        },
