@@ -305,6 +305,9 @@ msgstr ""
 msgid "%{filePath} deleted"
 msgstr ""
 
+msgid "%{file}:%{line} (%{klass}::%{method})"
+msgstr ""
+
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
@@ -8967,6 +8970,9 @@ msgid "File Hooks"
 msgstr ""
 
 msgid "File Hooks (%{count})"
+msgstr ""
+
+msgid "File Location"
 msgstr ""
 
 msgid "File added"
