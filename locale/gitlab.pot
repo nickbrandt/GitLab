@@ -18287,7 +18287,7 @@ msgstr ""
 msgid "Size settings for static websites"
 msgstr ""
 
-msgid "Skip older, pending deployment jobs"
+msgid "Skip outdated deployment jobs"
 msgstr ""
 
 msgid "Skip this for now"
