@@ -32,7 +32,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         post :create_deploy_token, path: 'deploy_token/create'
       end
 
-      resources :integrations, only: [:edit, :update] do
+      resources :integrations, only: [:index, :edit, :update] do
         member do
           put :test
         end
