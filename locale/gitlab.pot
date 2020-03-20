@@ -1631,6 +1631,9 @@ msgstr ""
 msgid "All %{replicableType} are being scheduled for %{action}"
 msgstr ""
 
+msgid "All (default)"
+msgstr ""
+
 msgid "All Members"
 msgstr ""
 
@@ -5902,6 +5905,9 @@ msgid "Create project"
 msgstr ""
 
 msgid "Create project label"
+msgstr ""
+
+msgid "Create wildcard: %{searchTerm}"
 msgstr ""
 
 msgid "Create your first page"

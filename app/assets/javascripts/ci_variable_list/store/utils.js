@@ -41,3 +41,14 @@ export const prepareDataForApi = (variable, destroy = false) => {
 };
 
 export const prepareEnvironments = environments => environments.map(e => e.name);
+
+/**
+ * Extract environment_scope from any variables that were created using
+ * wildcard environment scope
+ * @param {Array} variables - Array of variable objects
+ * @returns {Array} - Array of variable enviroment scopes
+ */
+
+export const extractEnvironmentScopes = variables => {
+  return [...new Set(variables.map(variable => variable.environment_scope))];
+};
