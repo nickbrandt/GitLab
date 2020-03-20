@@ -36,8 +36,8 @@ module PagesDomains
       when 'valid'
         save_certificate(acme_order.private_key, api_order)
         acme_order.destroy!
-        # when 'invalid'
-        # TODO: implement error handling
+      when 'invalid'
+        save_order_error(acme_order)
       end
     end
 
@@ -46,6 +46,13 @@ module PagesDomains
     def save_certificate(private_key, api_order)
       certificate = api_order.certificate
       pages_domain.update!(gitlab_provided_key: private_key, gitlab_provided_certificate: certificate)
+    end
+
+    def save_order_error(acme_order)
+      return unless Feature.enabled?(:pages_letsencrypt_errors, pages_domain.project)
+
+      acme_order.pages_domain.update_column(:auto_ssl_failed, true)
+      acme_order.destroy!
     end
   end
 end
