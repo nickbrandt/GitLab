@@ -18,7 +18,7 @@ module Users
 
       user_exists = @user.persisted?
 
-      discard_read_only_attributes
+      discard_read_only_attributes unless current_user&.admin?
       assign_attributes
       assign_identity
 

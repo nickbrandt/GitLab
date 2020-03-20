@@ -55,13 +55,24 @@ describe Users::UpdateService do
       expect(result[:message]).to eq("Emoji is not included in the list")
     end
 
-    it 'ignores read-only attributes' do
-      allow(user).to receive(:read_only_attribute?).with(:name).and_return(true)
+    context 'for read-only attributes' do
+      before do
+        allow(user).to receive(:read_only_attribute?).with(:name).and_return(true)
+      end
 
-      expect do
-        update_user(user, name: 'changed' + user.name)
-        user.reload
-      end.not_to change { user.name }
+      it 'ignores them if current user is not an admin' do
+        expect do
+          update_user(user, name: 'changed' + user.name)
+          user.reload
+        end.not_to change { user.name }
+      end
+
+      it 'updates them if current user is an admin' do
+        expect do
+          described_class.new(create(:admin), user: user, name: 'changed name').execute
+          user.reload
+        end.to change { user.name }.to('changed name')
+      end
     end
 
     it 'updates user detail with provided attributes' do

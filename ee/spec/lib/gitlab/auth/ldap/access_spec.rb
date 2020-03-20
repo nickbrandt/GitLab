@@ -10,6 +10,10 @@ describe Gitlab::Auth::Ldap::Access do
 
   subject(:access) { described_class.new(user) }
 
+  before do
+    allow(Gitlab::Auth::Ldap::Config).to receive(:enabled?).and_return(true)
+  end
+
   describe '#allowed?' do
     context 'LDAP user' do
       it 'finds a user by dn first' do

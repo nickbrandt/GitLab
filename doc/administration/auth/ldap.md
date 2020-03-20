@@ -114,6 +114,11 @@ would be on port 389. `plain` also operates on port 389.
 NOTE: **Note:**
 LDAP users must have an email address set, regardless of whether it is used to log in.
 
+NOTE: **Note:**
+As soon as LDAP is configured and enabled `name` and `email` attributes become
+read-only instance wide as they are expected to come from LDAP provider.
+Instance administrator can modify values for any user in admin area.
+
 **Omnibus configuration**
 
 ```ruby

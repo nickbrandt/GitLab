@@ -97,11 +97,18 @@ module EE
             return if ldap_email.blank? && ldap_name.blank?
 
             attrs = { user: user }
-            attrs[:email] = ldap_email if ldap_email.present?
-            attrs[:name] = ldap_name if ldap_name.present?
+            if ldap_email.present?
+              attrs[:email] = ldap_email
+              user.email = ldap_email
+            end
+
+            if ldap_name.present?
+              attrs[:name] = ldap_name
+              user.name = ldap_name
+            end
 
             ::Users::UpdateService.new(user, attrs).execute do |user|
-              user.skip_reconfirmation!
+              user.skip_reconfirmation! unless ::Feature.enabled?(:ldap_readonly_attributes, default_enabled: true)
             end
           end
 

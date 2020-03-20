@@ -1,0 +1,5 @@
+---
+title: Cannot change user name (even via user sync) when LDAP is enabled
+merge_request: 27653
+author:
+type: fixed
