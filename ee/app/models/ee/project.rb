@@ -406,10 +406,6 @@ module EE
       super && !(group && ::Gitlab::CurrentSettings.lock_memberships_to_ldap?)
     end
 
-    def reference_issue_tracker?
-      default_issues_tracker? || jira_tracker_active?
-    end
-
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
     def approvals_before_merge
       return 0 unless feature_available?(:merge_request_approvers)

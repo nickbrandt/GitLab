@@ -1292,10 +1292,6 @@ class Project < ApplicationRecord
     @monitoring_service ||= monitoring_services.reorder(nil).find_by(active: true)
   end
 
-  def jira_tracker?
-    issues_tracker.to_param == 'jira'
-  end
-
   def avatar_in_git
     repository.avatar
   end
@@ -1602,10 +1598,6 @@ class Project < ApplicationRecord
     strong_memoize(:wiki) do
       ProjectWiki.new(self, self.owner)
     end
-  end
-
-  def jira_tracker_active?
-    jira_tracker? && jira_service.active
   end
 
   def allowed_to_share_with_group?
