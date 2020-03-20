@@ -11305,6 +11305,9 @@ msgstr ""
 msgid "Jira import feature is disabled."
 msgstr ""
 
+msgid "Jira import is already running."
+msgstr ""
+
 msgid "Jira integration not configured."
 msgstr ""
 
@@ -23155,6 +23158,9 @@ msgid "You do not have permission to leave this %{namespaceType}."
 msgstr ""
 
 msgid "You do not have permission to run the Web Terminal. Please contact a project administrator."
+msgstr ""
+
+msgid "You do not have permissions to run the import."
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
