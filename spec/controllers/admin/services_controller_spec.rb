@@ -24,9 +24,17 @@ describe Admin::ServicesController do
       end
 
       it 'avoids N+1 queries' do
-        query_count = ActiveRecord::QueryRecorder.new { get :index }.count
+        control_count = ActiveRecord::QueryRecorder.new { get :index }.count
 
-        expect(query_count).to eq(6)
+        Service.insert_all(
+          [
+            { template: true, type: 'Service1' },
+            { template: true, type: 'Service2' },
+            { template: true, type: 'Service3' }
+          ]
+        )
+
+        expect { get :index }.not_to exceed_query_limit(control_count)
       end
     end
   end
