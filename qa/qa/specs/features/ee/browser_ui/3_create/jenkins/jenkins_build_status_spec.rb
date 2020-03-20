@@ -51,6 +51,14 @@ module QA
             end
           end
 
+          Vendor::Jenkins::Page::Logs.perform do |logs|
+            logs.visit!
+
+            Support::Waiter.wait_until(sleep_interval: 1, reload_page: page) do
+              logs.build_status_sent_to_gitlab?
+            end
+          end
+
           project.visit!
 
           Page::Project::Menu.perform(&:click_ci_cd_pipelines)
