@@ -8481,6 +8481,9 @@ msgstr ""
 msgid "Failed to create a branch for this issue. Please try again."
 msgstr ""
 
+msgid "Failed to create import label for jira import."
+msgstr ""
+
 msgid "Failed to create repository"
 msgstr ""
 
