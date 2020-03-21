@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { TEST_HOST } from 'spec/test_constants';
 import TerminalEmptyState from 'ee/ide/components/terminal/empty_state.vue';
@@ -11,10 +11,7 @@ describe('EE IDE TerminalEmptyState', () => {
   let wrapper;
 
   const factory = (options = {}) => {
-    const localVue = createLocalVue();
-
-    wrapper = shallowMount(localVue.extend(TerminalEmptyState), {
-      localVue,
+    wrapper = shallowMount(TerminalEmptyState, {
       ...options,
     });
   };

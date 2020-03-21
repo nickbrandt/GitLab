@@ -4,16 +4,26 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import Terminal from 'ee/ide/components/terminal/terminal.vue';
 import TerminalControls from 'ee/ide/components/terminal/terminal_controls.vue';
 import { STARTING, PENDING, RUNNING, STOPPING, STOPPED } from 'ee/ide/constants';
+import GLTerminal from '~/terminal/terminal';
 
 const TEST_TERMINAL_PATH = 'terminal/path';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+jest.mock('~/terminal/terminal', () =>
+  jest.fn().mockImplementation(() => ({
+    dispose: jest.fn(),
+    disable: jest.fn(),
+    addScrollListener: jest.fn(),
+    scrollToTop: jest.fn(),
+    scrollToBottom: jest.fn(),
+  })),
+);
+
 describe('EE IDE Terminal', () => {
   let wrapper;
   let state;
-  let GLTerminalSpy;
 
   const factory = propsData => {
     const store = new Vuex.Store({
@@ -37,15 +47,6 @@ describe('EE IDE Terminal', () => {
   };
 
   beforeEach(() => {
-    GLTerminalSpy = spyOnDependency(Terminal, 'GLTerminal').and.returnValue(
-      jasmine.createSpyObj('GLTerminal', [
-        'dispose',
-        'disable',
-        'addScrollListener',
-        'scrollToTop',
-        'scrollToBottom',
-      ]),
-    );
     state = {
       panelResizing: false,
     };
@@ -91,10 +92,11 @@ describe('EE IDE Terminal', () => {
   });
 
   describe('terminal controls', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       factory();
       wrapper.vm.createTerminal();
-      localVue.nextTick(done);
+
+      return localVue.nextTick();
     });
 
     it('is visible if terminal is created', () => {
@@ -113,7 +115,7 @@ describe('EE IDE Terminal', () => {
       expect(wrapper.vm.glterminal.scrollToBottom).toHaveBeenCalled();
     });
 
-    it('has props set', done => {
+    it('has props set', () => {
       expect(wrapper.find(TerminalControls).props()).toEqual({
         canScrollUp: false,
         canScrollDown: false,
@@ -121,16 +123,12 @@ describe('EE IDE Terminal', () => {
 
       wrapper.setData({ canScrollUp: true, canScrollDown: true });
 
-      localVue
-        .nextTick()
-        .then(() => {
-          expect(wrapper.find(TerminalControls).props()).toEqual({
-            canScrollUp: true,
-            canScrollDown: true,
-          });
-        })
-        .then(done)
-        .catch(done.fail);
+      return localVue.nextTick().then(() => {
+        expect(wrapper.find(TerminalControls).props()).toEqual({
+          canScrollUp: true,
+          canScrollDown: true,
+        });
+      });
     });
   });
 
@@ -139,8 +137,8 @@ describe('EE IDE Terminal', () => {
     let stopTerminal;
 
     beforeEach(() => {
-      createTerminal = jasmine.createSpy('createTerminal');
-      stopTerminal = jasmine.createSpy('stopTerminal');
+      createTerminal = jest.fn().mockName('createTerminal');
+      stopTerminal = jest.fn().mockName('stopTerminal');
     });
 
     it('creates the terminal if running', () => {
@@ -169,7 +167,7 @@ describe('EE IDE Terminal', () => {
     });
 
     it('creates the terminal', () => {
-      expect(GLTerminalSpy).toHaveBeenCalledWith(wrapper.vm.$refs.terminal);
+      expect(GLTerminal).toHaveBeenCalledWith(wrapper.vm.$refs.terminal);
       expect(wrapper.vm.glterminal).toBeTruthy();
     });
 
@@ -182,7 +180,7 @@ describe('EE IDE Terminal', () => {
         expect(wrapper.vm.canScrollUp).toBe(false);
         expect(wrapper.vm.canScrollDown).toBe(false);
 
-        const listener = wrapper.vm.glterminal.addScrollListener.calls.argsFor(0)[0];
+        const listener = wrapper.vm.glterminal.addScrollListener.mock.calls[0][0];
         listener({ canScrollUp: true, canScrollDown: true });
 
         expect(wrapper.vm.canScrollUp).toBe(true);

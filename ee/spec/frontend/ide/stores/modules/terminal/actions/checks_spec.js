@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { CHECK_CONFIG, CHECK_RUNNERS, RETRY_RUNNERS_INTERVAL } from 'ee/ide/constants';
 import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
@@ -39,30 +39,27 @@ describe('EE IDE store terminal check actions', () => {
         path_with_namespace: TEST_PROJECT_PATH,
       },
     };
-    jasmine.clock().install();
   });
 
   afterEach(() => {
     mock.restore();
-    jasmine.clock().uninstall();
   });
 
   describe('requestConfigCheck', () => {
-    it('handles request loading', done => {
-      testAction(
+    it('handles request loading', () => {
+      return testAction(
         actions.requestConfigCheck,
         null,
         {},
         [{ type: mutationTypes.REQUEST_CHECK, payload: CHECK_CONFIG }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveConfigCheckSuccess', () => {
-    it('handles successful response', done => {
-      testAction(
+    it('handles successful response', () => {
+      return testAction(
         actions.receiveConfigCheckSuccess,
         null,
         {},
@@ -71,17 +68,16 @@ describe('EE IDE store terminal check actions', () => {
           { type: mutationTypes.RECEIVE_CHECK_SUCCESS, payload: CHECK_CONFIG },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('receiveConfigCheckError', () => {
-    it('handles error response', done => {
+    it('handles error response', () => {
       const status = httpStatus.UNPROCESSABLE_ENTITY;
       const payload = { response: { status } };
 
-      testAction(
+      return testAction(
         actions.receiveConfigCheckError,
         payload,
         state,
@@ -99,15 +95,14 @@ describe('EE IDE store terminal check actions', () => {
           },
         ],
         [],
-        done,
       );
     });
 
     [httpStatus.FORBIDDEN, httpStatus.NOT_FOUND].forEach(status => {
-      it(`hides tab, when status is ${status}`, done => {
+      it(`hides tab, when status is ${status}`, () => {
         const payload = { response: { status } };
 
-        testAction(
+        return testAction(
           actions.receiveConfigCheckError,
           payload,
           state,
@@ -116,20 +111,19 @@ describe('EE IDE store terminal check actions', () => {
               type: mutationTypes.SET_VISIBLE,
               payload: false,
             },
-            jasmine.objectContaining({ type: mutationTypes.RECEIVE_CHECK_ERROR }),
+            expect.objectContaining({ type: mutationTypes.RECEIVE_CHECK_ERROR }),
           ],
           [],
-          done,
         );
       });
     });
   });
 
   describe('fetchConfigCheck', () => {
-    it('dispatches request and receive', done => {
+    it('dispatches request and receive', () => {
       mock.onPost(/.*\/ide_terminals\/check_config/).reply(200, {});
 
-      testAction(
+      return testAction(
         actions.fetchConfigCheck,
         null,
         {
@@ -138,14 +132,13 @@ describe('EE IDE store terminal check actions', () => {
         },
         [],
         [{ type: 'requestConfigCheck' }, { type: 'receiveConfigCheckSuccess' }],
-        done,
       );
     });
 
-    it('when error, dispatches request and receive', done => {
+    it('when error, dispatches request and receive', () => {
       mock.onPost(/.*\/ide_terminals\/check_config/).reply(400, {});
 
-      testAction(
+      return testAction(
         actions.fetchConfigCheck,
         null,
         {
@@ -155,90 +148,85 @@ describe('EE IDE store terminal check actions', () => {
         [],
         [
           { type: 'requestConfigCheck' },
-          { type: 'receiveConfigCheckError', payload: jasmine.any(Error) },
+          { type: 'receiveConfigCheckError', payload: expect.any(Error) },
         ],
-        done,
       );
     });
   });
 
   describe('requestRunnersCheck', () => {
-    it('handles request loading', done => {
-      testAction(
+    it('handles request loading', () => {
+      return testAction(
         actions.requestRunnersCheck,
         null,
         {},
         [{ type: mutationTypes.REQUEST_CHECK, payload: CHECK_RUNNERS }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveRunnersCheckSuccess', () => {
-    it('handles successful response, with data', done => {
+    it('handles successful response, with data', () => {
       const payload = [{}];
 
-      testAction(
+      return testAction(
         actions.receiveRunnersCheckSuccess,
         payload,
         state,
         [{ type: mutationTypes.RECEIVE_CHECK_SUCCESS, payload: CHECK_RUNNERS }],
         [],
-        done,
       );
     });
 
-    it('handles successful response, with empty data', done => {
+    it('handles successful response, with empty data', () => {
       const commitPayload = {
         type: CHECK_RUNNERS,
         message: messages.runnersCheckEmpty(TEST_RUNNERS_HELP_PATH),
       };
 
-      testAction(
+      return testAction(
         actions.receiveRunnersCheckSuccess,
         [],
         state,
         [{ type: mutationTypes.RECEIVE_CHECK_ERROR, payload: commitPayload }],
         [{ type: 'retryRunnersCheck' }],
-        done,
       );
     });
   });
 
   describe('receiveRunnersCheckError', () => {
-    it('dispatches handle with message', done => {
+    it('dispatches handle with message', () => {
       const commitPayload = {
         type: CHECK_RUNNERS,
         message: messages.UNEXPECTED_ERROR_RUNNERS,
       };
 
-      testAction(
+      return testAction(
         actions.receiveRunnersCheckError,
         null,
         {},
         [{ type: mutationTypes.RECEIVE_CHECK_ERROR, payload: commitPayload }],
         [],
-        done,
       );
     });
   });
 
   describe('retryRunnersCheck', () => {
     it('dispatches fetch again after timeout', () => {
-      const dispatch = jasmine.createSpy('dispatch');
+      const dispatch = jest.fn().mockName('dispatch');
 
       actions.retryRunnersCheck({ dispatch, state });
 
       expect(dispatch).not.toHaveBeenCalled();
 
-      jasmine.clock().tick(RETRY_RUNNERS_INTERVAL + 1);
+      jest.advanceTimersByTime(RETRY_RUNNERS_INTERVAL + 1);
 
       expect(dispatch).toHaveBeenCalledWith('fetchRunnersCheck', { background: true });
     });
 
     it('does not dispatch fetch if config check is error', () => {
-      const dispatch = jasmine.createSpy('dispatch');
+      const dispatch = jest.fn().mockName('dispatch');
       state.checks.config = {
         isLoading: false,
         isValid: false,
@@ -248,52 +236,49 @@ describe('EE IDE store terminal check actions', () => {
 
       expect(dispatch).not.toHaveBeenCalled();
 
-      jasmine.clock().tick(RETRY_RUNNERS_INTERVAL + 1);
+      jest.advanceTimersByTime(RETRY_RUNNERS_INTERVAL + 1);
 
       expect(dispatch).not.toHaveBeenCalled();
     });
   });
 
   describe('fetchRunnersCheck', () => {
-    it('dispatches request and receive', done => {
+    it('dispatches request and receive', () => {
       mock.onGet(/api\/.*\/projects\/.*\/runners/, { params: { scope: 'active' } }).reply(200, []);
 
-      testAction(
+      return testAction(
         actions.fetchRunnersCheck,
         {},
         rootGetters,
         [],
         [{ type: 'requestRunnersCheck' }, { type: 'receiveRunnersCheckSuccess', payload: [] }],
-        done,
       );
     });
 
-    it('does not dispatch request when background is true', done => {
+    it('does not dispatch request when background is true', () => {
       mock.onGet(/api\/.*\/projects\/.*\/runners/, { params: { scope: 'active' } }).reply(200, []);
 
-      testAction(
+      return testAction(
         actions.fetchRunnersCheck,
         { background: true },
         rootGetters,
         [],
         [{ type: 'receiveRunnersCheckSuccess', payload: [] }],
-        done,
       );
     });
 
-    it('dispatches request and receive, when error', done => {
+    it('dispatches request and receive, when error', () => {
       mock.onGet(/api\/.*\/projects\/.*\/runners/, { params: { scope: 'active' } }).reply(500, []);
 
-      testAction(
+      return testAction(
         actions.fetchRunnersCheck,
         {},
         rootGetters,
         [],
         [
           { type: 'requestRunnersCheck' },
-          { type: 'receiveRunnersCheckError', payload: jasmine.any(Error) },
+          { type: 'receiveRunnersCheckError', payload: expect.any(Error) },
         ],
-        done,
       );
     });
   });

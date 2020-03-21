@@ -1,10 +1,13 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { PENDING, RUNNING, STOPPING, STOPPED } from 'ee/ide/constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
-import actionsModule, * as actions from 'ee/ide/stores/modules/terminal/actions/session_status';
+import * as actions from 'ee/ide/stores/modules/terminal/actions/session_status';
 import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+
+jest.mock('~/flash');
 
 const TEST_SESSION = {
   id: 7,
@@ -19,30 +22,25 @@ describe('EE IDE store terminal session controls actions', () => {
   let mock;
   let dispatch;
   let commit;
-  let flashSpy;
 
   beforeEach(() => {
-    jasmine.clock().install();
     mock = new MockAdapter(axios);
-    dispatch = jasmine.createSpy('dispatch');
-    commit = jasmine.createSpy('commit');
-    flashSpy = spyOnDependency(actionsModule, 'flash');
+    dispatch = jest.fn().mockName('dispatch');
+    commit = jest.fn().mockName('commit');
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     mock.restore();
   });
 
   describe('pollSessionStatus', () => {
-    it('starts interval to poll status', done => {
-      testAction(
+    it('starts interval to poll status', () => {
+      return testAction(
         actions.pollSessionStatus,
         null,
         {},
-        [{ type: mutationTypes.SET_SESSION_STATUS_INTERVAL, payload: jasmine.any(Number) }],
+        [{ type: mutationTypes.SET_SESSION_STATUS_INTERVAL, payload: expect.any(Number) }],
         [{ type: 'stopPollingSessionStatus' }, { type: 'fetchSessionStatus' }],
-        done,
       );
     });
 
@@ -52,9 +50,9 @@ describe('EE IDE store terminal session controls actions', () => {
       };
 
       actions.pollSessionStatus({ state, dispatch, commit });
-      dispatch.calls.reset();
+      dispatch.mockClear();
 
-      jasmine.clock().tick(5001);
+      jest.advanceTimersByTime(5001);
 
       expect(dispatch).toHaveBeenCalledWith('stopPollingSessionStatus');
     });
@@ -65,52 +63,49 @@ describe('EE IDE store terminal session controls actions', () => {
       };
 
       actions.pollSessionStatus({ state, dispatch, commit });
-      dispatch.calls.reset();
+      dispatch.mockClear();
 
-      jasmine.clock().tick(5001);
+      jest.advanceTimersByTime(5001);
 
       expect(dispatch).toHaveBeenCalledWith('fetchSessionStatus');
     });
   });
 
   describe('stopPollingSessionStatus', () => {
-    it('does nothing if sessionStatusInterval is empty', done => {
-      testAction(actions.stopPollingSessionStatus, null, {}, [], [], done);
+    it('does nothing if sessionStatusInterval is empty', () => {
+      return testAction(actions.stopPollingSessionStatus, null, {}, [], []);
     });
 
-    it('clears interval', done => {
-      testAction(
+    it('clears interval', () => {
+      return testAction(
         actions.stopPollingSessionStatus,
         null,
         { sessionStatusInterval: 7 },
         [{ type: mutationTypes.SET_SESSION_STATUS_INTERVAL, payload: 0 }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveSessionStatusSuccess', () => {
-    it('sets session status', done => {
-      testAction(
+    it('sets session status', () => {
+      return testAction(
         actions.receiveSessionStatusSuccess,
         { status: RUNNING },
         {},
         [{ type: mutationTypes.SET_SESSION_STATUS, payload: RUNNING }],
         [],
-        done,
       );
     });
 
     [STOPPING, STOPPED, 'unexpected'].forEach(status => {
-      it(`kills session if status is ${status}`, done => {
-        testAction(
+      it(`kills session if status is ${status}`, () => {
+        return testAction(
           actions.receiveSessionStatusSuccess,
           { status },
           {},
           [{ type: mutationTypes.SET_SESSION_STATUS, payload: status }],
           [{ type: 'killSession' }],
-          done,
         );
       });
     });
@@ -120,11 +115,11 @@ describe('EE IDE store terminal session controls actions', () => {
     it('flashes message', () => {
       actions.receiveSessionStatusError({ dispatch });
 
-      expect(flashSpy).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STATUS);
+      expect(createFlash).toHaveBeenCalledWith(messages.UNEXPECTED_ERROR_STATUS);
     });
 
-    it('kills the session', done => {
-      testAction(actions.receiveSessionStatusError, null, {}, [], [{ type: 'killSession' }], done);
+    it('kills the session', () => {
+      return testAction(actions.receiveSessionStatusError, null, {}, [], [{ type: 'killSession' }]);
     });
   });
 
@@ -147,29 +142,27 @@ describe('EE IDE store terminal session controls actions', () => {
       expect(dispatch).not.toHaveBeenCalled();
     });
 
-    it('dispatches success on success', done => {
+    it('dispatches success on success', () => {
       mock.onGet(state.session.showPath).reply(200, TEST_SESSION);
 
-      testAction(
+      return testAction(
         actions.fetchSessionStatus,
         null,
         state,
         [],
         [{ type: 'receiveSessionStatusSuccess', payload: TEST_SESSION }],
-        done,
       );
     });
 
-    it('dispatches error on error', done => {
+    it('dispatches error on error', () => {
       mock.onGet(state.session.showPath).reply(400);
 
-      testAction(
+      return testAction(
         actions.fetchSessionStatus,
         null,
         state,
         [],
-        [{ type: 'receiveSessionStatusError', payload: jasmine.any(Error) }],
-        done,
+        [{ type: 'receiveSessionStatusError', payload: expect.any(Error) }],
       );
     });
   });

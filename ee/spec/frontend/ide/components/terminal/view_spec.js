@@ -29,7 +29,7 @@ describe('EE IDE TerminalView', () => {
       },
     });
 
-    wrapper = shallowMount(localVue.extend(TerminalView), { localVue, store });
+    wrapper = shallowMount(TerminalView, { localVue, store });
   };
 
   beforeEach(() => {
@@ -42,8 +42,8 @@ describe('EE IDE TerminalView', () => {
     };
 
     actions = {
-      hideSplash: jasmine.createSpy('hideSplash'),
-      startSession: jasmine.createSpy('startSession'),
+      hideSplash: jest.fn().mockName('hideSplash'),
+      startSession: jest.fn().mockName('startSession'),
     };
 
     getters = {
