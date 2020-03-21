@@ -1,0 +1,5 @@
+---
+title: Add warning message when changing target branch in MR edit
+merge_request: 27738
+author:
+type: added

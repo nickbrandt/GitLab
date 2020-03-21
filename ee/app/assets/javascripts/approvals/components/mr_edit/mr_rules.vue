@@ -27,6 +27,7 @@ export default {
     ...mapState({
       rules: state => state.approvals.rules,
     }),
+    ...mapState('targetBranchAlertModule', ['showTargetBranchAlert', 'confirmTargetBranchAlert']),
     hasNamedRule() {
       if (this.settings.allowMultiRule) {
         return this.rules.some(rule => rule.ruleType !== RULE_TYPE_ANY_APPROVER);
@@ -85,13 +86,16 @@ export default {
   },
   methods: {
     ...mapActions(['setEmptyRule', 'addEmptyRule', 'fetchRules']),
+    ...mapActions('targetBranchAlertModule', ['toggleDisplayTargetBranchAlert', 'setTargetBranch']),
     onTargetBranchMutation() {
       const selectedTargetBranchValue = this.mergeRequestTargetBranchElement.value;
 
       if (this.targetBranch !== selectedTargetBranchValue) {
         this.targetBranch = selectedTargetBranchValue;
-        this.fetchRules(this.targetBranch);
+        this.setTargetBranch(selectedTargetBranchValue);
+        this.toggleDisplayTargetBranchAlert(true);
       }
+      return false;
     },
   },
 };

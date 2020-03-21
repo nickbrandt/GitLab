@@ -3438,6 +3438,9 @@ msgstr ""
 msgid "Changing group path can have unintended side effects."
 msgstr ""
 
+msgid "Changing target branch will reset the approval rules. Any changes you have made will be lost."
+msgstr ""
+
 msgid "Charts can't be displayed as the request for data has timed out. %{documentationLink}"
 msgstr ""
 

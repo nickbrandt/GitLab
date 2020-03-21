@@ -1,0 +1,4 @@
+export const TOGGLE_DISPLAY_TARGET_BRANCH_ALERT = 'TOGGLE_DISPLAY_TARGET_BRANCH_ALERT';
+export const SET_TARGET_BRANCH = 'SET_TARGET_BRANCH';
+
+export default () => {};

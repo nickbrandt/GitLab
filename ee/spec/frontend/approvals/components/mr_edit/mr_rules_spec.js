@@ -83,6 +83,12 @@ describe('EE Approvals MRRules', () => {
         addEmptyRule: jest.fn(),
         setEmptyRule: jest.fn(),
       };
+
+      store.modules.targetBranchAlertModule.actions = {
+        setTargetBranch: jest.fn(),
+        toggleDisplayTargetBranchAlert: jest.fn(),
+      };
+
       store.state.settings.mrSettingsPath = 'some/path';
       store.state.settings.eligibleApproversDocsPath = 'some/path';
       store.state.settings.allowMultiRule = true;
@@ -106,11 +112,25 @@ describe('EE Approvals MRRules', () => {
       expect(wrapper.vm.targetBranch).toBe(newValue);
     });
 
-    it('re-fetches rules when target branch has changed', () => {
+    it('trigger alert when target branch has changed', () => {
+      factory();
+      const newValue = setTargetBranchInputValue();
+      setTargetBranchInputValue();
+      callTargetBranchHandler(MutationObserverSpy);
+      expect(store.modules.targetBranchAlertModule.actions.setTargetBranch).toHaveBeenCalledWith(
+        expect.anything(),
+        newValue,
+        undefined,
+      );
+    });
+
+    it('passes target branch when target branch has changed', () => {
       factory();
       setTargetBranchInputValue();
       callTargetBranchHandler(MutationObserverSpy);
-      expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalled();
+      expect(
+        store.modules.targetBranchAlertModule.actions.toggleDisplayTargetBranchAlert,
+      ).toHaveBeenCalledWith(expect.anything(), true, undefined);
     });
 
     it('disconnects MutationObserver when component gets destroyed', () => {
