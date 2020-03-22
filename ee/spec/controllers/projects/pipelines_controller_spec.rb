@@ -76,10 +76,10 @@ describe Projects::PipelinesController do
 
     let(:payload) { JSON.parse(licenses_with_json.body) }
 
-    context 'with a license management artifact' do
+    context 'with a license scanning artifact' do
       before do
         build = create(:ci_build, pipeline: pipeline)
-        create(:ee_ci_job_artifact, :license_management, job: build)
+        create(:ee_ci_job_artifact, :license_scanning, job: build)
       end
 
       context 'with feature enabled' do
@@ -99,7 +99,7 @@ describe Projects::PipelinesController do
           stub_licensed_features(license_scanning: true)
         end
 
-        it 'will return license management report in json format' do
+        it 'will return license scanning report in json format' do
           expect(payload.size).to eq(pipeline.license_scanning_report.licenses.size)
           expect(payload.first.keys).to eq(%w(name classification dependencies count url))
         end
@@ -138,7 +138,7 @@ describe Projects::PipelinesController do
       end
     end
 
-    context 'without license management artifact' do
+    context 'without license scanning artifact' do
       context 'with feature enabled' do
         before do
           stub_licensed_features(license_scanning: true)
