@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class Packages::GoModule #< ApplicationRecord
+class Packages::GoModule
   SEMVER_TAG_REGEX = Regexp.new("^#{::Packages::GoModuleVersion::SEMVER_REGEX.source}$").freeze
 
   # belongs_to :project
 
-  attr_reader :project, :name, :path, :versions
+  attr_reader :project, :name, :path
 
   def initialize(project, name)
     @project = project
@@ -15,17 +15,17 @@ class Packages::GoModule #< ApplicationRecord
       if @name == package_base
         ''
       elsif @name.start_with?(package_base + '/')
-        @name[(package_base.length+1)..]
+        @name[(package_base.length + 1)..]
       else
         nil
       end
   end
 
   def versions
-    @versions ||= project.repository.tags.
-      filter { |tag| SEMVER_TAG_REGEX.match?(tag.name) && !tag.dereferenced_target.nil? }.
-      map    { |tag| ::Packages::GoModuleVersion.new self, tag }.
-      filter { |ver| ver.valid? }
+    @versions ||= project.repository.tags
+      .filter { |tag| SEMVER_TAG_REGEX.match?(tag.name) && !tag.dereferenced_target.nil? }
+      .map    { |tag| ::Packages::GoModuleVersion.new self, tag }
+      .filter { |ver| ver.valid? }
   end
 
   def find_version(name)

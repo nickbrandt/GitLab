@@ -3,7 +3,9 @@ module API
   class GoProxy < Grape::API
     helpers ::API::Helpers::PackagesHelpers
 
-    MODULE_VERSION_REQUIREMENTS = { :module_version => ::Packages::GoModuleVersion::SEMVER_REGEX }
+    MODULE_VERSION_REQUIREMENTS = { module_version: ::Packages::GoModuleVersion::SEMVER_REGEX }.freeze
+
+    before { require_packages_enabled! }
 
     helpers do
       def find_module
@@ -23,6 +25,11 @@ module API
       requires :module_name, type: String, desc: 'Module name'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      before do
+        authorize_read_package!
+        authorize_packages_feature!
+      end
+
       namespace ':id/packages/go/*module_name/@v' do
         desc 'Get all tagged versions for a given Go module' do
           detail 'See `go help goproxy`, GET $GOPROXY/<module>/@v/list'
@@ -41,7 +48,7 @@ module API
         params do
           requires :module_version, type: String, desc: 'Module version'
         end
-        get ':module_version.info', :requirements => MODULE_VERSION_REQUIREMENTS do
+        get ':module_version.info', requirements: MODULE_VERSION_REQUIREMENTS do
           mod = find_module
 
           ver = mod.find_version params[:module_version]
@@ -56,7 +63,7 @@ module API
         params do
           requires :module_version, type: String, desc: 'Module version'
         end
-        get ':module_version.mod', :requirements => MODULE_VERSION_REQUIREMENTS do
+        get ':module_version.mod', requirements: MODULE_VERSION_REQUIREMENTS do
           mod = find_module
 
           ver = mod.find_version params[:module_version]
@@ -72,7 +79,7 @@ module API
         params do
           requires :module_version, type: String, desc: 'Module version'
         end
-        get ':module_version.zip', :requirements => MODULE_VERSION_REQUIREMENTS do
+        get ':module_version.zip', requirements: MODULE_VERSION_REQUIREMENTS do
           mod = find_module
 
           ver = mod.find_version params[:module_version]

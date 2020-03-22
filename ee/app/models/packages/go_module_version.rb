@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Packages::GoModuleVersion #< ApplicationRecord
+class Packages::GoModuleVersion
   SEMVER_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.A-Z0-9]+))?(?:\+([-.A-Z0-9]+))?/i.freeze
   VERSION_SUFFIX_REGEX = /\/v([1-9]\d*)$/i.freeze
 
