@@ -108,7 +108,7 @@ module EE
 
       navbar_sub_item(
         title: _('Code Review'),
-        path: 'projects/analytics/code_reviews#priority',
+        path: 'projects/analytics/code_reviews#index',
         link: project_analytics_code_reviews_path(project)
       )
     end
