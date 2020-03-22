@@ -12,10 +12,10 @@ RSpec.shared_context 'project navbar structure' do
     {
       nav_item: _('Analytics'),
       nav_sub_items: [
+        _('Value Stream'),
         _('CI / CD'),
         (_('Code Review') if Gitlab.ee?),
-        _('Repository'),
-        _('Value Stream')
+        _('Repository')
       ]
     }
   end
