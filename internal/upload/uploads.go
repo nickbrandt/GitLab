@@ -37,6 +37,8 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, p
 	err := rewriteFormFilesFromMultipart(r, writer, preauth, filter)
 	if err != nil {
 		switch err {
+		case ErrInjectedClientParam:
+			helper.CaptureAndFail(w, r, err, "Bad Request", http.StatusBadRequest)
 		case http.ErrNotMultipart:
 			h.ServeHTTP(w, r)
 		case filestore.ErrEntityTooLarge:
