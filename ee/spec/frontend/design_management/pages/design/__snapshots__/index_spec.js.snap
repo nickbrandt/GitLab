@@ -2,7 +2,7 @@
 
 exports[`Design management design index page renders design index 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <div
     class="d-flex overflow-hidden flex-grow-1 flex-column position-relative"
@@ -66,7 +66,7 @@ exports[`Design management design index page renders design index 1`] = `
 
 exports[`Design management design index page sets loading state 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <gl-loading-icon-stub
     class="align-self-center"
@@ -79,7 +79,7 @@ exports[`Design management design index page sets loading state 1`] = `
 
 exports[`Design management design index page with error GlAlert is rendered in correct position with correct content 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <div
     class="d-flex overflow-hidden flex-grow-1 flex-column position-relative"
