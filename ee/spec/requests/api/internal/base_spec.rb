@@ -4,8 +4,10 @@ require 'spec_helper'
 describe API::Internal::Base do
   include EE::GeoHelpers
 
-  let_it_be(:primary_node, reload: true) { create(:geo_node, :primary) }
-  let_it_be(:secondary_node, reload: true) { create(:geo_node) }
+  let_it_be(:primary_url) { 'http://primary.example.com' }
+  let_it_be(:secondary_url) { 'http://secondary.example.com' }
+  let_it_be(:primary_node, reload: true) { create(:geo_node, :primary, url: primary_url) }
+  let_it_be(:secondary_node, reload: true) { create(:geo_node, url: secondary_url) }
 
   describe 'POST /internal/post_receive', :geo do
     let_it_be(:user) { create(:user) }
@@ -95,6 +97,23 @@ describe API::Internal::Base do
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
         end
+      end
+
+      it 'includes a message advising a redirection occurred' do
+        redirect_message = <<~STR
+        You're pushing to a Geo secondary! We'll help you by redirecting this
+        request to the primary:
+
+          http://primary.example.com/#{project.full_path}.git
+        STR
+
+        post api('/internal/post_receive'), params: valid_params
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['messages']).to include({
+          'type' => 'basic',
+          'message' => redirect_message
+        })
       end
     end
 

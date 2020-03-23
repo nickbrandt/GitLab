@@ -21,12 +21,6 @@ export default {
     GlLoadingIcon,
     PaginatedList,
   },
-  props: {
-    apiUrl: {
-      type: String,
-      required: true,
-    },
-  },
   data() {
     return {
       formIsOpen: false,
@@ -55,17 +49,10 @@ export default {
     },
   },
   mounted() {
-    this.setAPISettings({
-      apiUrlManageLicenses: this.apiUrl,
-    });
     this.fetchManagedLicenses();
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, [
-      'fetchManagedLicenses',
-      'setAPISettings',
-      'setLicenseApproval',
-    ]),
+    ...mapActions(LICENSE_MANAGEMENT, ['fetchManagedLicenses', 'setLicenseApproval']),
     openAddLicenseForm() {
       this.formIsOpen = true;
     },

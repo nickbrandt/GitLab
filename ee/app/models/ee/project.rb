@@ -46,7 +46,6 @@ module EE
 
       has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
-      has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
       has_one :status_page_setting, inverse_of: :project
 
@@ -72,6 +71,7 @@ module EE
       end
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
+      has_many :vulnerability_exports, class_name: 'Vulnerabilities::Export'
 
       has_many :protected_environments
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
@@ -81,9 +81,6 @@ module EE
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
-
-      has_many :prometheus_alert_events, inverse_of: :project
-      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
@@ -182,7 +179,6 @@ module EE
       default_value_for :packages_enabled, true
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
-      accepts_nested_attributes_for :alerting_setting, update_only: true
       accepts_nested_attributes_for :status_page_setting, update_only: true, allow_destroy: true
 
       alias_attribute :fallback_approvals_required, :approvals_before_merge
@@ -346,9 +342,19 @@ module EE
     def add_import_job
       return if gitlab_custom_project_template_import?
 
-      if import? && !repository_exists?
-        super
-      elsif mirror?
+      # Historically this was intended ensure `super` is only called
+      # when a project is imported(usually on project creation only) so `repository_exists?`
+      # check was added so that it does not stop mirroring if later on mirroring option is added to the project.
+      #
+      # With jira importer we need to allow to run the import multiple times on same project,
+      # which can conflict with scheduled mirroring(if that project had or will have mirroring enabled),
+      # so we are checking if its a jira reimport then we trigger that and skip mirroring even if mirroring
+      # should have been started. When we run into race condition with mirroring on a jira imported project
+      # the mirroring would still be picked up 1 minute later, based on `Gitlab::Mirror::SCHEDULER_CRON` and
+      # `ProjectUpdateState#mirror_update_due?``
+      return super if jira_force_import? || import? && !repository_exists?
+
+      if mirror?
         ::Gitlab::Metrics.add_event(:mirrors_scheduled)
         job_id = RepositoryUpdateMirrorWorker.perform_async(self.id)
 
@@ -394,10 +400,6 @@ module EE
     override :allowed_to_share_with_group?
     def allowed_to_share_with_group?
       super && !(group && ::Gitlab::CurrentSettings.lock_memberships_to_ldap?)
-    end
-
-    def reference_issue_tracker?
-      default_issues_tracker? || jira_tracker_active?
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
@@ -756,8 +758,6 @@ module EE
     private
 
     def group_hooks
-      return group.hooks unless ::Feature.enabled?(:sub_group_webhooks, self)
-
       GroupHook.where(group_id: group.self_and_ancestors)
     end
 

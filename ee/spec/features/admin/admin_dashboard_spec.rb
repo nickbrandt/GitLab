@@ -17,8 +17,8 @@ describe 'Admin Dashboard' do
       project1.add_reporter(user)
       project2.add_developer(user)
 
-      create(:user, bot_type: :support_bot)
-      create(:user, bot_type: :alert_bot)
+      create(:user, user_type: :support_bot)
+      create(:user, user_type: :alert_bot)
 
       sign_in(create(:admin))
     end

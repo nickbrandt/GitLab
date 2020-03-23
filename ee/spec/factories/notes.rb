@@ -8,7 +8,17 @@ FactoryBot.modify do
     end
 
     trait :on_design do
-      noteable { create(:design, :with_file, issue: create(:issue, project: project)) }
+      transient do
+        issue { create(:issue, project: project) }
+      end
+      noteable { create(:design, :with_file, issue: issue) }
+
+      after(:build) do |note|
+        next if note.project == note.noteable.project
+
+        # note validations require consistency between these two objects
+        note.project = note.noteable.project
+      end
     end
 
     trait :with_review do

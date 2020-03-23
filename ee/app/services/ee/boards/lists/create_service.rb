@@ -37,13 +37,13 @@ module EE
 
         override :create_list_attributes
         def create_list_attributes(type, target, position)
-          max_issue_count, max_issue_weight = if wip_limits_available?
-                                                [max_issue_count_by_params, max_issue_weight_by_params]
-                                              else
-                                                [0, 0]
-                                              end
+          return super unless wip_limits_available?
 
-          super.merge(max_issue_count: max_issue_count, max_issue_weight: max_issue_weight)
+          super.merge(
+            max_issue_count: max_issue_count_by_params,
+            max_issue_weight: max_issue_weight_by_params,
+            limit_metric: limit_metric_by_params
+          )
         end
 
         private
@@ -70,6 +70,10 @@ module EE
 
         def wip_limits_available?
           parent.feature_available?(:wip_limits)
+        end
+
+        def limit_metric_by_params
+          params[:limit_metric]
         end
       end
     end

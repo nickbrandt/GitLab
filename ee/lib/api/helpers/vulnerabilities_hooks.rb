@@ -7,8 +7,6 @@ module API
 
       included do
         before do
-          not_found! unless Feature.enabled?(:first_class_vulnerabilities)
-
           authenticate!
         end
       end

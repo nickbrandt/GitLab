@@ -46,12 +46,14 @@ module EE
         mount ::API::Vulnerabilities
         mount ::API::VulnerabilityFindings
         mount ::API::VulnerabilityIssueLinks
+        mount ::API::VulnerabilityExports
         mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases
         mount ::API::Dependencies
         mount ::API::VisualReviewDiscussions
         mount ::API::Analytics::CodeReviewAnalytics
+        mount ::API::Analytics::GroupActivityAnalytics
         mount ::API::ProtectedEnvironments
 
         version 'v3', using: :path do

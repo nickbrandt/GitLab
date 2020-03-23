@@ -3,56 +3,6 @@
 module EE
   module API
     module Entities
-      module EntityHelpers
-        def can_read(attr, &block)
-          ->(obj, opts) { Ability.allowed?(opts[:user], "read_#{attr}".to_sym, yield(obj)) }
-        end
-
-        def can_destroy(attr, &block)
-          ->(obj, opts) { Ability.allowed?(opts[:user], "destroy_#{attr}".to_sym, yield(obj)) }
-        end
-
-        def expose_restricted(attr, &block)
-          expose attr, if: can_read(attr, &block)
-        end
-      end
-
-      module UserPublic
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :shared_runners_minutes_limit
-          expose :extra_shared_runners_minutes_limit
-        end
-      end
-
-      module UserWithAdmin
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :note
-        end
-      end
-
-      module Project
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :approvals_before_merge, if: ->(project, _) { project.feature_available?(:merge_request_approvers) }
-          expose :mirror, if: ->(project, _) { project.feature_available?(:repository_mirrors) }
-          expose :mirror_user_id, if: ->(project, _) { project.mirror? }
-          expose :mirror_trigger_builds, if: ->(project, _) { project.mirror? }
-          expose :only_mirror_protected_branches, if: ->(project, _) { project.mirror? }
-          expose :mirror_overwrites_diverged_branches, if: ->(project, _) { project.mirror? }
-          expose :external_authorization_classification_label,
-                 if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
-          expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
-          expose :service_desk_enabled, if: ->(project, _) { project.feature_available?(:service_desk) }
-          expose :service_desk_address, if: ->(project, _) { project.feature_available?(:service_desk) }
-          expose :marked_for_deletion_at, if: ->(project, _) { project.feature_available?(:adjourned_deletion_for_projects_and_groups) }
-        end
-      end
-
       module Group
         extend ActiveSupport::Concern
 
@@ -123,131 +73,6 @@ module EE
         end
       end
 
-      module Issue
-        extend ActiveSupport::Concern
-
-        prepended do
-          with_options if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do
-            expose :epic_iid do |issue|
-              issue.epic&.iid
-            end
-
-            expose :epic, using: EpicBaseEntity
-          end
-        end
-      end
-
-      module MergeRequestBasic
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :approvals_before_merge
-        end
-      end
-
-      module Namespace
-        extend ActiveSupport::Concern
-
-        prepended do
-          can_admin_namespace = ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) }
-
-          expose :shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
-          expose :extra_shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
-          expose :billable_members_count do |namespace, options|
-            namespace.billable_members_count(options[:requested_hosted_plan])
-          end
-          expose :plan, if: can_admin_namespace do |namespace, _|
-            namespace.actual_plan_name
-          end
-          expose :trial_ends_on, if: can_admin_namespace do |namespace, _|
-            namespace.trial_ends_on
-          end
-          expose :trial, if: can_admin_namespace do |namespace, _|
-            namespace.trial?
-          end
-        end
-      end
-
-      module Board
-        extend ActiveSupport::Concern
-
-        prepended do
-          # Default filtering configuration
-          expose :name
-          expose :group, using: ::API::Entities::BasicGroupDetails
-
-          with_options if: ->(board, _) { board.resource_parent.feature_available?(:scoped_issue_board) } do
-            expose :milestone do |board|
-              if board.milestone.is_a?(Milestone)
-                ::API::Entities::Milestone.represent(board.milestone)
-              else
-                SpecialBoardFilter.represent(board.milestone)
-              end
-            end
-            expose :assignee, using: ::API::Entities::UserBasic
-            expose :labels, using: ::API::Entities::LabelBasic
-            expose :weight
-          end
-        end
-      end
-
-      module List
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
-          expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
-          expose :max_issue_count, if: -> (list, _) { list.wip_limits_available? }
-          expose :max_issue_weight, if: -> (list, _) { list.wip_limits_available? }
-        end
-      end
-
-      module ApplicationSetting
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose(*EE::ApplicationSettingsHelper.repository_mirror_attributes, if: ->(_instance, _options) do
-            ::License.feature_available?(:repository_mirrors)
-          end)
-          expose(*EE::ApplicationSettingsHelper.merge_request_appovers_rules_attributes, if: ->(_instance, _options) do
-            ::License.feature_available?(:admin_merge_request_approvers_rules)
-          end)
-          expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
-          expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
-          expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
-          expose :deletion_adjourned_period, if: ->(_instance, _opts) { ::License.feature_available?(:adjourned_deletion_for_projects_and_groups) }
-          expose :updating_name_disabled_for_users, if: ->(_instance, _opts) { ::License.feature_available?(:disable_name_update_for_users) }
-          expose :npm_package_requests_forwarding, if: ->(_instance, _opts) { ::License.feature_available?(:packages) }
-        end
-      end
-
-      module Todo
-        extend ::Gitlab::Utils::Override
-        extend ActiveSupport::Concern
-
-        override :todo_target_class
-        def todo_target_class(target_type)
-          super
-        rescue NameError
-          # false as second argument prevents looking up in module hierarchy
-          # see also https://gitlab.com/gitlab-org/gitlab-foss/issues/59719
-          ::EE::API::Entities.const_get(target_type, false)
-        end
-
-        override :todo_target_url
-        def todo_target_url(todo)
-          return super unless todo.target_type == ::DesignManagement::Design.name
-
-          design = todo.target
-          path_options = {
-            anchor: todo_target_anchor(todo),
-            vueroute: design.filename
-          }
-
-          ::Gitlab::Routing.url_helpers.designs_project_issue_url(design.project, design.issue, path_options)
-        end
-      end
-
       ########################
       # EE-specific entities #
       ########################
@@ -259,63 +84,6 @@ module EE
           expose :image_url do |design|
             ::Gitlab::UrlBuilder.build(design)
           end
-        end
-      end
-
-      # Being used in private project-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers`.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class ProjectApprovalSettingRule < ProjectApprovalRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
-      end
-
-      # Being used in private project-level approvals API.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class ProjectApprovalSettings < Grape::Entity
-        expose :rules, using: ProjectApprovalSettingRule do |project, options|
-          project.visible_approval_rules(target_branch: options[:target_branch])
-        end
-
-        expose :min_fallback_approvals, as: :fallback_approvals_required
-      end
-
-      # Being used in private MR-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers`.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class MergeRequestApprovalSettingRule < MergeRequestApprovalStateRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
-      end
-
-      # Being used in private MR-level approvals API.
-      # This overrides the `rules` to be exposed using MergeRequestApprovalSettingRule.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
-      class MergeRequestApprovalSettings < MergeRequestApprovalState
-        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule, override: true
-      end
-
-      module ConanPackage
-        class ConanPackageManifest < Grape::Entity
-          expose :package_urls, merge: true
-        end
-
-        class ConanPackageSnapshot < Grape::Entity
-          expose :package_snapshot, merge: true
-        end
-
-        class ConanRecipeManifest < Grape::Entity
-          expose :recipe_urls, merge: true
-        end
-
-        class ConanRecipeSnapshot < Grape::Entity
-          expose :recipe_snapshot, merge: true
-        end
-
-        class ConanUploadUrls < Grape::Entity
-          expose :upload_urls, merge: true
         end
       end
 
@@ -420,18 +188,14 @@ module EE
             # rubocop: enable CodeReuse/ActiveRecord
           end
         end
-      end
 
-      module UserDetailsWithAdmin
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :plan do |user|
-            user.namespace.try(:gitlab_subscription)&.plan_name
+        module GroupActivity
+          class IssuesCount < Grape::Entity
+            expose :issues_count
           end
 
-          expose :trial do |user|
-            user.namespace.try(:trial?)
+          class MergeRequestsCount < Grape::Entity
+            expose :merge_requests_count
           end
         end
       end

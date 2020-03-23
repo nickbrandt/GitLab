@@ -156,13 +156,15 @@ describe Gitlab::UsageData do
                 events: 2,
                 groups: 2,
                 ldap_keys: 2,
-                ldap_users: 2
+                ldap_users: 2,
+                users_created: 6
               )
               expect(described_class.uncached_data[:usage_activity_by_stage_monthly][:manage]).to eq(
                 events: 1,
                 groups: 1,
                 ldap_keys: 1,
-                ldap_users: 1
+                ldap_users: 1,
+                users_created: 4
               )
             end
           end

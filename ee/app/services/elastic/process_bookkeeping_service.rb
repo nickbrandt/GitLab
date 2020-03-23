@@ -20,7 +20,7 @@ module Elastic
           min = (max - items.size) + 1
 
           (min..max).zip(items).each_slice(1000) do |group|
-            logger.debug(message: 'track_items', count: group.count, items: group)
+            logger.debug(message: 'track_items', count: group.count, tracked_items_encoded: group.to_json)
 
             redis.zadd(REDIS_SET_KEY, group)
           end

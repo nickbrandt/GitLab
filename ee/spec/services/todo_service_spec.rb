@@ -341,7 +341,6 @@ describe TodoService do
 
     let(:note) do
       build(:diff_note_on_design,
-             project: project,
              noteable: design,
              author: author,
              note: "Hey #{john_doe.to_reference}")

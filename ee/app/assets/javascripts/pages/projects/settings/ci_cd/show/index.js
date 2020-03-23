@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (el && el.dataset && el.dataset.apiUrl) {
     const store = createStore();
     store.dispatch('licenseManagement/setIsAdmin', Boolean(el.dataset.apiUrl));
+    store.dispatch('licenseManagement/setAPISettings', { apiUrlManageLicenses: el.dataset.apiUrl });
     // eslint-disable-next-line no-new
     new Vue({
       el,

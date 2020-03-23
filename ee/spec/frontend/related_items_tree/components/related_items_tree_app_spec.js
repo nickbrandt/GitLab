@@ -1,4 +1,5 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 import RelatedItemsTreeApp from 'ee/related_items_tree/components/related_items_tree_app.vue';
@@ -13,15 +14,12 @@ import AxiosMockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import { getJSONFixture } from 'helpers/fixtures';
 
-// https://gitlab.com/gitlab-org/gitlab/issues/118456
-import {
-  mockInitialConfig,
-  mockParentItem,
-  mockEpics,
-  mockIssues,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockInitialConfig, mockParentItem, mockEpics, mockIssues } from '../mock_data';
 
 const mockProjects = getJSONFixture('static/projects.json');
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = () => {
   const store = createDefaultStore();
@@ -34,6 +32,7 @@ const createComponent = () => {
   });
 
   return shallowMount(RelatedItemsTreeApp, {
+    localVue,
     store,
   });
 };

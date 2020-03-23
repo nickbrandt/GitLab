@@ -6,6 +6,7 @@ class Event < ApplicationRecord
   include Presentable
   include DeleteWithLimit
   include CreatedAtFilterable
+  include Gitlab::Utils::StrongMemoize
 
   default_scope { reorder(nil) }
 
@@ -42,7 +43,8 @@ class Event < ApplicationRecord
     note:           Note,
     project:        Project,
     snippet:        Snippet,
-    user:           User
+    user:           User,
+    wiki:           WikiPage::Meta
   ).freeze
 
   RESET_PROJECT_ACTIVITY_INTERVAL = 1.hour
@@ -79,6 +81,7 @@ class Event < ApplicationRecord
   scope :recent, -> { reorder(id: :desc) }
   scope :code_push, -> { where(action: PUSHED) }
   scope :merged, -> { where(action: MERGED) }
+  scope :for_wiki_page, -> { where(target_type: WikiPage::Meta.name) }
 
   scope :with_associations, -> do
     # We're using preload for "push_event_payload" as otherwise the association
@@ -135,29 +138,11 @@ class Event < ApplicationRecord
     super(presenter_class: ::EventPresenter)
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Metrics/PerceivedComplexity
   def visible_to_user?(user = nil)
-    if push_action? || commit_note?
-      Ability.allowed?(user, :download_code, project)
-    elsif membership_changed?
-      Ability.allowed?(user, :read_project, project)
-    elsif created_project_action?
-      Ability.allowed?(user, :read_project, project)
-    elsif issue? || issue_note?
-      Ability.allowed?(user, :read_issue, note? ? note_target : target)
-    elsif merge_request? || merge_request_note?
-      Ability.allowed?(user, :read_merge_request, note? ? note_target : target)
-    elsif personal_snippet_note? || project_snippet_note?
-      Ability.allowed?(user, :read_snippet, note_target)
-    elsif milestone?
-      Ability.allowed?(user, :read_milestone, project)
-    else
-      false # No other event types are visible
-    end
+    return false unless capability.present?
+
+    Ability.allowed?(user, capability, permission_object)
   end
-  # rubocop:enable Metrics/PerceivedComplexity
-  # rubocop:enable Metrics/CyclomaticComplexity
 
   def resource_parent
     project || group
@@ -215,6 +200,14 @@ class Event < ApplicationRecord
     created_action? && !target && target_type.nil?
   end
 
+  def created_wiki_page?
+    wiki_page? && action == CREATED
+  end
+
+  def updated_wiki_page?
+    wiki_page? && action == UPDATED
+  end
+
   def created_target?
     created_action? && target
   end
@@ -235,6 +228,10 @@ class Event < ApplicationRecord
     target_type == "MergeRequest"
   end
 
+  def wiki_page?
+    target_type == WikiPage::Meta.name
+  end
+
   def milestone
     target if milestone?
   end
@@ -245,6 +242,14 @@ class Event < ApplicationRecord
 
   def merge_request
     target if merge_request?
+  end
+
+  def wiki_page
+    strong_memoize(:wiki_page) do
+      next unless wiki_page?
+
+      ProjectWiki.new(project, author).find_page(target.canonical_slug)
+    end
   end
 
   def note
@@ -268,6 +273,10 @@ class Event < ApplicationRecord
       'destroyed'
     elsif commented_action?
       "commented on"
+    elsif created_wiki_page?
+      'created'
+    elsif updated_wiki_page?
+      'updated'
     elsif created_project_action?
       created_project_action_name
     else
@@ -364,7 +373,39 @@ class Event < ApplicationRecord
     Event._to_partial_path
   end
 
+  protected
+
+  def capability
+    @capability ||= begin
+                      if push_action? || commit_note?
+                        :download_code
+                      elsif membership_changed? || created_project_action?
+                        :read_project
+                      elsif issue? || issue_note?
+                        :read_issue
+                      elsif merge_request? || merge_request_note?
+                        :read_merge_request
+                      elsif personal_snippet_note? || project_snippet_note?
+                        :read_snippet
+                      elsif milestone?
+                        :read_milestone
+                      elsif wiki_page?
+                        :read_wiki
+                      end
+                    end
+  end
+
   private
+
+  def permission_object
+    if note?
+      note_target
+    elsif target_id.present?
+      target
+    else
+      project
+    end
+  end
 
   def push_action_name
     if new_ref?

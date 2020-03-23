@@ -220,14 +220,4 @@ describe SystemNoteService do
       described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, message)
     end
   end
-
-  describe '.auto_resolve_prometheus_alert' do
-    it 'calls IssuableService' do
-      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
-        expect(service).to receive(:auto_resolve_prometheus_alert)
-      end
-
-      described_class.auto_resolve_prometheus_alert(noteable, project, author)
-    end
-  end
 end

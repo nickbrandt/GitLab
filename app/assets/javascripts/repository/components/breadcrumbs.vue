@@ -1,6 +1,6 @@
 <script>
 import { GlDropdown, GlDropdownDivider, GlDropdownHeader, GlDropdownItem } from '@gitlab/ui';
-import { joinPaths } from '~/lib/utils/url_utility';
+import { joinPaths, escapeFileUrl } from '~/lib/utils/url_utility';
 import { __ } from '../../locale';
 import Icon from '../../vue_shared/components/icon.vue';
 import getRefMixin from '../mixins/get_ref';
@@ -103,7 +103,7 @@ export default {
         .filter(p => p !== '')
         .reduce(
           (acc, name, i) => {
-            const path = joinPaths(i > 0 ? acc[i].path : '', encodeURIComponent(name));
+            const path = joinPaths(i > 0 ? acc[i].path : '', escapeFileUrl(name));
 
             return acc.concat({
               name,
@@ -134,7 +134,9 @@ export default {
           },
           {
             attrs: {
-              href: `${this.newBlobPath}/${this.currentPath ? escape(this.currentPath) : ''}`,
+              href: `${this.newBlobPath}/${
+                this.currentPath ? encodeURIComponent(this.currentPath) : ''
+              }`,
               class: 'qa-new-file-option',
             },
             text: __('New file'),

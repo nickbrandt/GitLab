@@ -52,7 +52,7 @@ Host gitlab.com
 
 ## GitLab Pages
 
-Below are the settings for [GitLab Pages](https://about.gitlab.com/product/pages/).
+Below are the settings for [GitLab Pages](https://about.gitlab.com/stages-devops-lifecycle/pages/).
 
 | Setting                     | GitLab.com        | Default       |
 | --------------------------- | ----------------  | ------------- |
@@ -76,6 +76,7 @@ Below are the current settings regarding [GitLab CI/CD](../../ci/README.md).
 | Artifacts [expiry time](../../ci/yaml/README.md#artifactsexpire_in)   | kept forever           | deleted after 30 days unless otherwise specified    |
 | Scheduled Pipeline Cron | `*/5 * * * *` | `19 * * * *` |
 | [Max jobs in active pipelines](../../administration/instance_limits.md#number-of-jobs-in-active-pipelines) | `500` for Free tier, unlimited otherwise | Unlimited
+| [Max pipeline schedules in projects](../../administration/instance_limits.md#number-of-pipeline-schedules) | `10` for Free tier, `50` for all paid tiers | Unlimited |
 
 ## Repository size limit
 
@@ -88,11 +89,14 @@ or over the size limit, you can [reduce your repository size with Git](../projec
 
 ## IP range
 
-GitLab.com, CI/CD, and related services are deployed into Google Cloud Platform (GCP). Any
-IP based firewall can be configured by looking up all
-[IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).
+GitLab.com is using the IP range `34.74.90.64/28` for traffic from its Web/API
+fleet. You can expect connections from webhooks or repository mirroring to come
+from those IPs and whitelist them.
 
-[Static endpoints](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/97) are being considered.
+For connections from CI/CD runners we are not providing static IP addresses.
+All our runners are deployed into Google Cloud Platform (GCP) - any IP based
+firewall can be configured by looking up all
+[IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).
 
 ## Maximum number of webhooks
 

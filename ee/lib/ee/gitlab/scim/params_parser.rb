@@ -15,6 +15,10 @@ module EE
           update_params[:active] == false
         end
 
+        def reprovision_user?
+          !deprovision_user?
+        end
+
         def post_params
           @post_params ||= process_post_params
         end

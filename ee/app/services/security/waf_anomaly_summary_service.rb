@@ -14,6 +14,7 @@ module Security
 
     def execute
       return if elasticsearch_client.nil?
+      return unless @environment.external_url
 
       # Use multi-search with single query as we'll be adding nginx later
       # with https://gitlab.com/gitlab-org/gitlab/issues/14707
@@ -177,7 +178,7 @@ module Security
 
     # Derive server_name to filter modsec audit log by environment
     def application_server_name
-      "#{@environment.project.full_path_slug}.#{@environment.deployment_platform.cluster.base_domain}"
+      @environment.formatted_external_url
     end
 
     # Derive proxy upstream name to filter nginx log by environment

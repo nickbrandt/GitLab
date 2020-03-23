@@ -212,7 +212,7 @@ kubectl get service --namespace=gitlab-managed-apps ingress-nginx-ingress-contro
 For Istio/Knative, the command will be different:
 
 ```shell
-kubectl get svc --namespace=istio-system knative-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip} '
+kubectl get svc --namespace=istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip} '
 ```
 
 Otherwise, you can list the IP addresses of all load balancers:
@@ -488,13 +488,48 @@ The Elastic Stack cluster application is intended as a log aggregation solution 
 [Advanced Global Search](../search/advanced_global_search.md) functionality, which uses a separate
 Elasticsearch cluster.
 
+#### Optional: deploy Kibana to perform advanced queries
+
+If you are an advanced user and have direct access to your Kubernetes cluster using `kubectl` and `helm`, you can deploy Kibana manually.
+
+The following assumes that `helm` has been [initialized](https://v2.helm.sh/docs/helm/) with `helm init`.
+
+Save the following to `kibana.yml`:
+
+```yaml
+elasticsearch:
+  enabled: false
+
+logstash:
+  enabled: false
+
+kibana:
+  enabled: true
+  env:
+    ELASTICSEARCH_HOSTS: http://elastic-stack-elasticsearch-client.gitlab-managed-apps.svc.cluster.local:9200
+```
+
+Then install it on your cluster:
+
+```shell
+helm install --name kibana stable/elastic-stack --values kibana.yml
+```
+
+To access kibana, forward the port to your local machine:
+
+```shell
+kubectl port-forward svc/kibana 5601:443
+```
+
+Then, you can visit Kibana at `http://localhost:5601`.
+
 ### Future apps
 
 Interested in contributing a new GitLab managed app? Visit the
 [development guidelines page](../../development/kubernetes.md#gitlab-managed-apps)
 to get started.
 
-## Install using GitLab CI (alpha)
+## Install using GitLab CI/CD (alpha)
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20822) in GitLab 12.6.
 
@@ -503,19 +538,20 @@ This is an _alpha_ feature, and it is subject to change at any time without
 prior notice.
 
 This alternative method allows users to install GitLab-managed
-applications using GitLab CI. It also allows customization of the
+applications using GitLab CI/CD. It also allows customization of the
 install using Helm `values.yaml` files.
 
 Supported applications:
 
-- [Ingress](#install-ingress-using-gitlab-ci)
-- [cert-manager](#install-cert-manager-using-gitlab-ci)
-- [Sentry](#install-sentry-using-gitlab-ci)
-- [GitLab Runner](#install-gitlab-runner-using-gitlab-ci)
-- [Cilium](#install-cilium-using-gitlab-ci)
-- [JupyterHub](#install-jupyterhub-using-gitlab-ci)
-- [Elastic Stack](#install-elastic-stack-using-gitlab-ci)
-- [Crossplane](#install-crossplane-using-gitlab-ci)
+- [Ingress](#install-ingress-using-gitlab-cicd)
+- [cert-manager](#install-cert-manager-using-gitlab-cicd)
+- [Sentry](#install-sentry-using-gitlab-cicd)
+- [GitLab Runner](#install-gitlab-runner-using-gitlab-cicd)
+- [Cilium](#install-cilium-using-gitlab-cicd)
+- [Vault](#install-vault-using-gitlab-cicd)
+- [JupyterHub](#install-jupyterhub-using-gitlab-cicd)
+- [Elastic Stack](#install-elastic-stack-using-gitlab-cicd)
+- [Crossplane](#install-crossplane-using-gitlab-cicd)
 
 ### Usage
 
@@ -523,7 +559,7 @@ You can find and import all the files referenced below
 in the [example cluster applications
 project](https://gitlab.com/gitlab-org/cluster-integration/example-cluster-applications/).
 
-To install applications using GitLab CI:
+To install applications using GitLab CI/CD:
 
 1. Connect the cluster to a [cluster management project](management_project.md).
 1. In that project, add a `.gitlab-ci.yml` file with the following content:
@@ -546,13 +582,22 @@ To install applications using GitLab CI:
 1. Optionally, define `.gitlab/managed-apps/<application>/values.yaml` file to
    customize values for the installed application.
 
-A GitLab CI pipeline will then run on the `master` branch to install the
+A GitLab CI/CD pipeline will then run on the `master` branch to install the
 applications you have configured. In case of pipeline failure, the
 output of the [Helm
 Tiller](https://v2.helm.sh/docs/install/#running-tiller-locally) binary
 will be saved as a [CI job artifact](../../ci/pipelines/job_artifacts.md).
 
-### Install Ingress using GitLab CI
+### Important notes
+
+Note the following:
+
+- When you set the value for `installed` key back to `false`, the application will be
+  unprovisioned from the cluster.
+- If you update `.gitlab/managed-apps/<application>/values.yaml` with new values, the
+  application will be redeployed.
+
+### Install Ingress using GitLab CI/CD
 
 To install Ingress, define the `.gitlab/managed-apps/config.yaml` file
 with:
@@ -571,9 +616,9 @@ management project. Refer to the
 [chart](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
 for the available configuration options.
 
-### Install cert-manager using GitLab CI
+### Install cert-manager using GitLab CI/CD
 
-cert-manager is installed using GitLab CI by defining configuration in
+cert-manager is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
 
 cert-manager:
@@ -583,7 +628,7 @@ cert-manager:
   email address to be specified. The email address is used by Let's Encrypt to
   contact you about expiring certificates and issues related to your account.
 
-The following configuration is required to install cert-manager using GitLab CI:
+The following configuration is required to install cert-manager using GitLab CI/CD:
 
 ```yaml
 certManager:
@@ -593,7 +638,7 @@ certManager:
     email: "user@example.com"
 ```
 
-The following installs cert-manager using GitLab CI without the default `ClusterIssuer`:
+The following installs cert-manager using GitLab CI/CD without the default `ClusterIssuer`:
 
 ```yaml
 certManager:
@@ -608,7 +653,7 @@ management project. Refer to the
 [chart](https://hub.helm.sh/charts/jetstack/cert-manager) for the
 available configuration options.
 
-### Install Sentry using GitLab CI
+### Install Sentry using GitLab CI/CD
 
 NOTE: **Note:**
 The Sentry Helm chart [recommends](https://github.com/helm/charts/blob/f6e5784f265dd459c5a77430185d0302ed372665/stable/sentry/values.yaml#L284-L285) at least 3GB of available RAM for database migrations.
@@ -669,12 +714,12 @@ postgresql:
   postgresqlPassword: example-postgresql-password
 ```
 
-### Install GitLab Runner using GitLab CI
+### Install GitLab Runner using GitLab CI/CD
 
-GitLab Runner is installed using GitLab CI by defining configuration in
+GitLab Runner is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
 
-The following configuration is required to install GitLab Runner using GitLab CI:
+The following configuration is required to install GitLab Runner using GitLab CI/CD:
 
 ```yaml
 gitlabRunner:
@@ -700,7 +745,7 @@ management project. Refer to the
 [chart](https://gitlab.com/gitlab-org/charts/gitlab-runner) for the
 available configuration options.
 
-### Install Cilium using GitLab CI
+### Install Cilium using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/22) in GitLab 12.8.
 
@@ -778,11 +823,100 @@ agent:
     enabled: false
 ```
 
-### Install JupyterHub using GitLab CI
+### Install Vault using GitLab CI/CD
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9982) in GitLab 12.9.
+
+[Hashicorp Vault](https://vaultproject.io/) is a secrets management solution which
+can be used to safely manage and store passwords, credentials, certificates and more. A Vault
+installation could be leveraged to provide a single secure data store for credentials
+used in your applications, GitLab CI/CD jobs, and more. It could also serve as a way of
+providing SSL/TLS certificates to systems and deployments in your infrastructure. Leveraging
+Vault as a single source for all these credentials allows greater security by having
+a single source of access, control, and auditability around all your sensitive
+credentials and certificates.
+
+To install Vault, enable it in the `.gitlab/managed-apps/config.yaml` file:
+
+```yaml
+vault:
+  installed: true
+```
+
+By default you will get a basic Vault setup with no high availability nor any scalable
+storage backend. This is enough for simple testing and small scale deployments, though has limits
+to how much it can scale, and as it is a single instance deployment, you will experience downtime
+when upgrading the Vault application.
+
+To optimally use Vault in a production environment, it's ideal to have a good understanding
+of the internals of Vault and how to configure it. This can be done by reading the
+[the Vault documentation](https://www.vaultproject.io/docs/internals/) as well as
+the Vault Helm chart [values.yaml file](https://github.com/hashicorp/vault-helm/blob/v0.3.3/values.yaml).
+
+At a minimum you will likely set up:
+
+- A [seal](https://www.vaultproject.io/docs/configuration/seal/) for extra encryption
+  of the master key.
+- A [storage backend](https://www.vaultproject.io/docs/configuration/storage/) that is
+  suitable for environment and storage security requirements.
+- [HA Mode](https://www.vaultproject.io/docs/concepts/ha/).
+- [The Vault UI](https://www.vaultproject.io/docs/configuration/ui/).
+
+The following is an example values file (`.gitlab/managed-apps/vault/values.yaml`)
+that configures Google Key Management Service for auto-unseal, using a Google Cloud Storage backend, enabling
+the Vault UI, and enabling HA with 3 pod replicas. The `storage` and `seal` stanzas
+below are examples and should be replaced with settings specific to your environment.
+
+```yaml
+# Enable the Vault WebUI
+ui:
+  enabled: true
+server:
+  # Disable the built in data storage volume as it's not safe for Hight Availablity mode
+  dataStorage:
+    enabled: false
+  # Enable High Availability Mode
+  ha:
+    enabled: true
+    # Configure Vault to listen on port 8200 for normal traffic and port 8201 for inter-cluster traffic
+    config: |
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      # Configure Vault to store its data in a GCS Bucket backend
+      storage "gcs" {
+        path = "gcs://my-vault-storage/vault-bucket"
+        ha_enabled = "true"
+      }
+      # Configure Vault to automatically unseal storage using a GKMS key
+      seal "gcpckms" {
+         project     = "vault-helm-dev-246514"
+         region      = "global"
+         key_ring    = "vault-helm-unseal-kr"
+         crypto_key  = "vault-helm-unseal-key"
+      }
+```
+
+Once you have successfully installed Vault, you will need to [initialize the Vault](https://learn.hashicorp.com/vault/getting-started/deploy#initializing-the-vault)
+and obtain the initial root token. You will need access to your Kubernetes cluster that Vault has been deployed into in order to do this.
+To initialise the Vault, get a shell to one of the Vault pods running inside Kubernetes (typically this is done by using the `kubectl` command line tool).
+Once you have a shell into the pod, run the `vault operator init` command:
+
+```shell
+kubectl -n gitlab-managed-apps exec -it vault-0 sh
+/ $ vault operator init
+```
+
+This should give you your unseal keys and initial root token. Make sure to note these down
+and keep these safe as you will need them to unseal the Vault throughout its lifecycle.
+
+### Install JupyterHub using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/40) in GitLab 12.8.
 
-JupyterHub is installed using GitLab CI by defining configuration in
+JupyterHub is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml` as follows:
 
 ```yaml
@@ -827,14 +961,14 @@ Refer to the
 [chart reference](https://zero-to-jupyterhub.readthedocs.io/en/stable/reference.html) for the
 available configuration options.
 
-### Install Elastic Stack using GitLab CI
+### Install Elastic Stack using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/45) in GitLab 12.8.
 
-Elastic Stack is installed using GitLab CI by defining configuration in
+Elastic Stack is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
 
-The following configuration is required to install Elastic Stack using GitLab CI:
+The following configuration is required to install Elastic Stack using GitLab CI/CD:
 
 ```yaml
 elasticStack:
@@ -854,14 +988,14 @@ available configuration options.
 NOTE: **Note:**
 In this alpha implementation of installing Elastic Stack through CI, reading the environment logs through Elasticsearch is unsupported. This is supported if [installed via the UI](#elastic-stack).
 
-### Install Crossplane using GitLab CI
+### Install Crossplane using GitLab CI/CD
 
 > [Introduced](https://gitlab.com/gitlab-org/cluster-integration/cluster-applications/-/merge_requests/68) in GitLab 12.9.
 
-Crossplane is installed using GitLab CI by defining configuration in
+Crossplane is installed using GitLab CI/CD by defining configuration in
 `.gitlab/managed-apps/config.yaml`.
 
-The following configuration is required to install Crossplane using GitLab CI:
+The following configuration is required to install Crossplane using GitLab CI/CD:
 
 ```yaml
 Crossplane:

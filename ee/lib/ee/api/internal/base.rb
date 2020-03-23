@@ -8,6 +8,7 @@ module EE
 
         prepended do
           helpers do
+            include ::Gitlab::Utils::StrongMemoize
             extend ::Gitlab::Utils::Override
 
             override :lfs_authentication_url
@@ -17,22 +18,41 @@ module EE
 
             override :ee_post_receive_response_hook
             def ee_post_receive_response_hook(response)
-              response.add_basic_message(geo_secondary_lag_message) if ::Gitlab::Geo.primary?
+              response.add_basic_message(geo_redirect_to_primary_message) if display_geo_redirect_to_primary_message?
+              response.add_basic_message(geo_secondary_lag_message) if geo_display_secondary_lag_message?
+            end
+
+            def geo_display_secondary_lag_message?
+              ::Gitlab::Geo.primary? && geo_current_replication_lag.to_i > 0
             end
 
             def geo_secondary_lag_message
-              lag = current_replication_lag
-              return if lag.to_i <= 0
-
-              "Current replication lag: #{lag} seconds"
+              "Current replication lag: #{geo_current_replication_lag} seconds"
             end
 
-            def current_replication_lag
-              fetch_geo_node_referrer&.status&.db_replication_lag_seconds
+            def geo_current_replication_lag
+              strong_memoize(:geo_current_replication_lag) do
+                geo_referred_node&.status&.db_replication_lag_seconds
+              end
             end
 
-            def fetch_geo_node_referrer
-              ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
+            def geo_referred_node
+              strong_memoize(:geo_referred_node) do
+                ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
+              end
+            end
+
+            def display_geo_redirect_to_primary_message?
+              ::Gitlab::Geo.primary? && geo_redirect_to_primary_message
+            end
+
+            def geo_redirect_to_primary_message
+              return unless geo_referred_node
+
+              @geo_redirect_to_primary_message ||= begin
+                url = "#{::Gitlab::Geo.current_node.url.chomp('/')}/#{project.full_path}.git"
+                ::Gitlab::Geo.redirecting_push_to_primary_message(url)
+              end
             end
 
             override :check_allowed

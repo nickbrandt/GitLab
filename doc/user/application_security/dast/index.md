@@ -31,12 +31,16 @@ that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 GitLab checks the DAST report, compares the found vulnerabilities between the source and target
 branches, and shows the information right on the merge request.
 
-![DAST Widget](img/dast_all.png)
+NOTE: **Note:**
+This comparison logic uses only the latest pipeline executed for the target branch's base commit.
+Running the pipeline on any other commit has no effect on the merge request.
+
+![DAST Widget](img/dast_all_v12_9.png)
 
 By clicking on one of the detected linked vulnerabilities, you will be able to
 see the details and the URL(s) affected.
 
-![DAST Widget Clicked](img/dast_single.png)
+![DAST Widget Clicked](img/dast_single_v12_9.png)
 
 [Dynamic Application Security Testing (DAST)](https://en.wikipedia.org/wiki/Dynamic_Application_Security_Testing)
 is using the popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)

@@ -7,6 +7,12 @@ describe 'EE-specific project routing' do
     allow(Project).to receive(:find_by_full_path).with('gitlab/gitlabhq', any_args).and_return(true)
   end
 
+  describe Projects::RequirementsController, 'routing', type: :routing do
+    it "to #index" do
+      expect(get("/gitlab/gitlabhq/-/requirements")).to route_to('projects/requirements#index', namespace_id: 'gitlab', project_id: 'gitlabhq')
+    end
+  end
+
   # project_vulnerability_feedback  GET    /:project_id/vulnerability_feedback(.:format)     projects/vulnerability_feedback#index
   #                                 POST   /:project_id/vulnerability_feedback(.:format)     projects/vulnerability_feedback#create
   # project_vulnerability_feedback  DELETE /:project_id/vulnerability_feedback/:id(.:format) projects/vulnerability_feedback#destroy

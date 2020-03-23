@@ -1,12 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
 import { STATUS_FAILED } from '~/reports/constants';
 import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
+import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import ReportLink from '~/reports/components/report_link.vue';
 
 describe('Sast Issue Body', () => {
   let wrapper;
 
-  const findDescriptionText = () => wrapper.find('.report-block-list-issue-description-text');
   const findReportLink = () => wrapper.find(ReportLink);
 
   const createComponent = issue => {
@@ -25,27 +25,23 @@ describe('Sast Issue Body', () => {
 
   it('matches snapshot', () => {
     createComponent({
-      severity: 'medium',
-      priority: 'high',
+      severity: 'Medium',
     });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('renders priority if no security are passed', () => {
+  it('does show SeverityBadge if severity is present', () => {
     createComponent({
-      priority: 'high',
+      severity: 'Medium',
     });
 
-    expect(findDescriptionText().text()).toBe('high:');
+    expect(wrapper.find(SeverityBadge).props('severity')).toBe('Medium');
   });
 
-  it('renders severity', () => {
-    createComponent({
-      severity: 'medium',
-    });
-
-    expect(findDescriptionText().text()).toBe('Medium:');
+  it('does not show SeverityBadge if severity is not present', () => {
+    createComponent({});
+    expect(wrapper.contains(SeverityBadge)).toBe(false);
   });
 
   it('does not render report link if no path is passed', () => {

@@ -271,6 +271,28 @@ describe('Cycle analytics actions', () => {
           ],
         );
       });
+
+      describe('receiveTopRankedGroupLabelsSuccess', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it(`commits the ${types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS} mutation and dispatches the 'fetchTasksByTypeData' action`, done => {
+          testAction(
+            actions.receiveTopRankedGroupLabelsSuccess,
+            null,
+            state,
+            [
+              {
+                type: types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS,
+                payload: null,
+              },
+            ],
+            [{ type: 'fetchTasksByTypeData' }],
+            done,
+          );
+        });
+      });
     });
 
     describe('with an error', () => {
@@ -348,7 +370,6 @@ describe('Cycle analytics actions', () => {
         [
           { type: 'requestCycleAnalyticsData' },
           { type: 'fetchGroupLabels' },
-          { type: 'fetchTopRankedGroupLabels' },
           { type: 'fetchGroupStagesAndEvents' },
           { type: 'fetchStageMedianValues' },
           { type: 'fetchSummaryData' },

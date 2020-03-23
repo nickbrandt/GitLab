@@ -334,7 +334,7 @@ export const addItem = ({ state, dispatch, getters }) => {
         dispatch('receiveAddItemFailure', { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND });
       }
       // Ignore 409 conflict when the issue or epic is already attached to epic
-      /* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+      /* eslint-disable @gitlab/require-i18n-strings */
       else if (
         response.status === httpStatusCodes.CONFLICT &&
         response.data.message === 'Epic hierarchy level too deep'

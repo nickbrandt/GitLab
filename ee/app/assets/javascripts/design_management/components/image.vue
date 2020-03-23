@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { throttle } from 'lodash';
 
 export default {
   props: {
@@ -36,7 +36,7 @@ export default {
   mounted() {
     this.onImgLoad();
 
-    this.resizeThrottled = _.throttle(() => {
+    this.resizeThrottled = throttle(() => {
       // NOTE: if imageStyle is set, then baseImageSize
       // won't change due to resize. We must still emit a
       // `resize` event so that the parent can handle

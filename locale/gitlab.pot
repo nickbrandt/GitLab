@@ -217,6 +217,9 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
+msgid "%{buy_now_link_start}Buy now!%{link_end}"
+msgstr ""
+
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -708,9 +711,6 @@ msgstr ""
 msgid "20-29 contributions"
 msgstr ""
 
-msgid "24 hours"
-msgstr ""
-
 msgid "2FA"
 msgstr ""
 
@@ -721,9 +721,6 @@ msgid "3 days"
 msgstr ""
 
 msgid "3 hours"
-msgstr ""
-
-msgid "30 days"
 msgstr ""
 
 msgid "30 minutes"
@@ -745,9 +742,6 @@ msgid "404|Page Not Found"
 msgstr ""
 
 msgid "404|Please contact your GitLab administrator if you think this is a mistake."
-msgstr ""
-
-msgid "7 days"
 msgstr ""
 
 msgid "8 hours"
@@ -1810,6 +1804,9 @@ msgstr ""
 msgid "An error occurred while enabling Service Desk."
 msgstr ""
 
+msgid "An error occurred while fetching coverage reports."
+msgstr ""
+
 msgid "An error occurred while fetching environments."
 msgstr ""
 
@@ -2250,6 +2247,9 @@ msgstr ""
 msgid "Archive project"
 msgstr ""
 
+msgid "Archived"
+msgstr ""
+
 msgid "Archived project! Repository and other project resources are read only"
 msgstr ""
 
@@ -2407,6 +2407,12 @@ msgid "AsanaService|User Personal Access Token. User must have access to task, a
 msgstr ""
 
 msgid "Ascending"
+msgstr ""
+
+msgid "Ask an admin to upload a new license to ensure uninterrupted service."
+msgstr ""
+
+msgid "Ask an admin to upload a new license to restore service."
 msgstr ""
 
 msgid "Ask your group maintainer to set up a group Runner."
@@ -4120,6 +4126,9 @@ msgstr ""
 msgid "ClusterIntegration|Base domain"
 msgstr ""
 
+msgid "ClusterIntegration|Blocking mode"
+msgstr ""
+
 msgid "ClusterIntegration|CA Certificate"
 msgstr ""
 
@@ -4318,6 +4327,9 @@ msgstr ""
 msgid "ClusterIntegration|Gitlab Integration"
 msgstr ""
 
+msgid "ClusterIntegration|Global default"
+msgstr ""
+
 msgid "ClusterIntegration|Google Cloud Platform project"
 msgstr ""
 
@@ -4475,6 +4487,9 @@ msgid "ClusterIntegration|Loading subnets"
 msgstr ""
 
 msgid "ClusterIntegration|Loading subnetworks"
+msgstr ""
+
+msgid "ClusterIntegration|Logging mode"
 msgstr ""
 
 msgid "ClusterIntegration|Machine type"
@@ -4705,6 +4720,9 @@ msgstr ""
 msgid "ClusterIntegration|Set a prefix for your namespaces. If not set, defaults to your project path. If modified, existing environments will use their current namespaces until the cluster cache is cleared."
 msgstr ""
 
+msgid "ClusterIntegration|Set the global mode for the WAF in this cluster. This can be overridden at the environmental level."
+msgstr ""
+
 msgid "ClusterIntegration|Show"
 msgstr ""
 
@@ -4820,6 +4838,9 @@ msgid "ClusterIntegration|You must grant access to your organization’s AWS res
 msgstr ""
 
 msgid "ClusterIntegration|You must have an RBAC-enabled cluster to install Knative."
+msgstr ""
+
+msgid "ClusterIntegration|You should select at least two subnets"
 msgstr ""
 
 msgid "ClusterIntegration|Your account must have %{link_to_kubernetes_engine}"
@@ -5151,7 +5172,7 @@ msgstr ""
 msgid "Configure limits on the number of inbound alerts able to be sent to a project."
 msgstr ""
 
-msgid "Configure paths to be protected by Rack Attack. A web server restart is required after changing these settings."
+msgid "Configure paths to be protected by Rack Attack."
 msgstr ""
 
 msgid "Configure repository mirroring."
@@ -5253,6 +5274,9 @@ msgstr ""
 msgid "ContainerRegistry|Automatically remove extra images that aren't designed to be kept."
 msgstr ""
 
+msgid "ContainerRegistry|Build an image"
+msgstr ""
+
 msgid "ContainerRegistry|Container Registry"
 msgstr ""
 
@@ -5307,10 +5331,16 @@ msgstr ""
 msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
+msgid "ContainerRegistry|Login"
+msgstr ""
+
 msgid "ContainerRegistry|Missing or insufficient permission, delete button disabled"
 msgstr ""
 
 msgid "ContainerRegistry|Number of tags to retain:"
+msgstr ""
+
+msgid "ContainerRegistry|Push an image"
 msgstr ""
 
 msgid "ContainerRegistry|Quick Start"
@@ -6842,7 +6872,7 @@ msgstr ""
 msgid "Detect host keys"
 msgstr ""
 
-msgid "Detected %{timeago} in pipeline %{pipeline_link}"
+msgid "Detected %{timeago} in pipeline %{pipelineLink}"
 msgstr ""
 
 msgid "DevOps Score"
@@ -7645,6 +7675,9 @@ msgstr ""
 msgid "EnvironmentsDashboard|This dashboard displays a maximum of 7 projects and 3 environments per project. %{readMoreLink}"
 msgstr ""
 
+msgid "Environments|All pods"
+msgstr ""
+
 msgid "Environments|An error occurred while canceling the auto stop, please try again"
 msgstr ""
 
@@ -7699,6 +7732,9 @@ msgstr ""
 msgid "Environments|Environments are places where code gets deployed, such as staging or production."
 msgstr ""
 
+msgid "Environments|Filter by pod"
+msgstr ""
+
 msgid "Environments|Install Elastic Stack on your cluster to enable advanced querying capabilities such as full text search."
 msgstr ""
 
@@ -7711,9 +7747,6 @@ msgstr ""
 msgid "Environments|Learn more about stopping environments"
 msgstr ""
 
-msgid "Environments|Logs from"
-msgstr ""
-
 msgid "Environments|Logs from %{start} to %{end}."
 msgstr ""
 
@@ -7724,6 +7757,9 @@ msgid "Environments|No deployed environments"
 msgstr ""
 
 msgid "Environments|No deployments yet"
+msgstr ""
+
+msgid "Environments|No pod selected"
 msgstr ""
 
 msgid "Environments|No pods to display"
@@ -7768,10 +7804,10 @@ msgstr ""
 msgid "Environments|Search"
 msgstr ""
 
-msgid "Environments|Show all"
+msgid "Environments|Select environment"
 msgstr ""
 
-msgid "Environments|Show last"
+msgid "Environments|Show all"
 msgstr ""
 
 msgid "Environments|Stop"
@@ -8767,6 +8803,9 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
+msgid "Filter by %{issuable_type} that are currently archived."
+msgstr ""
+
 msgid "Filter by %{issuable_type} that are currently closed."
 msgstr ""
 
@@ -9127,18 +9166,6 @@ msgstr ""
 msgid "GeoNodes|Last event ID seen from primary"
 msgstr ""
 
-msgid "GeoNodes|Learn more about Repository checksum progress"
-msgstr ""
-
-msgid "GeoNodes|Learn more about Repository verification"
-msgstr ""
-
-msgid "GeoNodes|Learn more about Wiki checksum progress"
-msgstr ""
-
-msgid "GeoNodes|Learn more about Wiki verification"
-msgstr ""
-
 msgid "GeoNodes|Loading nodes"
 msgstr ""
 
@@ -9169,6 +9196,9 @@ msgstr ""
 msgid "GeoNodes|Removing a Geo secondary node stops the synchronization to that node. Are you sure?"
 msgstr ""
 
+msgid "GeoNodes|Replicated data is verified with the %{nodeText} using checksums"
+msgstr ""
+
 msgid "GeoNodes|Replication slot WAL"
 msgstr ""
 
@@ -9176,12 +9206,6 @@ msgid "GeoNodes|Replication slots"
 msgstr ""
 
 msgid "GeoNodes|Repositories"
-msgstr ""
-
-msgid "GeoNodes|Repositories checksummed for verification with their counterparts on Secondary nodes"
-msgstr ""
-
-msgid "GeoNodes|Repositories verified with their counterparts on the Primary node"
 msgstr ""
 
 msgid "GeoNodes|Repository checksum progress"
@@ -9235,16 +9259,16 @@ msgstr ""
 msgid "GeoNodes|Wikis"
 msgstr ""
 
-msgid "GeoNodes|Wikis checksummed for verification with their counterparts on Secondary nodes"
-msgstr ""
-
-msgid "GeoNodes|Wikis verified with their counterparts on the Primary node"
-msgstr ""
-
 msgid "GeoNodes|With %{geo} you can install a special read-only and replicated instance anywhere. Before you add nodes, follow the %{instructions} in the exact order they appear."
 msgstr ""
 
 msgid "GeoNodes|You have configured Geo nodes using an insecure HTTP connection. We recommend the use of HTTPS."
+msgstr ""
+
+msgid "GeoNodes|primary node"
+msgstr ""
+
+msgid "GeoNodes|secondary nodes"
 msgstr ""
 
 msgid "Geo|%{name} is scheduled for forced re-download"
@@ -12945,6 +12969,9 @@ msgstr ""
 msgid "Name has already been taken"
 msgstr ""
 
+msgid "Name must be between 1 and 255 characters"
+msgstr ""
+
 msgid "Name new label"
 msgstr ""
 
@@ -13101,6 +13128,9 @@ msgid "New project"
 msgstr ""
 
 msgid "New release"
+msgstr ""
+
+msgid "New requirement"
 msgstr ""
 
 msgid "New runners registration token has been generated!"
@@ -13323,6 +13353,9 @@ msgid "No start date"
 msgstr ""
 
 msgid "No template"
+msgstr ""
+
+msgid "No test coverage"
 msgstr ""
 
 msgid "No thanks, don't show this again"
@@ -13604,7 +13637,7 @@ msgstr ""
 msgid "OmniAuth"
 msgstr ""
 
-msgid "Omnibus Protected Paths throttle is active. From 12.4, Omnibus throttle is deprecated and will be removed in a future release. Please read the %{relative_url_link_start}Migrating Protected Paths documentation%{relative_url_link_end}."
+msgid "Omnibus Protected Paths throttle is active, and takes priority over these settings. From 12.4, Omnibus throttle is deprecated and will be removed in a future release. Please read the %{relative_url_link_start}Migrating Protected Paths documentation%{relative_url_link_end}."
 msgstr ""
 
 msgid "On track"
@@ -16144,6 +16177,12 @@ msgstr ""
 msgid "Pushes"
 msgstr ""
 
+msgid "Pushing code and creation of issues and merge requests has been disabled."
+msgstr ""
+
+msgid "Pushing code and creation of issues and merge requests will be disabled on %{disabled_on}."
+msgstr ""
+
 msgid "PushoverService|%{user_name} deleted branch \"%{ref}\"."
 msgstr ""
 
@@ -16773,6 +16812,9 @@ msgid "Require user password to approve"
 msgstr ""
 
 msgid "Require users to prove ownership of custom domains"
+msgstr ""
+
+msgid "Requirements"
 msgstr ""
 
 msgid "Requires approval from %{names}."
@@ -18266,7 +18308,7 @@ msgstr ""
 msgid "Size settings for static websites"
 msgstr ""
 
-msgid "Skip older, pending deployment jobs"
+msgid "Skip outdated deployment jobs"
 msgstr ""
 
 msgid "Skip this for now"
@@ -19469,6 +19511,11 @@ msgstr ""
 msgid "Test coverage parsing"
 msgstr ""
 
+msgid "Test coverage: %d hit"
+msgid_plural "Test coverage: %d hits"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Test failed."
 msgstr ""
 
@@ -20062,6 +20109,9 @@ msgid "There was an error resetting group pipeline minutes."
 msgstr ""
 
 msgid "There was an error resetting user pipeline minutes."
+msgstr ""
+
+msgid "There was an error saving this Geo Node"
 msgstr ""
 
 msgid "There was an error saving your changes."
@@ -21229,6 +21279,9 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
+msgid "URL must be a valid url (ex: https://gitlab.com)"
+msgstr ""
+
 msgid "URL of the external storage that will serve the repository static objects (e.g. archives, blobs, ...)."
 msgstr ""
 
@@ -21305,6 +21358,9 @@ msgid "Unblock"
 msgstr ""
 
 msgid "Undo"
+msgstr ""
+
+msgid "Undo Ignore"
 msgstr ""
 
 msgid "Undo ignore"
@@ -21554,6 +21610,12 @@ msgid "Upload New File"
 msgstr ""
 
 msgid "Upload a certificate for your domain with all intermediates"
+msgstr ""
+
+msgid "Upload a new license in the admin area to ensure uninterrupted service."
+msgstr ""
+
+msgid "Upload a new license in the admin area to restore service."
 msgstr ""
 
 msgid "Upload a private key for your certificate"
@@ -22685,9 +22747,6 @@ msgstr ""
 msgid "Wiki|Edit Page"
 msgstr ""
 
-msgid "Wiki|More Pages"
-msgstr ""
-
 msgid "Wiki|New page"
 msgstr ""
 
@@ -22704,6 +22763,9 @@ msgid "Wiki|Pages"
 msgstr ""
 
 msgid "Wiki|Title"
+msgstr ""
+
+msgid "Wiki|View All Pages"
 msgstr ""
 
 msgid "Wiki|Wiki Pages"
@@ -23285,7 +23347,13 @@ msgstr ""
 msgid "Your issues will be imported in the background. Once finished, you'll get a confirmation email."
 msgstr ""
 
+msgid "Your license expired on %{expires_at}."
+msgstr ""
+
 msgid "Your license is valid from"
+msgstr ""
+
+msgid "Your license will expire in %{remaining_days}."
 msgstr ""
 
 msgid "Your message here"
@@ -23316,6 +23384,12 @@ msgid "Your projects"
 msgstr ""
 
 msgid "Your request for access has been queued for review."
+msgstr ""
+
+msgid "Your trial license expired on %{expires_at}."
+msgstr ""
+
+msgid "Your trial license will expire in %{remaining_days}."
 msgstr ""
 
 msgid "Zoom meeting added"

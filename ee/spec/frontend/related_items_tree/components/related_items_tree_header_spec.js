@@ -1,4 +1,5 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import { GlButton, GlTooltip } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
@@ -8,11 +9,10 @@ import { issuableTypesMap } from 'ee/related_issues/constants';
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
-import {
-  mockInitialConfig,
-  mockParentItem,
-  mockQueryResponse,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockInitialConfig, mockParentItem, mockQueryResponse } from '../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = ({ slots } = {}) => {
   const store = createDefaultStore();
@@ -32,6 +32,7 @@ const createComponent = ({ slots } = {}) => {
   store.dispatch('setChildrenCount', mockParentItem.descendantCounts);
 
   return shallowMount(RelatedItemsTreeHeader, {
+    localVue,
     store,
     slots,
   });
@@ -73,7 +74,7 @@ describe('RelatedItemsTree', () => {
         let toggleAddItemForm;
 
         beforeEach(() => {
-          toggleAddItemForm = jasmine.createSpy();
+          toggleAddItemForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               toggleAddItemForm,
@@ -86,7 +87,7 @@ describe('RelatedItemsTree', () => {
 
           expect(toggleAddItemForm).toHaveBeenCalled();
 
-          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+          const payload = toggleAddItemForm.mock.calls[0][1];
 
           expect(payload).toEqual({
             issuableType: issuableTypesMap.EPIC,
@@ -99,7 +100,7 @@ describe('RelatedItemsTree', () => {
         let toggleCreateEpicForm;
 
         beforeEach(() => {
-          toggleCreateEpicForm = jasmine.createSpy();
+          toggleCreateEpicForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               toggleCreateEpicForm,
@@ -112,7 +113,8 @@ describe('RelatedItemsTree', () => {
 
           expect(toggleCreateEpicForm).toHaveBeenCalled();
 
-          const payload = toggleCreateEpicForm.calls.mostRecent().args[1];
+          const payload =
+            toggleCreateEpicForm.mock.calls[toggleCreateEpicForm.mock.calls.length - 1][1];
 
           expect(payload).toEqual({ toggleState: true });
         });
@@ -129,8 +131,8 @@ describe('RelatedItemsTree', () => {
         let setItemInputValue;
 
         beforeEach(() => {
-          setItemInputValue = jasmine.createSpy();
-          toggleAddItemForm = jasmine.createSpy();
+          setItemInputValue = jest.fn();
+          toggleAddItemForm = jest.fn();
           wrapper.vm.$store.hotUpdate({
             actions: {
               setItemInputValue,
@@ -144,11 +146,11 @@ describe('RelatedItemsTree', () => {
 
           expect(setItemInputValue).toHaveBeenCalled();
 
-          expect(setItemInputValue.calls.mostRecent().args[1]).toEqual('');
+          expect(setItemInputValue.mock.calls[setItemInputValue.mock.calls.length - 1][1]).toBe('');
 
           expect(toggleAddItemForm).toHaveBeenCalled();
 
-          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+          const payload = toggleAddItemForm.mock.calls[setItemInputValue.mock.calls.length - 1][1];
 
           expect(payload).toEqual({
             issuableType: issuableTypesMap.ISSUE,

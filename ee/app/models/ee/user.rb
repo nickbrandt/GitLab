@@ -16,6 +16,8 @@ module EE
     MAX_USERNAME_SUGGESTION_ATTEMPTS = 15
 
     prepended do
+      include UsageStatistics
+
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
 
       # We aren't using the `auditor?` method for the `if` condition here
@@ -92,7 +94,7 @@ module EE
       def support_bot
         email_pattern = "support%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
+        unique_internal(where(user_type: :support_bot), 'support-bot', email_pattern) do |u|
           u.bio = 'The GitLab support bot used for Service Desk'
           u.name = 'GitLab Support Bot'
         end
@@ -101,7 +103,7 @@ module EE
       def visual_review_bot
         email_pattern = "visual_review%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
+        unique_internal(where(user_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
           u.bio = 'The Gitlab Visual Review feedback bot'
           u.name = 'Gitlab Visual Review Bot'
         end
@@ -243,7 +245,10 @@ module EE
     end
 
     def managed_free_namespaces
-      manageable_groups.with_counts(archived: false).where(plan: [nil, Plan.free, Plan.default]).order(:name)
+      manageable_groups
+        .left_joins(:gitlab_subscription)
+        .merge(GitlabSubscription.left_joins(:hosted_plan).where(plans: { name: [nil, *Plan::DEFAULT_PLANS] }))
+        .order(:name)
     end
 
     override :has_current_license?

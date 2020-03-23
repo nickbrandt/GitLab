@@ -2,13 +2,11 @@
 
 module UserTypeEnums
   def self.types
-    bots
+    @types ||= bots.merge(human: nil, ghost: 5)
   end
 
   def self.bots
-    {
-      AlertBot: 2
-    }
+    @bots ||= { alert_bot: 2 }.with_indifferent_access
   end
 end
 

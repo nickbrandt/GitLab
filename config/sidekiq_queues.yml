@@ -128,6 +128,8 @@
   - 1
 - - jira_connect
   - 1
+- - jira_importer
+  - 1
 - - ldap_group_sync
   - 2
 - - mail_scheduler
@@ -232,6 +234,8 @@
   - 2
 - - service_desk_email_receiver
   - 1
+- - status_page_publish
+  - 1
 - - sync_seat_link_request
   - 1
 - - system_hook_push
@@ -247,6 +251,10 @@
 - - update_project_statistics
   - 1
 - - upload_checksum
+  - 1
+- - vulnerability_exports_export
+  - 1
+- - vulnerability_exports_export_deletion
   - 1
 - - web_hook
   - 1

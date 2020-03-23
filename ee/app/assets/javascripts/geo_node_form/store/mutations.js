@@ -12,4 +12,10 @@ export default {
     state.isLoading = false;
     state.synchronizationNamespaces = [];
   },
+  [types.REQUEST_SAVE_GEO_NODE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_SAVE_GEO_NODE_COMPLETE](state) {
+    state.isLoading = false;
+  },
 };

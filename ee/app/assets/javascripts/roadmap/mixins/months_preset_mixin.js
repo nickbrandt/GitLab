@@ -56,13 +56,13 @@ export default {
       } else if (startDate === 1) {
         // If Epic startDate is first day of the month
         // Set offset to 0.
-        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+        /* eslint-disable-next-line @gitlab/require-i18n-strings */
         return 'left: 0;';
       }
 
       // Calculate proportional offset based on startDate and total days in
       // current month.
-      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      /* eslint-disable-next-line @gitlab/require-i18n-strings */
       return `left: ${(startDate / daysInMonth) * 100}%;`;
     },
     /**

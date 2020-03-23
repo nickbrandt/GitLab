@@ -23,7 +23,7 @@ export const receiveReplicableItemsError = ({ state, commit }) => {
   commit(types.RECEIVE_REPLICABLE_ITEMS_ERROR);
 };
 
-export const fetchDesigns = ({ state, dispatch }) => {
+export const fetchReplicableItems = ({ state, dispatch }) => {
   dispatch('requestReplicableItems');
 
   const statusFilterName = state.filterOptions[state.currentFilterIndex]
@@ -66,7 +66,7 @@ export const receiveInitiateAllReplicableSyncsSuccess = (
     }),
   );
   commit(types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_SUCCESS);
-  dispatch('fetchDesigns');
+  dispatch('fetchReplicableItems');
 };
 export const receiveInitiateAllReplicableSyncsError = ({ state, commit }) => {
   createFlash(
@@ -77,7 +77,7 @@ export const receiveInitiateAllReplicableSyncsError = ({ state, commit }) => {
   commit(types.RECEIVE_INITIATE_ALL_REPLICABLE_SYNCS_ERROR);
 };
 
-export const initiateAllDesignSyncs = ({ state, dispatch }, action) => {
+export const initiateAllReplicableSyncs = ({ state, dispatch }, action) => {
   dispatch('requestInitiateAllReplicableSyncs');
 
   Api.initiateAllGeoReplicableSyncs(state.replicableType, action)
@@ -93,14 +93,14 @@ export const requestInitiateReplicableSync = ({ commit }) =>
 export const receiveInitiateReplicableSyncSuccess = ({ commit, dispatch }, { name, action }) => {
   toast(sprintf(__('%{name} is scheduled for %{action}'), { name, action }));
   commit(types.RECEIVE_INITIATE_REPLICABLE_SYNC_SUCCESS);
-  dispatch('fetchDesigns');
+  dispatch('fetchReplicableItems');
 };
 export const receiveInitiateReplicableSyncError = ({ commit }, { name }) => {
   createFlash(sprintf(__('There was an error syncing project %{name}'), { name }));
   commit(types.RECEIVE_INITIATE_REPLICABLE_SYNC_ERROR);
 };
 
-export const initiateDesignSync = ({ state, dispatch }, { projectId, name, action }) => {
+export const initiateReplicableSync = ({ state, dispatch }, { projectId, name, action }) => {
   dispatch('requestInitiateReplicableSync');
 
   Api.initiateGeoReplicableSync(state.replicableType, { projectId, action })

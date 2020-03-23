@@ -344,9 +344,9 @@ describe Ci::Pipeline, :mailer do
   end
 
   describe '.with_reports' do
-    subject { described_class.with_reports(Ci::JobArtifact.test_reports) }
-
     context 'when pipeline has a test report' do
+      subject { described_class.with_reports(Ci::JobArtifact.test_reports) }
+
       let!(:pipeline_with_report) { create(:ci_pipeline, :with_test_reports) }
 
       it 'selects the pipeline' do
@@ -354,7 +354,19 @@ describe Ci::Pipeline, :mailer do
       end
     end
 
+    context 'when pipeline has a coverage report' do
+      subject { described_class.with_reports(Ci::JobArtifact.coverage_reports) }
+
+      let!(:pipeline_with_report) { create(:ci_pipeline, :with_coverage_reports) }
+
+      it 'selects the pipeline' do
+        is_expected.to eq([pipeline_with_report])
+      end
+    end
+
     context 'when pipeline does not have metrics reports' do
+      subject { described_class.with_reports(Ci::JobArtifact.test_reports) }
+
       let!(:pipeline_without_report) { create(:ci_empty_pipeline) }
 
       it 'does not select the pipeline' do
@@ -1108,7 +1120,7 @@ describe Ci::Pipeline, :mailer do
           let(:from_status) { status }
 
           it 'schedules pipeline success worker' do
-            expect(PipelineSuccessWorker).to receive(:perform_async).with(pipeline.id)
+            expect(Ci::DailyReportResultsWorker).to receive(:perform_in).with(10.minutes, pipeline.id)
 
             pipeline.succeed
           end
@@ -2509,27 +2521,53 @@ describe Ci::Pipeline, :mailer do
       end
     end
 
-    context 'with success pipeline' do
-      before do
-        perform_enqueued_jobs do
+    shared_examples 'enqueues the notification worker' do
+      it 'enqueues PipelineUpdateCiRefStatusWorker' do
+        expect(PipelineUpdateCiRefStatusWorker).to receive(:perform_async).with(pipeline.id)
+        expect(PipelineNotificationWorker).not_to receive(:perform_async).with(pipeline.id)
+
+        pipeline.succeed
+      end
+
+      context 'when ci_pipeline_fixed_notifications is disabled' do
+        before do
+          stub_feature_flags(ci_pipeline_fixed_notifications: false)
+        end
+
+        it 'enqueues PipelineNotificationWorker' do
+          expect(PipelineUpdateCiRefStatusWorker).not_to receive(:perform_async).with(pipeline.id)
+          expect(PipelineNotificationWorker).to receive(:perform_async).with(pipeline.id)
+
           pipeline.succeed
         end
       end
-
-      it_behaves_like 'sending a notification'
     end
 
-    context 'with failed pipeline' do
-      before do
-        perform_enqueued_jobs do
-          create(:ci_build, :failed, pipeline: pipeline)
-          create(:generic_commit_status, :failed, pipeline: pipeline)
-
-          pipeline.drop
+    context 'with success pipeline' do
+      it_behaves_like 'sending a notification' do
+        before do
+          perform_enqueued_jobs do
+            pipeline.succeed
+          end
         end
       end
 
-      it_behaves_like 'sending a notification'
+      it_behaves_like 'enqueues the notification worker'
+    end
+
+    context 'with failed pipeline' do
+      it_behaves_like 'sending a notification' do
+        before do
+          perform_enqueued_jobs do
+            create(:ci_build, :failed, pipeline: pipeline)
+            create(:generic_commit_status, :failed, pipeline: pipeline)
+
+            pipeline.drop
+          end
+        end
+      end
+
+      it_behaves_like 'enqueues the notification worker'
     end
 
     context 'with skipped pipeline' do
@@ -2700,6 +2738,43 @@ describe Ci::Pipeline, :mailer do
       it 'returns empty test report count' do
         expect(subject.total_count).to eq(0)
         expect(subject.total_count).to eq(pipeline.test_reports_count)
+      end
+    end
+  end
+
+  describe '#coverage_reports' do
+    subject { pipeline.coverage_reports }
+
+    context 'when pipeline has multiple builds with coverage reports' do
+      let!(:build_rspec) { create(:ci_build, :success, name: 'rspec', pipeline: pipeline, project: project) }
+      let!(:build_golang) { create(:ci_build, :success, name: 'golang', pipeline: pipeline, project: project) }
+
+      before do
+        create(:ci_job_artifact, :cobertura, job: build_rspec, project: project)
+        create(:ci_job_artifact, :coverage_gocov_xml, job: build_golang, project: project)
+      end
+
+      it 'returns coverage reports with collected data' do
+        expect(subject.files.keys).to match_array([
+          "auth/token.go",
+          "auth/rpccredentials.go",
+          "app/controllers/abuse_reports_controller.rb"
+        ])
+      end
+
+      context 'when builds are retried' do
+        let!(:build_rspec) { create(:ci_build, :retried, :success, name: 'rspec', pipeline: pipeline, project: project) }
+        let!(:build_golang) { create(:ci_build, :retried, :success, name: 'golang', pipeline: pipeline, project: project) }
+
+        it 'does not take retried builds into account' do
+          expect(subject.files).to eql({})
+        end
+      end
+    end
+
+    context 'when pipeline does not have any builds with coverage reports' do
+      it 'returns empty coverage reports' do
+        expect(subject.files).to eql({})
       end
     end
   end
@@ -3037,6 +3112,27 @@ describe Ci::Pipeline, :mailer do
           end
         end
       end
+    end
+  end
+
+  describe '#source_ref_path' do
+    subject { pipeline.source_ref_path }
+
+    context 'when pipeline is for a branch' do
+      it { is_expected.to eq(Gitlab::Git::BRANCH_REF_PREFIX + pipeline.source_ref.to_s) }
+    end
+
+    context 'when pipeline is for a merge request' do
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let(:pipeline) { create(:ci_pipeline, project: project, head_pipeline_of: merge_request) }
+
+      it { is_expected.to eq(Gitlab::Git::BRANCH_REF_PREFIX + pipeline.source_ref.to_s) }
+    end
+
+    context 'when pipeline is for a tag' do
+      let(:pipeline) { create(:ci_pipeline, project: project, tag: true) }
+
+      it { is_expected.to eq(Gitlab::Git::TAG_REF_PREFIX + pipeline.source_ref.to_s) }
     end
   end
 end

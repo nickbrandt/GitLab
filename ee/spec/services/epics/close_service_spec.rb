@@ -11,7 +11,7 @@ describe Epics::CloseService do
 
     context 'when epics are disabled' do
       before do
-        group.add_master(user)
+        group.add_maintainer(user)
       end
 
       it 'does not close the epic' do
@@ -26,7 +26,7 @@ describe Epics::CloseService do
 
       context 'when a user has permissions to update the epic' do
         before do
-          group.add_master(user)
+          group.add_maintainer(user)
         end
 
         context 'when closing an opened epic' do

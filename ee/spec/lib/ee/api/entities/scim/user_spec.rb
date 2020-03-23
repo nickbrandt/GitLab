@@ -39,4 +39,14 @@ describe ::EE::API::Entities::Scim::User do
   it 'contains the resource type' do
     expect(subject[:meta][:resourceType]).to eq('User')
   end
+
+  context 'with a SCIM identity' do
+    let(:identity) { build(:scim_identity, user: user) }
+
+    it 'contains active false when the identity is not active' do
+      identity.active = false
+
+      expect(subject[:active]).to be false
+    end
+  end
 end

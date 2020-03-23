@@ -31,6 +31,7 @@ Issue:
 - last_edited_by_id
 - discussion_locked
 - health_status
+- external_key
 Event:
 - id
 - target_type
@@ -40,6 +41,14 @@ Event:
 - updated_at
 - action
 - author_id
+WikiPage::Meta:
+- id
+- title
+- project_id
+WikiPage::Slug:
+- id
+- wiki_page_meta_id
+- slug
 PushEventPayload:
 - commit_count
 - action
@@ -756,6 +765,7 @@ List:
 - user_id
 - max_issue_count
 - max_issue_weight
+- limit_metric
 ExternalPullRequest:
 - id
 - created_at
@@ -834,6 +844,7 @@ Epic:
   - start_date_sourcing_epic_id
   - due_date_sourcing_epic_id
   - health_status
+  - external_key
 EpicIssue:
   - id
   - relative_position

@@ -96,7 +96,7 @@ Having a knowledge base in any form that is separate from the documentation woul
 
 All GitLab documentation is written using [Markdown](https://en.wikipedia.org/wiki/Markdown).
 
-The [documentation website](https://docs.gitlab.com) uses GitLab Kramdown as its Markdown rendering engine. For a complete Kramdown reference, see the [GitLab Markdown Kramdown Guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/).
+The [documentation website](https://docs.gitlab.com) uses GitLab Kramdown as its Markdown rendering engine. For a complete Kramdown reference, see the [GitLab Markdown Kramdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/).
 
 The [`gitlab-kramdown`](https://gitlab.com/gitlab-org/gitlab_kramdown)
 Ruby gem will support all [GFM markup](../../user/markdown.md) in the future. That is,
@@ -628,8 +628,17 @@ do not use this option until further notice.
 
 ### Links to internal documentation
 
-- To link to internal documentation, use relative links, not absolute URLs.
-  Use `../` to navigate to high-level directories. Links should not refer to root.
+NOTE: **Note:**
+_Internal_ refers to documentation in the same project. When linking to documentation in
+separate projects (for example, linking to Omnibus docs from GitLab docs), you must use absolute
+URLs.
+
+To link to internal documentation:
+
+- Use relative links to Markdown files in the same repository.
+- Do not use absolute URLs or URLs from `docs.gitlab.com`.
+- Use `../` to navigate to higher-level directories.
+- Do not link relative to root. For example, `/ee/user/gitlab_com/index.md`.
 
   Don't:
 
@@ -652,8 +661,7 @@ do not use this option until further notice.
   - `../../issues/tags.md`
   - `../../issues/tags.md#stages`
 
-- Using the Markdown extension is necessary for the [`/help`](index.md#gitlab-help)
-  section of GitLab.
+- Use the Markdown extension for the [`/help`](index.md#gitlab-help) section of GitLab.
 
 ### Links requiring permissions
 
@@ -882,7 +890,7 @@ of language classes available.
 | `xml`                   |                                                                              |
 | `yaml`                  | Alias: `yml`.                                                                |
 
-For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/#code-blocks).
+For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/#code-blocks).
 
 ## GitLab SVG icons
 
@@ -1152,7 +1160,7 @@ introduced the change for reference. Also, they can easily understand what
 features they have in their GitLab instance and version, given that the note has
 some key information.
 
-`[Introduced](link-to-issue) in [GitLab Premium](https://about.gitlab.com/pricing) 12.7`
+`[Introduced](link-to-issue) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7`
 links to the issue that introduced the feature, says which GitLab tier it
 belongs to, says the GitLab version that it became available in, and links to
 the pricing page in case the user wants to upgrade to a paid tier

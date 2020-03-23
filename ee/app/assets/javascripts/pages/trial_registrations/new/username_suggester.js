@@ -19,13 +19,13 @@ export default class UsernameSuggester {
     this.usernameElement = document.getElementById(targetElement);
 
     if (!this.usernameElement) {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       throw new Error('The target element is missing.');
     }
 
     this.apiPath = this.usernameElement.dataset.apiPath;
     if (!this.apiPath) {
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       throw new Error('The API path was not specified.');
     }
 

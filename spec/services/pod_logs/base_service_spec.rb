@@ -9,11 +9,13 @@ describe ::PodLogs::BaseService do
   let(:namespace) { 'autodevops-deploy-9-production' }
 
   let(:pod_name) { 'pod-1' }
+  let(:pod_name_2) { 'pod-2' }
   let(:container_name) { 'container-0' }
   let(:params) { {} }
   let(:raw_pods) do
     JSON.parse([
-      kube_pod(name: pod_name)
+      kube_pod(name: pod_name),
+      kube_pod(name: pod_name_2)
     ].to_json, object_class: OpenStruct)
   end
 
@@ -78,9 +80,7 @@ describe ::PodLogs::BaseService do
         expect(result[:message]).to eq('Namespace is empty')
       end
     end
-  end
 
-  describe '#check_param_lengths' do
     context 'when pod_name and container_name are provided' do
       let(:params) do
         {
@@ -90,41 +90,11 @@ describe ::PodLogs::BaseService do
       end
 
       it 'returns success' do
-        result = subject.send(:check_param_lengths, {})
+        result = subject.send(:check_arguments, {})
 
         expect(result[:status]).to eq(:success)
         expect(result[:pod_name]).to eq(pod_name)
         expect(result[:container_name]).to eq(container_name)
-      end
-    end
-
-    context 'when pod_name is too long' do
-      let(:params) do
-        {
-        'pod_name' => "a very long string." * 15
-      }
-      end
-
-      it 'returns an error' do
-        result = subject.send(:check_param_lengths, {})
-
-        expect(result[:status]).to eq(:error)
-        expect(result[:message]).to eq('pod_name cannot be larger than 253 chars')
-      end
-    end
-
-    context 'when container_name is too long' do
-      let(:params) do
-        {
-          'container_name' => "a very long string." * 15
-        }
-      end
-
-      it 'returns an error' do
-        result = subject.send(:check_param_lengths, {})
-
-        expect(result[:status]).to eq(:error)
-        expect(result[:message]).to eq('container_name cannot be larger than 253 chars')
       end
     end
   end
@@ -147,83 +117,7 @@ describe ::PodLogs::BaseService do
       result = subject.send(:get_pod_names, raw_pods: raw_pods)
 
       expect(result[:status]).to eq(:success)
-      expect(result[:pods]).to eq([pod_name])
-    end
-  end
-
-  describe '#check_pod_name' do
-    it 'returns success if pod_name was specified' do
-      result = subject.send(:check_pod_name, pod_name: pod_name, pods: [pod_name])
-
-      expect(result[:status]).to eq(:success)
-      expect(result[:pod_name]).to eq(pod_name)
-    end
-
-    it 'returns success if pod_name was not specified but there are pods' do
-      result = subject.send(:check_pod_name, pod_name: nil, pods: [pod_name])
-
-      expect(result[:status]).to eq(:success)
-      expect(result[:pod_name]).to eq(pod_name)
-    end
-
-    it 'returns error if pod_name was not specified and there are no pods' do
-      result = subject.send(:check_pod_name, pod_name: nil, pods: [])
-
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('No pods available')
-    end
-
-    it 'returns error if pod_name was specified but does not exist' do
-      result = subject.send(:check_pod_name, pod_name: 'another_pod', pods: [pod_name])
-
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('Pod does not exist')
-    end
-  end
-
-  describe '#check_container_name' do
-    it 'returns success if container_name was specified' do
-      result = subject.send(:check_container_name,
-        container_name: container_name,
-        pod_name: pod_name,
-        raw_pods: raw_pods
-      )
-
-      expect(result[:status]).to eq(:success)
-      expect(result[:container_name]).to eq(container_name)
-    end
-
-    it 'returns success if container_name was not specified and there are containers' do
-      result = subject.send(:check_container_name,
-        pod_name: pod_name,
-        raw_pods: raw_pods
-      )
-
-      expect(result[:status]).to eq(:success)
-      expect(result[:container_name]).to eq(container_name)
-    end
-
-    it 'returns error if container_name was not specified and there are no containers on the pod' do
-      raw_pods.first.spec.containers = []
-
-      result = subject.send(:check_container_name,
-        pod_name: pod_name,
-        raw_pods: raw_pods
-      )
-
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('No containers available')
-    end
-
-    it 'returns error if container_name was specified but does not exist' do
-      result = subject.send(:check_container_name,
-        container_name: 'foo',
-        pod_name: pod_name,
-        raw_pods: raw_pods
-      )
-
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('Container does not exist')
+      expect(result[:pods]).to eq([pod_name, pod_name_2])
     end
   end
 end

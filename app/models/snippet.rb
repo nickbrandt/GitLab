@@ -17,6 +17,8 @@ class Snippet < ApplicationRecord
   include HasRepository
   extend ::Gitlab::Utils::Override
 
+  MAX_FILE_COUNT = 1
+
   ignore_column :repository_storage, remove_with: '12.10', remove_after: '2020-03-22'
 
   cache_markdown_field :title, pipeline: :single_line
@@ -281,6 +283,10 @@ class Snippet < ApplicationRecord
     end
   end
 
+  def url_to_repo
+    Gitlab::Shell.url_to_repo(full_path.delete('@'))
+  end
+
   def repository_storage
     snippet_repository&.shard_name ||
       Gitlab::CurrentSettings.pick_repository_storage
@@ -304,6 +310,10 @@ class Snippet < ApplicationRecord
 
   def hexdigest
     Digest::SHA256.hexdigest("#{title}#{description}#{created_at}#{updated_at}")
+  end
+
+  def versioned_enabled_for?(user)
+    repository_exists? && ::Feature.enabled?(:version_snippets, user)
   end
 
   class << self

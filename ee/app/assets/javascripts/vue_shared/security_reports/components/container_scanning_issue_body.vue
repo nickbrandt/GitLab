@@ -1,15 +1,16 @@
 <script>
 /**
  * Renders CONTAINER SCANNING body text
- * [priority]: [name] in [link]:[line]
+ * [severity-badge] [name] in [link]:[line]
  */
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
-import { humanize } from '~/lib/utils/text_utility';
+import SeverityBadge from './severity_badge.vue';
 
 export default {
   name: 'ContainerScanningIssueBody',
   components: {
     ModalOpenName,
+    SeverityBadge,
   },
   props: {
     issue: {
@@ -22,20 +23,12 @@ export default {
       required: true,
     },
   },
-  computed: {
-    severity() {
-      return this.issue.severity ? humanize(this.issue.severity) : null;
-    },
-  },
 };
 </script>
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      <template v-if="severity">
-        {{ severity }}:
-      </template>
-
+      <severity-badge v-if="issue.severity" class="d-inline-block" :severity="issue.severity" />
       <modal-open-name :issue="issue" :status="status" />
     </div>
   </div>

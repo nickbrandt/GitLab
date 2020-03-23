@@ -7,8 +7,10 @@ exports[`Container Scanning Issue Body matches snapshot 1`] = `
   <div
     class="report-block-list-issue-description-text"
   >
-    
-      Low:
+    <severity-badge-stub
+      class="d-inline-block"
+      severity="Low"
+    />
      
     <modal-open-name-stub
       issue="[object Object]"

@@ -14,7 +14,7 @@ jest.mock('~/flash', () => jest.fn());
 
 const statisticsEndpoint = 'statisticsEndpoint';
 const timeRange = {
-  from: '2019-01-01T00:00:00.000Z',
+  from: '2019-01-30T16:00:00.000Z',
   to: '2019-01-31T00:00:00.000Z',
 };
 
@@ -101,7 +101,7 @@ describe('threatMonitoringStatistics actions', () => {
           .onGet(statisticsEndpoint, {
             params: {
               environment_id: currentEnvironmentId,
-              interval: 'day',
+              interval: 'hour',
               ...timeRange,
             },
           })

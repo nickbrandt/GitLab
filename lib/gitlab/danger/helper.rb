@@ -34,6 +34,10 @@ module Gitlab
           .sort
       end
 
+      def all_ee_changes
+        all_changed_files.grep(%r{\Aee/})
+      end
+
       def ee?
         # Support former project name for `dev` and support local Danger run
         %w[gitlab gitlab-ee].include?(ENV['CI_PROJECT_NAME']) || Dir.exist?('../../ee')
@@ -144,7 +148,7 @@ module Gitlab
         %r{\A(ee/)?spec/(?!javascripts|frontend)[^/]+} => :backend,
         %r{\A(ee/)?vendor/(?!assets)[^/]+} => :backend,
         %r{\A(ee/)?vendor/(languages\.yml|licenses\.csv)\z} => :backend,
-        %r{\A(Gemfile|Gemfile.lock|Procfile|Rakefile)\z} => :backend,
+        %r{\A(Gemfile|Gemfile.lock|Rakefile)\z} => :backend,
         %r{\A[A-Z_]+_VERSION\z} => :backend,
         %r{\A\.rubocop(_todo)?\.yml\z} => :backend,
 

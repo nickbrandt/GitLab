@@ -70,6 +70,7 @@ describe Project do
     it { is_expected.to have_one(:auto_devops).class_name('ProjectAutoDevops') }
     it { is_expected.to have_one(:error_tracking_setting).class_name('ErrorTracking::ProjectErrorTrackingSetting') }
     it { is_expected.to have_one(:project_setting) }
+    it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
     it { is_expected.to have_many(:commit_statuses) }
     it { is_expected.to have_many(:ci_pipelines) }
     it { is_expected.to have_many(:ci_refs) }
@@ -107,6 +108,8 @@ describe Project do
     it { is_expected.to have_many(:external_pull_requests) }
     it { is_expected.to have_many(:sourced_pipelines) }
     it { is_expected.to have_many(:source_pipelines) }
+    it { is_expected.to have_many(:prometheus_alert_events) }
+    it { is_expected.to have_many(:self_managed_prometheus_alert_events) }
 
     it_behaves_like 'model with repository' do
       let_it_be(:container) { create(:project, :repository, path: 'somewhere') }
@@ -1401,6 +1404,22 @@ describe Project do
 
       expect(project.repository_storage).to eq('picked')
     end
+
+    it 'picks from the latest available storage', :request_store do
+      stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
+      Gitlab::CurrentSettings.current_application_settings
+
+      settings = ApplicationSetting.last
+      settings.repository_storages = %w(picked)
+      settings.save!
+
+      expect(Gitlab::CurrentSettings.repository_storages).to eq(%w(default))
+
+      project
+
+      expect(project.repository.storage).to eq('picked')
+      expect(Gitlab::CurrentSettings.repository_storages).to eq(%w(picked))
+    end
   end
 
   context 'shared runners by default' do
@@ -1740,7 +1759,7 @@ describe Project do
       expect(described_class.search(project.path.upcase)).to eq([project])
     end
 
-    context 'by full path' do
+    context 'when include_namespace is true' do
       let_it_be(:group) { create(:group) }
       let_it_be(:project) { create(:project, group: group) }
 
@@ -1750,11 +1769,11 @@ describe Project do
         end
 
         it 'returns projects that match the group path' do
-          expect(described_class.search(group.path)).to eq([project])
+          expect(described_class.search(group.path, include_namespace: true)).to eq([project])
         end
 
         it 'returns projects that match the full path' do
-          expect(described_class.search(project.full_path)).to eq([project])
+          expect(described_class.search(project.full_path, include_namespace: true)).to eq([project])
         end
       end
 
@@ -1764,11 +1783,11 @@ describe Project do
         end
 
         it 'returns no results when searching by group path' do
-          expect(described_class.search(group.path)).to be_empty
+          expect(described_class.search(group.path, include_namespace: true)).to be_empty
         end
 
         it 'returns no results when searching by full path' do
-          expect(described_class.search(project.full_path)).to be_empty
+          expect(described_class.search(project.full_path, include_namespace: true)).to be_empty
         end
       end
     end
@@ -2335,6 +2354,63 @@ describe Project do
 
         expect(RepositoryImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
         expect(project.add_import_job).to eq(import_jid)
+      end
+    end
+
+    context 'jira import' do
+      it 'schedules a jira import job' do
+        project = create(:project, import_type: 'jira')
+
+        expect(Gitlab::JiraImport::Stage::StartImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
+        expect(project.add_import_job).to eq(import_jid)
+      end
+    end
+  end
+
+  describe '#jira_import?' do
+    subject(:project) { build(:project, import_type: 'jira') }
+
+    it { expect(project.jira_import?).to be true }
+    it { expect(project.import?).to be true }
+  end
+
+  describe '#jira_force_import?' do
+    let(:imported_jira_project) do
+      JiraImportData::JiraProjectDetails.new('xx', Time.now.strftime('%Y-%m-%d %H:%M:%S'), { user_id: 1, name: 'root' })
+    end
+    let(:jira_import_data) do
+      data = JiraImportData.new
+      data << imported_jira_project
+      data.force_import!
+      data
+    end
+
+    subject(:project) { build(:project, import_type: 'jira', import_data: jira_import_data) }
+
+    it { expect(project.jira_force_import?).to be true }
+  end
+
+  describe '#remove_import_data' do
+    let(:import_data) { ProjectImportData.new(data: { 'test' => 'some data' }) }
+
+    context 'when jira import' do
+      let!(:project) { create(:project, import_type: 'jira', import_data: import_data) }
+
+      it 'does not remove import data' do
+        expect(project.mirror?).to be false
+        expect(project.jira_import?).to be true
+        expect { project.remove_import_data }.not_to change { ProjectImportData.count }
+      end
+    end
+
+    context 'when not mirror neither jira import' do
+      let(:user) { create(:user) }
+      let!(:project) { create(:project, import_type: 'github', import_data: import_data) }
+
+      it 'removes import data' do
+        expect(project.mirror?).to be false
+        expect(project.jira_import?).to be false
+        expect { project.remove_import_data }.to change { ProjectImportData.count }.by(-1)
       end
     end
   end

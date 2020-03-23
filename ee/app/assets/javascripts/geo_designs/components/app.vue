@@ -28,16 +28,16 @@ export default {
     },
   },
   computed: {
-    ...mapState(['isLoading', 'totalDesigns']),
-    hasDesigns() {
-      return this.totalDesigns > 0;
+    ...mapState(['isLoading', 'totalReplicableItems']),
+    hasReplicableItems() {
+      return this.totalReplicableItems > 0;
     },
   },
   created() {
-    this.fetchDesigns();
+    this.fetchReplicableItems();
   },
   methods: {
-    ...mapActions(['fetchDesigns']),
+    ...mapActions(['fetchReplicableItems']),
   },
 };
 </script>
@@ -47,7 +47,7 @@ export default {
     <geo-designs-filter-bar />
     <gl-loading-icon v-if="isLoading" size="xl" />
     <template v-else>
-      <geo-designs v-if="hasDesigns" />
+      <geo-designs v-if="hasReplicableItems" />
       <geo-designs-empty-state
         v-else
         :issues-svg-path="issuesSvgPath"

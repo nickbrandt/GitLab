@@ -22,23 +22,19 @@ export default {
       return (
         this.canManageLicenses &&
         this.currentLicenseInModal &&
-        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.APPROVED
+        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.ALLOWED
       );
     },
     canBlacklist() {
       return (
         this.canManageLicenses &&
         this.currentLicenseInModal &&
-        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.BLACKLISTED
+        this.currentLicenseInModal.approvalStatus !== LICENSE_APPROVAL_STATUS.DENIED
       );
     },
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, [
-      'resetLicenseInModal',
-      'approveLicense',
-      'blacklistLicense',
-    ]),
+    ...mapActions(LICENSE_MANAGEMENT, ['resetLicenseInModal', 'allowLicense', 'denyLicense']),
   },
 };
 </script>
@@ -97,7 +93,7 @@ export default {
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
         data-qa-selector="blacklist_license_button"
-        @click="blacklistLicense(currentLicenseInModal)"
+        @click="denyLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseCompliance|Deny') }}
       </button>
@@ -107,7 +103,7 @@ export default {
         class="btn btn-success js-modal-primary-action"
         data-dismiss="modal"
         data-qa-selector="approve_license_button"
-        @click="approveLicense(currentLicenseInModal)"
+        @click="allowLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseCompliance|Allow') }}
       </button>

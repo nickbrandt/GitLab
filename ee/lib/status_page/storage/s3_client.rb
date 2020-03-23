@@ -25,6 +25,17 @@ module StatusPage
         true
       end
 
+      # Deletes +key+ from storage
+      #
+      # Note, this operation succeeds even if +key+ does not exist in storage.
+      def delete_object(key)
+        wrap_errors(key: key) do
+          client.delete_object(bucket: bucket_name, key: key)
+        end
+
+        true
+      end
+
       private
 
       attr_reader :client, :bucket_name

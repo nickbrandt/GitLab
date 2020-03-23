@@ -2,7 +2,7 @@ import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import InstanceSecurityDashboard from 'ee/security_dashboard/components/instance_security_dashboard.vue';
-import SecurityDashboard from 'ee/security_dashboard/components/app.vue';
+import SecurityDashboard from 'ee/security_dashboard/components/security_dashboard.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 
 const localVue = createLocalVue();

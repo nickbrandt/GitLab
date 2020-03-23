@@ -4,7 +4,6 @@ import {
   ADD_IMAGE_DIFF_NOTE_ERROR,
   UPDATE_IMAGE_DIFF_NOTE_ERROR,
   ADD_DISCUSSION_COMMENT_ERROR,
-  UPLOAD_DESIGN_ERROR,
   designDeletionError,
 } from './error_messages';
 
@@ -73,7 +72,7 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables, d
       {
         __typename: 'UserEdge',
         node: {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           __typename: 'User',
           ...createNote.note.author,
         },
@@ -101,7 +100,7 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
     __typename: 'DiscussionEdge',
     node: {
       // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      // eslint-disable-next-line @gitlab/require-i18n-strings
       __typename: 'Discussion',
       id: createImageDiffNote.note.discussion.id,
       replyId: createImageDiffNote.note.discussion.replyId,
@@ -129,7 +128,7 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) =
       {
         __typename: 'UserEdge',
         node: {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           __typename: 'User',
           ...createImageDiffNote.note.author,
         },
@@ -292,7 +291,7 @@ export const updateStoreAfterUpdateImageDiffNote = (store, data, query, queryVar
 
 export const updateStoreAfterUploadDesign = (store, data, query) => {
   if (hasErrors(data)) {
-    onError(data, UPLOAD_DESIGN_ERROR);
+    onError(data, data.errors[0]);
   } else {
     addNewDesignToStore(store, data, query);
   }

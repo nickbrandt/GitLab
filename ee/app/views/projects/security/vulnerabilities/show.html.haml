@@ -4,22 +4,7 @@
 - page_title @vulnerability.title
 - page_description @vulnerability.description
 
-.detail-page-header.align-items-center
-  .detail-page-header-body
-    .issuable-status-box.status-box.status-box-open.closed
-      %span= @vulnerability.state
-    - if @pipeline
-      %span#js-pipeline-created
-        - timeago = time_ago_with_tooltip(@pipeline.created_at)
-        - pipeline_link = '<a href="%{url}">%{id}</a>'.html_safe % { url: pipeline_url(@pipeline), id: @pipeline.id }
-        = _('Detected %{timeago} in pipeline %{pipeline_link}').html_safe % { pipeline_link: pipeline_link, timeago: timeago }
-    - else
-      %span#js-vulnerability-created
-        = time_ago_with_tooltip(@vulnerability.created_at)
-  %label.mb-0.mr-2= _('Status')
-  #js-vulnerability-show-header{ data: { vulnerability: @vulnerability.to_json,
-    finding: @vulnerability.finding.to_json,
-    create_issue_url: create_vulnerability_feedback_issue_path(@vulnerability.finding.project) } }
+#js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline) }
 
 .issue-details.issuable-details
   .detail-page-description.content-block

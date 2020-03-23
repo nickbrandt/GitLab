@@ -3,13 +3,13 @@ import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/consta
 export const approvedLicense = {
   id: 5,
   name: 'MIT',
-  approvalStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+  approvalStatus: LICENSE_APPROVAL_STATUS.ALLOWED,
 };
 
 export const blacklistedLicense = {
   id: 6,
   name: 'New BSD',
-  approvalStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED,
+  approvalStatus: LICENSE_APPROVAL_STATUS.DENIED,
 };
 
 export const licenseReport = [

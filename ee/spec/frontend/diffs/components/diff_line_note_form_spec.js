@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import DiffLineNoteForm from '~/diffs/components/diff_line_note_form.vue';
 import NoteForm from '~/notes/components/note_form.vue';
 import diffFileMockData from 'jest/diffs/mock_data/diff_file';
-import note from '../../notes/mock_data';
+import note from 'jest/notes/mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

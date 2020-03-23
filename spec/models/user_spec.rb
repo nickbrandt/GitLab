@@ -3134,6 +3134,8 @@ describe User, :do_not_mock_admin_mode do
       expect(ghost).to be_persisted
       expect(ghost.namespace).not_to be_nil
       expect(ghost.namespace).to be_persisted
+      expect(ghost.user_type).to eq 'ghost'
+      expect(ghost.ghost).to eq true
     end
 
     it "does not create a second ghost user if one is already present" do
@@ -4244,12 +4246,12 @@ describe User, :do_not_mock_admin_mode do
     let!(:non_internal) { [user] }
     let!(:internal) { [ghost, alert_bot] }
 
-    it 'returns non internal users' do
+    it 'returns internal users' do
       expect(described_class.internal).to eq(internal)
       expect(internal.all?(&:internal?)).to eq(true)
     end
 
-    it 'returns internal users' do
+    it 'returns non internal users' do
       expect(described_class.non_internal).to eq(non_internal)
       expect(non_internal.all?(&:internal?)).to eq(false)
     end
@@ -4333,6 +4335,29 @@ describe User, :do_not_mock_admin_mode do
       let(:user) { create(:user, job_title: 'Engineer') }
 
       it { expect(user.user_detail).to be_persisted }
+    end
+  end
+
+  describe '#gitlab_employee?' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { user.gitlab_employee? }
+
+    where(:email, :is_com, :expected_result) do
+      'test@gitlab.com'   | true  | true
+      'test@example.com'  | true  | false
+      'test@gitlab.com'   | false | false
+      'test@example.com'  | false | false
+    end
+
+    with_them do
+      let(:user) { build(:user, email: email) }
+
+      before do
+        allow(Gitlab).to receive(:com?).and_return(is_com)
+      end
+
+      it { is_expected.to be expected_result }
     end
   end
 end

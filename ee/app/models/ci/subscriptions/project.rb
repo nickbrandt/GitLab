@@ -5,7 +5,7 @@ module Ci
     class Project < ApplicationRecord
       include ::Limitable
 
-      self.table_name = "ci_subscriptions_projects"
+      self.table_name = 'ci_subscriptions_projects'
 
       self.limit_name = 'ci_project_subscriptions'
       self.limit_scope = :upstream_project

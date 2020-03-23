@@ -9,5 +9,15 @@ FactoryBot.modify do
       action { Event::CREATED }
       project { nil }
     end
+
+    trait :for_design do
+      transient do
+        design { create(:design, issue: create(:issue, project: project)) }
+        note { create(:note, project: project, noteable: design) }
+      end
+
+      action { Event::COMMENTED }
+      target { note }
+    end
   end
 end

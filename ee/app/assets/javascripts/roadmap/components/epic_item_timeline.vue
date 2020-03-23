@@ -191,7 +191,7 @@ export default {
       </a>
       <gl-popover
         :target="`epic-bar-${epic.id}`"
-        :title="epic.description"
+        :title="epic.title"
         triggers="hover focus"
         placement="right"
       >

@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { flatten } from 'lodash';
 import dateFormat from 'dateformat';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import { median } from '~/lib/utils/number_utils';
@@ -134,7 +134,7 @@ export const getScatterPlotData = (data, startDate, endDate) => {
   const visibleData = data.slice(startIndex);
 
   // group by date
-  const result = _.flatten(visibleData).map(item => [
+  const result = flatten(visibleData).map(item => [
     dateFormat(item.merged_at, dateFormats.isoDate),
     item.metric,
     item.merged_at,
@@ -175,7 +175,7 @@ export const getMedianLineData = (data, startDate, endDate, daysOffset) => {
     startIndex = i - daysOffset - 1;
     if (transformedData[startIndex] && transformedData[i - 1]) {
       medianData = transformedData.slice(startIndex, i);
-      flattenedData = _.flatten(medianData);
+      flattenedData = flatten(medianData);
       if (flattenedData.length) {
         d = getDateInPast(endDate, len - i).toISOString();
         result.push([dateFormat(d, dateFormats.isoDate), median(flattenedData)]);

@@ -1,5 +1,5 @@
 <script>
-import { escape } from 'underscore';
+import { escape as esc } from 'lodash';
 import { mapState } from 'vuex';
 import { __, sprintf, n__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
@@ -25,7 +25,7 @@ export default {
   methods: {
     getTimeAgoString(createdAt) {
       return sprintf(__('opened %{timeAgo}'), {
-        timeAgo: escape(getTimeago().format(createdAt)),
+        timeAgo: esc(getTimeago().format(createdAt)),
       });
     },
     showReviewTime(value) {

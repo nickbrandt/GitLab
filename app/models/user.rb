@@ -21,6 +21,8 @@ class User < ApplicationRecord
   include OptionallySearch
   include FromUnion
   include BatchDestroyDependentAssociations
+  include HasUniqueInternalUsers
+  include IgnorableColumns
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
@@ -59,8 +61,9 @@ class User < ApplicationRecord
 
   MINIMUM_INACTIVE_DAYS = 180
 
-  enum bot_type: ::UserBotTypeEnums.bots
   enum user_type: ::UserTypeEnums.types
+
+  ignore_column :bot_type, remove_with: '12.11', remove_after: '2020-04-22'
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -337,8 +340,9 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
-  scope :bots, -> { where.not(bot_type: nil) }
-  scope :humans, -> { where(user_type: nil, bot_type: nil) }
+  scope :bots, -> { where(user_type: UserTypeEnums.bots.values) }
+  scope :not_bots, -> { humans.or(where.not(user_type: UserTypeEnums.bots.values)) }
+  scope :humans, -> { where(user_type: nil) }
 
   scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
     where('EXISTS (?)',
@@ -609,7 +613,7 @@ class User < ApplicationRecord
     # owns records previously belonging to deleted users.
     def ghost
       email = 'ghost%s@example.com'
-      unique_internal(where(ghost: true), 'ghost', email) do |u|
+      unique_internal(where(ghost: true, user_type: :ghost), 'ghost', email) do |u|
         u.bio = _('This is a "Ghost User", created to hold all issues authored by users that have since been deleted. This user cannot be removed.')
         u.name = 'Ghost User'
       end
@@ -618,7 +622,7 @@ class User < ApplicationRecord
     def alert_bot
       email_pattern = "alert%s@#{Settings.gitlab.host}"
 
-      unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+      unique_internal(where(user_type: :alert_bot), 'alert-bot', email_pattern) do |u|
         u.bio = 'The GitLab alert bot'
         u.name = 'GitLab Alert Bot'
       end
@@ -640,11 +644,18 @@ class User < ApplicationRecord
   end
 
   def bot?
-    bot_type.present?
+    UserTypeEnums.bots.has_key?(user_type)
   end
 
   def internal?
     ghost? || bot?
+  end
+
+  # We are transitioning from ghost boolean column to user_type
+  # so we need to read from old column for now
+  # @see https://gitlab.com/gitlab-org/gitlab/-/issues/210025
+  def ghost?
+    ghost
   end
 
   def self.internal
@@ -652,7 +663,7 @@ class User < ApplicationRecord
   end
 
   def self.non_internal
-    without_ghosts.humans
+    without_ghosts.not_bots
   end
 
   #
@@ -1672,8 +1683,15 @@ class User < ApplicationRecord
     callouts.any?
   end
 
-  # @deprecated
-  alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
+  def gitlab_employee?
+    strong_memoize(:gitlab_employee) do
+      if Gitlab.com?
+        Mail::Address.new(email).domain == "gitlab.com"
+      else
+        false
+      end
+    end
+  end
 
   protected
 
@@ -1778,48 +1796,6 @@ class User < ApplicationRecord
     if Gitlab::UntrustedRegexp.new(restrictions).match?(email)
       errors.add(:email, _('is not allowed for sign-up'))
     end
-  end
-
-  def self.unique_internal(scope, username, email_pattern, &block)
-    scope.first || create_unique_internal(scope, username, email_pattern, &block)
-  end
-
-  def self.create_unique_internal(scope, username, email_pattern, &creation_block)
-    # Since we only want a single one of these in an instance, we use an
-    # exclusive lease to ensure than this block is never run concurrently.
-    lease_key = "user:unique_internal:#{username}"
-    lease = Gitlab::ExclusiveLease.new(lease_key, timeout: 1.minute.to_i)
-
-    until uuid = lease.try_obtain
-      # Keep trying until we obtain the lease. To prevent hammering Redis too
-      # much we'll wait for a bit between retries.
-      sleep(1)
-    end
-
-    # Recheck if the user is already present. One might have been
-    # added between the time we last checked (first line of this method)
-    # and the time we acquired the lock.
-    existing_user = uncached { scope.first }
-    return existing_user if existing_user.present?
-
-    uniquify = Uniquify.new
-
-    username = uniquify.string(username) { |s| User.find_by_username(s) }
-
-    email = uniquify.string(-> (n) { Kernel.sprintf(email_pattern, n) }) do |s|
-      User.find_by_email(s)
-    end
-
-    user = scope.build(
-      username: username,
-      email: email,
-      &creation_block
-    )
-
-    Users::UpdateService.new(user, user: user).execute(validate: false) # rubocop: disable CodeReuse/ServiceClass
-    user
-  ensure
-    Gitlab::ExclusiveLease.cancel(lease_key, uuid)
   end
 
   def groups_with_developer_maintainer_project_access

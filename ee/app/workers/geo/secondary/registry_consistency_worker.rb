@@ -48,7 +48,12 @@ module Geo
       end
 
       def registry_classes
-        @registry_classes ||= REGISTRY_CLASSES.select(&:registry_consistency_worker_enabled?)
+        @registry_classes ||= REGISTRY_CLASSES.select do |registry_class|
+          # Defaults on. This check gives registry classes the opportunity to
+          # disable this worker, e.g. with a feature flag.
+          !registry_class.respond_to?(:registry_consistency_worker_enabled?) ||
+            registry_class.registry_consistency_worker_enabled?
+        end
       end
     end
   end

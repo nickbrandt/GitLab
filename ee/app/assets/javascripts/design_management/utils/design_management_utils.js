@@ -1,4 +1,4 @@
-import { uniqueId } from 'underscore';
+import { uniqueId } from 'lodash';
 import { VALID_DESIGN_FILE_MIMETYPE } from '../constants';
 
 export const isValidDesignFile = ({ type }) =>
@@ -49,7 +49,7 @@ export const extractDesign = data => data.project.issue.designCollection.designs
 export const designUploadOptimisticResponse = files => {
   const designs = files.map(file => ({
     // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+    // eslint-disable-next-line @gitlab/require-i18n-strings
     __typename: 'Design',
     id: -uniqueId(),
     image: '',
@@ -82,7 +82,7 @@ export const designUploadOptimisticResponse = files => {
 
   return {
     // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+    // eslint-disable-next-line @gitlab/require-i18n-strings
     __typename: 'Mutation',
     designManagementUpload: {
       __typename: 'DesignManagementUploadPayload',
@@ -99,7 +99,7 @@ export const designUploadOptimisticResponse = files => {
  */
 export const updateImageDiffNoteOptimisticResponse = (note, { position }) => ({
   // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   __typename: 'Mutation',
   updateImageDiffNote: {
     __typename: 'UpdateImageDiffNotePayload',

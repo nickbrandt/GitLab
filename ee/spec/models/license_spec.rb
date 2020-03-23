@@ -737,6 +737,20 @@ describe License do
     end
   end
 
+  describe '#edition' do
+    let(:ultimate) { build(:license, plan: 'ultimate') }
+    let(:premium) { build(:license, plan: 'premium') }
+    let(:starter) { build(:license, plan: 'starter') }
+    let(:old) { build(:license, plan: 'other') }
+
+    it 'have expected values' do
+      expect(ultimate.edition).to eq('EEU')
+      expect(premium.edition).to eq('EEP')
+      expect(starter.edition).to eq('EES')
+      expect(old.edition).to eq('EE')
+    end
+  end
+
   def set_restrictions(opts)
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],

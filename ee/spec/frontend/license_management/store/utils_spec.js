@@ -48,15 +48,13 @@ describe('utils', () => {
 
   describe('getStatusTranslationsFromLicenseStatus', () => {
     it('returns "Allowed" for allowed license status', () => {
-      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.APPROVED)).toBe(
+      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.ALLOWED)).toBe(
         'Allowed',
       );
     });
 
     it('returns "Denied" status for denied license status', () => {
-      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.BLACKLISTED)).toBe(
-        'Denied',
-      );
+      expect(getStatusTranslationsFromLicenseStatus(LICENSE_APPROVAL_STATUS.DENIED)).toBe('Denied');
     });
 
     it('returns "" for any other status', () => {
@@ -66,15 +64,11 @@ describe('utils', () => {
 
   describe('getIssueStatusFromLicenseStatus', () => {
     it('returns SUCCESS status for approved license status', () => {
-      expect(getIssueStatusFromLicenseStatus(LICENSE_APPROVAL_STATUS.APPROVED)).toBe(
-        STATUS_SUCCESS,
-      );
+      expect(getIssueStatusFromLicenseStatus(LICENSE_APPROVAL_STATUS.ALLOWED)).toBe(STATUS_SUCCESS);
     });
 
-    it('returns FAILED status for blacklisted licensens', () => {
-      expect(getIssueStatusFromLicenseStatus(LICENSE_APPROVAL_STATUS.BLACKLISTED)).toBe(
-        STATUS_FAILED,
-      );
+    it('returns FAILED status for blacklisted licenses', () => {
+      expect(getIssueStatusFromLicenseStatus(LICENSE_APPROVAL_STATUS.DENIED)).toBe(STATUS_FAILED);
     });
 
     it('returns NEUTRAL status for undefined', () => {
@@ -87,7 +81,7 @@ describe('utils', () => {
       name: 'license',
       classification: {
         id: 1,
-        approval_status: LICENSE_APPROVAL_STATUS.APPROVED,
+        approval_status: LICENSE_APPROVAL_STATUS.ALLOWED,
       },
       dependencies: [{ id: 1 }, { id: 2 }, { id: 3 }],
     };

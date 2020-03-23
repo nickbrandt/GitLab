@@ -14,7 +14,7 @@ describe('GeoDesigns', () => {
 
   const actionSpies = {
     setPage: jest.fn(),
-    fetchDesigns: jest.fn(),
+    fetchReplicableItems: jest.fn(),
   };
 
   const createComponent = () => {
@@ -45,10 +45,10 @@ describe('GeoDesigns', () => {
     });
 
     describe('GlPagination', () => {
-      describe('when pageSize >= totalDesigns', () => {
+      describe('when pageSize >= totalReplicableItems', () => {
         beforeEach(() => {
           wrapper.vm.$store.state.pageSize = 2;
-          wrapper.vm.$store.state.totalDesigns = 1;
+          wrapper.vm.$store.state.totalReplicableItems = 1;
         });
 
         it('is hidden', () => {
@@ -56,10 +56,10 @@ describe('GeoDesigns', () => {
         });
       });
 
-      describe('when pageSize < totalDesigns', () => {
+      describe('when pageSize < totalReplicableItems', () => {
         beforeEach(() => {
           wrapper.vm.$store.state.pageSize = 1;
-          wrapper.vm.$store.state.totalDesigns = 2;
+          wrapper.vm.$store.state.totalReplicableItems = 2;
         });
 
         it('renders', () => {
@@ -70,15 +70,15 @@ describe('GeoDesigns', () => {
 
     describe('GeoDesign', () => {
       beforeEach(() => {
-        wrapper.vm.$store.state.designs = MOCK_BASIC_FETCH_DATA_MAP.data;
+        wrapper.vm.$store.state.replicableItems = MOCK_BASIC_FETCH_DATA_MAP.data;
       });
 
       it('renders an instance for each design in the store', () => {
         const designWrappers = findGeoDesign();
-        const designs = [...wrapper.vm.$store.state.designs];
+        const replicableItems = [...wrapper.vm.$store.state.replicableItems];
 
         for (let i = 0; i < designWrappers.length; i += 1) {
-          expect(designWrappers.at(i).props().projectId).toBe(designs[i].projectId);
+          expect(designWrappers.at(i).props().projectId).toBe(replicableItems[i].projectId);
         }
       });
     });
@@ -94,8 +94,8 @@ describe('GeoDesigns', () => {
       expect(actionSpies.setPage).toHaveBeenCalledWith(2);
     });
 
-    it('should call fetchDesigns', () => {
-      expect(actionSpies.fetchDesigns).toHaveBeenCalled();
+    it('should call fetchReplicableItems', () => {
+      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 });

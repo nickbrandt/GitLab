@@ -14,6 +14,8 @@ module EE
         mount_mutation ::Mutations::Epics::Create
         mount_mutation ::Mutations::Epics::SetSubscription
         mount_mutation ::Mutations::Epics::AddIssue
+        mount_mutation ::Mutations::Requirements::Create
+        mount_mutation ::Mutations::Requirements::Update
       end
     end
   end

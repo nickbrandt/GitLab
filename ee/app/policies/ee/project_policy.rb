@@ -124,6 +124,11 @@ module EE
         @subject.feature_available?(:code_review_analytics, @user)
       end
 
+      condition(:status_page_available) do
+        @subject.feature_available?(:status_page, @user) &&
+          @subject.beta_feature_available?(:status_page)
+      end
+
       condition(:group_timelogs_available) do
         @subject.feature_available?(:group_timelogs)
       end
@@ -193,6 +198,7 @@ module EE
       rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
         enable :create_vulnerability
+        enable :create_vulnerability_export
         enable :admin_vulnerability
         enable :admin_vulnerability_issue_link
       end
@@ -366,6 +372,8 @@ module EE
       end
 
       rule { requirements_available & owner }.enable :destroy_requirement
+
+      rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
     end
 
     override :lookup_access_level!

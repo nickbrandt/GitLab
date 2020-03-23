@@ -362,6 +362,21 @@ describe API::Projects do
         end
       end
 
+      context 'and using search and search_namespaces is true' do
+        let(:group) { create(:group) }
+        let!(:project_in_group) { create(:project, group: group) }
+
+        before do
+          group.add_guest(user)
+        end
+
+        it_behaves_like 'projects response' do
+          let(:filter) { { search: group.name, search_namespaces: true } }
+          let(:current_user) { user }
+          let(:projects) { [project_in_group] }
+        end
+      end
+
       context 'and using id_after' do
         it_behaves_like 'projects response' do
           let(:filter) { { id_after: project2.id } }
@@ -726,6 +741,7 @@ describe API::Projects do
         issues_enabled: false,
         jobs_enabled: false,
         merge_requests_enabled: false,
+        forking_access_level: 'disabled',
         wiki_enabled: false,
         resolve_outdated_diff_discussions: false,
         remove_source_branch_after_merge: true,
@@ -1400,6 +1416,7 @@ describe API::Projects do
         expect(json_response['repository_access_level']).to be_present
         expect(json_response['issues_access_level']).to be_present
         expect(json_response['merge_requests_access_level']).to be_present
+        expect(json_response['forking_access_level']).to be_present
         expect(json_response['wiki_access_level']).to be_present
         expect(json_response['builds_access_level']).to be_present
         expect(json_response).to have_key('emails_disabled')

@@ -8,7 +8,6 @@ module Elastic
       ES_ROUTING_MAX_COUNT = 128
 
       def routing_options(options)
-        return {} if Feature.disabled?(:elasticsearch_use_routing)
         return {} if options[:public_and_internal_projects]
 
         ids = if options[:project_id]

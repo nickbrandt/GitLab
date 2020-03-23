@@ -4,13 +4,13 @@ module StatusPage
   # Render a list of issues as incidents and publish them to CDN.
   #
   # This is an internal service which is part of
-  # +StatusPage::PublishIncidentService+ and is not meant to be called directly.
+  # +StatusPage::PublishService+ and is not meant to be called directly.
   #
-  # Consider calling +StatusPage::PublishIncidentService+ instead.
+  # Consider calling +StatusPage::PublishService+ instead.
   class PublishListService < PublishBaseService
     private
 
-    def publish(issues)
+    def process(issues)
       json = serialize(issues)
 
       upload(object_key, json)

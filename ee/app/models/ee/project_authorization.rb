@@ -13,8 +13,8 @@ module EE
         pluck(:user_id)
       end
 
-      # Get amout of users with highest role they have.
-      # If John is developer in one project but maintainer in another he will be
+      # Get amount of users with highest role they have.
+      # If John is a developer in one project but maintainer in another he will be
       # counted once as maintainer. This is needed to count users who don't use
       # functionality available to higher roles only.
       #

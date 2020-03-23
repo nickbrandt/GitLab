@@ -10,8 +10,8 @@ module Groups
     before_action :check_epics_available!
     before_action :persist_roadmap_layout, only: [:show]
     before_action do
-      push_frontend_feature_flag(:roadmap_graphql, @group)
-      push_frontend_feature_flag(:unfiltered_epic_aggregates, @group)
+      push_frontend_feature_flag(:roadmap_graphql, @group, default_enabled: true)
+      push_frontend_feature_flag(:unfiltered_epic_aggregates, @group, default_enabled: true)
       push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
       push_frontend_feature_flag(:milestones_in_roadmap, @group)
     end

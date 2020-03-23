@@ -6,7 +6,7 @@ module Metrics
   module Dashboard
     class CloneDashboardService < ::BaseService
       ALLOWED_FILE_TYPE = '.yml'
-      USER_DASHBOARDS_DIR = ::Metrics::Dashboard::ProjectDashboardService::DASHBOARD_ROOT
+      USER_DASHBOARDS_DIR = ::Metrics::Dashboard::CustomDashboardService::DASHBOARD_ROOT
 
       class << self
         def allowed_dashboard_templates
@@ -16,7 +16,7 @@ module Metrics
         def sequences
           @sequences ||= {
             ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => [::Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
-                                                                             ::Gitlab::Metrics::Dashboard::Stages::ProjectMetricsInserter,
+                                                                             ::Gitlab::Metrics::Dashboard::Stages::CustomMetricsInserter,
                                                                              ::Gitlab::Metrics::Dashboard::Stages::Sorter].freeze
           }.freeze
         end
@@ -52,7 +52,7 @@ module Metrics
       def dashboard_details
         {
           path: new_dashboard_path,
-          display_name: ::Metrics::Dashboard::ProjectDashboardService.name_for_path(new_dashboard_path),
+          display_name: ::Metrics::Dashboard::CustomDashboardService.name_for_path(new_dashboard_path),
           default: false,
           system_dashboard: false
         }

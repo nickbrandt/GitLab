@@ -22,7 +22,7 @@ describe('AddLicenseForm', () => {
     it('clicking the Submit button submits the data and closes the form', done => {
       const name = 'LICENSE_TEST';
       jest.spyOn(vm, '$emit').mockImplementation(() => {});
-      vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+      vm.approvalStatus = LICENSE_APPROVAL_STATUS.ALLOWED;
       vm.licenseName = name;
 
       Vue.nextTick(() => {
@@ -30,7 +30,7 @@ describe('AddLicenseForm', () => {
         linkEl.click();
 
         expect(vm.$emit).toHaveBeenCalledWith('addLicense', {
-          newStatus: LICENSE_APPROVAL_STATUS.APPROVED,
+          newStatus: LICENSE_APPROVAL_STATUS.ALLOWED,
           license: { name },
         });
 
@@ -58,7 +58,7 @@ describe('AddLicenseForm', () => {
 
       it('is true if the licenseName is empty', () => {
         vm.licenseName = '';
-        vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+        vm.approvalStatus = LICENSE_APPROVAL_STATUS.ALLOWED;
 
         expect(vm.submitDisabled).toBe(true);
       });
@@ -66,7 +66,7 @@ describe('AddLicenseForm', () => {
       it('is true if the entered license is duplicated', () => {
         vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
         vm.licenseName = 'FOO';
-        vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+        vm.approvalStatus = LICENSE_APPROVAL_STATUS.ALLOWED;
 
         expect(vm.submitDisabled).toBe(true);
       });

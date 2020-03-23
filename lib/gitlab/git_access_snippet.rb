@@ -39,11 +39,11 @@ module Gitlab
 
     override :check_project!
     def check_project!(cmd, changes)
-      if snippet.is_a?(ProjectSnippet)
-        check_namespace!
-        check_project_accessibility!
-        # TODO add add_project_moved_message! to handle non-project repo https://gitlab.com/gitlab-org/gitlab/issues/205646
-      end
+      return unless snippet.is_a?(ProjectSnippet)
+
+      check_namespace!
+      check_project_accessibility!
+      add_project_moved_message!
     end
 
     override :check_push_access!
@@ -97,9 +97,11 @@ module Gitlab
     end
 
     def check_single_change_access(change)
-      change_access = Checks::SnippetCheck.new(change, logger: logger)
+      Checks::SnippetCheck.new(change, logger: logger).validate!
 
-      change_access.exec
+      if Feature.enabled?(:snippet_count_check)
+        Checks::PushFileCountCheck.new(change, repository: repository, limit: Snippet::MAX_FILE_COUNT, logger: logger).validate!
+      end
     rescue Checks::TimedLogger::TimeoutError
       raise TimeoutError, logger.full_message
     end

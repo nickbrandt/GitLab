@@ -6,6 +6,8 @@ module EE
 
     include ::Gitlab::Utils::StrongMemoize
 
+    LIMIT_METRIC_TYPES = %w[all_metrics issue_count issue_weights].freeze
+
     # ActiveSupport::Concern does not prepend the ClassMethods,
     # so we cannot call `super` if we use it.
     def self.prepended(base)
@@ -24,6 +26,11 @@ module EE
       base.validates :milestone_id, uniqueness: { scope: :board_id }, if: :milestone?
       base.validates :max_issue_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
       base.validates :max_issue_weight, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+      base.validates :limit_metric, inclusion: {
+          in: LIMIT_METRIC_TYPES,
+          allow_blank: true,
+          allow_nil: true
+      }
       base.validates :list_type,
         exclusion: { in: %w[assignee], message: _('Assignee lists not available with your current license') },
         unless: -> { board&.resource_parent&.feature_available?(:board_assignee_lists) }

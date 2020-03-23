@@ -27,62 +27,40 @@ describe Elastic::Latest::Routing do
   end
 
   describe '#routing_options' do
-    include StubFeatureFlags
-
-    context 'when feature flag is enabled' do
-      before do
-        stub_feature_flags(elasticsearch_use_routing: true)
-      end
-
-      it 'returns correct options for project_id' do
-        expect(subject.routing_options({ project_id: 1 })).to eq({ routing: 'project_1' })
-      end
-
-      it 'returns correct options for repository_id' do
-        expect(subject.routing_options({ repository_id: 1 })).to eq({ routing: 'project_1' })
-      end
-
-      it 'returns correct options for project_ids' do
-        expect(subject.routing_options({ project_ids: project_ids })).to eq({ routing: project_routing })
-      end
-
-      it 'returns empty hash when provided an empty array' do
-        expect(subject.routing_options({ project_ids: [] })).to eq({})
-      end
-
-      it 'returns empty hash when provided :any to project_ids' do
-        expect(subject.routing_options({ project_ids: :any })).to eq({})
-      end
-
-      it 'returns empty hash when public projects flag is passed' do
-        expect(subject.routing_options({ project_ids: project_ids, public_and_internal_projects: true })).to eq({})
-      end
-
-      it 'uses project_ids rather than repository_id when both are supplied' do
-        options = { project_ids: project_ids, repository_id: 'wiki_5' }
-
-        expect(subject.routing_options(options)).to eq({ routing: project_routing })
-      end
-
-      it 'returns empty hash when there are too many project_ids' do
-        max_count = included_class::ES_ROUTING_MAX_COUNT
-
-        expect(subject.routing_options({ project_ids: 1.upto(max_count + 1).to_a })).to eq({})
-      end
+    it 'returns correct options for project_id' do
+      expect(subject.routing_options({ project_id: 1 })).to eq({ routing: 'project_1' })
     end
 
-    context 'when feature flag is disabled' do
-      before do
-        stub_feature_flags(elasticsearch_use_routing: false)
-      end
+    it 'returns correct options for repository_id' do
+      expect(subject.routing_options({ repository_id: 1 })).to eq({ routing: 'project_1' })
+    end
 
-      it 'returns empty hash for project_ids' do
-        expect(subject.routing_options({ project_ids: project_ids })).to eq({})
-      end
+    it 'returns correct options for project_ids' do
+      expect(subject.routing_options({ project_ids: project_ids })).to eq({ routing: project_routing })
+    end
 
-      it 'returns empty hash for empty options' do
-        expect(subject.routing_options({})).to eq({})
-      end
+    it 'returns empty hash when provided an empty array' do
+      expect(subject.routing_options({ project_ids: [] })).to eq({})
+    end
+
+    it 'returns empty hash when provided :any to project_ids' do
+      expect(subject.routing_options({ project_ids: :any })).to eq({})
+    end
+
+    it 'returns empty hash when public projects flag is passed' do
+      expect(subject.routing_options({ project_ids: project_ids, public_and_internal_projects: true })).to eq({})
+    end
+
+    it 'uses project_ids rather than repository_id when both are supplied' do
+      options = { project_ids: project_ids, repository_id: 'wiki_5' }
+
+      expect(subject.routing_options(options)).to eq({ routing: project_routing })
+    end
+
+    it 'returns empty hash when there are too many project_ids' do
+      max_count = included_class::ES_ROUTING_MAX_COUNT
+
+      expect(subject.routing_options({ project_ids: 1.upto(max_count + 1).to_a })).to eq({})
     end
   end
 end

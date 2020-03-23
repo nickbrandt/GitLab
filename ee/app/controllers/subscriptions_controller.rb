@@ -24,11 +24,13 @@ class SubscriptionsController < ApplicationController
 
   def new
     if experiment_enabled?(:paid_signup_flow)
+      track_paid_signup_flow_event('start_experiment') unless experiment_already_started?
+
       if current_user
         track_paid_signup_flow_event('start')
       else
-        store_location_for :user, request.fullpath
-        redirect_to new_user_registration_path
+        store_location_for_user
+        redirect_to new_user_registration_path(redirect_from: 'checkout')
       end
     else
       redirect_to customer_portal_new_subscription_url
@@ -65,14 +67,14 @@ class SubscriptionsController < ApplicationController
     ).execute
 
     if response[:success]
+      plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
       redirect_location = if params[:selected_group]
                             group_path(group)
                           else
-                            plan_id, quantity = subscription_params.values_at(:plan_id, :quantity)
                             edit_subscriptions_group_path(group.path, plan_id: plan_id, quantity: quantity, new_user: params[:new_user])
                           end
 
-      response[:data] = { location: redirect_location }
+      response[:data] = { location: redirect_location, plan_id: plan_id, quantity: quantity }
 
       track_paid_signup_flow_event('end', label: plan_id, value: quantity)
     end
@@ -101,6 +103,15 @@ class SubscriptionsController < ApplicationController
 
   def client
     Gitlab::SubscriptionPortal::Client
+  end
+
+  def store_location_for_user
+    redirect_url = url_for(safe_params.merge(experiment_started: true))
+    store_location_for :user, redirect_url
+  end
+
+  def experiment_already_started?
+    params[:experiment_started].present?
   end
 
   def customer_portal_new_subscription_url

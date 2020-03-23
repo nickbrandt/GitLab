@@ -114,7 +114,7 @@ export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }) =>
   const { featureFlags: { hasDurationChart = false, hasTasksByTypeChart = false } = {} } = state;
   const promises = [];
   if (hasDurationChart) promises.push('fetchDurationData');
-  if (hasTasksByTypeChart) promises.push('fetchTasksByTypeData');
+  if (hasTasksByTypeChart) promises.push('fetchTopRankedGroupLabels');
   return Promise.all(promises.map(func => dispatch(func)));
 };
 
@@ -132,7 +132,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
   dispatch('requestCycleAnalyticsData');
   return Promise.resolve()
     .then(() => dispatch('fetchGroupLabels'))
-    .then(() => dispatch('fetchTopRankedGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
@@ -225,8 +224,10 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     );
 };
 
-export const receiveTopRankedGroupLabelsSuccess = ({ commit }, data) =>
+export const receiveTopRankedGroupLabelsSuccess = ({ commit, dispatch }, data) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_SUCCESS, data);
+  dispatch('fetchTasksByTypeData');
+};
 
 export const receiveTopRankedGroupLabelsError = ({ commit }, error) => {
   commit(types.RECEIVE_TOP_RANKED_GROUP_LABELS_ERROR, error);

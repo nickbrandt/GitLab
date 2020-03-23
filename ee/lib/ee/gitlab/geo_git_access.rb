@@ -40,7 +40,7 @@ module EE
       end
 
       def messages
-        messages = proxying_to_primary_message
+        messages = ::Gitlab::Geo.proxying_push_to_primary_message(primary_ssh_url_to_repo).split("\n")
         lag_message = current_replication_lag_message
 
         return messages unless lag_message
@@ -73,23 +73,6 @@ module EE
 
       def primary_ssh_url_to_repo
         geo_primary_ssh_url_to_repo(project_or_wiki)
-      end
-
-      def proxying_to_primary_message
-        # This is formatted like this to fit into the console 'box', e.g.
-        #
-        # remote:
-        # remote: You're pushing to a Geo secondary! We'll help you by proxying this
-        # remote: request to the primary:
-        # remote:
-        # remote:   ssh://<user>@<host>:<port>/<group>/<repo>.git
-        # remote:
-        <<~STR.split("\n")
-          You're pushing to a Geo secondary! We'll help you by proxying this
-          request to the primary:
-
-            #{primary_ssh_url_to_repo}
-        STR
       end
 
       def current_replication_lag_message

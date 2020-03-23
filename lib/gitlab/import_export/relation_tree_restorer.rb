@@ -9,13 +9,13 @@ module Gitlab
       attr_reader :user
       attr_reader :shared
       attr_reader :importable
-      attr_reader :tree_hash
+      attr_reader :relation_reader
 
-      def initialize(user:, shared:, importable:, tree_hash:, members_mapper:, object_builder:, relation_factory:, reader:)
+      def initialize(user:, shared:, importable:, relation_reader:, members_mapper:, object_builder:, relation_factory:, reader:)
         @user = user
         @shared = shared
         @importable = importable
-        @tree_hash = tree_hash
+        @relation_reader = relation_reader
         @members_mapper = members_mapper
         @object_builder = object_builder
         @relation_factory = relation_factory
@@ -28,9 +28,9 @@ module Gitlab
             update_params!
 
             bulk_inserts_enabled = @importable.class == ::Project &&
-              Feature.enabled?(:import_bulk_inserts, @importable.group)
+              Feature.enabled?(:import_bulk_inserts, @importable.group, default_enabled: true)
             BulkInsertableAssociations.with_bulk_insert(enabled: bulk_inserts_enabled) do
-              update_relation_hashes!
+              fix_ci_pipelines_not_sorted_on_legacy_project_json!
               create_relations!
             end
           end
@@ -57,18 +57,8 @@ module Gitlab
       end
 
       def process_relation!(relation_key, relation_definition)
-        data_hashes = @tree_hash.delete(relation_key)
-        return unless data_hashes
-
-        # we do not care if we process array or hash
-        data_hashes = [data_hashes] unless data_hashes.is_a?(Array)
-
-        relation_index = 0
-
-        # consume and remove objects from memory
-        while data_hash = data_hashes.shift
+        @relation_reader.consume_relation(relation_key) do |data_hash, relation_index|
           process_relation_item!(relation_key, relation_definition, relation_index, data_hash)
-          relation_index += 1
         end
       end
 
@@ -81,6 +71,7 @@ module Gitlab
 
         import_failure_service.with_retry(action: 'relation_object.save!', relation_key: relation_key, relation_index: relation_index) do
           relation_object.save!
+          log_relation_creation(@importable, relation_key, relation_object)
         end
       rescue => e
         import_failure_service.log_import_failure(
@@ -103,10 +94,7 @@ module Gitlab
       end
 
       def update_params!
-        params = @tree_hash.reject do |key, _|
-          relations.include?(key)
-        end
-
+        params = @relation_reader.root_attributes(relations.keys)
         params = params.merge(present_override_params)
 
         # Cleaning all imported and overridden params
@@ -223,8 +211,32 @@ module Gitlab
         }
       end
 
-      def update_relation_hashes!
-        @tree_hash['ci_pipelines']&.sort_by! { |hash| hash['id'] }
+      # Temporary fix for https://gitlab.com/gitlab-org/gitlab/-/issues/27883 when import from legacy project.json
+      # This should be removed once legacy JSON format is deprecated.
+      # Ndjson export file will fix the order during project export.
+      def fix_ci_pipelines_not_sorted_on_legacy_project_json!
+        return unless relation_reader.legacy?
+
+        relation_reader.sort_ci_pipelines_by_id
+      end
+
+      # Enable logging of each top-level relation creation when Importing
+      # into a Group if feature flag is enabled
+      def log_relation_creation(importable, relation_key, relation_object)
+        root_ancestor_group = importable.try(:root_ancestor)
+
+        return unless root_ancestor_group
+        return unless root_ancestor_group.instance_of?(::Group)
+        return unless Feature.enabled?(:log_import_export_relation_creation, root_ancestor_group)
+
+        @shared.logger.info(
+          importable_type: importable.class.to_s,
+          importable_id: importable.id,
+          relation_key: relation_key,
+          relation_id: relation_object.id,
+          author_id: relation_object.try(:author_id),
+          message: '[Project/Group Import] Created new object relation'
+        )
       end
     end
   end

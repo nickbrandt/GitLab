@@ -8,7 +8,7 @@ GitLab's documentation is [intended as the single source of truth (SSOT)](https:
 
 In addition to this page, the following resources can help you craft and contribute documentation:
 
-- [Style Guide](styleguide.md) - What belongs in the docs, language guidelines, Markdown standards to follow, and more.
+- [Style Guide](styleguide.md) - What belongs in the docs, language guidelines, Markdown standards to follow, links, and more.
 - [Structure and template](structure.md) - Learn the typical parts of a doc page and how to write each one.
 - [Documentation process](workflow.md).
 - [Markdown Guide](../../user/markdown.md) - A reference for all Markdown syntax supported by GitLab.
@@ -58,7 +58,7 @@ However, anyone can contribute [documentation improvements](improvement-workflow
 ## Markdown and styles
 
 [GitLab docs](https://gitlab.com/gitlab-org/gitlab-docs) uses [GitLab Kramdown](https://gitlab.com/gitlab-org/gitlab_kramdown)
-as its Markdown rendering engine. See the [GitLab Markdown Guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/) for a complete Kramdown reference.
+as its Markdown rendering engine. See the [GitLab Markdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/) for a complete Kramdown reference.
 
 Adhere to the [Documentation Style Guide](styleguide.md). If a style standard is missing, you are welcome to suggest one via a merge request.
 
@@ -116,8 +116,9 @@ Things to note:
 - The above `git grep` command will search recursively in the directory you run
   it in for `workflow/lfs/lfs_administration` and `lfs/lfs_administration`
   and will print the file and the line where this file is mentioned.
-  You may ask why the two greps. Since we use relative paths to link to
-  documentation, sometimes it might be useful to search a path deeper.
+  You may ask why the two greps. Since [we use relative paths to link to
+  documentation](styleguide.md#links)
+  , sometimes it might be useful to search a path deeper.
 - The `*.md` extension is not used when a document is linked to GitLab's
   built-in help page, that's why we omit it in `git grep`.
 - Use the checklist on the "Change documentation location" MR description template.
@@ -522,7 +523,7 @@ A file with `proselint` configuration must be placed in a
 [markdownlint](https://github.com/DavidAnson/markdownlint) checks that Markdown
 syntax follows [certain rules](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#rules),
 and is used by the [`docs-lint` test](#testing) with a [configuration file](#markdownlint-configuration).
-Our [Documentation Style Guide](styleguide.md#markdown) and [Markdown Guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/)
+Our [Documentation Style Guide](styleguide.md#markdown) and [Markdown Guide](https://about.gitlab.com/handbook/engineering/ux/technical-writing/markdown-guide/)
 elaborate on which choices must be made when selecting Markdown syntax for GitLab
 documentation. This tool helps catch deviations from those guidelines.
 

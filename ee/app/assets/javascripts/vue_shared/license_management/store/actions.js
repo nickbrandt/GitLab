@@ -154,17 +154,17 @@ export const setLicenseApproval = ({ dispatch, state }, payload) => {
       dispatch('removePendingLicense', id);
     });
 };
-export const approveLicense = ({ dispatch }, license) => {
+export const allowLicense = ({ dispatch }, license) => {
   const { approvalStatus } = license;
-  if (approvalStatus !== LICENSE_APPROVAL_STATUS.APPROVED) {
-    dispatch('setLicenseApproval', { license, newStatus: LICENSE_APPROVAL_STATUS.APPROVED });
+  if (approvalStatus !== LICENSE_APPROVAL_STATUS.ALLOWED) {
+    dispatch('setLicenseApproval', { license, newStatus: LICENSE_APPROVAL_STATUS.ALLOWED });
   }
 };
 
-export const blacklistLicense = ({ dispatch }, license) => {
+export const denyLicense = ({ dispatch }, license) => {
   const { approvalStatus } = license;
-  if (approvalStatus !== LICENSE_APPROVAL_STATUS.BLACKLISTED) {
-    dispatch('setLicenseApproval', { license, newStatus: LICENSE_APPROVAL_STATUS.BLACKLISTED });
+  if (approvalStatus !== LICENSE_APPROVAL_STATUS.DENIED) {
+    dispatch('setLicenseApproval', { license, newStatus: LICENSE_APPROVAL_STATUS.DENIED });
   }
 };
 

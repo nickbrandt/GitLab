@@ -14,8 +14,8 @@ export default {
   },
   LICENSE_APPROVAL_STATUS,
   approvalStatusOptions: [
-    { value: LICENSE_APPROVAL_STATUS.APPROVED, label: s__('LicenseCompliance|Allow') },
-    { value: LICENSE_APPROVAL_STATUS.BLACKLISTED, label: s__('LicenseCompliance|Deny') },
+    { value: LICENSE_APPROVAL_STATUS.ALLOWED, label: s__('LicenseCompliance|Allow') },
+    { value: LICENSE_APPROVAL_STATUS.DENIED, label: s__('LicenseCompliance|Deny') },
   ],
   props: {
     managedLicenses: {

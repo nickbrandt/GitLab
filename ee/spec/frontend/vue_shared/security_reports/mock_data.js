@@ -5,7 +5,7 @@ export const sastParsedIssues = [
     title: 'Arbitrary file existence disclosure in Action Pack',
     path: 'Gemfile.lock',
     line: 12,
-    priority: 'High',
+    severity: 'High',
     urlPath: 'foo/Gemfile.lock',
   },
 ];

@@ -8,7 +8,7 @@ type: reference, howto
 
 SAML on GitLab.com allows users to be added to a group. Those users can then sign in to GitLab.com. If such users don't already have an account on the GitLab instance, they can create one when signing in for the first time.
 
-If you follow our guidance to automate user provisioning using [SCIM](scim_setup.md) or [group managed accounts](#group-managed-accounts), you do not need to create such accounts manually.
+If you follow our guidance to automate user provisioning using [SCIM](scim_setup.md) or [group-managed accounts](#group-managed-accounts), you do not need to create such accounts manually.
 
 User synchronization for GitLab.com is partially supported using [SCIM](scim_setup.md).
 
@@ -86,6 +86,15 @@ Since use of the group-managed account requires the use of SSO, users of group-m
 - The user will be unable to access the group (their credentials will no longer work on the identity provider when prompted to SSO).
 - Contributions in the group (e.g. issues, merge requests) will remain intact.
 
+##### Feature flag
+
+Currently the group-managed accounts feature is behind a feature flag: `group_managed_accounts`. The flag is disabled by default.
+To activate the feature, ask a GitLab administrator with Rails console access to run:
+
+```ruby
+Feature.enable(:group_managed_accounts)
+```
+
 ##### Credentials inventory for Group-managed accounts **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/38133) in GitLab 12.8.
@@ -104,9 +113,9 @@ This feature is similar to the [Credentials inventory for self-managed instances
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34648) in GitLab 12.9.
 
-Groups with enabled group-managed accounts can allow or disallow forking of projects outside of root group
-by using separate toggle. If forking is disallowed any project of given root group or its subgroups can be forked to
-a subgroup of the same root group only.
+Groups with group-managed accounts can disallow forking of projects to destinations outside the group.
+To do so, enable the "Prohibit outer forks" option in **Settings > SAML SSO**.
+When enabled, projects within the group can only be forked to other destinations within the group (including its subgroups).
 
 ##### Other restrictions for Group-managed accounts
 
@@ -190,12 +199,8 @@ NOTE: **Note:** GitLab is unable to provide support for IdPs that are not listed
 |----------|---------------|
 | ADFS (Active Directory Federation Services) | [Create a Relying Party Trust](https://docs.microsoft.com/en-us/windows-server/identity/ad-fs/operations/create-a-relying-party-trust) |
 | Azure | [Configuring single sign-on to applications](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-single-sign-on-non-gallery-applications) |
-| Auth0 | [Auth0 as Identity Provider](https://auth0.com/docs/protocols/saml/saml-idp-generic) |
-| G Suite | [Set up your own custom SAML application](https://support.google.com/a/answer/6087519?hl=en) |
-| JumpCloud | [Single Sign On (SSO) with GitLab](https://support.jumpcloud.com/support/s/article/single-sign-on-sso-with-gitlab-2019-08-21-10-36-47) |
 | Okta | [Setting up a SAML application in Okta](https://developer.okta.com/docs/guides/saml-application-setup/overview/) |
 | OneLogin | [Use the OneLogin SAML Test Connector](https://onelogin.service-now.com/support?id=kb_article&sys_id=93f95543db109700d5505eea4b96198f) |
-| Ping One for Enterprise | [Add and configure a new SAML application](https://support.pingidentity.com/s/document-item?bundleId=pingone&topicId=xsh1564020480660-1.html) |
 
 When [configuring your identify provider](#configuring-your-identity-provider), please consider the notes below for specific providers to help avoid common issues and as a guide for terminology used.
 
@@ -359,6 +364,13 @@ This can be prevented by configuring the [NameID](#nameid) to return a consisten
 ### My identity provider isn't listed
 
 Not a problem, the SAML standard means that a wide range of identity providers will work with GitLab. Unfortunately we aren't familiar with all of them so can only offer support configuring the [listed providers](#providers).
+
+Your identity provider may also have relevant documentation. It may be generic SAML documentation, or specifically targeted for GitLab. Examples:
+
+- [Auth0](https://auth0.com/docs/protocols/saml/saml-idp-generic)
+- [G Suite](https://support.google.com/a/answer/6087519?hl=en)
+- [JumpCloud](https://support.jumpcloud.com/support/s/article/single-sign-on-sso-with-gitlab-2019-08-21-10-36-47)
+- [OneLogin](https://onelogin.service-now.com/support?id=kb_article&sys_id=93f95543db109700d5505eea4b96198f).
 
 ### I need additional information to configure my identity provider
 

@@ -147,6 +147,10 @@ module EE
       ::License.feature_available?(:ci_cd_projects) && import_sources_enabled?
     end
 
+    def first_class_vulnerabilities_available?(project)
+      ::Feature.enabled?(:first_class_vulnerabilities, project)
+    end
+
     def merge_pipelines_available?
       return false unless @project.builds_enabled?
 
@@ -222,8 +226,14 @@ module EE
           pipeline_path: pipeline_url(pipeline),
           pipeline_created: pipeline.created_at.to_s(:iso8601),
           has_pipeline_data: "true"
-        }
+        }.merge(project_vulnerabilities_config(project))
       end
+    end
+
+    def project_vulnerabilities_config(project)
+      return {} unless first_class_vulnerabilities_available?(project)
+
+      { vulnerabilities_export_endpoint: api_v4_projects_vulnerability_exports_path(id: project.id) }
     end
 
     def can_create_feedback?(project, feedback_type)

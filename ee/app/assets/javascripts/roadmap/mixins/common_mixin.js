@@ -105,17 +105,17 @@ export default {
       if (this.hasStartDate) {
         if (this.presetTypeQuarters) {
           // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForQuarters(
             roadmapItem,
           )}px; ${this.getTimelineBarStartOffsetForQuarters(roadmapItem)}`;
         } else if (this.presetTypeMonths) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths(
             roadmapItem,
           )}`;
         } else if (this.presetTypeWeeks) {
-          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+          // eslint-disable-next-line @gitlab/require-i18n-strings
           barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks(
             roadmapItem,
           )}`;

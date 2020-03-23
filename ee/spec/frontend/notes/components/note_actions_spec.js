@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { TEST_HOST } from 'spec/test_constants';
 import createStore from '~/notes/stores';
 import noteActions from '~/notes/components/note_actions.vue';
-import { userDataMock } from '../../../../spec/frontend/notes/mock_data';
+import { userDataMock } from 'jest/notes/mock_data';
 
 describe('noteActions', () => {
   let wrapper;
@@ -48,7 +48,7 @@ describe('noteActions', () => {
       const resolveButton = wrapper.find({ ref: 'resolveButton' });
 
       expect(resolveButton.exists()).toBe(true);
-      expect(resolveButton.attributes('title')).toEqual('Thread stays unresolved');
+      expect(resolveButton.attributes('title')).toBe('Thread stays unresolved');
     });
   });
 });

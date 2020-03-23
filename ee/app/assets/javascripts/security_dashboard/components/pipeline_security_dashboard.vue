@@ -1,7 +1,7 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlEmptyState } from '@gitlab/ui';
-import SecurityDashboard from './app.vue';
+import SecurityDashboard from './security_dashboard.vue';
 
 export default {
   name: 'PipelineSecurityDashboard',

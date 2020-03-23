@@ -17,15 +17,15 @@ export default {
   },
   [types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, { data, perPage, total }) {
     state.isLoading = false;
-    state.designs = data;
+    state.replicableItems = data;
     state.pageSize = perPage;
-    state.totalDesigns = total;
+    state.totalReplicableItems = total;
   },
   [types.RECEIVE_REPLICABLE_ITEMS_ERROR](state) {
     state.isLoading = false;
-    state.designs = [];
+    state.replicableItems = [];
     state.pageSize = 0;
-    state.totalDesigns = 0;
+    state.totalReplicableItems = 0;
   },
   [types.REQUEST_INITIATE_ALL_REPLICABLE_SYNCS](state) {
     state.isLoading = true;

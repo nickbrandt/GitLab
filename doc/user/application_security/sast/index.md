@@ -17,15 +17,16 @@ to learn how to protect your organization.
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your source code for known
 vulnerabilities using Static Application Security Testing (SAST).
 
-You can take advantage of SAST by either [including the CI job](#configuration) in
-your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
-that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
+You can take advantage of SAST by doing one of the following:
+
+- [Including the CI job](#configuration) in your existing `.gitlab-ci.yml` file.
+- Implicitly using [Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate) provided by
+  [Auto DevOps](../../../topics/autodevops/index.md).
 
 GitLab checks the SAST report, compares the found vulnerabilities between the
 source and target branches, and shows the information right on the merge request.
 
-![SAST Widget](img/sast.png)
+![SAST Widget](img/sast_v12_9.png)
 
 The results are sorted by the priority of the vulnerability:
 
@@ -89,14 +90,20 @@ The Java analyzers can also be used for variants like the
 [Gradle wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html),
 [Grails](https://grails.org/) and the [Maven wrapper](https://github.com/takari/maven-wrapper).
 
+## Contribute your scanner
+
+The [Security Scanner Integration](../../../development/integrations/secure.md) documentation explains how to integrate other security scanners into GitLab.
+
 ## Configuration
 
-For GitLab 11.9 and later, to enable SAST, you must
-[include](../../../ci/yaml/README.md#includetemplate) the
-[`SAST.gitlab-ci.yml` template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml)
-that's provided as a part of your GitLab installation.
-For GitLab versions earlier than 11.9, you can copy and use the job as defined
-that template.
+NOTE: **Note:**
+You don't have to configure SAST manually as shown in this section if you're using [Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
+provided by [Auto DevOps](../../../topics/autodevops/index.md).
+
+For GitLab 11.9 and later, to enable SAST you must [include](../../../ci/yaml/README.md#includetemplate)
+the [`SAST.gitlab-ci.yml` template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml)
+that is provided as a part of your GitLab installation. For GitLab versions earlier than 11.9, you
+can copy and use the job as defined that template.
 
 Add the following to your `.gitlab-ci.yml` file:
 
@@ -260,6 +267,11 @@ See [Analyzer settings](#analyzer-settings) for the complete list of available o
 ### Available variables
 
 SAST can be [configured](#customizing-the-sast-settings) using environment variables.
+
+#### Custom Certificate Authority
+
+To trust a custom Certificate Authority, set the `ADDITIONAL_CA_CERT_BUNDLE` variable to the bundle
+of CA certs that you want to trust within the SAST environment.
 
 #### Docker images
 
@@ -448,8 +460,9 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 
 ## Secret detection
 
-GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the repository.
-For example, an API key that allows write access to third-party deployment environments.
+GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the
+repository (for example, an API key that allows write access to third-party deployment
+environments).
 
 This check is performed by a specific analyzer during the `sast` job. It runs regardless of the programming
 language of your app, and you don't need to change anything to your

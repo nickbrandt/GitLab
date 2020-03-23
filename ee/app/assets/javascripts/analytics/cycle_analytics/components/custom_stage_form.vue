@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { isEqual } from 'underscore';
+import { isEqual } from 'lodash';
 import {
   GlFormGroup,
   GlFormInput,

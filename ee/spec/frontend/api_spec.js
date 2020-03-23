@@ -622,4 +622,71 @@ describe('Api', () => {
       });
     });
   });
+
+  describe('changeVulnerabilityState', () => {
+    it.each`
+      id    | action
+      ${5}  | ${'dismiss'}
+      ${7}  | ${'confirm'}
+      ${38} | ${'resolve'}
+    `('POSTS to correct endpoint ($id, $action)', ({ id, action }) => {
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/vulnerabilities/${id}/${action}`;
+      const expectedResponse = { id, action, test: 'test' };
+
+      mock.onPost(expectedUrl).replyOnce(200, expectedResponse);
+
+      return Api.changeVulnerabilityState(id, action).then(({ data }) => {
+        expect(mock.history.post).toContainEqual(expect.objectContaining({ url: expectedUrl }));
+        expect(data).toEqual(expectedResponse);
+      });
+    });
+  });
+
+  describe('GeoNode', () => {
+    let expectedUrl;
+    let mockNode;
+
+    beforeEach(() => {
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_nodes`;
+    });
+
+    describe('createGeoNode', () => {
+      it('POSTs with correct action', () => {
+        mockNode = {
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'post');
+        mock.onPost(expectedUrl).replyOnce(201, mockNode);
+
+        return Api.createGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.post).toHaveBeenCalledWith(expectedUrl, mockNode);
+        });
+      });
+    });
+
+    describe('updateGeoNode', () => {
+      it('PUTs with correct action', () => {
+        mockNode = {
+          id: 1,
+          name: 'Mock Node',
+          url: 'https://mock_node.gitlab.com',
+          primary: false,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'put');
+        mock.onPut(`${expectedUrl}/${mockNode.id}`).replyOnce(201, mockNode);
+
+        return Api.updateGeoNode(mockNode).then(({ data }) => {
+          expect(data).toEqual(mockNode);
+          expect(axios.put).toHaveBeenCalledWith(`${expectedUrl}/${mockNode.id}`, mockNode);
+        });
+      });
+    });
+  });
 });

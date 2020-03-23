@@ -793,6 +793,14 @@ module Gitlab
         end
       end
 
+      def import_repository(url)
+        raise ArgumentError, "don't use disk paths with import_repository: #{url.inspect}" if url.start_with?('.', '/')
+
+        wrapped_gitaly_errors do
+          gitaly_repository_client.import_repository(url)
+        end
+      end
+
       def blob_at(sha, path)
         Gitlab::Git::Blob.find(self, sha, path) unless Gitlab::Git.blank_ref?(sha)
       end
@@ -842,10 +850,9 @@ module Gitlab
         end
       end
 
-      def squash(user, squash_id, branch:, start_sha:, end_sha:, author:, message:)
+      def squash(user, squash_id, start_sha:, end_sha:, author:, message:)
         wrapped_gitaly_errors do
-          gitaly_operation_client.user_squash(user, squash_id, branch,
-              start_sha, end_sha, author, message)
+          gitaly_operation_client.user_squash(user, squash_id, start_sha, end_sha, author, message)
         end
       end
 

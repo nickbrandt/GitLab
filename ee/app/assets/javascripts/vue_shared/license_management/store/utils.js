@@ -19,18 +19,18 @@ export const normalizeLicense = license => {
 };
 
 export const getStatusTranslationsFromLicenseStatus = approvalStatus => {
-  if (approvalStatus === LICENSE_APPROVAL_STATUS.APPROVED) {
+  if (approvalStatus === LICENSE_APPROVAL_STATUS.ALLOWED) {
     return s__('LicenseCompliance|Allowed');
-  } else if (approvalStatus === LICENSE_APPROVAL_STATUS.BLACKLISTED) {
+  } else if (approvalStatus === LICENSE_APPROVAL_STATUS.DENIED) {
     return s__('LicenseCompliance|Denied');
   }
   return '';
 };
 
 export const getIssueStatusFromLicenseStatus = approvalStatus => {
-  if (approvalStatus === LICENSE_APPROVAL_STATUS.APPROVED) {
+  if (approvalStatus === LICENSE_APPROVAL_STATUS.ALLOWED) {
     return STATUS_SUCCESS;
-  } else if (approvalStatus === LICENSE_APPROVAL_STATUS.BLACKLISTED) {
+  } else if (approvalStatus === LICENSE_APPROVAL_STATUS.DENIED) {
     return STATUS_FAILED;
   }
   return STATUS_NEUTRAL;

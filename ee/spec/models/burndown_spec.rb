@@ -83,7 +83,7 @@ describe Burndown do
       new_milestone = create(:milestone)
       burndown = described_class.new(new_milestone.issues_visible_to_user(user), new_milestone.start_date, new_milestone.due_date)
 
-      new_milestone.project.add_master(user)
+      new_milestone.project.add_maintainer(user)
 
       expect(burndown).to be_accurate
     end
@@ -237,7 +237,7 @@ describe Burndown do
   end
 
   def build_sample(milestone, issue_params)
-    project.add_master(user)
+    project.add_maintainer(user)
 
     issues = []
     confidential_issues = []

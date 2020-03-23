@@ -6,7 +6,7 @@ import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
 
-import { LICENSE_APPROVAL_STATUS } from '../constants';
+import { LICENSE_APPROVAL_STATUS, LICENSE_APPROVAL_ACTION } from '../constants';
 import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_management/store/constants';
 
 const visibleClass = 'visible';
@@ -36,16 +36,19 @@ export default {
     },
   },
   LICENSE_APPROVAL_STATUS,
-  [LICENSE_APPROVAL_STATUS.APPROVED]: s__('LicenseCompliance|Allowed'),
-  [LICENSE_APPROVAL_STATUS.BLACKLISTED]: s__('LicenseCompliance|Denied'),
+  LICENSE_APPROVAL_ACTION,
+  [LICENSE_APPROVAL_ACTION.ALLOW]: s__('LicenseCompliance|Allow'),
+  [LICENSE_APPROVAL_ACTION.DENY]: s__('LicenseCompliance|Deny'),
+  [LICENSE_APPROVAL_STATUS.ALLOWED]: s__('LicenseCompliance|Allowed'),
+  [LICENSE_APPROVAL_STATUS.DENIED]: s__('LicenseCompliance|Denied'),
   computed: {
     approveIconClass() {
-      return this.license.approvalStatus === LICENSE_APPROVAL_STATUS.APPROVED
+      return this.license.approvalStatus === LICENSE_APPROVAL_STATUS.ALLOWED
         ? visibleClass
         : invisibleClass;
     },
     blacklistIconClass() {
-      return this.license.approvalStatus === LICENSE_APPROVAL_STATUS.BLACKLISTED
+      return this.license.approvalStatus === LICENSE_APPROVAL_STATUS.DENIED
         ? visibleClass
         : invisibleClass;
     },
@@ -57,7 +60,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(LICENSE_MANAGEMENT, ['setLicenseInModal', 'approveLicense', 'blacklistLicense']),
+    ...mapActions(LICENSE_MANAGEMENT, ['setLicenseInModal', 'allowLicense', 'denyLicense']),
   },
 };
 </script>
@@ -74,13 +77,13 @@ export default {
           toggle-class="d-flex justify-content-between align-items-center"
           right
         >
-          <gl-dropdown-item @click="approveLicense(license)">
+          <gl-dropdown-item @click="allowLicense(license)">
             <icon :class="approveIconClass" name="mobile-issue-close" />
-            {{ $options[$options.LICENSE_APPROVAL_STATUS.APPROVED] }}
+            {{ $options[$options.LICENSE_APPROVAL_ACTION.ALLOW] }}
           </gl-dropdown-item>
-          <gl-dropdown-item @click="blacklistLicense(license)">
+          <gl-dropdown-item @click="denyLicense(license)">
             <icon :class="blacklistIconClass" name="mobile-issue-close" />
-            {{ $options[$options.LICENSE_APPROVAL_STATUS.BLACKLISTED] }}
+            {{ $options[$options.LICENSE_APPROVAL_ACTION.DENY] }}
           </gl-dropdown-item>
         </gl-dropdown>
         <button

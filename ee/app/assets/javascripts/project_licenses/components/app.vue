@@ -32,10 +32,6 @@ export default {
       type: String,
       required: true,
     },
-    readLicensePoliciesEndpoint: {
-      type: String,
-      required: true,
-    },
   },
   data() {
     return {
@@ -120,7 +116,7 @@ export default {
             <gl-badge pill>{{ policyCount }}</gl-badge>
           </template>
 
-          <license-management :api-url="readLicensePoliciesEndpoint" />
+          <license-management />
         </gl-tab>
       </gl-tabs>
     </template>

@@ -29,9 +29,11 @@ module EE
           end
 
           def active
-            # We don't block the user yet when deprovisioning
-            # So the user is always active, until the identity link is removed.
-            true
+            object_active = object.try(:active)
+
+            return true if object_active.nil?
+
+            object_active
           end
 
           def email_type

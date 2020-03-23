@@ -313,122 +313,48 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_f
       stub_lfs_object_storage
     end
 
-    context 'with geo_lfs_registry_ssot_sync feature enabled' do
-      context 'with files missing on the primary' do
-        let!(:lfs_object_file_missing_on_primary) { create(:lfs_object, :with_file) }
+    context 'with files missing on the primary' do
+      let!(:lfs_object_file_missing_on_primary) { create(:lfs_object, :with_file) }
 
-        context 'with lfs_object_registry entries' do
-          before do
-            create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_local_store)
-            create(:geo_lfs_object_registry, :failed, lfs_object: lfs_object_remote_store)
-            Geo::LfsObjectRegistry.create!(lfs_object_id: lfs_object_file_missing_on_primary.id, bytes: 1234, success: true, missing_on_primary: true)
-          end
-
-          it 'enqueues file downloads if there is spare capacity' do
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_file_missing_on_primary.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
-
-          it 'does not retry those files if there is no spare capacity' do
-            expect(subject).to receive(:db_retrieve_batch_size).and_return(1).twice
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).once
-
-            subject.perform
-          end
-
-          it 'does not retry those files if they are already scheduled' do
-            scheduled_jobs = [{ type: 'lfs', id: lfs_object_file_missing_on_primary.id, job_id: 'foo' }]
-            expect(subject).to receive(:scheduled_jobs).and_return(scheduled_jobs).at_least(1)
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
+      context 'with lfs_object_registry entries' do
+        before do
+          create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_local_store)
+          create(:geo_lfs_object_registry, :failed, lfs_object: lfs_object_remote_store)
+          Geo::LfsObjectRegistry.create!(lfs_object_id: lfs_object_file_missing_on_primary.id, bytes: 1234, success: true, missing_on_primary: true)
         end
 
-        context 'with no lfs_object_registry entries' do
-          it 'does not enqueue file downloads' do
-            expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
+        it 'enqueues file downloads if there is spare capacity' do
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_file_missing_on_primary.id)
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
 
-            subject.perform
-          end
+          subject.perform
+        end
+
+        it 'does not retry those files if there is no spare capacity' do
+          expect(subject).to receive(:db_retrieve_batch_size).and_return(1).twice
+
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).once
+
+          subject.perform
+        end
+
+        it 'does not retry those files if they are already scheduled' do
+          scheduled_jobs = [{ type: 'lfs', id: lfs_object_file_missing_on_primary.id, job_id: 'foo' }]
+          expect(subject).to receive(:scheduled_jobs).and_return(scheduled_jobs).at_least(1)
+
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
+          expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
+
+          subject.perform
         end
       end
-    end
 
-    context 'with geo_lfs_registry_ssot_sync feature disabled' do
-      before do
-        stub_feature_flags(geo_lfs_registry_ssot_sync: false)
-      end
+      context 'with no lfs_object_registry entries' do
+        it 'does not enqueue file downloads' do
+          expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
 
-      context 'with files missing on the primary' do
-        let!(:lfs_object_file_missing_on_primary) { create(:lfs_object, :with_file) }
-
-        context 'with lfs_object_registry entries' do
-          before do
-            create(:geo_lfs_object_registry, :never_synced, lfs_object: lfs_object_local_store)
-            create(:geo_lfs_object_registry, :failed, lfs_object: lfs_object_remote_store)
-            Geo::LfsObjectRegistry.create!(lfs_object_id: lfs_object_file_missing_on_primary.id, bytes: 1234, success: true, missing_on_primary: true)
-          end
-
-          it 'enqueues file downloads if there is spare capacity' do
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_file_missing_on_primary.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
-
-          it 'does not enqueue file downloads if there is no spare capacity' do
-            expect(subject).to receive(:db_retrieve_batch_size).and_return(1).twice
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).once
-
-            subject.perform
-          end
-
-          it 'does not enqueue file downloads if they are already scheduled' do
-            scheduled_jobs = [{ type: 'lfs', id: lfs_object_file_missing_on_primary.id, job_id: 'foo' }]
-            expect(subject).to receive(:scheduled_jobs).and_return(scheduled_jobs).at_least(1)
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
-        end
-
-        context 'with no lfs_object_registry entries' do
-          it 'enqueues file downloads if there is spare capacity' do
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_file_missing_on_primary.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
-
-          it 'does not enqueue file downloads if there is no spare capacity' do
-            expect(subject).to receive(:db_retrieve_batch_size).and_return(1).twice
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).once
-
-            subject.perform
-          end
-
-          it 'does not enqueue file downloads if they are already scheduled' do
-            scheduled_jobs = [{ type: 'lfs', id: lfs_object_file_missing_on_primary.id, job_id: 'foo' }]
-            expect(subject).to receive(:scheduled_jobs).and_return(scheduled_jobs).at_least(1)
-
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-            expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-            subject.perform
-          end
+          subject.perform
         end
       end
     end
@@ -709,22 +635,6 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw, :use_sql_query_cache_f
       allow(::Gitlab::Geo).to receive(:current_node).and_call_original
       Rails.cache.write(:current_node, secondary.to_json)
       allow(::GeoNode).to receive(:current_node).and_return(secondary)
-    end
-
-    context 'when geo_lfs_registry_ssot_sync feature is disabled' do
-      before do
-        stub_feature_flags(geo_lfs_registry_ssot_sync: false)
-      end
-
-      it 'does not perform Geo::FileDownloadWorker for LFS object that does not belong to selected namespaces to replicate' do
-        lfs_object_in_synced_group = create(:lfs_objects_project, project: project_in_synced_group)
-        create(:lfs_objects_project, project: unsynced_project)
-
-        expect(Geo::FileDownloadWorker).to receive(:perform_async)
-          .with('lfs', lfs_object_in_synced_group.lfs_object_id).once.and_return(spy)
-
-        subject.perform
-      end
     end
 
     context 'when geo_job_artifact_registry_ssot_sync feature is disabled' do

@@ -61,25 +61,7 @@ module EE
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
     end
 
-    def prometheus_alerts_fired(project, alerts)
-      return if project.emails_disabled?
-
-      owners_and_maintainers_without_invites(project).to_a.product(alerts).each do |recipient, alert|
-        mailer.prometheus_alert_fired_email(project.id, recipient.user.id, alert).deliver_later
-      end
-    end
-
     private
-
-    def owners_and_maintainers_without_invites(project)
-      recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
-
-      if recipients.empty? && project.group
-        recipients = project.group.members.active_without_invites_and_requests.owners_and_maintainers
-      end
-
-      recipients
-    end
 
     def send_new_review_notification(review)
       recipients = ::NotificationRecipients::BuildService.build_new_review_recipients(review)

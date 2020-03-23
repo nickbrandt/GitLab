@@ -174,6 +174,8 @@ module Ci
               pipeline: Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE)
     end
 
+    scope :with_coverage, -> { where.not(coverage: nil) }
+
     acts_as_taggable
 
     add_authentication_token_field :token, encrypted: :optional
@@ -596,19 +598,15 @@ module Ci
     end
 
     def merge_request
-      return @merge_request if defined?(@merge_request)
+      strong_memoize(:merge_request) do
+        merge_requests = MergeRequest.includes(:latest_merge_request_diff)
+          .where(source_branch: ref, source_project: pipeline.project)
+          .reorder(iid: :desc)
 
-      @merge_request ||=
-        begin
-          merge_requests = MergeRequest.includes(:latest_merge_request_diff)
-            .where(source_branch: ref,
-                   source_project: pipeline.project)
-            .reorder(iid: :desc)
-
-          merge_requests.find do |merge_request|
-            merge_request.commit_shas.include?(pipeline.sha)
-          end
+        merge_requests.find do |merge_request|
+          merge_request.commit_shas.include?(pipeline.sha)
         end
+      end
     end
 
     def repo_url
@@ -914,6 +912,14 @@ module Ci
           Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, test_suite)
         end
       end
+    end
+
+    def collect_coverage_reports!(coverage_report)
+      each_report(Ci::JobArtifact::COVERAGE_REPORT_FILE_TYPES) do |file_type, blob|
+        Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, coverage_report)
+      end
+
+      coverage_report
     end
 
     def report_artifacts

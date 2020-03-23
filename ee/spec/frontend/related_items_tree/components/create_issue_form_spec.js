@@ -1,4 +1,5 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import {
   GlButton,
   GlDropdown,
@@ -12,13 +13,12 @@ import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 
-// https://gitlab.com/gitlab-org/gitlab/issues/118456
-import {
-  mockInitialConfig,
-  mockParentItem,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockInitialConfig, mockParentItem } from '../mock_data';
 
 const mockProjects = getJSONFixture('static/projects.json');
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 const createComponent = () => {
   const store = createDefaultStore();
@@ -27,6 +27,7 @@ const createComponent = () => {
   store.dispatch('setInitialParentItem', mockParentItem);
 
   return shallowMount(CreateIssueForm, {
+    localVue,
     store,
   });
 };

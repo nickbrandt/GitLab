@@ -114,10 +114,11 @@ module EE
               requires :audit_event_id, type: Integer, desc: 'The ID of the audit event'
             end
             get '/:audit_event_id' do
-              audit_log_finder_params = audit_log_finder_params(user_group)
-              audit_event = AuditLogFinder.new(audit_log_finder_params.merge(id: params[:audit_event_id])).execute
-
-              not_found!('Audit Event') unless audit_event
+              # rubocop: disable CodeReuse/ActiveRecord
+              # This is not `find_by!` from ActiveRecord
+              audit_event = AuditLogFinder.new(audit_log_finder_params(user_group))
+                .find_by!(id: params[:audit_event_id])
+              # rubocop: enable CodeReuse/ActiveRecord
 
               present audit_event, with: EE::API::Entities::AuditEvent
             end

@@ -69,6 +69,11 @@
     }
   }
 
+  .file-title.is-active,
+  .file-title-flex-parent.is-active {
+    background-color: $gray-200;
+  }
+
   @media (min-width: map-get($grid-breakpoints, md)) {
     &.conflict .file-title,
     &.conflict .file-title-flex-parent {
@@ -514,6 +519,10 @@ table.code {
           position: absolute;
           left: 0.5em;
         }
+
+        &.with-coverage::before {
+          left: 0;
+        }
       }
 
       &.new {
@@ -521,6 +530,10 @@ table.code {
           content: '+';
           position: absolute;
           left: 0.5em;
+        }
+
+        &.with-coverage::before {
+          left: 0;
         }
       }
     }

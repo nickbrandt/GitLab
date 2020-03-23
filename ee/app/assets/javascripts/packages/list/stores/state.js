@@ -41,6 +41,6 @@ export default () => ({
    */
   sorting: {
     sort: 'desc',
-    orderBy: 'version',
+    orderBy: 'created_at',
   },
 });

@@ -31,7 +31,7 @@ describe Metrics::Dashboard::CloneDashboardService, :use_clean_rails_memory_stor
           }
         end
 
-        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH, [STAGES::CommonMetricsInserter, STAGES::ProjectMetricsInserter, STAGES::Sorter]
+        it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH, [STAGES::CommonMetricsInserter, STAGES::CustomMetricsInserter, STAGES::Sorter]
         it_behaves_like 'valid dashboard cloning process', ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH, [STAGES::CommonMetricsInserter, STAGES::Sorter]
       end
     end

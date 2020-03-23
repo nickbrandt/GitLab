@@ -23,6 +23,7 @@ describe 'gitlab:app namespace rake task' do
   end
 
   before(:all) do
+    Rake.application.rake_require 'active_record/railties/databases'
     Rake.application.rake_require 'tasks/gitlab/helpers'
     Rake.application.rake_require 'tasks/gitlab/backup'
     Rake.application.rake_require 'tasks/gitlab/shell'

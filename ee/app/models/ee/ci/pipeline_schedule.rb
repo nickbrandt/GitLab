@@ -7,6 +7,10 @@ module EE
 
       prepended do
         include UsageStatistics
+        include Limitable
+
+        self.limit_name = 'ci_pipeline_schedules'
+        self.limit_scope = :project
       end
     end
   end

@@ -1,11 +1,17 @@
-import { TIME_WINDOWS, DEFAULT_TIME_WINDOW } from 'ee/threat_monitoring/constants';
+import { getTimeWindow, defaultTimeRange } from '~/vue_shared/constants';
+import { pick } from 'lodash';
 
-export const getTimeWindowConfig = timeWindow =>
-  TIME_WINDOWS[timeWindow] || TIME_WINDOWS[DEFAULT_TIME_WINDOW];
+export const getTimeWindowConfig = timeWindow => {
+  const timeWindowObj = pick(getTimeWindow(timeWindow) || defaultTimeRange, 'duration', 'interval');
+  return {
+    durationInMilliseconds: timeWindowObj.duration.seconds * 1000,
+    interval: timeWindowObj.interval,
+  };
+};
 
 /**
  * Get the from/to/interval query parameters for the given time window.
- * @param {string} timeWindow - The time window (keyof TIME_WINDOWS)
+ * @param {string} timeWindow - The time window name (from the array of objects timeRanges)
  * @param {number} to - Milliseconds past the epoch corresponding to the
  *     returned `to` parameter
  * @returns {Object} Query parameters `from` and `to` are ISO 8601 dates and

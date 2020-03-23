@@ -254,7 +254,7 @@ export default {
 
 <template>
   <div
-    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+    class="design-detail js-design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
   >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>

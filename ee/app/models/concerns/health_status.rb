@@ -14,7 +14,8 @@ module HealthStatus
 
   override :supports_health_status?
   def supports_health_status?
-    resource_parent.feature_available?(:issuable_health_status) &&
-      ::Feature.enabled?(:save_issuable_health_status, resource_parent)
+    return false unless resource_parent&.feature_available?(:issuable_health_status)
+
+    ::Feature.enabled?(:save_issuable_health_status, resource_parent.try(:group))
   end
 end

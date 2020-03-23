@@ -16,6 +16,7 @@ export default {
       endpoint,
       endpointMetadata,
       endpointBatch,
+      endpointCoverage,
       projectPath,
       dismissEndpoint,
       showSuggestPopover,
@@ -25,6 +26,7 @@ export default {
       endpoint,
       endpointMetadata,
       endpointBatch,
+      endpointCoverage,
       projectPath,
       dismissEndpoint,
       showSuggestPopover,
@@ -67,6 +69,10 @@ export default {
       ...convertObjectPropsToCamelCase(data),
       diffFiles: files,
     });
+  },
+
+  [types.SET_COVERAGE_DATA](state, coverageFiles) {
+    Object.assign(state, { coverageFiles });
   },
 
   [types.RENDER_FILE](state, file) {
@@ -278,6 +284,9 @@ export default {
   },
   [types.UPDATE_CURRENT_DIFF_FILE_ID](state, fileId) {
     state.currentDiffFileId = fileId;
+    if (!state.viewedDiffFileIds.includes(fileId)) {
+      state.viewedDiffFileIds = [fileId, ...state.viewedDiffFileIds];
+    }
   },
   [types.OPEN_DIFF_FILE_COMMENT_FORM](state, formData) {
     state.commentForms.push({

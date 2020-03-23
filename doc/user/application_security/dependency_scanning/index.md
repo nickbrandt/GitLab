@@ -67,6 +67,10 @@ The following languages and dependency managers are supported.
 | Scala ([sbt](https://www.scala-sbt.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Go ([Go Modules](https://github.com/golang/go/wiki/Modules)) | yes ([alpha](https://gitlab.com/gitlab-org/gitlab/issues/7132)) | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 
+## Contribute your scanner
+
+The [Security Scanner Integration](../../../development/integrations/secure.md) documentation explains how to integrate other security scanners into GitLab.
+
 ## Configuration
 
 For GitLab 11.9 and later, to enable Dependency Scanning, you must
@@ -145,6 +149,7 @@ The following variables allow configuration of global dependency scanning settin
 | `DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT`  | 2m          | Time limit for Docker client negotiation. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
 | `DS_PULL_ANALYZER_IMAGE_TIMEOUT`        | 5m          | Time limit when pulling an analyzer's image. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
 | `DS_RUN_ANALYZER_TIMEOUT`               | 20m         | Time limit when running an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, or `h`. For example, `300ms`, `1.5h`, or `2h45m`. |
+| `ADDITIONAL_CA_CERT_BUNDLE`   |  | Bundle of CA certs that you want to trust. |
 
 #### Configuring specific analyzers used by Dependency Scanning
 

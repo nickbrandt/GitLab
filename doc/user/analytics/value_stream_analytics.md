@@ -151,6 +151,92 @@ A few notes:
   cycles, calculate their median time and the result is what the dashboard of
   Value Stream Analytics is showing.
 
+## Customizable Value Stream Analytics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/12196) in GitLab 12.9.
+
+The default stages are designed to work straight out of the box, but they might not be suitable for
+all teams. Different teams use different approaches to building software, so some teams might want
+to customize their Value Stream Analytics.
+
+GitLab allows users to hide default stages and create custom stages that align better to their
+development workflow.
+
+### Adding a stage
+
+In the following example we're creating a new stage that measures and tracks issues from creation
+time until they are closed.
+
+1. Navigate to your group's **Analytics > Value Stream**.
+1. Click the **Add a stage** button.
+1. Fill in the new stage form:
+   - Name: Issue start to finish.
+   - Start event: Issue created.
+   - End event: Issue closed.
+1. Click the **Add stage** button.
+
+![New Value Stream Analytics Stage](img/new_vsm_stage_v12_9.png "Form for creating a new stage")
+
+The new stage is persisted and it will always show up on the Value Stream Analytics page for your
+group.
+
+If you want to alter or delete the stage, you can easily do that for customized stages by:
+
+1. Hovering over the stage.
+1. Clicking the vertical ellipsis (**{ellipsis_v}**) button that appears.
+
+![Value Stream Analytics Stages](img/vsm_stage_list_v12_9.png)
+
+Creating a custom stage requires specifying two events:
+
+- A start.
+- An end.
+
+Be careful to choose a start event that occurs *before* your end event. For example, consider a
+stage that:
+
+- Started when an issue is added to a board.
+- Ended when the issue is created.
+
+This stage would not work because the end event has already happened when the start event occurs.
+To prevent such invalid stages, the UI prohibits incompatible start and end events. After you select
+the start event, the stop event dropdown will only list the compatible events.
+
+NOTE: **Note:**
+The ability to re-order the stages is [planned](https://gitlab.com/gitlab-org/gitlab/issues/196698).
+
+### Label based stages
+
+The pre-defined start and end events can cover many use cases involving both issues and merge requests.
+
+For supporting more complex workflows, use stages based on group labels. These events are based on
+labels being added or removed. In particular, [scoped labels](../project/labels.md#scoped-labels-premium)
+are useful for complex workflows.
+
+In this example, we'd like to measure more accurate code review times. The workflow is the following:
+
+- When the code review starts, the reviewer adds `workflow::code_review_start` label to the merge request.
+- When the code review is finished, the reviewer adds `workflow::code_review_complete` label to the merge request.
+
+Creating a new stage called "Code Review":
+
+![New Label Based Value Stream Analytics Stage](img/label_based_stage_vsm_v12_9.png "Creating a label based Value Stream Analytics Stage")
+
+### Hiding unused stages
+
+Sometimes certain default stages are not relevant to a team. In this case, you can easily hide stages
+so they no longer appear in the list. To hide stages:
+
+1. Add a custom stage to activate customizability.
+1. Hover over the default stage you want to hide.
+1. Click the vertical ellipsis (**{ellipsis_v}**) button that appears and select **Hide stage**.
+
+To recover a default stage that was previously hidden:
+
+1. Click **Add a stage** button.
+1. In the top right corner open the **Recover hidden stage** dropdown.
+1. Select a stage.
+
 ## Days to completion chart
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21631) in GitLab 12.6.
@@ -214,6 +300,6 @@ For Value Stream Analytics functionality introduced in GitLab 12.3 and later:
 
 Learn more about Value Stream Analytics in the following resources:
 
-- [Value Stream Analytics feature page](https://about.gitlab.com/product/cycle-analytics/).
+- [Value Stream Analytics feature page](https://about.gitlab.com/stages-devops-lifecycle/cycle-analytics/).
 - [Value Stream Analytics feature preview](https://about.gitlab.com/blog/2016/09/16/feature-preview-introducing-cycle-analytics/).
 - [Value Stream Analytics feature highlight](https://about.gitlab.com/blog/2016/09/21/cycle-analytics-feature-highlight/).

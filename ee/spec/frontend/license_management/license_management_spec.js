@@ -7,14 +7,12 @@ import AdminLicenseManagementRow from 'ee/vue_shared/license_management/componen
 import LicenseManagementRow from 'ee/vue_shared/license_management/components/license_management_row.vue';
 import AddLicenseForm from 'ee/vue_shared/license_management/components/add_license_form.vue';
 import DeleteConfirmationModal from 'ee/vue_shared/license_management/components/delete_confirmation_modal.vue';
-import { TEST_HOST } from 'helpers/test_constants';
 import { approvedLicense, blacklistedLicense } from './mock_data';
 
 Vue.use(Vuex);
 
 let wrapper;
 
-const apiUrl = `${TEST_HOST}/license_management`;
 const managedLicenses = [approvedLicense, blacklistedLicense];
 
 const PaginatedListMock = {
@@ -50,7 +48,6 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin }) => {
         },
         actions: {
           fetchManagedLicenses: noop,
-          setAPISettings: noop,
           setLicenseApproval: noop,
           ...actionMocks,
         },
@@ -60,7 +57,6 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin }) => {
 
   wrapper = shallowMount(LicenseManagement, {
     propsData: {
-      apiUrl,
       ...props,
     },
     stubs: {
@@ -106,26 +102,16 @@ describe('License Management', () => {
         });
       });
 
-      it('should set api settings after mount and init API calls', () => {
-        const setAPISettingsMock = jest.fn();
+      it('should mount and fetch licenses', () => {
         const fetchManagedLicensesMock = jest.fn();
 
         createComponent({
           state: { isLoadingManagedLicenses: false },
           actionMocks: {
-            setAPISettings: setAPISettingsMock,
             fetchManagedLicenses: fetchManagedLicensesMock,
           },
           isAdmin,
         });
-
-        expect(setAPISettingsMock).toHaveBeenCalledWith(
-          expect.any(Object),
-          {
-            apiUrlManageLicenses: apiUrl,
-          },
-          undefined,
-        );
 
         expect(fetchManagedLicensesMock).toHaveBeenCalledWith(
           expect.any(Object),

@@ -74,15 +74,6 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 end
 
-Gitlab.ee do
-  Settings['smartcard'] ||= Settingslogic.new({})
-  Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
-  Settings.smartcard['client_certificate_required_host'] = Settings.gitlab['host'] if Settings.smartcard['client_certificate_required_host'].nil?
-  Settings.smartcard['client_certificate_required_port'] = 3444 if Settings.smartcard['client_certificate_required_port'].nil?
-  Settings.smartcard['required_for_git_access'] = false if Settings.smartcard['required_for_git_access'].nil?
-  Settings.smartcard['san_extensions'] = false if Settings.smartcard['san_extensions'].nil?
-end
-
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled'] = true if Settings.omniauth['enabled'].nil?
 Settings.omniauth['auto_sign_in_with_provider'] = false if Settings.omniauth['auto_sign_in_with_provider'].nil?
@@ -546,6 +537,9 @@ Gitlab.ee do
   Settings.cron_jobs['elastic_index_bulk_cron_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['elastic_index_bulk_cron_worker']['cron'] ||= '*/1 * * * *'
   Settings.cron_jobs['elastic_index_bulk_cron_worker']['job_class'] ||= 'ElasticIndexBulkCronWorker'
+  Settings.cron_jobs['elastic_metrics_update_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['elastic_metrics_update_worker']['cron'] ||= '*/1 * * * *'
+  Settings.cron_jobs['elastic_metrics_update_worker']['job_class'] ||= 'ElasticMetricsUpdateWorker'
   Settings.cron_jobs['sync_seat_link_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['sync_seat_link_worker']['cron'] ||= "#{rand(60)} 0 * * *"
   Settings.cron_jobs['sync_seat_link_worker']['job_class'] = 'SyncSeatLinkWorker'
@@ -666,6 +660,18 @@ Gitlab.ee do
   if Settings.kerberos['enabled'] && !Settings.omniauth.providers.map(&:name).include?('kerberos_spnego')
     Settings.omniauth.providers << Settingslogic.new({ 'name' => 'kerberos_spnego' })
   end
+end
+
+#
+# Smartcard
+#
+Gitlab.ee do
+  Settings['smartcard'] ||= Settingslogic.new({})
+  Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
+  Settings.smartcard['client_certificate_required_host'] = Settings.gitlab.host if Settings.smartcard['client_certificate_required_host'].nil?
+  Settings.smartcard['client_certificate_required_port'] = 3444 if Settings.smartcard['client_certificate_required_port'].nil?
+  Settings.smartcard['required_for_git_access'] = false if Settings.smartcard['required_for_git_access'].nil?
+  Settings.smartcard['san_extensions'] = false if Settings.smartcard['san_extensions'].nil?
 end
 
 #

@@ -78,13 +78,13 @@ describe('GeoReplicable Store Mutations', () => {
 
     it('sets designs array with data', () => {
       mutations[types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, mockData);
-      expect(state.designs).toBe(mockData.data);
+      expect(state.replicableItems).toBe(mockData.data);
     });
 
     it('sets pageSize and totalDesigns', () => {
       mutations[types.RECEIVE_REPLICABLE_ITEMS_SUCCESS](state, mockData);
       expect(state.pageSize).toEqual(mockData.perPage);
-      expect(state.totalDesigns).toEqual(mockData.total);
+      expect(state.totalReplicableItems).toEqual(mockData.total);
     });
   });
 
@@ -103,19 +103,19 @@ describe('GeoReplicable Store Mutations', () => {
     });
 
     it('resets designs array', () => {
-      state.designs = mockData.data;
+      state.replicableItems = mockData.data;
 
       mutations[types.RECEIVE_REPLICABLE_ITEMS_ERROR](state);
-      expect(state.designs).toEqual([]);
+      expect(state.replicableItems).toEqual([]);
     });
 
     it('resets pagination data', () => {
       state.pageSize = mockData.perPage;
-      state.totalDesigns = mockData.total;
+      state.totalReplicableItems = mockData.total;
 
       mutations[types.RECEIVE_REPLICABLE_ITEMS_ERROR](state);
       expect(state.pageSize).toEqual(0);
-      expect(state.totalDesigns).toEqual(0);
+      expect(state.totalReplicableItems).toEqual(0);
     });
   });
 

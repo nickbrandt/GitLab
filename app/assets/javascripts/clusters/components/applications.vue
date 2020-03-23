@@ -313,6 +313,7 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :install-failed="applications.ingress.installFailed"
         :install-application-request-params="{
           modsecurity_enabled: applications.ingress.modsecurity_enabled,
+          modsecurity_mode: applications.ingress.modsecurity_mode,
         }"
         :uninstallable="applications.ingress.uninstallable"
         :uninstall-successful="applications.ingress.uninstallSuccessful"
@@ -634,8 +635,13 @@ Crossplane runs inside your Kubernetes cluster and supports secure connectivity 
         :status-reason="applications.elastic_stack.statusReason"
         :request-status="applications.elastic_stack.requestStatus"
         :request-reason="applications.elastic_stack.requestReason"
+        :version="applications.elastic_stack.version"
+        :chart-repo="applications.elastic_stack.chartRepo"
+        :update-available="applications.elastic_stack.updateAvailable"
         :installed="applications.elastic_stack.installed"
         :install-failed="applications.elastic_stack.installFailed"
+        :update-successful="applications.elastic_stack.updateSuccessful"
+        :update-failed="applications.elastic_stack.updateFailed"
         :uninstallable="applications.elastic_stack.uninstallable"
         :uninstall-successful="applications.elastic_stack.uninstallSuccessful"
         :uninstall-failed="applications.elastic_stack.uninstallFailed"

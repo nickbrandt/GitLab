@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { throttle } from 'lodash';
 import DesignImage from './image.vue';
 import DesignOverlay from './design_overlay.vue';
 
@@ -66,7 +66,7 @@ export default {
     const { presentationViewport } = this.$refs;
     if (!presentationViewport) return;
 
-    this.scrollThrottled = _.throttle(() => {
+    this.scrollThrottled = throttle(() => {
       this.shiftZoomFocalPoint();
     }, 400);
 

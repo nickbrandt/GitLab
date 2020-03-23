@@ -33,7 +33,12 @@ export default class SidebarMediator extends CESidebarMediator {
     this.store.setFetchingState('status', true);
     return this.service
       .updateWithGraphQl(updateStatusMutation, { healthStatus })
-      .then(({ data }) => this.store.setStatus(data?.updateIssue?.issue?.healthStatus))
+      .then(({ data }) => {
+        if (data?.updateIssue?.errors?.length > 0) {
+          throw data.updateIssue.errors[0];
+        }
+        this.store.setStatus(data?.updateIssue?.issue?.healthStatus);
+      })
       .catch(error => {
         throw error;
       })

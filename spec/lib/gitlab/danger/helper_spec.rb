@@ -76,6 +76,16 @@ describe Gitlab::Danger::Helper do
     end
   end
 
+  describe '#all_ee_changes' do
+    subject { helper.all_ee_changes }
+
+    it 'returns all changed files starting with ee/' do
+      expect(helper).to receive(:all_changed_files).and_return(%w[fr/ee/beer.rb ee/wine.rb ee/lib/ido.rb ee.k])
+
+      is_expected.to match_array(%w[ee/wine.rb ee/lib/ido.rb])
+    end
+  end
+
   describe '#ee?' do
     subject { helper.ee? }
 
@@ -206,7 +216,6 @@ describe Gitlab::Danger::Helper do
 
       'Gemfile'        | :backend
       'Gemfile.lock'   | :backend
-      'Procfile'       | :backend
       'Rakefile'       | :backend
       'FOO_VERSION'    | :backend
 
@@ -230,6 +239,7 @@ describe Gitlab::Danger::Helper do
       'ee/FOO_VERSION' | :unknown
 
       'db/schema.rb'                                              | :database
+      'db/structure.sql'                                          | :database
       'db/migrate/foo'                                            | :database
       'db/post_migrate/foo'                                       | :database
       'ee/db/migrate/foo'                                         | :database

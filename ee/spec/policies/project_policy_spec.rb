@@ -36,7 +36,7 @@ describe ProjectPolicy do
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
-        read_vulnerability create_vulnerability admin_vulnerability
+        read_vulnerability create_vulnerability create_vulnerability_export admin_vulnerability
         admin_vulnerability_issue_link read_merge_train
       ]
     end
@@ -527,6 +527,7 @@ describe ProjectPolicy do
 
         it { is_expected.to be_disallowed(:create_vulnerability) }
         it { is_expected.to be_disallowed(:admin_vulnerability) }
+        it { is_expected.to be_disallowed(:create_vulnerability_export) }
       end
     end
   end
@@ -1019,6 +1020,55 @@ describe ProjectPolicy do
       let(:current_user) { admin }
 
       it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+  end
+
+  describe 'publish_status_page' do
+    let(:anonymous) { nil }
+    let(:feature) { :status_page }
+    let(:policy) { :publish_status_page }
+
+    context 'when feature is available' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:role, :allowed) do
+        :anonymous  | false
+        :guest      | false
+        :reporter   | false
+        :developer  | true
+        :maintainer | true
+        :owner      | true
+        :admin      | true
+      end
+
+      with_them do
+        let(:current_user) { public_send(role) if role }
+
+        before do
+          stub_feature_flags(feature => true)
+          stub_licensed_features(feature => true)
+        end
+
+        it do
+          is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy))
+        end
+
+        context 'when feature is not available' do
+          before do
+            stub_licensed_features(feature => false)
+          end
+
+          it { is_expected.to be_disallowed(policy) }
+        end
+
+        context 'when feature flag is disabled' do
+          before do
+            stub_feature_flags(feature => false)
+          end
+
+          it { is_expected.to be_disallowed(policy) }
+        end
+      end
     end
   end
 

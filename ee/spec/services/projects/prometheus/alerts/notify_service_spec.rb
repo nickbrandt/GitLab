@@ -292,6 +292,14 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
           it_behaves_like 'processes incident issues', 2
 
+          context 'multiple firing alerts' do
+            let(:payload_raw) do
+              payload_for(firing: [alert_firing, alert_firing], resolved: [])
+            end
+
+            it_behaves_like 'processes incident issues', 2
+          end
+
           context 'without firing alerts' do
             let(:payload_raw) do
               payload_for(firing: [], resolved: [alert_resolved])

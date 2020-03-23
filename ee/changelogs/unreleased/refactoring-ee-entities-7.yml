@@ -1,5 +1,0 @@
----
-title: Separate geo_node and license entities into own class file
-merge_request: 26685
-author: Rajendra Kadam
-type: added

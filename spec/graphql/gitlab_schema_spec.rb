@@ -27,11 +27,11 @@ describe GitlabSchema do
   end
 
   it 'has the base mutation' do
-    expect(described_class.mutation).to eq(::Types::MutationType.to_graphql)
+    expect(described_class.mutation).to eq(::Types::MutationType)
   end
 
   it 'has the base query' do
-    expect(described_class.query).to eq(::Types::QueryType.to_graphql)
+    expect(described_class.query).to eq(::Types::QueryType)
   end
 
   it 'paginates active record relations using `Connections::Keyset::Connection`' do
@@ -50,12 +50,6 @@ describe GitlabSchema do
     connection = implementations[Gitlab::Graphql::FilterableArray.name]
 
     expect(connection).to eq(Gitlab::Graphql::Connections::FilterableArrayConnection)
-  end
-
-  it 'paginates OffsetActiveRecordRelation using `Pagination::OffsetActiveRecordRelationConnection`' do
-    connection = implementations[Gitlab::Graphql::Pagination::Relations::OffsetActiveRecordRelation.name]
-
-    expect(connection).to eq(Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection)
   end
 
   describe '.execute' do

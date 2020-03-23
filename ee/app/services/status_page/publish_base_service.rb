@@ -12,14 +12,14 @@ module StatusPage
       return error_feature_not_available unless feature_available?
       return error_no_storage_client unless storage_client
 
-      publish(*args)
+      process(*args)
     end
 
     private
 
     attr_reader :project
 
-    def publish(*args)
+    def process(*args)
       raise NotImplementedError
     end
 
@@ -49,6 +49,12 @@ module StatusPage
 
       content = json.to_json
       storage_client.upload_object(key, content)
+
+      success(object_key: key)
+    end
+
+    def delete(key)
+      storage_client.delete_object(key)
 
       success(object_key: key)
     end

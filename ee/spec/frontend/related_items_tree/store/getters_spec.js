@@ -2,7 +2,7 @@ import * as getters from 'ee/related_items_tree/store/getters';
 import createDefaultState from 'ee/related_items_tree/store/state';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
-import { mockEpic1, mockEpic2 } from '../../../javascripts/related_items_tree/mock_data';
+import { mockEpic1, mockEpic2 } from '../mock_data';
 
 window.gl = window.gl || {};
 
