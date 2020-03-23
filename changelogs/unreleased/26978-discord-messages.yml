@@ -1,6 +1,5 @@
 ---
-title: sbingner Update discord notifications to be a single embed and include log
-  messages
+title: Update discord notifications to be a single embed and include log messages
 merge_request: 26978
 author: Sam Bingner
 type: fixed
