@@ -159,9 +159,12 @@ export default {
 
 <template>
   <div class="prometheus-alert-widget dropdown flex-grow-2 overflow-hidden">
-    <span v-if="errorMessage" class="alert-error-message">{{ errorMessage }}</span>
+    <span v-if="errorMessage" ref="alertErrorMessage" class="alert-error-message">{{
+      errorMessage
+    }}</span>
     <span
       v-else
+      ref="alertCurrentSetting"
       class="alert-current-setting text-secondary cursor-pointer d-flex align-items-end"
       @click="showModal"
     >
@@ -170,7 +173,7 @@ export default {
         variant="secondary"
         class="d-flex-center text-secondary text-truncate"
       >
-        <icon name="notifications" class="s18 append-right-4" :size="16" />
+        <icon name="warning" class="s18 append-right-4" :size="16" />
         <span class="text-truncate">{{ alertSummary }}</span>
       </gl-badge>
       <gl-loading-icon v-show="isLoading" :inline="true" />

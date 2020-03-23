@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlertWidget displays a warning icon and matches snapshopt 1`] = `
+<gl-badge-stub
+  class="d-flex-center text-secondary text-truncate"
+  variant="secondary"
+>
+  <icon-stub
+    class="s18 append-right-4"
+    name="warning"
+    size="16"
+  />
+   
+  <span
+    class="text-truncate"
+  >
+    alert-label &gt; 42
+  </span>
+</gl-badge-stub>
+`;
