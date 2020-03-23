@@ -41,29 +41,52 @@ describe Ci::Build do
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 
-    context 'for shared runner' do
-      before do
-        job.runner = create(:ci_runner, :instance)
+    shared_examples 'depends on runner presence and type' do
+      context 'for shared runner' do
+        before do
+          job.runner = create(:ci_runner, :instance)
+        end
+
+        context 'when project#shared_runners_minutes_limit_enabled? is true' do
+          specify do
+            expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
+              .and_return(true)
+
+            is_expected.to be_truthy
+          end
+        end
+
+        context 'when project#shared_runners_minutes_limit_enabled? is false' do
+          specify do
+            expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
+              .and_return(false)
+
+            is_expected.to be_falsey
+          end
+        end
       end
 
-      specify do
-        expect(job.project).to receive(:shared_runners_minutes_limit_enabled?)
-          .and_return(true)
+      context 'with specific runner' do
+        before do
+          job.runner = create(:ci_runner, :project)
+        end
 
-        is_expected.to be_truthy
+        it { is_expected.to be_falsey }
+      end
+
+      context 'without runner' do
+        it { is_expected.to be_falsey }
       end
     end
 
-    context 'with specific runner' do
+    it_behaves_like 'depends on runner presence and type'
+
+    context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
       before do
-        job.runner = create(:ci_runner, :project)
+        stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
       end
 
-      it { is_expected.to be_falsey }
-    end
-
-    context 'without runner' do
-      it { is_expected.to be_falsey }
+      it_behaves_like 'depends on runner presence and type'
     end
   end
 

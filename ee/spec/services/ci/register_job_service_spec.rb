@@ -71,11 +71,30 @@ describe Ci::RegisterJobService do
           it_behaves_like 'does not return a build', 11
 
           context 'and project is public' do
-            before do
-              project.update(visibility_level: Project::PUBLIC)
+            context 'and public projects cost factor is 0 (default)' do
+              before do
+                project.update(visibility_level: Project::PUBLIC)
+              end
+
+              it_behaves_like 'returns a build', 11
             end
 
-            it_behaves_like 'returns a build', 11
+            context 'and public projects cost factor is > 0' do
+              before do
+                project.update(visibility_level: Project::PUBLIC)
+                shared_runner.update(public_projects_minutes_cost_factor: 1.1)
+              end
+
+              it_behaves_like 'does not return a build', 11
+
+              context 'and :ci_minutes_enforce_quota_for_public_projects FF is disabled' do
+                before do
+                  stub_feature_flags(ci_minutes_enforce_quota_for_public_projects: false)
+                end
+
+                it_behaves_like 'returns a build', 11
+              end
+            end
           end
         end
 
