@@ -12,6 +12,8 @@ class AddMaxPersonalAccessTokenLifetimeToNamespaces < ActiveRecord::Migration[6.
   end
 
   def down
-    remove_column :namespaces, :max_personal_access_token_lifetime
+    with_lock_retries do
+      remove_column :namespaces, :max_personal_access_token_lifetime
+    end
   end
 end
