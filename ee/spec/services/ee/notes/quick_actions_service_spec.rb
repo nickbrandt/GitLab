@@ -393,6 +393,14 @@ describe Notes::QuickActionsService do
           end
         end
 
+        context 'when issue was already promoted' do
+          it 'does not promote issue' do
+            issue.update(promoted_to_epic_id: epic.id)
+
+            expect { execute(note) }.not_to change { Epic.count }
+          end
+        end
+
         context 'when an issue belongs to a project without group' do
           let(:user_project) { create(:project) }
           let(:issue) { create(:issue, project: user_project) }
