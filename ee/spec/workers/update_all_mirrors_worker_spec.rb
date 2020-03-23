@@ -138,7 +138,30 @@ describe UpdateAllMirrorsWorker do
       end
     end
 
-    context 'on GitLab.com' do
+    context 'when the instance is licensed' do
+      def scheduled_mirror(at:)
+        project = create(:project, :mirror)
+        project.import_state.update!(next_execution_timestamp: at)
+        project
+      end
+
+      before do
+        stub_feature_flags(free_period_for_pull_mirroring: false)
+      end
+
+      let_it_be(:project1) { scheduled_mirror(at: 8.weeks.ago) }
+      let_it_be(:project2) { scheduled_mirror(at: 7.weeks.ago) }
+
+      context 'when capacity is in excess' do
+        it 'schedules all available mirrors' do
+          schedule_mirrors!(capacity: 3)
+
+          expect_import_scheduled(project1, project2)
+        end
+      end
+    end
+
+    context 'when the instance checks namespace plans' do
       def scheduled_mirror(at:, licensed:, public: false, subgroup: nil)
         group_args = [:group, :public, subgroup && :nested].compact
         namespace = create(*group_args)
@@ -165,8 +188,35 @@ describe UpdateAllMirrorsWorker do
 
       let(:unlicensed_projects) { [unlicensed_project1, unlicensed_project2, unlicensed_project3, unlicensed_project4] }
 
-      context 'during the free period for pull mirroring' do
+      context 'after the free period for pull mirroring' do
         before do
+          stub_feature_flags(free_period_for_pull_mirroring: false)
+        end
+
+        context 'when capacity is in excess' do
+          it 'schedules all available mirrors' do
+            schedule_mirrors!(capacity: 4)
+
+            expect_import_scheduled(licensed_project1, licensed_project2, public_project)
+            expect_import_not_scheduled(*unlicensed_projects)
+          end
+        end
+
+        context 'when capacity is exactly sufficient' do
+          it 'does not include unlicensed non-public projects in batches' do
+            # We expect that all three eligible projects will be
+            # included in the first batch because the query will only
+            # return eligible projects.
+            expect(subject).to receive(:pull_mirrors_batch).with(hash_including(batch_size: 6)).and_call_original.once
+
+            schedule_mirrors!(capacity: 3)
+          end
+        end
+      end
+
+      context 'when checking licenses on each record individually' do
+        before do
+          stub_feature_flags(free_period_for_pull_mirroring: true)
           stub_const('License::ANY_PLAN_FEATURES', [])
         end
 
@@ -174,10 +224,8 @@ describe UpdateAllMirrorsWorker do
           it "schedules all available mirrors" do
             schedule_mirrors!(capacity: 4)
 
-            aggregate_failures do
-              expect_import_scheduled(licensed_project1, licensed_project2, public_project)
-              expect_import_not_scheduled(*unlicensed_projects)
-            end
+            expect_import_scheduled(licensed_project1, licensed_project2, public_project)
+            expect_import_not_scheduled(*unlicensed_projects)
           end
 
           it 'requests as many batches as necessary' do
