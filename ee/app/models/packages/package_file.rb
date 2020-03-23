@@ -2,9 +2,6 @@
 class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
   include ::Gitlab::Geo::ReplicableModel
-  include IgnorableColumns
-
-  ignore_column :file_type, remove_with: '12.10', remove_after: '2019-03-22'
 
   delegate :project, :project_id, to: :package
   delegate :conan_file_type, to: :conan_file_metadatum
