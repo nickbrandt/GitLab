@@ -22,7 +22,7 @@ import * as urlUtils from '~/lib/utils/url_utility';
 import { toYmd } from 'ee/analytics/shared/utils';
 import * as mockData from '../mock_data';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import UrlSyncMixin from 'ee/analytics/cycle_analytics/mixins/url_sync_mixin';
+import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
@@ -621,7 +621,14 @@ describe('Cycle Analytics component', () => {
     });
   });
 
-  describe('Url Sync', () => {
+  describe('Url parameters', () => {
+    const fakeGroup = {
+      id: 2,
+      path: 'new-test',
+      fullPath: 'new-test-group',
+      name: 'New test group',
+    };
+
     beforeEach(() => {
       commonUtils.historyPushState = jest.fn();
       urlUtils.setUrlParams = jest.fn();
@@ -649,14 +656,45 @@ describe('Cycle Analytics component', () => {
       });
     });
 
-    describe('with a group selected', () => {
-      const fakeGroup = {
-        id: 2,
-        path: 'new-test',
-        fullPath: 'new-test-group',
-        name: 'New test group',
-      };
+    describe('with hideGroupDropDown=true', () => {
+      beforeEach(() => {
+        commonUtils.historyPushState = jest.fn();
+        urlUtils.setUrlParams = jest.fn();
 
+        mock = new MockAdapter(axios);
+
+        wrapper = createComponent({
+          shallow: false,
+          scatterplotEnabled: false,
+          tasksByTypeChartEnabled: false,
+          stubs: {
+            ...defaultStubs,
+          },
+          props: {
+            hideGroupDropDown: true,
+          },
+        });
+
+        wrapper.vm.$store.dispatch('initializeCycleAnalytics', {
+          createdAfter: mockData.startDate,
+          createdBefore: mockData.endDate,
+          group: fakeGroup,
+        });
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('sets the group_id url parameter', () => {
+        return shouldSetUrlParams({
+          created_after: toYmd(mockData.startDate),
+          created_before: toYmd(mockData.endDate),
+          group_id: null,
+          'project_ids[]': [],
+        });
+      });
+    });
+
+    describe('with a group selected', () => {
       beforeEach(() => {
         wrapper.vm.$store.dispatch('setSelectedGroup', {
           ...fakeGroup,

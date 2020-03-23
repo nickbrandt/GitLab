@@ -13,7 +13,8 @@ import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import TasksByTypeChart from './tasks_by_type_chart.vue';
-import UrlSyncMixin from '../mixins/url_sync_mixin';
+import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
+import { toYmd } from '../../shared/utils';
 
 export default {
   name: 'CycleAnalytics',
@@ -123,6 +124,14 @@ export default {
         endDate,
         subject,
         selectedLabelIds,
+      };
+    },
+    query() {
+      return {
+        group_id: !this.hideGroupDropDown ? this.currentGroupPath : null,
+        'project_ids[]': this.selectedProjectIds,
+        created_after: toYmd(this.startDate),
+        created_before: toYmd(this.endDate),
       };
     },
   },
