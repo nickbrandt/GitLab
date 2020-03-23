@@ -79,7 +79,7 @@ export default {
 <template>
   <gl-tabs @input="tabChanged">
     <template #tabs-end>
-      <div class="d-flex align-self-center ml-auto">
+      <div class="d-flex align-self-center ml-md-auto py-1 py-md-0">
         <package-filter class="mr-1" @filter="requestPackagesList" />
         <package-sort @sort:changed="requestPackagesList" />
       </div>
