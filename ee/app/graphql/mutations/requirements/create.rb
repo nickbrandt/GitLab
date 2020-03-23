@@ -9,8 +9,7 @@ module Mutations
 
       authorize :create_requirement
 
-      field :requirement,
-            Types::RequirementType,
+      field :requirement, Types::RequirementType,
             null: true,
             description: 'The requirement after mutation'
 
