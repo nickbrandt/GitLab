@@ -37,7 +37,7 @@ describe Packages::Npm::CreateTagService do
       end
 
       context 'on same package with different version' do
-        let!(:package2) { create(:npm_package, project: package.project, name: package.name, version: '5.0.0testing') }
+        let!(:package2) { create(:npm_package, project: package.project, name: package.name, version: '5.0.0-testing') }
 
         it { expect { subject }.to not_change { Packages::Tag.count } }
         it { expect(subject.name).to eq(tag_name) }
