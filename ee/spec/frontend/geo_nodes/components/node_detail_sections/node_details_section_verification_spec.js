@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlPopover, GlSprintf } from '@gitlab/ui';
 
 import NodeDetailsSectionVerificationComponent from 'ee/geo_nodes/components/node_detail_sections/node_details_section_verification.vue';
 import SectionRevealButton from 'ee/geo_nodes/components/node_detail_sections/section_reveal_button.vue';
@@ -8,14 +9,17 @@ import { mockNodeDetails } from '../../mock_data';
 describe('NodeDetailsSectionVerification', () => {
   let wrapper;
 
-  const propsData = {
+  const defaultProps = {
     nodeDetails: mockNodeDetails,
     nodeTypePrimary: false,
   };
 
-  const createComponent = () => {
+  const createComponent = (props = {}) => {
     wrapper = shallowMount(NodeDetailsSectionVerificationComponent, {
-      propsData,
+      propsData: {
+        ...defaultProps,
+        ...props,
+      },
     });
   };
 
@@ -26,6 +30,8 @@ describe('NodeDetailsSectionVerification', () => {
   afterEach(() => {
     wrapper.destroy();
   });
+
+  const findGlPopover = () => wrapper.find(GlPopover);
 
   describe('data', () => {
     it('returns default data props', () => {
@@ -81,6 +87,30 @@ describe('NodeDetailsSectionVerification', () => {
     });
   });
 
+  describe('computed', () => {
+    describe('nodeText', () => {
+      describe('on Primary node', () => {
+        beforeEach(() => {
+          createComponent({ nodeTypePrimary: true });
+        });
+
+        it('returns text about secondary nodes', () => {
+          expect(wrapper.vm.nodeText).toBe('secondary nodes');
+        });
+      });
+
+      describe('on Secondary node', () => {
+        beforeEach(() => {
+          createComponent();
+        });
+
+        it('returns text about secondary nodes', () => {
+          expect(wrapper.vm.nodeText).toBe('primary node');
+        });
+      });
+    });
+  });
+
   describe('template', () => {
     it('renders component container element', () => {
       expect(wrapper.vm.$el.classList.contains('verification-section')).toBe(true);
@@ -97,6 +127,20 @@ describe('NodeDetailsSectionVerification', () => {
       wrapper.vm.showSectionItems = true;
       return wrapper.vm.$nextTick(() => {
         expect(wrapper.vm.$el.querySelector('.section-items-container')).not.toBeNull();
+      });
+    });
+
+    describe('GlPopover', () => {
+      it('renders always', () => {
+        expect(findGlPopover().exists()).toBeTruthy();
+      });
+
+      it('contains text about Replicated data', () => {
+        expect(
+          findGlPopover()
+            .find(GlSprintf)
+            .attributes('message'),
+        ).toContain('Replicated data is verified');
       });
     });
   });

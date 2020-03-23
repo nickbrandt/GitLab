@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 
-import Icon from '~/vue_shared/components/icon.vue';
 import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 import GeoNodeDetailItemComponent from 'ee/geo_nodes/components/geo_node_detail_item.vue';
 import GeoNodeSyncSettings from 'ee/geo_nodes/components/geo_node_sync_settings.vue';
@@ -53,24 +52,6 @@ describe('GeoNodeDetailItemComponent', () => {
       expect(wrapper.vm.$el.querySelector('.node-detail-value').innerText.trim()).toBe(
         '10.4.0-pre',
       );
-    });
-
-    describe('with help info', () => {
-      beforeEach(() => {
-        createComponent({
-          helpInfo: {
-            title: 'Foo title tooltip',
-            url: 'https://docs.gitlab.com',
-            urlText: 'Help',
-          },
-        });
-      });
-
-      it('renders item title help info icon', () => {
-        const helpTextIconEl = wrapper.find(Icon);
-        expect(helpTextIconEl.exists()).toBeTruthy();
-        expect(helpTextIconEl.attributes('name')).toBe('question');
-      });
     });
 
     describe('when graph item value', () => {
