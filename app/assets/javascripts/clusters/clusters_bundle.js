@@ -334,7 +334,7 @@ export default class Clusters {
       );
     }
 
-    if (this.store.state.applications[KNATIVE].status === APPLICATION_STATUS.INSTALLED) {
+    if (this.store.state.applications[KNATIVE]?.status === APPLICATION_STATUS.INSTALLED) {
       initServerlessSurveyBanner();
     }
   }
