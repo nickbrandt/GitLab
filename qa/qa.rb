@@ -479,7 +479,6 @@ module QA
         autoload :NewJob, 'qa/vendor/jenkins/page/new_job'
         autoload :LastJobConsole, 'qa/vendor/jenkins/page/last_job_console'
         autoload :ConfigureJob, 'qa/vendor/jenkins/page/configure_job'
-        autoload :Logs, 'qa/vendor/jenkins/page/logs'
       end
     end
 
