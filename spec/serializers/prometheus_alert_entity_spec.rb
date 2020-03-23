@@ -12,7 +12,7 @@ describe PrometheusAlertEntity do
 
   context 'when user can read prometheus alerts' do
     before do
-      prometheus_alert.project.add_master(user)
+      prometheus_alert.project.add_maintainer(user)
       stub_licensed_features(prometheus_alerts: true)
     end
 
