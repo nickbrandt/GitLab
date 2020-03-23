@@ -9,36 +9,6 @@ describe Admin::ServicesController do
     sign_in(admin)
   end
 
-  describe 'GET #index' do
-    it 'uses less than 100 SQL queries limit' do
-      query_count = ActiveRecord::QueryRecorder.new { get :index }.count
-
-      expect(query_count).to be < 100
-    end
-
-    context 'with all existing templates' do
-      before do
-        Service.insert_all(
-          Service.available_services_types.map { |type| { template: true, type: type } }
-        )
-      end
-
-      it 'avoids N+1 queries' do
-        control_count = ActiveRecord::QueryRecorder.new { get :index }.count
-
-        Service.insert_all(
-          [
-            { template: true, type: 'Service1' },
-            { template: true, type: 'Service2' },
-            { template: true, type: 'Service3' }
-          ]
-        )
-
-        expect { get :index }.not_to exceed_query_limit(control_count)
-      end
-    end
-  end
-
   describe 'GET #edit' do
     let!(:service) do
       create(:jira_service, :template)
