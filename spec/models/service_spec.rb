@@ -152,14 +152,18 @@ describe Service do
   describe 'template' do
     let(:project) { create(:project) }
 
+    shared_examples 'retrieves service templates' do
+      it 'returns the available service templates' do
+        expect(Service.find_or_create_templates.pluck(:type)).to match_array(Service.available_services_types)
+      end
+    end
+
     describe '.find_or_create_templates' do
       it 'creates service templates' do
         expect { Service.find_or_create_templates }.to change { Service.count }.from(0).to(Service.available_services_names.size)
       end
 
-      it 'returns the available service templates' do
-        expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
-      end
+      it_behaves_like 'retrieves service templates'
 
       context 'with all existing templates' do
         before do
@@ -172,9 +176,7 @@ describe Service do
           expect { Service.find_or_create_templates }.to change { Service.count }.by(0)
         end
 
-        it 'returns the available service templates' do
-          expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
-        end
+        it_behaves_like 'retrieves service templates'
 
         context 'with a previous existing service (Previous) and a new service (Asana)' do
           before do
@@ -182,24 +184,20 @@ describe Service do
             Service.delete_by(type: 'AsanaService', template: true)
           end
 
-          it 'returns the available service templates' do
-            expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
-          end
+          it_behaves_like 'retrieves service templates'
         end
       end
 
       context 'with a few existing templates' do
         before do
-          JiraService.create(template: true)
+          create(:jira_service, :template)
         end
 
         it 'creates the rest of the service templates' do
           expect { Service.find_or_create_templates }.to change { Service.count }.from(1).to(Service.available_services_names.size)
         end
 
-        it 'returns the available service templates' do
-          expect(Service.find_or_create_templates.map(&:type)).to match_array(Service.available_services_types)
-        end
+        it_behaves_like 'retrieves service templates'
       end
     end
 
