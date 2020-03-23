@@ -3,59 +3,6 @@
 module EE
   module API
     module Entities
-      module Group
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :ldap_cn, :ldap_access
-          expose :ldap_group_links,
-                 using: EE::API::Entities::LdapGroupLink,
-                 if: ->(group, options) { group.ldap_group_links.any? }
-
-          expose :checked_file_template_project_id,
-                 as: :file_template_project_id,
-                 if: ->(group, options) { group.feature_available?(:custom_file_templates_for_namespace) }
-          expose :marked_for_deletion_on, if: ->(group, _) { group.feature_available?(:adjourned_deletion_for_projects_and_groups) }
-        end
-      end
-
-      module GroupDetail
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :shared_runners_minutes_limit
-          expose :extra_shared_runners_minutes_limit
-        end
-      end
-
-      module Identity
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :saml_provider_id
-        end
-      end
-
-      module Member
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :group_saml_identity,
-                 using: ::API::Entities::Identity,
-                 if: -> (member, options) { Ability.allowed?(options[:current_user], :read_group_saml_identity, member.source) }
-          expose :is_using_seat, if: -> (_, options) { options[:show_seat_info] }
-        end
-      end
-
-      module ProtectedRefAccess
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :user_id
-          expose :group_id
-        end
-      end
-
       module ProtectedBranch
         extend ActiveSupport::Concern
 
