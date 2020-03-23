@@ -380,6 +380,13 @@ Cop/BanCatchThrow:
 Performance/ReadlinesEach:
   Enabled: true
 
+Performance/ChainArrayAllocation:
+  Enabled: true
+  Include:
+    - 'lib/gitlab/import_export/**/*'
+    - 'ee/lib/gitlab/import_export/**/*'
+    - 'ee/lib/ee/gitlab/import_export/**/*'
+
 # https://gitlab.com/gitlab-org/gitlab/-/issues/212541
 RSpec/RepeatedExample:
   Exclude:
