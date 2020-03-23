@@ -3,9 +3,9 @@
 class PrometheusAlertEvent < ApplicationRecord
   include AlertEventLifecycle
 
-  belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alert_events
-  belongs_to :prometheus_alert, required: true, validate: true, inverse_of: :prometheus_alert_events
-  has_and_belongs_to_many :related_issues, class_name: 'Issue', join_table: :issues_prometheus_alert_events
+  belongs_to :project, optional: false, validate: true, inverse_of: :prometheus_alert_events
+  belongs_to :prometheus_alert, optional: false, validate: true, inverse_of: :prometheus_alert_events
+  has_and_belongs_to_many :related_issues, class_name: 'Issue', join_table: :issues_prometheus_alert_events # rubocop:disable Rails/HasAndBelongsToMany
 
   validates :payload_key, uniqueness: { scope: :prometheus_alert_id }
   validates :started_at, presence: true
