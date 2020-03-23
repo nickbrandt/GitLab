@@ -18,6 +18,7 @@ import TrackEventDirective from '~/vue_shared/directives/track_event';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Icon from '~/vue_shared/components/icon.vue';
 import { alertsValidator, queriesValidator } from '../validators';
+import { OPERATORS } from '../constants';
 
 Vue.use(Translate);
 
@@ -31,12 +32,6 @@ const SUBMIT_BUTTON_CLASS = {
   create: 'btn-success',
   update: 'btn-success',
   delete: 'btn-remove',
-};
-
-const OPERATORS = {
-  greaterThan: '>',
-  equalTo: '==',
-  lessThan: '<',
 };
 
 export default {
