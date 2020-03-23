@@ -632,5 +632,5 @@ Sometimes there may be issues with your Elasticsearch index data and as such
 GitLab will allow you to revert to "basic search" when there are no search
 results and assuming that basic search is supported in that scope. This "basic
 search" will behave as though you don't have Elasticsearch enabled at all for
-your instance and search using other data sources (ie. Postgres data and Git
+your instance and search using other data sources (ie. PostgreSQL data and Git
 data).
