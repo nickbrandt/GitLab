@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     new ZenMode(); // eslint-disable-line no-new
     snippetEmbed();
   } else {
-    initSnippetsApp();
+    // initSnippetsApp();
+    SnippetShowInit();
     initNotes();
   }
 });
