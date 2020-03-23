@@ -156,7 +156,7 @@ export default {
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('Pipelines|Loading Pipelines')"
-      size="md"
+      size="lg"
       class="prepend-top-20"
     />
 
