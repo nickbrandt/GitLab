@@ -11,6 +11,11 @@ describe Geo::ProjectRegistry do
 
   subject { registry }
 
+  it_behaves_like 'a BulkInsertSafe model', Geo::ProjectRegistry do
+    let(:valid_items_for_bulk_insertion) { build_list(:geo_project_registry, 10, created_at: Time.zone.now) }
+    let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
+  end
+
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }
   end

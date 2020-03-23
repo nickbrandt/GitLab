@@ -29,14 +29,11 @@ class Geo::UploadRegistry < Geo::BaseRegistry
   end
 
   def self.insert_for_model_ids(attrs)
-    inserts = attrs.map do |file_id, file_type|
-      { file_id: file_id, file_type: file_type, created_at: Time.zone.now }
+    records = attrs.map do |file_id, file_type|
+      new(file_id: file_id, file_type: file_type, created_at: Time.zone.now)
     end
 
-    ActiveRecord::InsertAll
-      .new(self, inserts, on_duplicate: :skip, returning: [:id])
-      .execute
-      .pluck('id')
+    bulk_insert!(records, returns: :ids)
   end
 
   def self.with_search(query)

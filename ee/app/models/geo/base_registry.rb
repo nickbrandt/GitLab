@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Geo::BaseRegistry < Geo::TrackingBase
+  include BulkInsertSafe
+
   self.abstract_class = true
 
   def self.pluck_model_ids_in_range(range)
@@ -16,12 +18,10 @@ class Geo::BaseRegistry < Geo::TrackingBase
   end
 
   def self.insert_for_model_ids(ids)
-    inserts = ids.map do |id|
-      { self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now }
+    records = ids.map do |id|
+      new(self::MODEL_FOREIGN_KEY => id, created_at: Time.zone.now)
     end
 
-    ActiveRecord::InsertAll
-      .new(self, inserts, on_duplicate: :skip, returning: [:id])
-      .execute
+    bulk_insert!(records, returns: :ids)
   end
 end
