@@ -25,10 +25,7 @@ export default {
   },
   methods: {
     handleClose() {
-      Cookies.set('hide_serverless_survey', 'true', {
-        expires: 365 * 10,
-        path: '',
-      });
+      Cookies.set('hide_serverless_survey', 'true', { expires: 365 * 10 });
       this.visible = false;
     },
   },
