@@ -60,8 +60,6 @@ module Packages
       end
 
       def build_package_dependencies(package)
-        return {} if package.dependency_links.empty?
-
         dependencies = Hash.new { |h, key| h[key] = {} }
         dependency_links = package.dependency_links
                                   .with_dependency_type(NPM_VALID_DEPENDENCY_TYPES)
