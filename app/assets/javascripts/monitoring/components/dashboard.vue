@@ -362,11 +362,12 @@ export default {
       refreshCurrentPage();
     },
 
-    onTimeRange({ start, end }) {
+    onTimeRangeZoom({ start, end }) {
       updateHistory({
         url: mergeUrlParams({ start, end }, window.location.href),
         title: document.title,
       });
+      this.selectedTimeRange = { start, end };
     },
   },
   addMetric: {
@@ -589,7 +590,7 @@ export default {
                 :alerts-endpoint="alertsEndpoint"
                 :prometheus-alerts-available="prometheusAlertsAvailable"
                 :index="`${index}-${graphIndex}`"
-                @timerange="onTimeRange"
+                @timerangezoom="onTimeRangeZoom"
               />
             </div>
           </div>

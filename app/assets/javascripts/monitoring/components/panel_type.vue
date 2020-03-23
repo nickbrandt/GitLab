@@ -23,6 +23,10 @@ import MonitorEmptyChart from './charts/empty_chart.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
+const events = {
+  timeRangeZoom: 'timerangezoom',
+};
+
 export default {
   components: {
     MonitorSingleStatChart,
@@ -159,7 +163,7 @@ export default {
     },
     onDatazoom({ start, end }) {
       this.zoomedTimeRange = { start, end };
-      this.$emit('timerange', { start, end });
+      this.$emit(events.timeRangeZoom, { start, end });
     },
   },
 };
