@@ -9,7 +9,7 @@ describe "Admin sends notification", :js, :sidekiq_might_not_need_inline do
   let(:user) { create(:user) }
 
   before do
-    stub_const('NOTIFICATION_TEXT', 'Your project has been moved.'.freeze)
+    stub_const('NOTIFICATION_TEXT', 'Your project has been moved.')
 
     group.add_developer(user)
 
