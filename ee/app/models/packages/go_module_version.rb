@@ -18,7 +18,7 @@ class Packages::GoModuleVersion
   def gomod
     return @gomod unless @gomod.nil?
 
-    blob = @mod.project.repository.blob_at(tag.dereferenced_target.sha, @mod.path + '/go.mod')
+    blob = @mod.project.repository.blob_at(@tag.dereferenced_target.sha, @mod.path + '/go.mod')
     @gomod = blob ? blob.data : ''
   end
 
