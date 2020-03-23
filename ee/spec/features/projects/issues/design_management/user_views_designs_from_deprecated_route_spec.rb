@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'User views issue designs', :js do
+describe 'User views issue designs from deprecated issue routes', :js do
   include DesignManagementTestHelpers
 
   let_it_be(:project) { create(:project_empty_repo, :public) }
@@ -13,9 +13,9 @@ describe 'User views issue designs', :js do
     enable_design_management
   end
 
-  context 'navigates from the issue view' do
+  context 'navigates from the issue view on the deprecated route' do
     before do
-      visit project_issue_path(project, issue)
+      visit project_deprecated_issue_path(project, issue)
       click_link 'Designs'
       wait_for_requests
     end
@@ -25,9 +25,9 @@ describe 'User views issue designs', :js do
     end
   end
 
-  context 'navigates directly to the design collection view' do
+  context 'navigates directly to the design collection view on the deprecated route' do
     before do
-      visit designs_project_issue_path(project, issue)
+      visit designs_project_deprecated_issue_path(project, issue)
     end
 
     it 'expands the sidebar' do
@@ -35,9 +35,9 @@ describe 'User views issue designs', :js do
     end
   end
 
-  context 'navigates directly to the individual design view' do
+  context 'navigates directly to the individual design view on the deprecated route' do
     before do
-      visit designs_project_issue_path(project, issue, vueroute: design.filename)
+      visit designs_project_deprecated_issue_path(project, issue, vueroute: design.filename)
     end
 
     it 'sees the design' do
