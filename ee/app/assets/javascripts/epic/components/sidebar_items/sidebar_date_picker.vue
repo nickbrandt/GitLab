@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { uniqueId } from 'lodash';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 
 import { __, s__ } from '~/locale';
@@ -102,7 +102,7 @@ export default {
     fieldName: {
       type: String,
       required: false,
-      default: () => _.uniqueId('dateType_'),
+      default: () => uniqueId('dateType_'),
     },
   },
   data() {

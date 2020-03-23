@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import _ from 'underscore';
+import { debounce } from 'lodash';
 
 import ListLabel from '../../models/label';
 
@@ -66,7 +66,7 @@ export default {
       // dropdown as otherwise it causes `calc()`
       // used in CSS to miscalculate collapsed
       // sidebar size.
-      _.debounce(() => {
+      debounce(() => {
         this.sidebarExpandedOnClick = true;
         if (contentContainer) {
           contentContainer
