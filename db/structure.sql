@@ -3944,7 +3944,8 @@ CREATE TABLE public.namespaces (
     max_artifacts_size integer,
     mentions_disabled boolean,
     default_branch_protection smallint,
-    unlock_membership_to_ldap boolean
+    unlock_membership_to_ldap boolean,
+    max_personal_access_token_lifetime integer
 );
 
 CREATE SEQUENCE public.namespaces_id_seq
@@ -12708,5 +12709,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200318163148'),
 ('20200318164448'),
 ('20200318165448'),
-('20200319203901');
+('20200319203901'),
+('20200323075043');
 
