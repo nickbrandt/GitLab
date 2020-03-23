@@ -200,6 +200,9 @@ export default {
     hideNodeActionModal() {
       this.$root.$emit('bv::hide::modal', this.modalId);
     },
+    nodeRemovalAllowed(node) {
+      return !node.primary || this.nodes.length <= 1;
+    },
   },
 };
 </script>
@@ -219,6 +222,7 @@ export default {
       :primary-node="node.primary"
       :node-actions-allowed="nodeActionsAllowed"
       :node-edit-allowed="nodeEditAllowed"
+      :node-removal-allowed="nodeRemovalAllowed(node)"
       :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
     <gl-modal

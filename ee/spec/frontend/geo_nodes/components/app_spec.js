@@ -445,6 +445,31 @@ describe('AppComponent', () => {
         expect(rootEmit).toHaveBeenCalledWith('bv::hide::modal', vm.modalId);
       });
     });
+
+    describe('nodeRemovalAllowed', () => {
+      describe.each`
+        primaryNode | nodesLength | nodeRemovalAllowed
+        ${false}    | ${2}        | ${true}
+        ${false}    | ${1}        | ${true}
+        ${true}     | ${2}        | ${false}
+        ${true}     | ${1}        | ${true}
+      `(
+        'with (primaryNode = $primaryNode, nodesLength = $nodesLength)',
+        ({ primaryNode, nodesLength, nodeRemovalAllowed }) => {
+          const testPhrasing = nodeRemovalAllowed ? 'allow' : 'disallow';
+          let node;
+
+          beforeEach(() => {
+            node = { ...mockNode, primary: primaryNode };
+            vm.store.state.nodes = [mockNode, node].slice(0, nodesLength);
+          });
+
+          it(`should ${testPhrasing} node removal`, () => {
+            expect(vm.nodeRemovalAllowed(node)).toBe(nodeRemovalAllowed);
+          });
+        },
+      );
+    });
   });
 
   describe('created', () => {

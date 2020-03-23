@@ -12,6 +12,7 @@ describe('GeoNodeDetailsComponent', () => {
     nodeDetails: mockNodeDetails,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    nodeRemovalAllowed: true,
     geoTroubleshootingHelpPath: '/foo/bar',
   };
 

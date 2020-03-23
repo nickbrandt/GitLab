@@ -29,6 +29,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    nodeRemovalAllowed: {
+      type: Boolean,
+      required: true,
+    },
     geoTroubleshootingHelpPath: {
       type: String,
       required: true,
@@ -91,6 +95,7 @@ export default {
       :node-details="nodeDetails"
       :node-edit-allowed="nodeEditAllowed"
       :node-actions-allowed="nodeActionsAllowed"
+      :node-removal-allowed="nodeRemovalAllowed"
       :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
     <div v-if="isNodeDetailsFailed">
