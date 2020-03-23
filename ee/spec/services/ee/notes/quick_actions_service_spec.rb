@@ -353,4 +353,69 @@ describe Notes::QuickActionsService do
       end
     end
   end
+
+  context '/promote' do
+    let(:note_text) { "/promote" }
+    let(:note) { create(:note_on_issue, noteable: issue, project: project, note: note_text) }
+
+    context 'when epics are enabled' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when a user does not have permissions to promote an issue' do
+        it 'does not promote an issue to an epic' do
+          expect { execute(note) }.not_to change { Epic.count }
+          expect(issue.promoted_to_epic_id).to be_nil
+        end
+      end
+
+      context 'when a user has permissions to promote an issue' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'promotes an issue to an epic' do
+          expect { execute(note) }.to change { Epic.count }.by(1)
+          expect(issue.promoted_to_epic_id).to be_present
+        end
+
+        context 'with a double promote' do
+          let(:note_text) do
+            <<~HEREDOC
+            /promote
+            /promote
+            HEREDOC
+          end
+
+          it 'only creates one epic' do
+            expect { execute(note) }.to change { Epic.count }.by(1)
+          end
+        end
+
+        context 'when an issue belongs to a project without group' do
+          let(:user_project) { create(:project) }
+          let(:issue) { create(:issue, project: user_project) }
+          let(:note) { create(:note_on_issue, noteable: issue, project: user_project, note: note_text) }
+
+          before do
+            user_project.add_developer(user)
+          end
+
+          it 'does not promote an issue to an epic' do
+            expect { execute(note) }
+              .to raise_error(Epics::IssuePromoteService::PromoteError)
+          end
+        end
+      end
+    end
+
+    context 'when epics are disabled' do
+      it 'does not promote an issue to an epic' do
+        group.add_developer(user)
+
+        expect { execute(note) }.not_to change { Epic.count }
+      end
+    end
+  end
 end

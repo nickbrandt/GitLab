@@ -8,6 +8,8 @@ module EE
       override :execute
       def execute(issue)
         handle_epic(issue)
+        handle_promotion(issue)
+
         result = super
 
         if issue.previous_changes.include?(:milestone_id) && issue.epic
@@ -18,6 +20,12 @@ module EE
       end
 
       private
+
+      def handle_promotion(issue)
+        return unless params.delete(:promote_to_epic)
+
+        Epics::IssuePromoteService.new(issue.project, current_user).execute(issue)
+      end
 
       def handle_epic(issue)
         return unless params.key?(:epic)
