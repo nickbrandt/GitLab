@@ -22,6 +22,7 @@ module Packages
       packages = ::Packages::Package
         .for_projects(group_projects_visible_to_current_user)
         .processed
+        .has_version
         .sort_by_attribute("#{params[:order_by]}_#{params[:sort]}")
 
       return packages unless package_type
