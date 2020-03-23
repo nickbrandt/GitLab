@@ -1,5 +1,3 @@
-import { historyPushState } from '~/lib/utils/common_utils';
-import { setUrlParams } from '~/lib/utils/url_utility';
 import * as actions from 'ee/analytics/productivity_analytics/store/modules/filters/actions';
 import * as types from 'ee/analytics/productivity_analytics/store/modules/filters/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
@@ -29,10 +27,6 @@ describe('Productivity analytics filter actions', () => {
         groupNamespace,
       },
     };
-  });
-
-  afterEach(() => {
-    setUrlParams.mockClear();
   });
 
   describe('setInitialData', () => {
@@ -106,21 +100,6 @@ describe('Productivity analytics filter actions', () => {
         .then(done)
         .catch(done.fail);
     });
-
-    it('calls setUrlParams with the group_id param', done => {
-      actions
-        .setGroupNamespace(store, groupNamespace)
-        .then(() => {
-          expect(setUrlParams).toHaveBeenCalledWith(
-            { group_id: groupNamespace },
-            window.location.href,
-            true,
-          );
-          expect(historyPushState).toHaveBeenCalled();
-        })
-        .then(done)
-        .catch(done.fail);
-    });
   });
 
   describe('setProjectPath', () => {
@@ -149,21 +128,6 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[3]).toEqual(['table/setPage', 0, { root: true }]);
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('calls setUrlParams with the group_id and project_id params', done => {
-      actions
-        .setProjectPath(store, projectPath)
-        .then(() => {
-          expect(setUrlParams).toHaveBeenCalledWith(
-            { group_id: groupNamespace, project_id: projectPath },
-            window.location.href,
-            true,
-          );
-          expect(historyPushState).toHaveBeenCalled();
         })
         .then(done)
         .catch(done.fail);
@@ -200,17 +164,6 @@ describe('Productivity analytics filter actions', () => {
         .then(done)
         .catch(done.fail);
     });
-
-    it('calls setUrlParams with the author_username', done => {
-      actions
-        .setFilters(store, { author_username: 'root' })
-        .then(() => {
-          expect(setUrlParams).toHaveBeenCalledWith({ author_username: 'root' });
-          expect(historyPushState).toHaveBeenCalled();
-        })
-        .then(done)
-        .catch(done.fail);
-    });
   });
 
   describe('setDateRange', () => {
@@ -239,21 +192,6 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[3]).toEqual(['table/setPage', 0, { root: true }]);
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-
-    it('calls setUrlParams with the merged_after=startDate and merged_before=endDate', done => {
-      actions
-        .setDateRange(store, { startDate, endDate })
-        .then(() => {
-          expect(setUrlParams).toHaveBeenCalledWith({
-            merged_after: '2019-09-01T00:00:00Z',
-            merged_before: '2019-09-07T23:59:59Z',
-          });
-
-          expect(historyPushState).toHaveBeenCalled();
         })
         .then(done)
         .catch(done.fail);

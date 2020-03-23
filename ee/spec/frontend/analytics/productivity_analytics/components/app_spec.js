@@ -10,6 +10,9 @@ import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
 import { TEST_HOST } from 'helpers/test_constants';
 import { GlEmptyState, GlLoadingIcon, GlDropdown, GlDropdownItem, GlButton } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
+import * as commonUtils from '~/lib/utils/common_utils';
+import * as urlUtils from '~/lib/utils/url_utility';
+import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -33,11 +36,15 @@ describe('ProductivityApp component', () => {
 
   const mainChartData = { 1: 2, 2: 3 };
 
-  const createComponent = (scatterplotEnabled = true) => {
+  const createComponent = ({ props = {}, scatterplotEnabled = true } = {}) => {
     wrapper = shallowMount(ProductivityApp, {
       localVue,
       store,
-      propsData,
+      mixins: [UrlSyncMixin],
+      propsData: {
+        ...propsData,
+        ...props,
+      },
       methods: {
         ...actionSpies,
       },
@@ -347,7 +354,7 @@ describe('ProductivityApp component', () => {
 
               describe('when the feature flag is disabled', () => {
                 beforeEach(() => {
-                  createComponent(false);
+                  createComponent({ scatterplotEnabled: false });
                 });
 
                 it('isScatterplotFeatureEnabled returns false', () => {
@@ -486,6 +493,118 @@ describe('ProductivityApp component', () => {
               expect(findMrTableSection().exists()).toBe(false);
             });
           });
+        });
+      });
+    });
+  });
+
+  describe('Url parameters', () => {
+    const defaultFilters = {
+      author_username: null,
+      milestone_title: null,
+      label_name: [],
+    };
+
+    const defaultResults = {
+      project_id: null,
+      group_id: null,
+      merged_after: '2019-09-01T00:00:00Z',
+      merged_before: '2019-09-02T23:59:59Z',
+      'label_name[]': [],
+      author_username: null,
+      milestone_title: null,
+    };
+
+    const shouldSetUrlParams = result => {
+      expect(urlUtils.setUrlParams).toHaveBeenCalledWith(result, window.location.href, true);
+      expect(commonUtils.historyPushState).toHaveBeenCalled();
+    };
+
+    beforeEach(() => {
+      commonUtils.historyPushState = jest.fn();
+      urlUtils.setUrlParams = jest.fn();
+
+      createComponent();
+      wrapper.vm.$store.dispatch('filters/setInitialData', {
+        skipFetch: true,
+        data: {
+          mergedAfter: new Date('2019-09-01'),
+          mergedBefore: new Date('2019-09-02'),
+        },
+      });
+    });
+
+    it('sets the default url parameters', () => {
+      shouldSetUrlParams(defaultResults);
+    });
+
+    describe('with hideGroupDropDown=true', () => {
+      beforeEach(() => {
+        commonUtils.historyPushState = jest.fn();
+        urlUtils.setUrlParams = jest.fn();
+
+        createComponent({ props: { hideGroupDropDown: true } });
+        wrapper.vm.$store.dispatch('filters/setInitialData', {
+          skipFetch: true,
+          data: {
+            mergedAfter: new Date('2019-09-01'),
+            mergedBefore: new Date('2019-09-02'),
+          },
+        });
+
+        wrapper.vm.$store.dispatch('filters/setGroupNamespace', 'earth-special-forces');
+      });
+
+      it('does not set the group_id', () => {
+        shouldSetUrlParams({
+          ...defaultResults,
+        });
+      });
+    });
+
+    describe('with a group selected', () => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('filters/setGroupNamespace', 'earth-special-forces');
+      });
+
+      it('sets the group_id', () => {
+        shouldSetUrlParams({
+          ...defaultResults,
+          group_id: 'earth-special-forces',
+        });
+      });
+    });
+
+    describe('with a project selected', () => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('filters/setProjectPath', 'earth-special-forces/frieza-saga');
+      });
+
+      it('sets the project_id', () => {
+        shouldSetUrlParams({
+          ...defaultResults,
+          project_id: 'earth-special-forces/frieza-saga',
+        });
+      });
+    });
+
+    describe.each`
+      paramKey             | resultKey            | value
+      ${'milestone_title'} | ${'milestone_title'} | ${'final-form'}
+      ${'author_username'} | ${'author_username'} | ${'piccolo'}
+      ${'label_name'}      | ${'label_name[]'}    | ${['who-will-win']}
+    `('with the $paramKey filter set', ({ paramKey, resultKey, value }) => {
+      beforeEach(() => {
+        wrapper.vm.$store.dispatch('filters/setFilters', {
+          ...defaultFilters,
+          [paramKey]: value,
+        });
+      });
+
+      it(`sets the '${resultKey}' url parameter`, () => {
+        shouldSetUrlParams({
+          ...defaultResults,
+          [resultKey]: value,
         });
       });
     });
