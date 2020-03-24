@@ -92,6 +92,20 @@ describe Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate do
         expect(lazy_state[:pending_ids]).to be_empty
       end
 
+      context 'if a block is provided' do
+        let(:result) { 123 }
+
+        subject do
+          described_class.new(query_ctx, epic_id, COUNT) do |object|
+            result
+          end
+        end
+
+        it 'calls the block' do
+          expect(subject.epic_aggregate).to eq result
+        end
+      end
+
       it 'creates the parent-child associations', :aggregate_failures do
         subject.epic_aggregate
 

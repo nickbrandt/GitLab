@@ -79,11 +79,9 @@ module Types
           description: 'Labels assigned to the epic'
 
     field :has_children, GraphQL::BOOLEAN_TYPE, null: false,
-          description: 'Indicates if the epic has children',
-          method: :has_children?
+          description: 'Indicates if the epic has children'
     field :has_issues, GraphQL::BOOLEAN_TYPE, null: false,
-          description: 'Indicates if the epic has direct issues',
-          method: :has_issues?
+          description: 'Indicates if the epic has direct issues'
 
     field :web_path, GraphQL::STRING_TYPE, null: false,
           description: 'Web path of the epic',
@@ -145,5 +143,24 @@ module Types
       resolve: -> (epic, args, ctx) do
         Epics::DescendantCountService.new(epic, ctx[:current_user])
       end
+
+    def has_children?
+      return object.has_children? unless Feature.enabled?(:unfiltered_epic_aggregates, object.group, default_enabled: true)
+
+      Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(context, object.id, COUNT) do |node, _aggregate_object|
+        node.children.any?
+      end
+    end
+
+    def has_issues?
+      return object.has_issues? unless Feature.enabled?(:unfiltered_epic_aggregates, object.group, default_enabled: true)
+
+      Gitlab::Graphql::Aggregations::Epics::LazyEpicAggregate.new(context, object.id, COUNT) do |node, _aggregate_object|
+        node.has_issues?
+      end
+    end
+
+    alias_method :has_children, :has_children?
+    alias_method :has_issues, :has_issues?
   end
 end

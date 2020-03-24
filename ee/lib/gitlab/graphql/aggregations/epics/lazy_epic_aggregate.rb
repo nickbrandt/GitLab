@@ -13,7 +13,7 @@ module Gitlab
 
           # Because facets "count" and "weight_sum" share the same db query, but have a different graphql type object,
           # we can separate them and serve only the fields which are requested by the GraphQL query
-          def initialize(query_ctx, epic_id, aggregate_facet)
+          def initialize(query_ctx, epic_id, aggregate_facet, &block)
             @epic_id = epic_id
 
             error = validate_facet(aggregate_facet)
@@ -31,6 +31,8 @@ module Gitlab
             }
             # Register this ID to be loaded later:
             @lazy_state[:pending_ids] << epic_id
+
+            @block = block
           end
 
           # Return the loaded record, hitting the database if needed
@@ -41,7 +43,10 @@ module Gitlab
               load_records_into_tree
             end
 
-            aggregate_object(tree[@epic_id])
+            node = tree[@epic_id]
+            object = aggregate_object(node)
+
+            @block ? @block.call(node, object) : object
           end
 
           private
