@@ -581,10 +581,12 @@ msgstr ""
 msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
 
-msgid "+%{approvers} more approvers"
-msgstr ""
+msgid "+%d more"
+msgid_plural "+%d more"
+msgstr[0] ""
+msgstr[1] ""
 
-msgid "+%{extraOptionCount} more"
+msgid "+%{approvers} more approvers"
 msgstr ""
 
 msgid "+%{tags} more"

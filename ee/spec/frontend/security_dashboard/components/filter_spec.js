@@ -1,15 +1,19 @@
-import Vuex from 'vuex';
 import Filter from 'ee/security_dashboard/components/filter.vue';
-import createStore from 'ee/security_dashboard/store';
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import stubChildren from 'helpers/stub_children';
+import { trimText } from 'helpers/text_helper';
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+const generateOption = index => ({
+  name: `Option ${index}`,
+  id: `option-${index}`,
+});
+
+const generateOptions = length => {
+  return Array.from({ length }).map((_, i) => generateOption(i));
+};
 
 describe('Filter component', () => {
   let wrapper;
-  let store;
 
   const createWrapper = propsData => {
     wrapper = mount(Filter, {
@@ -19,7 +23,6 @@ describe('Filter component', () => {
         GlSearchBoxByType: false,
       },
       propsData,
-      store,
       attachToDocument: true,
     });
   };
@@ -34,37 +37,36 @@ describe('Filter component', () => {
     return toggleButton.attributes('aria-expanded') === 'true';
   }
 
-  function setProjectsCount(count) {
-    const projects = new Array(count).fill(null).map((_, i) => ({
-      name: i.toString(),
-      id: i.toString(),
-    }));
-
-    store.dispatch('filters/setFilterOptions', {
-      filterId: 'project_id',
-      options: projects,
-    });
-  }
-
-  beforeEach(() => {
-    store = createStore();
-  });
-
   afterEach(() => {
     wrapper.destroy();
   });
 
   describe('severity', () => {
+    let options;
+
     beforeEach(() => {
-      createWrapper({ filterId: 'severity' });
+      options = generateOptions(8);
+      const filter = {
+        name: 'Severity',
+        id: 'severity',
+        options,
+        selection: new Set([options[0].id, options[1].id, options[2].id]),
+      };
+      createWrapper({ filter });
     });
 
     it('should display all 8 severity options', () => {
       expect(dropdownItemsCount()).toEqual(8);
     });
 
-    it('should display a check next to only the selected item', () => {
-      expect(wrapper.findAll('.dropdown-item .js-check').length).toEqual(1);
+    it('should display a check next to only the selected items', () => {
+      expect(wrapper.findAll('.dropdown-item .js-check').length).toEqual(3);
+    });
+
+    it('should correctly display the selected text', () => {
+      const selectedText = trimText(wrapper.find('.dropdown-toggle').text());
+
+      expect(selectedText).toBe(`${options[0].name} +2 more`);
     });
 
     it('should display "Severity" as the option name', () => {
@@ -107,11 +109,18 @@ describe('Filter component', () => {
 
   describe('Project', () => {
     describe('when there are lots of projects', () => {
-      const lots = 30;
+      const LOTS = 30;
+
       beforeEach(() => {
-        createWrapper({ filterId: 'project_id', dashboardDocumentation: '' });
-        setProjectsCount(lots);
-        return wrapper.vm.$nextTick();
+        const options = generateOptions(LOTS);
+        const filter = {
+          name: 'Project',
+          id: 'project',
+          options,
+          selection: new Set([options[0].id]),
+        };
+
+        createWrapper({ filter });
       });
 
       it('should display a search box', () => {
@@ -119,7 +128,7 @@ describe('Filter component', () => {
       });
 
       it(`should show all projects`, () => {
-        expect(dropdownItemsCount()).toBe(lots);
+        expect(dropdownItemsCount()).toBe(LOTS);
       });
 
       it('should show only matching projects when a search term is entered', () => {
