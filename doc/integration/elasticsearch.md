@@ -563,7 +563,7 @@ Here are some common pitfalls and how to overcome them:
   If you enabled Elasticsearch before GitLab 8.12 and have not rebuilt indexes you will get
   exception in lots of different cases:
 
-  ```text
+  ```plaintext
   Elasticsearch::Transport::Transport::Errors::BadRequest([400] {
       "error": {
           "root_cause": [{
@@ -587,7 +587,7 @@ Here are some common pitfalls and how to overcome them:
 
 - Exception `Elasticsearch::Transport::Transport::Errors::RequestEntityTooLarge`
 
-  ```text
+  ```plaintext
   [413] {"Message":"Request size exceeded 10485760 bytes"}
   ```
 
@@ -619,7 +619,7 @@ Here are some common pitfalls and how to overcome them:
 
 - **I'm getting a `health check timeout: no Elasticsearch node available` error in Sidekiq during the indexing process**
 
-   ```
+   ```plaintext
    Gitlab::Elastic::Indexer::Error: time="2020-01-23T09:13:00Z" level=fatal msg="health check timeout: no Elasticsearch node available"
    ```
 
