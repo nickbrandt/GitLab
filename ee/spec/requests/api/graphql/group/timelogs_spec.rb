@@ -14,24 +14,22 @@ describe 'Timelogs through GroupQuery' do
     let(:issue)         { create(:issue, project: project, milestone: milestone, epic: epic) }
     let!(:timelog1)     { create(:timelog, issue: issue, user: user, spent_at: 10.days.ago) }
     let!(:timelog2)     { create(:timelog, spent_at: 15.days.ago) }
-    let(:timelogs_data) { graphql_data['group']['timelogs']['edges'] }
+    let(:timelogs_data) { graphql_data['group']['timelogs']['nodes'] }
     let(:query) do
-      timelog_node = <<~NODE
-      edges {
-        node {
-          date
-          timeSpent
-          user {
-            username
-          }
-          issue {
+      timelog_nodes = <<~NODE
+      nodes {
+        date
+        timeSpent
+        user {
+          username
+        }
+        issue {
+          title
+          milestone {
             title
-            milestone {
-              title
-            }
-            epic {
-              title
-            }
+          }
+          epic {
+            title
           }
         }
       }
@@ -41,7 +39,7 @@ describe 'Timelogs through GroupQuery' do
         ['groupTimelogsEnabled', query_graphql_field(
           "timelogs",
           { startDate: "#{13.days.ago.to_date}", endDate: "#{2.days.ago.to_date}" },
-          timelog_node
+          timelog_nodes
         )]
       )
     end
@@ -61,17 +59,17 @@ describe 'Timelogs through GroupQuery' do
       it 'returns timelogs successfully' do
         expect(response).to have_gitlab_http_status(:ok)
         expect(graphql_errors).to be_nil
-        expect(node_array.size).to eq 1
+        expect(timelog_array.size).to eq 1
         expect(graphql_data['group']['groupTimelogsEnabled']).to be_truthy
       end
 
       it 'contains correct data' do
-        username = node_array.map {|data| data['user']['username'] }
-        date = node_array.map { |data| data['date'].to_date.to_s }
-        time_spent = node_array.map { |data| data['timeSpent'] }
-        issue_title = node_array.map {|data| data['issue']['title'] }
-        milestone_title = node_array.map {|data| data['issue']['milestone']['title'] }
-        epic_title = node_array.map {|data| data['issue']['epic']['title'] }
+        username = timelog_array.map {|data| data['user']['username'] }
+        date = timelog_array.map { |data| data['date'].to_date.to_s }
+        time_spent = timelog_array.map { |data| data['timeSpent'] }
+        issue_title = timelog_array.map {|data| data['issue']['title'] }
+        milestone_title = timelog_array.map {|data| data['issue']['milestone']['title'] }
+        epic_title = timelog_array.map {|data| data['issue']['epic']['title'] }
 
         expect(username).to eq([user.username])
         expect(date).to eq([timelog1.spent_at.to_date.to_s])
@@ -130,9 +128,9 @@ describe 'Timelogs through GroupQuery' do
     end
   end
 
-  def node_array(extract_attribute = nil)
+  def timelog_array(extract_attribute = nil)
     timelogs_data.map do |item|
-      extract_attribute ? item['node'][extract_attribute] : item['node']
+      extract_attribute ? item[extract_attribute] : item
     end
   end
 end
