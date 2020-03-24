@@ -22,10 +22,10 @@ The current stages are:
 - `test`: This stage includes most of the tests, DB/migration jobs, and static analysis jobs.
 - `post-test`: This stage includes jobs that build reports or gather data from
   the `test` stage's jobs (e.g. coverage, Knapsack metadata etc.).
-- `review-prepare`: This stage includes a job that build the CNG images that are
+- `review`: This stage includes a job that build the CNG images that are
   later used by the (Helm) Review App deployment (see
-  [Review Apps](testing_guide/review_apps.md) for details).
-- `review`: This stage includes jobs that deploy the GitLab and Docs Review Apps.
+  [Review Apps](testing_guide/review_apps.md) for details), as well as jobs that
+  deploy the GitLab and Docs Review Apps.
 - `qa`: This stage includes jobs that perform QA tasks against the Review App
   that is deployed in the previous stage.
 - `post-qa`: This stage includes jobs that build reports or gather data from

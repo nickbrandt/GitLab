@@ -6,7 +6,6 @@ stages:
   - fixtures
   - test
   - post-test
-  - review-prepare
   - review
   - qa
   - post-qa

@@ -58,7 +58,7 @@ review-build-cng:
     - .default-retry
     - .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise
   image: ruby:2.6-alpine
-  stage: review-prepare
+  stage: review
   before_script:
     - source scripts/utils.sh
     - install_api_client_dependencies_with_apk
@@ -70,7 +70,7 @@ review-build-cng:
     - BUILD_TRIGGER_TOKEN=$REVIEW_APPS_BUILD_TRIGGER_TOKEN ./scripts/trigger-build cng
     # When the job is manual, review-deploy is also manual and we don't want people
     # to have to manually start the jobs in sequence, so we do it for them.
-    - '[ -z $CI_JOB_MANUAL ] || play_job "review-deploy"'
+    - play_job "review-deploy"
 
 .review-workflow-base:
   extends:
@@ -90,11 +90,14 @@ review-build-cng:
 review-deploy:
   extends:
     - .review-workflow-base
-    - .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise
+    - .review:rules:review-deploy-manual
   stage: review
-  dependencies: []
+  # Hack so that the jobs can be played by `review-build-cng` (before it's finished). Ideally, this job should depend on `review-build-cng` directly.
+  # This should become un-needed once https://gitlab.com/gitlab-org/gitlab/issues/31264 is resolved.
+  needs:
+    - job: gitlab:assets:compile pull-cache
+      artifacts: false
   resource_group: "review/${CI_COMMIT_REF_NAME}"
-  allow_failure: true
   before_script:
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
     - export GITLAB_SHELL_VERSION=$(<GITLAB_SHELL_VERSION)
@@ -104,6 +107,9 @@ review-deploy:
     - source ./scripts/utils.sh
     - install_api_client_dependencies_with_apk
     - source scripts/review_apps/review-apps.sh
+    # We don't want people to have to manually start the jobs in sequence, so we do it for them.
+    - '[ -z $CI_JOB_MANUAL ] || play_job "review-build-cng"'
+    - '[ -z $CI_JOB_MANUAL ] || wait_for_job_to_be_done "review-build-cng"'
   script:
     - check_kube_domain
     - ensure_namespace
@@ -111,8 +117,7 @@ review-deploy:
     - download_chart
     - date
     - deploy || (display_deployment_debug && exit 1)
-    # When the job is manual, review-qa-smoke is also manual and we don't want people
-    # to have to manually start the jobs in sequence, so we do it for them.
+    # We don't want people to have to manually start the jobs in sequence, so we do it for them.
     - '[ -z $CI_JOB_MANUAL ] || play_job "review-qa-smoke"'
     - '[ -z $CI_JOB_MANUAL ] || play_job "review-performance"'
   artifacts:
@@ -156,8 +161,9 @@ review-stop:
 .review-qa-base:
   extends: .review-docker
   stage: qa
-  # This is needed so that manual jobs with needs don't block the pipeline.
-  # See https://gitlab.com/gitlab-org/gitlab/-/issues/199979.
+  # This is needed so that manual jobs (e.g. `review-qa-smoke`) wich needs other manual jobs (e.g. `review-deploy`)
+  # don't block the pipeline if the needed manual job is never played.
+  # This should become un-needed once https://gitlab.com/gitlab-org/gitlab/issues/31264 is resolved.
   dependencies: ["review-deploy"]
   allow_failure: true
   variables:
@@ -171,13 +177,20 @@ review-stop:
     GITHUB_ACCESS_TOKEN: "${REVIEW_APPS_QA_GITHUB_ACCESS_TOKEN}"
     EE_LICENSE: "${REVIEW_APPS_EE_LICENSE}"
   before_script:
+    - source scripts/utils.sh
+    - install_api_client_dependencies_with_apk
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
     - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
+    # If this job is played from `review-deploy`, it would start before `review-deploy`
+    # is finished, leading to no artifact being downloaded.
+    # Thus, we need to:
+    # 1. Wait for `review-deploy` to finish so that artifact exists
+    # 2. Fetch the artifact manually
+    - wait_for_job_to_be_done "review-deploy"
+    - retrieve_artifact "review-deploy" "environment_url.txt"
     - export CI_ENVIRONMENT_URL="$(cat environment_url.txt)"
     - echo "${CI_ENVIRONMENT_URL}"
     - echo "${QA_IMAGE}"
-    - source scripts/utils.sh
-    - install_api_client_dependencies_with_apk
     - gem install gitlab-qa --no-document ${GITLAB_QA_VERSION:+ --version ${GITLAB_QA_VERSION}}
   artifacts:
     paths:
@@ -188,7 +201,7 @@ review-stop:
 review-qa-smoke:
   extends:
     - .review-qa-base
-    - .review:rules:mr-only-auto-if-frontend-manual-otherwise
+    - .review:rules:review-deploy-manual
   script:
     - gitlab-qa Test::Instance::Smoke "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}"
 
@@ -205,21 +218,11 @@ review-qa-all:
 review-performance:
   extends:
     - .default-retry
-    - .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise
+    - .review-qa-base
+    - .review:rules:review-deploy-manual
   image:
     name: sitespeedio/sitespeed.io:6.3.1
     entrypoint: [""]
-  stage: qa
-  # This is needed so that manual jobs with needs don't block the pipeline.
-  # See https://gitlab.com/gitlab-org/gitlab/-/issues/199979.
-  dependencies: ["review-deploy"]
-  allow_failure: true
-  before_script:
-    - export CI_ENVIRONMENT_URL="$(cat environment_url.txt)"
-    - echo "${CI_ENVIRONMENT_URL}"
-    - mkdir -p gitlab-exporter
-    - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
-    - mkdir -p sitespeed-results
   script:
     - /start.sh --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
   after_script:

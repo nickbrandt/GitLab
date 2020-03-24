@@ -480,6 +480,15 @@
     - <<: *if-dot-com-gitlab-org-schedule
       when: on_success
 
+.review:rules:review-deploy-manual:
+  rules:
+    - <<: *if-dot-com-gitlab-org-merge-request
+      when: manual
+      allow_failure: true
+    - <<: *if-dot-com-gitlab-org-schedule
+      when: manual
+      allow_failure: true
+
 .review:rules:mr-only-auto:
   rules:
     - <<: *if-dot-com-gitlab-org-merge-request
