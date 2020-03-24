@@ -1364,17 +1364,18 @@ NOTE: **Note:**
 The [Product Manager for the relevant group](https://about.gitlab.com/handbook/product/categories/#devops-stages)
 must review and approve the addition or removal of any mentions of using feature flags before the doc change is merged.
 
-The following is sample text for adding feature flag documentation for a feature:
+The following is sample text for adding feature flag documentation for a feature that is
+off by default:
 
 ````md
-### Disabling the feature
+### Enabling the feature
 
-This feature comes with the `:feature_flag` feature flag enabled by default. However, in some cases
-this feature is incompatible with old configuration. To turn off the feature while configuration is
-migrated, ask a GitLab administrator with Rails console access to run the following command:
+This feature comes with the `:feature_flag` feature flag disabled by default. In some cases,
+this feature is incompatible with an old configuration. To turn on the feature,
+ask a GitLab administrator with Rails console access to run the following command:
 
 ```ruby
-Feature.disable(:feature_flag)
+Feature.enable(:feature_flag)
 ```
 ````
 
