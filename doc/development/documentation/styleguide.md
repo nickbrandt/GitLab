@@ -972,6 +972,7 @@ The following are examples of source Markdown for menu items with their publishe
 1. Go to **{book}** **Wiki**
 1. Go to **{snippet}** **Snippets**
 1. Go to **{users}** **Members**
+1. Select the **More actions** **{ellipsis_v}** icon  > **Hide stage**
 ```
 
 1. Go to **{home}** **Project overview > Details**
@@ -986,6 +987,7 @@ The following are examples of source Markdown for menu items with their publishe
 1. Go to **{book}** **Wiki**
 1. Go to **{snippet}** **Snippets**
 1. Go to **{users}** **Members**
+1. Select the **More actions** **{ellipsis_v}** icon > **Hide stage**
 
 ## Alert boxes
 
