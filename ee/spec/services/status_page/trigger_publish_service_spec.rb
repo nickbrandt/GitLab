@@ -11,7 +11,6 @@ describe StatusPage::TriggerPublishService do
   describe '#execute' do
     # Variables used by shared examples
     let(:execute) { subject }
-    let(:issue_id) { triggered_by.id }
 
     let_it_be(:status_page_setting, reload: true) do
       create(:status_page_setting, :enabled, project: project)
@@ -21,6 +20,7 @@ describe StatusPage::TriggerPublishService do
 
     describe 'triggered by issue' do
       let_it_be(:triggered_by, reload: true) { create(:issue, project: project) }
+      let(:issue_id) { triggered_by.id }
 
       using RSpec::Parameterized::TableSyntax
 
@@ -74,6 +74,90 @@ describe StatusPage::TriggerPublishService do
       end
     end
 
+    describe 'triggered by note' do
+      let(:issue_id) { triggered_by.noteable_id }
+      let(:emoji_name) { StatusPage::AWARD_EMOJI }
+
+      before do
+        create(:award_emoji, user: user, name: emoji_name,
+               awardable: triggered_by)
+      end
+
+      context 'for issues' do
+        let_it_be(:triggered_by, refind: true) do
+          create(:note_on_issue, project: project)
+        end
+
+        context 'without changes' do
+          include_examples 'no trigger status page publish'
+        end
+
+        context 'when changed' do
+          include_examples 'trigger status page publish' do
+            before do
+              triggered_by.update!(note: 'changed')
+            end
+          end
+        end
+
+        context 'when destroyed' do
+          include_examples 'trigger status page publish' do
+            before do
+              triggered_by.destroy
+            end
+          end
+        end
+
+        context 'as system note' do
+          let_it_be(:triggered_by, reload: true) do
+            create(:note_on_issue, :system, project: project)
+          end
+
+          include_examples 'no trigger status page publish' do
+            before do
+              triggered_by.update!(note: 'changed')
+            end
+          end
+        end
+
+        context 'without recognized emoji' do
+          let(:emoji_name) { 'thumbsup' }
+
+          context 'when changed' do
+            include_examples 'no trigger status page publish' do
+              before do
+                triggered_by.update!(note: 'changed')
+              end
+            end
+          end
+
+          context 'when destroyed' do
+            include_examples 'trigger status page publish' do
+              before do
+                triggered_by.destroy
+              end
+            end
+          end
+        end
+      end
+
+      context 'for merge requests' do
+        let_it_be(:project) { create(:project, :repository) }
+
+        let_it_be(:triggered_by) do
+          create(:note_on_merge_request, project: project)
+        end
+
+        context 'when changed' do
+          include_examples 'no trigger status page publish' do
+            before do
+              triggered_by.update!(note: 'changed')
+            end
+          end
+        end
+      end
+    end
+
     describe 'triggered by unsupported type' do
       context 'for some abitary type' do
         let(:triggered_by) { Object.new }
@@ -89,6 +173,7 @@ describe StatusPage::TriggerPublishService do
 
     context 'with eligable triggered_by' do
       let_it_be(:triggered_by) { create(:issue, project: project) }
+      let(:issue_id) { triggered_by.id }
 
       context 'when eligable' do
         include_examples 'trigger status page publish'
