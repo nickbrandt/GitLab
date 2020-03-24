@@ -15520,6 +15520,9 @@ msgstr ""
 msgid "ProjectSettings|Issues"
 msgstr ""
 
+msgid "ProjectSettings|LFS objects from this repository are still available to forks. %{linkStart}How do I remove them?%{linkEnd}"
+msgstr ""
+
 msgid "ProjectSettings|Learn more about badges."
 msgstr ""
 
