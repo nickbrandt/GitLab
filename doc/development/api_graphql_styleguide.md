@@ -150,7 +150,7 @@ query($project_path: ID!) {
 ```
 
 This would return the first 2 pipelines of a project and related
-pagination info., ordered by descending ID. The returned data would
+pagination information, ordered by descending ID. The returned data would
 look like this:
 
 ```json
@@ -210,6 +210,15 @@ query($project_path: ID!) {
 To ensure that we get consistent ordering, we will append an ordering on the primary
 key, in descending order. This is usually `id`, so basically we will add `order(id: :desc)`
 to the end of the relation. A primary key _must_ be available on the underlying table.
+
+#### Shortcut fields
+
+Sometimes it can seem easy to implement a "shortcut field", having the resolver return the first of a collection if no parameters are passed.
+These "shortcut fields" are discouraged because they create maintenance overhead.
+They need to be kept in sync with their canonical field, and deprecated or modified if their canonical field changes.
+Use the functionality the framework provides unless there is a compelling reason to do otherwise.
+
+For example, instead of `latest_pipeline`, use `pipelines(last: 1)`.
 
 ### Exposing permissions for a type
 
