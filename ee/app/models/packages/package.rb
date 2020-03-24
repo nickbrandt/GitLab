@@ -2,6 +2,7 @@
 class Packages::Package < ApplicationRecord
   include Sortable
   include Gitlab::SQL::Pattern
+  include UsageStatistics
 
   belongs_to :project
   # package_files must be destroyed by ruby code in order to properly remove carrierwave uploads and update project statistics
