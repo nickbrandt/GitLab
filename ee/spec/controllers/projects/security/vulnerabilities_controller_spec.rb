@@ -80,7 +80,7 @@ describe Projects::Security::VulnerabilitiesController do
       it 'renders the solution card' do
         show_vulnerability
 
-        expect(response.body).to have_css("#js-vulnerability-solution")
+        expect(response.body).to have_css("#js-vulnerability-footer")
       end
     end
 
