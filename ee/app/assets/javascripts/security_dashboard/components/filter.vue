@@ -1,5 +1,4 @@
 <script>
-import { mapGetters, mapActions } from 'vuex';
 import { GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -10,8 +9,8 @@ export default {
     Icon,
   },
   props: {
-    filterId: {
-      type: String,
+    filter: {
+      type: Object,
       required: true,
     },
   },
@@ -21,15 +20,17 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('filters', ['getFilter', 'getSelectedOptions', 'getSelectedOptionNames']),
-    filter() {
-      return this.getFilter(this.filterId);
+    filterId() {
+      return this.filter.id;
     },
     selection() {
-      return this.getFilter(this.filterId).selection;
+      return this.filter.selection;
     },
-    selectedOptionText() {
-      return this.getSelectedOptionNames(this.filterId) || '-';
+    firstSelectedOption() {
+      return this.filter.options.find(option => this.selection.has(option.id))?.name || '-';
+    },
+    extraOptionCount() {
+      return this.selection.size - 1;
     },
     filteredOptions() {
       return this.filter.options.filter(option =>
@@ -41,12 +42,8 @@ export default {
     },
   },
   methods: {
-    ...mapActions('filters', ['setFilter']),
     clickFilter(option) {
-      this.setFilter({
-        filterId: this.filterId,
-        optionId: option.id,
-      });
+      this.$emit('setFilter', { filterId: this.filterId, optionId: option.id });
     },
     isSelected(option) {
       return this.selection.has(option.id);
@@ -64,12 +61,11 @@ export default {
     <gl-dropdown ref="dropdown" class="d-block mt-1" menu-class="dropdown-extended-height">
       <template slot="button-content">
         <span class="text-truncate" :data-qa-selector="qaSelector">
-          {{ selectedOptionText.firstOption }}
+          {{ firstSelectedOption }}
         </span>
-        <span v-if="selectedOptionText.extraOptionCount" class="flex-grow-1 ml-1">
-          {{ selectedOptionText.extraOptionCount }}
+        <span v-if="extraOptionCount" class="flex-grow-1 ml-1">
+          {{ n__('+%d more', '+%d more', extraOptionCount) }}
         </span>
-
         <i class="fa fa-chevron-down" aria-hidden="true"></i>
       </template>
 
