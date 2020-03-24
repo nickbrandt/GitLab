@@ -8,12 +8,6 @@ export default {
   },
   methods: {
     ...mapActions(['setFilter']),
-    onInput(query) {
-      this.setFilter(query);
-    },
-    onSubmit() {
-      this.$emit('filter');
-    },
   },
 };
 </script>
@@ -21,7 +15,7 @@ export default {
 <template>
   <gl-search-box-by-click
     :placeholder="s__('PackageRegistry|Filter by name')"
-    @submit="onSubmit"
-    @input="onInput"
+    @submit="$emit('filter')"
+    @input="setFilter"
   />
 </template>
