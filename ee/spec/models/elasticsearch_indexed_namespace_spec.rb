@@ -28,6 +28,17 @@ describe ElasticsearchIndexedNamespace do
     end
   end
 
+  context 'caching' do
+    it 'invalidates indexed project cache' do
+      expect(ElasticsearchIndexedProject).to receive(:drop_limited_ids_cache!).and_call_original.twice
+      expect(ElasticsearchIndexedNamespace).to receive(:drop_limited_ids_cache!).and_call_original.twice
+
+      n = create(:elasticsearch_indexed_namespace)
+
+      n.destroy
+    end
+  end
+
   context 'with plans' do
     Plan::PAID_HOSTED_PLANS.each do |plan|
       plan_factory = "#{plan}_plan"
