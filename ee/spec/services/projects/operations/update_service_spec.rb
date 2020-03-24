@@ -163,14 +163,6 @@ describe Projects::Operations::UpdateService do
           context 'without an existing setting' do
             it_behaves_like 'setting creation'
 
-            context 'without license' do
-              before do
-                stub_licensed_features(prometheus_alerts: false)
-              end
-
-              it_behaves_like 'no operation'
-            end
-
             context 'with insufficient permissions' do
               before do
                 project.add_reporter(user)
