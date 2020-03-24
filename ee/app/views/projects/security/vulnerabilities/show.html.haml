@@ -28,7 +28,13 @@
           %h3= _("File Location")
           %ul
             %li
-              %a{ :href=>project_tree_path(@project, @vulnerability.finding.location["file"]), target: "_blank", rel: 'noopener noreferrer' }= _("%{file}:%{line} (%{klass}::%{method})") % { file: @vulnerability.finding.location["file"], line: @vulnerability.finding.location["start_line"], klass: @vulnerability.finding.location["class"], method: @vulnerability.finding.location["method"] }
+              - link_text = _("File: %{file}:%{line}") % { file: @vulnerability.finding.location["file"],
+                line: @vulnerability.finding.location["start_line"] }
+              %a{ :href=>fast_project_blob_path(@project, tree_join(@vulnerability.project.default_branch, @vulnerability.finding.location["file"])),
+                target: "_blank", rel: 'noopener noreferrer' }= link_text
+            - if @vulnerability.finding.location["class"]
+              %li= _("Class: %{className}::%{method}") % {className: @vulnerability.finding.location["class"],
+                method: @vulnerability.finding.location["method"] }
 
         - if @vulnerability.finding.links.any?
           %h3= _("Links")
