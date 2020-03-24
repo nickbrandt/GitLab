@@ -14,6 +14,7 @@ describe 'GlobalSearch', :elastic do
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    stub_const('POSSIBLE_FEATURES', %i(issues merge_requests wiki_blobs blobs commits).freeze)
 
     project.add_developer(member)
     project.add_developer(external_member)
@@ -165,8 +166,6 @@ describe 'GlobalSearch', :elastic do
   def expect_no_items_to_be_found(user)
     expect_items_to_be_found(user, except: :all)
   end
-
-  POSSIBLE_FEATURES = %i(issues merge_requests wiki_blobs blobs commits).freeze
 
   def expect_items_to_be_found(user, only: nil, except: nil)
     arr = if only

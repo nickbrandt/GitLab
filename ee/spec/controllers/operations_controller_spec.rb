@@ -5,10 +5,14 @@ require 'spec_helper'
 describe OperationsController do
   include Rails.application.routes.url_helpers
 
-  PUBLIC = Gitlab::VisibilityLevel::PUBLIC
-  PRIVATE = Gitlab::VisibilityLevel::PRIVATE
-
   let(:user) { create(:user) }
+
+  before do
+    stub_const('PUBLIC', Gitlab::VisibilityLevel::PUBLIC)
+    stub_const('PRIVATE', Gitlab::VisibilityLevel::PRIVATE)
+    stub_licensed_features(operations_dashboard: true)
+    sign_in(user)
+  end
 
   shared_examples 'unlicensed' do |http_method, action|
     before do
@@ -20,11 +24,6 @@ describe OperationsController do
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
-  end
-
-  before do
-    stub_licensed_features(operations_dashboard: true)
-    sign_in(user)
   end
 
   describe 'GET #index' do

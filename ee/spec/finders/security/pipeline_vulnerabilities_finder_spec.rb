@@ -3,19 +3,9 @@
 require 'spec_helper'
 
 describe Security::PipelineVulnerabilitiesFinder do
-  class NoDeduplicationMergeReportsService
-    def initialize(*source_reports)
-      @source_reports = source_reports
-    end
-
-    def execute
-      @source_reports.last
-    end
-  end
-
   def disable_deduplication
     allow(::Security::MergeReportsService).to receive(:new) do |*args|
-      NoDeduplicationMergeReportsService.new(*args)
+      instance_double('NoDeduplicationMergeReportsService', execute: args.last)
     end
   end
 
