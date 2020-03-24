@@ -1188,6 +1188,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: stateWithStages,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenNthCalledWith(1, 'requestDurationMedianData');
@@ -1208,6 +1209,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: stateWithStages,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith(
@@ -1235,6 +1237,7 @@ describe('Cycle analytics actions', () => {
         .fetchDurationMedianData({
           dispatch,
           state: brokenState,
+          getters,
         })
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith('receiveDurationMedianDataError');
