@@ -339,18 +339,20 @@ are cached per-branch:
 ```yaml
 image: golang:1.13
 
-# Cache libraries in between jobs
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-  - vendor/
-
-before_script:
-- go mod vendor
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .go/pkg/mod/
 
 test:
+  extends: .go-cache
   script:
-  - go test -mod vendor ./... -v -short
+  - go test ./... -v -short
 ```
 
 ## Availability of the cache
