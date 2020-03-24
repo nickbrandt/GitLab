@@ -29,15 +29,13 @@ export const requestPackagesList = ({ dispatch, state }, params = {}) => {
   const { sort, orderBy } = state.sorting;
 
   const type = state.selectedType?.type?.toLowerCase();
-  const packageType = { package_type: type };
-
   const nameFilter = state.filterQuery?.toLowerCase();
-  const packageName = { package_name: nameFilter };
+  const packageFilters = { package_type: type, package_name: nameFilter };
 
   const apiMethod = state.config.isGroupPage ? 'groupPackages' : 'projectPackages';
 
   return Api[apiMethod](state.config.resourceId, {
-    params: { page, per_page, sort, order_by: orderBy, ...packageType, ...packageName },
+    params: { page, per_page, sort, order_by: orderBy, ...packageFilters },
   })
     .then(({ data, headers }) => {
       dispatch('receivePackagesListSuccess', { data, headers });
