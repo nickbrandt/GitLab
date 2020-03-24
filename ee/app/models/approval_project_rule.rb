@@ -19,8 +19,16 @@ class ApprovalProjectRule < ApplicationRecord
   validates :name, uniqueness: { scope: [:project_id, :rule_type] }
   validates :rule_type, uniqueness: { scope: :project_id, message: proc { _('any-approver for the project already exists') } }, if: :any_approver?
 
-  def self.applicable_to_branch(branch)
-    includes(:protected_branches).select { |rule| rule.applies_to_branch?(branch) }
+  def self.filtered(branch)
+    { applicable: [], non_applicable: [] }.tap do |h|
+      includes(:protected_branches).each do |rule|
+        if rule.applies_to_branch?(branch)
+          h[:applicable] << rule
+        else
+          h[:non_applicable] << rule
+        end
+      end
+    end
   end
 
   def applies_to_branch?(branch)

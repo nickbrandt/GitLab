@@ -9,6 +9,7 @@ module EE
       # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class MergeRequestApprovalSettings < MergeRequestApprovalState
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule, override: true
+        expose :non_applicable_rules, using: MergeRequestApprovalSettingRule
       end
     end
   end

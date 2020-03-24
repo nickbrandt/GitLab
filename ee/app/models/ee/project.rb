@@ -410,16 +410,26 @@ module EE
     end
 
     def visible_approval_rules(target_branch: nil)
-      strong_memoize(:"visible_approval_rules_#{target_branch}") do
-        visible_user_defined_rules(branch: target_branch) + approval_rules.report_approver
+      rules = strong_memoize(:visible_approval_rules) do
+        Hash.new do |h, key|
+          h[key] = visible_user_defined_rules(target_branch: key) + approval_rules.report_approver
+        end
       end
+
+      rules[target_branch]
     end
 
-    def visible_user_defined_rules(branch: nil)
+    def visible_user_defined_rules(target_branch: nil)
       return user_defined_rules.take(1) unless multiple_approval_rules_available?
-      return user_defined_rules unless branch
+      return user_defined_rules unless target_branch
 
-      user_defined_rules.applicable_to_branch(branch)
+      filtered_user_defined_rules(target_branch)[:applicable]
+    end
+
+    def visible_user_defined_non_applicable_rules(target_branch: nil)
+      return [] unless multiple_approval_rules_available? && target_branch
+
+      filtered_user_defined_rules(target_branch)[:non_applicable]
     end
 
     # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
@@ -807,6 +817,16 @@ module EE
       strong_memoize(:user_defined_rules) do
         approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
       end
+    end
+
+    def filtered_user_defined_rules(branch)
+      rules = strong_memoize(:filtered_user_defined_rules) do
+        Hash.new do |h, key|
+          h[key] = user_defined_rules.filtered(branch)
+        end
+      end
+
+      rules[branch]
     end
   end
 end

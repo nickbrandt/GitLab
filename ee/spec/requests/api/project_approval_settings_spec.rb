@@ -35,6 +35,7 @@ describe API::ProjectApprovalSettings do
         json = json_response
 
         expect(json['rules'].size).to eq(1)
+        expect(json['non_applicable_rules'].size).to eq(0)
 
         rule = json['rules'].first
 
@@ -64,11 +65,17 @@ describe API::ProjectApprovalSettings do
           get api("#{url}?target_branch=test", developer)
 
           expect(json_response['rules'].size).to eq(1)
+          expect(json_response['non_applicable_rules'].size).to eq(1)
 
           rule_response = json_response['rules'].first
 
           expect(rule_response['id']).to eq(another_rule.id)
-          expect(rule_response['name']).to eq('test')
+          expect(rule_response['name']).to eq(another_rule.name)
+
+          non_applicable_rule_response = json_response['non_applicable_rules'].first
+
+          expect(non_applicable_rule_response['id']).to eq(rule.id)
+          expect(non_applicable_rule_response['name']).to eq(rule.name)
         end
       end
 

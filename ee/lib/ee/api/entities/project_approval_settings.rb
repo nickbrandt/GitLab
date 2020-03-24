@@ -11,6 +11,10 @@ module EE
           project.visible_approval_rules(target_branch: options[:target_branch])
         end
 
+        expose :non_applicable_rules, using: ProjectApprovalSettingRule do |project, options|
+          project.visible_user_defined_non_applicable_rules(target_branch: options[:target_branch])
+        end
+
         expose :min_fallback_approvals, as: :fallback_approvals_required
       end
     end

@@ -5,6 +5,10 @@
       "type": "array",
       "items": { "$ref": "project_approval_setting.json" }
     },
+    "non_applicable_rules": {
+      "type": "array",
+      "items": { "$ref": "project_approval_setting.json" }
+    },
     "fallback_approvals_required": { "type": "integer" }
   },
   "additionalProperties": false

@@ -156,6 +156,7 @@ describe API::MergeRequestApprovals do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(json_response['rules'].size).to eq(1)
+      expect(json_response['non_applicable_rules'].size).to eq(0)
 
       rule_response = json_response['rules'].first
 
@@ -202,11 +203,17 @@ describe API::MergeRequestApprovals do
         get api("#{url}?target_branch=master", user)
 
         expect(json_response['rules'].size).to eq(1)
+        expect(json_response['non_applicable_rules'].size).to eq(1)
 
         rule_response = json_response['rules'].first
 
         expect(rule_response['id']).to eq(rule.id)
-        expect(rule_response['name']).to eq('foo')
+        expect(rule_response['name']).to eq(rule.name)
+
+        non_applicable_rule_response = json_response['non_applicable_rules'].first
+
+        expect(non_applicable_rule_response['id']).to eq(another_rule.id)
+        expect(non_applicable_rule_response['name']).to eq(another_rule.name)
       end
     end
   end

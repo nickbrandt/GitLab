@@ -1623,4 +1623,102 @@ describe ApprovalState do
       end
     end
   end
+
+  describe '#non_applicable_rules' do
+    context 'when merge_request_approvers feature is available' do
+      before do
+        stub_licensed_features(merge_request_approvers: true)
+      end
+
+      context 'when scoped_approval_rules feature is enabled' do
+        before do
+          stub_feature_flags(scoped_approval_rules: true)
+        end
+
+        context 'when rules are overwritten' do
+          let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
+          let!(:another_rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
+
+          before do
+            project.update!(disable_overriding_approvers_per_merge_request: false)
+            merge_request.update!(target_branch: 'stable-1')
+          end
+
+          context 'when rules are scoped' do
+            let(:source_rule) { create(:approval_project_rule, project: project) }
+            let(:another_source_rule) { create(:approval_project_rule, project: project) }
+            let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+            let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test-*') }
+
+            before do
+              source_rule.update!(protected_branches: [protected_branch])
+              another_source_rule.update!(protected_branches: [another_protected_branch])
+              rule.update!(approval_project_rule: source_rule)
+              another_rule.update!(approval_project_rule: another_source_rule)
+            end
+
+            it 'returns rules that are not applicable to target branch' do
+              expect(subject.non_applicable_rules.map(&:approval_rule)).to match_array([another_rule])
+            end
+          end
+
+          context 'when rules are not scoped' do
+            it 'returns empty array' do
+              expect(subject.non_applicable_rules).to be_empty
+            end
+          end
+        end
+
+        context 'when rules are not overwritten' do
+          let!(:rule) { create(:approval_project_rule, project: project) }
+          let!(:another_rule) { create(:approval_project_rule, project: project) }
+
+          before do
+            project.update!(disable_overriding_approvers_per_merge_request: true)
+            merge_request.update!(target_branch: 'stable-1')
+          end
+
+          context 'when project rules are scoped' do
+            let(:protected_branch) { create(:protected_branch, project: project, name: 'stable-*') }
+            let(:another_protected_branch) { create(:protected_branch, project: project, name: 'test-*') }
+
+            before do
+              rule.update!(protected_branches: [protected_branch])
+              another_rule.update!(protected_branches: [another_protected_branch])
+            end
+
+            it 'returns rules that are not applicable to target branch' do
+              expect(subject.non_applicable_rules.map(&:approval_rule)).to match_array([another_rule])
+            end
+          end
+
+          context 'when project rules are not scoped' do
+            it 'returns empty array' do
+              expect(subject.non_applicable_rules).to be_empty
+            end
+          end
+        end
+      end
+
+      context 'when scoped_approval_rules feature is disabled' do
+        before do
+          stub_feature_flags(scoped_approval_rules: false)
+        end
+
+        it 'returns empty array' do
+          expect(subject.non_applicable_rules).to be_empty
+        end
+      end
+    end
+
+    context 'when merge_request_approvers feature is not available' do
+      before do
+        stub_licensed_features(merge_request_approvers: false)
+      end
+
+      it 'returns empty array' do
+        expect(subject.non_applicable_rules).to be_empty
+      end
+    end
+  end
 end

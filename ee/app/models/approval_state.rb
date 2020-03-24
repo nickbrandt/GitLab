@@ -49,6 +49,15 @@ class ApprovalState
     end
   end
 
+  def non_applicable_rules
+    strong_memoize(:non_applicable_rules) do
+      next [] unless approval_feature_available? && project.scoped_approval_rules_enabled?
+      next user_defined_merge_request_non_applicable_rules if approval_rules_overwritten?
+
+      user_defined_project_non_applicable_rules
+    end
+  end
+
   # Determines which set of rules to use (MR or project)
   def approval_rules_overwritten?
     project.can_override_approvers? && user_defined_merge_request_rules.any?
@@ -155,15 +164,9 @@ class ApprovalState
 
   def user_defined_rules
     strong_memoize(:user_defined_rules) do
-      if approval_rules_overwritten?
-        user_defined_merge_request_rules
-      else
-        branch = project.scoped_approval_rules_enabled? ? target_branch : nil
+      next user_defined_merge_request_rules if approval_rules_overwritten?
 
-        project.visible_user_defined_rules(branch: branch).map do |rule|
-          ApprovalWrappedRule.wrap(merge_request, rule)
-        end
-      end
+      user_defined_project_rules
     end
   end
 
@@ -192,6 +195,12 @@ class ApprovalState
     end
   end
 
+  def user_defined_merge_request_non_applicable_rules
+    filtered_merge_request_rules[:non_applicable].map do |rule|
+      wrapped_rule(rule)
+    end
+  end
+
   def code_owner_rules
     strong_memoize(:code_owner_rules) do
       wrapped_rules.select(&:code_owner?)
@@ -206,12 +215,40 @@ class ApprovalState
 
   def wrapped_rules
     strong_memoize(:wrapped_rules) do
-      merge_request_rules = merge_request.approval_rules
-      merge_request_rules = merge_request_rules.applicable_to_branch(target_branch) if project.scoped_approval_rules_enabled?
+      merge_request_rules =
+        if project.scoped_approval_rules_enabled?
+          filtered_merge_request_rules[:applicable]
+        else
+          merge_request.approval_rules
+        end
 
       merge_request_rules.map do |rule|
-        ApprovalWrappedRule.wrap(merge_request, rule)
+        wrapped_rule(rule)
       end
     end
+  end
+
+  def filtered_merge_request_rules
+    strong_memoize(:filtered_merge_request_rules) do
+      merge_request.approval_rules.filtered(target_branch)
+    end
+  end
+
+  def user_defined_project_rules
+    branch = project.scoped_approval_rules_enabled? ? target_branch : nil
+
+    project.visible_user_defined_rules(target_branch: branch).map do |rule|
+      wrapped_rule(rule)
+    end
+  end
+
+  def user_defined_project_non_applicable_rules
+    project.visible_user_defined_non_applicable_rules(target_branch: target_branch).map do |rule|
+      wrapped_rule(rule)
+    end
+  end
+
+  def wrapped_rule(rule)
+    ApprovalWrappedRule.wrap(merge_request, rule)
   end
 end

@@ -152,14 +152,14 @@ describe ApprovalProjectRule do
     end
   end
 
-  describe '.applicable_to_branch' do
+  describe '.filtered' do
     let!(:rule) { create(:approval_project_rule) }
     let(:branch) { 'stable' }
 
-    subject { described_class.applicable_to_branch(branch) }
+    subject { described_class.filtered(branch) }
 
     context 'when there are no associated protected branches' do
-      it { is_expected.to eq([rule]) }
+      it { is_expected.to eq(applicable: [rule], non_applicable: []) }
     end
 
     context 'when there are associated protected branches' do
@@ -170,13 +170,13 @@ describe ApprovalProjectRule do
       context 'and branch matches' do
         let(:protected_branches) { [create(:protected_branch, name: branch)] }
 
-        it { is_expected.to eq([rule]) }
+        it { is_expected.to eq(applicable: [rule], non_applicable: []) }
       end
 
       context 'but branch does not match anything' do
         let(:protected_branches) { [create(:protected_branch, name: branch.reverse)] }
 
-        it { is_expected.to be_empty }
+        it { is_expected.to eq(applicable: [], non_applicable: [rule]) }
       end
     end
   end

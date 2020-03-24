@@ -74,11 +74,15 @@ class ApprovalMergeRequestRule < ApplicationRecord
     retry
   end
 
-  def self.applicable_to_branch(branch)
-    includes(approval_project_rule: :protected_branches).select do |rule|
-      next true unless rule.approval_project_rule.present?
-
-      rule.approval_project_rule.applies_to_branch?(branch)
+  def self.filtered(branch)
+    { applicable: [], non_applicable: [] }.tap do |h|
+      includes(approval_project_rule: :protected_branches).each do |rule|
+        if !rule.approval_project_rule.present? || rule.approval_project_rule.applies_to_branch?(branch)
+          h[:applicable] << rule
+        else
+          h[:non_applicable] << rule
+        end
+      end
     end
   end
 
