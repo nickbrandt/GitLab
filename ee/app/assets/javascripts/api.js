@@ -24,6 +24,8 @@ export default {
     '/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
   cycleAnalyticsGroupLabelsPath: '/api/:version/groups/:namespace_path/labels',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
+  groupActivityIssuesPath: '/api/:version/analytics/group_activity/issues_count',
+  groupActivityMergeRequestsPath: '/api/:version/analytics/group_activity/merge_requests_count',
   countriesPath: '/-/countries',
   countryStatesPath: '/-/country_states',
   paymentFormPath: '/-/subscriptions/payment_form',
@@ -214,6 +216,16 @@ export default {
   codeReviewAnalytics(params = {}) {
     const url = Api.buildUrl(this.codeReviewAnalyticsPath);
     return axios.get(url, { params });
+  },
+
+  groupActivityMergeRequestsCount(groupPath) {
+    const url = Api.buildUrl(this.groupActivityMergeRequestsPath);
+    return axios.get(url, { params: { group_path: groupPath } });
+  },
+
+  groupActivityIssuesCount(groupPath) {
+    const url = Api.buildUrl(this.groupActivityIssuesPath);
+    return axios.get(url, { params: { group_path: groupPath } });
   },
 
   getGeoReplicableItems(replicable, params = {}) {
