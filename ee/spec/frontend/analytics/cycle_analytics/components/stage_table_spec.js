@@ -188,4 +188,36 @@ describe('StageTable', () => {
       expect(wrapper.html()).toContain('Add a stage');
     });
   });
+
+  describe('customOrdering = true', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        customOrdering: true,
+      });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('renders the manual-ordering class', () => {
+      expect(wrapper.find('.js-manual-ordering').exists()).toBeTruthy();
+    });
+  });
+
+  describe('customOrdering = false', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        customOrdering: false,
+      });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('does not render the manual-ordering class', () => {
+      expect(wrapper.find('.js-manual-ordering').exists()).toBeFalsy();
+    });
+  });
 });

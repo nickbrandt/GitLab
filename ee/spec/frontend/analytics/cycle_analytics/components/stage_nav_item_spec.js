@@ -7,10 +7,12 @@ import { approximateDuration } from '~/lib/utils/datetime_utility';
 describe('StageNavItem', () => {
   const title = 'Rad stage';
   const median = 50;
+  const id = 1;
 
   function createComponent({ props = {}, opts = {} } = {}) {
     return shallowMount(StageNavItem, {
       propsData: {
+        id,
         title,
         value: median,
         ...props,

@@ -9,6 +9,7 @@ import {
   GlDropdown,
   GlDropdownHeader,
   GlDropdownItem,
+  GlSprintf,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
@@ -64,6 +65,7 @@ export default {
     GlDropdown,
     GlDropdownHeader,
     GlDropdownItem,
+    GlSprintf,
   },
   props: {
     events: {
@@ -389,6 +391,20 @@ export default {
         <gl-loading-icon v-if="isSavingCustomStage" size="sm" inline />
         {{ saveStageText }}
       </button>
+    </div>
+
+    <div class="mt-2">
+      <gl-sprintf
+        :message="
+          __(
+            '%{strongStart}Note:%{strongEnd} Once a custom stage has been added you can re-order stages by dragging them into the desired position.',
+          )
+        "
+      >
+        <template #strong="{ content }">
+          <strong>{{ content }}</strong>
+        </template>
+      </gl-sprintf>
     </div>
   </form>
 </template>

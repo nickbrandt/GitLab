@@ -597,3 +597,30 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
 
   return dispatch('initializeCycleAnalyticsSuccess');
 };
+
+export const requestReorderStage = ({ commit }) => commit(types.REQUEST_REORDER_STAGE);
+
+export const receiveReorderStageSuccess = ({ commit }) =>
+  commit(types.RECEIVE_REORDER_STAGE_SUCCESS);
+
+export const receiveReorderStageError = ({ commit }) => {
+  commit(types.RECEIVE_REORDER_STAGE_ERROR);
+  createFlash(__('There was an error updating the stage order. Please try reloading the page.'));
+};
+
+export const reorderStage = ({ dispatch, state }, initialData) => {
+  dispatch('requestReorderStage');
+
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+  const { id, moveAfterId, moveBeforeId } = initialData;
+
+  const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
+
+  return Api.cycleAnalyticsUpdateStage(id, fullPath, params)
+    .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
+    .catch(({ response: { status = 400, data: responseData } = {} }) =>
+      dispatch('receiveReorderStageError', { status, responseData }),
+    );
+};
