@@ -149,7 +149,7 @@ module EE
                                          ldap_keys: count(::LDAPKey),
                                          ldap_users: count(::User.ldap, 'users.id'),
                                          pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
-                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval, batch: false),
+                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
                                          merge_requests_with_optional_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_optional, :merge_request_id),
                                          merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
                                          projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
