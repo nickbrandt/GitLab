@@ -1,10 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import VirtualList from 'vue-virtual-scroll-list';
-
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import eventHub from '../event_hub';
+import { generateKey } from '../utils/epic_utils';
 
 import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, EPIC_ITEM_HEIGHT } from '../constants';
 
@@ -62,14 +62,29 @@ export default {
         left: `${this.offsetLeft}px`,
       };
     },
+    displayedEpics() {
+      const displayedEpics = [];
+
+      this.epics.forEach(epic => {
+        displayedEpics.push(epic);
+
+        if (epic.isChildEpicShowing) {
+          displayedEpics.push(...epic.children.edges);
+        }
+      });
+
+      return displayedEpics;
+    },
   },
   mounted() {
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$on('toggleIsEpicExpanded', this.toggleIsEpicExpanded);
     window.addEventListener('resize', this.syncClientWidth);
     this.initMounted();
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$off('toggleIsEpicExpanded', this.toggleIsEpicExpanded);
     window.removeEventListener('resize', this.syncClientWidth);
   },
   methods: {
@@ -130,6 +145,11 @@ export default {
         },
       };
     },
+    toggleIsEpicExpanded(epicId) {
+      const epic = this.epics.find(e => e.id === epicId);
+      epic.isChildEpicShowing = !epic.isChildEpicShowing;
+    },
+    generateKey,
   },
 };
 </script>
@@ -150,9 +170,9 @@ export default {
     </template>
     <template v-else>
       <epic-item
-        v-for="(epic, index) in epics"
+        v-for="(epic, index) in displayedEpics"
         ref="epicItems"
-        :key="index"
+        :key="generateKey(epic)"
         :first-epic="index === 0"
         :preset-type="presetType"
         :epic="epic"

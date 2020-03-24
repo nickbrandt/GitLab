@@ -17,3 +17,37 @@ describe('extractGroupEpics', () => {
     );
   });
 });
+
+describe('addIsChildEpicTrueProperty', () => {
+  it('adds `isChildEpic` property with value `true`', () => {
+    const obj = {
+      title: 'Lorem ipsum dolar sit',
+    };
+
+    const newObj = epicUtils.addIsChildEpicTrueProperty(obj);
+
+    expect(newObj.isChildEpic).toBe(true);
+  });
+});
+
+describe('generateKey', () => {
+  it('returns epic namespaced key for an epic object', () => {
+    const obj = {
+      id: 3,
+      title: 'Lorem ipsum dolar sit',
+      isChildEpic: false,
+    };
+
+    expect(epicUtils.generateKey(obj)).toBe('epic-3');
+  });
+
+  it('returns child-epic- namespaced key for a child epic object', () => {
+    const obj = {
+      id: 3,
+      title: 'Lorem ipsum dolar sit',
+      isChildEpic: true,
+    };
+
+    expect(epicUtils.generateKey(obj)).toBe('child-epic-3');
+  });
+});

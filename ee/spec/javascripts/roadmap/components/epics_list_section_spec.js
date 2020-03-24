@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vue from 'vue';
 import VirtualList from 'vue-virtual-scroll-list';
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
 import EpicItem from 'ee/roadmap/components/epic_item.vue';
@@ -10,6 +11,8 @@ import {
   TIMELINE_CELL_MIN_WIDTH,
 } from 'ee/roadmap/constants';
 import {
+  mockFormattedChildEpic1,
+  mockFormattedChildEpic2,
   mockTimeframeInitialDate,
   mockGroupId,
   rawEpics,
@@ -33,6 +36,10 @@ store.dispatch('setInitialData', {
 store.dispatch('receiveEpicsSuccess', { rawEpics });
 
 const mockEpics = store.state.epics;
+
+store.state.epics[0].children = {
+  edges: [mockFormattedChildEpic1, mockFormattedChildEpic2],
+};
 
 const createComponent = ({
   epics = mockEpics,
@@ -225,6 +232,9 @@ describe('EpicsListSectionComponent', () => {
     });
 
     it('renders epic-item when roadmapBufferedRendering is `false`', () => {
+      // Destroy the wrapper created in the beforeEach above
+      wrapper.destroy();
+
       const wrapperFlagOff = createComponent({
         roadmapBufferedRendering: false,
       });
@@ -253,5 +263,23 @@ describe('EpicsListSectionComponent', () => {
 
       expect(wrapper.find('.epic-scroll-bottom-shadow').exists()).toBe(true);
     });
+  });
+
+  it('expands to show sub-epics when epic is toggled', done => {
+    const epic = mockEpics[0];
+    wrapper = createComponent();
+
+    expect(wrapper.findAll(EpicItem).length).toBe(mockEpics.length);
+
+    wrapper.vm.toggleIsEpicExpanded(epic.id);
+
+    Vue.nextTick()
+      .then(() => {
+        const expected = mockEpics.length + epic.children.edges.length;
+
+        expect(wrapper.findAll(EpicItem).length).toBe(expected);
+      })
+      .then(done)
+      .catch(done.fail);
   });
 });

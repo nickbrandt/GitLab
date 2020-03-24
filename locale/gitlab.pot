@@ -76,6 +76,11 @@ msgid_plural "%d changed files"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d child epic"
+msgid_plural "%d child epics"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d code quality issue"
 msgid_plural "%d code quality issues"
 msgstr[0] ""
