@@ -21009,6 +21009,9 @@ msgstr ""
 msgid "Toggle Sidebar"
 msgstr ""
 
+msgid "Toggle all threads"
+msgstr ""
+
 msgid "Toggle backtrace"
 msgstr ""
 
