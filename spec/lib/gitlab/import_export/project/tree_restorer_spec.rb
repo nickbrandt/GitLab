@@ -78,6 +78,28 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
             expect(merge_request_note.note_html).to match(/#{note_content}/)
           end
+
+          context 'merge request system note metadata' do
+            it 'restores title action for unmark wip' do
+              note_content = 'unmarked as a \\*\\*Work In Progress\\*\\*'
+              merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+
+              expect(merge_request_note.noteable_type).to eq('MergeRequest')
+              expect(merge_request_note.system).to eq(true)
+              expect(merge_request_note.system_note_metadata.action).to eq('title')
+              expect(merge_request_note.system_note_metadata.commit_count).to be_nil
+            end
+
+            it 'restores commit action and commit count for pushing 3 commits' do
+              note_content = 'added 3 commits'
+              merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+
+              expect(merge_request_note.noteable_type).to eq('MergeRequest')
+              expect(merge_request_note.system).to eq(true)
+              expect(merge_request_note.system_note_metadata.action).to eq('commit')
+              expect(merge_request_note.system_note_metadata.commit_count).to eq(3)
+            end
+          end
         end
       end
 
@@ -373,7 +395,9 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
 
         context 'notes' do
           it 'has award emoji' do
-            award_emoji = MergeRequest.find_by_title('MR1').notes.first.award_emoji.first
+            note_content = 'Sit voluptatibus eveniet architecto quidem'
+            merge_request_note = MergeRequest.find_by(title: 'MR1').notes.select { |n| n.note.match(/#{note_content}/)}.first
+            award_emoji = merge_request_note.award_emoji.first
 
             expect(award_emoji.name).to eq('tada')
           end
@@ -506,6 +530,16 @@ describe Gitlab::ImportExport::Project::TreeRestorer do
                       milestones: 1,
                       first_issue_labels: 1,
                       services: 1
+
+      it 'issue system note metadata restored successfully' do
+        note_content = 'created merge request !1 to address this issue'
+        note = project.issues.first.notes.select { |n| n.note.match(/#{note_content}/)}.first
+
+        expect(note.noteable_type).to eq('Issue')
+        expect(note.system).to eq(true)
+        expect(note.system_note_metadata.action).to eq('merge')
+        expect(note.system_note_metadata.commit_count).to be_nil
+      end
 
       context 'when there is an existing build with build token' do
         before do
