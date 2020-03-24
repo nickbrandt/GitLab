@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this */
-
-import _ from 'underscore';
+import { escape as esc, find, countBy } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
 import { n__, s__, __ } from '~/locale';
@@ -269,7 +268,7 @@ export default class AccessDropdown {
     }
 
     const labelPieces = [];
-    const counts = _.countBy(currentItems, item => item.type);
+    const counts = countBy(currentItems, item => item.type);
 
     if (counts[LEVEL_TYPES.ROLE] > 0) {
       labelPieces.push(n__('1 role', '%d roles', counts[LEVEL_TYPES.ROLE]));
@@ -445,7 +444,7 @@ export default class AccessDropdown {
         break;
     }
 
-    const isActive = _.find(this.getSelectedItems(), criteria) ? 'is-active' : '';
+    const isActive = find(this.getSelectedItems(), criteria) ? 'is-active' : '';
 
     switch (item.type) {
       case LEVEL_TYPES.USER:
@@ -472,7 +471,7 @@ export default class AccessDropdown {
       <li>
         <a href="#" class="${isActiveClass}">
           <img src="${user.avatar_url}" class="avatar avatar-inline" width="30">
-          <strong class="dropdown-menu-user-full-name">${_.escape(user.name)}</strong>
+          <strong class="dropdown-menu-user-full-name">${esc(user.name)}</strong>
           <span class="dropdown-menu-user-username">${user.username}</span>
         </a>
       </li>

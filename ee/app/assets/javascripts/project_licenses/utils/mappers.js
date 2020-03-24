@@ -1,11 +1,11 @@
-import _ from 'underscore';
+import { uniqueId } from 'lodash';
 
 export const getLicenseKey = ({ id }) => {
   if (id) {
     return `id_${id}`;
   }
 
-  return `client_${_.uniqueId()}`;
+  return `client_${uniqueId()}`;
 };
 
 /**
