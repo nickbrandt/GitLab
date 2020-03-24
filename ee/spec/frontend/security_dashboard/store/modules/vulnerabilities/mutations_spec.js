@@ -3,6 +3,9 @@ import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/muta
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 import mockData from './data/mock_data_vulnerabilities';
+import { visitUrl } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility');
 
 describe('vulnerabilities module mutations', () => {
   let state;
@@ -256,7 +259,7 @@ describe('vulnerabilities module mutations', () => {
 
     describe('with irregular data', () => {
       const vulnerability = mockData[0];
-      it('should set isDismissed when the vulnerabilitiy is dismissed', () => {
+      it('should set isDismissed when the vulnerability is dismissed', () => {
         const payload = {
           vulnerability: { ...vulnerability, dismissal_feedback: 'I am dismissed' },
         };
@@ -265,7 +268,7 @@ describe('vulnerabilities module mutations', () => {
         expect(state.modal.vulnerability.isDismissed).toBe(true);
       });
 
-      it('should set hasIssue when the vulnerabilitiy has a related issue', () => {
+      it('should set hasIssue when the vulnerability has a related issue', () => {
         const payload = {
           vulnerability: {
             ...vulnerability,
@@ -312,7 +315,6 @@ describe('vulnerabilities module mutations', () => {
   describe('RECEIVE_CREATE_ISSUE_SUCCESS', () => {
     it('should fire the visitUrl function on the issue URL', () => {
       const payload = { issue_url: 'fakepath.html' };
-      const visitUrl = spyOnDependency(mutations, 'visitUrl');
       mutations[types.RECEIVE_CREATE_ISSUE_SUCCESS](state, payload);
 
       expect(visitUrl).toHaveBeenCalledWith(payload.issue_url);
@@ -350,7 +352,6 @@ describe('vulnerabilities module mutations', () => {
   describe('RECEIVE_CREATE_MERGE_REQUEST_SUCCESS', () => {
     it('should fire the visitUrl function on the merge request URL', () => {
       const payload = { merge_request_path: 'fakepath.html' };
-      const visitUrl = spyOnDependency(mutations, 'visitUrl');
       mutations[types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload);
 
       expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_path);
@@ -454,7 +455,7 @@ describe('vulnerabilities module mutations', () => {
       mutations[types.RECEIVE_DISMISS_SELECTED_VULNERABILITIES_ERROR](state);
     });
 
-    it('should set isDismissingVulnerabilties to false', () => {
+    it('should set isDismissingVulnerabilities to false', () => {
       expect(state.isDismissingVulnerabilities).toBe(false);
     });
   });
@@ -471,10 +472,10 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should not add a duplicate id to the selected vulnerabilities', () => {
-      expect(state.selectedVulnerabilities).toHaveLength(1);
+      expect(state.selectedVulnerabilities).toStrictEqual({ [id]: true });
       mutations[types.SELECT_VULNERABILITY](state, id);
 
-      expect(state.selectedVulnerabilities).toHaveLength(1);
+      expect(state.selectedVulnerabilities).toStrictEqual({ [id]: true });
     });
   });
 
@@ -496,7 +497,7 @@ describe('vulnerabilities module mutations', () => {
   describe('SELECT_ALL_VULNERABILITIES', () => {
     beforeEach(() => {
       state.vulnerabilities = [{ id: 12 }, { id: 34 }, { id: 56 }];
-      state.selectedVulnerabilites = {};
+      state.selectedVulnerabilities = {};
     });
 
     it('should add all the vulnerabilities when none are selected', () => {
@@ -506,7 +507,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should add all the vulnerabilities when some are already selected', () => {
-      state.selectedVulnerabilites = { 12: true, 13: true };
+      state.selectedVulnerabilities = { 12: true, 13: true };
       mutations[types.SELECT_ALL_VULNERABILITIES](state);
 
       expect(Object.keys(state.selectedVulnerabilities)).toHaveLength(state.vulnerabilities.length);
@@ -559,7 +560,7 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isDismissingVulnerability).toBe(false);
     });
 
-    it('should set isDissmissed on the modal vulnerability to be true', () => {
+    it('should set isDismissed on the modal vulnerability to be true', () => {
       expect(state.modal.vulnerability.isDismissed).toBe(true);
     });
   });
@@ -583,7 +584,7 @@ describe('vulnerabilities module mutations', () => {
       mutations[types.SHOW_DISMISSAL_DELETE_BUTTONS](state);
     });
 
-    it('should set isShowingDeleteButtonsto to true', () => {
+    it('should set isShowingDeleteButtons to true', () => {
       expect(state.modal.isShowingDeleteButtons).toBe(true);
     });
   });
@@ -633,7 +634,7 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isDismissingVulnerability).toBe(false);
     });
 
-    it('should set isDissmissed on the modal vulnerability to be true', () => {
+    it('should set isDismissed on the modal vulnerability to be true', () => {
       expect(state.modal.vulnerability.isDismissed).toBe(true);
     });
   });
@@ -685,7 +686,7 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isDismissingVulnerability).toBe(false);
     });
 
-    it('should set isDissmissed on the modal vulnerability to be false', () => {
+    it('should set isDismissed on the modal vulnerability to be false', () => {
       expect(state.modal.vulnerability.isDismissed).toBe(false);
     });
   });
