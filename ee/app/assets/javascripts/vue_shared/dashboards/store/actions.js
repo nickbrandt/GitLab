@@ -1,5 +1,5 @@
 import Visibility from 'visibilityjs';
-import _ from 'underscore';
+import { find } from 'lodash';
 import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
@@ -33,7 +33,7 @@ export const addProjectsToDashboard = ({ state, dispatch }) =>
     .catch(() => dispatch('receiveAddProjectsToDashboardError'));
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
-  if (!_.find(state.selectedProjects, { id: project.id })) {
+  if (!find(state.selectedProjects, { id: project.id })) {
     commit(types.ADD_SELECTED_PROJECT, project);
   } else {
     commit(types.REMOVE_SELECTED_PROJECT, project);

@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { mapActions, mapState } from 'vuex';
 import { s__, sprintf } from '~/locale';
 import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
@@ -12,7 +12,7 @@ export default {
   computed: {
     ...mapState(LICENSE_MANAGEMENT, ['currentLicenseInModal']),
     confirmationText() {
-      const name = `<strong>${_.escape(this.currentLicenseInModal.name)}</strong>`;
+      const name = `<strong>${esc(this.currentLicenseInModal.name)}</strong>`;
 
       return sprintf(
         s__('LicenseCompliance|You are about to remove the license, %{name}, from this project.'),
