@@ -13,7 +13,7 @@ describe SoftwareLicensePolicies::CreateService do
   end
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   subject { described_class.new(project, user, params) }
@@ -21,7 +21,7 @@ describe SoftwareLicensePolicies::CreateService do
   describe '#execute' do
     context 'with license management unavailable' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       it 'does not creates a software license policy' do

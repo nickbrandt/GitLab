@@ -21,7 +21,7 @@ describe ProjectPolicy do
     project.add_developer(developer)
     project.add_reporter(reporter)
     project.add_guest(guest)
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   context 'basic permissions' do
@@ -68,7 +68,7 @@ describe ProjectPolicy do
       let(:current_user) { create(:user, :auditor) }
 
       before do
-        stub_licensed_features(security_dashboard: true, license_management: true, threat_monitoring: true)
+        stub_licensed_features(security_dashboard: true, license_scanning: true, threat_monitoring: true)
       end
 
       context 'who is not a team member' do
@@ -696,7 +696,7 @@ describe ProjectPolicy do
   describe 'admin_license_management' do
     context 'without license management feature available' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       let(:current_user) { admin }
@@ -756,7 +756,7 @@ describe ProjectPolicy do
   describe 'read_software_license_policy' do
     context 'without license management feature available' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       let(:current_user) { admin }
@@ -890,7 +890,7 @@ describe ProjectPolicy do
 
     context 'when license management feature in not available' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       let(:current_user) { admin }

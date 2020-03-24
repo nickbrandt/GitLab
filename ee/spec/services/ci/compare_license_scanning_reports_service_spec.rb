@@ -8,7 +8,7 @@ describe Ci::CompareLicenseScanningReportsService do
   let(:project) { create(:project, :repository) }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   describe '#execute' do

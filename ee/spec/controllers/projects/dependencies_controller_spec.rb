@@ -22,7 +22,7 @@ describe Projects::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_scanning: true, license_management: true, security_dashboard: true)
+          stub_licensed_features(dependency_scanning: true, license_scanning: true, security_dashboard: true)
         end
 
         context 'when requesting HTML' do

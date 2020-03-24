@@ -91,7 +91,7 @@ describe Ci::Pipeline do
 
     context 'with license compliance artifact' do
       before do
-        stub_licensed_features(license_management: true)
+        stub_licensed_features(license_scanning: true)
       end
 
       [:license_management, :license_scanning].each do |artifact_type|
@@ -120,7 +120,7 @@ describe Ci::Pipeline do
     subject { pipeline.expose_license_scanning_data? }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     [:license_scanning, :license_management].each do |artifact_type|
@@ -247,7 +247,7 @@ describe Ci::Pipeline do
     subject { pipeline.license_scanning_report }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     context 'when pipeline has multiple builds with license management reports' do

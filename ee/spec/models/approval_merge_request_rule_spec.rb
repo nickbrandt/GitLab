@@ -369,7 +369,7 @@ describe ApprovalMergeRequestRule do
 
   describe "#refresh_required_approvals!" do
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     context "when the rule is a `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` rule" do

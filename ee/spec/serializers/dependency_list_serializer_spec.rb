@@ -13,7 +13,7 @@ describe DependencyListSerializer do
   end
 
   before do
-    stub_licensed_features(security_dashboard: true, license_management: true)
+    stub_licensed_features(security_dashboard: true, license_scanning: true)
     project.add_developer(user)
   end
 

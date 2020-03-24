@@ -11,7 +11,7 @@ describe 'EE > Projects > Licenses > Maintainer views policies', :js do
   end
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
 
     sign_in(maintainer)
     visit(project_licenses_path(project))

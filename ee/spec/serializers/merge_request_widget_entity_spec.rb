@@ -124,7 +124,7 @@ describe MergeRequestWidgetEntity do
 
       context 'when feature is not licensed' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
         end
 
         it 'is not included' do
@@ -178,7 +178,7 @@ describe MergeRequestWidgetEntity do
   describe '#license_scanning', :request_store do
     before do
       allow(merge_request).to receive_messages(head_pipeline: pipeline, target_project: project)
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     it 'is not included, if missing artifacts' do
@@ -201,7 +201,7 @@ describe MergeRequestWidgetEntity do
 
       context 'when feature is not licensed' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
         end
 
         it 'is not included' do
@@ -238,7 +238,7 @@ describe MergeRequestWidgetEntity do
 
         before do
           allow(fork_merge_request).to receive_messages(head_pipeline: pipeline)
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
         end
 
         it 'is a path for target project' do

@@ -9,7 +9,7 @@ describe RefreshLicenseComplianceChecksWorker do
     let(:project) { create(:project) }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     context "when there are merge requests associated with the project" do

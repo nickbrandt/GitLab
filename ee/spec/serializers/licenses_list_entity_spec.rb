@@ -7,7 +7,7 @@ describe LicensesListEntity do
   let(:license_compliance) { ::SCA::LicenseCompliance.new(project) }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
   end
 
   it_behaves_like 'report list' do

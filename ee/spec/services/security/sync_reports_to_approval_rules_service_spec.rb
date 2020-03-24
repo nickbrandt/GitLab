@@ -13,7 +13,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
   before do
     allow(Ci::Pipeline).to receive(:find).with(pipeline.id) { pipeline }
 
-    stub_licensed_features(dependency_scanning: true, dast: true, license_management: true)
+    stub_licensed_features(dependency_scanning: true, dast: true, license_scanning: true)
   end
 
   context 'when there are reports' do

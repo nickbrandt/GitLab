@@ -18,7 +18,7 @@ describe LicensesListSerializer do
 
     before do
       project.add_guest(user)
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     it { is_expected.to match_schema('licenses_list', dir: 'ee') }
