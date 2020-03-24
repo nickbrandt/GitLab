@@ -74,7 +74,7 @@ module Types
 
     field :children, ::Types::EpicType.connection_type, null: true,
           description: 'Children (sub-epics) of the epic',
-          resolver: ::Resolvers::EpicResolver
+          resolver: ::Resolvers::EpicsResolver
     field :labels, Types::LabelType.connection_type, null: true,
           description: 'Labels assigned to the epic'
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Resolvers
-  class EpicResolver < BaseResolver
+  class EpicsResolver < BaseResolver
     include TimeFrameArguments
 
     argument :iid, GraphQL::ID_TYPE,
