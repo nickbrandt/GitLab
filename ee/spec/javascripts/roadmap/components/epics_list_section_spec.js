@@ -1,5 +1,4 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vue from 'vue';
 import VirtualList from 'vue-virtual-scroll-list';
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
 import EpicItem from 'ee/roadmap/components/epic_item.vue';
@@ -78,6 +77,7 @@ describe('EpicsListSectionComponent', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('data', () => {
@@ -265,7 +265,7 @@ describe('EpicsListSectionComponent', () => {
     });
   });
 
-  it('expands to show sub-epics when epic is toggled', done => {
+  it('expands to show child epics when epic is toggled', done => {
     const epic = mockEpics[0];
     wrapper = createComponent();
 
@@ -273,7 +273,8 @@ describe('EpicsListSectionComponent', () => {
 
     wrapper.vm.toggleIsEpicExpanded(epic.id);
 
-    Vue.nextTick()
+    wrapper.vm
+      .$nextTick()
       .then(() => {
         const expected = mockEpics.length + epic.children.edges.length;
 

@@ -27,7 +27,7 @@ const getTitle = wrapper => wrapper.find('.epic-title');
 
 const getGroupName = wrapper => wrapper.find('.epic-group');
 
-const getExpandIconDiv = wrapper => wrapper.find('.epic-details-cell-expand-icon');
+const getExpandIconDiv = wrapper => wrapper.find('.btn-link');
 
 const getChildEpicsCount = wrapper => wrapper.find({ ref: 'childEpicsCount' });
 
@@ -36,6 +36,7 @@ describe('EpicItemDetails', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('epic title', () => {
@@ -107,13 +108,13 @@ describe('EpicItemDetails', () => {
 
   describe('epic', () => {
     describe('expand icon', () => {
-      it('is hidden when epic has no sub-epics', () => {
+      it('is hidden when epic has no child epics', () => {
         wrapper = createComponent();
 
         expect(getExpandIconDiv(wrapper).classes()).toContain('invisible');
       });
 
-      it('is shown when epic has sub-epics', () => {
+      it('is shown when epic has child epics', () => {
         const epic = {
           ...mockFormattedEpic,
           children: {
@@ -125,36 +126,36 @@ describe('EpicItemDetails', () => {
         expect(getExpandIconDiv(wrapper).classes()).not.toContain('invisible');
       });
 
-      it('shows "angle-right" icon when sub-epics are not expanded', () => {
+      it('shows "chevron-right" icon when child epics are not expanded', () => {
         wrapper = createComponent();
 
-        expect(wrapper.find(GlIcon).attributes('name')).toBe('angle-right');
+        expect(wrapper.find(GlIcon).attributes('name')).toBe('chevron-right');
       });
 
-      it('shows "angle-down" icon when sub-epics are expanded', () => {
+      it('shows "chevron-down" icon when child epics are expanded', () => {
         const epic = {
           ...mockFormattedEpic,
           isChildEpicShowing: true,
         };
         wrapper = createComponent(epic);
 
-        expect(wrapper.find(GlIcon).attributes('name')).toBe('angle-down');
+        expect(wrapper.find(GlIcon).attributes('name')).toBe('chevron-down');
       });
 
-      it('has "Expand" label when sub-epics are not expanded', () => {
+      it('has "Expand child epics" label when child epics are not expanded', () => {
         wrapper = createComponent();
 
-        expect(wrapper.find(GlIcon).attributes('aria-label')).toBe('Expand');
+        expect(getExpandIconDiv(wrapper).attributes('aria-label')).toBe('Expand child epics');
       });
 
-      it('has "Collapse" label when sub-epics are expanded', () => {
+      it('has "Collapse child epics" label when child epics are expanded', () => {
         const epic = {
           ...mockFormattedEpic,
           isChildEpicShowing: true,
         };
         wrapper = createComponent(epic);
 
-        expect(wrapper.find(GlIcon).attributes('aria-label')).toBe('Collapse');
+        expect(getExpandIconDiv(wrapper).attributes('aria-label')).toBe('Collapse child epics');
       });
 
       it('emits toggleIsEpicExpanded event when clicked', () => {
@@ -175,7 +176,7 @@ describe('EpicItemDetails', () => {
         expect(eventHub.$emit).toHaveBeenCalledWith('toggleIsEpicExpanded', id);
       });
 
-      it('is hidden when it is sub-epic', () => {
+      it('is hidden when it is child epic', () => {
         const epic = {
           ...mockFormattedEpic,
           isChildEpic: true,
@@ -186,8 +187,8 @@ describe('EpicItemDetails', () => {
       });
     });
 
-    describe('sub-epics count', () => {
-      it('shows the correct count of sub-epics', () => {
+    describe('child epics count', () => {
+      it('shows the correct count of child epics', () => {
         const epic = {
           ...mockFormattedEpic,
           children: {
@@ -199,7 +200,7 @@ describe('EpicItemDetails', () => {
         expect(getChildEpicsCount(wrapper).text()).toBe('2');
       });
 
-      it('shows the count as 0 when there are no sub-epics', () => {
+      it('shows the count as 0 when there are no child epics', () => {
         wrapper = createComponent();
 
         expect(getChildEpicsCount(wrapper).text()).toBe('0');
@@ -217,7 +218,7 @@ describe('EpicItemDetails', () => {
         expect(wrapper.find(GlTooltip).text()).toBe('1 child epic');
       });
 
-      it('is hidden when it is a sub-epic', () => {
+      it('is hidden when it is a child epic', () => {
         const epic = {
           ...mockFormattedEpic,
           isChildEpic: true,

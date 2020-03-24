@@ -19,14 +19,25 @@ describe('extractGroupEpics', () => {
 });
 
 describe('addIsChildEpicTrueProperty', () => {
+  const title = 'Lorem ipsum dolar sit';
+  const description = 'Beatae suscipit dolorum nihil quidem est accusamus';
+  const obj = {
+    title,
+    description,
+  };
+  let newObj;
+
+  beforeEach(() => {
+    newObj = epicUtils.addIsChildEpicTrueProperty(obj);
+  });
+
   it('adds `isChildEpic` property with value `true`', () => {
-    const obj = {
-      title: 'Lorem ipsum dolar sit',
-    };
-
-    const newObj = epicUtils.addIsChildEpicTrueProperty(obj);
-
     expect(newObj.isChildEpic).toBe(true);
+  });
+
+  it('has original properties in returned object', () => {
+    expect(newObj.title).toBe(title);
+    expect(newObj.description).toBe(description);
   });
 });
 

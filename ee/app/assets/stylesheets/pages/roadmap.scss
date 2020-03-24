@@ -305,17 +305,9 @@ html.group-epics-roadmap-html {
   }
 }
 
-.epic-details-cell-expand-icon {
-  height: 20px;
-}
-
 .epic-title,
 .epic-group-timeframe {
   @include text-truncate;
-}
-
-.epic-group:hover {
-  cursor: pointer;
 }
 
 .epic-timeline-cell {

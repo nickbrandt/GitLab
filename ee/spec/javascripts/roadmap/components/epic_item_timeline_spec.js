@@ -33,30 +33,27 @@ describe('EpicItemTimelineComponent', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('epic bar', () => {
-    it('shows the title', () => {
+    beforeEach(() => {
       wrapper = createComponent();
+    });
 
+    it('shows the title', () => {
       expect(getEpicBar(wrapper).text()).toContain(mockFormattedEpic.title);
     });
 
     it('shows the progress bar with correct value', () => {
-      wrapper = createComponent();
-
       expect(wrapper.find(GlProgressBar).attributes('value')).toBe('60');
     });
 
     it('shows the percentage', () => {
-      wrapper = createComponent();
-
       expect(getEpicBar(wrapper).text()).toContain('60%');
     });
 
     it('contains a link to the epic', () => {
-      wrapper = createComponent();
-
       expect(getEpicBar(wrapper).attributes('href')).toBe(mockFormattedEpic.webUrl);
     });
   });

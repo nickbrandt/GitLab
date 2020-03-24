@@ -59,10 +59,9 @@ export const fetchGroupEpics = (
       variables,
     })
     .then(({ data }) => {
-      const { group } = data;
       const edges = epicIid
-        ? (group.epic && group.epic.children.edges) || []
-        : (group.epics && group.epics.edges) || [];
+        ? data?.group?.epic?.children?.edges || []
+        : data?.group?.epics?.edges || [];
 
       return epicUtils.extractGroupEpics(edges);
     });
@@ -89,9 +88,9 @@ export const receiveEpicsSuccess = (
       formattedEpic.children.edges = formattedEpic.children.edges
         .map(epicUtils.flattenGroupProperty)
         .map(epicUtils.addIsChildEpicTrueProperty)
-        .map(e =>
+        .map(childEpic =>
           roadmapItemUtils.formatRoadmapItemDetails(
-            e,
+            childEpic,
             getters.timeframeStartDate,
             getters.timeframeEndDate,
           ),
@@ -214,9 +213,9 @@ export const refreshEpicDates = ({ commit, state, getters }) => {
   const epics = state.epics.map(epic => {
     // Update child epic dates too
     if (epic?.children?.edges?.length > 0) {
-      epic.children.edges.map(e =>
+      epic.children.edges.map(childEpic =>
         roadmapItemUtils.processRoadmapItemDates(
-          e,
+          childEpic,
           getters.timeframeStartDate,
           getters.timeframeEndDate,
         ),

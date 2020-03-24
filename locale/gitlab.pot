@@ -395,6 +395,9 @@ msgstr ""
 msgid "%{openedIssues} open, %{closedIssues} closed"
 msgstr ""
 
+msgid "%{percentage}%% weight completed"
+msgstr ""
+
 msgid "%{percent}%% complete"
 msgstr ""
 
@@ -4988,6 +4991,9 @@ msgstr ""
 msgid "Collapse approvers"
 msgstr ""
 
+msgid "Collapse child epics"
+msgstr ""
+
 msgid "Collapse sidebar"
 msgstr ""
 
@@ -8319,6 +8325,9 @@ msgid "Expand all"
 msgstr ""
 
 msgid "Expand approvers"
+msgstr ""
+
+msgid "Expand child epics"
 msgstr ""
 
 msgid "Expand down"

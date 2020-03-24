@@ -142,6 +142,11 @@ export default {
           )
         : 0;
     },
+    epicWeightPercentageText() {
+      return sprintf(__(`%{percentage}%% weight completed`), {
+        percentage: this.epicWeightPercentage,
+      });
+    },
     popoverWeightText() {
       if (this.epic.descendantWeightSum) {
         return sprintf(__('%{completedWeight} of %{totalWeight} weight completed'), {
@@ -170,19 +175,18 @@ export default {
         :class="['epic-bar', 'rounded', { 'epic-bar-child-epic': epic.isChildEpic }]"
       >
         <div class="epic-bar-inner px-2 py-1" :style="timelineBarInnerStyle">
-          <p class="epic-bar-title text-nowrap text-truncate mb-0">
-            {{ timelineBarTitle }}
-          </p>
+          <p class="epic-bar-title text-nowrap text-truncate m-0">{{ timelineBarTitle }}</p>
 
           <div v-if="!isTimelineBarSmall" class="d-flex align-items-center">
             <gl-progress-bar
               class="epic-bar-progress flex-grow-1 mr-1"
               :value="epicWeightPercentage"
+              aria-hidden="true"
             />
-            <span class="gl-font-size-small d-flex align-items-center text-nowrap">
+            <div class="gl-font-size-small d-flex align-items-center text-nowrap">
               <icon class="append-right-2" :size="12" name="weight" />
-              {{ epicWeightPercentage }}%
-            </span>
+              <p class="m-0" :aria-label="epicWeightPercentageText">{{ epicWeightPercentage }}%</p>
+            </div>
           </div>
         </div>
       </a>

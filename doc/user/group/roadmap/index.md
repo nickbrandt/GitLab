@@ -17,7 +17,7 @@ When you hover over an epic bar, a popover appears with its title, start and due
 completed.
 
 You can expand epics that contain child epics to show their child epics in the roadmap.
-You can click the chevron **{angle-down}** next to the epic title to expand and collapse the child epics.
+You can click the chevron **{chevron-down}** next to the epic title to expand and collapse the child epics.
 
 ![roadmap view](img/roadmap_view_v12_9.png)
 

@@ -7,7 +7,7 @@ export const gqClient = createGqClient(
   },
 );
 
-export const flattenGroupProperty = ({ node, epicNode = node }) => ({
+export const flattenGroupProperty = ({ node: epicNode }) => ({
   ...epicNode,
   // We can get rid of below two lines
   // by updating `epic_item_details.vue`
