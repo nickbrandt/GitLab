@@ -202,7 +202,7 @@ describe SubscriptionsController do
           group.save
           subject
 
-          expect(response.body).to eq({ name: ["can't be blank"] }.to_json)
+          expect(response.body).to include({ name: ["can't be blank", Gitlab::Regex.group_name_regex_message] }.to_json)
         end
       end
 
