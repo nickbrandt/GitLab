@@ -4,7 +4,6 @@ import { GlTable, GlPagination, GlModal } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { mount, createLocalVue } from '@vue/test-utils';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
-import PackageTags from 'ee/packages/shared/components/package_tags.vue';
 import PackagesListLoader from 'ee/packages/list/components/packages_list_loader.vue';
 import * as SharedUtils from 'ee/packages/shared/utils';
 import { TrackingActions } from 'ee/packages/shared/constants';
@@ -22,12 +21,8 @@ describe('packages_list', () => {
   const EmptySlotStub = { name: 'empty-slot-stub', template: '<div>bar</div>' };
 
   const findPackagesListLoader = () => wrapper.find(PackagesListLoader);
-  const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
-  const findPackageListTable = () => wrapper.find(GlTable);
   const findPackageListPagination = () => wrapper.find(GlPagination);
   const findPackageListDeleteModal = () => wrapper.find(GlModal);
-  const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
-  const findPackageTags = () => wrapper.findAll(PackageTags);
   const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
   const createStore = (isGroupPage, packages, isLoading) => {
@@ -104,30 +99,9 @@ describe('packages_list', () => {
     });
   });
 
-  describe('when is isGroupPage', () => {
-    beforeEach(() => {
-      mountComponent({ isGroupPage: true });
-    });
-
-    it('has project field', () => {
-      const projectColumn = findFirstProjectColumn();
-      expect(projectColumn.exists()).toBe(true);
-    });
-
-    it('does not show the action column', () => {
-      const action = findFirstActionColumn();
-      expect(action.exists()).toBe(false);
-    });
-  });
-
   describe('layout', () => {
     beforeEach(() => {
       mountComponent();
-    });
-
-    it('contains a table component', () => {
-      const sorting = findPackageListTable();
-      expect(sorting.exists()).toBe(true);
     });
 
     it('contains a pagination component', () => {
@@ -139,20 +113,11 @@ describe('packages_list', () => {
       const sorting = findPackageListDeleteModal();
       expect(sorting.exists()).toBe(true);
     });
-
-    it('renders package tags when a package has tags', () => {
-      expect(findPackageTags()).toHaveLength(1);
-    });
   });
 
   describe('when the user can destroy the package', () => {
     beforeEach(() => {
       mountComponent();
-    });
-
-    it('show the action column', () => {
-      const action = findFirstActionColumn();
-      expect(action.exists()).toBe(true);
     });
 
     it('shows the correct deletePackageDescription', () => {
@@ -164,11 +129,12 @@ describe('packages_list', () => {
       );
     });
 
-    it('delete button set itemToBeDeleted and open the modal', () => {
+    it('setItemToBeDeleted sets itemToBeDeleted and open the modal', () => {
       wrapper.vm.$refs.packageListDeleteModal.show = jest.fn();
+
       const item = last(wrapper.vm.list);
-      const action = findFirstActionColumn();
-      action.vm.$emit('click');
+      wrapper.vm.setItemToBeDeleted(item);
+
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.itemToBeDeleted).toEqual(item);
         expect(wrapper.vm.$refs.packageListDeleteModal.show).toHaveBeenCalled();
@@ -208,9 +174,7 @@ describe('packages_list', () => {
     });
 
     it('show the empty slot', () => {
-      const table = findPackageListTable();
       const emptySlot = findEmptySlot();
-      expect(table.exists()).toBe(false);
       expect(emptySlot.exists()).toBe(true);
     });
   });
@@ -229,17 +193,6 @@ describe('packages_list', () => {
     it('emits page:changed events when the page changes', () => {
       pagination.vm.$emit(modelEvent, 2);
       expect(wrapper.emitted('page:changed')).toEqual([[2]]);
-    });
-  });
-
-  describe('table component', () => {
-    beforeEach(() => {
-      mountComponent();
-    });
-
-    it('has stacked-md class', () => {
-      const table = findPackageListTable();
-      expect(table.classes()).toContain('b-table-stacked-md');
     });
   });
 

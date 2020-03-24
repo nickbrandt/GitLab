@@ -1,5 +1,5 @@
-import { s__ } from '~/locale';
 import { generateConanRecipe } from '../utils';
+import { getPackageType } from '../../shared/utils';
 import { NpmManager } from '../constants';
 
 export const packagePipeline = ({ packageEntity }) => {
@@ -7,19 +7,7 @@ export const packagePipeline = ({ packageEntity }) => {
 };
 
 export const packageTypeDisplay = ({ packageEntity }) => {
-  switch (packageEntity.package_type) {
-    case 'conan':
-      return s__('PackageType|Conan');
-    case 'maven':
-      return s__('PackageType|Maven');
-    case 'npm':
-      return s__('PackageType|NPM');
-    case 'nuget':
-      return s__('PackageType|NuGet');
-
-    default:
-      return null;
-  }
+  return getPackageType(packageEntity.package_type);
 };
 
 export const conanInstallationCommand = ({ packageEntity }) => {

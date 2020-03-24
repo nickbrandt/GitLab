@@ -1,4 +1,4 @@
-import { packageTypeToTrackCategory, beautifyPath } from 'ee/packages/shared/utils';
+import { packageTypeToTrackCategory, beautifyPath, getPackageType } from 'ee/packages/shared/utils';
 import { PackageType, TrackingCategories } from 'ee/packages/shared/constants';
 
 describe('Packages shared utils', () => {
@@ -14,12 +14,27 @@ describe('Packages shared utils', () => {
       );
     });
   });
+
   describe('beautifyPath', () => {
     it('returns a string with spaces around /', () => {
       expect(beautifyPath('foo/bar')).toBe('foo / bar');
     });
     it('does not fail for empty string', () => {
       expect(beautifyPath()).toBe('');
+    });
+  });
+
+  describe('getPackageType', () => {
+    describe.each`
+      packageType | expectedResult
+      ${'conan'}  | ${'Conan'}
+      ${'maven'}  | ${'Maven'}
+      ${'npm'}    | ${'NPM'}
+      ${'nuget'}  | ${'NuGet'}
+    `(`package type`, ({ packageType, expectedResult }) => {
+      it(`${packageType} should show as ${expectedResult}`, () => {
+        expect(getPackageType(packageType)).toBe(expectedResult);
+      });
     });
   });
 });

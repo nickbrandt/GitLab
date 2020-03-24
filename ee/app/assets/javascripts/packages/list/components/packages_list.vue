@@ -1,35 +1,19 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
-import {
-  GlTable,
-  GlPagination,
-  GlDeprecatedButton,
-  GlModal,
-  GlLink,
-  GlIcon,
-  GlTooltipDirective,
-} from '@gitlab/ui';
+import { GlPagination, GlModal, GlTooltipDirective } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { s__, sprintf } from '~/locale';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import { LIST_KEY_ACTIONS, LIST_LABEL_ACTIONS } from '../constants';
-import getTableHeaders from '../utils';
 import { TrackingActions } from '../../shared/constants';
 import { packageTypeToTrackCategory } from '../../shared/utils';
-import PackageTags from '../../shared/components/package_tags.vue';
 import PackagesListLoader from './packages_list_loader.vue';
+import PackagesListRow from './packages_list_row.vue';
 
 export default {
   components: {
-    GlTable,
     GlPagination,
-    GlDeprecatedButton,
-    GlLink,
-    TimeAgoTooltip,
     GlModal,
-    GlIcon,
-    PackageTags,
     PackagesListLoader,
+    PackagesListRow,
   },
   directives: { GlTooltip: GlTooltipDirective },
   mixins: [Tracking.mixin()],
@@ -57,22 +41,6 @@ export default {
     },
     isListEmpty() {
       return !this.list || this.list.length === 0;
-    },
-    showActions() {
-      return !this.isGroupPage;
-    },
-    headerFields() {
-      const fields = getTableHeaders(this.isGroupPage);
-
-      if (this.showActions) {
-        fields.push({
-          key: LIST_KEY_ACTIONS,
-          label: LIST_LABEL_ACTIONS,
-        });
-      }
-
-      fields[fields.length - 1].class = ['text-right'];
-      return fields;
     },
     modalAction() {
       return s__('PackageRegistry|Delete package');
@@ -121,84 +89,26 @@ export default {
   <div class="d-flex flex-column">
     <slot v-if="isListEmpty && !isLoading" name="empty-state"></slot>
 
+    <div v-else-if="isLoading">
+      <packages-list-loader :is-group="isGroupPage" />
+    </div>
+
     <template v-else>
-      <gl-table
-        :items="list"
-        :fields="headerFields"
-        :no-local-sorting="true"
-        :busy="isLoading"
-        stacked="md"
-        class="package-list-table"
-        data-qa-selector="packages-table"
-      >
-        <template #table-busy>
-          <packages-list-loader :is-group="isGroupPage" />
-        </template>
+      <div data-qa-selector="packages-table">
+        <packages-list-row
+          v-for="pk in list"
+          :key="pk.id"
+          :package-entity="pk"
+          @packageToDelete="setItemToBeDeleted"
+        />
+      </div>
 
-        <template #cell(name)="{value, item}">
-          <div
-            class="flex-truncate-parent d-flex align-items-center justify-content-end justify-content-md-start"
-          >
-            <gl-link
-              v-gl-tooltip.hover
-              :title="value"
-              :href="item._links.web_path"
-              data-qa-selector="package_link"
-            >
-              {{ value }}
-            </gl-link>
-
-            <package-tags
-              v-if="item.tags && item.tags.length"
-              class="prepend-left-8"
-              :tags="item.tags"
-              hide-label
-              :tag-display-limit="1"
-            />
-          </div>
-        </template>
-
-        <template #cell(project_path)="{item}">
-          <div ref="col-project" class="flex-truncate-parent">
-            <gl-link
-              v-gl-tooltip.hover
-              :title="item.projectPathName"
-              :href="`/${item.project_path}`"
-              class="flex-truncate-child"
-            >
-              {{ item.projectPathName }}
-            </gl-link>
-          </div>
-        </template>
-        <template #cell(version)="{value}">
-          {{ value }}
-        </template>
-        <template #cell(package_type)="{value}">
-          {{ value }}
-        </template>
-        <template #cell(created_at)="{value}">
-          <time-ago-tooltip :time="value" />
-        </template>
-        <template #cell(actions)="{item}">
-          <!-- _links contains the urls needed to navigate to the page details and to perform a package deletion and it comes straight from the API -->
-          <gl-deprecated-button
-            ref="action-delete"
-            variant="danger"
-            :title="s__('PackageRegistry|Remove package')"
-            :aria-label="s__('PackageRegistry|Remove package')"
-            :disabled="!item._links.delete_api_path"
-            @click="setItemToBeDeleted(item)"
-          >
-            <gl-icon name="remove" />
-          </gl-deprecated-button>
-        </template>
-      </gl-table>
       <gl-pagination
         v-model="currentPage"
         :per-page="perPage"
         :total-items="totalItems"
         align="center"
-        class="w-100"
+        class="w-100 mt-2"
       />
 
       <gl-modal

@@ -6067,6 +6067,9 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+msgid "Created %{timestamp}"
+msgstr ""
+
 msgid "Created At"
 msgstr ""
 
@@ -14258,6 +14261,9 @@ msgid "Package type must be Maven"
 msgstr ""
 
 msgid "Package was removed"
+msgstr ""
+
+msgid "PackageRegistry|%{version} published by %{author}"
 msgstr ""
 
 msgid "PackageRegistry|Add Conan Remote"
