@@ -7,6 +7,7 @@ import Wikis from './wikis';
 import ZenMode from '../../../zen_mode';
 import GLForm from '../../../gl_form';
 import deleteWikiModal from './components/delete_wiki_modal.vue';
+import initWikiPagesList from '~/wikis';
 
 document.addEventListener('DOMContentLoaded', () => {
   new Wikis(); // eslint-disable-line no-new
@@ -21,8 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const { deleteWikiUrl, pageTitle } = deleteWikiModalWrapperEl.dataset;
 
-    // eslint-disable-next-line no-new
-    new Vue({
+    return new Vue({
       el: deleteWikiModalWrapperEl,
       data: {
         deleteWikiUrl: '',
@@ -38,4 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
       },
     });
   }
+
+  initWikiPagesList(document.querySelector('#js-wiki-all-pages'));
 });
