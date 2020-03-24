@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Packages::GoModule
-  SEMVER_TAG_REGEX = Regexp.new("^#{::Packages::GoModuleVersion::SEMVER_REGEX.source}$").freeze
+  SEMVER_TAG_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?$/i.freeze
 
   # belongs_to :project
 
@@ -22,7 +22,7 @@ class Packages::GoModule
   end
 
   def versions
-    @versions ||= project.repository.tags
+    @versions ||= @project.repository.tags
       .filter { |tag| SEMVER_TAG_REGEX.match?(tag.name) && !tag.dereferenced_target.nil? }
       .map    { |tag| ::Packages::GoModuleVersion.new self, tag }
       .filter { |ver| ver.valid? }

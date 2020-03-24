@@ -3,13 +3,18 @@ module API
   class GoProxy < Grape::API
     helpers ::API::Helpers::PackagesHelpers
 
-    MODULE_VERSION_REQUIREMENTS = { module_version: ::Packages::GoModuleVersion::SEMVER_REGEX }.freeze
+    MODULE_VERSION_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.!a-z0-9]+))?(?:\+([-.!a-z0-9]+))?/.freeze
+    MODULE_VERSION_REQUIREMENTS = { module_version: MODULE_VERSION_REGEX }.freeze
 
     before { require_packages_enabled! }
 
     helpers do
+      def case_decode(str)
+        str.gsub(/![[:alpha:]]/) { |s| s[1..].upcase }
+      end
+
       def find_module
-        module_name = params[:module_name].gsub(/![[:alpha:]]/) { |s| s[1..].upcase }
+        module_name = case_decode params[:module_name]
 
         bad_request!('Module Name') if module_name.blank?
 
@@ -17,6 +22,15 @@ module API
         not_found! if mod.path.nil?
 
         mod
+      end
+
+      def find_version
+        mod = find_module
+
+        ver = mod.find_version case_decode params[:module_version]
+        not_found! unless ver
+
+        ver
       end
     end
 
@@ -49,10 +63,7 @@ module API
           requires :module_version, type: String, desc: 'Module version'
         end
         get ':module_version.info', requirements: MODULE_VERSION_REQUIREMENTS do
-          mod = find_module
-
-          ver = mod.find_version params[:module_version]
-          not_found! unless ver
+          ver = find_version
 
           present ::Packages::Go::ModuleVersionPresenter.new(ver), with: EE::API::Entities::GoModuleVersion
         end
@@ -64,10 +75,7 @@ module API
           requires :module_version, type: String, desc: 'Module version'
         end
         get ':module_version.mod', requirements: MODULE_VERSION_REQUIREMENTS do
-          mod = find_module
-
-          ver = mod.find_version params[:module_version]
-          not_found! unless ver
+          ver = find_version
 
           content_type 'text/plain'
           ver.gomod
@@ -80,14 +88,13 @@ module API
           requires :module_version, type: String, desc: 'Module version'
         end
         get ':module_version.zip', requirements: MODULE_VERSION_REQUIREMENTS do
-          mod = find_module
+          ver = find_version
 
-          ver = mod.find_version params[:module_version]
-          not_found! unless ver
+          suffix_len = ver.mod.path == '' ? 0 : ver.mod.path.length + 1
 
           s = Zip::OutputStream.write_buffer do |zip|
             ver.files.each do |file|
-              zip.put_next_entry file.path
+              zip.put_next_entry "#{ver.mod.name}@#{ver.name}/#{file.path[suffix_len...]}"
               zip.write ver.blob_at(file.path)
             end
           end

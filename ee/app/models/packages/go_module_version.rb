@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Packages::GoModuleVersion
-  SEMVER_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.A-Z0-9]+))?(?:\+([-.A-Z0-9]+))?/i.freeze
+  SEMVER_REGEX = /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?/i.freeze
   VERSION_SUFFIX_REGEX = /\/v([1-9]\d*)$/i.freeze
 
   # belongs_to :mod
@@ -16,20 +16,28 @@ class Packages::GoModuleVersion
   end
 
   def gomod
-    return @gomod unless @gomod.nil?
-
-    blob = @mod.project.repository.blob_at(@tag.dereferenced_target.sha, @mod.path + '/go.mod')
-    @gomod = blob ? blob.data : ''
+    @gomod ||= @mod.project.repository.blob_at(@tag.dereferenced_target.sha, @mod.path + '/go.mod')&.data
   end
 
   def valid?
-    m = gomod.split("\n", 2).first
+    valid_path? && valid_module?
+  end
+
+  def valid_path?
+    m = VERSION_SUFFIX_REGEX.match(@mod.name)
+
     case major
     when 0, 1
-      m == "module #{@mod.name}"
+      m.nil?
     else
-      m == "module #{@mod.name}/v#{major}"
+      !m.nil? && m[1].to_i == major
     end
+  end
+
+  def valid_module?
+    return false unless gomod
+
+    gomod.split("\n", 2).first == "module #{@mod.name}"
   end
 
   def major
@@ -56,8 +64,8 @@ class Packages::GoModuleVersion
     return @files unless @files.nil?
 
     sha = @tag.dereferenced_target.sha
-    tree = @mod.project.repository.tree(sha, mod.path, recursive: true).entries.filter { |e| e.file? }
-    nested = tree.filter { |e| e.name == 'go.mod' && !(mod.path == '' && e.path == 'go.mod' || e.path == mod.path + '/go.mod') }.map { |e| e.path[0..-7] }
+    tree = @mod.project.repository.tree(sha, @mod.path, recursive: true).entries.filter { |e| e.file? }
+    nested = tree.filter { |e| e.name == 'go.mod' && !(@mod.path == '' && e.path == 'go.mod' || e.path == @mod.path + '/go.mod') }.map { |e| e.path[0..-7] }
     @files = tree.filter { |e| !nested.any? { |n| e.path.start_with? n } }
   end
 
