@@ -591,13 +591,7 @@ module Ci
 
     def merge_request
       strong_memoize(:merge_request) do
-        merge_requests = MergeRequest.includes(:latest_merge_request_diff)
-          .where(source_branch: ref, source_project: pipeline.project)
-          .reorder(iid: :desc)
-
-        merge_requests.find do |merge_request|
-          merge_request.commit_shas.include?(pipeline.sha)
-        end
+        pipeline.all_merge_requests.first
       end
     end
 
