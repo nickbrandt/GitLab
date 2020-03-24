@@ -305,9 +305,6 @@ msgstr ""
 msgid "%{filePath} deleted"
 msgstr ""
 
-msgid "%{file}:%{line} (%{klass}::%{method})"
-msgstr ""
-
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
@@ -3954,6 +3951,9 @@ msgid "CiVariable|Validation failed"
 msgstr ""
 
 msgid "Class"
+msgstr ""
+
+msgid "Class: %{className}::%{method}"
 msgstr ""
 
 msgid "Classification Label (optional)"
@@ -8922,6 +8922,9 @@ msgid "File templates"
 msgstr ""
 
 msgid "File upload error."
+msgstr ""
+
+msgid "File: %{file}:%{line}"
 msgstr ""
 
 msgid "Files"
