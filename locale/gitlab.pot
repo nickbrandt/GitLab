@@ -7825,6 +7825,9 @@ msgstr ""
 msgid "Environments|Select environment"
 msgstr ""
 
+msgid "Environments|Select pod"
+msgstr ""
+
 msgid "Environments|Show all"
 msgstr ""
 
