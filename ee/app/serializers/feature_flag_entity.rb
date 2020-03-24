@@ -10,6 +10,7 @@ class FeatureFlagEntity < Grape::Entity
   expose :updated_at
   expose :name
   expose :description
+  expose :version
 
   expose :edit_path, if: -> (feature_flag, _) { can_update?(feature_flag) } do |feature_flag|
     edit_project_feature_flag_path(feature_flag.project, feature_flag)
@@ -26,6 +27,8 @@ class FeatureFlagEntity < Grape::Entity
   expose :scopes, with: FeatureFlagScopeEntity do |feature_flag|
     feature_flag.scopes.sort_by(&:id)
   end
+
+  expose :strategies, with: FeatureFlags::StrategyEntity
 
   private
 

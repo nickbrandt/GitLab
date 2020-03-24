@@ -452,6 +452,7 @@ describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response).to eq({ 'message' => 'Version is invalid' })
       end
     end
   end

@@ -40,7 +40,7 @@ module API
         params do
           requires :name, type: String, desc: 'The name of feature flag'
           optional :description, type: String, desc: 'The description of the feature flag'
-          optional :version, type: String, desc: 'The version of the feature flag', values: Operations::FeatureFlag.versions.keys
+          optional :version, type: String, desc: 'The version of the feature flag'
           optional :scopes, type: Array do
             requires :environment_scope, type: String, desc: 'The environment scope of the scope'
             requires :active, type: Boolean, desc: 'Active/inactive of the scope'

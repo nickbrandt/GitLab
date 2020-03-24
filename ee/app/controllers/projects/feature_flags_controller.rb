@@ -94,14 +94,23 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   protected
 
   def feature_flag
-    @feature_flag ||= project.operations_feature_flags.find(params[:id])
+    @feature_flag ||= if new_version_feature_flags_enabled?
+                        project.operations_feature_flags.find(params[:id])
+                      else
+                        project.operations_feature_flags.legacy_flag.find(params[:id])
+                      end
+  end
+
+  def new_version_feature_flags_enabled?
+    ::Feature.enabled?(:feature_flags_new_version, project)
   end
 
   def create_params
     params.require(:operations_feature_flag)
-      .permit(:name, :description, :active,
+      .permit(:name, :description, :active, :version,
               scopes_attributes: [:environment_scope, :active,
-                                  strategies: [:name, parameters: [:groupId, :percentage, :userIds]]])
+                                  strategies: [:name, parameters: [:groupId, :percentage, :userIds]]],
+             strategies_attributes: [:name, parameters: [:groupId, :percentage, :userIds], scopes_attributes: [:environment_scope]])
   end
 
   def update_params
