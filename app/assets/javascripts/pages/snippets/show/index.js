@@ -3,7 +3,7 @@ import BlobViewer from '~/blob/viewer';
 import ZenMode from '~/zen_mode';
 import initNotes from '~/init_notes';
 import snippetEmbed from '~/snippet/snippet_embed';
-import { SnippetShowInit } from '~/snippets';
+import initSnippetsApp from '~/snippets';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!gon.features.snippetsVue) {
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     new ZenMode(); // eslint-disable-line no-new
     snippetEmbed();
   } else {
-    SnippetShowInit();
+    initSnippetsApp();
     initNotes();
   }
 });
