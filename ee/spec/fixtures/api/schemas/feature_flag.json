@@ -7,6 +7,7 @@
   "properties" : {
     "id": { "type": "integer" },
     "iid": { "type": ["integer", "null"] },
+    "version": { "type": "string" },
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
     "name": { "type": "string" },
@@ -15,7 +16,8 @@
     "edit_path": { "type": ["string", "null"] },
     "update_path": { "type": ["string", "null"] },
     "destroy_path": { "type": ["string", "null"] },
-    "scopes": { "type": "array", "items": { "$ref": "feature_flag_scope.json" } }
+    "scopes": { "type": "array", "items": { "$ref": "feature_flag_scope.json" } },
+    "strategies": { "type": "array", "items": { "$ref": "feature_flag_strategy.json" } }
   },
   "additionalProperties": false
 }

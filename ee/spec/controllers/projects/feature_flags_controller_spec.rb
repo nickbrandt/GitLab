@@ -206,6 +206,27 @@ describe Projects::FeatureFlagsController do
         expect(related_count).to be_within(5).of(2)
       end
     end
+
+    context 'with version 1 and 2 feature flags' do
+      let!(:new_version_feature_flag) do
+        create(:operations_feature_flag, :new_version_flag, project: project)
+      end
+
+      it 'returns all feature flags as json response' do
+        subject
+
+        expect(json_response['feature_flags'].count).to eq(3)
+      end
+
+      it 'returns only version 1 flags when new version flags are disabled' do
+        stub_feature_flags(feature_flags_new_version: false)
+
+        subject
+
+        expected = [feature_flag_active.name, feature_flag_inactive.name].sort
+        expect(json_response['feature_flags'].map { |f| f['name'] }.sort).to eq(expected)
+      end
+    end
   end
 
   describe 'GET new' do
@@ -233,11 +254,12 @@ describe Projects::FeatureFlagsController do
       }
     end
 
-    it 'returns all feature flags as json response' do
+    it 'returns the feature flag as json response' do
       subject
 
       expect(json_response['name']).to eq(feature_flag.name)
       expect(json_response['active']).to eq(feature_flag.active)
+      expect(json_response['version']).to eq('legacy_flag')
     end
 
     it 'matches json schema' do
@@ -305,6 +327,36 @@ describe Projects::FeatureFlagsController do
 
           expect(json_response['active']).to be_falsy
         end
+      end
+    end
+
+    context 'with a version 2 feature flag' do
+      let!(:new_version_feature_flag) do
+        create(:operations_feature_flag, :new_version_flag, project: project)
+      end
+
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_feature_flag.id
+        }
+      end
+
+      it 'returns the feature flag' do
+        subject
+
+        expect(json_response['name']).to eq(new_version_feature_flag.name)
+        expect(json_response['active']).to eq(new_version_feature_flag.active)
+        expect(json_response['version']).to eq('new_version_flag')
+      end
+
+      it 'returns a 404 when new version flags are disabled' do
+        stub_feature_flags(feature_flags_new_version: false)
+
+        subject
+
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
@@ -501,6 +553,169 @@ describe Projects::FeatureFlagsController do
         expect(response).to have_gitlab_http_status(:ok)
         default_strategies_json = json_response['scopes'].first['strategies']
         expect(default_strategies_json).to eq([{ "name" => "default", "parameters" => {} }])
+      end
+    end
+
+    context 'when creating a version 2 feature flag' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            version: 'new_version_flag'
+          }
+        }
+      end
+
+      it 'creates a new feature flag' do
+        subject
+
+        expect(json_response['name']).to eq('my_feature_flag')
+        expect(json_response['active']).to be_truthy
+        expect(json_response['version']).to eq('new_version_flag')
+      end
+    end
+
+    context 'when creating a version 2 feature flag with strategies and scopes' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            version: 'new_version_flag',
+            strategies_attributes: [{
+              name: 'userWithId',
+              parameters: { userIds: 'user1' },
+              scopes_attributes: [{ environment_scope: '*' }]
+            }]
+          }
+        }
+      end
+
+      it 'creates a new feature flag with the strategies and scopes' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['name']).to eq('my_feature_flag')
+        expect(json_response['active']).to eq(true)
+        expect(json_response['strategies'].count).to eq(1)
+
+        strategy_json = json_response['strategies'].first
+        expect(strategy_json).to have_key('id')
+        expect(strategy_json['name']).to eq('userWithId')
+        expect(strategy_json['parameters']).to eq({ 'userIds' => 'user1' })
+        expect(strategy_json['scopes'].count).to eq(1)
+
+        scope_json = strategy_json['scopes'].first
+        expect(scope_json).to have_key('id')
+        expect(scope_json['environment_scope']).to eq('*')
+      end
+    end
+
+    context 'when creating a version 2 feature flag with a gradualRolloutUserId strategy' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            version: 'new_version_flag',
+            strategies_attributes: [{
+              name: 'gradualRolloutUserId',
+              parameters: { groupId: 'default', percentage: '15' },
+              scopes_attributes: [{ environment_scope: 'production' }]
+            }]
+          }
+        }
+      end
+
+      it 'creates the new strategy' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+
+        strategy_json = json_response['strategies'].first
+        expect(strategy_json['name']).to eq('gradualRolloutUserId')
+        expect(strategy_json['parameters']).to eq({ 'groupId' => 'default', 'percentage' => '15' })
+        expect(strategy_json['scopes'].count).to eq(1)
+
+        scope_json = strategy_json['scopes'].first
+        expect(scope_json['environment_scope']).to eq('production')
+      end
+    end
+
+    context 'when version parameter is invalid' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            version: 'bad_version'
+          }
+        }
+      end
+
+      it 'returns a 400' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response).to eq({ 'message' => 'Version is invalid' })
+        expect(Operations::FeatureFlag.count).to eq(0)
+      end
+    end
+
+    context 'when version 2 flags are disabled' do
+      context 'and attempting to create a version 2 flag' do
+        let(:params) do
+          {
+            namespace_id: project.namespace,
+            project_id: project,
+            operations_feature_flag: {
+              name: 'my_feature_flag',
+              active: true,
+              version: 'new_version_flag'
+            }
+          }
+        end
+
+        it 'returns a 400' do
+          stub_feature_flags(feature_flags_new_version: false)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(Operations::FeatureFlag.count).to eq(0)
+        end
+      end
+
+      context 'and attempting to create a version 1 flag' do
+        let(:params) do
+          {
+            namespace_id: project.namespace,
+            project_id: project,
+            operations_feature_flag: {
+              name: 'my_feature_flag',
+              active: true
+            }
+          }
+        end
+
+        it 'creates the flag' do
+          stub_feature_flags(feature_flags_new_version: false)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(Operations::FeatureFlag.count).to eq(1)
+          expect(json_response['version']).to eq('legacy_flag')
+        end
       end
     end
   end
