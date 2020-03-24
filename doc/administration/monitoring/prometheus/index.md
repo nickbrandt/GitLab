@@ -268,37 +268,37 @@ export Prometheus metrics.
 The node exporter allows you to measure various machine resources, such as
 memory, disk, and CPU utilization.
 
-[➔ Read more about the node exporter.](node_exporter.md)
+[Read more about the node exporter](node_exporter.md).
 
 ### Redis exporter
 
 The Redis exporter allows you to measure various Redis metrics.
 
-[➔ Read more about the Redis exporter.](redis_exporter.md)
+[Read more about the Redis exporter](redis_exporter.md).
 
-### Postgres exporter
+### PostgreSQL exporter
 
-The Postgres exporter allows you to measure various PostgreSQL metrics.
+The PostgreSQL exporter allows you to measure various PostgreSQL metrics.
 
-[➔ Read more about the Postgres exporter.](postgres_exporter.md)
+[Read more about the PostgreSQL exporter](postgres_exporter.md).
 
 ### PgBouncer exporter
 
 The PgBouncer exporter allows you to measure various PgBouncer metrics.
 
-[➔ Read more about the PgBouncer exporter.](pgbouncer_exporter.md)
+[Read more about the PgBouncer exporter](pgbouncer_exporter.md).
 
 ### Registry exporter
 
 The Registry exporter allows you to measure various Registry metrics.
 
-[➔ Read more about the Registry exporter.](registry_exporter.md)
+[Read more about the Registry exporter](registry_exporter.md).
 
 ### GitLab exporter
 
 The GitLab exporter allows you to measure various GitLab metrics, pulled from Redis and the database.
 
-[➔ Read more about the GitLab exporter.](gitlab_exporter.md)
+[Read more about the GitLab exporter](gitlab_exporter.md).
 
 ## Configuring Prometheus to monitor Kubernetes
 
