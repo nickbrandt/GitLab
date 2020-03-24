@@ -45,8 +45,8 @@ module EE
           container_scanning: %i[container_scanning sast_container],
           dast: %i[dast],
           performance: %i[merge_request_performance_metrics],
-          license_management: %i[license_management],
-          license_scanning: %i[license_management],
+          license_management: %i[license_scanning license_management],
+          license_scanning: %i[license_scanning license_management],
           metrics: %i[metrics_reports]
         }.freeze
 

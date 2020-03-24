@@ -10,7 +10,7 @@ describe API::ManagedLicenses do
   let_it_be(:software_license_policy) { create(:software_license_policy, project: project) }
 
   before do
-    stub_licensed_features(license_management: true)
+    stub_licensed_features(license_scanning: true)
     project.add_maintainer(maintainer_user)
     project.add_developer(dev_user)
     project.add_reporter(reporter_user)
@@ -19,7 +19,7 @@ describe API::ManagedLicenses do
   describe 'GET /projects/:id/managed_licenses' do
     context 'with license management not available' do
       before do
-        stub_licensed_features(license_management: false)
+        stub_licensed_features(license_scanning: false)
       end
 
       it 'returns a forbidden status' do

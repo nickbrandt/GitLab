@@ -198,7 +198,7 @@ describe Ci::Build do
     let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     before do
-      stub_licensed_features(license_management: true)
+      stub_licensed_features(license_scanning: true)
     end
 
     it { expect(license_scanning_report.licenses.count).to eq(0) }
@@ -243,7 +243,7 @@ describe Ci::Build do
 
       context 'when the license management feature is disabled' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
@@ -344,7 +344,7 @@ describe Ci::Build do
 
       context 'when license does not have metrics_reports' do
         before do
-          stub_licensed_features(license_management: false)
+          stub_licensed_features(license_scanning: false)
         end
 
         it 'does not parse metrics report' do

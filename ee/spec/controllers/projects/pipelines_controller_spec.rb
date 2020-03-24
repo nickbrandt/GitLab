@@ -84,7 +84,7 @@ describe Projects::PipelinesController do
 
       context 'with feature enabled' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_html
         end
 
@@ -96,7 +96,7 @@ describe Projects::PipelinesController do
 
       context 'with feature enabled json' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
         end
 
         it 'will return license management report in json format' do
@@ -141,7 +141,7 @@ describe Projects::PipelinesController do
     context 'without license management artifact' do
       context 'with feature enabled' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_html
         end
 
@@ -152,7 +152,7 @@ describe Projects::PipelinesController do
 
       context 'with feature enabled json' do
         before do
-          stub_licensed_features(license_management: true)
+          stub_licensed_features(license_scanning: true)
           licenses_with_json
         end
 
