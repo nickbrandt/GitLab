@@ -1,5 +1,4 @@
 <script>
-import _ from 'underscore';
 import { mapState, mapActions } from 'vuex';
 import { GlModal, GlModalDirective, GlButton, GlDashboardSkeleton } from '@gitlab/ui';
 import VueDraggable from 'vuedraggable';
@@ -58,7 +57,7 @@ export default {
       return this.searchCount > 0;
     },
     okDisabled() {
-      return _.isEmpty(this.selectedProjects);
+      return Object.keys(this.selectedProjects).length === 0;
     },
   },
   created() {
