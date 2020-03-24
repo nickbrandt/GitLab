@@ -3,7 +3,6 @@
 class Admin::Geo::NodesController < Admin::Geo::ApplicationController
   before_action :check_license!, except: :index
   before_action :load_node, only: [:edit, :update]
-  before_action :push_feature_flag, except: :index
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
@@ -25,12 +24,18 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
     else
       @nodes = GeoNode.all
 
-      render :new
+      render :form
     end
   end
 
   def new
-    @node = GeoNode.new
+    @form_title = _('New Geo Node')
+    render :form
+  end
+
+  def edit
+    @form_title = _('Edit Geo Node')
+    render :form
   end
 
   def update
@@ -38,7 +43,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
       flash[:toast] = _('Node was successfully updated.')
       redirect_to admin_geo_nodes_path
     else
-      render :edit
+      render :form
     end
   end
 
@@ -65,9 +70,5 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
   def load_node
     @node = GeoNode.find(params[:id])
     @serialized_node = GeoNodeSerializer.new.represent(@node).to_json
-  end
-
-  def push_feature_flag
-    push_frontend_feature_flag(:enable_geo_node_form_js)
   end
 end
