@@ -3,7 +3,10 @@
 require 'spec_helper'
 
 describe Gitlab::Prometheus::Queries::ValidateQuery do
-  let(:client) { double('prometheus_client') }
+  include PrometheusHelpers
+
+  let(:api_url) { 'https://prometheus.example.com' }
+  let(:client) { Gitlab::PrometheusClient.new(api_url) }
   let(:query) { 'avg(metric)' }
 
   subject { described_class.new(client) }
@@ -21,16 +24,39 @@ describe Gitlab::Prometheus::Queries::ValidateQuery do
   end
 
   context 'invalid query' do
-    let(:message) { 'message' }
+    let(:query) { 'invalid query' }
+    let(:error_message) { "invalid parameter 'query': 1:9: parse error: unexpected identifier \"query\"" }
 
-    before do
-      allow(client).to receive(:query).with(query).and_raise(Gitlab::PrometheusClient::QueryError.new(message))
+    it 'returns invalid' do
+      Timecop.freeze do
+        stub_prometheus_query_error(
+          prometheus_query_with_time_url(query, Time.now),
+          error_message
+        )
+
+        expect(subject.query(query)).to eq(valid: false, error: error_message)
+      end
     end
+  end
 
-    it 'passes query to prometheus' do
-      expect(subject.query(query)).to eq(valid: false, error: message)
+  context 'when exceptions occur' do
+    context 'Gitlab::HTTP::BlockedUrlError' do
+      let(:api_url) { 'http://192.168.1.1' }
 
-      expect(client).to have_received(:query).with(query)
+      let(:message) do
+        "URL 'http://192.168.1.1/api/v1/query?query=avg%28metric%29&time=#{Time.now.to_f}'" \
+        " is blocked: Requests to the local network are not allowed"
+      end
+
+      before do
+        stub_application_setting(allow_local_requests_from_web_hooks_and_services: false)
+      end
+
+      it 'catches exception and returns invalid' do
+        Timecop.freeze do
+          expect(subject.query(query)).to eq(valid: false, error: message)
+        end
+      end
     end
   end
 end
