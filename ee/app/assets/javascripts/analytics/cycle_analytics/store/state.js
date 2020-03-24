@@ -18,6 +18,8 @@ export default () => ({
   isSavingCustomStage: false,
   isCreatingCustomStage: false,
   isEditingCustomStage: false,
+  isSavingStageOrder: false,
+  errorSavingStageOrder: false,
 
   selectedGroup: null,
   selectedProjects: [],

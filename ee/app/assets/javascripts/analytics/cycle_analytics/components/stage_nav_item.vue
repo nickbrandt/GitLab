@@ -36,6 +36,12 @@ export default {
       default: false,
       required: false,
     },
+    id: {
+      // The IDs of stages are strings until custom stages have been added.
+      // Only at this point the IDs become numbers, so we have to allow both.
+      type: [String, Number],
+      required: true,
+    },
   },
   data() {
     return {
@@ -88,7 +94,12 @@ export default {
 </script>
 
 <template>
-  <li @click="handleSelectStage" @mouseover="handleHover(true)" @mouseleave="handleHover()">
+  <li
+    :data-id="id"
+    @click="handleSelectStage"
+    @mouseover="handleHover(true)"
+    @mouseleave="handleHover()"
+  >
     <stage-card-list-item
       :is-active="isActive"
       :can-edit="editable"

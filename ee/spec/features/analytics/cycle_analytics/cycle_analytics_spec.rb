@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe 'Group Value Stream Analytics', :js do
+  include DragTo
+
   let!(:user) { create(:user) }
   let!(:group) { create(:group, name: "CA-test-group") }
   let!(:group2) { create(:group, name: "CA-bad-test-group") }
@@ -427,9 +429,84 @@ describe 'Group Value Stream Analytics', :js do
       page.find("[name=#{field}] .dropdown-menu").all('.dropdown-item')[index].click
     end
 
+    def confirm_stage_order(stages)
+      page.within('.stage-nav>ul') do
+        stages.each_with_index do |stage, index|
+          expect(find("li:nth-child(#{index + 1})")).to have_content(stage)
+        end
+      end
+    end
+
+    def drag_from_index_to_index(from, to)
+      drag_to(selector: '.stage-nav>ul',
+        from_index: from,
+        to_index: to)
+    end
+
+    default_stage_order = %w[Issue Plan Code Test Review Staging Total].freeze
+    default_custom_stage_order = %w[Issue Plan Code Test Review Staging Total Cool\ beans].freeze
+    stages_near_middle_swapped = %w[Issue Plan Test Code Review Staging Total Cool\ beans].freeze
+    stage_dragged_to_top = %w[Review Issue Plan Code Test Staging Total Cool\ beans].freeze
+    stage_dragged_to_bottom = %w[Issue Plan Code Test Staging Total Cool\ beans Review].freeze
+
+    shared_examples 'manual ordering disabled' do
+      it 'does not allow stages to be draggable', :js do
+        confirm_stage_order(default_stage_order)
+
+        drag_from_index_to_index(0, 1)
+
+        confirm_stage_order(default_stage_order)
+      end
+    end
+
     context 'enabled' do
       before do
         select_group
+      end
+
+      context 'Manual ordering' do
+        context 'with only default stages' do
+          it_behaves_like 'manual ordering disabled'
+        end
+
+        context 'with at least one custom stage' do
+          shared_examples 'draggable stage' do |original_order, updated_order, start_index, end_index,|
+            before do
+              page.driver.browser.manage.window.resize_to(1650, 1150)
+
+              create_custom_stage
+              select_group
+            end
+
+            it 'allows a stage to be dragged' do
+              confirm_stage_order(original_order)
+
+              drag_from_index_to_index(start_index, end_index)
+
+              confirm_stage_order(updated_order)
+            end
+
+            it 'persists the order when a group is selected' do
+              drag_from_index_to_index(start_index, end_index)
+
+              select_group
+
+              confirm_stage_order(updated_order)
+            end
+          end
+
+          context 'dragging a stage to the top', :js do
+            it_behaves_like 'draggable stage', default_custom_stage_order, stage_dragged_to_top, 4, 0
+          end
+
+          context 'dragging a stage to the bottom', :js do
+            it_behaves_like 'draggable stage', default_custom_stage_order, stage_dragged_to_bottom, 4, 7
+          end
+
+          context 'dragging stages in the middle', :js do
+            it_behaves_like 'draggable stage', default_custom_stage_order, stages_near_middle_swapped, 2, 3
+          end
+        end
       end
 
       context 'Add a stage button' do
@@ -798,6 +875,8 @@ describe 'Group Value Stream Analytics', :js do
           expect(page).to have_selector('.js-add-stage-button', visible: false)
         end
       end
+
+      it_behaves_like 'manual ordering disabled'
     end
   end
 end

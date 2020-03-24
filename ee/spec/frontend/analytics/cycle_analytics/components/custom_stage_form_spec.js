@@ -115,6 +115,14 @@ describe('CustomStageForm', () => {
     });
   });
 
+  describe('Helper text', () => {
+    it('displays the manual ordering helper text', () => {
+      expect(wrapper.text()).toContain(
+        'Note: Once a custom stage has been added you can re-order stages by dragging them into the desired position.',
+      );
+    });
+  });
+
   describe('Name', () => {
     describe('with a reserved name', () => {
       beforeEach(() => {

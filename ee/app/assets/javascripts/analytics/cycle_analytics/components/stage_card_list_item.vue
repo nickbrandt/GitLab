@@ -24,7 +24,7 @@ export default {
 <template>
   <div
     :class="[isActive ? activeClass : inactiveClass]"
-    class="stage-nav-item d-flex pl-4 pr-4 m-0 mb-1 ml-2 rounded border-width-1px border-style-solid"
+    class="stage-nav-item d-flex px-4 m-0 mb-1 rounded border-width-1px border-style-solid"
   >
     <slot></slot>
   </div>

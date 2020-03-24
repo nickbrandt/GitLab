@@ -84,6 +84,7 @@ export default {
       'durationChartMedianData',
       'activeStages',
       'selectedProjectIds',
+      'enableCustomOrdering',
     ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
@@ -134,6 +135,9 @@ export default {
         created_before: toYmd(this.endDate),
       };
     },
+    stageCount() {
+      return this.activeStages.length;
+    },
   },
   mounted() {
     this.setFeatureFlags({
@@ -162,6 +166,7 @@ export default {
       'clearCustomStageFormErrors',
       'updateStage',
       'setTasksByTypeFilters',
+      'reorderStage',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -193,6 +198,9 @@ export default {
     },
     onDurationStageSelect(stages) {
       this.updateSelectedDurationChartStages(stages);
+    },
+    onStageReorder(data) {
+      this.reorderStage(data);
     },
   },
   multiProjectSelect: true,
@@ -281,6 +289,7 @@ export default {
           <summary-table class="js-summary-table" :items="summary" />
           <stage-table
             v-if="selectedStage"
+            :key="stageCount"
             class="js-stage-table"
             :current-stage="selectedStage"
             :stages="activeStages"
@@ -297,6 +306,7 @@ export default {
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
+            :custom-ordering="enableCustomOrdering"
             @clearCustomStageFormErrors="clearCustomStageFormErrors"
             @selectStage="onStageSelect"
             @editStage="onShowEditStageForm"
@@ -305,6 +315,7 @@ export default {
             @removeStage="onRemoveStage"
             @createStage="onCreateCustomStage"
             @updateStage="onUpdateCustomStage"
+            @reorderStage="onStageReorder"
           />
         </div>
       </div>
