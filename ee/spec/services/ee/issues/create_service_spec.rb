@@ -43,5 +43,22 @@ describe Issues::CreateService do
     it_behaves_like 'issue with epic_id parameter' do
       let(:execute) { service.execute }
     end
+
+    describe 'publish to status page' do
+      let(:execute) { service.execute }
+      let(:issue_id) { execute&.id }
+
+      context 'when creation succeeds' do
+        let(:params) { { title: 'New title' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when creation fails' do
+        let(:params) { { title: nil } }
+
+        include_examples 'no trigger status page publish'
+      end
+    end
   end
 end

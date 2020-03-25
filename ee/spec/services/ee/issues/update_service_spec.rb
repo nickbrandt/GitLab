@@ -185,5 +185,35 @@ describe Issues::UpdateService do
         end
       end
     end
+
+    describe 'publish to status page' do
+      let(:execute) { update_issue(params) }
+      let(:issue_id) { execute&.id }
+
+      context 'when update succeeds' do
+        let(:params) { { title: 'New title' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when closing' do
+        let(:params) { { state_event: 'close' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when reopening' do
+        let(:issue) { create(:issue, :closed, project: project) }
+        let(:params) { { state_event: 'reopen' } }
+
+        include_examples 'trigger status page publish'
+      end
+
+      context 'when update fails' do
+        let(:params) { { title: nil } }
+
+        include_examples 'no trigger status page publish'
+      end
+    end
   end
 end
