@@ -12,6 +12,7 @@ module EE
         prevent :create_deployment
         prevent :update_deployment
         prevent :update_environment
+        prevent :destroy_environment
       end
 
       private
