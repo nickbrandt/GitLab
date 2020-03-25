@@ -11,6 +11,7 @@
     %h2.title= @vulnerability.title
     .description
       .md
+        - location = @vulnerability.finding.location
         %h3= "Description"
         %p= @vulnerability.finding.description
         %ul
@@ -18,23 +19,26 @@
           %li= _("Confidence: %{confidence}") % { confidence: @vulnerability.confidence }
           %li= _("Report Type: %{report_type}") % { report_type: @vulnerability.report_type }
 
-          - if @vulnerability.finding.location["image"]
-            %li= _("Image: %{image}") % { image: @vulnerability.finding.location['image'] }
+          - if location['image']
+            %li= _("Image: %{image}") % { image: location['image'] }
 
-          - if @vulnerability.finding.location["operating_system"]
-            %li= _("Namespace: %{namespace}") % { namespace: @vulnerability.finding.location['operating_system'] }
+          - if location['operating_system']
+            %li= _("Namespace: %{namespace}") % { namespace: location['operating_system'] }
 
-        - if @vulnerability.finding.location["file"]
-          %h3= _("File Location")
+        - if location['file']
+          %h3= _('File Location')
           %ul
             %li
-              - link_text = _("File: %{file}:%{line}") % { file: @vulnerability.finding.location["file"],
-                line: @vulnerability.finding.location["start_line"] }
-              %a{ :href=>fast_project_blob_path(@project, tree_join(@vulnerability.project.default_branch, @vulnerability.finding.location["file"])),
-                target: "_blank", rel: 'noopener noreferrer' }= link_text
-            - if @vulnerability.finding.location["class"]
-              %li= _("Class: %{className}::%{method}") % {className: @vulnerability.finding.location["class"],
-                method: @vulnerability.finding.location["method"] }
+              - link_text = _("%{file}:%{line}") % { file: location['file'], line: location['start_line'] }
+              File: 
+              %a{ href: fast_project_blob_path(@project, tree_join(@vulnerability.project.default_branch, location['file'])),
+                target: '_blank', rel: 'noopener noreferrer' }= link_text
+            - if location['class']
+              %li= _("Class: %{className}") % { className: location['class'] }
+            - if location['method']
+              %li
+                Method:
+                %code= _("%{method}") % { method: location['method'] }
 
         - if @vulnerability.finding.links.any?
           %h3= _("Links")
