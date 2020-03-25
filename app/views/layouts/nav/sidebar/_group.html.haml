@@ -160,6 +160,11 @@
                 %span
                   = _('CI / CD')
 
+            = nav_link(controller: :integrations) do
+              = link_to group_settings_integrations_path(@group), title: _('Integrations') do
+                %span
+                  = _('Integrations')
+
             = render_if_exists "groups/ee/settings_nav"
 
         = render_if_exists "groups/ee/administration_nav"

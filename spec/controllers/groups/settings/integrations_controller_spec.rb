@@ -11,6 +11,39 @@ describe Groups::Settings::IntegrationsController do
     sign_in(user)
   end
 
+  describe '#index' do
+    context 'when group_level_integrations not enabled' do
+      it 'returns not_found' do
+        stub_feature_flags(group_level_integrations: { enabled: false, thing: group })
+
+        get :index, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'when user is not owner' do
+      it 'renders not_found' do
+        get :index, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'when user is owner' do
+      before do
+        group.add_owner(user)
+      end
+
+      it 'successfully displays the template' do
+        get :index, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to render_template(:index)
+      end
+    end
+  end
+
   describe '#edit' do
     context 'when group_level_integrations not enabled' do
       it 'returns not_found' do
