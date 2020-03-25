@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Groups::Settings::IntegrationsController do
+  let_it_be(:project) { create(:project) }
   let(:user) { create(:user) }
   let(:group) { create(:group) }
-  let!(:project) { create(:project) }
 
   before do
     sign_in(user)
@@ -14,7 +14,7 @@ describe Groups::Settings::IntegrationsController do
   describe '#edit' do
     context 'when group_level_integrations not enabled' do
       it 'returns not_found' do
-        allow(Feature).to receive(:enabled?).with(:group_level_integrations) { false }
+        stub_feature_flags(group_level_integrations: { enabled: false, thing: group })
 
         get :edit, params: { group_id: group, id: Service.available_services_names.sample }
 

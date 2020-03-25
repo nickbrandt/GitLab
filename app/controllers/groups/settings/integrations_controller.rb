@@ -10,11 +10,11 @@ module Groups
       private
 
       def integrations_enabled?
-        Feature.enabled?(:group_level_integrations)
+        Feature.enabled?(:group_level_integrations, group)
       end
 
       def scoped_edit_integration_path(integration)
-        edit_group_settings_integration_path(@group, integration)
+        edit_group_settings_integration_path(group, integration)
       end
     end
   end

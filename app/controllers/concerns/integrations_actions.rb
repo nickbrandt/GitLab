@@ -50,8 +50,9 @@ module IntegrationsActions
     false
   end
 
+  # TODO: Use actual integrations on the group / instance level
+  # To be completed in https://gitlab.com/groups/gitlab-org/-/epics/2430
   def project
-    # TODO: Change to something more meaningful
     Project.first
   end
 
