@@ -36,7 +36,7 @@ export default {
   <gl-banner
     v-if="visible"
     class="mt-4"
-    :title="s__('Help shape the future of Serverless at GitLab')"
+    :title="s__('Serverless|Help shape the future of Serverless at GitLab')"
     :button-text="s__('Serverless|Sign up for First Look')"
     :button-link="surveyUrl"
     @close="handleClose"
