@@ -50,35 +50,13 @@ describe 'groups/edit.html.haml' do
     end
 
     context 'subgroup' do
-      shared_examples 'renders read-only ip_restriction setting of root ancestor' do
-        it 'renders disabled ranges of root ancestor in comma separated format' do
-          render
-
-          expect(rendered).to render_template('groups/settings/_ip_restriction')
-          expect(rendered).to(have_field('group_ip_restriction_ranges',
-                                         { disabled: true,
-                                           with: ranges.join(",") }))
-        end
-      end
-
       let(:group) { create(:group, :nested) }
 
-      before do
-        ranges.each do |range|
-          create(:ip_restriction, group: group.parent, range: range)
-        end
-      end
+      it 'does not show ip_restriction setting' do
+        render
 
-      context 'with single subnet' do
-        let(:ranges) { ['192.168.0.0/24'] }
-
-        it_behaves_like 'renders read-only ip_restriction setting of root ancestor'
-      end
-
-      context 'with multiple subnets' do
-        let(:ranges) { ['192.168.0.0/24', '192.168.1.0/8'] }
-
-        it_behaves_like 'renders read-only ip_restriction setting of root ancestor'
+        expect(rendered).to render_template('groups/settings/_ip_restriction')
+        expect(rendered).not_to have_field('group_ip_restriction_attributes_range')
       end
     end
 
@@ -120,18 +98,11 @@ describe 'groups/edit.html.haml' do
     context 'subgroup' do
       let(:group) { create(:group, :nested) }
 
-      before do
-        create(:allowed_email_domain, group: group.parent)
-        group.build_allowed_email_domain
-      end
-
-      it 'show read-only allowed_email_domain setting of root ancestor' do
+      it 'does not show allowed_email_domain setting' do
         render
 
         expect(rendered).to render_template('groups/settings/_allowed_email_domain')
-        expect(rendered).to(have_field('group_allowed_email_domain_attributes_domain',
-                                       { disabled: true,
-                                         with: 'gitlab.com' }))
+        expect(rendered).not_to have_field('group_allowed_email_domain_attributes_domain')
       end
     end
 
