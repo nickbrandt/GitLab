@@ -32,6 +32,18 @@ module API
         render('projects/commit/_signature', signature: commit.signature) if commit.has_signature?
       end
 
+      expose :prev_commit_id, if: { type: :full } do |commit|
+        next unless options[:prev_commit_id]
+
+        options[:prev_commit_id]
+      end
+
+      expose :next_commit_id, if: { type: :full } do |commit|
+        next unless options[:next_commit_id]
+
+        options[:next_commit_id]
+      end
+
       expose :pipeline_status_path, if: { type: :full } do |commit, options|
         pipeline_ref = options[:pipeline_ref]
         pipeline_project = options[:pipeline_project] || commit.project

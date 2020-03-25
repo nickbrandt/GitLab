@@ -26,5 +26,24 @@ describe DiffsEntity do
         :merge_request_diffs
       )
     end
+
+    context "when a commit_id is passed" do
+      let(:commits) { merge_request.commits }
+      let(:commit) { commits.sample }
+      let(:entity) do
+        described_class.new(merge_request_diffs.first.diffs, request: request, merge_request: merge_request, merge_request_diffs: merge_request_diffs, commit: commit)
+      end
+
+      it 'includes commit references for previous and next' do
+        expect(subject[:commit]).to include(:prev_commit_id, :next_commit_id)
+
+        index = commits.index(commit)
+        prev_commit = commits[index - 1]&.id
+        next_commit = commits[index + 1]&.id
+
+        expect(subject[:commit][:prev_commit_id]).to eq(prev_commit)
+        expect(subject[:commit][:next_commit_id]).to eq(next_commit)
+      end
+    end
   end
 end

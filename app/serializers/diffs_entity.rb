@@ -3,6 +3,7 @@
 class DiffsEntity < Grape::Entity
   include DiffHelper
   include RequestAwareEntity
+  include Gitlab::Utils::StrongMemoize
 
   expose :real_size
   expose :size
@@ -16,11 +17,19 @@ class DiffsEntity < Grape::Entity
   end
 
   expose :commit do |diffs, options|
+    if options[:commit]
+      neighbors = commits(options[:commit].id) if options[:commit]
+      prev_commit_id = neighbors[:prev_commit_id]
+      next_commit_id = neighbors[:next_commit_id]
+    end
+
     CommitEntity.represent options[:commit], options.merge(
       type: :full,
       commit_url_params: { merge_request_iid: merge_request&.iid },
       pipeline_ref: merge_request&.source_branch,
-      pipeline_project: merge_request&.source_project
+      pipeline_project: merge_request&.source_project,
+      prev_commit_id: prev_commit_id,
+      next_commit_id: next_commit_id
     )
   end
 
@@ -79,5 +88,17 @@ class DiffsEntity < Grape::Entity
 
   def merge_request
     options[:merge_request]
+  end
+
+  def commit_ids
+    strong_memoize(:commit_ids) do
+      [nil] + merge_request.commits.collect(&:id) + [nil]
+    end
+  end
+
+  def commits(id)
+    commit_ids.each_cons(3) do |prev_commit, commit, next_commit|
+      { prev_commit_id: prev_commit, next_commit_id: next_commit } if commit == id
+    end
   end
 end
