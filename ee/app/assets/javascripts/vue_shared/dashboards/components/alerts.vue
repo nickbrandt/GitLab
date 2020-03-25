@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import { escape as esc } from 'lodash';
 import { __, n__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -40,8 +40,8 @@ export default {
       return sprintf(
         __('%{title} %{operator} %{threshold}'),
         {
-          title: _.escape(this.lastAlert.title),
-          threshold: `${_.escape(this.lastAlert.threshold)}%`,
+          title: esc(this.lastAlert.title),
+          threshold: `${esc(this.lastAlert.threshold)}%`,
           operator: this.lastAlert.operator,
         },
         false,
