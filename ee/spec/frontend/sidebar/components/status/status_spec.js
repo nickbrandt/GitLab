@@ -12,6 +12,8 @@ const getStatusIconCssClasses = wrapper => wrapper.find('[name="severity-low"]')
 
 const getEditButton = wrapper => wrapper.find({ ref: 'editButton' });
 
+const getRemoveStatusButton = wrapper => wrapper.find('.value .btn-link');
+
 const getEditForm = wrapper => wrapper.find('form');
 
 const getRadioInputs = wrapper => wrapper.findAll('input[type="radio"]');
@@ -84,6 +86,43 @@ describe('Status', () => {
       shallowMountStatus(props);
 
       expect(getEditButton(wrapper).exists()).toBe(false);
+    });
+  });
+
+  describe('remove status button', () => {
+    it('is hidden when there is no status', () => {
+      const props = {
+        isEditable: true,
+        status: '',
+      };
+
+      shallowMountStatus(props);
+
+      expect(getRemoveStatusButton(wrapper).exists()).toBe(false);
+    });
+
+    it('is displayed when there is a status', () => {
+      const props = {
+        isEditable: true,
+        status: healthStatus.AT_RISK,
+      };
+
+      shallowMountStatus(props);
+
+      expect(getRemoveStatusButton(wrapper).exists()).toBe(true);
+    });
+
+    it('emits an onFormSubmit event with argument null when clicked', () => {
+      const props = {
+        isEditable: true,
+        status: healthStatus.AT_RISK,
+      };
+
+      shallowMountStatus(props);
+
+      getRemoveStatusButton(wrapper).trigger('click');
+
+      expect(wrapper.emitted().onFormSubmit[0]).toEqual([null]);
     });
   });
 

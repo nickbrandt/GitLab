@@ -47,6 +47,9 @@ export default {
     };
   },
   computed: {
+    canRemoveStatus() {
+      return this.isEditable && this.status;
+    },
     statusText() {
       return this.status ? healthStatusTextMap[this.status] : s__('Sidebar|None');
     },
@@ -79,6 +82,9 @@ export default {
     },
     toggleFormDropdown() {
       this.isFormShowing = !this.isFormShowing;
+    },
+    removeStatus() {
+      this.$emit('onFormSubmit', null);
     },
   },
 };
@@ -148,6 +154,12 @@ export default {
           :class="statusColor"
         />
         {{ statusText }}
+        <template v-if="canRemoveStatus">
+          <span class="text-secondary" aria-hidden="true">-</span>
+          <button class="btn-link text-secondary" @click="removeStatus">
+            {{ __('remove status') }}
+          </button>
+        </template>
       </p>
     </div>
   </div>
