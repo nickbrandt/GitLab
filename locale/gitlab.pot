@@ -23714,6 +23714,9 @@ msgstr ""
 msgid "assign yourself"
 msgstr ""
 
+msgid "at risk"
+msgstr ""
+
 msgid "attach a new file"
 msgstr ""
 
@@ -24217,6 +24220,15 @@ msgstr ""
 msgid "issue"
 msgstr ""
 
+msgid "issues at risk"
+msgstr ""
+
+msgid "issues need attention"
+msgstr ""
+
+msgid "issues on track"
+msgstr ""
+
 msgid "it is stored externally"
 msgstr ""
 
@@ -24597,6 +24609,9 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
+msgid "need attention"
+msgstr ""
+
 msgid "needs to be between 10 minutes and 1 month"
 msgstr ""
 
@@ -24628,6 +24643,9 @@ msgid "nounSeries|%{item}, %{nextItem}"
 msgstr ""
 
 msgid "nounSeries|%{item}, and %{lastItem}"
+msgstr ""
+
+msgid "on track"
 msgstr ""
 
 msgid "opened %{timeAgoString} by %{user}"

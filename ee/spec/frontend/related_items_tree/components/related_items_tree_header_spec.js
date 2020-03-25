@@ -1,13 +1,12 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlDeprecatedButton, GlTooltip } from '@gitlab/ui';
+import { GlDeprecatedButton, GlTooltip, GlIcon } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 
 import { mockInitialConfig, mockParentItem, mockQueryResponse } from '../mock_data';
 
@@ -172,11 +171,11 @@ describe('RelatedItemsTree', () => {
       });
 
       describe('when sub-epics feature is available', () => {
-        it('renders epics count and icon', () => {
+        it('renders epics count and gl-icon', () => {
           const epicsEl = wrapper.findAll('.issue-count-badge > span').at(0);
-          const epicIcon = epicsEl.find(Icon);
+          const epicIcon = epicsEl.find(GlIcon);
 
-          expect(epicsEl.text().trim()).toBe('2');
+          expect(epicsEl.text().trim()).toContain('2');
           expect(epicIcon.isVisible()).toBe(true);
           expect(epicIcon.props('name')).toBe('epic');
         });
@@ -196,9 +195,9 @@ describe('RelatedItemsTree', () => {
           return wrapper.vm.$nextTick();
         });
 
-        it('does not render epics count and icon', () => {
+        it('does not render epics count and gl-icon', () => {
           const countBadgesEl = wrapper.findAll('.issue-count-badge > span');
-          const badgeIcon = countBadgesEl.at(0).find(Icon);
+          const badgeIcon = countBadgesEl.at(0).find(GlIcon);
 
           expect(countBadgesEl.length).toBe(1);
           expect(badgeIcon.props('name')).toBe('issues');
@@ -209,11 +208,11 @@ describe('RelatedItemsTree', () => {
         });
       });
 
-      it('renders issues count and icon', () => {
+      it('renders issues count and gl-icon', () => {
         const issuesEl = wrapper.findAll('.issue-count-badge > span').at(1);
-        const issueIcon = issuesEl.find(Icon);
+        const issueIcon = issuesEl.find(GlIcon);
 
-        expect(issuesEl.text().trim()).toBe('2');
+        expect(issuesEl.text().trim()).toContain('2');
         expect(issueIcon.isVisible()).toBe(true);
         expect(issueIcon.props('name')).toBe('issues');
       });
