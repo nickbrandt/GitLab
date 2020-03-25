@@ -25,6 +25,7 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :on_status_page, -> { joins(project: :status_page_setting).where(status_page_settings: { enabled: true }, confidential: false) }
       scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
 
       has_one :epic_issue
