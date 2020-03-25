@@ -591,7 +591,7 @@ module Ci
 
     def merge_request
       strong_memoize(:merge_request) do
-        pipeline.all_merge_requests.first
+        pipeline.all_merge_requests.order(iid: :asc).first
       end
     end
 
