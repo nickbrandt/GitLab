@@ -3,14 +3,14 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker do
+  context 'Secure', :docker, :runner do
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
       let(:blacklisted_license_name) { "Zlib" }
       let(:executor) {"qa-runner-#{Time.now.to_i}"}
 
       after do
-        Service::DockerRun::GitlabRunner.new(executor).remove!
+        @runner.remove_via_api!
       end
 
       before do
@@ -21,7 +21,7 @@ module QA
           project.description = 'License widget test'
         end
 
-        Resource::Runner.fabricate! do |runner|
+        @runner = Resource::Runner.fabricate! do |runner|
           runner.project = @project
           runner.name = executor
           runner.tags = %w[qa test]

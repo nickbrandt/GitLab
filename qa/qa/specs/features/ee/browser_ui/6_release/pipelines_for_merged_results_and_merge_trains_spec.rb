@@ -3,12 +3,12 @@
 require 'securerandom'
 
 module QA
-  context 'Release', :docker do
+  context 'Release', :docker, :runner do
     describe 'Pipelines for merged results and merge trains' do
       before(:context) do
         @group = Resource::Group.fabricate_via_api!
 
-        Resource::Runner.fabricate_via_api! do |runner|
+        @runner = Resource::Runner.fabricate_via_api! do |runner|
           runner.token = @group.reload!.runners_token
           runner.name = @group.name
           runner.tags = [@group.name]
@@ -55,7 +55,7 @@ module QA
       end
 
       after(:context) do
-        Service::DockerRun::GitlabRunner.new(@group.name).remove!
+        @runner.remove_via_api! if @runner
       end
 
       it 'creates a pipeline with merged results' do

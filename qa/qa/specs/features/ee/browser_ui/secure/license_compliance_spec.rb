@@ -3,7 +3,7 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker do
+  context 'Secure', :docker, :runner do
     let(:approved_license_name) { "MIT" }
     let(:denied_license_name) { "WTFPL" }
 
@@ -42,7 +42,7 @@ module QA
       let(:number_of_licenses_in_fixture) { 2 }
 
       after do
-        Service::DockerRun::GitlabRunner.new(@executor).remove!
+        @runner.remove_via_api!
       end
 
       before do
@@ -55,7 +55,7 @@ module QA
           project.description = 'Project with Secure'
         end
 
-        Resource::Runner.fabricate! do |runner|
+        @runner = Resource::Runner.fabricate! do |runner|
           runner.project = @project
           runner.name = @executor
           runner.tags = %w[qa test]
