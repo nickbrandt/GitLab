@@ -6,7 +6,7 @@ module Gitlab
       module StageEvents
         class MergeRequestLabelAdded < LabelBasedStageEvent
           def self.name
-            s_("CycleAnalyticsEvent|Merge Request label was added")
+            s_("CycleAnalyticsEvent|Merge request label was added")
           end
 
           def self.identifier

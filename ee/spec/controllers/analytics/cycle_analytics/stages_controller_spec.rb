@@ -40,7 +40,7 @@ describe Analytics::CycleAnalytics::StagesController do
       response_event_names = json_response['events'].map { |s| s['name'] }
       event_names = Gitlab::Analytics::CycleAnalytics::StageEvents.events.map(&:name)
 
-      expect(response_event_names).to eq(event_names)
+      expect(response_event_names).to eq(event_names.sort)
     end
 
     it 'succeeds for subgroups' do

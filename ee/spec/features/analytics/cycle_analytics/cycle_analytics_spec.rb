@@ -428,8 +428,8 @@ describe 'Group Value Stream Analytics', :js do
       stage.find(".more-actions-toggle").click
     end
 
-    def select_dropdown_option(name, elem = "option", index = 1)
-      page.find("select[name='#{name}']").all(elem)[index].select_option
+    def select_dropdown_option(name, value = start_event_identifier)
+      page.find("select[name='#{name}']").all('option').find { |item| item.value == value.to_s }.select_option
     end
 
     def select_dropdown_option_by_value(name, value, elem = "option")
@@ -569,7 +569,7 @@ describe 'Group Value Stream Analytics', :js do
             end
 
             it 'submit button is disabled if the start event changes' do
-              select_dropdown_option 'custom-stage-start-event', 'option', 2
+              select_dropdown_option 'custom-stage-start-event', 'issue_created'
 
               expect(page).to have_button('Add stage', disabled: true)
             end
@@ -598,8 +598,8 @@ describe 'Group Value Stream Analytics', :js do
           context 'with all required fields set' do
             before do
               fill_in 'custom-stage-name', with: custom_stage_name
-              select_dropdown_option 'custom-stage-start-event'
-              select_dropdown_option 'custom-stage-stop-event'
+              select_dropdown_option 'custom-stage-start-event', start_event_identifier
+              select_dropdown_option 'custom-stage-stop-event', end_event_identifier
             end
 
             it 'does not have label dropdowns' do

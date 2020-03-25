@@ -6127,12 +6127,6 @@ msgstr ""
 msgid "CycleAnalyticsEvent|Issue last edited"
 msgstr ""
 
-msgid "CycleAnalyticsEvent|Merge Request label was added"
-msgstr ""
-
-msgid "CycleAnalyticsEvent|Merge Request label was removed"
-msgstr ""
-
 msgid "CycleAnalyticsEvent|Merge request closed"
 msgstr ""
 
@@ -6140,6 +6134,12 @@ msgid "CycleAnalyticsEvent|Merge request created"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request first deployed to production"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request label was added"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request label was removed"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request last build finish time"
@@ -11156,6 +11156,9 @@ msgid "Issue cannot be found."
 msgstr ""
 
 msgid "Issue events"
+msgstr ""
+
+msgid "Issue first depoloyed to production"
 msgstr ""
 
 msgid "Issue or Merge Request ID is required"
