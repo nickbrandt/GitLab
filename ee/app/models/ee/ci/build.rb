@@ -119,44 +119,7 @@ module EE
         !merge_train_pipeline? && super
       end
 
-      override :cross_dependencies
-      def cross_dependencies
-        return [] unless user_id
-        return [] unless project.feature_available?(:cross_project_pipelines)
-
-        cross_dependencies_relationship
-          .preload(project: [:project_feature])
-          .select { |job| user.can?(:read_build, job) }
-      end
-
       private
-
-      def cross_dependencies_relationship
-        deps = Array(options[:cross_dependencies])
-        return ::Ci::Build.none unless deps.any?
-
-        relationship_fragments = build_cross_dependencies_fragments(deps, ::Ci::Build.latest.success)
-        return ::Ci::Build.none unless relationship_fragments.any?
-
-        ::Ci::Build
-          .from_union(relationship_fragments)
-          .limit(::Gitlab::Ci::Config::Entry::Needs::NEEDS_CROSS_DEPENDENCIES_LIMIT)
-      end
-
-      def build_cross_dependencies_fragments(deps, search_scope)
-        deps.inject([]) do |fragments, dep|
-          next fragments unless dep[:artifacts]
-
-          fragments << build_cross_dependency_relationship_fragment(dep, search_scope)
-        end
-      end
-
-      def build_cross_dependency_relationship_fragment(dependency, search_scope)
-        args = dependency.values_at(:job, :ref, :project)
-        dep_id = search_scope.max_build_id_by(*args)
-
-        ::Ci::Build.id_in(dep_id)
-      end
 
       def parse_security_artifact_blob(security_report, blob)
         report_clone = security_report.clone_as_blank
