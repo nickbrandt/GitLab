@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlFormSelect, GlFormTextarea, GlFormInput, GlToken } from '@gitlab/ui';
+import { GlFormSelect, GlFormTextarea, GlFormInput, GlToken, GlButton } from '@gitlab/ui';
 import {
   PERCENT_ROLLOUT_GROUP_ID,
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -22,6 +22,10 @@ describe('Feature flags strategy', () => {
       },
     },
   ) => {
+    if (wrapper) {
+      wrapper.destroy();
+      wrapper = null;
+    }
     wrapper = shallowMount(Strategy, opts);
   };
 
@@ -76,62 +80,136 @@ describe('Feature flags strategy', () => {
   });
 
   describe('with a strategy', () => {
-    beforeEach(() => {
-      const strategy = {
-        name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-        parameters: { percentage: '50' },
-        scopes: [],
-      };
-      const propsData = { strategy, index: 0, endpoint: '', canDelete: true };
-      factory({ propsData });
-    });
+    describe('with scopes defined', () => {
+      let strategy;
 
-    it('should change the parameters if a different strategy is chosen', () => {
-      const select = wrapper.find(GlFormSelect);
-      select.vm.$emit('input', ROLLOUT_STRATEGY_ALL_USERS);
-      select.vm.$emit('change', ROLLOUT_STRATEGY_ALL_USERS);
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.find(GlFormInput).exists()).toBe(false);
-        expect(wrapper.emitted('change')).toEqual([
-          [{ name: ROLLOUT_STRATEGY_ALL_USERS, parameters: {}, scopes: [] }],
-        ]);
+      beforeEach(() => {
+        strategy = {
+          name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+          parameters: { percentage: '50' },
+          scopes: [{ environmentScope: '*' }],
+        };
+        const propsData = { strategy, index: 0, endpoint: '', canDelete: true };
+        factory({ propsData });
+      });
+
+      it('should change the parameters if a different strategy is chosen', () => {
+        const select = wrapper.find(GlFormSelect);
+        select.vm.$emit('input', ROLLOUT_STRATEGY_ALL_USERS);
+        select.vm.$emit('change', ROLLOUT_STRATEGY_ALL_USERS);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.find(GlFormInput).exists()).toBe(false);
+          expect(wrapper.emitted('change')).toEqual([
+            [
+              {
+                name: ROLLOUT_STRATEGY_ALL_USERS,
+                parameters: {},
+                scopes: [{ environmentScope: '*' }],
+              },
+            ],
+          ]);
+        });
+      });
+
+      it('should display selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.findAll(GlToken)).toHaveLength(1);
+          expect(wrapper.find(GlToken).text()).toBe('production');
+        });
+      });
+
+      it('should display all selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        dropdown.vm.$emit('add', 'staging');
+        return wrapper.vm.$nextTick().then(() => {
+          const tokens = wrapper.findAll(GlToken);
+          expect(tokens).toHaveLength(2);
+          expect(tokens.at(0).text()).toBe('production');
+          expect(tokens.at(1).text()).toBe('staging');
+        });
+      });
+
+      it('should emit selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.emitted('change')).toEqual([
+            [
+              {
+                name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                parameters: { percentage: '50', groupId: PERCENT_ROLLOUT_GROUP_ID },
+                scopes: [
+                  { environmentScope: '*', shouldDestroy: true },
+                  { environmentScope: 'production' },
+                ],
+              },
+            ],
+          ]);
+        });
+      });
+
+      it('should emit a delete if the delete button is clicked', () => {
+        wrapper.find(GlButton).vm.$emit('click');
+        expect(wrapper.emitted('delete')).toEqual([[]]);
+      });
+
+      it('should not display the delete button if can delete is false', () => {
+        const propsData = { strategy, index: 0, endpoint: '', canDelete: false };
+        factory({ propsData });
+
+        expect(wrapper.find(GlButton).exists()).toBe(false);
       });
     });
 
-    it('should display selected scopes', () => {
-      const dropdown = wrapper.find(NewEnvironmentsDropdown);
-      dropdown.vm.$emit('add', 'production');
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.findAll(GlToken)).toHaveLength(1);
-        expect(wrapper.find(GlToken).text()).toBe('production');
+    describe('wihtout scopes defined', () => {
+      beforeEach(() => {
+        const strategy = {
+          name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+          parameters: { percentage: '50' },
+          scopes: [],
+        };
+        const propsData = { strategy, index: 0, endpoint: '', canDelete: true };
+        factory({ propsData });
       });
-    });
 
-    it('should display all selected scopes', () => {
-      const dropdown = wrapper.find(NewEnvironmentsDropdown);
-      dropdown.vm.$emit('add', 'production');
-      dropdown.vm.$emit('add', 'staging');
-      return wrapper.vm.$nextTick().then(() => {
-        const tokens = wrapper.findAll(GlToken);
-        expect(tokens).toHaveLength(2);
-        expect(tokens.at(0).text()).toBe('production');
-        expect(tokens.at(1).text()).toBe('staging');
+      it('should display selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.findAll(GlToken)).toHaveLength(1);
+          expect(wrapper.find(GlToken).text()).toBe('production');
+        });
       });
-    });
 
-    it('should emit selected scopes', () => {
-      const dropdown = wrapper.find(NewEnvironmentsDropdown);
-      dropdown.vm.$emit('add', 'production');
-      return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emitted('change')).toEqual([
-          [
-            {
-              name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-              parameters: { percentage: '50', groupId: PERCENT_ROLLOUT_GROUP_ID },
-              scopes: ['production'],
-            },
-          ],
-        ]);
+      it('should display all selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        dropdown.vm.$emit('add', 'staging');
+        return wrapper.vm.$nextTick().then(() => {
+          const tokens = wrapper.findAll(GlToken);
+          expect(tokens).toHaveLength(2);
+          expect(tokens.at(0).text()).toBe('production');
+          expect(tokens.at(1).text()).toBe('staging');
+        });
+      });
+
+      it('should emit selected scopes', () => {
+        const dropdown = wrapper.find(NewEnvironmentsDropdown);
+        dropdown.vm.$emit('add', 'production');
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.emitted('change')).toEqual([
+            [
+              {
+                name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                parameters: { percentage: '50', groupId: PERCENT_ROLLOUT_GROUP_ID },
+                scopes: [{ environmentScope: 'production' }],
+              },
+            ],
+          ]);
+        });
       });
     });
   });
