@@ -1,0 +1,5 @@
+---
+title:  Show legacy pipelines where ci_pipelines.source is nil
+merge_request: 27984
+author:
+type: fixed
