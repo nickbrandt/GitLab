@@ -34,6 +34,10 @@ export default {
     state.descendantCounts = data;
   },
 
+  [types.SET_HEALTH_STATUS](state, data) {
+    state.healthStatus = data;
+  },
+
   [types.SET_ITEM_CHILDREN](state, { parentItem, children, append }) {
     if (append) {
       state.children[parentItem.reference].push(...children);

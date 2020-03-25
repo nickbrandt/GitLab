@@ -29,6 +29,11 @@ describe('RelatedItemsTree', () => {
           expect(state).toHaveProperty('autoCompleteEpics', true);
           expect(state).toHaveProperty('autoCompleteIssues', false);
           expect(state).toHaveProperty('allowSubEpics', true);
+          expect(state).toHaveProperty('healthStatus', {
+            issuesNeedingAttention: 0,
+            issuesAtRisk: 0,
+            issuesOnTrack: 0,
+          });
         });
       });
 
