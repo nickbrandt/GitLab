@@ -68,13 +68,7 @@ describe Metrics::Dashboard::GitlabAlertEmbedService do
 
     let(:service_call) { described_class.new(*service_params).get_dashboard }
 
-    it_behaves_like 'misconfigured dashboard service response', :unauthorized
-
     context 'when alerting is available' do
-      before do
-        stub_licensed_features(prometheus_alerts: true)
-      end
-
       it_behaves_like 'valid embedded dashboard service response'
       it_behaves_like 'raises error for users with insufficient permissions'
 

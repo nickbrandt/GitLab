@@ -26,18 +26,6 @@ describe Projects::Prometheus::AlertsController do
     end
   end
 
-  shared_examples 'unlicensed' do
-    before do
-      stub_licensed_features(prometheus_alerts: false)
-    end
-
-    it 'returns not_found' do
-      make_request
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
-  end
-
   shared_examples 'project non-specific environment' do |status|
     let(:other) { create(:environment) }
 
@@ -118,7 +106,6 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it_behaves_like 'unprivileged'
-    it_behaves_like 'unlicensed'
     it_behaves_like 'project non-specific environment', :ok
   end
 
@@ -166,7 +153,6 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it_behaves_like 'unprivileged'
-      it_behaves_like 'unlicensed'
       it_behaves_like 'project non-specific environment', :not_found
       it_behaves_like 'project non-specific metric', :not_found
     end
@@ -269,7 +255,6 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it_behaves_like 'unprivileged'
-    it_behaves_like 'unlicensed'
     it_behaves_like 'project non-specific environment', :no_content
   end
 
@@ -318,7 +303,6 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it_behaves_like 'unprivileged'
-    it_behaves_like 'unlicensed'
     it_behaves_like 'project non-specific environment', :not_found
     it_behaves_like 'project non-specific metric', :not_found
   end
@@ -350,7 +334,6 @@ describe Projects::Prometheus::AlertsController do
     end
 
     it_behaves_like 'unprivileged'
-    it_behaves_like 'unlicensed'
     it_behaves_like 'project non-specific environment', :not_found
     it_behaves_like 'project non-specific metric', :not_found
   end
