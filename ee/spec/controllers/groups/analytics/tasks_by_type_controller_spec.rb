@@ -3,13 +3,10 @@
 require 'spec_helper'
 
 describe Analytics::TasksByTypeController do
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:label) { create(:group_label, group: group) }
-  let(:params) { { group_id: group.full_path, label_ids: [label.id], created_after: 10.days.ago, subject: 'Issue' } }
   let!(:issue) { create(:labeled_issue, created_at: 5.days.ago, project: create(:project, group: group), labels: [label]) }
-
-  subject { get :show, params: params }
 
   before do
     stub_licensed_features(type_of_work_analytics: true)
@@ -90,7 +87,11 @@ describe Analytics::TasksByTypeController do
     end
   end
 
-  describe 'GET show' do
+  describe 'GET #show' do
+    let(:params) { { group_id: group, label_ids: [label.id], created_after: 10.days.ago, subject: 'Issue' } }
+
+    subject { get :show, params: params }
+
     context 'when valid parameters are given' do
       it 'succeeds' do
         subject
@@ -102,7 +103,7 @@ describe Analytics::TasksByTypeController do
       it 'returns valid count' do
         subject
 
-        date, count = json_response.first["series"].first
+        date, count = json_response.first['series'].first
         expect(Date.parse(date)).to eq(issue.created_at.to_date)
         expect(count).to eq(1)
       end
@@ -119,7 +120,7 @@ describe Analytics::TasksByTypeController do
     it_behaves_like 'parameter validation'
   end
 
-  describe 'GET top_labels' do
+  describe 'GET #top_labels' do
     let(:params) { { group_id: group.full_path, created_after: 10.days.ago, subject: 'Issue' } }
 
     subject { get :top_labels, params: params }

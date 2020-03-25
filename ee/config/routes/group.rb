@@ -19,21 +19,32 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     get '/analytics', to: redirect('groups/%{group_id}/-/contribution_analytics')
     resource :contribution_analytics, only: [:show]
-    resource :cycle_analytics, only: [:show], path: 'value_stream_analytics'
-    scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
-      scope :events, controller: 'events' do
-        get :issue
-        get :plan
-        get :code
-        get :test
-        get :review
-        get :staging
-        get :production
-      end
-    end
+
     namespace :analytics do
       resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
-      resource :cycle_analytics, path: 'value_stream_analytics', only: :show, constraints: -> (req) { Gitlab::Analytics.cycle_analytics_enabled? }
+
+      constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG, default_enabled: Gitlab::Analytics.feature_enabled_by_default?(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG))) do
+        resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
+        scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
+          resources :stages, only: [:index, :create, :update, :destroy] do
+            member do
+              get :duration_chart
+              get :median
+              get :records
+            end
+          end
+          resource :summary, controller: :summary, only: :show
+        end
+        get '/cycle_analytics', to: redirect('-/analytics/value_stream_analytics')
+      end
+
+      constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG)) do
+        scope :type_of_work do
+          resource :tasks_by_type, controller: :tasks_by_type, only: :show do
+            get :top_labels
+          end
+        end
+      end
     end
 
     resource :ldap, only: [] do
