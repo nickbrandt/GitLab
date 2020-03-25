@@ -8675,6 +8675,9 @@ msgstr ""
 msgid "FeatureFlags|Active"
 msgstr ""
 
+msgid "FeatureFlags|Add strategy"
+msgstr ""
+
 msgid "FeatureFlags|All users"
 msgstr ""
 
@@ -8699,6 +8702,9 @@ msgstr ""
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies. By default, features are available to all users in all environments."
+msgstr ""
+
 msgid "FeatureFlags|Environment Spec"
 msgstr ""
 
@@ -8709,6 +8715,9 @@ msgid "FeatureFlags|Feature Flag"
 msgstr ""
 
 msgid "FeatureFlags|Feature Flag behavior is built up by creating a set of rules to define the status of target environments. A default wildcard rule %{codeStart}*%{codeEnd} for %{boldStart}All Environments%{boldEnd} is set, and you are able to add as many rules as you need by choosing environment specs below. You can toggle the behavior for each of your rules to set them %{boldStart}Active%{boldEnd} or %{boldStart}Inactive%{boldEnd}."
+msgstr ""
+
+msgid "FeatureFlags|Feature Flag has no strategies"
 msgstr ""
 
 msgid "FeatureFlags|Feature Flags"
@@ -8778,6 +8787,9 @@ msgid "FeatureFlags|Rollout Strategy"
 msgstr ""
 
 msgid "FeatureFlags|Status"
+msgstr ""
+
+msgid "FeatureFlags|Strategies"
 msgstr ""
 
 msgid "FeatureFlags|Target environments"
