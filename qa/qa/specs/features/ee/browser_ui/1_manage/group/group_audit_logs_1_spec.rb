@@ -7,8 +7,8 @@ module QA
 
     let(:api_client) { Runtime::API::Client.new(:gitlab) }
 
-    shared_examples 'group audit event logs' do |expected_events|
-      it 'logs audit events' do
+    shared_examples 'audit event' do |expected_events|
+      it 'logs audit events for UI operations' do
         wait_for_audit_events(expected_events, group)
 
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
@@ -24,7 +24,7 @@ module QA
       end
     end
 
-    describe 'Group audit logs' do
+    describe 'Group' do
       before(:all) do
         @group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "test-group-#{SecureRandom.hex(8)}"
@@ -56,7 +56,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_general_settings_item)
         end
 
-        it_behaves_like 'group audit event logs', ['Add group'] do
+        it_behaves_like 'audit event', ['Add group'] do
           let(:group) do
             Resource::Group.fabricate_via_api! do |group|
               group.name = group_name
@@ -75,7 +75,7 @@ module QA
             settings.click_save_name_visibility_settings_button
           end
         end
-        it_behaves_like 'group audit event logs', ['Change repository size limit']
+        it_behaves_like 'audit event', ['Change repository size limit']
       end
 
       context 'Update group name' do
@@ -90,7 +90,7 @@ module QA
           end
         end
 
-        it_behaves_like 'group audit event logs', ['Change name']
+        it_behaves_like 'audit event', ['Change name']
       end
 
       context 'Add user, change access level, remove user' do
@@ -105,7 +105,7 @@ module QA
           end
         end
 
-        it_behaves_like 'group audit event logs', ['Add user access as guest', 'Change access level', 'Remove user access']
+        it_behaves_like 'audit event', ['Add user access as guest', 'Change access level', 'Remove user access']
       end
 
       context 'Add and remove project access' do
@@ -126,7 +126,7 @@ module QA
           @group.visit!
         end
 
-        it_behaves_like 'group audit event logs', ['Add project access', 'Remove project access']
+        it_behaves_like 'audit event', ['Add project access', 'Remove project access']
       end
     end
 
