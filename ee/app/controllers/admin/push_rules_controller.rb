@@ -14,6 +14,7 @@ class Admin::PushRulesController < Admin::ApplicationController
     @push_rule.update(push_rule_params)
 
     if @push_rule.valid?
+      link_push_rule_to_application_settings
       redirect_to admin_push_rule_path, notice: _('Push Rule updated successfully.')
     else
       render :show
@@ -50,5 +51,11 @@ class Admin::PushRulesController < Admin::ApplicationController
 
   def set_application_setting
     @application_setting = ApplicationSetting.current_without_cache
+  end
+
+  def link_push_rule_to_application_settings
+    return if @application_setting.push_rule_id
+
+    @application_setting.update(push_rule_id: @push_rule.id)
   end
 end
