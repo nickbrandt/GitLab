@@ -174,6 +174,7 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :admin_board
+        enable :read_vulnerability_feedback
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
         enable :update_vulnerability_feedback
@@ -189,8 +190,6 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
-
       rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
       rule { can?(:read_merge_request) & can?(:read_pipeline) }.enable :read_merge_train
@@ -204,8 +203,6 @@ module EE
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
-
-      rule { can?(:read_security_findings) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 

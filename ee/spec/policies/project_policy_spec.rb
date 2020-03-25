@@ -51,7 +51,7 @@ describe ProjectPolicy do
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
-        read_vulnerability_feedback read_security_findings read_software_license_policy
+        read_software_license_policy
         read_threat_monitoring read_merge_train
       ]
     end
@@ -331,121 +331,11 @@ describe ProjectPolicy do
     end
   end
 
-  describe 'read_vulnerability_feedback' do
-    context 'with private project' do
-      let(:current_user) { admin }
-      let(:project) { create(:project, :private, namespace: owner.namespace) }
-
-      where(role: %w[admin owner maintainer developer reporter])
-
-      with_them do
-        let(:current_user) { public_send(role) }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with guest' do
-        let(:current_user) { guest }
-
-        it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with non member' do
-        let(:current_user) { create(:user) }
-
-        it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with anonymous' do
-        let(:current_user) { nil }
-
-        it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
-      end
-    end
-
-    context 'with public project' do
-      let(:current_user) { create(:user) }
-
-      context 'with limited access to both builds and merge requests' do
-        context 'when builds enabled for project members' do
-          let(:project) { create(:project, :public, :merge_requests_private, :builds_private) }
-
-          it { is_expected.not_to be_allowed(:read_vulnerability_feedback) }
-        end
-
-        context 'when public builds disabled' do
-          let(:project) { create(:project, :public, :merge_requests_private, public_builds: false) }
-
-          it { is_expected.not_to be_allowed(:read_vulnerability_feedback) }
-        end
-      end
-
-      context 'with limited access to merge requests' do
-        let(:project) { create(:project, :public, :merge_requests_private) }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with public access to repository' do
-        let(:project) { create(:project, :public) }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-    end
-  end
-
-  describe 'read_security_findings' do
-    context 'with private project' do
-      let(:project) { create(:project, :private, namespace: owner.namespace) }
-
-      context 'with reporter or above' do
-        let(:current_user) { reporter }
-
-        it { is_expected.to be_allowed(:read_security_findings) }
-      end
-
-      context 'with non member' do
-        let(:current_user) { create(:user) }
-
-        it { is_expected.to be_disallowed(:read_security_findings) }
-      end
-
-      context 'with anonymous' do
-        let(:current_user) { nil }
-
-        it { is_expected.to be_disallowed(:read_security_findings) }
-      end
-    end
-
-    context 'with public project' do
-      let(:current_user) { create(:user) }
-
-      context 'with limited access to builds' do
-        context 'when builds enabled only for project members' do
-          let(:project) { create(:project, :public, :builds_private) }
-
-          it { is_expected.not_to be_allowed(:read_security_findings) }
-        end
-
-        context 'when public builds disabled' do
-          let(:project) { create(:project, :public, public_builds: false) }
-
-          it { is_expected.not_to be_allowed(:read_security_findings) }
-        end
-      end
-
-      context 'with public access to repository' do
-        let(:project) { create(:project, :public) }
-
-        it { is_expected.to be_allowed(:read_security_findings) }
-      end
-    end
-  end
-
   describe 'vulnerability feedback permissions' do
     subject { described_class.new(current_user, project) }
 
     where(permission: %i[
+      read_vulnerability_feedback
       create_vulnerability_feedback
       update_vulnerability_feedback
       destroy_vulnerability_feedback
