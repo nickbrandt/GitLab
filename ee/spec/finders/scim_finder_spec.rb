@@ -56,8 +56,18 @@ describe ScimFinder do
             expect(finder.search(filter: "userName eq \"#{id.user.username}\"").first).to eq id
           end
 
-          it 'allows lookup by userName when userName is an email address' do
-            expect(finder.search(filter: "userName eq #{id.user.email}").first).to eq id
+          context 'allows lookup by userName' do
+            it 'finds user when userName is an email address' do
+              expect(finder.search(filter: "userName eq #{id.user.email}").first).to eq id
+            end
+
+            it 'finds user by username' do
+              expect(finder.search(filter: "userName eq \"#{id.user.username}\"").first).to eq id
+            end
+
+            it 'finds user by extern_uid' do
+              expect(finder.search(filter: "userName eq \"#{id.extern_uid}\"").first).to eq id
+            end
           end
         end
 

@@ -10,9 +10,10 @@ module EE
           expose :active
           expose :email_user, as: :emails, using: ::EE::API::Entities::Scim::Emails
 
-          expose 'name.formatted' do |identity, _options|
-            identity.user.name
+          expose :name, using: ::EE::API::Entities::Scim::UserName do |identity, _options|
+            identity.user
           end
+
           expose :meta do
             expose :resource_type, as: :resourceType
           end
