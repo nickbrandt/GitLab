@@ -19,16 +19,11 @@ module LicenseHelper
   end
 
   def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)
-    return unless current_license
-    return unless signed_in
-    return unless (is_admin && current_license.notify_admins?) || current_license.notify_users?
-
-    message = []
-
-    message << license_message_subject
-    message << expiration_blocking_message
-
-    message.reject {|string| string.blank? }.join(' ').html_safe
+    Gitlab::ExpiringSubscriptionMessage.new(
+      subscribable: current_license,
+      signed_in: signed_in,
+      is_admin: is_admin
+    ).message
   end
 
   def seats_calculation_message
@@ -104,45 +99,5 @@ module LicenseHelper
 
   def active_user_count
     User.active.count
-  end
-
-  def license_message_subject
-    if current_license.expired?
-      message = if current_license.block_changes?
-                  _('Your subscription has been downgraded')
-                else
-                  _('Your subscription expired!')
-                end
-    else
-      remaining_days = pluralize(current_license.remaining_days, 'day')
-
-      message = _('Your subscription will expire in %{remaining_days}') % { remaining_days: remaining_days }
-    end
-
-    message = content_tag(:strong, message)
-
-    content_tag(:p, message, class: 'mb-2')
-  end
-
-  def expiration_blocking_message
-    return '' unless current_license.will_block_changes?
-
-    plan_name = current_license.plan.titleize
-    strong = "<strong>".html_safe
-    strong_close = "</strong>".html_safe
-
-    if current_license.expired?
-      if current_license.block_changes?
-        message = _('You didn\'t renew your %{strong}%{plan_name}%{strong_close} subscription so it was downgraded to the GitLab Core Plan.') % { plan_name: plan_name, strong: strong, strong_close: strong_close }
-      else
-        remaining_days = pluralize((current_license.block_changes_at - Date.today).to_i, 'day')
-
-        message = _('No worries, you can still use all the %{strong}%{plan_name}%{strong_close} features for now. You have %{remaining_days} to renew your subscription.') % { plan_name: plan_name, remaining_days: remaining_days, strong: strong, strong_close: strong_close }
-      end
-    else
-      message = _('Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features.') % { expires_on: current_license.expires_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close }
-    end
-
-    content_tag(:p, message.html_safe)
   end
 end
