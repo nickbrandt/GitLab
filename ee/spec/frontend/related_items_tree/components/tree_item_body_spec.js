@@ -291,8 +291,9 @@ describe('RelatedItemsTree', () => {
         const stateTooltip = wrapper.findAll(StateTooltip).at(0);
 
         const { itemPath, itemId } = wrapper.vm;
+        const path = itemPath + mockItem.pathIdSeparator + itemId;
 
-        expect(stateTooltip.props('path')).toBe(itemPath + mockItem.pathIdSeparator + itemId);
+        expect(stateTooltip.props('path')).toBe(path);
       });
 
       it('renders confidential icon when `item.confidential` is true', () => {

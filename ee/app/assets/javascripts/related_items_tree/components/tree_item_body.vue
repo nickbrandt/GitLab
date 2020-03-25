@@ -79,6 +79,9 @@ export default {
     itemId() {
       return this.itemReference.split(this.item.pathIdSeparator).pop();
     },
+    itemHierarchy() {
+      return this.itemPath + this.item.pathIdSeparator + this.itemId;
+    },
     computedPath() {
       return this.itemWebPath.length ? this.itemWebPath : null;
     },
@@ -127,7 +130,7 @@ export default {
           />
           <state-tooltip
             :get-target-ref="() => $refs.stateIconLg"
-            :path="itemPath + item.pathIdSeparator + itemId"
+            :path="itemHierarchy"
             :is-open="isOpen"
             :state="item.state"
             :created-at="item.createdAt"
@@ -158,7 +161,7 @@ export default {
             />
             <state-tooltip
               :get-target-ref="() => $refs.stateIconMd"
-              :path="itemPath + item.pathIdSeparator + itemId"
+              :path="itemHierarchy"
               :is-open="isOpen"
               :state="item.state"
               :created-at="item.createdAt"

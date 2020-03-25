@@ -159,7 +159,7 @@ describe('RelatedItemsTree', () => {
       it('renders path in bold', () => {
         expect(
           wrapper
-            .find('span.bold')
+            .find({ ref: 'statePath' })
             .text()
             .trim(),
         ).toBe('/foo/bar#1');
@@ -168,7 +168,7 @@ describe('RelatedItemsTree', () => {
       it('renders stateText in bold', () => {
         expect(
           wrapper
-            .find('span.text-tertiary span.bold')
+            .find({ ref: 'stateText' })
             .text()
             .trim(),
         ).toBe('Closed');
@@ -181,7 +181,7 @@ describe('RelatedItemsTree', () => {
       it('renders stateTimestamp in muted', () => {
         expect(
           wrapper
-            .find('span.text-tertiary')
+            .find({ ref: 'stateTimestamp' })
             .text()
             .trim(),
         ).toContain(mockClosedAtYear);
