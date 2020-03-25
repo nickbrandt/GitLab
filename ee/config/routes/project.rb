@@ -38,12 +38,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :settings do
-          resource :operations, only: [] do
-            member do
-              post :reset_alerting_token
-            end
-          end
-
           resource :slack, only: [:destroy, :edit, :update] do
             get :slack_auth
           end
