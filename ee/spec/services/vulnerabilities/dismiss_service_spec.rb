@@ -31,6 +31,12 @@ describe Vulnerabilities::DismissService do
       end
     end
 
+    it 'creates note' do
+      expect(SystemNoteService).to receive(:change_vulnerability_state).with(vulnerability, user)
+
+      dismiss_vulnerability
+    end
+
     context 'when there is a finding dismissal error' do
       before do
         allow(service).to receive(:dismiss_findings).and_return(
