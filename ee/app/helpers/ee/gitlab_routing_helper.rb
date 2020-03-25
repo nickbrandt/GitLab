@@ -4,7 +4,6 @@ module EE
   module GitlabRoutingHelper
     include ::ProjectsHelper
     include ::ApplicationSettingsHelper
-    include ::API::Helpers::RelatedResourcesHelpers
 
     def geo_primary_web_url(project_or_wiki)
       File.join(::Gitlab::Geo.primary_node.url, project_or_wiki.full_path)
