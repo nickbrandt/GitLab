@@ -11769,7 +11769,7 @@ msgstr ""
 msgid "LicenseCompliance|Add a license"
 msgstr ""
 
-msgid "LicenseCompliance|Add licenses manually to approve or blacklist"
+msgid "LicenseCompliance|Add license and related policy"
 msgstr ""
 
 msgid "LicenseCompliance|Allow"
@@ -11787,7 +11787,7 @@ msgstr ""
 msgid "LicenseCompliance|Deny"
 msgstr ""
 
-msgid "LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
+msgid "LicenseCompliance|Here you can allow or deny licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and allow or deny them in merge request."
 msgstr ""
 
 msgid "LicenseCompliance|License"

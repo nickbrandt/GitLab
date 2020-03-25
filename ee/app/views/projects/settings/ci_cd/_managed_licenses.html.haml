@@ -11,6 +11,6 @@
     %p
       - ci = link_to(s_('Gitlab CI/CD'), 'https://docs.gitlab.com/ee/ci/', target: '_blank', rel: 'noopener noreferrer')
       - license = link_to(s_('Auto License Compliance'), 'https://docs.gitlab.com/ee/topics/autodevops/index.html#auto-license-management-ultimate', target: '_blank', rel: 'noopener noreferrer')
-      = s_('LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request.').html_safe % { ci: ci, license: license }
+      = s_('LicenseCompliance|Here you can allow or deny licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and allow or deny them in merge request.').html_safe % { ci: ci, license: license }
   .settings-content
     #js-managed-licenses{ data: { api_url: @license_management_url } }

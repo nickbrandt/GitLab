@@ -60,7 +60,7 @@ export default {
   <div class="col-sm-6 js-add-license-form">
     <div class="form-group">
       <label class="label-bold" for="js-license-dropdown">
-        {{ s__('LicenseCompliance|Add licenses manually to approve or blacklist') }}
+        {{ s__('LicenseCompliance|Add license and related policy') }}
       </label>
       <add-license-form-dropdown
         id="js-license-dropdown"
