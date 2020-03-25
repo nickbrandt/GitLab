@@ -1748,7 +1748,8 @@ CREATE TABLE public.clusters_applications_prometheus (
     updated_at timestamp with time zone NOT NULL,
     last_update_started_at timestamp with time zone,
     encrypted_alert_manager_token character varying,
-    encrypted_alert_manager_token_iv character varying
+    encrypted_alert_manager_token_iv character varying,
+    healthy boolean
 );
 
 CREATE SEQUENCE public.clusters_applications_prometheus_id_seq
@@ -12731,6 +12732,7 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200302152516
 20200303055348
 20200303074328
+20200303181648
 20200304085423
 20200304090155
 20200304121828
