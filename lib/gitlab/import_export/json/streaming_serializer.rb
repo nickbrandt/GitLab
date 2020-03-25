@@ -47,6 +47,8 @@ module Gitlab
           record = exportable.public_send(key) # rubocop: disable GitlabSecurity/PublicSend
           if record.is_a?(ActiveRecord::Relation)
             serialize_many_relations(key, record, options)
+          elsif record.respond_to?(:each) # this is to support `project_members` that return an Array
+            serialize_many_each(key, record, options)
           else
             serialize_single_relation(key, record, options)
           end
@@ -57,6 +59,14 @@ module Gitlab
           records = records.preload(key_preloads) if key_preloads
 
           records.find_each(batch_size: BATCH_SIZE) do |record|
+            json = Raw.new(record.to_json(options))
+
+            json_writer.append(key, json)
+          end
+        end
+
+        def serialize_many_each(key, records, options)
+          records.each do |record|
             json = Raw.new(record.to_json(options))
 
             json_writer.append(key, json)
