@@ -41,6 +41,10 @@ describe Gitlab::UsageData do
       # for group_view testing
       create(:user) # user with group_view = NULL (should be counted as having default value 'details')
       create(:user, group_view: :details)
+
+      # Status Page
+      create(:status_page_setting, project: projects[0], enabled: true)
+      create(:status_page_setting, project: projects[1], enabled: false)
     end
 
     subject { described_class.data }
@@ -93,6 +97,7 @@ describe Gitlab::UsageData do
         projects_with_prometheus_alerts
         projects_with_tracing_enabled
         sast_jobs
+        status_page_projects
         design_management_designs_create
         design_management_designs_update
         design_management_designs_delete
@@ -105,6 +110,7 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
       expect(count_data[:feature_flags]).to eq(1)
+      expect(count_data[:status_page_projects]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do
