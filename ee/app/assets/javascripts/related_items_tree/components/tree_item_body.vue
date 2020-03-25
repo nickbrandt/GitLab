@@ -127,6 +127,7 @@ export default {
           />
           <state-tooltip
             :get-target-ref="() => $refs.stateIconLg"
+            :path="itemPath + item.pathIdSeparator + itemId"
             :is-open="isOpen"
             :state="item.state"
             :created-at="item.createdAt"
@@ -157,15 +158,12 @@ export default {
             />
             <state-tooltip
               :get-target-ref="() => $refs.stateIconMd"
+              :path="itemPath + item.pathIdSeparator + itemId"
               :is-open="isOpen"
               :state="item.state"
               :created-at="item.createdAt"
               :closed-at="item.closedAt || ''"
             />
-            <span v-gl-tooltip :title="itemPath" class="path-id-text d-inline-block">{{
-              itemPath
-            }}</span
-            >{{ item.pathIdSeparator }}{{ itemId }}
           </div>
           <div
             class="item-meta-child d-flex align-items-center order-0 flex-wrap mr-md-1 ml-md-auto ml-xl-2 mt-2 mt-md-0 flex-xl-nowrap"

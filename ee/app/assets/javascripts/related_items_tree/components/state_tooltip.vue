@@ -15,6 +15,10 @@ export default {
       type: Function,
       required: true,
     },
+    path: {
+      type: String,
+      required: true,
+    },
     isOpen: {
       type: Boolean,
       required: true,
@@ -69,11 +73,15 @@ export default {
 <template>
   <gl-tooltip :target="getTargetRef()">
     <span class="bold">
-      {{ stateText }}
+      {{ path }}
     </span>
-    {{ stateTimeInWords }}
     <br />
     <span class="text-tertiary">
+      <span class="bold">
+        {{ stateText }}
+      </span>
+      {{ stateTimeInWords }}
+      <br />
       {{ stateTimestamp }}
     </span>
   </gl-tooltip>
