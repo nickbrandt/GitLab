@@ -54,6 +54,7 @@ module Gitlab
           {
             id: group.id,
             name: group.name,
+            parent_id: group.parent_id,
             full_path: group.full_path,
             avatar_url: group.avatar_url
           }
