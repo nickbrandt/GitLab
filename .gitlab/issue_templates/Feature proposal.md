@@ -1,4 +1,4 @@
-<!-- The first three sections: "Problem to solve", "Internded users" and "Proposal", are strongly recommended, while the rest of the sections can be filled out during the problem validation or breakdown phase. However, keep in mind that providing complete and relevant information early helps our product team validate the problem and start working on a solution. -->
+<!-- The first three sections: "Problem to solve", "Intended users" and "Proposal", are strongly recommended, while the rest of the sections can be filled out during the problem validation or breakdown phase. However, keep in mind that providing complete and relevant information early helps our product team validate the problem and start working on a solution. -->
 
 ### Problem to solve
 
@@ -21,6 +21,10 @@ Personas are described at https://about.gitlab.com/handbook/marketing/product-ma
 * [Dana (Data Analyst)](https://about.gitlab.com/handbook/marketing/product-marketing/roles-personas/#dana-data-analyst)
 * [Simone (Software Engineer in Test)](https://about.gitlab.com/handbook/marketing/product-marketing/roles-personas/#simone-software-engineer-in-test)
 * [Allison (Application Ops)](https://about.gitlab.com/handbook/marketing/product-marketing/roles-personas/#allison-application-ops) -->
+
+### Further details
+
+<!-- Include use cases, benefits, goals, or any other details that will help us understand the problem better. -->
 
 ### Proposal
 
