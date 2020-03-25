@@ -25,8 +25,11 @@ module EE
         expose :created_at
         expose :project_id, if: ->(_, opts) { opts[:group] }
         expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
-        expose :build_info, using: Package::BuildInfo
         expose :tags
+
+        expose :pipeline, if: ->(obj) { obj.build_info } do |package|
+          ::API::Entities::Pipeline.represent package.build_info.pipeline, only: [:created_at, :id, :sha, :ref, :status, :updated_at, :web_url, user: [:name, :avatar_url]]
+        end
 
         private
 
