@@ -9,31 +9,25 @@ import statusCodes from '~/lib/utils/http_status';
 import { backOff } from '~/lib/utils/common_utils';
 import { queryTypes, formDataValidator } from '../constants';
 
-const MAX_REQUESTS = 4;
+const VALIDATION_REQUEST_TIMEOUT = 10000;
 const axiosCancelToken = axios.CancelToken;
 let cancelTokenSource;
 
 function backOffRequest(makeRequestCallback) {
-  let requestsCount = 0;
   return backOff((next, stop) => {
     makeRequestCallback()
       .then(resp => {
         if (resp.status === statusCodes.OK) {
           stop(resp);
         } else {
-          requestsCount += 1;
-          if (requestsCount < MAX_REQUESTS) {
-            next();
-          } else {
-            stop(resp);
-          }
+          next();
         }
       })
       // If the request is cancelled by axios
       // then consider it as noop so that its not
       // caught by subsequent catches
       .catch(thrown => (axios.isCancel(thrown) ? undefined : stop(thrown)));
-  });
+  }, VALIDATION_REQUEST_TIMEOUT);
 }
 
 export default {
