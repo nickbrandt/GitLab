@@ -17940,7 +17940,7 @@ msgstr ""
 msgid "Select the branch you want to set as the default for this project. All merge requests and commits will automatically be made against this branch unless you specify a different one."
 msgstr ""
 
-msgid "Select the configured storaged available for new projects to be placed on."
+msgid "Select the configured storage available for new repositories to be placed on."
 msgstr ""
 
 msgid "Select the custom project template source group."
@@ -19226,7 +19226,7 @@ msgstr ""
 msgid "Storage"
 msgstr ""
 
-msgid "Storage nodes for new projects"
+msgid "Storage nodes for new repositories"
 msgstr ""
 
 msgid "Storage:"
@@ -21969,7 +21969,7 @@ msgstr ""
 msgid "Use hashed storage"
 msgstr ""
 
-msgid "Use hashed storage paths for newly created and renamed projects. Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Project URL changes and may improve disk I/O performance."
+msgid "Use hashed storage paths for newly created and renamed repositories. Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Repository URL changes and may improve disk I/O performance."
 msgstr ""
 
 msgid "Use one line per URI"
