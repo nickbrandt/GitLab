@@ -11,13 +11,8 @@ module EE
         .count
     end
 
-    override :group_nav_link_paths
-    def group_nav_link_paths
-      if ::Gitlab::CurrentSettings.should_check_namespace_plan? && can?(current_user, :admin_group, @group)
-        super + %w[billings#index saml_providers#show]
-      else
-        super
-      end
+    def group_administration_nav_link_paths
+      %w[saml_providers#show usage_quotas#index billings#index]
     end
 
     def size_limit_message_for_group(group)
@@ -86,6 +81,32 @@ module EE
       can?(current_user, :read_group_activity_analytics, @group)
     end
 
+    def show_usage_quotas_in_sidebar?
+      License.feature_available?(:usage_quotas)
+    end
+
+    def show_billing_in_sidebar?
+      ::Gitlab::CurrentSettings.should_check_namespace_plan?
+    end
+
+    def show_administration_nav?(group)
+      group_sidebar_link?(:administration) &&
+      group.parent.nil? &&
+      (
+        show_saml_in_sidebar?(group) ||
+        show_usage_quotas_in_sidebar? ||
+        show_billing_in_sidebar?
+      )
+    end
+
+    def administration_nav_path(group)
+      return group_saml_providers_path(group) if show_saml_in_sidebar?(group)
+
+      return group_usage_quotas_path(group) if show_usage_quotas_in_sidebar?
+
+      group_billings_path(group) if show_billing_in_sidebar?
+    end
+
     private
 
     def get_group_sidebar_links
@@ -101,6 +122,10 @@ module EE
 
       if can?(current_user, :read_epic, @group)
         links << :epics
+      end
+
+      if can?(current_user, :admin_group, @group)
+        links << :administration
       end
 
       if @group.feature_available?(:issues_analytics)
