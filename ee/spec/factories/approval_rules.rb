@@ -27,6 +27,11 @@ FactoryBot.define do
       name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
       report_type { :license_management }
     end
+
+    trait :license_scanning do
+      name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
+      report_type { :license_scanning }
+    end
   end
 
   factory :any_approver_rule, parent: :approval_merge_request_rule do
