@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import { parseBoolean } from '~/lib/utils/common_utils';
 import HeaderApp from 'ee/vulnerabilities/components/app.vue';
 import FooterApp from 'ee/vulnerabilities/components/footer.vue';
 
@@ -10,17 +9,17 @@ function createFooterApp() {
     return false;
   }
 
-  const { solution, vulnerabilityFeedbackHelpPath, vulnerabilityState } = el.dataset;
-  const hasMr = parseBoolean(el.dataset.hasMr);
-  const remediation = JSON.parse(el.dataset.remediation);
+  const { vulnerabilityFeedbackHelpPath, hasMr } = el.dataset;
+  const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
   const finding = JSON.parse(el.dataset.finding);
+  const remediation = finding.remediations[0];
   const hasDownload = Boolean(
-    vulnerabilityState !== 'resolved' && remediation?.diff?.length && !hasMr,
+    vulnerability.state !== 'resolved' && remediation?.diff?.length && !hasMr,
   );
 
   const props = {
-    solutionCard: {
-      solution,
+    solutionInfo: {
+      solution: finding.solution,
       remediation,
       hasDownload,
       hasMr,

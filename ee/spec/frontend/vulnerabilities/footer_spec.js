@@ -2,12 +2,13 @@ import { shallowMount } from '@vue/test-utils';
 import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
+import { TEST_HOST } from 'helpers/test_constants';
 
 describe('Vulnerability Footer', () => {
   let wrapper;
 
   const minimumProps = {
-    solutionCard: {
+    solutionInfo: {
       hasDownload: false,
       hasMr: false,
       hasRemediation: false,
@@ -23,7 +24,7 @@ describe('Vulnerability Footer', () => {
     },
   };
 
-  const solutionCardProp = {
+  const solutionInfoProp = {
     hasDownload: true,
     hasMr: false,
     hasRemediation: true,
@@ -42,7 +43,7 @@ describe('Vulnerability Footer', () => {
     feedback_type: 'issue',
     id: 36,
     issue_iid: 22,
-    issue_url: 'http://gitlab.aturinske:3000/root/security-reports/-/issues/22',
+    issue_url: `${TEST_HOST}/root/security-reports/-/issues/22`,
     project_fingerprint: 'f7319ea35fc016e754e9549dd89b338aea4c72cc',
     project_id: 19,
   };
@@ -59,25 +60,25 @@ describe('Vulnerability Footer', () => {
 
   describe('solution card', () => {
     it('does show solution card when there is one', () => {
-      createWrapper({ ...minimumProps, solutionCard: solutionCardProp });
-      expect(wrapper.find(SolutionCard).exists()).toBe(true);
+      createWrapper({ ...minimumProps, solutionInfo: solutionInfoProp });
+      expect(wrapper.contains(SolutionCard)).toBe(true);
     });
 
     it('does not show solution card when there is not one', () => {
       createWrapper();
-      expect(wrapper.find(SolutionCard).exists()).toBe(false);
+      expect(wrapper.contains(SolutionCard)).toBe(false);
     });
   });
 
   describe('issue history', () => {
     it('does show issue history when there is one', () => {
       createWrapper({ ...minimumProps, feedback: feedbackProps });
-      expect(wrapper.find(IssueNote).exists()).toBe(true);
+      expect(wrapper.contains(IssueNote)).toBe(true);
     });
 
     it('does not show issue history when there is not one', () => {
       createWrapper();
-      expect(wrapper.find(IssueNote).exists()).toBe(false);
+      expect(wrapper.contains(IssueNote)).toBe(false);
     });
   });
 });
