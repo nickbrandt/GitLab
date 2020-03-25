@@ -89,7 +89,6 @@ export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
 
   const { stages } = state;
   const params = {
-    group_id: currentGroupPath,
     created_after,
     created_before,
     project_ids,
@@ -192,8 +191,7 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
     selectedGroup: { fullPath },
   } = state;
 
-  return Api.cycleAnalyticsSummaryData({
-    group_id: fullPath,
+  return Api.cycleAnalyticsSummaryData(fullPath, {
     created_after,
     created_before,
     project_ids,
@@ -254,11 +252,10 @@ export const fetchTopRankedGroupLabels = ({
   dispatch('requestTopRankedGroupLabels');
   const { subject } = state.tasksByType;
 
-  return Api.cycleAnalyticsTopLabels({
+  return Api.cycleAnalyticsTopLabels(currentGroupPath, {
     subject,
     created_after,
     created_before,
-    group_id: currentGroupPath,
   })
     .then(({ data }) => dispatch('receiveTopRankedGroupLabelsSuccess', data))
     .catch(error =>
@@ -383,7 +380,6 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   // dont request if we have no labels selected...for now
   if (selectedLabelIds.length) {
     const params = {
-      group_id: currentGroupPath,
       created_after,
       created_before,
       project_ids,
@@ -393,7 +389,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
     dispatch('requestTasksByTypeData');
 
-    return Api.cycleAnalyticsTasksByType(params)
+    return Api.cycleAnalyticsTasksByType(currentGroupPath, params)
       .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
@@ -496,8 +492,7 @@ export const fetchDurationData = ({ state, dispatch, getters }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after,
         created_before,
         project_ids,
@@ -545,8 +540,7 @@ export const fetchDurationMedianData = ({ state, dispatch, getters }) => {
     stages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(slug, {
-        group_id: fullPath,
+      return Api.cycleAnalyticsDurationChart(fullPath, slug, {
         created_after: dateFormat(offsetCreatedAfter, dateFormats.isoDate),
         created_before: dateFormat(offsetCreatedBefore, dateFormats.isoDate),
         project_ids,

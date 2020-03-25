@@ -3,28 +3,13 @@
 require 'spec_helper'
 
 describe Analytics::AnalyticsController do
-  include AnalyticsHelpers
-
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(group_level_cycle_analytics: false)
-
     sign_in(user)
-    disable_all_analytics_feature_flags
   end
 
   describe 'GET index' do
-    describe 'redirects to the first enabled analytics page' do
-      it 'redirects to value stream analytics' do
-        stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
-
-        get :index
-
-        expect(response).to redirect_to(analytics_cycle_analytics_path)
-      end
-    end
-
     it 'renders devops score page when all the analytics feature flags are disabled' do
       get :index
 

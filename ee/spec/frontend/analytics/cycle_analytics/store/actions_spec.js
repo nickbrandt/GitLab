@@ -33,7 +33,8 @@ const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
 const selectedStageSlug = selectedStage.slug;
 
-const stageEndpoint = ({ stageId }) => `/-/analytics/value_stream_analytics/stages/${stageId}`;
+const stageEndpoint = ({ stageId }) =>
+  `/groups/${group.full_path}/-/analytics/value_stream_analytics/stages/${stageId}`;
 
 describe('Cycle analytics actions', () => {
   let state;
