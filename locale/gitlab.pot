@@ -5435,6 +5435,9 @@ msgstr ""
 msgid "ContainerRegistry|There are no container images stored for this project"
 msgstr ""
 
+msgid "ContainerRegistry|This Registry contains deleted image tag data. Remember to run  %{docLinkStart}garbage collection%{docLinkEnd} to remove the stale data from storage."
+msgstr ""
+
 msgid "ContainerRegistry|This image has no active tags"
 msgstr ""
 
