@@ -6,13 +6,16 @@ describe API::Releases do
   let(:project) { create(:project, :repository, :private) }
   let(:maintainer) { create(:user) }
   let(:reporter) { create(:user) }
+  let(:developer) { create(:user) }
   let(:guest) { create(:user) }
+  let(:non_project_member) { create(:user) }
   let(:commit) { create(:commit, project: project) }
 
   before do
     project.add_maintainer(maintainer)
     project.add_reporter(reporter)
     project.add_guest(guest)
+    project.add_developer(developer)
 
     project.repository.add_tag(maintainer, 'v0.1', commit.id)
     project.repository.add_tag(maintainer, 'v0.2', commit.id)
@@ -146,6 +149,73 @@ describe API::Releases do
           let(:milestone_message) { "Milestones associated with release changed to [none]" }
 
           it_behaves_like 'update with milestones'
+        end
+      end
+    end
+  end
+
+  describe 'POST /projects/:id/releases/:tag_name/evidence' do
+    let(:tag_name) { 'v0.1' }
+    let!(:release) do
+      create(:release,
+             project: project,
+             tag: 'v0.1',
+             name: 'New release',
+             description: 'Super nice release')
+    end
+
+    it 'accepts the request' do
+      post api("/projects/#{project.id}/releases/#{tag_name}/evidence", maintainer)
+
+      expect(response).to have_gitlab_http_status(:accepted)
+    end
+
+    it 'creates the Evidence', :sidekiq_inline do
+      expect do
+        post api("/projects/#{project.id}/releases/#{tag_name}/evidence", maintainer)
+      end.to change { Releases::Evidence.count }.by(1)
+    end
+
+    context 'when tag_name is invalid' do
+      let(:tag_name) { 'v9.5.0' }
+
+      it 'returns a 404' do
+        post api("/projects/#{project.id}/releases/#{tag_name}/evidence", maintainer)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'when user is a reporter' do
+      it 'forbids the request' do
+        post api("/projects/#{project.id}/releases/#{tag_name}/evidence", reporter)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+
+    context 'when user is a developer' do
+      it 'accepts the request' do
+        post api("/projects/#{project.id}/releases/#{tag_name}/evidence", developer)
+
+        expect(response).to have_gitlab_http_status(:accepted)
+      end
+    end
+
+    context 'when user is not a project member' do
+      it 'forbids the request' do
+        post api("/projects/#{project.id}/releases/#{tag_name}/evidence", non_project_member)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      context 'when project is public' do
+        let(:project) { create(:project, :repository, :public) }
+
+        it 'forbids the request' do
+          post api("/projects/#{project.id}/releases/#{tag_name}/evidence", non_project_member)
+
+          expect(response).to have_gitlab_http_status(:forbidden)
         end
       end
     end
