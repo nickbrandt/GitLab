@@ -11,6 +11,14 @@ const groupDataset = {
   groupAvatarUrl: 'foo/bar',
 };
 
+const subGroupDataset = {
+  groupId: '1',
+  groupName: 'My Group',
+  groupFullPath: 'parent/my-group',
+  groupAvatarUrl: 'foo/bar',
+  groupParentId: 20,
+};
+
 const projectDataset = {
   projectId: '1',
   projectName: 'My Project',
@@ -36,6 +44,16 @@ describe('buildGroupFromDataset', () => {
       name: 'My Group',
       full_path: 'my-group',
       avatar_url: 'foo/bar',
+    });
+  });
+
+  it('sets the parent_id when a subgroup is given', () => {
+    expect(buildGroupFromDataset(subGroupDataset)).toEqual({
+      id: 1,
+      name: 'My Group',
+      full_path: 'parent/my-group',
+      avatar_url: 'foo/bar',
+      parent_id: 20,
     });
   });
 });
@@ -80,6 +98,7 @@ describe('buildCycleAnalyticsInitialData', () => {
       ${'avatarUrl'} | ${null}
       ${'fullPath'}  | ${null}
       ${'name'}      | ${null}
+      ${'parentId'}  | ${null}
     `("will be $value if the '$field' field is not present", ({ field, value }) => {
       expect(buildCycleAnalyticsInitialData({ groupId: groupDataset.groupId })).toMatchObject({
         group: { id: 1, [field]: value },

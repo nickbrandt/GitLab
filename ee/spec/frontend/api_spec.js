@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import Api from 'ee/api';
 import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
 import axios from '~/lib/utils/axios_utils';
+import httpStatus from '~/lib/utils/http_status';
 import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
 
 describe('Api', () => {
@@ -537,7 +538,7 @@ describe('Api', () => {
       it('fetches group level labels', done => {
         const response = [];
         const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/labels`;
-        mock.onGet(expectedUrl).reply(200, response);
+        mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
         Api.cycleAnalyticsGroupLabels(groupId)
           .then(({ data, config: { url } }) => {

@@ -220,10 +220,10 @@ export const requestGroupLabels = ({ commit }) => commit(types.REQUEST_GROUP_LAB
 export const fetchGroupLabels = ({ dispatch, state }) => {
   dispatch('requestGroupLabels');
   const {
-    selectedGroup: { fullPath },
+    selectedGroup: { fullPath, parentId = null },
   } = state;
 
-  return Api.cycleAnalyticsGroupLabels(fullPath)
+  return Api.cycleAnalyticsGroupLabels(parentId || fullPath)
     .then(({ data }) => dispatch('receiveGroupLabelsSuccess', data))
     .catch(error =>
       handleErrorOrRethrow({ error, action: () => dispatch('receiveGroupLabelsError', error) }),
