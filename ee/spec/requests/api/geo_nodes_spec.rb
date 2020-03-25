@@ -8,15 +8,13 @@ describe API::GeoNodes, :request_store, :geo, :prometheus, api: true do
 
   include_context 'custom session'
 
-  set(:primary) { create(:geo_node, :primary) }
-  set(:secondary) { create(:geo_node) }
-  set(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
-
+  let_it_be(:admin, refind: true) { create(:admin) }
+  let_it_be(:user, refind: true) { create(:user) }
+  let_it_be(:primary, refind: true) { create(:geo_node, :primary) }
+  let_it_be(:secondary, refind: true) { create(:geo_node) }
+  let_it_be(:secondary_status, refind: true) { create(:geo_node_status, :healthy, geo_node: secondary) }
   let(:unexisting_node_id) { GeoNode.maximum(:id).to_i.succ }
   let(:group_to_sync) { create(:group) }
-
-  set(:admin) { create(:admin) }
-  set(:user) { create(:user) }
 
   describe 'POST /geo_nodes' do
     it 'denies access if not admin' do

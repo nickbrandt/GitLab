@@ -11,8 +11,8 @@ RSpec.describe Geo::Fdw::Project, :geo, type: :model do
   end
 
   describe '.search' do
-    set(:test_project) { create(:project, description: 'kitten mittens') }
-    set(:project) { described_class.find(test_project.id) }
+    let_it_be(:test_project, refind: true) { create(:project, description: 'kitten mittens') }
+    let_it_be(:project) { described_class.find(test_project.id) }
 
     it 'returns projects with a matching name' do
       expect(described_class.search(project.name)).to eq([project])

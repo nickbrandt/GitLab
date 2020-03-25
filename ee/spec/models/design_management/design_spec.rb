@@ -180,7 +180,7 @@ describe DesignManagement::Design do
   end
 
   describe '#visible_in?' do
-    set(:issue) { create(:issue) }
+    let_it_be(:issue) { create(:issue) }
 
     # It is expensive to re-create complex histories, so we do it once, and then
     # assert that we can establish visibility at any given version.

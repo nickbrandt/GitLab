@@ -6,8 +6,8 @@ describe Geo::ProjectRegistry do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project, description: 'kitten mittens') }
-  set(:registry) { create(:geo_project_registry, project_id: project.id) }
+  let_it_be(:project, refind: true) { create(:project, description: 'kitten mittens') }
+  let_it_be(:registry, refind: true) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
 
