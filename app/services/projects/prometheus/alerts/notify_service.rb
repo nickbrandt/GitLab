@@ -21,17 +21,11 @@ module Projects
 
         private
 
-        def incident_management_available?
-          project.feature_available?(:incident_management)
-        end
-
         def valid_payload_size?
           Gitlab::Utils::DeepSize.new(params).valid?
         end
 
         def send_email?
-          return firings.any? unless incident_management_available?
-
           incident_management_setting.send_email && firings.any?
         end
 
