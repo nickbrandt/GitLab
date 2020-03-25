@@ -36,7 +36,7 @@ describe Analytics::CycleAnalytics::SummaryController do
     it 'contains `projects` parameter' do
       params[:project_ids] = [-1]
 
-      expect(CycleAnalytics::GroupLevel).to receive(:new).with(group: group, options: hash_including(:projects)).and_call_original
+      expect(CycleAnalytics::GroupLevel).to receive(:new).with(group: group, options: hash_including(projects: ['-1'])).and_call_original
 
       subject
 
