@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlBadge, GlLink, GlSprintf } from '@gitlab/ui';
+import { GlLoadingIcon, GlLink, GlSprintf } from '@gitlab/ui';
 import Api from 'ee/api';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import axios from '~/lib/utils/axios_utils';
@@ -14,7 +14,6 @@ export default {
   name: 'VulnerabilityManagementApp',
   components: {
     GlLoadingIcon,
-    GlBadge,
     GlLink,
     GlSprintf,
     TimeAgoTooltip,
@@ -51,9 +50,9 @@ export default {
   },
 
   computed: {
-    variant() {
-      // Get the badge variant based on the vulnerability state, defaulting to 'warning'.
-      return VULNERABILITY_STATES[this.state]?.variant || 'warning';
+    statusBoxStyle() {
+      // Get the badge variant based on the vulnerability state, defaulting to 'expired'.
+      return VULNERABILITY_STATES[this.state]?.statusBoxStyle || 'expired';
     },
   },
 
@@ -102,37 +101,49 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex align-items-center border-bottom pt-2 pb-2">
-    <gl-loading-icon v-if="isLoadingVulnerability" />
-    <gl-badge v-else ref="badge" class="text-capitalize" :variant="variant">{{ state }}</gl-badge>
+  <div class="detail-page-header">
+    <div class="detail-page-header-body lh-4 align-items-center">
+      <gl-loading-icon v-if="isLoadingVulnerability" class="mr-2" />
+      <span
+        v-else
+        ref="badge"
+        :class="
+          `text-capitalize align-self-center issuable-status-box status-box status-box-${statusBoxStyle}`
+        "
+      >
+        {{ state }}
+      </span>
 
-    <span v-if="pipeline" class="mx-2">
-      <gl-sprintf :message="__('Detected %{timeago} in pipeline %{pipelineLink}')">
-        <template #timeago>
-          <time-ago-tooltip :time="pipeline.created_at" />
-        </template>
-        <template v-if="pipeline.id" #pipelineLink>
-          <gl-link :href="pipeline.url" target="_blank">{{ pipeline.id }}</gl-link>
-        </template>
-      </gl-sprintf>
-    </span>
+      <span v-if="pipeline" class="issuable-meta">
+        <gl-sprintf :message="__('Detected %{timeago} in pipeline %{pipelineLink}')">
+          <template #timeago>
+            <time-ago-tooltip :time="pipeline.created_at" />
+          </template>
+          <template v-if="pipeline.id" #pipelineLink>
+            <gl-link :href="pipeline.url" class="link" target="_blank">{{ pipeline.id }}</gl-link>
+          </template>
+        </gl-sprintf>
+      </span>
 
-    <time-ago-tooltip v-else class="ml-2" :time="vulnerability.created_at" />
+      <time-ago-tooltip v-else class="issuable-meta" :time="vulnerability.created_at" />
+    </div>
 
-    <label class="mb-0 ml-auto mr-2">{{ __('Status') }}</label>
-    <gl-loading-icon v-if="isLoadingVulnerability" />
-    <vulnerability-state-dropdown
-      v-else
-      :initial-state="state"
-      @change="onVulnerabilityStateChange"
-    />
-    <loading-button
-      ref="create-issue-btn"
-      class="align-items-center d-inline-flex ml-2"
-      :loading="isCreatingIssue"
-      :label="s__('VulnerabilityManagement|Create issue')"
-      container-class="btn btn-success btn-inverted"
-      @click="createIssue"
-    />
+    <div class="detail-page-header-actions align-items-center">
+      <label class="mb-0 mx-2">{{ __('Status') }}</label>
+      <gl-loading-icon v-if="isLoadingVulnerability" class="d-inline" />
+      <vulnerability-state-dropdown
+        v-else
+        :initial-state="state"
+        @change="onVulnerabilityStateChange"
+      />
+      <loading-button
+        ref="create-issue-btn"
+        class="ml-2"
+        :loading="isCreatingIssue"
+        :label="s__('VulnerabilityManagement|Create issue')"
+        container-class="btn btn-success btn-inverted"
+        @click="createIssue"
+      />
+    </div>
   </div>
 </template>

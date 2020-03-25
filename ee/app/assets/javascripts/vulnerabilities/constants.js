@@ -4,19 +4,19 @@ import { s__ } from '~/locale';
 export const VULNERABILITY_STATES = {
   dismissed: {
     action: 'dismiss',
-    variant: 'light',
+    statusBoxStyle: 'upcoming',
     displayName: s__('VulnerabilityManagement|Dismiss'),
     description: s__('VulnerabilityManagement|Will not fix or a false-positive'),
   },
   confirmed: {
     action: 'confirm',
-    variant: 'danger',
+    statusBoxStyle: 'closed',
     displayName: s__('VulnerabilityManagement|Confirm'),
     description: s__('VulnerabilityManagement|A true-positive and will fix'),
   },
   resolved: {
     action: 'resolve',
-    variant: 'success',
+    statusBoxStyle: 'open',
     displayName: s__('VulnerabilityManagement|Resolved'),
     description: s__('VulnerabilityManagement|Verified as fixed or mitigated'),
   },

@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlBadge } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import * as urlUtility from '~/lib/utils/url_utility';
@@ -34,6 +33,7 @@ describe('Vulnerability management app', () => {
   };
 
   const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
+  const findBadge = () => wrapper.find({ ref: 'badge' });
 
   const createWrapper = (state = 'detected') => {
     wrapper = shallowMount(App, {
@@ -125,13 +125,12 @@ describe('Vulnerability management app', () => {
 
   describe('state badge', () => {
     test.each(vulnerabilityStateEntries)(
-      'the vulnerability state badge has the correct variant for the %s state',
+      'the vulnerability state badge has the correct style for the %s state',
       (stateString, stateObject) => {
         createWrapper(stateString);
-        const badge = wrapper.find(GlBadge);
 
-        expect(badge.attributes('variant')).toBe(stateObject.variant);
-        expect(badge.text()).toBe(stateString);
+        expect(findBadge().classes()).toContain(`status-box-${stateObject.statusBoxStyle}`);
+        expect(findBadge().text()).toBe(stateString);
       },
     );
   });
