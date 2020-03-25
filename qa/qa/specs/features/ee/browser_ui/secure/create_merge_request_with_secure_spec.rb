@@ -3,7 +3,7 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker do
+  context 'Secure', :docker, :runner do
     describe 'Security Reports in a Merge Request' do
       let(:sast_vuln_count) { 5 }
       let(:dependency_scan_vuln_count) { 4 }
@@ -12,7 +12,7 @@ module QA
       let(:remediable_vuln_name) { "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js" }
 
       after do
-        Service::DockerRun::GitlabRunner.new(@executor).remove!
+        @runner.remove_via_api! if @runner
 
         Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
       end
@@ -29,7 +29,7 @@ module QA
           p.initialize_with_readme = true
         end
 
-        Resource::Runner.fabricate! do |runner|
+        @runner = Resource::Runner.fabricate! do |runner|
           runner.project = @project
           runner.name = @executor
           runner.tags = %w[qa test]
