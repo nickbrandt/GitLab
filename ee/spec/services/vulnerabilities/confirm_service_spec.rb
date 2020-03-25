@@ -30,6 +30,12 @@ describe Vulnerabilities::ConfirmService do
       end
     end
 
+    it 'creates note' do
+      expect(SystemNoteService).to receive(:change_vulnerability_state).with(vulnerability, user)
+
+      confirm_vulnerability
+    end
+
     context 'when security dashboard feature is disabled' do
       before do
         stub_licensed_features(security_dashboard: false)

@@ -159,5 +159,10 @@ module EE
     def abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, reason)
       EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author).abort_add_when_pipeline_succeeds(reason)
     end
+
+    # Called when state is changed for 'vulnerability'
+    def change_vulnerability_state(noteable, author)
+      EE::SystemNotes::VulnerabilitiesService.new(noteable: noteable, project: noteable.project, author: author).change_vulnerability_state
+    end
   end
 end

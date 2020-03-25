@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class ConfirmService
+  class ConfirmService < BaseService
     include Gitlab::Allowable
 
-    def initialize(user, vulnerability)
-      @user = user
-      @vulnerability = vulnerability
-    end
-
     def execute
-      raise Gitlab::Access::AccessDeniedError unless can?(@user, :admin_vulnerability, @vulnerability.project)
+      raise Gitlab::Access::AccessDeniedError unless authorized?
 
       @vulnerability.tap do |vulnerability|
-        vulnerability.update(state: Vulnerability.states[:confirmed], confirmed_by: @user, confirmed_at: Time.current)
+        update_with_note(vulnerability, state: Vulnerability.states[:confirmed], confirmed_by: @user, confirmed_at: Time.current)
       end
     end
   end
