@@ -509,6 +509,8 @@ class Project < ApplicationRecord
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
 
+  enum squash_option: [:never, :disabled, :enabled, :always]
+
   chronic_duration_attr :build_timeout_human_readable, :build_timeout,
     default: 3600, error_message: _('Maximum job timeout has a value which could not be accepted')
 
@@ -2200,10 +2202,6 @@ class Project < ApplicationRecord
     else
       :merge
     end
-  end
-
-  def squash_option
-    :always
   end
 
   def squash_value_default
