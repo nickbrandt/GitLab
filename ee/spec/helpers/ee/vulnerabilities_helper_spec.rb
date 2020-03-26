@@ -50,4 +50,16 @@ describe VulnerabilitiesHelper do
       end
     end
   end
+
+  describe '#vulnerability_finding_data' do
+    let(:vulnerability) { create(:vulnerability, :with_findings) }
+    let(:finding) { vulnerability.finding }
+
+    subject { helper.vulnerability_finding_data(finding) }
+
+    it "returns finding information" do
+      expect(subject[:name]).not_to be_nil
+      expect(subject[:description]).not_to be_nil
+    end
+  end
 end
