@@ -39,5 +39,19 @@ FactoryBot.define do
         )
       end
     end
+
+    trait :started do
+      started_at { 'Di 29. Okt 09:51:28 CET 2013' }
+    end
+
+    trait :finished do
+      started
+      finished_at { 'Di 29. Okt 09:53:28 CET 2013' }
+    end
+
+    trait :failed do
+      finished
+      status { 'failed' }
+    end
   end
 end

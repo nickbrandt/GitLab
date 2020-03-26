@@ -47,6 +47,9 @@ module Ci
           # and update the status when the downstream pipeline completes.
           subject.success! unless subject.dependent?
         else
+          # TODO: this is a wrong assignment to just try it.
+          # We may drop with different type of failure reasons according to pipeline.errors
+          subject.description = pipeline.errors.full_messages.join(', ')
           subject.drop!(:downstream_pipeline_creation_failed)
         end
       end
