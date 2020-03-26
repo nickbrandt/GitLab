@@ -17,7 +17,6 @@ class Groups::EpicsController < Groups::ApplicationController
   before_action :verify_group_bulk_edit_enabled!, only: [:bulk_update]
 
   before_action do
-    push_frontend_feature_flag(:roadmap_graphql, @group, default_enabled: true)
     push_frontend_feature_flag(:vue_issuable_epic_sidebar, @group)
   end
 

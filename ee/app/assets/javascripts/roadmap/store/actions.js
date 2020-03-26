@@ -1,11 +1,9 @@
 import flash from '~/flash';
 import { s__ } from '~/locale';
-import axios from '~/lib/utils/axios_utils';
 
 import * as epicUtils from '../utils/epic_utils';
 import * as roadmapItemUtils from '../utils/roadmap_item_utils';
 import {
-  getEpicsPathForPreset,
   getEpicsTimeframeRange,
   sortEpics,
   extendTimeframeForPreset,
@@ -111,18 +109,8 @@ export const receiveEpicsFailure = ({ commit }) => {
   commit(types.RECEIVE_EPICS_FAILURE);
   flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
 };
+
 export const fetchEpics = ({ state, dispatch }) => {
-  dispatch('requestEpics');
-
-  return axios
-    .get(state.initialEpicsPath)
-    .then(({ data }) => {
-      dispatch('receiveEpicsSuccess', { rawEpics: data });
-    })
-    .catch(() => dispatch('receiveEpicsFailure'));
-};
-
-export const fetchEpicsGQL = ({ state, dispatch }) => {
   dispatch('requestEpics');
 
   fetchGroupEpics(state)
@@ -133,31 +121,6 @@ export const fetchEpicsGQL = ({ state, dispatch }) => {
 };
 
 export const fetchEpicsForTimeframe = ({ state, dispatch }, { timeframe }) => {
-  dispatch('requestEpicsForTimeframe');
-
-  const epicsPath = getEpicsPathForPreset({
-    basePath: state.basePath,
-    epicsState: state.epicsState,
-    filterQueryString: state.filterQueryString,
-    presetType: state.presetType,
-    timeframe,
-  });
-
-  return axios
-    .get(epicsPath)
-    .then(({ data }) => {
-      dispatch('receiveEpicsSuccess', {
-        rawEpics: data,
-        newEpic: true,
-        timeframeExtended: true,
-      });
-    })
-    .catch(() => {
-      dispatch('receiveEpicsFailure');
-    });
-};
-
-export const fetchEpicsForTimeframeGQL = ({ state, dispatch }, { timeframe }) => {
   dispatch('requestEpicsForTimeframe');
 
   return fetchGroupEpics(state, timeframe)

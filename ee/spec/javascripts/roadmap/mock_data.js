@@ -350,6 +350,35 @@ export const mockGroupEpicsQueryResponse = {
   },
 };
 
+export const mockGroupEpicsQueryResponseFormatted = [
+  {
+    id: 'gid://gitlab/Epic/40',
+    title: 'Marketing epic',
+    startDate: '2017-12-25',
+    dueDate: '2018-03-09',
+    webUrl: '/groups/gitlab-org/marketing/-/epics/1',
+    group: {
+      name: 'Gitlab Org',
+      fullName: 'Gitlab Org',
+    },
+    groupName: 'Gitlab Org',
+    groupFullName: 'Gitlab Org',
+  },
+  {
+    id: 'gid://gitlab/Epic/41',
+    title: 'Another marketing',
+    startDate: '2017-12-26',
+    dueDate: '2018-03-10',
+    webUrl: '/groups/gitlab-org/marketing/-/epics/2',
+    group: {
+      name: 'Gitlab Org',
+      fullName: 'Gitlab Org',
+    },
+    groupName: 'Gitlab Org',
+    groupFullName: 'Gitlab Org',
+  },
+];
+
 export const mockEpicChildEpicsQueryResponse = {
   data: {
     group: {
