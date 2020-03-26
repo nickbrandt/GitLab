@@ -14,6 +14,6 @@ class AddPartialIndexOnEnabledToStatusPageSettings < ActiveRecord::Migration[6.0
   end
 
   def down
-    remove_concurrent_index :status_page_settings, INDEX_NAME
+    remove_concurrent_index_by_name :status_page_settings, INDEX_NAME
   end
 end
