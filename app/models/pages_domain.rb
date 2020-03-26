@@ -13,6 +13,8 @@ class PagesDomain < ApplicationRecord
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"
   has_many :serverless_domain_clusters, class_name: 'Serverless::DomainCluster', inverse_of: :pages_domain
 
+  before_validation :clear_auto_ssl_fauilure, unless: :auto_ssl_enabled
+
   validates :domain, hostname: { allow_numeric_hostname: true }
   validates :domain, uniqueness: { case_sensitive: false }
   validates :certificate, :key, presence: true, if: :usage_serverless?
@@ -206,6 +208,10 @@ class PagesDomain < ApplicationRecord
     return unless pages_deployed?
 
     Pages::VirtualDomain.new([project], domain: self)
+  end
+
+  def clear_auto_ssl_fauilure
+    self.auto_ssl_failed = false
   end
 
   private
