@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.28.0
+
+- Reject parameters that override upload fields
+
 v 8.27.0
 
 - Remove Set-Cookie header from archive and raw blob responses !475

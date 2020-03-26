@@ -3,7 +3,6 @@ package upload
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -37,8 +36,8 @@ func (a *testFormProcessor) ProcessFile(ctx context.Context, formName string, fi
 }
 
 func (a *testFormProcessor) ProcessField(ctx context.Context, formName string, writer *multipart.Writer) error {
-	if formName != "token" {
-		return errors.New("illegal field")
+	if formName != "token" && !strings.HasPrefix(formName, "file.") && !strings.HasPrefix(formName, "other.") {
+		return fmt.Errorf("illegal field: %v", formName)
 	}
 	return nil
 }
@@ -135,6 +134,14 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			t.Error("Expected to the file to be in tempPath")
 		}
 
+		if r.FormValue("file.remote_url") != "" {
+			t.Error("Expected to receive empty remote_url")
+		}
+
+		if r.FormValue("file.remote_id") != "" {
+			t.Error("Expected to receive empty remote_id")
+		}
+
 		if r.FormValue("file.size") != "4" {
 			t.Error("Expected to receive the file size")
 		}
@@ -152,8 +159,8 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			}
 		}
 
-		if valueCnt := len(r.MultipartForm.Value); valueCnt != 8 {
-			t.Fatal("Expected to receive exactly 8 values but got", valueCnt)
+		if valueCnt := len(r.MultipartForm.Value); valueCnt != 10 {
+			t.Fatal("Expected to receive exactly 10 values but got", valueCnt)
 		}
 
 		w.WriteHeader(202)
@@ -188,18 +195,80 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	testhelper.AssertResponseCode(t, response, 202)
 
 	cancel() // this will trigger an async cleanup
+	waitUntilDeleted(t, filePath)
+}
 
-	// Poll because the file removal is async
-	for i := 0; i < 100; i++ {
-		_, err = os.Stat(filePath)
-		if err != nil {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
+func TestUploadHandlerDetectingInjectedMultiPartData(t *testing.T) {
+	var filePath string
+
+	tempPath, err := ioutil.TempDir("", "uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempPath)
+
+	tests := []struct {
+		name     string
+		field    string
+		response int
+	}{
+		{
+			name:     "injected file.path",
+			field:    "file.path",
+			response: 400,
+		},
+		{
+			name:     "injected file.remote_id",
+			field:    "file.remote_id",
+			response: 400,
+		},
+		{
+			name:     "field with other prefix",
+			field:    "other.path",
+			response: 202,
+		},
 	}
 
-	if !os.IsNotExist(err) {
-		t.Fatal("expected the file to be deleted")
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != "PUT" {
+					t.Fatal("Expected PUT request")
+				}
+
+				w.WriteHeader(202)
+				fmt.Fprint(w, "RESPONSE")
+			})
+
+			var buffer bytes.Buffer
+
+			writer := multipart.NewWriter(&buffer)
+			file, err := writer.CreateFormFile("file", "my.file")
+			if err != nil {
+				t.Fatal(err)
+			}
+			fmt.Fprint(file, "test")
+
+			writer.WriteField(test.field, "value")
+			writer.Close()
+
+			httpRequest, err := http.NewRequest("PUT", ts.URL+"/url/path", &buffer)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			ctx, cancel := context.WithCancel(context.Background())
+			httpRequest = httpRequest.WithContext(ctx)
+			httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+			response := httptest.NewRecorder()
+
+			handler := newProxy(ts.URL)
+			HandleFileUploads(response, httpRequest, handler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
+			testhelper.AssertResponseCode(t, response, test.response)
+
+			cancel() // this will trigger an async cleanup
+			waitUntilDeleted(t, filePath)
+		})
 	}
 }
 
@@ -416,4 +485,21 @@ func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
 func newProxy(url string) *proxy.Proxy {
 	parsedURL := helper.URLMustParse(url)
 	return proxy.NewProxy(parsedURL, "123", roundtripper.NewTestBackendRoundTripper(parsedURL))
+}
+
+func waitUntilDeleted(t *testing.T, path string) {
+	var err error
+
+	// Poll because the file removal is async
+	for i := 0; i < 100; i++ {
+		_, err = os.Stat(path)
+		if err != nil {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	if !os.IsNotExist(err) {
+		t.Fatal("expected the file to be deleted")
+	}
 }
