@@ -9,14 +9,8 @@ module EE
         helpers do
           extend ::Gitlab::Utils::Override
 
-          # rubocop: disable CodeReuse/ActiveRecord
-          def epic
-            @epic ||= user_group.epics.find_by(iid: params[:epic_iid])
-          end
-          # rubocop: enable CodeReuse/ActiveRecord
-
           def authorize_can_read!
-            authorize!(:read_epic, epic)
+            authorize!(:read_epic, user_group)
           end
         end
 
@@ -29,6 +23,7 @@ module EE
           end
           post ":id/epics/:epic_iid/todo" do
             authorize_can_read!
+            epic = find_group_epic(params[:epic_iid])
             todo = ::TodoService.new.mark_todo(epic, current_user).first
 
             if todo

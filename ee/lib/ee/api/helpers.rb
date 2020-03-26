@@ -104,12 +104,9 @@ module EE
         end
       end
 
-      override :find_project_issue
       # rubocop: disable CodeReuse/ActiveRecord
-      def find_project_issue(iid, project_id = nil)
-        project = project_id ? find_project!(project_id) : user_project
-
-        ::IssuesFinder.new(current_user, project_id: project.id).find_by!(iid: iid)
+      def find_group_epic(iid)
+        EpicsFinder.new(current_user, group_id: user_group.id).find_by!(iid: iid)
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
