@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Packages::GoModule
-  SEMVER_TAG_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([-.a-z0-9]+))?(?:\+([-.a-z0-9]+))?$/i.freeze
-
-  # belongs_to :project
-
   attr_reader :project, :name, :path
 
   def initialize(project, name)
@@ -23,13 +19,21 @@ class Packages::GoModule
 
   def versions
     @versions ||= @project.repository.tags
-      .filter { |tag| SEMVER_TAG_REGEX.match?(tag.name) && !tag.dereferenced_target.nil? }
+      .filter { |tag| ::Packages::GoModuleVersion.semver? tag }
       .map    { |tag| ::Packages::GoModuleVersion.new self, tag }
       .filter { |ver| ver.valid? }
   end
 
   def find_version(name)
-    versions.filter { |ver| ver.name == name }.first
+    if ::Packages::GoModuleVersion.pseudo_version? name
+      begin
+        ::Packages::GoModuleVersion.new self, name
+      rescue ArgumentError
+        nil
+      end
+    else
+      versions.filter { |ver| ver.name == name }.first
+    end
   end
 
   private

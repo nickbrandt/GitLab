@@ -23,11 +23,11 @@ describe API::GoProxy do
     create_version(1, 0, 1, create_module)
     create_version(1, 0, 2, create_package('pkg'))
     create_version(1, 0, 3, create_module('mod'))
-                            create_module('v2')
+    sha1 =                  create_file('y.go', "package a\n")
+    sha2 =                  create_module('v2')
     create_version(2, 0, 0, create_file('v2/x.go', "package a\n"))
-                            create_file('v2/y.go', "package a\n") # todo tag this v1.0.4
 
-    project.repository.head_commit
+    { sha: [sha1, sha2] }
   end
 
   context 'with an invalid module directive' do
@@ -73,7 +73,7 @@ describe API::GoProxy do
         let(:module_name) { base }
         let(:resource) { "v1.0.0.info" }
 
-        it 'returns 404' do
+        it 'returns not found' do
           get_resource(user)
 
           expect(response).to have_gitlab_http_status(:not_found)
@@ -84,7 +84,7 @@ describe API::GoProxy do
         let(:module_name) { "#{base}/v2" }
         let(:resource) { "v2.0.0.info" }
 
-        it 'returns 404' do
+        it 'returns not found' do
           get_resource(user)
 
           expect(response).to have_gitlab_http_status(:not_found)
@@ -122,7 +122,7 @@ describe API::GoProxy do
       context 'without a case encoded path' do
         let(:module_name) { base.downcase }
 
-        it 'returns 404' do
+        it 'returns not found' do
           get_resource(user)
 
           expect(response).to have_gitlab_http_status(:not_found)
@@ -212,44 +212,46 @@ describe API::GoProxy do
   end
 
   describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.info' do
+    let(:resource) { "#{version}.info" }
+
     context 'with the root module v1.0.1' do
       let(:module_name) { base }
-      let(:resource) { "v1.0.1.info" }
+      let(:version) { "v1.0.1" }
 
       it 'returns correct information' do
         get_resource(user)
 
-        expect_module_version_info('v1.0.1')
+        expect_module_version_info(version)
       end
     end
 
     context 'with the submodule v1.0.3' do
       let(:module_name) { "#{base}/mod" }
-      let(:resource) { "v1.0.3.info" }
+      let(:version) { "v1.0.3" }
 
       it 'returns correct information' do
         get_resource(user)
 
-        expect_module_version_info('v1.0.3')
+        expect_module_version_info(version)
       end
     end
 
     context 'with the root module v2.0.0' do
       let(:module_name) { "#{base}/v2" }
-      let(:resource) { "v2.0.0.info" }
+      let(:version) { "v2.0.0" }
 
       it 'returns correct information' do
         get_resource(user)
 
-        expect_module_version_info('v2.0.0')
+        expect_module_version_info(version)
       end
     end
 
     context 'with an invalid path' do
       let(:module_name) { "#{base}/pkg" }
-      let(:resource) { "v1.0.3.info" }
+      let(:version) { "v1.0.3" }
 
-      it 'returns 404' do
+      it 'returns not found' do
         get_resource(user)
 
         expect(response).to have_gitlab_http_status(:not_found)
@@ -258,9 +260,75 @@ describe API::GoProxy do
 
     context 'with an invalid version' do
       let(:module_name) { "#{base}/mod" }
-      let(:resource) { "v1.0.1.info" }
+      let(:version) { "v1.0.1" }
 
-      it 'returns 404' do
+      it 'returns not found' do
+        get_resource(user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'with a pseudo-version for v1' do
+      let(:module_name) { base }
+      let(:commit) { project.repository.commit_by(oid: modules[:sha][0]) }
+      let(:version) { "v1.0.4-0.#{commit.committed_date.strftime('%Y%m%d%H%M%S')}-#{commit.sha[0..11]}" }
+
+      it 'returns the correct commit' do
+        get_resource(user)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to be_kind_of(Hash)
+        expect(json_response['Version']).to eq(version)
+        expect(json_response['Time']).to eq(commit.committed_date.strftime '%Y-%m-%dT%H:%M:%S.%L%:z')
+      end
+    end
+
+    context 'with a pseudo-version for v2' do
+      let(:module_name) { "#{base}/v2" }
+      let(:commit) { project.repository.commit_by(oid: modules[:sha][1]) }
+      let(:version) { "v2.0.0-#{commit.committed_date.strftime('%Y%m%d%H%M%S')}-#{commit.sha[0..11]}" }
+
+      it 'returns the correct commit' do
+        get_resource(user)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to be_kind_of(Hash)
+        expect(json_response['Version']).to eq(version)
+        expect(json_response['Time']).to eq(commit.committed_date.strftime '%Y-%m-%dT%H:%M:%S.%L%:z')
+      end
+    end
+
+    context 'with a pseudo-version with an invalid timestamp' do
+      let(:module_name) { base }
+      let(:commit) { project.repository.commit_by(oid: modules[:sha][0]) }
+      let(:version) { "v1.0.4-0.00000000000000-#{commit.sha[0..11]}" }
+
+      it 'returns not found' do
+        get_resource(user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'with a pseudo-version with an invalid commit sha' do
+      let(:module_name) { base }
+      let(:commit) { project.repository.commit_by(oid: modules[:sha][0]) }
+      let(:version) { "v1.0.4-0.#{commit.committed_date.strftime('%Y%m%d%H%M%S')}-000000000000" }
+
+      it 'returns not found' do
+        get_resource(user)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'with a pseudo-version with a short commit sha' do
+      let(:module_name) { base }
+      let(:commit) { project.repository.commit_by(oid: modules[:sha][0]) }
+      let(:version) { "v1.0.4-0.#{commit.committed_date.strftime('%Y%m%d%H%M%S')}-#{commit.sha[0..10]}" }
+
+      it 'returns not found' do
         get_resource(user)
 
         expect(response).to have_gitlab_http_status(:not_found)
@@ -269,9 +337,11 @@ describe API::GoProxy do
   end
 
   describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.mod' do
+    let(:resource) { "#{version}.mod" }
+
     context 'with the root module v1.0.1' do
       let(:module_name) { base }
-      let(:resource) { "v1.0.1.mod" }
+      let(:version) { "v1.0.1" }
 
       it 'returns correct content' do
         get_resource(user)
@@ -282,7 +352,7 @@ describe API::GoProxy do
 
     context 'with the submodule v1.0.3' do
       let(:module_name) { "#{base}/mod" }
-      let(:resource) { "v1.0.3.mod" }
+      let(:version) { "v1.0.3" }
 
       it 'returns correct content' do
         get_resource(user)
@@ -293,7 +363,7 @@ describe API::GoProxy do
 
     context 'with the root module v2.0.0' do
       let(:module_name) { "#{base}/v2" }
-      let(:resource) { "v2.0.0.mod" }
+      let(:version) { "v2.0.0" }
 
       it 'returns correct content' do
         get_resource(user)
@@ -304,9 +374,9 @@ describe API::GoProxy do
 
     context 'with an invalid path' do
       let(:module_name) { "#{base}/pkg" }
-      let(:resource) { "v1.0.3.mod" }
+      let(:version) { "v1.0.3" }
 
-      it 'returns 404' do
+      it 'returns not found' do
         get_resource(user)
 
         expect(response).to have_gitlab_http_status(:not_found)
@@ -315,9 +385,9 @@ describe API::GoProxy do
 
     context 'with an invalid version' do
       let(:module_name) { "#{base}/mod" }
-      let(:resource) { "v1.0.1.mod" }
+      let(:version) { "v1.0.1" }
 
-      it 'returns 404' do
+      it 'returns not found' do
         get_resource(user)
 
         expect(response).to have_gitlab_http_status(:not_found)
@@ -326,58 +396,60 @@ describe API::GoProxy do
   end
 
   describe 'GET /projects/:id/packages/go/*module_name/@v/:module_version.zip' do
+    let(:resource) { "#{version}.zip" }
+
     context 'with the root module v1.0.1' do
       let(:module_name) { base }
-      let(:resource) { "v1.0.1.zip" }
+      let(:version) { "v1.0.1" }
 
       it 'returns a zip of everything' do
         get_resource(user)
 
-        expect_module_version_zip(module_name, 'v1.0.1', ['README.md', 'go.mod', 'a.go'])
+        expect_module_version_zip(module_name, version, ['README.md', 'go.mod', 'a.go'])
       end
     end
 
     context 'with the root module v1.0.2' do
       let(:module_name) { base }
-      let(:resource) { "v1.0.2.zip" }
+      let(:version) { "v1.0.2" }
 
       it 'returns a zip of everything' do
         get_resource(user)
 
-        expect_module_version_zip(module_name, 'v1.0.2', ['README.md', 'go.mod', 'a.go', 'pkg/b.go'])
+        expect_module_version_zip(module_name, version, ['README.md', 'go.mod', 'a.go', 'pkg/b.go'])
       end
     end
 
     context 'with the root module v1.0.3' do
       let(:module_name) { base }
-      let(:resource) { "v1.0.3.zip" }
+      let(:version) { "v1.0.3" }
 
       it 'returns a zip of everything, excluding the submodule' do
         get_resource(user)
 
-        expect_module_version_zip(module_name, 'v1.0.3', ['README.md', 'go.mod', 'a.go', 'pkg/b.go'])
+        expect_module_version_zip(module_name, version, ['README.md', 'go.mod', 'a.go', 'pkg/b.go'])
       end
     end
 
     context 'with the submodule v1.0.3' do
       let(:module_name) { "#{base}/mod" }
-      let(:resource) { "v1.0.3.zip" }
+      let(:version) { "v1.0.3" }
 
       it 'returns a zip of the submodule' do
         get_resource(user)
 
-        expect_module_version_zip(module_name, 'v1.0.3', ['go.mod', 'a.go'])
+        expect_module_version_zip(module_name, version, ['go.mod', 'a.go'])
       end
     end
 
     context 'with the root module v2.0.0' do
       let(:module_name) { "#{base}/v2" }
-      let(:resource) { "v2.0.0.zip" }
+      let(:version) { "v2.0.0" }
 
       it 'returns a zip of v2 of the root module' do
         get_resource(user)
 
-        expect_module_version_zip(module_name, 'v2.0.0', ['go.mod', 'a.go', 'x.go'])
+        expect_module_version_zip(module_name, version, ['go.mod', 'a.go', 'x.go'])
       end
     end
   end
@@ -402,29 +474,29 @@ describe API::GoProxy do
   end
 
   shared_examples 'a module that requires auth' do
-    it 'returns 200 with oauth token' do
+    it 'returns ok with oauth token' do
       get_resource(access_token: oauth.token)
       expect(response).to have_gitlab_http_status(:ok)
     end
 
-    it 'returns 200 with job token' do
+    it 'returns ok with job token' do
       get_resource(job_token: job.token)
       expect(response).to have_gitlab_http_status(:ok)
     end
 
-    it 'returns 200 with personal access token' do
+    it 'returns ok with personal access token' do
       get_resource(personal_access_token: pa_token)
       expect(response).to have_gitlab_http_status(:ok)
     end
 
-    it 'returns 404 with no authentication' do
+    it 'returns not found with no authentication' do
       get_resource
       expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
   shared_examples 'a module that does not require auth' do
-    it 'returns 200 with no authentication' do
+    it 'returns ok with no authentication' do
       get_resource
       expect(response).to have_gitlab_http_status(:ok)
     end
@@ -499,12 +571,12 @@ describe API::GoProxy do
   end
 
   def expect_module_version_info(version)
-    # time = project.repository.find_tag(version).dereferenced_target.committed_date
+    time = project.repository.find_tag(version).dereferenced_target.committed_date
 
     expect(response).to have_gitlab_http_status(:ok)
     expect(json_response).to be_kind_of(Hash)
     expect(json_response['Version']).to eq(version)
-    # expect(Date.parse json_response['Time']).to eq(time)
+    expect(json_response['Time']).to eq(time.strftime '%Y-%m-%dT%H:%M:%S.%L%:z')
   end
 
   def expect_module_version_mod(name)

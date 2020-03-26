@@ -28,7 +28,7 @@ module API
         mod = find_module
 
         ver = mod.find_version case_decode params[:module_version]
-        not_found! unless ver
+        not_found! unless ver&.valid?
 
         ver
       end

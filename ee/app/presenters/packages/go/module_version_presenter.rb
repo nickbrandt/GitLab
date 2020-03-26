@@ -12,7 +12,7 @@ module Packages
       end
 
       def time
-        @version.tag.dereferenced_target.committed_date
+        @version.commit.committed_date
       end
     end
   end
