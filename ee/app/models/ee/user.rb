@@ -231,8 +231,9 @@ module EE
 
     def has_paid_namespace?
       ::Namespace
-        .from("(#{namespace_union_for_reporter_developer_maintainer_owned(:plan_id)}) #{::Namespace.table_name}")
-        .where(plan_id: Plan.where(name: Plan::PAID_HOSTED_PLANS).select(:id))
+        .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { hosted_plan_id: Plan.where(name: Plan::PAID_HOSTED_PLANS) })
         .any?
     end
 
