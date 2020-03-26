@@ -37,10 +37,10 @@ export default {
       required: false,
       default: null,
     },
-    isLoading: {
+    isUploading: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
   },
   data() {

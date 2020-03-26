@@ -269,7 +269,7 @@ export default {
         </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
           <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
-            ><design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)"
+            ><design v-bind="design" :is-uploading="isDesignToBeSaved(design.filename)"
           /></design-dropzone>
 
           <input
