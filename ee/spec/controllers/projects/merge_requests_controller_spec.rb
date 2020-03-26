@@ -90,6 +90,29 @@ shared_examples 'approvals' do
   end
 end
 
+shared_examples 'authorize read pipeline' do
+  context 'public project with private builds' do
+    let(:comparison_status) { {} }
+    let(:project) { create(:project, :public, :builds_private) }
+
+    it 'restricts access to signed out users' do
+      sign_out user
+
+      subject
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
+
+    it 'restricts access to other users' do
+      sign_in create(:user)
+
+      subject
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
+  end
+end
+
 describe Projects::MergeRequestsController do
   include ProjectForksHelper
 
@@ -462,20 +485,7 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'public project with private builds' do
-      let(:comparison_status) { {} }
-      let(:project) { create(:project, :public, :builds_private) }
-
-      before do
-        sign_out user
-      end
-
-      it 'restricts unauthorized access' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
+    it_behaves_like 'authorize read pipeline'
   end
 
   describe 'GET #container_scanning_reports' do
@@ -545,20 +555,7 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'public project with private builds' do
-      let(:comparison_status) { {} }
-      let(:project) { create(:project, :public, :builds_private) }
-
-      before do
-        sign_out user
-      end
-
-      it 'restricts unauthorized access' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
+    it_behaves_like 'authorize read pipeline'
   end
 
   describe 'GET #sast_reports' do
@@ -628,20 +625,7 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'public project with private builds' do
-      let(:comparison_status) { {} }
-      let(:project) { create(:project, :public, :builds_private) }
-
-      before do
-        sign_out user
-      end
-
-      it 'restricts unauthorized access' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
+    it_behaves_like 'authorize read pipeline'
   end
 
   describe 'GET #dast_reports' do
@@ -711,26 +695,7 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'public project with private builds' do
-      let(:comparison_status) { {} }
-      let(:project) { create(:project, :public, :builds_private) }
-
-      it 'restricts access to signed out users' do
-        sign_out user
-
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-
-      it 'restricts access to other users' do
-        sign_in create(:user)
-
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
+    it_behaves_like 'authorize read pipeline'
   end
 
   describe 'GET #license_management_reports' do
@@ -868,6 +833,8 @@ describe Projects::MergeRequestsController do
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse test reports' })
       end
     end
+
+    it_behaves_like 'authorize read pipeline'
   end
 
   it_behaves_like DescriptionDiffActions do
