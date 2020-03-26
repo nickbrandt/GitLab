@@ -4,7 +4,7 @@
 - page_title @vulnerability.title
 - page_description @vulnerability.description
 
-#js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline) }
+#js-vulnerability-management-app{ data: vulnerability_data(@vulnerability, @pipeline, current_user: @current_user) }
 
 .issue-details.issuable-details
   .detail-page-description

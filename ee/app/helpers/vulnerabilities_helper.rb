@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module VulnerabilitiesHelper
-  def vulnerability_data(vulnerability, pipeline)
+  def vulnerability_data(vulnerability, pipeline, current_user: nil)
     return unless vulnerability
 
     {
@@ -9,10 +9,9 @@ module VulnerabilitiesHelper
       project_fingerprint: vulnerability.finding.project_fingerprint,
       create_issue_url: create_vulnerability_feedback_issue_path(vulnerability.finding.project),
       pipeline_json: vulnerability_pipeline_data(pipeline).to_json,
-      finding: Vulnerabilities::OccurrenceSerializer.new({}).represent(@vulnerability.finding).to_json,
-      has_mr: !!@vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
+      has_mr: !!vulnerability.finding.merge_request_feedback.try(:merge_request_iid),
       vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
-      finding_json: vulnerability_finding_data(vulnerability.finding).to_json
+      finding_json: vulnerability_finding_data(vulnerability.finding, current_user: current_user).to_json
     }
   end
 
