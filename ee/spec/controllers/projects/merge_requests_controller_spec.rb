@@ -734,7 +734,7 @@ describe Projects::MergeRequestsController do
   end
 
   describe 'GET #license_management_reports' do
-    let(:merge_request) { create(:ee_merge_request, :with_license_management_reports, source_project: project, author: create(:user)) }
+    let(:merge_request) { create(:ee_merge_request, :with_license_scanning_reports, source_project: project, author: create(:user)) }
     let(:params) do
       {
         namespace_id: project.namespace.to_param,
