@@ -159,11 +159,11 @@ export default {
       :illustrations="loadingErrorIllustrations"
     />
     <template v-else>
+      <vulnerability-count-list v-if="shouldShowCountList" />
+
       <header>
         <filters />
       </header>
-
-      <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
 
       <div class="row mt-4">
         <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
