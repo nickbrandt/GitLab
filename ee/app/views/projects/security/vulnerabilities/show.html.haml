@@ -26,12 +26,16 @@
             %li= _("Namespace: %{namespace}") % { namespace: location['operating_system'] }
 
         - if location['file']
-          %h3= _('File Location')
+          %h3= _('Location')
           %ul
             %li
-              - link_text = _("%{file}:%{line}") % { file: location['file'], line: location['start_line'] }
+              - link_text = _("%{file}") % { file: location['file'] }
+              - offset = _('')
+              - if location['start_line']
+                - link_text = _("%{link_text}:%{line}") % { link_text: link_text, line: location['start_line'] }
+                - offset = _("#L%{start_line}") % { start_line: location['start_line'] }
               File: 
-              %a{ href: fast_project_blob_path(@project, tree_join(@vulnerability.project.default_branch, location['file'])),
+              %a{ href: project_blob_path(@project, tree_join(@vulnerability.project.default_branch, location['file'])) + offset,
                 target: '_blank', rel: 'noopener noreferrer' }= link_text
             - if location['class']
               %li= _("Class: %{className}") % { className: location['class'] }

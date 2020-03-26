@@ -305,6 +305,9 @@ msgstr ""
 msgid "%{filePath} deleted"
 msgstr ""
 
+msgid "%{file}:%{line}"
+msgstr ""
+
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
@@ -363,6 +366,9 @@ msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
 msgid "%{mergeLength}/%{usersLength} can merge"
+msgstr ""
+
+msgid "%{method}"
 msgstr ""
 
 msgid "%{mrText}, this issue will be closed automatically."
@@ -4001,7 +4007,7 @@ msgstr ""
 msgid "Class"
 msgstr ""
 
-msgid "Class: %{className}::%{method}"
+msgid "Class: %{className}"
 msgstr ""
 
 msgid "Classification Label (optional)"
@@ -9003,9 +9009,6 @@ msgid "File templates"
 msgstr ""
 
 msgid "File upload error."
-msgstr ""
-
-msgid "File: %{file}:%{line}"
 msgstr ""
 
 msgid "Files"
