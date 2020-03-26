@@ -1,7 +1,7 @@
 import createState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 import * as getters from 'ee/security_dashboard/store/modules/vulnerabilities/getters';
-import mockHistoryData from '../vulnerabilities/data/mock_data_vulnerabilities_history.json';
+import mockHistoryData from './data/mock_data_vulnerabilities_history.json';
 
 describe('vulnerabilities module getters', () => {
   describe('dashboardError', () => {
@@ -65,16 +65,26 @@ describe('vulnerabilities module getters', () => {
         getters.getVulnerabilityHistoryByName(state)(name);
       return { getVulnerabilityHistoryByName };
     };
+    const realDate = Date;
 
     beforeEach(() => {
       state = createState();
       state.vulnerabilitiesHistory = mockHistoryData;
-      jasmine.clock().install();
-      jasmine.clock().mockDate(new Date(2019, 1, 2));
+      jest.useFakeTimers();
+      const currentDate = new Date(2019, 1, 2);
+      global.Date = class extends Date {
+        constructor(date) {
+          if (date) {
+            // eslint-disable-next-line constructor-super
+            return super(date);
+          }
+          return currentDate;
+        }
+      };
     });
 
-    afterEach(function() {
-      jasmine.clock().uninstall();
+    afterEach(() => {
+      global.Date = realDate;
     });
 
     it('should filter the data to the last 30 days and days we have data for', () => {
