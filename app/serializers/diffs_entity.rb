@@ -85,16 +85,15 @@ class DiffsEntity < Grape::Entity
     end
   end
 
-  def commits(id)
-    commit_ids.each_cons(3) do |prev_commit, commit, next_commit|
-      { prev_commit_id: prev_commit, next_commit_id: next_commit } if commit == id
-    end
+  def commit_with_neighbors(id)
+    commits = commit_ids.each_cons(3).find { |prev_commit, commit, next_commit| commit == id }
+    { prev_commit_id: commits.first, next_commit_id: commits.last } if commits
   end
 
   def commit_options(options)
-    neighbors = commits(options[:commit].id)
-    prev_commit_id = neighbors.try(:prev_commit_id)
-    next_commit_id = neighbors.try(:next_commit_id)
+    neighbors = commit_with_neighbors(options[:commit]&.id)
+    prev_commit_id = neighbors&.dig(:prev_commit_id)
+    next_commit_id = neighbors&.dig(:next_commit_id)
 
     options.merge(
       type: :full,

@@ -28,8 +28,8 @@ describe DiffsEntity do
     end
 
     context "when a commit_id is passed" do
-      let(:commits) { merge_request.commits }
-      let(:commit) { commits.sample }
+      let(:commits) { [nil] + merge_request.commits + [nil] }
+      let(:commit) { commits.compact.sample }
       let(:entity) do
         described_class.new(merge_request_diffs.first.diffs, request: request, merge_request: merge_request, merge_request_diffs: merge_request_diffs, commit: commit)
       end
