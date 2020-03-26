@@ -3,6 +3,8 @@
 module Elastic
   module Latest
     module GitClassProxy
+      SHA_REGEX = /\A[0-9a-f]{5,40}\z/i.freeze
+
       def elastic_search(query, type: :all, page: 1, per: 20, options: {})
         results = { blobs: [], commits: [] }
 
@@ -41,13 +43,15 @@ module Elastic
 
         fields = %w(message^10 sha^5 author.name^2 author.email^2 committer.name committer.email).map {|i| "commit.#{i}"}
 
+        query_with_prefix = query.split(/\s+/).map { |s| s.gsub(SHA_REGEX) { |sha| "#{sha}*" } }.join(' ')
+
         query_hash = {
           query: {
             bool: {
               must: {
                 simple_query_string: {
                   fields: fields,
-                  query: query,
+                  query: query_with_prefix,
                   default_operator: :and
                 }
               },
