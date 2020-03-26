@@ -181,7 +181,7 @@ export const mapStrategiesToRails = params => ({
       name: s.name,
       parameters: s.parameters,
       _destroy: s.shouldBeDestroyed,
-      scopes: mapStrategyScopesToRails(s.scopes || []),
+      scopes_attributes: mapStrategyScopesToRails(s.scopes || []),
     })),
   },
 });

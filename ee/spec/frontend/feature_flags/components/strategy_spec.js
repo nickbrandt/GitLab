@@ -142,7 +142,7 @@ describe('Feature flags strategy', () => {
                 name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 parameters: { percentage: '50', groupId: PERCENT_ROLLOUT_GROUP_ID },
                 scopes: [
-                  { environmentScope: '*', shouldDestroy: true },
+                  { environmentScope: '*', shouldBeDestroyed: true },
                   { environmentScope: 'production' },
                 ],
               },

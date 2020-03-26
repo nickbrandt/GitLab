@@ -413,7 +413,7 @@ describe('feature flags helpers spec', () => {
               name: 'default',
               parameters: {},
               _destroy: true,
-              scopes: [
+              scopes_attributes: [
                 {
                   environment_scope: '*',
                   id: '1',
@@ -450,7 +450,7 @@ describe('feature flags helpers spec', () => {
               id: '1',
               name: 'default',
               parameters: {},
-              scopes: [
+              scopes_attributes: [
                 {
                   environment_scope: '*',
                 },
