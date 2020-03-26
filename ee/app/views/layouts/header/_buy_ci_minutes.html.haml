@@ -1,0 +1,6 @@
+- return unless show_buy_ci_minutes?
+
+%li
+  = link_to profile_pipeline_quota_path, class: 'ci-minutes-emoji' do
+    = s_("CurrentUser|Buy CI minutes")
+    = emoji_icon('clock9')
