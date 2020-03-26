@@ -12,22 +12,22 @@ function createFooterApp() {
   const { vulnerabilityFeedbackHelpPath, hasMr } = el.dataset;
   const vulnerability = JSON.parse(el.dataset.vulnerabilityJson);
   const finding = JSON.parse(el.dataset.findingJson);
-  const remediation = finding.solution;
+  const { issue_feedback: feedback, remediation, solution } = finding;
   const hasDownload = Boolean(
     vulnerability.state !== 'resolved' && remediation?.diff?.length && !hasMr,
   );
 
   const props = {
     solutionInfo: {
-      solution: finding.solution,
-      remediation: finding.solution,
+      solution,
+      remediation,
       hasDownload,
       hasMr,
       hasRemediation: Boolean(remediation),
       vulnerabilityFeedbackHelpPath,
       isStandaloneVulnerability: true,
     },
-    feedback: finding.feedback,
+    feedback,
     project: {
       url: finding.project.full_path,
       value: finding.project.full_name,

@@ -35,8 +35,9 @@ module VulnerabilitiesHelper
       links: occurrence[:links],
       location: occurrence[:location],
       name: occurrence[:name],
-      solution: remediation ? remediation['summary'] : occurrence[:solution],
-      feedback: occurrence[:issue_feedback],
+      solution: occurrence[:solution],
+      remediation: remediation,
+      issue_feedback: occurrence[:issue_feedback],
       project: occurrence[:project]
     }
   end
