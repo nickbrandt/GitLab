@@ -70,13 +70,13 @@ export default {
     fetchAlertData() {
       this.isLoading = true;
 
-      const queriesWithAlerts = this.relevantQueries.filter(query => query.alert_path);
+      const queriesWithAlerts = this.relevantQueries.filter(query => query.alert_defined);
 
       return Promise.all(
         queriesWithAlerts.map(query =>
           this.service
             .readAlert(query.alert_path)
-            .then(alertAttributes => this.setAlert(alertAttributes, query.metricKey)),
+            .then(alertAttributes => this.setAlert(alertAttributes, query.metricId)),
         ),
       )
         .then(() => {
@@ -111,9 +111,11 @@ export default {
     },
     handleCreate({ operator, threshold, prometheus_metric_id }) {
       const newAlert = { operator, threshold, prometheus_metric_id };
+      const metric = this.relevantQueries.find(({ metricId }) => metricId === prometheus_metric_id);
+
       this.isLoading = true;
       this.service
-        .createAlert(newAlert)
+        .createAlert(metric.alert_path, newAlert)
         .then(alertAttributes => {
           this.setAlert(alertAttributes, prometheus_metric_id);
           this.isLoading = false;
