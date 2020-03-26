@@ -5,7 +5,7 @@ describe Packages::Npm::CreatePackageService do
   let(:namespace) {create(:namespace)}
   let(:project) { create(:project, namespace: namespace) }
   let(:user) { create(:user) }
-  let(:version) { '1.0.1'.freeze }
+  let(:version) { '1.0.1' }
 
   let(:params) do
     JSON.parse(
@@ -37,7 +37,6 @@ describe Packages::Npm::CreatePackageService do
       expect(package.version).to eq(version)
     end
 
-    it { is_expected.to be_valid }
     it { expect(subject.name).to eq(package_name) }
     it { expect(subject.version).to eq(version) }
   end
@@ -76,6 +75,24 @@ describe Packages::Npm::CreatePackageService do
 
       it { expect(subject[:http_status]).to eq 400 }
       it { expect(subject[:message]).to eq 'Version is empty.' }
+    end
+
+    context 'with invalid versions' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:version) do
+        [
+          '1',
+          '1.2',
+          '1./2.3',
+          '../../../../../1.2.3',
+          '%2e%2e%2f1.2.3'
+        ]
+      end
+
+      with_them do
+        it { expect { subject }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Version is invalid') }
+      end
     end
   end
 end
