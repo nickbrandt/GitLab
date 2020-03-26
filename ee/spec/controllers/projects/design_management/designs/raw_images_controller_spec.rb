@@ -52,6 +52,8 @@ describe Projects::DesignManagement::Designs::RawImagesController do
         expect(response).to have_gitlab_http_status(:ok)
       end
 
+      it_behaves_like 'project cache control headers'
+
       context 'when the user does not have permission' do
         let_it_be(:viewer) { create(:user) }
 
