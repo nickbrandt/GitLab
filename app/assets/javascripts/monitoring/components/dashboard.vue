@@ -184,6 +184,8 @@ export default {
       required: false,
       default: false,
     },
+    // `alertsEndpoint` prop should be removed as it is not used
+    // https://gitlab.com/gitlab-org/gitlab/-/issues/212534
     alertsEndpoint: {
       type: String,
       required: false,
@@ -591,7 +593,6 @@ export default {
               <panel-type
                 :clipboard-text="generateLink(groupData.group, graphData.title, graphData.y_label)"
                 :graph-data="graphData"
-                :alerts-endpoint="alertsEndpoint"
                 :prometheus-alerts-available="prometheusAlertsAvailable"
                 :index="`${index}-${graphIndex}`"
                 @timerangezoom="onTimeRangeZoom"
