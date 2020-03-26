@@ -33,7 +33,7 @@ describe Gitlab::RepositorySizeErrorMessage do
         end
 
         it 'returns the correct message' do
-          expect(message.push_error(15.megabytes))
+          expect(message.push_error(10.megabytes))
             .to eq("Your push has been rejected, #{rejection_message}. #{message.more_info_message}")
         end
       end

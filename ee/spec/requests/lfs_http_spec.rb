@@ -52,15 +52,15 @@ describe 'Git LFS API and storage' do
             allow_next_instance_of(Gitlab::RepositorySizeChecker) do |checker|
               allow(checker).to receive_messages(
                 enabled?: true,
-                current_size: 100.megabytes,
-                limit: 99.megabytes
+                current_size: 110.megabytes,
+                limit: 100.megabytes
               )
             end
           end
 
           it 'responds with status 406' do
             expect(response).to have_gitlab_http_status(:not_acceptable)
-            expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 99 MB by 1 MB. Please contact your GitLab administrator for more information.')
+            expect(json_response['message']).to eql('Your push has been rejected, because this repository has exceeded its size limit of 100 MB by 160 MB. Please contact your GitLab administrator for more information.')
           end
         end
 
