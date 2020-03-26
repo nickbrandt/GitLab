@@ -63,6 +63,11 @@ input AdminSidekiqQueuesDeleteJobsInput {
   queueName: String!
 
   """
+  Delete jobs matching related_class in the context metadata
+  """
+  relatedClass: String
+
+  """
   Delete jobs matching root_namespace in the context metadata
   """
   rootNamespace: String
