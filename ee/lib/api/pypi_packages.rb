@@ -41,7 +41,7 @@ module API
         end
 
         params do
-          requires :file_identifier, type: String, desc: 'The PyPi package file identifier', regexp: API::NO_SLASH_URL_PART_REGEX
+          requires :file_identifier, type: String, desc: 'The PyPi package file identifier', file_path: true
         end
 
         get 'files/*file_identifier', :txt do
@@ -53,7 +53,7 @@ module API
         end
 
         params do
-          requires :package_name, type: String, desc: 'The PyPi package name', regexp: API::NO_SLASH_URL_PART_REGEX
+          requires :package_name, type: String, file_path: true, desc: 'The PyPi package name'
         end
 
         get 'simple/*package_name', format: :txt do
