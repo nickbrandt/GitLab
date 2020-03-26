@@ -102,6 +102,22 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
 
     relation = relation.where('import_state.next_execution_timestamp > ?', offset_at) if offset_at
 
+    if check_mirror_plans_in_query?
+      root_namespaces_sql = Gitlab::ObjectHierarchy
+        .new(Namespace.where('id = projects.namespace_id'))
+        .roots
+        .select(:id)
+        .to_sql
+
+      root_namespaces_join = "INNER JOIN namespaces AS root_namespaces ON root_namespaces.id = (#{root_namespaces_sql})"
+
+      relation = relation
+        .joins(root_namespaces_join)
+        .joins('LEFT JOIN gitlab_subscriptions ON gitlab_subscriptions.namespace_id = root_namespaces.id')
+        .joins('LEFT JOIN plans ON plans.id = gitlab_subscriptions.hosted_plan_id')
+        .where(['plans.name IN (?) OR projects.visibility_level = ?', ::Plan::ALL_HOSTED_PLANS, ::Gitlab::VisibilityLevel::PUBLIC])
+    end
+
     relation
   end
   # rubocop: enable CodeReuse/ActiveRecord
@@ -112,5 +128,10 @@ class UpdateAllMirrorsWorker # rubocop:disable Scalability/IdempotentWorker
       arguments_proc: -> (project) { project.id },
       context_proc: -> (project) { { project: project } }
     )
+  end
+
+  def check_mirror_plans_in_query?
+    ::Gitlab::CurrentSettings.should_check_namespace_plan? &&
+      !::Feature.enabled?(:free_period_for_pull_mirroring, default_enabled: true)
   end
 end
