@@ -20032,6 +20032,9 @@ msgstr ""
 msgid "The vulnerability is no longer detected. Verify the vulnerability has been fixed or removed before changing its status."
 msgstr ""
 
+msgid "The vulnerability is no longer detected. Verify the vulnerability has been remediated before changing its status."
+msgstr ""
+
 msgid "There are no GPG keys associated with this account."
 msgstr ""
 
@@ -22439,6 +22442,12 @@ msgid "Vulnerability List"
 msgstr ""
 
 msgid "Vulnerability remediated. Review before resolving."
+msgstr ""
+
+msgid "Vulnerability resolved in %{branch}"
+msgstr ""
+
+msgid "Vulnerability resolved in the default branch"
 msgstr ""
 
 msgid "Vulnerability-Check"
