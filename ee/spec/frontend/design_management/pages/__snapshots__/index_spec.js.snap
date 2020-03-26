@@ -194,13 +194,19 @@ exports[`Design management index page designs renders error 1`] = `
   <div
     class="mt-4"
   >
-    <div
-      class="alert alert-danger"
+    <gl-alert-stub
+      dismisslabel="Dismiss"
+      primarybuttonlink=""
+      primarybuttontext=""
+      secondarybuttonlink=""
+      secondarybuttontext=""
+      title=""
+      variant="danger"
     >
       
       An error occurred while loading designs. Please try again.
     
-    </div>
+    </gl-alert-stub>
   </div>
    
   <router-view-stub
