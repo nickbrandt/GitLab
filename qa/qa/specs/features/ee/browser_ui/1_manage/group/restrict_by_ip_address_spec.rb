@@ -2,7 +2,7 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
+  context 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/212544', type: :flaky } do
     describe 'Group access', :requires_admin do
       include Runtime::IPAddress
 
