@@ -60,6 +60,4 @@ namespace :admin do
   namespace :elasticsearch do
     post :enqueue_index
   end
-
-  get '/dashboard/stats', to: 'dashboard#stats'
 end
