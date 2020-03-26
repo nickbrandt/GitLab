@@ -5331,6 +5331,11 @@ type Note {
   bodyHtml: String
 
   """
+  Indicates if this note is confidential
+  """
+  confidential: Boolean
+
+  """
   Timestamp of the note creation
   """
   createdAt: Time!
