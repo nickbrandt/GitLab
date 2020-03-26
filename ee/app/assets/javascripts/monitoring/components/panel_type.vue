@@ -31,6 +31,20 @@ export default {
       allAlerts: {},
     };
   },
+  computed: {
+    alertWidgetAvailable() {
+      if (!this.prometheusAlertsAvailable) {
+        return false;
+      }
+      // true if any metric has an `alert_path` defined
+      if (!this.graphData || !this.graphData.metrics) {
+        return false;
+      }
+      return this.graphData.metrics.reduce((acc, metric) => {
+        return acc || Boolean(metric.alert_path);
+      }, false);
+    },
+  },
   methods: {
     setAlerts(alertPath, alertAttributes) {
       if (alertAttributes) {

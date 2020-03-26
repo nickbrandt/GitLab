@@ -1,17 +1,18 @@
 import axios from '~/lib/utils/axios_utils';
 
 export default class AlertsService {
-  constructor({ alertsEndpoint }) {
-    this.alertsEndpoint = alertsEndpoint;
-  }
+  // constructor({ alertsEndpoint }) {
+  //   this.alertsEndpoint = alertsEndpoint;
+  // }
 
-  getAlerts() {
-    return axios.get(this.alertsEndpoint).then(resp => resp.data);
-  }
+  // getAlerts() {
+  //   return axios.get(this.alertsEndpoint).then(resp => resp.data);
+  // }
 
-  createAlert({ prometheus_metric_id, operator, threshold }) {
+  // eslint-disable-next-line class-methods-use-this
+  createAlert(alertPath, { prometheus_metric_id, operator, threshold }) {
     return axios
-      .post(this.alertsEndpoint, { prometheus_metric_id, operator, threshold })
+      .post(alertPath, { prometheus_metric_id, operator, threshold })
       .then(resp => resp.data);
   }
 

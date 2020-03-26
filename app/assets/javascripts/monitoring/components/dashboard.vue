@@ -184,6 +184,10 @@ export default {
       required: false,
       default: null,
     },
+    /**
+     * true if the user has permissions to read prometheus alerts
+     * @type Boolean
+     */
     prometheusAlertsAvailable: {
       type: Boolean,
       required: false,
