@@ -49,6 +49,12 @@ FactoryBot.define do
       end
     end
 
+    factory :pypi_package do
+      sequence(:name) { |n| "pypi-package-#{n}"}
+      sequence(:version) { |n| "1.0.#{n}" }
+      package_type { :pypi }
+    end
+
     factory :conan_package do
       conan_metadatum
 
