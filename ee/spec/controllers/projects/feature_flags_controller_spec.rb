@@ -757,11 +757,49 @@ describe Projects::FeatureFlagsController do
       end
     end
 
+    context 'when the feature flag does not exist' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: 0
+        }
+      end
+
+      it 'returns not found' do
+        is_expected.to have_gitlab_http_status(:not_found)
+      end
+    end
+
     context 'when there is an additional scope' do
       let!(:scope) { create_scope(feature_flag, 'production', false) }
 
       it 'destroys the default scope and production scope' do
         expect { subject }.to change { Operations::FeatureFlagScope.count }.by(-2)
+      end
+    end
+
+    context 'with a version 2 flag' do
+      let!(:new_version_flag) { create(:operations_feature_flag, :new_version_flag, project: project) }
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id
+        }
+      end
+
+      it 'deletes the flag' do
+        expect { subject }.to change { Operations::FeatureFlag.count }.by(-1)
+      end
+
+      context 'when new version flags are disabled' do
+        it 'returns a 404' do
+          stub_feature_flags(feature_flags_new_version: false)
+
+          expect { subject }.not_to change { Operations::FeatureFlag.count }
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
       end
     end
   end
@@ -1166,6 +1204,186 @@ describe Projects::FeatureFlagsController do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response['message']).to eq(["Scopes strategies parameters are invalid"])
+      end
+    end
+
+    context 'with a version 2 feature flag' do
+      let!(:new_version_flag) do
+        create(:operations_feature_flag,
+               :new_version_flag,
+               name: 'new-feature',
+               active: true,
+               project: project)
+      end
+
+      it 'creates a new strategy and scope' do
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              name: 'userWithId',
+              parameters: { userIds: 'user1' },
+              scopes_attributes: [{
+                environment_scope: 'production'
+              }]
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies'].count).to eq(1)
+        strategy_json = json_response['strategies'].first
+        expect(strategy_json['name']).to eq('userWithId')
+        expect(strategy_json['parameters']).to eq({
+          'userIds' => 'user1'
+        })
+        expect(strategy_json['scopes'].count).to eq(1)
+        scope_json = strategy_json['scopes'].first
+        expect(scope_json['environment_scope']).to eq('production')
+      end
+
+      it 'creates a gradualRolloutUserId strategy' do
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              name: 'gradualRolloutUserId',
+              parameters: { groupId: 'default', percentage: '30' }
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies'].count).to eq(1)
+        strategy_json = json_response['strategies'].first
+        expect(strategy_json['name']).to eq('gradualRolloutUserId')
+        expect(strategy_json['parameters']).to eq({
+          'groupId' => 'default',
+          'percentage' => '30'
+        })
+        expect(strategy_json['scopes']).to eq([])
+      end
+
+      it 'updates an existing strategy' do
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'default', parameters: {})
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              name: 'userWithId',
+              parameters: { userIds: 'user2,user3' }
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([{
+          'id' => strategy.id,
+          'name' => 'userWithId',
+          'parameters' => { 'userIds' => 'user2,user3' },
+          'scopes' => []
+        }])
+      end
+
+      it 'updates an existing scope' do
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'default', parameters: {})
+        scope = create(:operations_scope, strategy: strategy, environment_scope: 'staging')
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              scopes_attributes: [{
+                id: scope.id,
+                environment_scope: 'sandbox'
+              }]
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies'].first['scopes']).to eq([{
+          'id' => scope.id,
+          'environment_scope' => 'sandbox'
+        }])
+      end
+
+      it 'deletes an existing strategy' do
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'default', parameters: {})
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              _destroy: true
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies']).to eq([])
+      end
+
+      it 'deletes an existing scope' do
+        strategy = create(:operations_strategy, feature_flag: new_version_flag, name: 'default', parameters: {})
+        scope = create(:operations_scope, strategy: strategy, environment_scope: 'staging')
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            strategies_attributes: [{
+              id: strategy.id,
+              scopes_attributes: [{
+                id: scope.id,
+                _destroy: true
+              }]
+            }]
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['strategies'].first['scopes']).to eq([])
+      end
+
+      it 'does not update the flag if version 2 flags are disabled' do
+        stub_feature_flags(feature_flags_new_version: false)
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: new_version_flag.id,
+          operations_feature_flag: {
+            name: 'some-other-name'
+          }
+        }
+
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(new_version_flag.reload.name).to eq('new-feature')
       end
     end
   end
