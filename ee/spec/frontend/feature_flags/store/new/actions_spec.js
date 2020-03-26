@@ -14,8 +14,13 @@ import { TEST_HOST } from 'spec/test_constants';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  LEGACY_FLAG,
+  NEW_VERSION_FLAG,
 } from 'ee/feature_flags/constants';
-import { mapFromScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
+import {
+  mapFromScopesViewModel,
+  mapStrategiesToRails,
+} from 'ee/feature_flags/store/modules/helpers';
 import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/lib/utils/url_utility');
@@ -60,6 +65,7 @@ describe('Feature flags New Module Actions', () => {
       name: 'name',
       description: 'description',
       active: true,
+      version: LEGACY_FLAG,
       scopes: [
         {
           id: 1,
@@ -92,6 +98,43 @@ describe('Feature flags New Module Actions', () => {
         testAction(
           createFeatureFlag,
           actionParams,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestCreateFeatureFlag',
+            },
+            {
+              type: 'receiveCreateFeatureFlagSuccess',
+            },
+          ],
+          done,
+        );
+      });
+
+      it('sends strategies for new style feature flags', done => {
+        const newVersionFlagParams = {
+          name: 'name',
+          description: 'description',
+          active: true,
+          version: NEW_VERSION_FLAG,
+          strategies: [
+            {
+              name: ROLLOUT_STRATEGY_ALL_USERS,
+              parameters: {},
+              id: 1,
+              scopes: [{ id: 1, environmentScope: 'environmentScope', shouldBeDestroyed: false }],
+              shouldBeDestroyed: false,
+            },
+          ],
+        };
+        mock
+          .onPost(`${TEST_HOST}/endpoint.json`, mapStrategiesToRails(newVersionFlagParams))
+          .replyOnce(200);
+
+        testAction(
+          createFeatureFlag,
+          newVersionFlagParams,
           mockedState,
           [],
           [

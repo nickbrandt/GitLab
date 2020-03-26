@@ -8,6 +8,7 @@ import {
   PERCENT_ROLLOUT_GROUP_ID,
   fetchPercentageParams,
   fetchUserIdParams,
+  LEGACY_FLAG,
 } from '../../constants';
 
 /**
@@ -104,6 +105,7 @@ export const mapFromScopesViewModel = params => {
       description: params.description,
       active: params.active,
       scopes_attributes: scopes,
+      version: LEGACY_FLAG,
     },
   };
 
@@ -141,3 +143,45 @@ export const createNewEnvironmentScope = (overrides = {}, featureFlagPermissions
 
   return newScope;
 };
+
+const mapStrategyScopesToRails = scopes =>
+  scopes.length === 0
+    ? [{ environment_scope: '*' }]
+    : scopes.map(s => ({
+        id: s.id,
+        _destroy: s.shouldBeDestroyed,
+        environment_scope: s.environmentScope,
+      }));
+
+const mapStrategyScopesToView = scopes =>
+  scopes.map(s => ({
+    id: s.id,
+    // eslint-disable-next-line no-underscore-dangle
+    shouldBeDestroyed: Boolean(s._destroy),
+    environmentScope: s.environment_scope,
+  }));
+
+export const mapStrategiesToViewModel = strategiesFromRails =>
+  (strategiesFromRails || []).map(s => ({
+    id: s.id,
+    name: s.name,
+    parameters: s.parameters,
+    // eslint-disable-next-line no-underscore-dangle
+    shouldBeDestroyed: Boolean(s._destroy),
+    scopes: mapStrategyScopesToView(s.scopes),
+  }));
+
+export const mapStrategiesToRails = params => ({
+  operations_feature_flag: {
+    name: params.name,
+    description: params.description,
+    version: params.version,
+    strategies_attributes: (params.strategies || []).map(s => ({
+      id: s.id,
+      name: s.name,
+      parameters: s.parameters,
+      _destroy: s.shouldBeDestroyed,
+      scopes: mapStrategyScopesToRails(s.scopes || []),
+    })),
+  },
+});

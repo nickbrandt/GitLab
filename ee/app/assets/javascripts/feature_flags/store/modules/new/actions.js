@@ -1,7 +1,8 @@
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import { visitUrl } from '~/lib/utils/url_utility';
-import { mapFromScopesViewModel } from '../helpers';
+import { NEW_VERSION_FLAG } from '../../../constants';
+import { mapFromScopesViewModel, mapStrategiesToRails } from '../helpers';
 
 /**
  * Commits mutation to set the main endpoint
@@ -29,8 +30,13 @@ export const setPath = ({ commit }, path) => commit(types.SET_PATH, path);
 export const createFeatureFlag = ({ state, dispatch }, params) => {
   dispatch('requestCreateFeatureFlag');
 
-  axios
-    .post(state.endpoint, mapFromScopesViewModel(params))
+  return axios
+    .post(
+      state.endpoint,
+      params.version === NEW_VERSION_FLAG
+        ? mapStrategiesToRails(params)
+        : mapFromScopesViewModel(params),
+    )
     .then(() => {
       dispatch('receiveCreateFeatureFlagSuccess');
       visitUrl(state.path);
