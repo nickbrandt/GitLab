@@ -22,6 +22,13 @@ describe Repository, :elastic do
     expect(project.repository.elastic_search('def popen')[:blobs][:total_count]).to eq(1)
     expect(project.repository.elastic_search('def | popen')[:blobs][:total_count] > 1).to be_truthy
     expect(project.repository.elastic_search('initial')[:commits][:total_count]).to eq(1)
+
+    root_ref = project.repository.root_ref_sha.upcase
+    expect(project.repository.elastic_search(root_ref)[:commits][:total_count]).to eq(1)
+
+    partial_ref = root_ref[0...5]
+    expect(project.repository.elastic_search(partial_ref)[:commits][:total_count]).to eq(1)
+    expect(project.repository.elastic_search(partial_ref + '*')[:commits][:total_count]).to eq(1)
   end
 
   it 'can filter blobs' do
