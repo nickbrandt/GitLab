@@ -10,6 +10,11 @@ export default {
   },
   extends: CePanelType,
   props: {
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
+    },
     prometheusAlertsAvailable: {
       type: Boolean,
       required: false,
@@ -35,6 +40,7 @@ export default {
       if (!this.graphData || !this.graphData.metrics) {
         return false;
       }
+      // TODO Repplace this for ID
       return this.graphData.metrics.reduce((acc, metric) => {
         return acc || Boolean(metric.alert_path);
       }, false);

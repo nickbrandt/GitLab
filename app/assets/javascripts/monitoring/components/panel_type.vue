@@ -185,6 +185,7 @@ export default {
           <alert-widget
             v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"
+            :alerts-endpoint="alertsEndpoint"
             :relevant-queries="graphData.metrics"
             :alerts-to-manage="getGraphAlerts(graphData.metrics)"
             @setAlerts="setAlerts"
