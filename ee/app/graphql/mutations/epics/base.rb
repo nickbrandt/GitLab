@@ -3,7 +3,7 @@
 module Mutations
   module Epics
     class Base < ::Mutations::BaseMutation
-      include Mutations::ResolvesGroup
+      include Mutations::ResolvesIssuable
 
       argument :iid, GraphQL::ID_TYPE,
                required: true,
@@ -21,11 +21,7 @@ module Mutations
       private
 
       def find_object(group_path:, iid:)
-        group = resolve_group(full_path: group_path)
-        resolver = Resolvers::EpicResolver
-                     .single.new(object: group, context: context, field: nil)
-
-        resolver.resolve(iid: iid)
+        resolve_issuable(type: :epic, parent_path: group_path, iid: iid)
       end
     end
   end
