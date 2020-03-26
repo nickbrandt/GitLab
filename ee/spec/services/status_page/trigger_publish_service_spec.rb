@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe StatusPage::TriggerPublishService do
   let_it_be(:user) { create(:user) }
-  let_it_be(:project, refind: true) { create(:project) }
+  let_it_be(:project, refind: true) { create(:project, :repository) }
 
   let(:service) { described_class.new(project, user, triggered_by) }
 
@@ -142,8 +142,6 @@ describe StatusPage::TriggerPublishService do
       end
 
       context 'for merge requests' do
-        let_it_be(:project) { create(:project, :repository) }
-
         let_it_be(:triggered_by) do
           create(:note_on_merge_request, project: project)
         end
@@ -155,6 +153,39 @@ describe StatusPage::TriggerPublishService do
             end
           end
         end
+      end
+    end
+
+    describe 'triggered by award emoji' do
+      let(:emoji_name) { StatusPage::AWARD_EMOJI }
+      let(:issue_id) { triggered_by.awardable.noteable_id }
+
+      let(:triggered_by) do
+        create(:award_emoji, name: emoji_name, awardable: awardable)
+      end
+
+      context 'for notes on issues' do
+        let_it_be(:awardable) { create(:note_on_issue, project: project) }
+
+        include_examples 'trigger status page publish'
+
+        context 'without recognized emoji' do
+          let(:emoji_name) { 'thumbsup' }
+
+          include_examples 'no trigger status page publish'
+        end
+      end
+
+      context 'for issues' do
+        let_it_be(:awardable) { create(:issue, project: project) }
+
+        include_examples 'no trigger status page publish'
+      end
+
+      context 'for notes on merge requests' do
+        let_it_be(:awardable) { create(:note_on_merge_request, project: project) }
+
+        include_examples 'no trigger status page publish'
       end
     end
 

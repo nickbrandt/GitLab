@@ -51,6 +51,7 @@ module StatusPage
       case triggered_by
       when Issue then eligable_issue_id_from_issue
       when Note then eligable_issue_id_from_note
+      when AwardEmoji then eligable_issue_id_from_award_emoji
       else
         raise ArgumentError, "unsupported trigger type #{triggered_by.class}"
       end
@@ -88,6 +89,16 @@ module StatusPage
       return if note.award_emoji.named(StatusPage::AWARD_EMOJI).none?
 
       note.noteable_id
+    end
+
+    def eligable_issue_id_from_award_emoji
+      award_emoji = triggered_by
+
+      return unless award_emoji.name == StatusPage::AWARD_EMOJI
+      return unless award_emoji.awardable.is_a?(Note)
+      return unless award_emoji.awardable.for_issue?
+
+      award_emoji.awardable.noteable_id
     end
   end
 end
