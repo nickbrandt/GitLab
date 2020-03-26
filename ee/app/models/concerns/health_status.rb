@@ -16,6 +16,6 @@ module HealthStatus
   def supports_health_status?
     return false unless resource_parent&.feature_available?(:issuable_health_status)
 
-    ::Feature.enabled?(:save_issuable_health_status, resource_parent.try(:group))
+    ::Feature.enabled?(:save_issuable_health_status, resource_parent.try(:group), default_enabled: true)
   end
 end
