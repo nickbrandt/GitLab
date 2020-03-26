@@ -38,4 +38,4 @@
               %li
                 %a{ :href=>identifier.url, target: "_blank", rel: 'noopener noreferrer' }= identifier.name
 
-#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline) }
+#js-vulnerability-footer{ data: vulnerability_data(@vulnerability, @pipeline, current_user: @current_user) }
