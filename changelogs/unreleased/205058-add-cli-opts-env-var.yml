@@ -1,0 +1,5 @@
+---
+title: Add CLI_OPTS var to dependency scanning template
+merge_request: 28071
+author:
+type: added
