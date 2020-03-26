@@ -6,7 +6,7 @@ import PanelType from 'ee/monitoring/components/panel_type.vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
-import { graphDataPrometheusQueryRange } from 'jest/monitoring/mock_data';
+import { graphDataPrometheusQueryRange, mockProjectDir } from 'jest/monitoring/mock_data';
 
 global.URL.createObjectURL = jest.fn();
 
@@ -18,6 +18,14 @@ describe('Panel Type', () => {
   let panelType;
   let store;
   const exampleText = 'example_text';
+
+  const mockQueryRange = {
+    ...graphDataPrometheusQueryRange,
+    metrics: graphDataPrometheusQueryRange.metrics.map(metric => ({
+      alert_path: `${mockProjectDir}/alerts/${metric.metric_id}.json`,
+      ...metric,
+    })),
+  };
 
   const createWrapper = propsData => {
     store = createStore();
@@ -45,8 +53,7 @@ describe('Panel Type', () => {
       beforeEach(() => {
         createWrapper({
           clipboardText: exampleText,
-          graphData: graphDataPrometheusQueryRange,
-          alertsEndpoint: '/endpoint',
+          graphData: mockQueryRange,
           prometheusAlertsAvailable: true,
         });
       });
@@ -87,8 +94,7 @@ describe('Panel Type', () => {
       beforeEach(() => {
         createWrapper({
           clipboardText: exampleText,
-          graphData: graphDataPrometheusQueryRange,
-          alertsEndpoint: '/endpoint',
+          graphData: mockQueryRange,
           prometheusAlertsAvailable: false,
         });
       });

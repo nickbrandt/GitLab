@@ -4,7 +4,7 @@ import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
-import AlertsService from '../services/alerts_service';
+import { createAlert, readAlert, updateAlert, deleteAlert } from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
 
 export default {
@@ -18,10 +18,6 @@ export default {
     GlModal: GlModalDirective,
   },
   props: {
-    alertsEndpoint: {
-      type: String,
-      required: true,
-    },
     // { [alertPath]: { alert_attributes } }. Populated from subsequent API calls.
     // Includes only the metrics/alerts to be managed by this widget.
     alertsToManage: {
@@ -44,7 +40,6 @@ export default {
   },
   data() {
     return {
-      service: null,
       errorMessage: null,
       isLoading: false,
       apiAction: 'create',
@@ -63,7 +58,6 @@ export default {
     },
   },
   created() {
-    this.service = new AlertsService({ alertsEndpoint: this.alertsEndpoint });
     this.fetchAlertData();
   },
   methods: {
@@ -74,7 +68,7 @@ export default {
 
       return Promise.all(
         queriesWithAlerts.map(query =>
-          this.service.readAlert(query.alert_path).then(alertAttributes => {
+          readAlert(query.alert_path).then(alertAttributes => {
             if (alertAttributes) {
               this.setAlert(alertAttributes, query.metricId);
             }
@@ -116,8 +110,8 @@ export default {
       const metric = this.relevantQueries.find(({ metricId }) => metricId === prometheus_metric_id);
 
       this.isLoading = true;
-      this.service
-        .createAlert(metric.alert_path, newAlert)
+
+      createAlert(metric.alert_path, newAlert)
         .then(alertAttributes => {
           this.setAlert(alertAttributes, prometheus_metric_id);
           this.isLoading = false;
@@ -131,8 +125,8 @@ export default {
     handleUpdate({ alert, operator, threshold }) {
       const updatedAlert = { operator, threshold };
       this.isLoading = true;
-      this.service
-        .updateAlert(alert, updatedAlert)
+
+      updateAlert(alert, updatedAlert)
         .then(alertAttributes => {
           this.setAlert(alertAttributes, this.alertsToManage[alert].metricId);
           this.isLoading = false;
@@ -145,8 +139,8 @@ export default {
     },
     handleDelete({ alert }) {
       this.isLoading = true;
-      this.service
-        .deleteAlert(alert)
+
+      deleteAlert(alert)
         .then(() => {
           this.removeAlert(alert);
           this.isLoading = false;

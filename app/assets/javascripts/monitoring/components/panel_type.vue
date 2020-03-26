@@ -182,11 +182,9 @@ export default {
         data-qa-selector="prometheus_graph_widgets"
       >
         <div class="d-flex align-items-center">
-          <!-- TODO TRY TO REMOVE :alerts-endpoint="alertsEndpoint" -->
           <alert-widget
             v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"
-            :alerts-endpoint="alertsEndpoint"
             :relevant-queries="graphData.metrics"
             :alerts-to-manage="getGraphAlerts(graphData.metrics)"
             @setAlerts="setAlerts"

@@ -10,11 +10,6 @@ export default {
   },
   extends: CePanelType,
   props: {
-    alertsEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
     prometheusAlertsAvailable: {
       type: Boolean,
       required: false,

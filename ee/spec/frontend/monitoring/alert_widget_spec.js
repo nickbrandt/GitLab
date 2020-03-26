@@ -4,34 +4,26 @@ import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 
-const mockReadAlert = jest.fn();
-const mockCreateAlert = jest.fn();
-const mockUpdateAlert = jest.fn();
-const mockDeleteAlert = jest.fn();
+import {
+  createAlert,
+  readAlert,
+  updateAlert,
+  deleteAlert,
+} from 'ee/monitoring/services/alerts_service';
 
 jest.mock('~/flash');
-jest.mock(
-  'ee/monitoring/services/alerts_service',
-  () =>
-    function AlertsServiceMock() {
-      return {
-        readAlert: mockReadAlert,
-        createAlert: mockCreateAlert,
-        updateAlert: mockUpdateAlert,
-        deleteAlert: mockDeleteAlert,
-      };
-    },
-);
+jest.mock('ee/monitoring/services/alerts_service');
 
 describe('AlertWidget', () => {
   let wrapper;
 
   const metricId = '5';
   const alertPath = 'my/alert.json';
-  const relevantQueries = [{ metricId, label: 'alert-label', alert_path: alertPath }];
+  const relevantQueries = [
+    { metricId, label: 'alert-label', alert_path: alertPath, alert_defined: true },
+  ];
 
   const defaultProps = {
-    alertsEndpoint: '',
     relevantQueries,
     alertsToManage: {},
     modalId: 'alert-modal-1',
@@ -68,12 +60,15 @@ describe('AlertWidget', () => {
 
   it('displays a loading spinner and disables form when fetching alerts', () => {
     let resolveReadAlert;
-    mockReadAlert.mockReturnValue(
+
+    readAlert.mockReturnValue(
       new Promise(resolve => {
         resolveReadAlert = resolve;
       }),
     );
+
     createComponent(defaultProps);
+
     return wrapper.vm
       .$nextTick()
       .then(() => {
@@ -90,7 +85,7 @@ describe('AlertWidget', () => {
   });
 
   it('displays an error message when fetch fails', () => {
-    mockReadAlert.mockRejectedValue();
+    readAlert.mockRejectedValue();
     createComponent(propsWithAlert);
 
     expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(true);
@@ -102,21 +97,21 @@ describe('AlertWidget', () => {
   });
 
   it('displays an alert summary when there is a single alert', () => {
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+    readAlert.mockResolvedValue({ operator: '>', threshold: 42 });
     createComponent(propsWithAlertData);
 
     expect(wrapper.text()).toContain('alert-label > 42');
   });
 
   it('displays a warning icon and matches snapshopt', () => {
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+    readAlert.mockResolvedValue({ operator: '>', threshold: 42 });
     createComponent(propsWithAlertData);
 
     expect(findBadge().element).toMatchSnapshot();
   });
 
   it('displays a combined alert summary when there are multiple alerts', () => {
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+    readAlert.mockResolvedValue({ operator: '>', threshold: 42 });
     const propsWithManyAlerts = {
       relevantQueries: relevantQueries.concat([
         { metricId: '6', alert_path: 'my/alert2.json', label: 'alert-label2' },
@@ -147,13 +142,12 @@ describe('AlertWidget', () => {
       threshold: 4,
       prometheus_metric_id: '5',
     };
-    mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
-    const fakeAlertPath = 'foo/bar';
-    mockCreateAlert.mockResolvedValue({ alert_path: fakeAlertPath, ...alertParams });
+    readAlert.mockResolvedValue({ operator: '>', threshold: 42 });
+    createAlert.mockResolvedValue({ alert_path: alertPath, ...alertParams });
     createComponent({
       alertsToManage: {
-        [fakeAlertPath]: {
-          alert_path: fakeAlertPath,
+        [alertPath]: {
+          alert_path: alertPath,
           operator: '<',
           threshold: 4,
           prometheus_metric_id: '5',
@@ -164,14 +158,14 @@ describe('AlertWidget', () => {
 
     findWidgetForm().vm.$emit('create', alertParams);
 
-    expect(mockCreateAlert).toHaveBeenCalledWith(alertParams);
+    expect(createAlert).toHaveBeenCalledWith(alertPath, alertParams);
   });
 
   it('updates an alert with an appropriate handler', () => {
     const alertParams = { operator: '<', threshold: 4, alert_path: alertPath };
     const newAlertParams = { operator: '==', threshold: 12 };
-    mockReadAlert.mockResolvedValue(alertParams);
-    mockUpdateAlert.mockResolvedValue({ ...alertParams, ...newAlertParams });
+    readAlert.mockResolvedValue(alertParams);
+    updateAlert.mockResolvedValue({ ...alertParams, ...newAlertParams });
     createComponent({
       ...propsWithAlertData,
       alertsToManage: {
@@ -190,13 +184,13 @@ describe('AlertWidget', () => {
       prometheus_metric_id: '5',
     });
 
-    expect(mockUpdateAlert).toHaveBeenCalledWith(alertPath, newAlertParams);
+    expect(updateAlert).toHaveBeenCalledWith(alertPath, newAlertParams);
   });
 
   it('deletes an alert with an appropriate handler', () => {
     const alertParams = { alert_path: alertPath, operator: '>', threshold: 42 };
-    mockReadAlert.mockResolvedValue(alertParams);
-    mockDeleteAlert.mockResolvedValue({});
+    readAlert.mockResolvedValue(alertParams);
+    deleteAlert.mockResolvedValue({});
     createComponent({
       ...propsWithAlert,
       alertsToManage: {
@@ -212,7 +206,7 @@ describe('AlertWidget', () => {
     findWidgetForm().vm.$emit('delete', { alert: alertPath });
 
     return wrapper.vm.$nextTick().then(() => {
-      expect(mockDeleteAlert).toHaveBeenCalledWith(alertPath);
+      expect(deleteAlert).toHaveBeenCalledWith(alertPath);
       expect(findAlertErrorMessage().exists()).toBe(false);
     });
   });
@@ -220,8 +214,8 @@ describe('AlertWidget', () => {
   describe('when delete fails', () => {
     beforeEach(() => {
       const alertParams = { alert_path: alertPath, operator: '>', threshold: 42 };
-      mockReadAlert.mockResolvedValue(alertParams);
-      mockDeleteAlert.mockRejectedValue();
+      readAlert.mockResolvedValue(alertParams);
+      deleteAlert.mockRejectedValue();
 
       createComponent({
         ...propsWithAlert,
