@@ -118,7 +118,7 @@ export const anomalyMockGraphData = {
   weight: 3,
   metrics: [
     {
-      metricId: '90',
+      metricKey: '90',
       id: 'metric',
       query_range: 'MOCK_PROMETHEUS_METRIC_QUERY_RANGE',
       unit: 'RPS',
@@ -133,7 +133,7 @@ export const anomalyMockGraphData = {
       ],
     },
     {
-      metricId: '91',
+      metricKey: '91',
       id: 'upper',
       query_range: '...',
       unit: 'RPS',
@@ -148,7 +148,7 @@ export const anomalyMockGraphData = {
       ],
     },
     {
-      metricId: '92',
+      metricKey: '92',
       id: 'lower',
       query_range: '...',
       unit: 'RPS',
@@ -283,33 +283,33 @@ const metricsResult = [
 ];
 
 export const mockedEmptyResult = {
-  metricId: '1_response_metrics_nginx_ingress_throughput_status_code',
+  metricKey: '1_response_metrics_nginx_ingress_throughput_status_code',
   result: [],
 };
 
 export const mockedEmptyThroughputResult = {
-  metricId: 'undefined_response_metrics_nginx_ingress_16_throughput_status_code',
+  metricKey: 'undefined_response_metrics_nginx_ingress_16_throughput_status_code',
   result: [],
 };
 
 export const mockedQueryResultPayload = {
-  metricId: '12_system_metrics_kubernetes_container_memory_total',
+  metricKey: '12_system_metrics_kubernetes_container_memory_total',
   result: metricsResult,
 };
 
 export const mockedQueryResultPayloadCoresTotal = {
-  metricId: '13_system_metrics_kubernetes_container_cores_total',
+  metricKey: '13_system_metrics_kubernetes_container_cores_total',
   result: metricsResult,
 };
 
 export const mockedQueryResultFixture = {
   // First metric in fixture `metrics_dashboard/environment_metrics_dashboard.json`
-  metricId: 'undefined_response_metrics_nginx_ingress_throughput_status_code',
+  metricKey: 'undefined_response_metrics_nginx_ingress_throughput_status_code',
   result: metricsResult,
 };
 
 export const mockedQueryResultFixtureStatusCode = {
-  metricId: 'undefined_response_metrics_nginx_ingress_latency_pod_average',
+  metricKey: 'undefined_response_metrics_nginx_ingress_latency_pod_average',
   result: metricsResult,
 };
 
@@ -537,7 +537,7 @@ export const graphDataPrometheusQuery = {
   metrics: [
     {
       id: 'metric_a1',
-      metricId: '2',
+      metricKey: '2',
       query: 'max(go_memstats_alloc_bytes{job="prometheus"}) by (job) /1024/1024',
       unit: 'MB',
       label: 'Total Consumption',
@@ -561,7 +561,7 @@ export const graphDataPrometheusQueryRange = {
   metrics: [
     {
       id: 'metric_a1',
-      metricId: '2',
+      metricKey: '2',
       query_range:
         'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job)  /1024/1024/1024',
       unit: 'MB',
@@ -587,7 +587,7 @@ export const graphDataPrometheusQueryRangeMultiTrack = {
   y_label: 'Time',
   metrics: [
     {
-      metricId: '1',
+      metricKey: '1',
       id: 'response_metrics_nginx_ingress_throughput_status_code',
       query_range:
         'sum(rate(nginx_upstream_responses_total{upstream=~"%{kube_namespace}-%{ci_environment_slug}-.*"}[60m])) by (status_code)',
@@ -670,7 +670,7 @@ export const stackedColumnMockedData = {
       prometheus_endpoint_path:
         '/root/autodevops-deploy-6/-/environments/24/prometheus/api/v1/query_range?query=avg%28sum%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+by+%28job%29%29+without+%28job%29+%2F+count%28avg%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+without+%28job%29%29+%2F1024%2F1024',
       metric_id: 'undefined_metric_of_ages_1024',
-      metricId: 'undefined_metric_of_ages_1024',
+      metricKey: 'undefined_metric_of_ages_1024',
       result: [
         {
           metric: {},
@@ -689,7 +689,7 @@ export const stackedColumnMockedData = {
       prometheus_endpoint_path:
         '/root/autodevops-deploy-6/-/environments/24/prometheus/api/v1/query_range?query=avg%28sum%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+by+%28job%29%29+without+%28job%29+%2F+count%28avg%28container_memory_usage_bytes%7Bcontainer_name%21%3D%22POD%22%2Cpod_name%3D~%22%5E%25%7Bci_environment_slug%7D-%28%5B%5Ec%5D.%2A%7Cc%28%5B%5Ea%5D%7Ca%28%5B%5En%5D%7Cn%28%5B%5Ea%5D%7Ca%28%5B%5Er%5D%7Cr%5B%5Ey%5D%29%29%29%29.%2A%7C%29-%28.%2A%29%22%2Cnamespace%3D%22%25%7Bkube_namespace%7D%22%7D%29+without+%28job%29%29+%2F1024%2F1024',
       metric_id: 'undefined_metric_of_ages_1000',
-      metricId: 'undefined_metric_of_ages_1000',
+      metricKey: 'undefined_metric_of_ages_1000',
       result: [
         {
           metric: {},

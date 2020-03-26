@@ -65,13 +65,13 @@ describe('Monitoring mutations', () => {
 
       const groups = getGroups();
 
-      expect(groups[0].panels[0].metrics[0].metricId).toEqual(
+      expect(groups[0].panels[0].metrics[0].metricKey).toEqual(
         'undefined_system_metrics_kubernetes_container_memory_total',
       );
-      expect(groups[1].panels[0].metrics[0].metricId).toEqual(
+      expect(groups[1].panels[0].metrics[0].metricKey).toEqual(
         'undefined_response_metrics_nginx_ingress_throughput_status_code',
       );
-      expect(groups[2].panels[0].metrics[0].metricId).toEqual(
+      expect(groups[2].panels[0].metrics[0].metricKey).toEqual(
         'undefined_response_metrics_nginx_ingress_16_throughput_status_code',
       );
     });
@@ -132,7 +132,7 @@ describe('Monitoring mutations', () => {
   });
 
   describe('Individual panel/metric results', () => {
-    const metricId = 'undefined_response_metrics_nginx_ingress_throughput_status_code';
+    const metricKey = 'undefined_response_metrics_nginx_ingress_throughput_status_code';
     const result = [
       {
         values: [[0, 1], [1, 1], [1, 3]],
@@ -149,7 +149,7 @@ describe('Monitoring mutations', () => {
         expect(stateCopy.showEmptyState).toBe(true);
 
         mutations[types.REQUEST_METRIC_RESULT](stateCopy, {
-          metricId,
+          metricKey,
           result,
         });
 
@@ -172,7 +172,7 @@ describe('Monitoring mutations', () => {
         expect(stateCopy.showEmptyState).toBe(true);
 
         mutations[types.RECEIVE_METRIC_RESULT_SUCCESS](stateCopy, {
-          metricId,
+          metricKey,
           result,
         });
 
@@ -183,7 +183,7 @@ describe('Monitoring mutations', () => {
         expect(getMetric().result).toBe(undefined);
 
         mutations[types.RECEIVE_METRIC_RESULT_SUCCESS](stateCopy, {
-          metricId,
+          metricKey,
           result,
         });
 
@@ -205,7 +205,7 @@ describe('Monitoring mutations', () => {
         expect(stateCopy.showEmptyState).toBe(true);
 
         mutations[types.RECEIVE_METRIC_RESULT_FAILURE](stateCopy, {
-          metricId,
+          metricKey,
           error: 'an error',
         });
 
@@ -214,7 +214,7 @@ describe('Monitoring mutations', () => {
 
       it('stores a timeout error in a metric', () => {
         mutations[types.RECEIVE_METRIC_RESULT_FAILURE](stateCopy, {
-          metricId,
+          metricKey,
           error: { message: 'BACKOFF_TIMEOUT' },
         });
 
@@ -229,7 +229,7 @@ describe('Monitoring mutations', () => {
 
       it('stores a connection failed error in a metric', () => {
         mutations[types.RECEIVE_METRIC_RESULT_FAILURE](stateCopy, {
-          metricId,
+          metricKey,
           error: {
             response: {
               status: httpStatusCodes.SERVICE_UNAVAILABLE,
@@ -247,7 +247,7 @@ describe('Monitoring mutations', () => {
 
       it('stores a bad data error in a metric', () => {
         mutations[types.RECEIVE_METRIC_RESULT_FAILURE](stateCopy, {
-          metricId,
+          metricKey,
           error: {
             response: {
               status: httpStatusCodes.BAD_REQUEST,
@@ -266,7 +266,7 @@ describe('Monitoring mutations', () => {
 
       it('stores an unknown error in a metric', () => {
         mutations[types.RECEIVE_METRIC_RESULT_FAILURE](stateCopy, {
-          metricId,
+          metricKey,
           error: null, // no reason in response
         });
 

@@ -26,9 +26,9 @@ jest.mock(
 describe('AlertWidget', () => {
   let wrapper;
 
-  const metricId = '5';
+  const metricKey = '5';
   const alertPath = 'my/alert.json';
-  const relevantQueries = [{ metricId, label: 'alert-label', alert_path: alertPath }];
+  const relevantQueries = [{ metricKey, label: 'alert-label', alert_path: alertPath }];
 
   const defaultProps = {
     alertsEndpoint: '',
@@ -44,7 +44,7 @@ describe('AlertWidget', () => {
   const propsWithAlertData = {
     relevantQueries,
     alertsToManage: {
-      [alertPath]: { operator: '>', threshold: 42, alert_path: alertPath, metricId },
+      [alertPath]: { operator: '>', threshold: 42, alert_path: alertPath, metricKey },
     },
   };
 
@@ -119,20 +119,20 @@ describe('AlertWidget', () => {
     mockReadAlert.mockResolvedValue({ operator: '>', threshold: 42 });
     const propsWithManyAlerts = {
       relevantQueries: relevantQueries.concat([
-        { metricId: '6', alert_path: 'my/alert2.json', label: 'alert-label2' },
+        { metricKey: '6', alert_path: 'my/alert2.json', label: 'alert-label2' },
       ]),
       alertsToManage: {
         'my/alert.json': {
           operator: '>',
           threshold: 42,
           alert_path: alertPath,
-          metricId,
+          metricKey,
         },
         'my/alert2.json': {
           operator: '==',
           threshold: 900,
           alert_path: 'my/alert2.json',
-          metricId: '6',
+          metricKey: '6',
         },
       },
     };
@@ -157,7 +157,7 @@ describe('AlertWidget', () => {
           operator: '<',
           threshold: 4,
           prometheus_metric_id: '5',
-          metricId: '5',
+          metricKey: '5',
         },
       },
     });
@@ -179,7 +179,7 @@ describe('AlertWidget', () => {
           alert_path: alertPath,
           operator: '==',
           threshold: 12,
-          metricId: '5',
+          metricKey: '5',
         },
       },
     });
@@ -204,7 +204,7 @@ describe('AlertWidget', () => {
           alert_path: alertPath,
           operator: '>',
           threshold: 42,
-          metricId: '5',
+          metricKey: '5',
         },
       },
     });
@@ -230,7 +230,7 @@ describe('AlertWidget', () => {
             alert_path: alertPath,
             operator: '>',
             threshold: 42,
-            metricId: '5',
+            metricKey: '5',
           },
         },
       });

@@ -31,7 +31,7 @@ export const metricsData = [
   {
     metrics: [
       {
-        metricId: '15_metric_a',
+        metricKey: '15_metric_a',
         result,
       },
     ],
@@ -39,7 +39,7 @@ export const metricsData = [
   {
     metrics: [
       {
-        metricId: '16_metric_b',
+        metricKey: '16_metric_b',
         result,
       },
     ],

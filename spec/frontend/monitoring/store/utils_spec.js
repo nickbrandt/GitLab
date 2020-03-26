@@ -212,7 +212,7 @@ describe('mapToDashboardViewModel', () => {
 
       expect(getMappedMetric(dashboard)).toEqual({
         label: expect.any(String),
-        metricId: expect.any(String),
+        metricKey: expect.any(String),
       });
     });
 
@@ -222,7 +222,7 @@ describe('mapToDashboardViewModel', () => {
         metric_id: 1,
       });
 
-      expect(getMappedMetric(dashboard).metricId).toEqual('1_http_responses');
+      expect(getMappedMetric(dashboard).metricKey).toEqual('1_http_responses');
     });
 
     it('creates a metric with a default label', () => {

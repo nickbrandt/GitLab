@@ -76,7 +76,7 @@ export default {
         queriesWithAlerts.map(query =>
           this.service
             .readAlert(query.alert_path)
-            .then(alertAttributes => this.setAlert(alertAttributes, query.metricId)),
+            .then(alertAttributes => this.setAlert(alertAttributes, query.metricKey)),
         ),
       )
         .then(() => {
@@ -87,15 +87,15 @@ export default {
           this.isLoading = false;
         });
     },
-    setAlert(alertAttributes, metricId) {
-      this.$emit('setAlerts', alertAttributes.alert_path, { ...alertAttributes, metricId });
+    setAlert(alertAttributes, metricKey) {
+      this.$emit('setAlerts', alertAttributes.alert_path, { ...alertAttributes, metricKey });
     },
     removeAlert(alertPath) {
       this.$emit('setAlerts', alertPath, null);
     },
     formatAlertSummary(alertPath) {
       const alert = this.alertsToManage[alertPath];
-      const alertQuery = this.relevantQueries.find(query => query.metricId === alert.metricId);
+      const alertQuery = this.relevantQueries.find(query => query.metricKey === alert.metricKey);
 
       return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
     },
@@ -130,7 +130,7 @@ export default {
       this.service
         .updateAlert(alert, updatedAlert)
         .then(alertAttributes => {
-          this.setAlert(alertAttributes, this.alertsToManage[alert].metricId);
+          this.setAlert(alertAttributes, this.alertsToManage[alert].metricKey);
           this.isLoading = false;
           this.hideModal();
         })

@@ -152,16 +152,16 @@ export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
     step,
   };
 
-  commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metricId });
+  commit(types.REQUEST_METRIC_RESULT, { metricKey: metric.metricKey });
 
   return fetchPrometheusResult(metric.prometheusEndpointPath, queryParams)
     .then(result => {
-      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metricId, result });
+      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricKey: metric.metricKey, result });
     })
     .catch(error => {
       Sentry.captureException(error);
 
-      commit(types.RECEIVE_METRIC_RESULT_FAILURE, { metricId: metric.metricId, error });
+      commit(types.RECEIVE_METRIC_RESULT_FAILURE, { metricKey: metric.metricKey, error });
       // Continue to throw error so the dashboard can notify using createFlash
       throw error;
     });

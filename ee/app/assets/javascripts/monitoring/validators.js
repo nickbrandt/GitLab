@@ -3,7 +3,7 @@
 // {
 //   '/root/autodevops-deploy/prometheus/alerts/16.json?environment_id=37': {
 //     alert_path: "/root/autodevops-deploy/prometheus/alerts/16.json?environment_id=37",
-//     metricId: '1',
+//     metricKey: '1',
 //     operator: ">",
 //     query: "rate(http_requests_total[5m])[30m:1m]",
 //     threshold: 0.002,
@@ -16,8 +16,8 @@ export function alertsValidator(value) {
     return (
       alert.alert_path &&
       key === alert.alert_path &&
-      alert.metricId &&
-      typeof alert.metricId === 'string' &&
+      alert.metricKey &&
+      typeof alert.metricKey === 'string' &&
       alert.operator &&
       typeof alert.threshold === 'number'
     );
@@ -28,14 +28,14 @@ export function alertsValidator(value) {
 //
 // [
 //   {
-//     metricId: '16',
+//     metricKey: '16',
 //     label: 'Total Cores'
 //   },
 //   {
-//     metricId: '17',
+//     metricKey: '17',
 //     label: 'Sub-total Cores'
 //   }
 // ]
 export function queriesValidator(value) {
-  return value.every(query => query.metricId && typeof query.metricId === 'string' && query.label);
+  return value.every(query => query.metricKey && typeof query.metricKey === 'string' && query.label);
 }

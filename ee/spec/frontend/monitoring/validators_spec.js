@@ -5,15 +5,15 @@ describe('alertsValidator', () => {
     alert_path: 'my/alert.json',
     operator: '<',
     threshold: 5,
-    metricId: '8',
+    metricKey: '8',
   };
   it('requires all alerts to have an alert path', () => {
-    const { operator, threshold, metricId } = validAlert;
+    const { operator, threshold, metricKey } = validAlert;
     const input = {
       [validAlert.alert_path]: {
         operator,
         threshold,
-        metricId,
+        metricKey,
       },
     };
     expect(alertsValidator(input)).toEqual(false);
@@ -26,13 +26,13 @@ describe('alertsValidator', () => {
   });
   it('requires all alerts to have a metric id', () => {
     const input = {
-      [validAlert.alert_path]: { ...validAlert, metricId: undefined },
+      [validAlert.alert_path]: { ...validAlert, metricKey: undefined },
     };
     expect(alertsValidator(input)).toEqual(false);
   });
-  it('requires the metricId to be a string', () => {
+  it('requires the metricKey to be a string', () => {
     const input = {
-      [validAlert.alert_path]: { ...validAlert, metricId: 8 },
+      [validAlert.alert_path]: { ...validAlert, metricKey: 8 },
     };
     expect(alertsValidator(input)).toEqual(false);
   });
@@ -57,16 +57,16 @@ describe('alertsValidator', () => {
 });
 describe('queriesValidator', () => {
   const validQuery = {
-    metricId: '8',
+    metricKey: '8',
     alert_path: 'alert',
     label: 'alert-label',
   };
   it('requires all alerts to have a metric id', () => {
-    const input = [{ ...validQuery, metricId: undefined }];
+    const input = [{ ...validQuery, metricKey: undefined }];
     expect(queriesValidator(input)).toEqual(false);
   });
-  it('requires the metricId to be a string', () => {
-    const input = [{ ...validQuery, metricId: 8 }];
+  it('requires the metricKey to be a string', () => {
+    const input = [{ ...validQuery, metricKey: 8 }];
     expect(queriesValidator(input)).toEqual(false);
   });
   it('requires all queries to have a label', () => {

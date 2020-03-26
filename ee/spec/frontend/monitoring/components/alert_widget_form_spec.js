@@ -6,9 +6,9 @@ import ModalStub from '../stubs/modal_stub';
 describe('AlertWidgetForm', () => {
   let wrapper;
 
-  const metricId = '8';
+  const metricKey = '8';
   const alertPath = 'alert';
-  const relevantQueries = [{ metricId, alert_path: alertPath, label: 'alert-label' }];
+  const relevantQueries = [{ metricKey, alert_path: alertPath, label: 'alert-label' }];
   const dataTrackingOptions = {
     create: { action: 'click_button', label: 'create_alert' },
     delete: { action: 'click_button', label: 'delete_alert' },
@@ -24,7 +24,7 @@ describe('AlertWidgetForm', () => {
   const propsWithAlertData = {
     ...defaultProps,
     alertsToManage: {
-      alert: { alert_path: alertPath, operator: '<', threshold: 5, metricId },
+      alert: { alert_path: alertPath, operator: '<', threshold: 5, metricKey },
     },
   };
 
@@ -115,14 +115,14 @@ describe('AlertWidgetForm', () => {
     expect(wrapper.vm.selectedAlert).toEqual({});
     expect(wrapper.vm.operator).toBe(null);
     expect(wrapper.vm.threshold).toBe(null);
-    expect(wrapper.vm.prometheusMetricId).toBe(null);
+    expect(wrapper.vm.prometheusMetricKey).toBe(null);
   });
 
   describe('with existing alert', () => {
     beforeEach(() => {
       createComponent(propsWithAlertData);
 
-      wrapper.vm.selectQuery(metricId);
+      wrapper.vm.selectQuery(metricKey);
     });
 
     it('sets tracking options for delete alert', () => {

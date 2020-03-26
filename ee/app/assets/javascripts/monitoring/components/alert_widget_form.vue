@@ -87,7 +87,7 @@ export default {
       operators: OPERATORS,
       operator: null,
       threshold: null,
-      prometheusMetricId: null,
+      prometheusMetricKey: null,
       selectedAlert: {},
       alertQuery: '',
     };
@@ -98,12 +98,12 @@ export default {
       return this.alertQuery.length ? true : null;
     },
     currentQuery() {
-      return this.relevantQueries.find(query => query.metricId === this.prometheusMetricId) || {};
+      return this.relevantQueries.find(query => query.metricKey === this.prometheusMetricKey) || {};
     },
     formDisabled() {
-      // We need a prometheusMetricId to determine whether we're
+      // We need a prometheusMetricKey to determine whether we're
       // creating/updating/deleting
-      return this.disabled || !(this.prometheusMetricId || this.isValidQuery);
+      return this.disabled || !(this.prometheusMetricKey || this.isValidQuery);
     },
     supportsComputedAlerts() {
       return this.glFeatures.prometheusComputedAlerts;
@@ -149,7 +149,7 @@ export default {
   },
   methods: {
     selectQuery(queryId) {
-      const existingAlertPath = findKey(this.alertsToManage, alert => alert.metricId === queryId);
+      const existingAlertPath = findKey(this.alertsToManage, alert => alert.metricKey === queryId);
       const existingAlert = this.alertsToManage[existingAlertPath];
 
       if (existingAlert) {
@@ -162,7 +162,7 @@ export default {
         this.threshold = null;
       }
 
-      this.prometheusMetricId = queryId;
+      this.prometheusMetricKey = queryId;
     },
     handleHidden() {
       this.resetAlertData();
@@ -174,13 +174,13 @@ export default {
         alert: this.selectedAlert.alert_path,
         operator: this.operator,
         threshold: this.threshold,
-        prometheus_metric_id: this.prometheusMetricId,
+        prometheus_metric_id: this.prometheusMetricKey,
       });
     },
     resetAlertData() {
       this.operator = null;
       this.threshold = null;
-      this.prometheusMetricId = null;
+      this.prometheusMetricKey = null;
       this.selectedAlert = {};
     },
     getAlertFormActionTrackingOption() {
@@ -243,9 +243,9 @@ export default {
         >
           <gl-dropdown-item
             v-for="query in relevantQueries"
-            :key="query.metricId"
+            :key="query.metricKey"
             data-qa-selector="alert_query_option"
-            @click="selectQuery(query.metricId)"
+            @click="selectQuery(query.metricKey)"
           >
             {{ query.label }}
           </gl-dropdown-item>

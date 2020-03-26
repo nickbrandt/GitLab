@@ -522,7 +522,7 @@ describe('Monitoring store actions', () => {
       metric = convertObjectPropsToCamelCase(metric, { deep: true });
 
       data = {
-        metricId: metric.metricId,
+        metricKey: metric.metricKey,
         result: [1582065167.353, 5, 1582065599.353],
       };
     });
@@ -538,13 +538,13 @@ describe('Monitoring store actions', () => {
           {
             type: types.REQUEST_METRIC_RESULT,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
             },
           },
           {
             type: types.RECEIVE_METRIC_RESULT_SUCCESS,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
               result: data.result,
             },
           },
@@ -572,13 +572,13 @@ describe('Monitoring store actions', () => {
           {
             type: types.REQUEST_METRIC_RESULT,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
             },
           },
           {
             type: types.RECEIVE_METRIC_RESULT_SUCCESS,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
               result: data.result,
             },
           },
@@ -608,13 +608,13 @@ describe('Monitoring store actions', () => {
           {
             type: types.REQUEST_METRIC_RESULT,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
             },
           },
           {
             type: types.RECEIVE_METRIC_RESULT_FAILURE,
             payload: {
-              metricId: metric.metricId,
+              metricKey: metric.metricKey,
               error,
             },
           },

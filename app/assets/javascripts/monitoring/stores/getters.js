@@ -1,5 +1,5 @@
 const metricsIdsInPanel = panel =>
-  panel.metrics.filter(metric => metric.metricId && metric.result).map(metric => metric.metricId);
+  panel.metrics.filter(metric => metric.metricKey && metric.result).map(metric => metric.metricKey);
 
 /**
  * Get all state for metric in the dashboard or a group. The
