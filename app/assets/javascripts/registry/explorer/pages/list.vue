@@ -40,7 +40,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [Tracking.mixin()],
+  mixins: [Tracking.mixin({ label: 'registry_repository_delete' })],
   loader: {
     repeat: 10,
     width: 1000,
@@ -70,10 +70,17 @@ export default {
   },
   computed: {
     ...mapState(['config', 'isLoading', 'images', 'pagination']),
-    tracking() {
-      return {
-        label: 'registry_repository_delete',
-      };
+    groupedImages() {
+      let lastHeader = null;
+      return this.images.reduce((a, c) => {
+        const header = c.path.replace(`/${c.name}`, '');
+        if (lastHeader !== header) {
+          a.push({ isHeader: true, header });
+          lastHeader = header;
+        }
+        a.push(c);
+        return a;
+      }, []);
     },
     currentPage: {
       get() {
@@ -174,45 +181,51 @@ export default {
       </div>
       <template v-else>
         <div v-if="images.length" ref="imagesList" class="d-flex flex-column">
-          <div
-            v-for="(listItem, index) in images"
-            :key="index"
-            ref="rowItem"
-            :class="{ 'border-top': index === 0 }"
-            class="d-flex justify-content-between align-items-center py-2 border-bottom"
-          >
-            <div>
-              <router-link
-                ref="detailsLink"
-                :to="{ name: 'details', params: { id: encodeListItem(listItem) } }"
-              >
-                {{ listItem.path }}
-              </router-link>
-              <clipboard-button
-                v-if="listItem.location"
-                ref="clipboardButton"
-                :text="listItem.location"
-                :title="listItem.location"
-                css-class="btn-default btn-transparent btn-clipboard"
-              />
+          <div v-for="(listItem, index) in groupedImages" :key="index" ref="rowItem">
+            <div
+              v-if="listItem.isHeader"
+              class="bg-secondary border-bottom py-3 px-2"
+              :class="{ 'border-top': index === 0 }"
+            >
+              {{ listItem.header }}
             </div>
             <div
-              v-gl-tooltip="{ disabled: listItem.destroy_path }"
-              class="d-none d-sm-block"
-              :title="$options.i18n.deleteButtonDisabled"
+              v-else
+              class="d-flex justify-content-between align-items-center py-2 border-bottom"
             >
-              <gl-button
-                ref="deleteImageButton"
-                v-gl-tooltip
-                :disabled="!listItem.destroy_path"
-                :title="$options.i18n.removeRepositoryLabel"
-                :aria-label="$options.i18n.removeRepositoryLabel"
-                class="btn-inverted"
-                variant="danger"
-                @click="deleteImage(listItem)"
+              <div class="pl-4 ">
+                <router-link
+                  ref="detailsLink"
+                  :to="{ name: 'details', params: { id: encodeListItem(listItem) } }"
+                >
+                  {{ listItem.name }}
+                </router-link>
+                <clipboard-button
+                  v-if="listItem.location"
+                  ref="clipboardButton"
+                  :text="listItem.location"
+                  :title="listItem.location"
+                  css-class="btn-default btn-transparent btn-clipboard"
+                />
+              </div>
+              <div
+                v-gl-tooltip="{ disabled: listItem.destroy_path }"
+                class="d-none d-sm-block"
+                :title="$options.i18n.deleteButtonDisabled"
               >
-                <gl-icon name="remove" />
-              </gl-button>
+                <gl-button
+                  ref="deleteImageButton"
+                  v-gl-tooltip
+                  :disabled="!listItem.destroy_path"
+                  :title="$options.i18n.removeRepositoryLabel"
+                  :aria-label="$options.i18n.removeRepositoryLabel"
+                  class="btn-inverted"
+                  variant="danger"
+                  @click="deleteImage(listItem)"
+                >
+                  <gl-icon name="remove" />
+                </gl-button>
+              </div>
             </div>
           </div>
           <gl-pagination
