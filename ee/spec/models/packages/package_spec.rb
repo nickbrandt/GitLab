@@ -80,6 +80,21 @@ RSpec.describe Packages::Package, type: :model do
       it { is_expected.not_to allow_value("my(dom$$$ain)com.my-app").for(:name) }
     end
 
+    describe '#version' do
+      context 'npm package' do
+        subject { create(:npm_package) }
+
+        it { is_expected.to allow_value('1.2.3').for(:version) }
+        it { is_expected.to allow_value('1.2.3-beta').for(:version) }
+        it { is_expected.to allow_value('1.2.3-alpha.3').for(:version) }
+        it { is_expected.not_to allow_value('1').for(:version) }
+        it { is_expected.not_to allow_value('1.2').for(:version) }
+        it { is_expected.not_to allow_value('1./2.3').for(:version) }
+        it { is_expected.not_to allow_value('../../../../../1.2.3').for(:version) }
+        it { is_expected.not_to allow_value('%2e%2e%2f1.2.3').for(:version) }
+      end
+    end
+
     describe '#package_already_taken' do
       context 'npm package' do
         let!(:package) { create(:npm_package) }
@@ -173,7 +188,7 @@ RSpec.describe Packages::Package, type: :model do
     end
 
     describe '.has_version' do
-      let!(:package4) { create(:npm_package, version: nil) }
+      let!(:package4) { create(:nuget_package, version: nil) }
 
       subject { described_class.has_version }
 
