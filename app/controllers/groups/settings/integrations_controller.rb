@@ -8,7 +8,7 @@ module Groups
       before_action :authorize_admin_group!
 
       def index
-        @integrations = Project.first.find_or_initialize_services
+        @integrations = []
       end
 
       private
