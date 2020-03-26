@@ -4441,4 +4441,52 @@ describe User, :do_not_mock_admin_mode do
       end
     end
   end
+
+  context 'when after_commit :update_highest_role' do
+    describe 'create user' do
+      it 'initializes a new Members::UpdateHighestRoleService object' do
+        expect_next_instance_of(Members::UpdateHighestRoleService) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        create(:user)
+      end
+    end
+
+    context 'when user already exists' do
+      let!(:user) { create(:user) }
+
+      describe 'update user' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:attributes) do
+          [
+            { state: 'blocked' },
+            { ghost: true },
+            { user_type: :alert_bot }
+          ]
+        end
+
+        with_them do
+          context 'when state was changed' do
+            it 'initializes a new Members::UpdateHighestRoleService object' do
+              expect_next_instance_of(Members::UpdateHighestRoleService) do |service|
+                expect(service).to receive(:execute)
+              end
+
+              user.update(attributes)
+            end
+          end
+        end
+
+        context 'when state was not changed' do
+          it 'does not initialize a new Members::UpdateHighestRoleService object' do
+            expect(Members::UpdateHighestRoleService).not_to receive(:new)
+
+            user.update(email: 'newmail@example.com')
+          end
+        end
+      end
+    end
+  end
 end
