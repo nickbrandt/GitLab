@@ -1221,6 +1221,10 @@ describe User, :do_not_mock_admin_mode do
     end
 
     it 'uses SecureRandom to generate the incoming email token' do
+      allow_next_instance_of(User) do |user|
+        allow(user).to receive(:update_highest_role)
+      end
+
       expect(SecureRandom).to receive(:hex).and_return('3b8ca303')
 
       user = create(:user)
