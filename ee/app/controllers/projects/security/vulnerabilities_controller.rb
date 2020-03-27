@@ -7,8 +7,7 @@ module Projects
       include IssuableActions
       include RendersNotes
 
-      before_action :not_found, unless: -> { project.first_class_vulnerabilities_enabled? }
-      before_action :vulnerability
+      before_action :vulnerability, except: :index
 
       alias_method :vulnerable, :project
 

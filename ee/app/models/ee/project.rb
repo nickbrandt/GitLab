@@ -303,10 +303,6 @@ module EE
       ::Feature.enabled?(:repository_push_audit_event, self)
     end
 
-    def first_class_vulnerabilities_enabled?
-      ::Feature.enabled?(:first_class_vulnerabilities, self, default_enabled: true)
-    end
-
     def feature_available?(feature, user = nil)
       if ::ProjectFeature::FEATURES.include?(feature)
         super

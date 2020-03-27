@@ -130,10 +130,6 @@ module EE
       ::License.feature_available?(:ci_cd_projects) && import_sources_enabled?
     end
 
-    def first_class_vulnerabilities_available?(project)
-      ::Feature.enabled?(:first_class_vulnerabilities, project, default_enabled: true)
-    end
-
     def merge_pipelines_available?
       return false unless @project.builds_enabled?
 
@@ -190,6 +186,7 @@ module EE
           project_full_path: project.full_path,
           vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
           vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
+          vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
@@ -225,8 +222,6 @@ module EE
     end
 
     def project_vulnerabilities_config(project)
-      return {} unless first_class_vulnerabilities_available?(project)
-
       { vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id) }
     end
 
