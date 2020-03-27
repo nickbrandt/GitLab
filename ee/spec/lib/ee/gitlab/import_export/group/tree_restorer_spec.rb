@@ -21,11 +21,16 @@ describe Gitlab::ImportExport::Group::TreeRestorer do
   describe 'restore group tree' do
     context 'epics' do
       it 'has group epics' do
-        expect(group.epics.count).to eq(1)
+        expect(group.epics.count).to eq(2)
       end
 
       it 'has award emoji' do
         expect(group.epics.first.award_emoji.first.name).to eq('thumbsup')
+      end
+
+      it 'preserves epic state' do
+        expect(group.epics.first.state).to eq('opened')
+        expect(group.epics.last.state).to eq('closed')
       end
     end
 
