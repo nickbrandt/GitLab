@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :group_with_members, parent: :group do
     after(:create) do |group, evaluator|
-      group.add_developer(create :user)
+      group.add_developer(create(:user))
     end
   end
 
