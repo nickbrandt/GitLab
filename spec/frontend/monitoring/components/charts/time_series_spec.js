@@ -1,7 +1,8 @@
-import { shallowMount } from '@vue/test-utils';
+import {  mount } from '@vue/test-utils';
 import { setTestTimeout } from 'helpers/timeout';
 import { GlLink } from '@gitlab/ui';
-import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
+import { GlAreaChart, GlLineChart, GlChartSeriesLabel, GlChartLegend } from '@gitlab/ui/dist/charts';
+import { GlPopover } from '@gitlab/ui';
 import { cloneDeep } from 'lodash';
 import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
 import { createStore } from '~/monitoring/stores';
@@ -41,13 +42,16 @@ describe('Time series component', () => {
   let store;
 
   const makeTimeSeriesChart = (graphData, type) =>
-    shallowMount(TimeSeries, {
+    mount(TimeSeries, {
       propsData: {
         graphData: { ...graphData, type },
         deploymentData: store.state.monitoringDashboard.deploymentData,
         projectPath: `${mockHost}${mockProjectDir}`,
       },
       store,
+      stubs: {
+        GlPopover: true,
+      }
     });
 
   describe('With a single time series', () => {
@@ -552,7 +556,7 @@ describe('Time series component', () => {
         timeSeriesChart.destroy();
       });
 
-      describe('computed', () => {
+      describe('Color match', () => {
         let chartData;
 
         beforeEach(() => {
@@ -560,11 +564,39 @@ describe('Time series component', () => {
         });
 
         it('should contain different colors for each time series', () => {
-          expect(chartData[0].lineStyle.color).toBe('#1f78d1');
-          expect(chartData[1].lineStyle.color).toBe('#1aaa55');
-          expect(chartData[2].lineStyle.color).toBe('#fc9403');
-          expect(chartData[3].lineStyle.color).toBe('#6d49cb');
-          expect(chartData[4].lineStyle.color).toBe('#1f78d1');
+          const colors = timeSeriesChart.find(GlAreaChart).vm.series.map(
+            item => item.lineStyle.color,
+          );
+
+          colors.forEach((color, index) => {
+            expect(color !== colors[index+1]).toBe(true);
+          });
+        });
+
+        it('should match series color with tooltip label color', () => {
+          const labels = timeSeriesChart.findAll(GlChartSeriesLabel);
+          const lineColors = timeSeriesChart.find(GlAreaChart).vm.series.map(
+            item => item.lineStyle.color,
+          );
+
+          lineColors.forEach((color, index) => {
+            const labelColor = labels.at(index).props('color');
+            expect(color === labelColor).toBe(true);
+          });
+        });
+
+
+        it('should match series color with legend color', () => {
+          const legendColors = timeSeriesChart.find(GlChartLegend)
+            .props('seriesInfo').map(item => item.color);
+
+          const lineColors = timeSeriesChart.find(GlAreaChart).vm.series.map(
+            item => item.lineStyle.color,
+          );
+
+          lineColors.forEach((color, index) => {
+            expect(color === legendColors[index]).toBe(true);
+          });
         });
       });
     });
