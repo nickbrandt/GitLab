@@ -27,16 +27,16 @@ module EE
         expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
         expose :tags
 
-        PIPELINE_PROPS = [:created_at, :id, :sha, :ref, :status, :updated_at, :web_url, user: [:name, :avatar_url]].freeze
-
-        expose :pipeline, if: ->(obj) { obj.build_info } do |package|
-          ::API::Entities::Pipeline.represent package.build_info.pipeline, only: PIPELINE_PROPS
-        end
+        expose :pipeline, if: ->(package) { package.build_info }, using: Package::Pipeline
 
         private
 
         def project_path
           object.project.full_path
+        end
+
+        def pipeline
+          object.build_info.pipeline
         end
       end
     end
