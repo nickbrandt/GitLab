@@ -392,7 +392,7 @@ describe API::Geo do
 
         context 'where an exception occurs' do
           it 'responds with 500' do
-            expect(git_push_ssh_proxy).to receive(:info_refs).and_raise('deliberate exception raised')
+            expect(git_push_ssh_proxy).to receive(:info_refs_receive_pack).and_raise('deliberate exception raised')
 
             post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
 
@@ -413,7 +413,7 @@ describe API::Geo do
           end
 
           it 'responds with 200' do
-            expect(git_push_ssh_proxy).to receive(:info_refs).and_return(api_response)
+            expect(git_push_ssh_proxy).to receive(:info_refs_receive_pack).and_return(api_response)
 
             post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
 
@@ -453,8 +453,8 @@ describe API::Geo do
 
         context 'where an exception occurs' do
           it 'responds with 500' do
-            expect(git_push_ssh_proxy).to receive(:push).and_raise('deliberate exception raised')
-            post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
+            expect(git_push_ssh_proxy).to receive(:receive_pack).and_raise('deliberate exception raised')
+            post api('/geo/proxy_git_ssh/receive_pack'), params: { secret_token: secret_token, data: data, output: output }
 
             expect(response).to have_gitlab_http_status(:internal_server_error)
             expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
@@ -473,7 +473,7 @@ describe API::Geo do
           end
 
           it 'responds with 201' do
-            expect(git_push_ssh_proxy).to receive(:push).with(output).and_return(api_response)
+            expect(git_push_ssh_proxy).to receive(:receive_pack).with(output).and_return(api_response)
 
             post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
 

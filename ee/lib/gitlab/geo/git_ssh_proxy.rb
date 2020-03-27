@@ -5,9 +5,8 @@ module Gitlab
     class GitSSHProxy
       HTTP_READ_TIMEOUT = 60
 
-      INFO_REFS_CONTENT_TYPE = 'application/x-git-upload-pack-request'.freeze
-      PUSH_CONTENT_TYPE = 'application/x-git-receive-pack-request'.freeze
-      PUSH_ACCEPT = 'application/x-git-receive-pack-result'.freeze
+      RECEIVE_PACK_REQUEST_CONTENT_TYPE = 'application/x-git-receive-pack-request'.freeze
+      RECEIVE_PACK_RESULT_CONTENT_TYPE = 'application/x-git-receive-pack-result'.freeze
 
       MustBeASecondaryNode = Class.new(StandardError)
 
@@ -50,28 +49,30 @@ module Gitlab
         @data = data
       end
 
-      def info_refs
+      # For git push
+      def info_refs_receive_pack
         ensure_secondary!
 
         url = "#{primary_repo}/info/refs?service=git-receive-pack"
-        headers = { 'Content-Type' => INFO_REFS_CONTENT_TYPE }
+        headers = { 'Content-Type' => RECEIVE_PACK_REQUEST_CONTENT_TYPE }
 
         resp = get(url, headers)
-        resp.body = remove_http_service_fragment_from(resp.body) if resp.is_a?(Net::HTTPSuccess)
+        resp.body = remove_receive_pack_http_service_fragment_from(resp.body) if resp.is_a?(Net::HTTPSuccess)
 
         APIResponse.from_http_response(resp, primary_repo)
       rescue => e
         handle_exception(e)
       end
 
-      def push(encoded_info_refs_response)
+      # For git push
+      def receive_pack(encoded_info_refs_response)
         ensure_secondary!
 
         url = "#{primary_repo}/git-receive-pack"
-        headers = { 'Content-Type' => PUSH_CONTENT_TYPE, 'Accept' => PUSH_ACCEPT }
+        headers = { 'Content-Type' => RECEIVE_PACK_REQUEST_CONTENT_TYPE, 'Accept' => RECEIVE_PACK_RESULT_CONTENT_TYPE }
         info_refs_response = Base64.decode64(encoded_info_refs_response)
-
         resp = post(url, info_refs_response, headers)
+
         APIResponse.from_http_response(resp, primary_repo)
       rescue => e
         handle_exception(e)
@@ -130,7 +131,7 @@ module Gitlab
         http.start { http.request(req) }
       end
 
-      def remove_http_service_fragment_from(body)
+      def remove_receive_pack_http_service_fragment_from(body)
         # HTTP(S) and SSH responses are very similar, except for the fragment below.
         # As we're performing a git HTTP(S) request here, we'll get a HTTP(s)
         # suitable git response.  However, we're executing in the context of an
@@ -139,6 +140,7 @@ module Gitlab
         #
         # See Downloading Data > HTTP(S) section at:
         # https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+        #
         body.gsub(/\A001f# service=git-receive-pack\n0000/, '')
       end
 
