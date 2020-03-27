@@ -3,9 +3,8 @@
 require 'spec_helper'
 
 describe Ci::CompareLicenseScanningReportsService do
-  let(:current_user) { project.users.take }
-  let(:service) { described_class.new(project, current_user) }
-  let(:project) { create(:project, :repository) }
+  let(:service) { described_class.new(project, nil) }
+  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(license_scanning: true)
@@ -50,8 +49,8 @@ describe Ci::CompareLicenseScanningReportsService do
     end
 
     context 'when head pipeline has corrupted license scanning reports' do
-      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
+      let!(:base_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
+      let!(:head_pipeline) { build(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
