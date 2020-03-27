@@ -15,8 +15,6 @@ import { EXTEND_AS } from '../constants';
 
 import groupEpics from '../queries/groupEpics.query.graphql';
 import epicChildEpics from '../queries/epicChildEpics.query.graphql';
-import groupEpicsForUnfilteredEpicAggregatesFeatureFlag from '../queries/groupEpicsForUnfilteredEpicAggregatesFeatureFlag.query.graphql';
-import epicChildEpicsForUnfilteredEpicAggregatesFeatureFlag from '../queries/epicChildEpicsForUnfilteredEpicAggregatesFeatureFlag.query.graphql';
 import groupMilestones from '../queries/groupMilestones.query.graphql';
 
 import * as types from './mutation_types';
@@ -46,15 +44,9 @@ export const fetchGroupEpics = (
   // and then we don't need to pass `filterParams`.
   if (epicIid) {
     query = epicChildEpics;
-    if (gon.features && gon.features.unfilteredEpicAggregates) {
-      query = epicChildEpicsForUnfilteredEpicAggregatesFeatureFlag;
-    }
     variables.iid = epicIid;
   } else {
     query = groupEpics;
-    if (gon.features && gon.features.unfilteredEpicAggregates) {
-      query = groupEpicsForUnfilteredEpicAggregatesFeatureFlag;
-    }
     variables = {
       ...variables,
       ...filterParams,
