@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Ci::CompareDependencyScanningReportsService do
-  let(:current_user) { project.users.take }
+  let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(dependency_scanning: true)
@@ -36,6 +36,7 @@ describe Ci::CompareDependencyScanningReportsService do
 
       it 'populates fields based on current_user' do
         payload = subject[:data]['existing'].first
+
         expect(payload['create_vulnerability_feedback_issue_path']).not_to be_empty
         expect(payload['create_vulnerability_feedback_merge_request_path']).not_to be_empty
         expect(payload['create_vulnerability_feedback_dismissal_path']).not_to be_empty
@@ -61,8 +62,14 @@ describe Ci::CompareDependencyScanningReportsService do
     end
 
     context 'when head pipeline has corrupted dependency scanning vulnerability reports' do
-      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_dependency_scanning_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_dependency_scanning_report, project: project) }
+      let!(:base_pipeline) { build(:ee_ci_pipeline, :with_corrupted_dependency_scanning_report, project: project) }
+      let!(:head_pipeline) { build(:ee_ci_pipeline, :with_corrupted_dependency_scanning_report, project: project) }
+
+      before do
+        error = Gitlab::Ci::Parsers::ParserError.new('Exception: JSON parsing failed')
+        allow(base_pipeline).to receive(:license_scanning_report).and_raise(error)
+        allow(head_pipeline).to receive(:license_scanning_report).and_raise(error)
+      end
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
