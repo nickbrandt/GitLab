@@ -48,6 +48,10 @@ Options:
       Authentication/authorization backend (default "http://localhost:8080")
   -authSocket string
       Optional: Unix domain socket to dial authBackend at
+  -cableBackend string
+      Optional: ActionCable backend (default authBackend)
+  -cableSocket string
+      Optional: Unix domain socket to dial cableBackend at (default authSocket)
   -config string
       TOML file to load config from
   -developmentMode
@@ -163,6 +167,8 @@ In table form:
 |unset|`/path/to/socket`|`/path/to/socket`|`/`|
 |`http://localhost:3000`|`/path/to/socket`|`/path/to/socket`|`/`|
 |`http://localhost:3000/gitlab`|`/path/to/socket`|`/path/to/socket`|`/gitlab`|
+
+The same applies to `cableBackend` and `cableSocket`.
 
 ## Installation
 
