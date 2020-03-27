@@ -1278,10 +1278,6 @@ class Project < ApplicationRecord
   end
   # rubocop: enable CodeReuse/ServiceClass
 
-  def find_service(list, name)
-    list.find { |service| service.to_param == name }
-  end
-
   def ci_services
     services.where(category: :ci)
   end
@@ -2421,6 +2417,10 @@ class Project < ApplicationRecord
   end
 
   private
+
+  def find_service(services, name)
+    services.find { |service| service.to_param == name }
+  end
 
   def closest_namespace_setting(name)
     namespace.closest_setting(name)
