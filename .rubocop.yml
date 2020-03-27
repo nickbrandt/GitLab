@@ -380,3 +380,6 @@ Style/FloatDivision:
 
 Cop/BanCatchThrow:
   Enabled: true
+
+Performance/ReadlinesEach:
+  Enabled: true
