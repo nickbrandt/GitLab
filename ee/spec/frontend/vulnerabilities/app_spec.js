@@ -113,6 +113,7 @@ describe('Vulnerability management app', () => {
             vulnerability_data: {
               ...defaultVulnerability,
               category: defaultVulnerability.report_type,
+              vulnerability_id: defaultVulnerability.id,
             },
           },
         });
