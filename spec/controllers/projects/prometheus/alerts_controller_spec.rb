@@ -9,7 +9,6 @@ describe Projects::Prometheus::AlertsController do
   let_it_be(:metric) { create(:prometheus_metric, project: project) }
 
   before do
-    stub_licensed_features(prometheus_alerts: true)
     project.add_maintainer(user)
     sign_in(user)
   end
