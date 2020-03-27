@@ -60,6 +60,9 @@ module EE
                 presence: { message: "can't be blank when indexing is enabled" },
                 if: ->(setting) { setting.elasticsearch_indexing? }
 
+      validate :check_elasticsearch_url_scheme,
+               if: ->(setting) { setting.elasticsearch_indexing? }
+
       validates :elasticsearch_aws_region,
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
                 if: ->(setting) { setting.elasticsearch_indexing? && setting.elasticsearch_aws? }
@@ -290,6 +293,18 @@ module EE
       ::Gitlab::CIDR.new(geo_node_allowed_ips)
     rescue ::Gitlab::CIDR::ValidationError => e
       errors.add(:geo_node_allowed_ips, e.message)
+    end
+
+    def check_elasticsearch_url_scheme
+      urls = elasticsearch_url.map(&URI.method(:parse))
+
+      # ElasticSearch only exposes a RESTful API, hence we need
+      # to use the HTTP protocol on all URLs.
+      unless urls.all? { [:http, :https].include? url.scheme&.to_sym }
+        errors.add(:elasticsearch_url, "only supports HTTP(S) URLs.")
+      end
+    rescue URI::InvalidURIError => e
+      errors.add(:elasticsearch_url, e.message)
     end
   end
 end
