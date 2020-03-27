@@ -60,8 +60,7 @@ module EE
                 presence: { message: "can't be blank when indexing is enabled" },
                 if: ->(setting) { setting.elasticsearch_indexing? }
 
-      validate :check_elasticsearch_url_scheme,
-               if: ->(setting) { setting.elasticsearch_indexing? }
+      validate :check_elasticsearch_url_scheme
 
       validates :elasticsearch_aws_region,
                 presence: { message: "can't be blank when using aws hosted elasticsearch" },
@@ -300,7 +299,7 @@ module EE
 
       # ElasticSearch only exposes a RESTful API, hence we need
       # to use the HTTP protocol on all URLs.
-      unless urls.all? { [:http, :https].include? url.scheme&.to_sym }
+      unless urls.all? { |url| [:http, :https].include? url.scheme&.to_sym }
         errors.add(:elasticsearch_url, "only supports HTTP(S) URLs.")
       end
     rescue URI::InvalidURIError => e
