@@ -20,7 +20,7 @@
 
       &:focus,
       &.active {
-        background-color: $white-light;
+        background-color: $white;
       }
 
       &.active {
@@ -90,7 +90,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background: $white-light;
+  background: $white;
   z-index: 9000;
 
   @include media-breakpoint-down(sm) {
