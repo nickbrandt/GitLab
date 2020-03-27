@@ -23,4 +23,15 @@ describe Requirement do
     it { is_expected.to validate_length_of(:title).is_at_most(::Issuable::TITLE_LENGTH_MAX) }
     it { is_expected.to validate_length_of(:title_html).is_at_most(::Issuable::TITLE_HTML_LENGTH_MAX) }
   end
+
+  describe 'scopes' do
+    describe '.counts_by_state' do
+      let_it_be(:opened) { create(:requirement, project: project, state: :opened) }
+      let_it_be(:archived) { create(:requirement, project: project, state: :archived) }
+
+      subject { described_class.counts_by_state }
+
+      it { is_expected.to contain_exactly(['archived', 1], ['opened', 1]) }
+    end
+  end
 end

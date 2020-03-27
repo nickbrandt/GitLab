@@ -27,6 +27,18 @@ module EE
               description: 'Find requirements. Available only when feature flag `requirements_management` is enabled.',
               max_page_size: 2000,
               resolver: ::Resolvers::RequirementsResolver
+
+        field :requirement_states_count, ::Types::RequirementStatesCountType, null: true,
+              description: 'Number of requirements for the project by their state',
+              resolve: -> (project, args, ctx) do
+                return unless requirements_available?(project, ctx[:current_user])
+
+                Hash.new(0).merge(project.requirements.counts_by_state)
+              end
+
+        def self.requirements_available?(project, user)
+          ::Feature.enabled?(:requirements_management, project) && Ability.allowed?(user, :read_requirement, project)
+        end
       end
     end
   end
