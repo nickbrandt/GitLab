@@ -71,11 +71,11 @@ module API
             requires :primary_repo, type: String
           end
         end
-        post 'info_refs' do
+        post 'info_refs_receive_pack' do
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitSSHProxy.new(params['data']).info_refs
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).info_refs_receive_pack
           status(response.code)
           response.body
         end
@@ -91,11 +91,11 @@ module API
           end
           requires :output, type: String, desc: 'Output from git-receive-pack'
         end
-        post 'push' do
+        post 'receive_pack' do
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitSSHProxy.new(params['data']).push(params['output'])
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).receive_pack(params['output'])
           status(response.code)
           response.body
         end
