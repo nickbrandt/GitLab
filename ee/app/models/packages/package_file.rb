@@ -55,4 +55,8 @@ class Packages::PackageFile < ApplicationRecord
   def download_path
     Gitlab::Routing.url_helpers.download_project_package_file_path(project, self)
   end
+
+  def local?
+    file_store == ::Packages::PackageFileUploader::Store::LOCAL
+  end
 end
