@@ -215,6 +215,24 @@ module Gitlab
     def issue
       @issue ||= /(?<issue>\d+\b)/
     end
+
+    def go_package_regex
+      # A Go package name looks like a URL but is not; it:
+      #   - Must not have a scheme, such as http:// or https://
+      #   - Must not have a port number, such as :8080 or :8443
+
+      @go_package_regex ||= /
+        \b (?# word boundary)
+        [0-9a-z]((-|[0-9a-z]){0,61}[0-9a-z])? (?# first domain)
+        (\.[0-9a-z]((-|[0-9a-z]){0,61}[0-9a-z])?)* (?# inner domains)
+        \.[a-z]{2,} (?# top-level domain)
+        (\/(
+          [-\/$_.+!*'(),0-9a-z] (?# plain URL character)
+          | %[0-9a-f]{2})* (?# URL encoded character)
+        )? (?# path)
+        \b (?# word boundary)
+      /ix.freeze
+    end
   end
 end
 
