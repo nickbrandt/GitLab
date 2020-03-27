@@ -75,7 +75,7 @@ module API
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).info_refs
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).info_refs
           status(response.code)
           response.body
         end
@@ -95,7 +95,7 @@ module API
           authenticate_by_gitlab_shell_token!
           params.delete(:secret_token)
 
-          response = Gitlab::Geo::GitPushSSHProxy.new(params['data']).push(params['output'])
+          response = Gitlab::Geo::GitSSHProxy.new(params['data']).push(params['output'])
           status(response.code)
           response.body
         end

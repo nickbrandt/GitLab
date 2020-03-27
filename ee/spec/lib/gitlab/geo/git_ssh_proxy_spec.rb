@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::GitPushSSHProxy, :geo do
+describe Gitlab::Geo::GitSSHProxy, :geo do
   include ::EE::GeoHelpers
 
   # TODO This spec doesn't work with a relative_url_root https://gitlab.com/gitlab-org/gitlab/issues/11173
@@ -86,8 +86,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:get, full_info_refs_url).to_timeout
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.info_refs).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
           end
 
           it 'has a code of 500' do
@@ -114,8 +114,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg, headers: info_refs_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.info_refs).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 502' do
@@ -140,8 +140,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full, headers: info_refs_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::APIResponse' do
-            expect(subject.info_refs).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
+            expect(subject.info_refs).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 200' do
@@ -192,8 +192,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:post, full_git_receive_pack_url).to_timeout
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::FailedAPIResponse)
           end
 
           it 'has a messsage' do
@@ -212,8 +212,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:post, full_git_receive_pack_url).to_return(status: 502, body: error_msg, headers: push_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::FailedAPIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
+            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a messsage' do
@@ -233,8 +233,8 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
             stub_request(:post, full_git_receive_pack_url).to_return(status: 201, body: body, headers: push_headers)
           end
 
-          it 'returns a Gitlab::Geo::GitPushSSHProxy::APIResponse' do
-            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitPushSSHProxy::APIResponse)
+          it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do
+            expect(subject.push(info_refs_body_short)).to be_a(Gitlab::Geo::GitSSHProxy::APIResponse)
           end
 
           it 'has a code of 201' do

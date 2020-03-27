@@ -409,10 +409,10 @@ describe API::Geo do
       end
 
       context 'with all required params' do
-        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitPushSSHProxy) }
+        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitSSHProxy) }
 
         before do
-          allow(Gitlab::Geo::GitPushSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
+          allow(Gitlab::Geo::GitSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
         end
 
         context 'with an invalid secret_token' do
@@ -438,7 +438,7 @@ describe API::Geo do
 
         context 'with a valid secret token' do
           let(:http_response) { double(Net::HTTPOK, code: 200, body: 'something here') }
-          let(:api_response) { Gitlab::Geo::GitPushSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
+          let(:api_response) { Gitlab::Geo::GitSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
 
           before do
             # Mocking a real Net::HTTPSuccess is very difficult as it's not
@@ -470,10 +470,10 @@ describe API::Geo do
 
       context 'with all required params' do
         let(:output) { Base64.encode64('info_refs content') }
-        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitPushSSHProxy) }
+        let(:git_push_ssh_proxy) { double(Gitlab::Geo::GitSSHProxy) }
 
         before do
-          allow(Gitlab::Geo::GitPushSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
+          allow(Gitlab::Geo::GitSSHProxy).to receive(:new).with(data).and_return(git_push_ssh_proxy)
         end
 
         context 'with an invalid secret_token' do
@@ -498,7 +498,7 @@ describe API::Geo do
 
         context 'with a valid secret token' do
           let(:http_response) { double(Net::HTTPCreated, code: 201, body: 'something here', class: Net::HTTPCreated) }
-          let(:api_response) { Gitlab::Geo::GitPushSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
+          let(:api_response) { Gitlab::Geo::GitSSHProxy::APIResponse.from_http_response(http_response, primary_repo) }
 
           before do
             # Mocking a real Net::HTTPSuccess is very difficult as it's not
