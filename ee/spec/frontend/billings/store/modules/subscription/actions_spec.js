@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 
 import state from 'ee/billings/stores/modules/subscription/state';
 import * as types from 'ee/billings/stores/modules/subscription/mutation_types';
@@ -22,7 +22,7 @@ describe('subscription actions', () => {
   });
 
   describe('setNamespaceId', () => {
-    it('should commit the correct mutuation', done => {
+    it('should commit the correct mutuation', () => {
       const namespaceId = 1;
 
       testAction(
@@ -36,7 +36,6 @@ describe('subscription actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
@@ -54,7 +53,7 @@ describe('subscription actions', () => {
           .replyOnce(200, mockDataSubscription.gold);
       });
 
-      it('should dispatch the request and success actions', done => {
+      it('should dispatch the request and success actions', () => {
         testAction(
           actions.fetchSubscription,
           {},
@@ -67,7 +66,6 @@ describe('subscription actions', () => {
               payload: mockDataSubscription.gold,
             },
           ],
-          done,
         );
       });
     });
@@ -77,34 +75,32 @@ describe('subscription actions', () => {
         mock.onGet(/\/api\/v4\/namespaces\/\d+\/gitlab_subscription(.*)$/).replyOnce(404, {});
       });
 
-      it('should dispatch the request and error actions', done => {
+      it('should dispatch the request and error actions', () => {
         testAction(
           actions.fetchSubscription,
           {},
           mockedState,
           [],
           [{ type: 'requestSubscription' }, { type: 'receiveSubscriptionError' }],
-          done,
         );
       });
     });
   });
 
   describe('requestSubscription', () => {
-    it('should commit the request mutation', done => {
+    it('should commit the request mutation', () => {
       testAction(
         actions.requestSubscription,
         {},
         state,
         [{ type: types.REQUEST_SUBSCRIPTION }],
         [],
-        done,
       );
     });
   });
 
   describe('receiveSubscriptionSuccess', () => {
-    it('should commit the success mutation', done => {
+    it('should commit the success mutation', () => {
       testAction(
         actions.receiveSubscriptionSuccess,
         mockDataSubscription.gold,
@@ -116,20 +112,18 @@ describe('subscription actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
 
   describe('receiveSubscriptionError', () => {
-    it('should commit the error mutation', done => {
+    it('should commit the error mutation', () => {
       testAction(
         actions.receiveSubscriptionError,
         {},
         mockedState,
         [{ type: types.RECEIVE_SUBSCRIPTION_ERROR }],
         [],
-        done,
       );
     });
   });

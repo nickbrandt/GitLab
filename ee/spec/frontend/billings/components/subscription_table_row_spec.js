@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import component from 'ee/billings/components/subscription_table_row.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 import { dateInWords } from '~/lib/utils/datetime_utility';
 
 describe('Subscription Table Row', () => {
