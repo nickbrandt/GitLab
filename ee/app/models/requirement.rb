@@ -24,6 +24,7 @@ class Requirement < ApplicationRecord
 
   scope :for_iid, -> (iid) { where(iid: iid) }
   scope :for_state, -> (state) { where(state: state) }
+  scope :counts_by_state, -> { group(:state).count }
 
   def self.simple_sorts
     super.except('name_asc', 'name_desc')
