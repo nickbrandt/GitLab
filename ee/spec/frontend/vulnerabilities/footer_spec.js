@@ -62,6 +62,7 @@ describe('Vulnerability Footer', () => {
     it('does show solution card when there is one', () => {
       createWrapper({ ...minimumProps, solutionInfo: solutionInfoProp });
       expect(wrapper.contains(SolutionCard)).toBe(true);
+      expect(wrapper.find(SolutionCard).props()).toMatchObject(solutionInfoProp);
     });
 
     it('does not show solution card when there is not one', () => {
@@ -74,6 +75,10 @@ describe('Vulnerability Footer', () => {
     it('does show issue history when there is one', () => {
       createWrapper({ ...minimumProps, feedback: feedbackProps });
       expect(wrapper.contains(IssueNote)).toBe(true);
+      expect(wrapper.find(IssueNote).props()).toMatchObject({
+        feedback: feedbackProps,
+        project: minimumProps.project,
+      });
     });
 
     it('does not show issue history when there is not one', () => {

@@ -57,9 +57,21 @@ describe VulnerabilitiesHelper do
 
     subject { helper.vulnerability_finding_data(finding) }
 
-    it "returns finding information" do
+    it 'returns finding information' do
+      puts finding.to_json
       expect(subject[:name]).not_to be_nil
       expect(subject[:description]).not_to be_nil
+      expect(subject).to include(
+        :solution => finding.solution,
+        :remediation => nil,
+        :issue_feedback => finding.issue_feedback,
+        :project => finding.project,
+        :description => finding.description,
+        :identifiers => finding.identifiers,
+        :links => finding.links,
+        :location => finding.location,
+        :name => finding.name
+      )
     end
   end
 end
