@@ -62,7 +62,6 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
         let(:current_node) { secondary_node }
 
         let(:full_info_refs_url) { "#{primary_repo_http}/info/refs?service=git-receive-pack" }
-        let(:info_refs_receive_pack_headers) { base_headers.merge('Content-Type' => 'application/x-git-upload-pack-request') }
         let(:info_refs_http_body_full) { "001f# service=git-receive-pack\n0000#{info_refs_body_short}" }
 
         context 'authorization header is scoped' do
@@ -111,7 +110,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
           let(:error_msg) { 'dial unix /Users/ash/src/gdk/gdk-ee/gitlab.socket: connect: connection refused' }
 
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg, headers: info_refs_receive_pack_headers)
+            stub_request(:get, full_info_refs_url).to_return(status: 502, body: error_msg)
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::FailedAPIResponse' do
@@ -137,7 +136,7 @@ describe Gitlab::Geo::GitSSHProxy, :geo do
 
         context 'with a valid response' do
           before do
-            stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full, headers: info_refs_receive_pack_headers)
+            stub_request(:get, full_info_refs_url).to_return(status: 200, body: info_refs_http_body_full)
           end
 
           it 'returns a Gitlab::Geo::GitSSHProxy::APIResponse' do

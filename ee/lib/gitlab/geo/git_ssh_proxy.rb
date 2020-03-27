@@ -54,9 +54,8 @@ module Gitlab
         ensure_secondary!
 
         url = "#{primary_repo}/info/refs?service=git-receive-pack"
-        headers = { 'Content-Type' => RECEIVE_PACK_REQUEST_CONTENT_TYPE }
 
-        resp = get(url, headers)
+        resp = get(url)
         resp.body = remove_receive_pack_http_service_fragment_from(resp.body) if resp.is_a?(Net::HTTPSuccess)
 
         APIResponse.from_http_response(resp, primary_repo)
@@ -110,7 +109,7 @@ module Gitlab
         URI.parse(primary_repo).path.gsub(%r{^\/|\.git$}, '')
       end
 
-      def get(url, headers)
+      def get(url, headers = {})
         request(url, Net::HTTP::Get, headers)
       end
 
