@@ -83,7 +83,7 @@ module QA
             # as ssh:// can appear depending on how GitLab is configured.
             ssh_uri = project.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
 
-            expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
+            expect(push.output).to match(%r{This request to a Geo secondary node will be forwarded to the.*Geo primary node:.*#{ssh_uri}}m)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
@@ -171,7 +171,7 @@ module QA
             end
 
             ssh_uri = project.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
-            expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
+            expect(push.output).to match(%r{This request to a Geo secondary node will be forwarded to the.*Geo primary node:.*#{ssh_uri}}m)
             expect(push.output).to match(/Locking support detected on remote "#{location.uri}"/)
 
             # Validate git push worked and new content is visible

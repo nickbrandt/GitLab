@@ -51,7 +51,7 @@ module EE
 
               @geo_redirect_to_primary_message ||= begin
                 url = "#{::Gitlab::Geo.current_node.url.chomp('/')}/#{project.full_path}.git"
-                ::Gitlab::Geo.redirecting_push_to_primary_message(url)
+                ::Gitlab::Geo.interacting_with_primary_message(url)
               end
             end
 
