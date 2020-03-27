@@ -3,6 +3,10 @@
 module SnippetsActions
   extend ActiveSupport::Concern
 
+  included do
+    before_action :redirect_if_binary, only: [:edit, :update]
+  end
+
   def edit
     # We need to load some info from the existing blob
     snippet.content = blob.data
@@ -51,5 +55,9 @@ module SnippetsActions
 
     flash.now[:alert] = repository_errors.first if repository_errors.present?
     recaptcha_check_with_fallback(repository_errors.empty?) { render :edit }
+  end
+
+  def redirect_if_binary
+    redirect_to gitlab_snippet_path(snippet) if blob&.binary?
   end
 end
