@@ -1258,13 +1258,11 @@ class Project < ApplicationRecord
     service = find_service(services, name)
     return service if service
 
-    # We should check if template for the service exists
     template = find_service(services_templates, name)
 
     if template
       Service.build_from_template(id, template)
     else
-      # If no template, we should create an instance. Ex `build_gitlab_ci_service`
       public_send("build_#{name}_service") # rubocop:disable GitlabSecurity/PublicSend
     end
   end
