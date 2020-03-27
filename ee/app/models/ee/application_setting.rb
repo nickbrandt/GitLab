@@ -299,7 +299,7 @@ module EE
 
       # ElasticSearch only exposes a RESTful API, hence we need
       # to use the HTTP protocol on all URLs.
-      unless urls.all? { |url| [:http, :https].include? url.scheme&.to_sym }
+      unless urls.all? { |uri| uri.is_a?(URI::HTTP) && !uri.host.nil? }
         errors.add(:elasticsearch_url, "only supports HTTP(S) URLs.")
       end
     rescue URI::InvalidURIError => e
