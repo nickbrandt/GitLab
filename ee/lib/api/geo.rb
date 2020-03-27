@@ -56,9 +56,9 @@ module API
         end
       end
 
-      # git push over SSH secondary -> primary related proxying logic
+      # git over SSH secondary endpoints -> primary related proxying logic
       #
-      resource 'proxy_git_push_ssh' do
+      resource 'proxy_git_ssh' do
         format :json
 
         # Responsible for making HTTP GET /repo.git/info/refs?service=git-receive-pack

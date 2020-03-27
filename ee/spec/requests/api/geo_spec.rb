@@ -389,7 +389,7 @@ describe API::Geo do
     end
   end
 
-  describe '/geo/proxy_git_push_ssh' do
+  describe '/geo/proxy_git_ssh' do
     let(:secret_token) { Gitlab::Shell.secret_token }
     let(:primary_repo) { 'http://localhost:3001/testuser/repo.git' }
     let(:data) { { primary_repo: primary_repo, gl_id: 'key-1', gl_username: 'testuser' } }
@@ -398,10 +398,10 @@ describe API::Geo do
       stub_current_geo_node(secondary_node)
     end
 
-    describe 'POST /geo/proxy_git_push_ssh/info_refs' do
+    describe 'POST /geo/proxy_git_ssh/info_refs_receive_pack' do
       context 'with all required params missing' do
         it 'responds with 400' do
-          post api('/geo/proxy_git_push_ssh/info_refs'), params: nil
+          post api('/geo/proxy_git_ssh/info_refs_receive_pack'), params: nil
 
           expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing')
@@ -417,7 +417,7 @@ describe API::Geo do
 
         context 'with an invalid secret_token' do
           it 'responds with 401' do
-            post(api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: 'invalid', data: data })
+            post(api('/geo/proxy_git_ssh/info_refs_receive_pack'), params: { secret_token: 'invalid', data: data })
 
             expect(response).to have_gitlab_http_status(:unauthorized)
             expect(json_response['error']).to be_nil
@@ -428,7 +428,7 @@ describe API::Geo do
           it 'responds with 500' do
             expect(git_push_ssh_proxy).to receive(:info_refs_receive_pack).and_raise('deliberate exception raised')
 
-            post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
+            post api('/geo/proxy_git_ssh/info_refs_receive_pack'), params: { secret_token: secret_token, data: data }
 
             expect(response).to have_gitlab_http_status(:internal_server_error)
             expect(json_response['message']).to include('RuntimeError (deliberate exception raised)')
@@ -449,7 +449,7 @@ describe API::Geo do
           it 'responds with 200' do
             expect(git_push_ssh_proxy).to receive(:info_refs_receive_pack).and_return(api_response)
 
-            post api('/geo/proxy_git_push_ssh/info_refs'), params: { secret_token: secret_token, data: data }
+            post api('/geo/proxy_git_ssh/info_refs_receive_pack'), params: { secret_token: secret_token, data: data }
 
             expect(response).to have_gitlab_http_status(:ok)
             expect(Base64.decode64(json_response['result'])).to eql('something here')
@@ -458,10 +458,10 @@ describe API::Geo do
       end
     end
 
-    describe 'POST /geo/proxy_git_push_ssh/push' do
+    describe 'POST /geo/proxy_git_ssh/receive_pack' do
       context 'with all required params missing' do
         it 'responds with 400' do
-          post api('/geo/proxy_git_push_ssh/push'), params: nil
+          post api('/geo/proxy_git_ssh/receive_pack'), params: nil
 
           expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['error']).to eql('secret_token is missing, data is missing, data[gl_id] is missing, data[primary_repo] is missing, output is missing')
@@ -478,7 +478,7 @@ describe API::Geo do
 
         context 'with an invalid secret_token' do
           it 'responds with 401' do
-            post(api('/geo/proxy_git_push_ssh/push'), params: { secret_token: 'invalid', data: data, output: output })
+            post(api('/geo/proxy_git_ssh/receive_pack'), params: { secret_token: 'invalid', data: data, output: output })
 
             expect(response).to have_gitlab_http_status(:unauthorized)
             expect(json_response['error']).to be_nil
@@ -509,7 +509,7 @@ describe API::Geo do
           it 'responds with 201' do
             expect(git_push_ssh_proxy).to receive(:receive_pack).with(output).and_return(api_response)
 
-            post api('/geo/proxy_git_push_ssh/push'), params: { secret_token: secret_token, data: data, output: output }
+            post api('/geo/proxy_git_ssh/receive_pack'), params: { secret_token: secret_token, data: data, output: output }
 
             expect(response).to have_gitlab_http_status(:created)
             expect(Base64.decode64(json_response['result'])).to eql('something here')
