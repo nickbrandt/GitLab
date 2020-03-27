@@ -2,9 +2,10 @@ import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 
-import SecurityDashboard from 'ee/security_dashboard/components/security_dashboard.vue';
+import SecurityDashboard from 'ee/security_dashboard/components/security_dashboard_vuex.vue';
 import Filters from 'ee/security_dashboard/components/filters.vue';
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
+import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_chart.vue';
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 import VulnerabilitySeverity from 'ee/security_dashboard/components/vulnerability_severity.vue';
@@ -41,6 +42,9 @@ describe('Security Dashboard component', () => {
     store = createStore();
     wrapper = shallowMount(SecurityDashboard, {
       store,
+      stubs: {
+        SecurityDashboardLayout,
+      },
       methods: {
         lockFilter: lockFilterSpy,
         setPipelineId: setPipelineIdSpy,

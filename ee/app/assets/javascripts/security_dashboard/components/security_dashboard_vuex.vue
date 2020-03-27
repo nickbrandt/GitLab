@@ -3,6 +3,7 @@ import { isUndefined } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
+import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
@@ -10,10 +11,10 @@ import VulnerabilitySeverity from './vulnerability_severity.vue';
 import LoadingError from './loading_error.vue';
 
 export default {
-  name: 'SecurityDashboard',
   components: {
     Filters,
     IssueModal,
+    SecurityDashboardLayout,
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
@@ -159,29 +160,26 @@ export default {
       :illustrations="loadingErrorIllustrations"
     />
     <template v-else>
-      <vulnerability-count-list v-if="shouldShowCountList" />
+      <security-dashboard-layout>
+        <template #header>
+          <vulnerability-count-list v-if="shouldShowCountList" />
+          <filters />
+        </template>
 
-      <header>
-        <filters />
-      </header>
+        <security-dashboard-table>
+          <template #emptyState>
+            <slot name="emptyState"></slot>
+          </template>
+        </security-dashboard-table>
 
-      <div class="row mt-4">
-        <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-          <security-dashboard-table>
-            <template #emptyState>
-              <slot name="emptyState"></slot>
-            </template>
-          </security-dashboard-table>
-        </article>
-
-        <aside v-if="shouldShowAside" class="col-xl-5">
+        <template v-if="shouldShowAside" #aside>
           <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
           <vulnerability-severity
             v-if="shouldShowVulnerabilitySeverities"
             :endpoint="vulnerableProjectsEndpoint"
           />
-        </aside>
-      </div>
+        </template>
+      </security-dashboard-layout>
 
       <issue-modal
         :modal="modal"

@@ -5,7 +5,7 @@ import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import SecurityDashboard from './security_dashboard.vue';
+import SecurityDashboard from './security_dashboard_vuex.vue';
 
 export default {
   name: 'ProjectSecurityDashboard',
