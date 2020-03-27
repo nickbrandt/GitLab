@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Cookies from 'js-cookie';
 import SurveyBanner from '~/serverless/survey_banner.vue';
 import { GlBanner } from '@gitlab/ui';
@@ -7,7 +7,7 @@ describe('Knative survey banner', () => {
   let wrapper;
 
   function mountBanner() {
-    wrapper = mount(SurveyBanner, {
+    wrapper = shallowMount(SurveyBanner, {
       propsData: {
         surveyUrl: 'http://somesurvey.com/',
       },
@@ -15,7 +15,8 @@ describe('Knative survey banner', () => {
   }
 
   afterEach(() => {
-    if (wrapper) wrapper.destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   it('should render the banner when the cookie is absent', () => {
