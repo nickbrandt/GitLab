@@ -51,6 +51,8 @@ module Gitlab
         const_get(replicator_class_name, false)
       end
 
+      attr_reader :model_record_id
+
       def initialize(model_record: nil, model_record_id: nil)
         @model_record = model_record
         @model_record_id = model_record_id

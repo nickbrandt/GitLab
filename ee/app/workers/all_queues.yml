@@ -213,6 +213,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: geo:geo_blob_verification_primary
+  :feature_category: :geo_replication
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
 - :name: geo:geo_container_repository_sync
   :feature_category: :geo_replication
   :has_external_dependencies: 
