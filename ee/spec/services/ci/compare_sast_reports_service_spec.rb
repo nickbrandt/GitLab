@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Ci::CompareSastReportsService do
-  let(:current_user) { project.users.take }
+  let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)
@@ -37,6 +37,7 @@ describe Ci::CompareSastReportsService do
 
       it 'populates fields based on current_user' do
         payload = subject[:data]['existing'].first
+
         expect(payload['create_vulnerability_feedback_issue_path']).not_to be_empty
         expect(payload['create_vulnerability_feedback_merge_request_path']).not_to be_empty
         expect(payload['create_vulnerability_feedback_dismissal_path']).not_to be_empty

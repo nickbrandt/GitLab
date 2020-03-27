@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Ci::CompareContainerScanningReportsService do
-  let(:current_user) { project.users.take }
+  let(:current_user) { build(:user, :admin) }
   let(:service) { described_class.new(project, current_user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { build(:project, :repository) }
 
   before do
     stub_licensed_features(container_scanning: true)
@@ -57,23 +57,6 @@ describe Ci::CompareContainerScanningReportsService do
         compare_keys = subject[:data]['fixed'].map { |t| t['identifiers'].first['external_id'] }
         expected_keys = %w(CVE-2017-16997 CVE-2017-18269 CVE-2018-1000001 CVE-2016-10228 CVE-2010-4052 CVE-2018-18520 CVE-2018-16869 CVE-2018-18311)
         expect(compare_keys - expected_keys).to eq([])
-      end
-    end
-
-    context 'when head pipeline has corrupted container scanning vulnerability reports' do
-      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_container_scanning_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_container_scanning_report, project: project) }
-
-      it 'returns status and error message' do
-        expect(subject[:status]).to eq(:error)
-        expect(subject[:status_reason]).to include('JSON parsing failed')
-      end
-
-      it 'returns status and error message when pipeline is nil' do
-        result = service.execute(nil, head_pipeline)
-
-        expect(result[:status]).to eq(:error)
-        expect(result[:status_reason]).to include('JSON parsing failed')
       end
     end
   end
