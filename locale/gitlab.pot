@@ -71,6 +71,9 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "#L%{start_line}"
+msgstr ""
+
 msgid "%d changed file"
 msgid_plural "%d changed files"
 msgstr[0] ""
@@ -305,7 +308,7 @@ msgstr ""
 msgid "%{filePath} deleted"
 msgstr ""
 
-msgid "%{file}:%{line}"
+msgid "%{file}"
 msgstr ""
 
 msgid "%{firstLabel} +%{labelCount} more"
@@ -351,6 +354,9 @@ msgid "%{link_start}Learn more%{link_end} about what information is shared with 
 msgstr ""
 
 msgid "%{link_start}Read more%{link_end} about role permissions"
+msgstr ""
+
+msgid "%{link_text}:%{line}"
 msgstr ""
 
 msgid "%{link} can be used for binding events when something is happening within the project."
@@ -8978,9 +8984,6 @@ msgstr ""
 msgid "File Hooks (%{count})"
 msgstr ""
 
-msgid "File Location"
-msgstr ""
-
 msgid "File added"
 msgstr ""
 
@@ -9009,6 +9012,9 @@ msgid "File templates"
 msgstr ""
 
 msgid "File upload error."
+msgstr ""
+
+msgid "File:"
 msgstr ""
 
 msgid "Files"
@@ -12185,6 +12191,9 @@ msgstr ""
 msgid "Localization"
 msgstr ""
 
+msgid "Location"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
@@ -12762,6 +12771,9 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method"
+msgstr ""
+
+msgid "Method:"
 msgstr ""
 
 msgid "Metric was successfully added."

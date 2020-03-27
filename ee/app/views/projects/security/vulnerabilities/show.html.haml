@@ -34,14 +34,14 @@
               - if location['start_line']
                 - link_text = _("%{link_text}:%{line}") % { link_text: link_text, line: location['start_line'] }
                 - offset = _("#L%{start_line}") % { start_line: location['start_line'] }
-              File: 
+              = _('File:')
               %a{ href: project_blob_path(@project, tree_join(@vulnerability.project.default_branch, location['file'])) + offset,
                 target: '_blank', rel: 'noopener noreferrer' }= link_text
             - if location['class']
               %li= _("Class: %{className}") % { className: location['class'] }
             - if location['method']
               %li
-                Method:
+                = _('Method:')
                 %code= _("%{method}") % { method: location['method'] }
 
         - if @vulnerability.finding.links.any?
