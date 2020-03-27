@@ -12,7 +12,11 @@ module EE
 
         ActiveRecord::Base.no_touching do
           handle_weight_change(is_update)
-          handle_date_change_note if is_update
+
+          if is_update
+            handle_date_change_note
+            handle_health_status_change
+          end
         end
       end
 
@@ -38,6 +42,12 @@ module EE
         else
           ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
         end
+      end
+
+      def handle_health_status_change
+        return unless issuable.previous_changes.include?('health_status')
+
+        ::SystemNoteService.change_health_status_note(issuable, issuable.project, current_user)
       end
 
       def weight_changes_tracking_enabled?
