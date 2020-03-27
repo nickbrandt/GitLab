@@ -6,6 +6,7 @@ describe 'Admin updates EE-only settings' do
   include StubENV
 
   before do
+    stub_feature_flags(instance_level_integrations: false)
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     sign_in(create(:admin))
     allow(License).to receive(:feature_available?).and_return(true)
@@ -57,7 +58,7 @@ describe 'Admin updates EE-only settings' do
 
   context 'Elasticsearch settings' do
     before do
-      visit general_admin_application_settings_path
+      visit integrations_admin_application_settings_path
       page.within('.as-elasticsearch') do
         click_button 'Expand'
       end
@@ -137,7 +138,7 @@ describe 'Admin updates EE-only settings' do
       namespace = create(:elasticsearch_indexed_namespace).namespace
       project = create(:elasticsearch_indexed_project).project
 
-      visit general_admin_application_settings_path
+      visit integrations_admin_application_settings_path
 
       expect(ElasticsearchIndexedNamespace.count).to be > 0
       expect(ElasticsearchIndexedProject.count).to be > 0
@@ -167,7 +168,7 @@ describe 'Admin updates EE-only settings' do
 
   it 'Enable Slack application' do
     allow(Gitlab).to receive(:com?).and_return(true)
-    visit general_admin_application_settings_path
+    visit integrations_admin_application_settings_path
 
     page.within('.as-slack') do
       check 'Enable Slack application'
