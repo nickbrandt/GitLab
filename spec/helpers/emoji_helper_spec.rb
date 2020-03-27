@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe EmojiHelper do
-  # include UploadHelpers
-
   describe '#emoji_icon' do
     let(:options) { {} }
     let(:emoji_text) { 'rocket' }
