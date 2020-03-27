@@ -7,8 +7,8 @@ describe API::MavenPackages do
   let(:project) { create(:project, :public, namespace: group) }
   let(:package) { create(:maven_package, project: project) }
   let(:maven_metadatum) { package.maven_metadatum }
-  let(:package_file) { package.package_files.where('file_name like ?', '%.xml').first }
-  let(:jar_file) { package.package_files.where('file_name like ?', '%.jar').first }
+  let(:package_file) { package.package_files.find_by('file_name like ?', '%.xml') }
+  let(:jar_file) { package.package_files.find_by('file_name like ?', '%.jar') }
   let(:personal_access_token) { create(:personal_access_token, user: user) }
   let(:workhorse_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
   let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => workhorse_token } }

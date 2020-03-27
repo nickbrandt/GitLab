@@ -84,7 +84,7 @@ module Geo
       last_processed = Geo::EventLogState.last_processed
       return first unless last_processed
 
-      where('id > ?', last_processed.event_id).first
+      find_by('id > ?', last_processed.event_id)
     end
 
     def self.event_classes

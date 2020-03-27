@@ -18,15 +18,21 @@ import MonitorAnomalyChart from './charts/anomaly.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import MonitorHeatmapChart from './charts/heatmap.vue';
 import MonitorColumnChart from './charts/column.vue';
+import MonitorBarChart from './charts/bar.vue';
 import MonitorStackedColumnChart from './charts/stacked_column.vue';
 import MonitorEmptyChart from './charts/empty_chart.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
+const events = {
+  timeRangeZoom: 'timerangezoom',
+};
+
 export default {
   components: {
     MonitorSingleStatChart,
     MonitorColumnChart,
+    MonitorBarChart,
     MonitorHeatmapChart,
     MonitorStackedColumnChart,
     MonitorEmptyChart,
@@ -159,6 +165,7 @@ export default {
     },
     onDatazoom({ start, end }) {
       this.zoomedTimeRange = { start, end };
+      this.$emit(events.timeRangeZoom, { start, end });
     },
   },
 };
@@ -252,6 +259,10 @@ export default {
     />
     <monitor-heatmap-chart
       v-else-if="isPanelType('heatmap') && graphDataHasMetrics"
+      :graph-data="graphData"
+    />
+    <monitor-bar-chart
+      v-else-if="isPanelType('bar') && graphDataHasMetrics"
       :graph-data="graphData"
     />
     <monitor-column-chart

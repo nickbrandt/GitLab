@@ -87,13 +87,18 @@ or over the size limit, you can [reduce your repository size with Git](../projec
 | -----------             | ----------------- | ------------- |
 | Repository size including LFS | 10G         | Unlimited     |
 
+NOTE: **Note:**
+A single `git push` is limited to 5GB. LFS is not affected by this limit.
+
 ## IP range
 
 GitLab.com is using the IP range `34.74.90.64/28` for traffic from its Web/API
 fleet. You can expect connections from webhooks or repository mirroring to come
 from those IPs and whitelist them.
 
-For connections from CI/CD runners we are not providing static IP addresses.
+GitLab.com is fronted by Cloudflare. For incoming connections to GitLab.com you might need to whitelist CIDR blocks of Cloudflare ([IPv4](https://www.cloudflare.com/ips-v4) and [IPv6](https://www.cloudflare.com/ips-v6))
+
+For outgoing connections from CI/CD runners we are not providing static IP addresses.
 All our runners are deployed into Google Cloud Platform (GCP) - any IP based
 firewall can be configured by looking up all
 [IP address ranges or CIDR blocks for GCP](https://cloud.google.com/compute/docs/faq#where_can_i_find_product_name_short_ip_ranges).

@@ -25,7 +25,15 @@ describe ::EE::API::Entities::Scim::User do
   end
 
   it 'contains the name' do
-    expect(subject[:'name.formatted']).to eq(user.name)
+    expect(subject[:name][:formatted]).to eq(user.name)
+  end
+
+  it 'contains the first name' do
+    expect(subject[:name][:givenName]).to eq(user.first_name)
+  end
+
+  it 'contains the last name' do
+    expect(subject[:name][:familyName]).to eq(user.last_name)
   end
 
   it 'contains the email' do

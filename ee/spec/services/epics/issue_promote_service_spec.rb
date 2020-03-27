@@ -96,7 +96,7 @@ describe Epics::IssuePromoteService do
             let(:issue) { create(:issue, project: project, description: "description with mention to #{user.to_reference}") }
 
             it 'only saves user mentions with actual mentions' do
-              expect(epic.user_mentions.where(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
+              expect(epic.user_mentions.find_by(note_id: nil).mentioned_users_ids).to match_array([user.id])
               expect(epic.user_mentions.where.not(note_id: nil).first.mentioned_users_ids).to match_array([user.id])
               expect(epic.user_mentions.where.not(note_id: nil).count).to eq 1
               expect(epic.user_mentions.count).to eq 2

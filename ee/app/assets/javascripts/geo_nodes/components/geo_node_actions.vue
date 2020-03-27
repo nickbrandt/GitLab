@@ -1,4 +1,5 @@
 <script>
+import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import eventHub from '../event_hub';
 import { NODE_ACTIONS } from '../constants';
@@ -7,6 +8,10 @@ import Icon from '~/vue_shared/components/icon.vue';
 export default {
   components: {
     Icon,
+    GlButton,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     node: {
@@ -18,6 +23,10 @@ export default {
       required: true,
     },
     nodeEditAllowed: {
+      type: Boolean,
+      required: true,
+    },
+    nodeRemovalAllowed: {
       type: Boolean,
       required: true,
     },
@@ -38,6 +47,11 @@ export default {
     },
     isSecondaryNode() {
       return !this.node.primary;
+    },
+    disabledRemovalTooltip() {
+      return this.nodeRemovalAllowed
+        ? ''
+        : s__('Geo Nodes|Cannot remove a primary node if there is a secondary node');
     },
   },
   methods: {
@@ -83,48 +97,60 @@ export default {
 
 <template>
   <div class="d-flex align-items-center justify-content-end geo-node-actions">
-    <a v-if="isSecondaryNode" :href="node.geoProjectsUrl" class="btn btn-sm mx-1 " target="_blank">
+    <a
+      v-if="isSecondaryNode"
+      :href="node.geoProjectsUrl"
+      class="btn btn-sm mx-1 sm-column-spacing"
+      target="_blank"
+    >
       <icon v-if="!node.current" name="external-link" /> {{ __('Open projects') }}
     </a>
     <template v-if="nodeActionsAllowed">
-      <button
+      <gl-button
         v-if="nodeMissingOauth"
-        type="button"
-        class="btn btn-sm btn-default mx-1"
+        class="btn btn-sm btn-default mx-1 sm-column-spacing"
         @click="onRepairNode"
       >
         {{ s__('Repair authentication') }}
-      </button>
-      <button
+      </gl-button>
+      <gl-button
         v-if="isToggleAllowed"
         :class="{
           'btn-warning': node.enabled,
           'btn-success': !node.enabled,
         }"
-        type="button"
-        class="btn btn-sm mx-1"
+        class="btn btn-sm mx-1 sm-column-spacing"
         @click="onToggleNode"
       >
         <icon :name="nodeToggleIcon" />
         {{ nodeToggleLabel }}
-      </button>
-      <a v-if="nodeEditAllowed" :href="node.editPath" class="btn btn-sm mx-1"> {{ __('Edit') }} </a>
-      <button
+      </gl-button>
+      <a v-if="nodeEditAllowed" :href="node.editPath" class="btn btn-sm mx-1 sm-column-spacing">
+        {{ __('Edit') }}
+      </a>
+      <gl-button
         v-if="isSecondaryNode"
-        type="button"
-        class="btn btn-sm btn-danger mx-1"
+        class="btn btn-sm btn-danger mx-1 sm-column-spacing"
+        :disabled="!nodeRemovalAllowed"
         @click="onRemoveSecondaryNode"
       >
         {{ __('Remove') }}
-      </button>
-      <button
-        v-if="!isSecondaryNode"
-        type="button"
-        class="btn btn-sm btn-danger mx-1"
-        @click="onRemovePrimaryNode"
+      </gl-button>
+      <div
+        v-gl-tooltip.hover
+        name="disabledRemovalTooltip"
+        class="mx-1 sm-column-spacing"
+        :title="disabledRemovalTooltip"
       >
-        {{ __('Remove') }}
-      </button>
+        <gl-button
+          v-if="!isSecondaryNode"
+          class="btn btn-sm btn-danger w-100"
+          :disabled="!nodeRemovalAllowed"
+          @click="onRemovePrimaryNode"
+        >
+          {{ __('Remove') }}
+        </gl-button>
+      </div>
     </template>
   </div>
 </template>

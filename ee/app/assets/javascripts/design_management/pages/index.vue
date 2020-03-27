@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -28,8 +28,9 @@ const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 export default {
   components: {
     GlLoadingIcon,
-    UploadButton,
+    GlAlert,
     GlButton,
+    UploadButton,
     Design,
     DesignDestroyer,
     DesignVersionDropdown,
@@ -260,16 +261,16 @@ export default {
     </header>
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
-      <div v-else-if="error" class="alert alert-danger">
+      <gl-alert v-else-if="error" variant="danger" :dismissible="false">
         {{ __('An error occurred while loading designs. Please try again.') }}
-      </div>
+      </gl-alert>
       <ol v-else class="list-unstyled row">
         <li class="col-md-6 col-lg-4 mb-3">
           <design-dropzone class="design-list-item" @change="onUploadDesign" />
         </li>
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
           <design-dropzone @change="onExistingDesignDropzoneChange($event, design.filename)"
-            ><design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)"
+            ><design v-bind="design" :is-uploading="isDesignToBeSaved(design.filename)"
           /></design-dropzone>
 
           <input

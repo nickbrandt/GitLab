@@ -25,13 +25,18 @@ module EE
         expose :created_at
         expose :project_id, if: ->(_, opts) { opts[:group] }
         expose :project_path, if: ->(obj, opts) { opts[:group] && Ability.allowed?(opts[:user], :read_project, obj.project) }
-        expose :build_info, using: Package::BuildInfo
         expose :tags
+
+        expose :pipeline, if: ->(package) { package.build_info }, using: Package::Pipeline
 
         private
 
         def project_path
           object.project.full_path
+        end
+
+        def pipeline
+          object.build_info.pipeline
         end
       end
     end

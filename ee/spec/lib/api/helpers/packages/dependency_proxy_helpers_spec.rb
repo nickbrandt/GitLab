@@ -35,20 +35,15 @@ describe API::Helpers::Packages::DependencyProxyHelpers do
     context 'with npm packages' do
       let(:package_type) { :npm }
 
-      where(:feature_flag, :application_setting, :forward_to_registry, :example_name) do
-        true  | true  | true  | 'executing redirect'
-        true  | true  | false | 'executing fallback'
-        true  | false | true  | 'executing fallback'
-        true  | false | false | 'executing fallback'
-        false | true  | true  | 'executing fallback'
-        false | true  | false | 'executing fallback'
-        false | false | true  | 'executing fallback'
-        false | false | false | 'executing fallback'
+      where(:application_setting, :forward_to_registry, :example_name) do
+        true  | true  | 'executing redirect'
+        true  | false | 'executing fallback'
+        false | true  | 'executing fallback'
+        false | false | 'executing fallback'
       end
 
       with_them do
         before do
-          stub_feature_flags(forward_npm_package_registry_requests: { enabled: feature_flag })
           stub_application_setting(npm_package_requests_forwarding: application_setting)
         end
 
@@ -60,7 +55,6 @@ describe API::Helpers::Packages::DependencyProxyHelpers do
       let(:forward_to_registry) { true }
 
       before do
-        stub_feature_flags(forward_npm_package_registry_requests: { enabled: true })
         stub_application_setting(npm_package_requests_forwarding: true)
       end
 

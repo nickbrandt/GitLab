@@ -8,6 +8,8 @@ module EE
       expose :supports_epic?, as: :supports_epic
 
       expose :features_available do
+        expose :supports_health_status?, as: :health_status
+
         expose :issue_weights do |issuable|
           issuable.project.feature_available?(:issue_weights)
         end

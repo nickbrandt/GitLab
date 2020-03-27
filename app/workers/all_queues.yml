@@ -556,6 +556,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: jira_importer:jira_import_import_issue
+  :feature_category: :importers
+  :has_external_dependencies: 
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: 
 - :name: jira_importer:jira_import_stage_finish_import
   :feature_category: :importers
   :has_external_dependencies: 
@@ -1333,6 +1340,13 @@
   :resource_boundary: :unknown
   :weight: 3
   :idempotent: 
+- :name: update_highest_role
+  :feature_category: :authentication_and_authorization
+  :has_external_dependencies: 
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 2
+  :idempotent: true
 - :name: update_merge_requests
   :feature_category: :source_code_management
   :has_external_dependencies: 

@@ -3,6 +3,8 @@ import {
   mapToScopesViewModel,
   mapFromScopesViewModel,
   createNewEnvironmentScope,
+  mapStrategiesToViewModel,
+  mapStrategiesToRails,
 } from 'ee/feature_flags/store/modules/helpers';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -11,6 +13,8 @@ import {
   PERCENT_ROLLOUT_GROUP_ID,
   INTERNAL_ID_PREFIX,
   DEFAULT_PERCENT_ROLLOUT,
+  LEGACY_FLAG,
+  NEW_VERSION_FLAG,
 } from 'ee/feature_flags/constants';
 
 describe('feature flags helpers spec', () => {
@@ -174,6 +178,7 @@ describe('feature flags helpers spec', () => {
           name: 'name',
           description: 'description',
           active: true,
+          version: LEGACY_FLAG,
           scopes_attributes: [
             {
               id: 4,
@@ -233,21 +238,11 @@ describe('feature flags helpers spec', () => {
       expect(actualScopes).toEqual([]);
     });
     describe('with user IDs per environment', () => {
-      let oldGon;
-
-      beforeEach(() => {
-        oldGon = window.gon;
-        window.gon = { features: { featureFlagsUsersPerEnvironment: true } };
-      });
-
-      afterEach(() => {
-        window.gon = oldGon;
-      });
-
       it('sets the user IDs as a comma separated string', () => {
         const input = {
           name: 'name',
           description: 'description',
+          active: true,
           scopes: [
             {
               id: 4,
@@ -268,6 +263,8 @@ describe('feature flags helpers spec', () => {
           operations_feature_flag: {
             name: 'name',
             description: 'description',
+            version: LEGACY_FLAG,
+            active: true,
             scopes_attributes: [
               {
                 id: 4,
@@ -346,6 +343,122 @@ describe('feature flags helpers spec', () => {
           protected: false,
         }),
       );
+    });
+  });
+
+  describe('mapStrategiesToViewModel', () => {
+    it('should map rails casing to view model casing', () => {
+      expect(
+        mapStrategiesToViewModel([
+          {
+            id: '1',
+            name: 'default',
+            parameters: {},
+            scopes: [
+              {
+                environment_scope: '*',
+                id: '1',
+              },
+            ],
+          },
+        ]),
+      ).toEqual([
+        {
+          id: '1',
+          name: 'default',
+          parameters: {},
+          shouldBeDestroyed: false,
+          scopes: [
+            {
+              shouldBeDestroyed: false,
+              environmentScope: '*',
+              id: '1',
+            },
+          ],
+        },
+      ]);
+    });
+  });
+  describe('mapStrategiesToRails', () => {
+    it('should map rails casing to view model casing', () => {
+      expect(
+        mapStrategiesToRails({
+          name: 'test',
+          description: 'test description',
+          version: NEW_VERSION_FLAG,
+          strategies: [
+            {
+              id: '1',
+              name: 'default',
+              parameters: {},
+              shouldBeDestroyed: true,
+              scopes: [
+                {
+                  environmentScope: '*',
+                  id: '1',
+                  shouldBeDestroyed: true,
+                },
+              ],
+            },
+          ],
+        }),
+      ).toEqual({
+        operations_feature_flag: {
+          name: 'test',
+          description: 'test description',
+          version: NEW_VERSION_FLAG,
+          strategies_attributes: [
+            {
+              id: '1',
+              name: 'default',
+              parameters: {},
+              _destroy: true,
+              scopes: [
+                {
+                  environment_scope: '*',
+                  id: '1',
+                  _destroy: true,
+                },
+              ],
+            },
+          ],
+        },
+      });
+    });
+    it('should insert a default * scope if there are none', () => {
+      expect(
+        mapStrategiesToRails({
+          name: 'test',
+          description: 'test description',
+          version: NEW_VERSION_FLAG,
+          strategies: [
+            {
+              id: '1',
+              name: 'default',
+              parameters: {},
+              scopes: [],
+            },
+          ],
+        }),
+      ).toEqual({
+        operations_feature_flag: {
+          name: 'test',
+          description: 'test description',
+          version: NEW_VERSION_FLAG,
+          strategies_attributes: [
+            {
+              id: '1',
+              name: 'default',
+              parameters: {},
+              scopes: [
+                {
+                  environment_scope: '*',
+                },
+              ],
+            },
+          ],
+        },
+      });
     });
   });
 });

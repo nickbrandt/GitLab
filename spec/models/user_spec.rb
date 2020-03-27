@@ -55,6 +55,67 @@ describe User, :do_not_mock_admin_mode do
     it { is_expected.to have_many(:custom_attributes).class_name('UserCustomAttribute') }
     it { is_expected.to have_many(:releases).dependent(:nullify) }
 
+    describe "#bio" do
+      it 'syncs bio with `user_details.bio` on create' do
+        user = create(:user, bio: 'my bio')
+
+        expect(user.bio).to eq(user.user_detail.bio)
+      end
+
+      context 'when `migrate_bio_to_user_details` feature flag is off' do
+        before do
+          stub_feature_flags(migrate_bio_to_user_details: false)
+        end
+
+        it 'does not sync bio with `user_details.bio`' do
+          user = create(:user, bio: 'my bio')
+
+          expect(user.bio).to eq('my bio')
+          expect(user.user_detail.bio).to eq('')
+        end
+      end
+
+      it 'syncs bio with `user_details.bio` on update' do
+        user = create(:user)
+
+        user.update!(bio: 'my bio')
+
+        expect(user.bio).to eq(user.user_detail.bio)
+      end
+
+      context 'when `user_details` association already exists' do
+        let(:user) { create(:user) }
+
+        before do
+          create(:user_detail, user: user)
+        end
+
+        it 'syncs bio with `user_details.bio`' do
+          user.update!(bio: 'my bio')
+
+          expect(user.bio).to eq(user.user_detail.bio)
+        end
+
+        it 'falls back to "" when nil is given' do
+          user.update!(bio: nil)
+
+          expect(user.bio).to eq(nil)
+          expect(user.user_detail.bio).to eq('')
+        end
+
+        # very unlikely scenario
+        it 'truncates long bio when syncing to user_details' do
+          invalid_bio = 'a' * 256
+          truncated_bio = 'a' * 255
+
+          user.bio = invalid_bio
+          user.save(validate: false)
+
+          expect(user.user_detail.bio).to eq(truncated_bio)
+        end
+      end
+    end
+
     describe "#abuse_report" do
       let(:current_user) { create(:user) }
       let(:other_user) { create(:user) }
@@ -4358,6 +4419,26 @@ describe User, :do_not_mock_admin_mode do
       end
 
       it { is_expected.to be expected_result }
+    end
+  end
+
+  describe '#current_highest_access_level' do
+    let_it_be(:user) { create(:user) }
+
+    context 'when no memberships exist' do
+      it 'returns nil' do
+        expect(user.current_highest_access_level).to be_nil
+      end
+    end
+
+    context 'when memberships exist' do
+      it 'returns the highest access level for non requested memberships' do
+        create(:group_member, :reporter, user_id: user.id)
+        create(:project_member, :guest, user_id: user.id)
+        create(:project_member, :maintainer, user_id: user.id, requested_at: Time.current)
+
+        expect(user.current_highest_access_level).to eq(Gitlab::Access::REPORTER)
+      end
     end
   end
 end

@@ -8,7 +8,8 @@ describe Geo::DesignRepositorySyncService do
 
   let_it_be(:primary) { create(:geo_node, :primary) }
   let_it_be(:secondary) { create(:geo_node) }
-  let_it_be(:project) { create(:project_empty_repo) }
+  let(:user) { create(:user) }
+  let(:project) { create(:project_empty_repo, namespace: create(:namespace, owner: user)) }
 
   let(:repository) { project.design_repository }
   let(:lease_key) { "geo_sync_service:design:#{project.id}" }
@@ -27,6 +28,8 @@ describe Geo::DesignRepositorySyncService do
     let(:url_to_repo) { "#{primary.url}#{project.full_path}.design.git" }
 
     before do
+      allow_any_instance_of(Member).to receive(:update_highest_role) # avoid stubbing exclusive lease for this method
+
       stub_exclusive_lease(lease_key, lease_uuid)
       stub_exclusive_lease("geo_project_housekeeping:#{project.id}")
 

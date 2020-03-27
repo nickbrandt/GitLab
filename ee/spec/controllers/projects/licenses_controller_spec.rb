@@ -43,7 +43,7 @@ describe Projects::LicensesController do
           end
 
           context 'with existing report' do
-            let!(:pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
+            let!(:pipeline) { create(:ee_ci_pipeline, :with_license_scanning_report, project: project) }
 
             before do
               get_licenses

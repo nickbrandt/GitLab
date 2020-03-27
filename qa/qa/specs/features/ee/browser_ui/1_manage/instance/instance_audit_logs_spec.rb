@@ -2,8 +2,8 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
-    shared_examples 'instance audit event logs' do |expected_events|
+  context 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/207741', type: :flaky } do
+    shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         sign_in
 
@@ -17,7 +17,7 @@ module QA
       end
     end
 
-    describe 'Instance audit logs', :requires_admin do
+    describe 'Instance', :requires_admin do
       context 'Failed sign in' do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
@@ -32,7 +32,7 @@ module QA
           sign_in
         end
 
-        it_behaves_like 'instance audit event logs', ["Failed to login with STANDARD authentication"]
+        it_behaves_like 'audit event', ["Failed to login with STANDARD authentication"]
       end
 
       context 'Successful sign in' do
@@ -40,18 +40,18 @@ module QA
           sign_in
         end
 
-        it_behaves_like 'instance audit event logs', ["Signed in with STANDARD authentication"]
+        it_behaves_like 'audit event', ["Signed in with STANDARD authentication"]
       end
 
       context 'Add SSH key' do
         before do
           sign_in
           Resource::SSHKey.fabricate_via_browser_ui! do |resource|
-            resource.title = "key for instance audit event logs test #{Time.now.to_f}"
+            resource.title = "key for audit event test #{Time.now.to_f}"
           end
         end
 
-        it_behaves_like 'instance audit event logs', ["Added SSH key"]
+        it_behaves_like 'audit event', ["Added SSH key"]
       end
 
       context 'Add and delete email' do
@@ -66,7 +66,7 @@ module QA
           end
         end
 
-        it_behaves_like 'instance audit event logs', ["Added email", "Removed email"]
+        it_behaves_like 'audit event', ["Added email", "Removed email"]
       end
 
       context 'Change password', :skip_signup_disabled do
@@ -89,7 +89,7 @@ module QA
           sign_in
         end
 
-        it_behaves_like 'instance audit event logs', ["Changed password"]
+        it_behaves_like 'audit event', ["Changed password"]
       end
 
       context 'Start and stop user impersonation' do
@@ -108,7 +108,7 @@ module QA
           Page::Main::Menu.perform(&:click_stop_impersonation_link)
         end
 
-        it_behaves_like 'instance audit event logs', ["Started Impersonation", "Stopped Impersonation"]
+        it_behaves_like 'audit event', ["Started Impersonation", "Stopped Impersonation"]
       end
 
       def sign_in

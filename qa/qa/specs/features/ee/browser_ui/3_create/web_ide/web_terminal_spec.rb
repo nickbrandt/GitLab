@@ -3,7 +3,7 @@
 module QA
   # This test was quarantined because relative URL isn't supported
   # See https://gitlab.com/gitlab-org/gitlab/issues/13833
-  context 'Create', :quarantine do
+  context 'Create', :runner, :quarantine do
     describe 'Web IDE web terminal', :docker do
       before do
         project = Resource::Project.fabricate_via_api! do |project|
@@ -48,8 +48,7 @@ module QA
       end
 
       after do
-        # Remove the runner even if the test fails
-        Service::DockerRun::GitlabRunner.new(@runner.name).remove! if @runner
+        @runner.remove_via_api! if @runner
       end
 
       it 'user starts the web terminal' do

@@ -6,6 +6,11 @@ describe Geo::UploadRegistry, :geo, :geo_fdw do
   let!(:failed) { create(:geo_upload_registry, :failed) }
   let!(:synced) { create(:geo_upload_registry) }
 
+  it_behaves_like 'a BulkInsertSafe model', Geo::UploadRegistry do
+    let(:valid_items_for_bulk_insertion) { build_list(:geo_upload_registry, 10, created_at: Time.zone.now) }
+    let(:invalid_items_for_bulk_insertion) { [] } # class does not have any validations defined
+  end
+
   it 'finds associated Upload record' do
     registry = create(:geo_upload_registry, :attachment, :with_file)
 

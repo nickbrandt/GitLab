@@ -11,6 +11,7 @@ const createComponent = () => {
     nodes: mockNodes,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    nodeRemovalAllowed: true,
     geoTroubleshootingHelpPath: '/foo/bar',
   });
 };

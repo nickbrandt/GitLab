@@ -150,7 +150,7 @@ Component statuses are linked to configuration documentation for each component.
 | [Node Exporter](#node-exporter) | Prometheus endpoint with system metrics | [✅][node-exporter-omnibus] | [N/A][node-exporter-charts] | [N/A][node-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
 | [Mattermost](#mattermost) | Open-source Slack alternative | [⚙][mattermost-omnibus] | [⤓][mattermost-charts] | [⤓][mattermost-charts] | [⤓](../user/project/integrations/mattermost.md) | ❌ | ❌ | CE & EE |
 | [MinIO](#minio) | Object storage service | [⤓][minio-omnibus] | [✅][minio-charts] | [✅][minio-charts] | [✅](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#storage-architecture) | ❌ | [⚙][minio-gdk] | CE & EE |
-| [Runner](#gitlab-runner) | Executes GitLab CI jobs | [⤓][runner-omnibus] | [✅][runner-charts] | [⚙][runner-charts] | [✅](../user/gitlab_com/index.md#shared-runners) | [⚙][runner-source] | [⚙][runner-gdk] | CE & EE |
+| [Runner](#gitlab-runner) | Executes GitLab CI/CD jobs | [⤓][runner-omnibus] | [✅][runner-charts] | [⚙][runner-charts] | [✅](../user/gitlab_com/index.md#shared-runners) | [⚙][runner-source] | [⚙][runner-gdk] | CE & EE |
 | [Database Migrations](#database-migrations) | Database migrations | [✅][database-migrations-omnibus] | [✅][database-migrations-charts] | [✅][database-migrations-charts] | ✅ | [⚙][database-migrations-source] | ✅ | CE & EE |
 | [Certificate Management](#certificate-management) | TLS Settings, Let's Encrypt | [✅][certificate-management-omnibus] | [✅][certificate-management-charts] | [⚙][certificate-management-charts] | [✅](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#secrets-management) | [⚙][certificate-management-source] | [⚙][certificate-management-gdk] | CE & EE |
 | [GitLab Geo Node](#gitlab-geo) | Geographically distributed GitLab nodes | [⚙][geo-omnibus] | [❌][geo-charts] | [❌][geo-charts] | ✅ | ❌ | [⚙][geo-gdk] | EE Only |
@@ -230,7 +230,7 @@ Gitaly is a service designed by GitLab to remove our need for NFS for Git storag
 - Process: `praefect`
 
 Praefect is a transparent proxy between each Git client and the Gitaly coordinating the replication of
-repository updates to secondairy nodes.
+repository updates to secondary nodes.
 
 #### GitLab Geo
 
@@ -263,7 +263,7 @@ You can use it either for personal or business websites, such as portfolios, doc
 
 GitLab Runner runs tests and sends the results to GitLab.
 
-GitLab CI is the open-source continuous integration service included with GitLab that coordinates the testing. The old name of this project was GitLab CI Multi Runner but please use "GitLab Runner" (without CI) from now on.
+GitLab CI/CD is the open-source continuous integration service included with GitLab that coordinates the testing. The old name of this project was `GitLab CI Multi Runner` but please use `GitLab Runner` (without CI) from now on.
 
 #### GitLab Shell
 
@@ -563,18 +563,23 @@ sequenceDiagram
     participant Git on server
 
     Note left of Git on client: git fetch
-    Git on client->>SSH server: git fetch-pack
-    SSH server-->>AuthorizedKeysCommand: gitlab-shell-authorized-keys-check git AAAA...
-    AuthorizedKeysCommand-->>Rails: GET /internal/api/authorized_keys?key=AAAA...
+    Git on client->>+SSH server: ssh git fetch-pack request
+    SSH server->>+AuthorizedKeysCommand: gitlab-shell-authorized-keys-check git AAAA...
+    AuthorizedKeysCommand->>+Rails: GET /internal/api/authorized_keys?key=AAAA...
     Note right of Rails: Lookup key ID
-    Rails-->>SSH server: 200 OK, command="gitlab-shell upload-pack key_id=1"
-    SSH server-->>GitLab Shell: gitlab-shell upload-pack key_id=1
-    GitLab Shell-->>Rails: GET /internal/api/allowed?action=upload_pack&key_id=1
+    Rails-->>-AuthorizedKeysCommand: 200 OK, command="gitlab-shell upload-pack key_id=1"
+    AuthorizedKeysCommand-->>-SSH server: command="gitlab-shell upload-pack key_id=1"
+    SSH server->>+GitLab Shell: gitlab-shell upload-pack key_id=1
+    GitLab Shell->>+Rails: GET /internal/api/allowed?action=upload_pack&key_id=1
     Note right of Rails: Auth check
-    Rails-->>GitLab Shell: 200 OK, { gitaly: ... }
-    GitLab Shell-->>Gitaly: SSHService.SSHUploadPack bidirectional request
-    Gitaly-->>Git on server: git upload-pack
-    Git on server->>Git on client: SSHService.SSHUploadPack bidirectional response
+    Rails-->>-GitLab Shell: 200 OK, { gitaly: ... }
+    GitLab Shell->>+Gitaly: SSHService.SSHUploadPack request
+    Gitaly->>+Git on server: git upload-pack request
+    Note over Git on client,Git on server: Bidirectional communication between Git client and server
+    Git on server-->>-Gitaly: git upload-pack response
+    Gitaly -->>-GitLab Shell: SSHService.SSHUploadPack response
+    GitLab Shell-->>-SSH server: gitlab-shell upload-pack response
+    SSH server-->>-Git on client: ssh git fetch-pack response
 ```
 
 The `git push` operation is very similar, except `git receive-pack` is used

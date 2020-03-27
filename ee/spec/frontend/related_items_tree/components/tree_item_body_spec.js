@@ -287,6 +287,15 @@ describe('RelatedItemsTree', () => {
         expect(stateTooltip.props('state')).toBe(mockItem.state);
       });
 
+      it('renders item path in tooltip for large screens', () => {
+        const stateTooltip = wrapper.findAll(StateTooltip).at(0);
+
+        const { itemPath, itemId } = wrapper.vm;
+        const path = itemPath + mockItem.pathIdSeparator + itemId;
+
+        expect(stateTooltip.props('path')).toBe(path);
+      });
+
       it('renders confidential icon when `item.confidential` is true', () => {
         const confidentialIcon = wrapper.findAll(Icon).at(1);
 
@@ -311,19 +320,6 @@ describe('RelatedItemsTree', () => {
         const stateTooltip = wrapper.findAll(StateTooltip).at(1);
 
         expect(stateTooltip.props('state')).toBe(mockItem.state);
-      });
-
-      it('renders item path', () => {
-        const pathEl = wrapper.find('.path-id-text');
-
-        expect(pathEl.attributes('title')).toBe('gitlab-org/gitlab-shell');
-        expect(pathEl.text()).toBe('gitlab-org/gitlab-shell');
-      });
-
-      it('renders item id with separator', () => {
-        const pathIdEl = wrapper.find('.item-path-id');
-
-        expect(pathIdEl.text()).toBe(mockItem.reference);
       });
 
       it('renders item milestone when it has milestone', () => {

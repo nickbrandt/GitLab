@@ -9,7 +9,7 @@ module API
         }.freeze
 
         def redirect_registry_request(forward_to_registry, package_type, options)
-          if redirect_registry_request_available? && forward_to_registry
+          if forward_to_registry && redirect_registry_request_available?
             redirect(registry_url(package_type, options))
           else
             yield
@@ -28,8 +28,7 @@ module API
         end
 
         def redirect_registry_request_available?
-          Feature.enabled?(:forward_npm_package_registry_requests, default_enabled: true) &&
-            ::Gitlab::CurrentSettings.current_application_settings.npm_package_requests_forwarding
+          ::Gitlab::CurrentSettings.current_application_settings.npm_package_requests_forwarding
         end
       end
     end

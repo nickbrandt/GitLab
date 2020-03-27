@@ -76,6 +76,43 @@ describe 'Issue Sidebar' do
     end
   end
 
+  context 'health status', :js do
+    before do
+      project.add_developer(user)
+    end
+
+    context 'when health status feature is available' do
+      it 'shows health status on sidebar' do
+        stub_licensed_features(issuable_health_status: true)
+
+        visit_issue(project, issue)
+
+        expect(page).to have_selector('.block.health-status')
+      end
+    end
+
+    context 'when health status feature is not available' do
+      it 'does not show health status on sidebar' do
+        stub_licensed_features(issuable_health_status: false)
+
+        visit_issue(project, issue)
+
+        expect(page).not_to have_selector('.block.health-status')
+      end
+    end
+
+    context 'when health status feature flag is disabled' do
+      it 'does not show health status on sidebar' do
+        stub_licensed_features(issuable_health_status: true)
+        stub_feature_flags(save_issuable_health_status: false)
+
+        visit_issue(project, issue)
+
+        expect(page).not_to have_selector('.block.health-status')
+      end
+    end
+  end
+
   def visit_issue(project, issue)
     visit project_issue_path(project, issue)
   end

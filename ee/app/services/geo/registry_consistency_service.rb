@@ -99,8 +99,8 @@ module Geo
           registry_class: registry_class.name,
           start: range.first,
           finish: range.last,
-          created: created.size,
-          failed_to_create: untracked.size - created.size
+          created: created.length,
+          failed_to_create: untracked.length - created.length
         }
       )
     end

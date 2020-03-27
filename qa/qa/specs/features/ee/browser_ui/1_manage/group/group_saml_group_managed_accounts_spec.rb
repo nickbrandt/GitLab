@@ -105,7 +105,7 @@ module QA
 
       return if username_or_email.nil?
 
-      response = parse_body(get Runtime::API::Request.new(@api_client, "/users?search=#{username_or_email}").url)
+      response = parse_body(get(Runtime::API::Request.new(@api_client, "/users?search=#{username_or_email}").url))
 
       if response.any?
         raise "GET /users?search=#{username_or_email} returned multiple results. response: #{response}" if response.size > 1

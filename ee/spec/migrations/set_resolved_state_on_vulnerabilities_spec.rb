@@ -4,8 +4,6 @@ require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191114173624_set_resolved_state_on_vulnerabilities.rb')
 
 describe SetResolvedStateOnVulnerabilities do
-  PACK_FORMAT = 'H*'
-
   let(:confidence_levels) do
     { undefined: 0, ignore: 1, unknown: 2, experimental: 3, low: 4, medium: 5, high: 6, confirmed: 7 }
   end
@@ -47,6 +45,8 @@ describe SetResolvedStateOnVulnerabilities do
   end
 
   before do
+    stub_const('PACK_FORMAT', 'H*')
+
     author = users.create!(id: 1, email: 'author@example.com', projects_limit: 10)
     closer = users.create!(id: closer_id, email: 'closer@example.com', projects_limit: 10)
     namespace = namespaces.create!(id: 1, name: 'namespace_1', path: 'namespace_1', owner_id: author.id)

@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import _ from 'underscore';
+import { find } from 'lodash';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
@@ -78,7 +78,7 @@ export default class ProtectedTagEdit {
         // Do this only for users for now
         // get the current data for selected items
         const selectedItems = this[dropdownName].getSelectedItems();
-        const currentSelectedItem = _.find(selectedItems, {
+        const currentSelectedItem = find(selectedItems, {
           user_id: currentItem.user_id,
         });
 

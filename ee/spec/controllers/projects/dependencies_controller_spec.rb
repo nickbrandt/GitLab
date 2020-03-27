@@ -163,7 +163,7 @@ describe Projects::DependenciesController do
         context 'with found license report' do
           let(:user) { developer }
           let(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
-          let(:license_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline) }
+          let(:license_build) { create(:ee_ci_build, :success, :license_scanning, pipeline: pipeline) }
 
           before do
             pipeline.builds << license_build

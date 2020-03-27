@@ -77,7 +77,7 @@ module EE
             # replace any existing Kerberos identity for the user
             return unless ldap_user.kerberos_principal.present?
 
-            kerberos_identity = user.identities.where(provider: :kerberos).first
+            kerberos_identity = user.identities.find_by(provider: :kerberos)
             return if kerberos_identity && kerberos_identity.extern_uid == ldap_user.kerberos_principal
 
             kerberos_identity ||= ::Identity.new(provider: :kerberos, user: user)

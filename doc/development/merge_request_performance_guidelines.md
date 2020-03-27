@@ -377,7 +377,7 @@ Examples:
    in service degradation as the system will try to process all schedules
    assigned the the project.
 
-1. GitLab CI includes: We started with the limit of maximum of 50 nested includes.
+1. GitLab CI/CD includes: We started with the limit of maximum of 50 nested includes.
    We understood that performance of the feature was acceptable at that level.
    We received a request from the community that the limit is too small.
    We had a time to understand the customer requirement, and implement an additional
@@ -435,7 +435,7 @@ We can consider the following types of storages:
 ### Temporary storage
 
 The storage on production nodes is really sparse. The application should be built
-in a way that accomodates running under very limited temporary storage.
+in a way that accommodates running under very limited temporary storage.
 You can expect the system on which your code runs has a total of `1G-10G`
 of temporary storage. However, this storage is really shared across all
 jobs being run. If your job requires to use more than `100MB` of that space

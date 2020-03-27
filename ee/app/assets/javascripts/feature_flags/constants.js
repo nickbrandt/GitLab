@@ -14,3 +14,6 @@ export const INTERNAL_ID_PREFIX = 'internal_';
 
 export const fetchPercentageParams = property(['parameters', 'percentage']);
 export const fetchUserIdParams = property(['parameters', 'userIds']);
+
+export const NEW_VERSION_FLAG = 'new_version_flag';
+export const LEGACY_FLAG = 'legacy_flag';

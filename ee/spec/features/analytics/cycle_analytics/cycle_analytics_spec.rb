@@ -6,6 +6,7 @@ describe 'Group Value Stream Analytics', :js do
 
   let!(:user) { create(:user) }
   let!(:group) { create(:group, name: "CA-test-group") }
+  let!(:sub_group) { create(:group, name: "CA-sub-group", parent: group) }
   let!(:group2) { create(:group, name: "CA-bad-test-group") }
   let!(:project) { create(:project, :repository, namespace: group, group: group, name: "Cool fun project") }
   let!(:label) { create(:group_label, group: group) }
@@ -157,11 +158,10 @@ describe 'Group Value Stream Analytics', :js do
     expect(page).to have_selector '.js-stage-table'
   end
 
-  # TODO: Followup should have tests for stub_licensed_features(cycle_analytics_for_groups: false)
-  def select_group
+  def select_group(name = group.name)
     dropdown = page.find('.dropdown-groups')
     dropdown.click
-    dropdown.find('a').click
+    dropdown.find('.js-group-path', exact_text: name).click
 
     wait_for_stages_to_load
   end
@@ -184,31 +184,13 @@ describe 'Group Value Stream Analytics', :js do
     end
   end
 
-  context 'with a group selected' do
-    before do
-      select_group
-    end
-
+  shared_examples 'group value stream analytics' do
     context 'summary table', :js do
       it 'will display recent activity' do
         page.within(find('.js-summary-table')) do
           expect(page).to have_selector('.card-header')
           expect(page).to have_content('Recent Activity')
         end
-      end
-
-      it 'displays the number of issues' do
-        expect(page).to have_content('New Issues')
-
-        issue_count = find(".card .header", match: :first)
-        expect(issue_count).to have_content('3')
-      end
-
-      it 'displays the number of deploys' do
-        expect(page).to have_content('Deploys')
-
-        deploys_count = page.all(".card .header").last
-        expect(deploys_count).to have_content('-')
       end
     end
 
@@ -234,6 +216,36 @@ describe 'Group Value Stream Analytics', :js do
         end
       end
     end
+  end
+
+  context 'with a group selected' do
+    before do
+      select_group
+    end
+
+    it_behaves_like 'group value stream analytics'
+
+    it 'displays the number of issues' do
+      expect(page).to have_content('New Issues')
+
+      issue_count = find(".card .header", match: :first)
+      expect(issue_count).to have_content('3')
+    end
+
+    it 'displays the number of deploys' do
+      expect(page).to have_content('Deploys')
+
+      deploys_count = page.all(".card .header").last
+      expect(deploys_count).to have_content('-')
+    end
+  end
+
+  context 'with a sub group selected' do
+    before do
+      select_group(sub_group.full_name)
+    end
+
+    it_behaves_like 'group value stream analytics'
   end
 
   def select_stage(name)
@@ -406,8 +418,8 @@ describe 'Group Value Stream Analytics', :js do
     let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage_name).ancestor(".stage-nav-item") }
     let(:nav) { page.find(stage_nav_selector) }
 
-    def create_custom_stage
-      Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
+    def create_custom_stage(parent_group = group)
+      Analytics::CycleAnalytics::Stages::CreateService.new(parent: parent_group, params: params, current_user: user).execute
     end
 
     def toggle_more_options(stage)
@@ -416,8 +428,8 @@ describe 'Group Value Stream Analytics', :js do
       stage.find(".more-actions-toggle").click
     end
 
-    def select_dropdown_option(name, elem = "option", index = 1)
-      page.find("select[name='#{name}']").all(elem)[index].select_option
+    def select_dropdown_option(name, value = start_event_identifier)
+      page.find("select[name='#{name}']").all('option').find { |item| item.value == value.to_s }.select_option
     end
 
     def select_dropdown_option_by_value(name, value, elem = "option")
@@ -460,11 +472,11 @@ describe 'Group Value Stream Analytics', :js do
     end
 
     context 'enabled' do
-      before do
-        select_group
-      end
-
       context 'Manual ordering' do
+        before do
+          select_group
+        end
+
         context 'with only default stages' do
           it_behaves_like 'manual ordering disabled'
         end
@@ -510,6 +522,10 @@ describe 'Group Value Stream Analytics', :js do
       end
 
       context 'Add a stage button' do
+        before do
+          select_group
+        end
+
         it 'is visible' do
           expect(page).to have_selector(add_stage_button, visible: true)
           expect(page).to have_text('Add a stage')
@@ -532,179 +548,216 @@ describe 'Group Value Stream Analytics', :js do
         end
       end
 
-      context 'Custom stage form' do
-        let(:show_form_add_stage_button) { '.js-add-stage-button' }
+      shared_examples 'can create custom stages' do
+        context 'Custom stage form' do
+          let(:show_form_add_stage_button) { '.js-add-stage-button' }
 
-        before do
-          select_group
-
-          page.find(show_form_add_stage_button).click
-          wait_for_requests
-        end
-
-        context 'with empty fields' do
-          it 'submit button is disabled by default' do
-            expect(page).to have_button('Add stage', disabled: true)
-          end
-        end
-
-        shared_examples 'submits the form successfully' do |stage_name|
-          it 'submit button is enabled' do
-            expect(page).to have_button('Add stage', disabled: false)
-          end
-
-          it 'submit button is disabled if the start event changes' do
-            select_dropdown_option 'custom-stage-start-event', 'option', 2
-
-            expect(page).to have_button('Add stage', disabled: true)
-          end
-
-          it 'the custom stage is saved' do
-            click_button 'Add stage'
-
-            expect(page).to have_selector('.stage-nav-item', text: stage_name)
-          end
-
-          it 'a confirmation message is displayed' do
-            fill_in 'custom-stage-name', with: stage_name
-            click_button 'Add stage'
-
-            expect(page.find('.flash-notice')).to have_text("Your custom stage '#{stage_name}' was created")
-          end
-
-          it 'with a default name' do
-            fill_in 'custom-stage-name', with: 'issue'
-            click_button 'Add stage'
-
-            expect(page).to have_button('Add stage', disabled: true)
-          end
-        end
-
-        context 'with all required fields set' do
           before do
-            fill_in 'custom-stage-name', with: custom_stage_name
-            select_dropdown_option 'custom-stage-start-event'
-            select_dropdown_option 'custom-stage-stop-event'
+            page.find(show_form_add_stage_button).click
+            wait_for_requests
           end
 
-          it 'does not have label dropdowns' do
-            expect(page).not_to have_content('Start event label')
-            expect(page).not_to have_content('Stop event label')
+          context 'with empty fields' do
+            it 'submit button is disabled by default' do
+              expect(page).to have_button('Add stage', disabled: true)
+            end
           end
 
-          it_behaves_like 'submits the form successfully', custom_stage_name
-        end
+          shared_examples 'submits the form successfully' do |stage_name|
+            it 'submit button is enabled' do
+              expect(page).to have_button('Add stage', disabled: false)
+            end
 
-        context 'with label based stages selected' do
-          before do
-            fill_in 'custom-stage-name', with: custom_stage_with_labels_name
-            select_dropdown_option_by_value 'custom-stage-start-event', start_label_event
-            select_dropdown_option_by_value 'custom-stage-stop-event', stop_label_event
-          end
+            it 'submit button is disabled if the start event changes' do
+              select_dropdown_option 'custom-stage-start-event', 'issue_created'
 
-          it 'has label dropdowns' do
-            expect(page).to have_content('Start event label')
-            expect(page).to have_content('Stop event label')
-          end
+              expect(page).to have_button('Add stage', disabled: true)
+            end
 
-          it 'submit button is disabled' do
-            expect(page).to have_button('Add stage', disabled: true)
-          end
+            it 'the custom stage is saved' do
+              click_button 'Add stage'
 
-          it 'does not contain labels from outside the group' do
-            field = 'custom-stage-start-event-label'
-            page.find("[name=#{field}] .dropdown-toggle").click
+              expect(page).to have_selector('.stage-nav-item', text: stage_name)
+            end
 
-            menu = page.find("[name=#{field}] .dropdown-menu")
+            it 'a confirmation message is displayed' do
+              fill_in 'custom-stage-name', with: stage_name
+              click_button 'Add stage'
 
-            expect(menu).not_to have_content(label3.name)
-            expect(menu).to have_content(label.name)
-            expect(menu).to have_content(label2.name)
+              expect(page.find('.flash-notice')).to have_text("Your custom stage '#{stage_name}' was created")
+            end
+
+            it 'with a default name' do
+              fill_in 'custom-stage-name', with: 'issue'
+              click_button 'Add stage'
+
+              expect(page).to have_button('Add stage', disabled: true)
+            end
           end
 
           context 'with all required fields set' do
             before do
-              select_dropdown_label 'custom-stage-start-event-label', 1
-              select_dropdown_label 'custom-stage-stop-event-label', 2
+              fill_in 'custom-stage-name', with: custom_stage_name
+              select_dropdown_option 'custom-stage-start-event', start_event_identifier
+              select_dropdown_option 'custom-stage-stop-event', end_event_identifier
             end
 
-            it_behaves_like 'submits the form successfully', custom_stage_with_labels_name
+            it 'does not have label dropdowns' do
+              expect(page).not_to have_content('Start event label')
+              expect(page).not_to have_content('Stop event label')
+            end
+
+            it_behaves_like 'submits the form successfully', custom_stage_name
+          end
+
+          context 'with label based stages selected' do
+            before do
+              fill_in 'custom-stage-name', with: custom_stage_with_labels_name
+              select_dropdown_option_by_value 'custom-stage-start-event', start_label_event
+              select_dropdown_option_by_value 'custom-stage-stop-event', stop_label_event
+            end
+
+            it 'has label dropdowns' do
+              expect(page).to have_content('Start event label')
+              expect(page).to have_content('Stop event label')
+            end
+
+            it 'submit button is disabled' do
+              expect(page).to have_button('Add stage', disabled: true)
+            end
+
+            it 'does not contain labels from outside the group' do
+              field = 'custom-stage-start-event-label'
+              page.find("[name=#{field}] .dropdown-toggle").click
+
+              menu = page.find("[name=#{field}] .dropdown-menu")
+
+              expect(menu).not_to have_content(label3.name)
+              expect(menu).to have_content(label.name)
+              expect(menu).to have_content(label2.name)
+            end
+
+            context 'with all required fields set' do
+              before do
+                select_dropdown_label 'custom-stage-start-event-label', 1
+                select_dropdown_label 'custom-stage-stop-event-label', 2
+              end
+
+              it_behaves_like 'submits the form successfully', custom_stage_with_labels_name
+            end
           end
         end
       end
 
-      context 'Edit stage form' do
-        stage_form_class = '.custom-stage-form'
-        stage_save_button = '.js-save-stage'
-        name_field = "custom-stage-name"
-        start_event_field = "custom-stage-start-event"
-        end_event_field = "custom-stage-stop-event"
-        updated_custom_stage_name = 'Extra uber cool stage'
+      shared_examples 'can edit custom stages' do
+        context 'Edit stage form' do
+          stage_form_class = '.custom-stage-form'
+          stage_save_button = '.js-save-stage'
+          name_field = "custom-stage-name"
+          start_event_field = "custom-stage-start-event"
+          end_event_field = "custom-stage-stop-event"
+          updated_custom_stage_name = 'Extra uber cool stage'
 
-        def select_edit_stage
-          toggle_more_options(first_custom_stage)
-          click_button "Edit stage"
+          def select_edit_stage
+            toggle_more_options(first_custom_stage)
+            click_button "Edit stage"
+          end
+
+          context 'with no changes to the data' do
+            before do
+              select_edit_stage
+            end
+
+            it 'displays the editing stage form' do
+              expect(page.find(stage_form_class)).to have_text 'Editing stage'
+            end
+
+            it 'prepoulates the stage data' do
+              expect(page.find_field(name_field).value).to eq custom_stage_name
+              expect(page.find_field(start_event_field).value).to eq start_event_identifier.to_s
+              expect(page.find_field(end_event_field).value).to eq end_event_identifier.to_s
+            end
+
+            it 'disables the submit form button' do
+              expect(page.find(stage_save_button)[:disabled]).to eq "true"
+            end
+          end
+
+          context 'with changes' do
+            before do
+              select_edit_stage
+            end
+
+            it 'enables the submit button' do
+              fill_in name_field, with: updated_custom_stage_name
+
+              expect(page.find(stage_save_button)[:disabled]).to eq nil
+            end
+
+            it 'will persist updates to the stage' do
+              fill_in name_field, with: updated_custom_stage_name
+              page.find(stage_save_button).click
+
+              expect(page.find('.flash-notice')).to have_text 'Stage data updated'
+              expect(page.find(stage_nav_selector)).not_to have_text custom_stage_name
+              expect(page.find(stage_nav_selector)).to have_text updated_custom_stage_name
+            end
+
+            it 'disables the submit form button if incomplete' do
+              fill_in name_field, with: ""
+
+              expect(page.find(stage_save_button)[:disabled]).to eq "true"
+            end
+
+            it 'with a default name' do
+              fill_in name_field, with: 'issue'
+              page.find(stage_save_button).click
+
+              expect(page.find(stage_form_class)).to have_text("Stage name already exists")
+            end
+          end
         end
+      end
 
-        before do
-          create_custom_stage
-          select_group
-
-          expect(page).to have_text custom_stage_name
-        end
-
-        context 'with no changes to the data' do
+      context 'with a group' do
+        context 'selected' do
           before do
-            select_edit_stage
+            select_group
           end
 
-          it 'displays the editing stage form' do
-            expect(page.find(stage_form_class)).to have_text 'Editing stage'
-          end
-
-          it 'prepoulates the stage data' do
-            expect(page.find_field(name_field).value).to eq custom_stage_name
-            expect(page.find_field(start_event_field).value).to eq start_event_identifier.to_s
-            expect(page.find_field(end_event_field).value).to eq end_event_identifier.to_s
-          end
-
-          it 'disables the submit form button' do
-            expect(page.find(stage_save_button)[:disabled]).to eq "true"
-          end
+          it_behaves_like 'can create custom stages'
         end
 
-        context 'with changes' do
+        context 'with a custom stage created' do
           before do
-            select_edit_stage
+            create_custom_stage
+            select_group
+
+            expect(page).to have_text custom_stage_name
           end
 
-          it 'enables the submit button' do
-            fill_in name_field, with: updated_custom_stage_name
+          it_behaves_like 'can edit custom stages'
+        end
+      end
 
-            expect(page.find(stage_save_button)[:disabled]).to eq nil
+      context 'with a sub group' do
+        context 'selected' do
+          before do
+            select_group(sub_group.full_name)
           end
 
-          it 'will persist updates to the stage' do
-            fill_in name_field, with: updated_custom_stage_name
-            page.find(stage_save_button).click
+          it_behaves_like 'can create custom stages'
+        end
 
-            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
-            expect(page.find(stage_nav_selector)).not_to have_text custom_stage_name
-            expect(page.find(stage_nav_selector)).to have_text updated_custom_stage_name
+        context 'with a custom stage created' do
+          before do
+            create_custom_stage(sub_group)
+            select_group(sub_group.full_name)
+
+            expect(page).to have_text custom_stage_name
           end
 
-          it 'disables the submit form button if incomplete' do
-            fill_in name_field, with: ""
-
-            expect(page.find(stage_save_button)[:disabled]).to eq "true"
-          end
-
-          it 'with a default name' do
-            fill_in name_field, with: 'issue'
-            page.find(stage_save_button).click
-
-            expect(page.find(stage_form_class)).to have_text("Stage name already exists")
-          end
+          it_behaves_like 'can edit custom stages'
         end
       end
 
@@ -865,9 +918,7 @@ describe 'Group Value Stream Analytics', :js do
       before do
         stub_feature_flags(customizable_cycle_analytics: false)
 
-        dropdown = page.find('.dropdown-groups')
-        dropdown.click
-        dropdown.find('a').click
+        select_group
       end
 
       context 'Add a stage button' do

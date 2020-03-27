@@ -12,6 +12,7 @@ const createComponent = (
   node = mockNodes[0],
   nodeEditAllowed = true,
   nodeActionsAllowed = true,
+  nodeRemovalAllowed = true,
   nodeMissingOauth = false,
 ) => {
   const Component = Vue.extend(geoNodeActionsComponent);
@@ -20,6 +21,7 @@ const createComponent = (
     node,
     nodeEditAllowed,
     nodeActionsAllowed,
+    nodeRemovalAllowed,
     nodeMissingOauth,
   });
 };
@@ -63,6 +65,23 @@ describe('GeoNodeActionsComponent', () => {
 
         expect(vmX.nodeToggleLabel).toBe('Resume replication');
         vmX.$destroy();
+      });
+    });
+
+    describe('disabledRemovalTooltip', () => {
+      describe.each`
+        nodeRemovalAllowed | tooltip
+        ${true}            | ${''}
+        ${false}           | ${'Cannot remove a primary node if there is a secondary node'}
+      `('when nodeRemovalAllowed is $nodeRemovalAllowed', ({ nodeRemovalAllowed, tooltip }) => {
+        beforeEach(() => {
+          vm = createComponent(mockNodes[0], true, true, nodeRemovalAllowed, false);
+        });
+
+        it('renders the correct tooltip', () => {
+          const tip = vm.$el.querySelector('div[name=disabledRemovalTooltip]');
+          expect(tip.title).toBe(tooltip);
+        });
       });
     });
   });
@@ -128,5 +147,29 @@ describe('GeoNodeActionsComponent', () => {
       expect(vm.$el.classList.contains('geo-node-actions')).toBe(true);
       expect(vm.$el.querySelectorAll('.btn-sm').length).not.toBe(0);
     });
+
+    describe.each`
+      nodeRemovalAllowed | buttonDisabled
+      ${false}           | ${true}
+      ${true}            | ${false}
+    `(
+      `when nodeRemovalAllowed is $nodeRemovalAllowed`,
+      ({ nodeRemovalAllowed, buttonDisabled }) => {
+        let removeButton;
+
+        beforeEach(() => {
+          vm = createComponent(mockNodes[0], true, true, nodeRemovalAllowed, false);
+          removeButton = vm.$el.querySelector('.btn-danger');
+        });
+
+        it('has the correct button text', () => {
+          expect(removeButton.innerText.trim()).toBe('Remove');
+        });
+
+        it(`the button's disabled attribute should be ${buttonDisabled}`, () => {
+          expect(removeButton.disabled).toBe(buttonDisabled);
+        });
+      },
+    );
   });
 });

@@ -537,7 +537,7 @@ Arguments can be defined within the resolver, those arguments will be
 made available to the fields using the resolver. When exposing a model
 that had an internal ID (`iid`), prefer using that in combination with
 the namespace path as arguments in a resolver over a database
-ID. Othewise use a [globally unique ID](#exposing-global-ids).
+ID. Otherwise use a [globally unique ID](#exposing-global-ids).
 
 We already have a `FullPathLoader` that can be included in other
 resolvers to quickly find Projects and Namespaces which will have a
@@ -762,7 +762,7 @@ a hash with the input for the mutation. This will return a struct with
 a mutation query, and prepared variables.
 
 This struct can then be passed to the `post_graphql_mutation` helper,
-that will post the request with the correct params, like a GraphQL
+that will post the request with the correct parameters, like a GraphQL
 client would do.
 
 To access the response of a mutation, the `graphql_mutation_response`
@@ -798,11 +798,15 @@ that wraps around a query being executed. It is implemented as a module that use
 Example: `Present`
 
 ```ruby
-module Present
-  #... some code above...
+module Gitlab
+  module Graphql
+    module Present
+      #... some code above...
 
-  def self.use(schema_definition)
-    schema_definition.instrument(:field, Instrumentation.new)
+      def self.use(schema_definition)
+        schema_definition.instrument(:field, ::Gitlab::Graphql::Present::Instrumentation.new)
+      end
+    end
   end
 end
 ```

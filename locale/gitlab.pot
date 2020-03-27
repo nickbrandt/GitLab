@@ -5992,6 +5992,9 @@ msgstr ""
 msgid "Current vulnerabilities count"
 msgstr ""
 
+msgid "CurrentUser|Buy CI minutes"
+msgstr ""
+
 msgid "CurrentUser|Profile"
 msgstr ""
 
@@ -6124,12 +6127,6 @@ msgstr ""
 msgid "CycleAnalyticsEvent|Issue last edited"
 msgstr ""
 
-msgid "CycleAnalyticsEvent|Merge Request label was added"
-msgstr ""
-
-msgid "CycleAnalyticsEvent|Merge Request label was removed"
-msgstr ""
-
 msgid "CycleAnalyticsEvent|Merge request closed"
 msgstr ""
 
@@ -6137,6 +6134,12 @@ msgid "CycleAnalyticsEvent|Merge request created"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request first deployed to production"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request label was added"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request label was removed"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request last build finish time"
@@ -9141,6 +9144,9 @@ msgstr ""
 msgid "Geo Nodes"
 msgstr ""
 
+msgid "Geo Nodes|Cannot remove a primary node if there is a secondary node"
+msgstr ""
+
 msgid "Geo Settings"
 msgstr ""
 
@@ -11155,6 +11161,9 @@ msgstr ""
 msgid "Issue events"
 msgstr ""
 
+msgid "Issue first depoloyed to production"
+msgstr ""
+
 msgid "Issue or Merge Request ID is required"
 msgstr ""
 
@@ -11282,6 +11291,12 @@ msgid "January"
 msgstr ""
 
 msgid "Jira Issue Import"
+msgstr ""
+
+msgid "Jira import feature is disabled."
+msgstr ""
+
+msgid "Jira integration not configured."
 msgstr ""
 
 msgid "JiraService|Events for %{noteable_model_name} are disabled."
@@ -12851,6 +12866,9 @@ msgstr ""
 msgid "Mirror repository"
 msgstr ""
 
+msgid "Mirror settings are only available to GitLab administrators."
+msgstr ""
+
 msgid "Mirror user"
 msgstr ""
 
@@ -13208,6 +13226,9 @@ msgid "New! Suggest changes directly"
 msgstr ""
 
 msgid "New..."
+msgstr ""
+
+msgid "Newest first"
 msgstr ""
 
 msgid "Newly registered users will by default be external"
@@ -13688,6 +13709,9 @@ msgid "Oh no!"
 msgstr ""
 
 msgid "Ok let's go"
+msgstr ""
+
+msgid "Oldest first"
 msgstr ""
 
 msgid "OmniAuth"
@@ -15879,6 +15903,9 @@ msgstr ""
 msgid "PrometheusAlerts|%{count} alerts applied"
 msgstr ""
 
+msgid "PrometheusAlerts|%{firingCount} firing"
+msgstr ""
+
 msgid "PrometheusAlerts|Add alert"
 msgstr ""
 
@@ -15895,6 +15922,12 @@ msgid "PrometheusAlerts|Error fetching alert"
 msgstr ""
 
 msgid "PrometheusAlerts|Error saving alert"
+msgstr ""
+
+msgid "PrometheusAlerts|Firing: %{alerts}"
+msgstr ""
+
+msgid "PrometheusAlerts|Firing: %{alert}"
 msgstr ""
 
 msgid "PrometheusAlerts|Operator"
@@ -17942,6 +17975,9 @@ msgstr ""
 msgid "Serverless|Getting started with serverless"
 msgstr ""
 
+msgid "Serverless|Help shape the future of Serverless at GitLab"
+msgstr ""
+
 msgid "Serverless|If you believe none of these apply, please check back later as the function data may be in the process of becoming available."
 msgstr ""
 
@@ -17954,6 +17990,9 @@ msgstr ""
 msgid "Serverless|No functions available"
 msgstr ""
 
+msgid "Serverless|Sign up for First Look"
+msgstr ""
+
 msgid "Serverless|The deploy job has not finished."
 msgstr ""
 
@@ -17961,6 +18000,9 @@ msgid "Serverless|The functions listed in the %{startTag}serverless.yml%{endTag}
 msgstr ""
 
 msgid "Serverless|There is currently no function data available from Knative. This could be for a variety of reasons including:"
+msgstr ""
+
+msgid "Serverless|We are continually striving to improve our Serverless functionality. As a Knative user, we would love to hear how we can make this experience better for you. Sign up for GitLab First Look today and we will be in touch shortly."
 msgstr ""
 
 msgid "Serverless|Your %{startTag}.gitlab-ci.yml%{endTag} file is not properly configured."
@@ -18845,6 +18887,9 @@ msgid "Specific Runners"
 msgstr ""
 
 msgid "Specified URL cannot be used."
+msgstr ""
+
+msgid "Specified URL cannot be used: \"%{reason}\""
 msgstr ""
 
 msgid "Specify an e-mail address regex pattern to identify default internal users."
@@ -20021,6 +20066,9 @@ msgid "The value lying at the midpoint of a series of observed values. E.g., bet
 msgstr ""
 
 msgid "The vulnerability is no longer detected. Verify the vulnerability has been fixed or removed before changing its status."
+msgstr ""
+
+msgid "The vulnerability is no longer detected. Verify the vulnerability has been remediated before changing its status."
 msgstr ""
 
 msgid "There are no GPG keys associated with this account."
@@ -21386,6 +21434,9 @@ msgstr ""
 msgid "Unable to fetch vulnerable projects"
 msgstr ""
 
+msgid "Unable to find Jira project to import data from."
+msgstr ""
+
 msgid "Unable to generate new instance ID"
 msgstr ""
 
@@ -22430,6 +22481,12 @@ msgid "Vulnerability List"
 msgstr ""
 
 msgid "Vulnerability remediated. Review before resolving."
+msgstr ""
+
+msgid "Vulnerability resolved in %{branch}"
+msgstr ""
+
+msgid "Vulnerability resolved in the default branch"
 msgstr ""
 
 msgid "Vulnerability-Check"

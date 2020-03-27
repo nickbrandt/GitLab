@@ -138,4 +138,24 @@ describe EE::RunnersHelper do
       end
     end
   end
+
+  describe '.show_buy_ci_minutes?' do
+    subject { helper.show_buy_ci_minutes? }
+
+    context 'when experiment is disabled' do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(false)
+      end
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when experiment is enabled' do
+      before do
+        allow(helper).to receive(:experiment_enabled?).with(:buy_ci_minutes_version_a).and_return(true)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+  end
 end

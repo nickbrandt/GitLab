@@ -49,6 +49,9 @@ class ScimFinder
     if eq_filter_on_extern_uid?(parser)
       by_extern_uid(parser.filter_params[:extern_uid])
     elsif eq_filter_on_username?(parser)
+      identity = by_extern_uid(parser.filter_params[:username])
+      return identity if identity.present?
+
       by_username(parser.filter_params[:username])
     else
       raise UnsupportedFilter

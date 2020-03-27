@@ -15,6 +15,10 @@ module EE
       message.join(' ').html_safe
     end
 
+    def show_buy_ci_minutes?
+      experiment_enabled?(:buy_ci_minutes_version_a)
+    end
+
     private
 
     def purchase_shared_runner_minutes_link

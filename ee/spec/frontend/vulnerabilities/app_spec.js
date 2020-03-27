@@ -6,6 +6,7 @@ import * as urlUtility from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
 import App from 'ee/vulnerabilities/components/app.vue';
 import waitForPromises from 'helpers/wait_for_promises';
+import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
 
@@ -16,10 +17,11 @@ jest.mock('~/flash');
 describe('Vulnerability management app', () => {
   let wrapper;
 
-  const vulnerability = {
+  const defaultVulnerability = {
     id: 1,
     created_at: new Date().toISOString(),
     report_type: 'sast',
+    state: 'detected',
   };
 
   const dataset = {
@@ -34,12 +36,16 @@ describe('Vulnerability management app', () => {
 
   const findCreateIssueButton = () => wrapper.find({ ref: 'create-issue-btn' });
   const findBadge = () => wrapper.find({ ref: 'badge' });
+  const findResolutionAlert = () => wrapper.find(ResolutionAlert);
 
-  const createWrapper = (state = 'detected') => {
+  const createWrapper = (vulnerability = {}) => {
     wrapper = shallowMount(App, {
       propsData: {
-        vulnerability: Object.assign({ state }, vulnerability),
         ...dataset,
+        vulnerability: {
+          ...defaultVulnerability,
+          ...vulnerability,
+        },
       },
     });
   };
@@ -102,9 +108,13 @@ describe('Vulnerability management app', () => {
         expect(JSON.parse(postRequest.data)).toMatchObject({
           vulnerability_feedback: {
             feedback_type: 'issue',
-            category: vulnerability.report_type,
+            category: defaultVulnerability.report_type,
             project_fingerprint: dataset.projectFingerprint,
-            vulnerability_data: { ...vulnerability, category: vulnerability.report_type },
+            vulnerability_data: {
+              ...defaultVulnerability,
+              category: defaultVulnerability.report_type,
+              vulnerability_id: defaultVulnerability.id,
+            },
           },
         });
         expect(spy).toHaveBeenCalledWith(issueUrl);
@@ -126,12 +136,50 @@ describe('Vulnerability management app', () => {
   describe('state badge', () => {
     test.each(vulnerabilityStateEntries)(
       'the vulnerability state badge has the correct style for the %s state',
-      (stateString, stateObject) => {
-        createWrapper(stateString);
+      (state, stateObject) => {
+        createWrapper({ state });
 
         expect(findBadge().classes()).toContain(`status-box-${stateObject.statusBoxStyle}`);
-        expect(findBadge().text()).toBe(stateString);
+        expect(findBadge().text()).toBe(state);
       },
     );
+  });
+
+  describe('when the vulnerability is no-longer detected on the default branch', () => {
+    const branchName = 'master';
+
+    beforeEach(() => {
+      createWrapper({
+        resolved_on_default_branch: true,
+        default_branch_name: branchName,
+      });
+    });
+
+    it('should show the resolution alert component', () => {
+      const alert = findResolutionAlert();
+
+      expect(alert.exists()).toBe(true);
+    });
+
+    it('should pass down the default branch name', () => {
+      const alert = findResolutionAlert();
+
+      expect(alert.props().defaultBranchName).toEqual(branchName);
+    });
+
+    describe('when the vulnerability is already resolved', () => {
+      beforeEach(() => {
+        createWrapper({
+          resolved_on_default_branch: true,
+          state: 'resolved',
+        });
+      });
+
+      it('should not show the resolution alert component', () => {
+        const alert = findResolutionAlert();
+
+        expect(alert.exists()).toBe(false);
+      });
+    });
   });
 });

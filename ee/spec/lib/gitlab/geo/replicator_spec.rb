@@ -4,14 +4,18 @@ require 'spec_helper'
 
 describe Gitlab::Geo::Replicator do
   context 'with defined events' do
-    class DummyReplicator < Gitlab::Geo::Replicator
-      event :test
-      event :another_test
+    before do
+      stub_const('DummyReplicator', Class.new(Gitlab::Geo::Replicator))
 
-      protected
+      DummyReplicator.class_eval do
+        event :test
+        event :another_test
 
-      def publish_test(other:)
-        true
+        protected
+
+        def publish_test(other:)
+          true
+        end
       end
     end
 
@@ -36,15 +40,19 @@ describe Gitlab::Geo::Replicator do
     end
 
     context 'model DSL' do
-      class DummyModel
-        include ActiveModel::Model
+      before do
+        stub_const('DummyModel', Class.new)
 
-        def self.after_create_commit(*args)
+        DummyModel.class_eval do
+          include ActiveModel::Model
+
+          def self.after_create_commit(*args)
+          end
+
+          include Gitlab::Geo::ReplicableModel
+
+          with_replicator DummyReplicator
         end
-
-        include Gitlab::Geo::ReplicableModel
-
-        with_replicator DummyReplicator
       end
 
       subject { DummyModel.new }

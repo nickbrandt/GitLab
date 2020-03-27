@@ -81,7 +81,7 @@ Complementary reads:
 - [Working with Merge Request diffs](diffs.md)
 - [Kubernetes integration guidelines](kubernetes.md)
 - [Permissions](permissions.md)
-- [Prometheus metrics](prometheus_metrics.md)
+- [Prometheus](prometheus.md)
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
 - [How Git object deduplication works in GitLab](git_object_deduplication.md)
@@ -164,6 +164,7 @@ Complementary reads:
 - [Jira Connect app](integrations/jira_connect.md)
 - [Security Scanners](integrations/secure.md)
 - [Secure Partner Integration](integrations/secure_partner_integration.md)
+- [How to run Jenkins in development environment](integrations/jenkins.md)
 
 ## Testing guides
 

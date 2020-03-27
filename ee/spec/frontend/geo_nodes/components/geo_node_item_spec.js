@@ -15,6 +15,7 @@ describe('GeoNodeItemComponent', () => {
     primaryNode: true,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    nodeRemovalAllowed: true,
     geoTroubleshootingHelpPath: '/foo/bar',
   };
 
