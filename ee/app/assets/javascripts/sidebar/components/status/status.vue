@@ -85,7 +85,7 @@ export default {
 </script>
 
 <template>
-  <div class="block">
+  <div class="block health-status">
     <div ref="status" class="sidebar-collapsed-icon">
       <gl-icon name="status-health" :size="14" />
 
