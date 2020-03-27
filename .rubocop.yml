@@ -206,7 +206,6 @@ Gitlab/DuplicateSpecLocation:
     - ee/spec/lib/gitlab/gl_repository_spec.rb
     - ee/spec/lib/gitlab/usage_data_spec.rb
     - ee/spec/models/namespace_spec.rb
-    - ee/spec/models/note_spec.rb
     - ee/spec/serializers/environment_entity_spec.rb
     - ee/spec/services/issues/create_service_spec.rb
     - ee/spec/services/merge_requests/create_service_spec.rb
@@ -217,7 +216,6 @@ Gitlab/DuplicateSpecLocation:
     - ee/spec/lib/ee/gitlab/gl_repository_spec.rb
     - ee/spec/lib/ee/gitlab/usage_data_spec.rb
     - ee/spec/models/ee/namespace_spec.rb
-    - ee/spec/models/ee/note_spec.rb
     - ee/spec/serializers/ee/environment_entity_spec.rb
     - ee/spec/services/ee/issues/create_service_spec.rb
     - ee/spec/services/ee/merge_requests/create_service_spec.rb
