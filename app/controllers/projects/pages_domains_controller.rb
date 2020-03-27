@@ -26,6 +26,12 @@ class Projects::PagesDomainsController < Projects::ApplicationController
     redirect_to project_pages_domain_path(@project, @domain)
   end
 
+  def retry_auto_ssl
+    PagesDomains::RetryAcmeOrderService.new(@domain).execute
+
+    redirect_to project_pages_domain_path(@project, @domain)
+  end
+
   def edit
     redirect_to project_pages_domain_path(@project, @domain)
   end
