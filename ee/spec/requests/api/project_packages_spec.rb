@@ -227,10 +227,10 @@ describe API::ProjectPackages do
           it_behaves_like 'destroy url'
         end
 
-        context 'with build info' do
+        context 'with pipeline' do
           let!(:package1) { create(:npm_package, :with_build, project: project) }
 
-          it 'returns the build info' do
+          it 'returns the pipeline info' do
             project.add_developer(user)
 
             get api(package_url, user)

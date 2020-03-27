@@ -4,8 +4,8 @@ module EE
   module API
     module Entities
       class Package < Grape::Entity
-        class BuildInfo < Grape::Entity
-          expose :pipeline, using: ::API::Entities::PipelineBasic
+        class Pipeline < ::API::Entities::PipelineBasic
+          expose :user, using: ::API::Entities::UserBasic
         end
       end
     end
