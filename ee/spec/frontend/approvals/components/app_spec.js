@@ -38,8 +38,13 @@ describe('EE Approvals App', () => {
       canEdit: true,
       prefix: APP_PREFIX,
     });
-    spyOn(store.modules.approvals.actions, 'fetchRules');
-    spyOn(store.modules.createModal.actions, 'open');
+
+    store.modules.approvals.actions = {
+      fetchRules: jest.fn(),
+    };
+
+    jest.spyOn(store.modules.approvals.actions, 'fetchRules');
+    jest.spyOn(store.modules.createModal.actions, 'open');
   });
 
   describe('when allow multi rule', () => {
@@ -136,7 +141,7 @@ describe('EE Approvals App', () => {
         findAddButton().vm.$emit('click');
 
         expect(store.modules.createModal.actions.open).toHaveBeenCalledWith(
-          jasmine.anything(),
+          expect.anything(),
           null,
           undefined,
         );
