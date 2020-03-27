@@ -101,7 +101,8 @@ export default {
       return this.graphData.title || '';
     },
     alertWidgetAvailable() {
-      return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint && this.graphData;
+      // This method is extended by ee functionality
+      return false;
     },
     graphDataHasMetrics() {
       return (
@@ -208,8 +209,9 @@ export default {
         data-qa-selector="prometheus_graph_widgets"
       >
         <div class="d-flex align-items-center">
+          <!--  -->
           <alert-widget
-            v-if="alertWidgetAvailable && graphData"
+            v-if="alertWidgetAvailable"
             :modal-id="`alert-modal-${index}`"
             :alerts-endpoint="alertsEndpoint"
             :relevant-queries="graphData.metrics"
