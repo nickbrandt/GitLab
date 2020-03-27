@@ -1,9 +1,9 @@
-import _ from 'underscore';
+import { isNumber } from 'lodash';
 
 export default {
   computed: {
     validIssueWeight() {
-      if (this.issue && _.isNumber(this.issue.weight)) {
+      if (this.issue && isNumber(this.issue.weight)) {
         return this.issue.weight >= 0;
       }
 
