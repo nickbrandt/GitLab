@@ -4,7 +4,6 @@ module Ci
   class Build < Ci::Processable
     include Ci::Metadatable
     include Ci::Contextable
-    include Ci::PipelineDelegator
     include TokenAuthenticatable
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove

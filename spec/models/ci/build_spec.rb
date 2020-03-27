@@ -37,8 +37,6 @@ describe Ci::Build do
   it { is_expected.to delegate_method(:merge_request_ref?).to(:pipeline) }
   it { is_expected.to delegate_method(:legacy_detached_merge_request_pipeline?).to(:pipeline) }
 
-  it { is_expected.to include_module(Ci::PipelineDelegator) }
-
   describe 'associations' do
     it 'has a bidirectional relationship with projects' do
       expect(described_class.reflect_on_association(:project).has_inverse?).to eq(:builds)
