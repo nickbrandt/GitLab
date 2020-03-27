@@ -1238,14 +1238,12 @@ class Project < ApplicationRecord
     update_column(:has_external_wiki, services.external_wikis.any?) if Gitlab::Database.read_write?
   end
 
-  def find_or_initialize_services(exceptions: [])
-    available_services_names = Service.available_services_names - exceptions
+  def find_or_initialize_services
+    available_services_names = Service.available_services_names - disabled_services
 
-    available_services = available_services_names.map do |service_name|
+    available_services_names.map do |service_name|
       find_or_initialize_service(service_name)
     end
-
-    available_services.compact
   end
 
   def disabled_services
