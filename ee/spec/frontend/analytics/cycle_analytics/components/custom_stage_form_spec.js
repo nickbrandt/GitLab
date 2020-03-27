@@ -25,6 +25,9 @@ const initData = {
   endEventLabelId: groupLabels[1].id,
 };
 
+const MERGE_REQUEST_CREATED = 'merge_request_created';
+const MERGE_REQUEST_CLOSED = 'merge_request_closed';
+
 let store = null;
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -72,7 +75,20 @@ describe('CustomStageForm', () => {
     getDropdownOption(_wrapper, dropdown, index).setSelected();
   }
 
-  function setEventDropdowns({ startEventDropdownIndex = 1, stopEventDropdownIndex = 1 } = {}) {
+  // Valid start and end event pair: merge request created - merge request closed
+  const mergeRequestCreatedIndex = startEvents.findIndex(
+    e => e.identifier === MERGE_REQUEST_CREATED,
+  );
+  const mergeRequestCreatedDropdownIndex = mergeRequestCreatedIndex;
+  const mergeReqestCreatedEvent = startEvents[mergeRequestCreatedIndex];
+  const mergeRequestClosedDropdownIndex = mergeReqestCreatedEvent.allowedEndEvents.findIndex(
+    e => e === MERGE_REQUEST_CLOSED,
+  );
+
+  function setEventDropdowns({
+    startEventDropdownIndex = mergeRequestCreatedDropdownIndex,
+    stopEventDropdownIndex = mergeRequestClosedDropdownIndex,
+  } = {}) {
     selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex);
     return Vue.nextTick().then(() => {
       selectDropdownOption(wrapper, sel.endEvent, stopEventDropdownIndex);
@@ -219,8 +235,8 @@ describe('CustomStageForm', () => {
   });
 
   describe('Stop event', () => {
-    const startEventArrayIndex = 2;
-    const startEventDropdownIndex = 1;
+    const startEventArrayIndex = mergeRequestCreatedIndex;
+    const startEventDropdownIndex = startEventArrayIndex + 1;
     const currAllowed = startEvents[startEventArrayIndex].allowedEndEvents;
 
     beforeEach(() => {
@@ -269,7 +285,7 @@ describe('CustomStageForm', () => {
 
       expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-      selectDropdownOption(wrapper, sel.startEvent, startEventArrayIndex + 1);
+      selectDropdownOption(wrapper, sel.startEvent, startEventDropdownIndex - 1);
 
       return Vue.nextTick().then(() => {
         stopOptions = wrapper.find(sel.endEvent);
@@ -306,9 +322,9 @@ describe('CustomStageForm', () => {
         wrapper.setData({
           fields: {
             name: 'Cool stage',
-            startEventIdentifier: 'issue_created',
+            startEventIdentifier: MERGE_REQUEST_CREATED,
             startEventLabelId: null,
-            endEventIdentifier: 'issue_stage_end',
+            endEventIdentifier: MERGE_REQUEST_CLOSED,
             endEventLabelId: null,
           },
         });

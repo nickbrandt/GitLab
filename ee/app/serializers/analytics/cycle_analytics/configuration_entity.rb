@@ -11,7 +11,7 @@ module Analytics
       private
 
       def events
-        Gitlab::Analytics::CycleAnalytics::StageEvents.events
+        Gitlab::Analytics::CycleAnalytics::StageEvents.events.sort_by(&:name)
       end
     end
   end
