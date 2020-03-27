@@ -2,17 +2,17 @@
 
 require 'spec_helper'
 
-describe API::GeoNodes, :request_store, :geo, :prometheus, api: true do
+describe API::GeoNodes, :request_store, :geo_fdw, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
   include_context 'custom session'
 
-  let_it_be(:admin, refind: true) { create(:admin) }
-  let_it_be(:user, refind: true) { create(:user) }
-  let_it_be(:primary, refind: true) { create(:geo_node, :primary) }
-  let_it_be(:secondary, refind: true) { create(:geo_node) }
-  let_it_be(:secondary_status, refind: true) { create(:geo_node_status, :healthy, geo_node: secondary) }
+  let!(:admin) { create(:admin) }
+  let!(:user) { create(:user) }
+  let!(:primary) { create(:geo_node, :primary) }
+  let!(:secondary) { create(:geo_node) }
+  let!(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
   let(:unexisting_node_id) { GeoNode.maximum(:id).to_i.succ }
   let(:group_to_sync) { create(:group) }
 
