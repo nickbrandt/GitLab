@@ -23,10 +23,9 @@ across GitLab releases.
 
 Every API call to vulnerabilities must be [authenticated](README.md#authentication).
 
-Vulnerabilities are project-bound entities. If a user is not
-a member of a project to which vulnerability belongs
-and the project is private, a request on that project
-will result in a `404` status code.
+Vulnerability permissions inherit permissions from their project. If a project is
+private, and a user isn't a member of the project to which the vulnerability
+belongs, requests to that project will return a `404 Not Found` status code.
 
 ## Single vulnerability
 
