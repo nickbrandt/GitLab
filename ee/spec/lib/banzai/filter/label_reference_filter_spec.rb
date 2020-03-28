@@ -14,16 +14,18 @@ describe Banzai::Filter::LabelReferenceFilter do
       stub_licensed_features(scoped_labels: true)
     end
 
-    it 'includes link to scoped documentation' do
+    it 'renders scoped label with link to documentation' do
       doc = reference_filter("See #{scoped_label.to_reference}")
 
-      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped_label.scoped_label_key}</span><span.+>#{scoped_label.scoped_label_value}</span></a><a.+>.*question-circle.*</a></span>))
+      expect(doc.css('.gl-label-scoped .gl-label-text').map(&:text)).to eq([scoped_label.scoped_label_key, scoped_label.scoped_label_value])
+      expect(doc.at_css('a.gl-label-icon')['href']).to eq('http://localhost/help/user/project/labels.md#scoped-labels-premium')
     end
 
-    it 'does not include link to scoped documentation for common labels' do
+    it 'renders common label' do
       doc = reference_filter("See #{label.to_reference}")
 
-      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{label.name}</span></a></span>$))
+      expect(doc.css('.gl-label .gl-label-text').map(&:text)).to eq([label.name])
+      expect(doc.at_css('a.gl-label-icon')).to be_nil
     end
   end
 
@@ -32,10 +34,11 @@ describe Banzai::Filter::LabelReferenceFilter do
       stub_licensed_features(scoped_labels: false)
     end
 
-    it 'renders label as a common label' do
+    it 'renders scoped label as a common label' do
       doc = reference_filter("See #{scoped_label.to_reference}")
 
-      expect(doc.to_html).to match(%r(<span.+><a.+><span.+>#{scoped_label.name}</span></a></span>$))
+      expect(doc.css('.gl-label .gl-label-text').map(&:text)).to eq([scoped_label.name])
+      expect(doc.at_css('a.gl-label-icon')).to be_nil
     end
   end
 end
