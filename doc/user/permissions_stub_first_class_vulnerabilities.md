@@ -237,9 +237,9 @@ group.
 
 ### Subgroup permissions
 
-When you add a member to a subgroup, they inherit the membership and
-permission level from the parent group. This model allows access to
-nested groups if you have membership in one of its parents.
+When you add a member to a subgroup, the user inherits the membership and
+permission level from the parent group. This model allows users access to
+nested groups if they have membership in one of its parents.
 
 To learn more, read through the documentation on
 [subgroups memberships](group/subgroups/index.md#membership).
