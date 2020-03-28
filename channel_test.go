@@ -171,7 +171,13 @@ func startWebsocketServer(subprotocols ...string) (chan connWithReq, *httptest.S
 	upgrader := &websocket.Upgrader{Subprotocols: subprotocols}
 
 	connCh := make(chan connWithReq, 1)
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewTLSServer(webSocketHandler(upgrader, connCh))
+
+	return connCh, server
+}
+
+func webSocketHandler(upgrader *websocket.Upgrader, connCh chan connWithReq) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logEntry := log.WithFields(log.Fields{
 			"method":  r.Method,
 			"url":     r.URL,
@@ -186,9 +192,7 @@ func startWebsocketServer(subprotocols ...string) (chan connWithReq, *httptest.S
 		}
 		connCh <- connWithReq{conn, r}
 		// The connection has been hijacked so it's OK to end here
-	}))
-
-	return connCh, server
+	})
 }
 
 func channelOkBody(remote *httptest.Server, header http.Header, subprotocols ...string) *api.Response {
