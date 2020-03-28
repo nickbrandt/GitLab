@@ -35,7 +35,7 @@ If an authenticated user does not have permission to
 [use the Project Security Dashboard](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
 `GET` requests for vulnerabilities of this project will result in a `403` status code.
 
-```
+```plaintext
 GET /projects/:id/vulnerabilities
 ```
 
