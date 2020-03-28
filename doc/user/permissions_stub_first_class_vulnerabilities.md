@@ -37,9 +37,7 @@ usernames. A GitLab administrator can configure the GitLab instance to
 NOTE: **Note:**
 In GitLab 11.0, the Master role was renamed to Maintainer.
 
-While Maintainer is the highest project-level role, some actions can only be performed by a personal namespace or group owner.
-
-The following table depicts the various user permission levels in a project.
+While Maintainer is the highest project-level role, some actions can only be performed by a personal namespace or group owner. The following table depicts the various user permission levels in a project:
 
 | Action                                            | Guest   | Reporter   | Developer   |Maintainer| Owner  |
 |---------------------------------------------------|---------|------------|-------------|----------|--------|
