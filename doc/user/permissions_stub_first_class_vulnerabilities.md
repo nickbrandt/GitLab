@@ -246,26 +246,26 @@ To learn more, read through the documentation on
 
 ## External users **(CORE ONLY)**
 
-In cases where it is desired that a user has access only to some internal or
-private projects, there is the option of creating **External Users**. This
-feature may be useful when for example a contractor is working on a given
-project and should only have access to that project.
+To grant a user has access only to some, but not all, internal or private
+projects, you can create **External Users**. This feature can be useful
+for limiting which private projects a user can access, such as an external
+contractor who should only have access to a specific project.
 
-External users:
+External users have the following permissions:
 
-- Cannot create groups or projects.
-- Can only access projects to which they are explicitly granted access,
-  thus hiding all other internal or private ones from them (like being
-  logged out).
+- They cannot create groups or projects.
+- They can only access projects to which they are explicitly granted access.
+  All other internal or private projects are hidden from them.
 
-Access can be granted by adding the user as member to the project or group.
-They will, like usual users, receive a role in the project or group with all
-the abilities that are mentioned in the [permissions table above](#project-members-permissions).
-For example, if an external user is added as Guest, and your project is
-private, they will not have access to the code; you would need to grant the external
-user access at the Reporter level or above if you want them to have access to the code. You should
-always take into account the
-[project's visibility and permissions settings](project/settings/index.md#sharing-and-permissions)
+To grant access to an external user, add the user as a member to a project
+or group. The external user receives a role in the project or group, with
+all the abilities described in the [permissions table](#project-members-permissions).
+For example, an external user added to a private project will not have access
+to the code; the external user would need access at the Reporter level or above
+to have code access. 
+
+You should always consider the
+[project's visibility and permissions settings](project/settings/index.md#sharing-and-permissions),
 as well as the permission level of the user.
 
 NOTE: **Note:**
