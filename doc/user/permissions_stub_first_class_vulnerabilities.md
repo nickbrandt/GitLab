@@ -315,7 +315,7 @@ mentioned in the [permissions table above](#project-members-permissions) (they
 will not be able to browse the project's repository for example).
 
 TIP: **Tip:**
-To prevent a guest user from creating projects, as an admin, you can edit the
+Administrators can prevent a guest user from creating projects by editing the
 user's profile to mark the user as [external](#external-users-core-only).
 Be aware that even if an external user already has Reporter or higher permissions
 in any project or group, they will **not** be counted as a free guest user.
