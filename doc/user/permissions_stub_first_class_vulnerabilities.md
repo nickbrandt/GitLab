@@ -5,16 +5,17 @@ description: 'Understand and explore the user permission levels in GitLab, and w
 # Permissions
 
 Users have different abilities depending on the access level they have in a
-particular group or project. If a user is both in a group's project and the
-project itself, the highest permission level is used.
+particular group or project: 
 
-On public and internal projects the Guest role is not enforced. All users will
-be able to create issues, leave comments, and clone or download the project code.
-
-When a member leaves a team's project, all the assigned [Issues](project/issues/index.md) and [Merge Requests](project/merge_requests/index.md)
-will be unassigned automatically.
-
-GitLab [administrators](../administration/index.md) receive all permissions.
+- GitLab [administrators](../administration/index.md) receive all permissions.
+- If a user is both in a group's project and the project itself, the highest
+  permission level is used. For more information, see
+  [Project member permissions](#project-members-permissions).
+- The Guest role is not enforced on public and internal projects. All users can
+  create issues, leave comments, and clone or download the project code.
+- When a member leaves a team's project, all the assigned
+  [Issues](project/issues/index.md) and [Merge Requests](project/merge_requests/index.md)
+  will be unassigned automatically.
 
 To add or import a user, you can follow the
 [project members documentation](project/members/index.md).
@@ -22,9 +23,8 @@ To add or import a user, you can follow the
 For information on eligible approvers for Merge Requests, see
 [Eligible approvers](project/merge_requests/merge_request_approvals.md#eligible-approvers).
 
-## Principles behind permissions
-
-See our [product handbook on permissions](https://about.gitlab.com/handbook/product/#permissions-in-gitlab)
+To learn more about the principles behind permissions, see the
+[GitLab product handbook on permissions](https://about.gitlab.com/handbook/product/#permissions-in-gitlab).
 
 ## Instance-wide user permissions
 
