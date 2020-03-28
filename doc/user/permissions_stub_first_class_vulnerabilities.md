@@ -412,7 +412,7 @@ read through the documentation on the [new CI/CD permissions model](project/new_
 
 ## Running pipelines on protected branches
 
-The permission to merge or push to protected branches is used to define if a user can
+The permission to merge or push to protected branches defines whether a user can
 run CI/CD pipelines and execute actions on jobs that are related to those branches.
 
 See [Security on protected branches](../ci/pipelines.md#security-on-protected-branches)
