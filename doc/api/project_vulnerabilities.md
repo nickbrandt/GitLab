@@ -109,7 +109,7 @@ Example response:
 Creates a new vulnerability.
 
 If an authenticated user does not have a permission to
-[create vulnerability](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+[create a new vulnerability](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```
