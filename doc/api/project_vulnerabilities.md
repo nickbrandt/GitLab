@@ -23,8 +23,7 @@ belongs, requests to that project will return a `404 Not Found` status code.
 
 ## Vulnerabilities pagination
 
-By default, `GET` requests return 20 results at a time because the API results
-are paginated.
+API results are paginated, and `GET` requests return 20 results at a time by default.
 
 Read more on [pagination](README.md#pagination).
 
