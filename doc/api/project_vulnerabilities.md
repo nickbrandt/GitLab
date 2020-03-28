@@ -122,8 +122,8 @@ POST /projects/:id/vulnerabilities?finding_id=<your_finding_id>
 | `finding_id`        | integer or string | yes        | The ID of a Vulnerability Finding from which the new Vulnerability will be created   
                                          |
 
-The rest of the attributes of a newly created Vulnerability are populated from
-its source Vulnerability Finding or with their default values:
+The other attributes of a newly created Vulnerability are populated from
+its source Vulnerability Finding, or with these default values:
 
 | Attribute    | Value                                                 |
 |--------------|-------------------------------------------------------|
@@ -133,7 +133,7 @@ its source Vulnerability Finding or with their default values:
 | `severity`   | The `severity` attribute of a Vulnerability Finding   |
 | `confidence` | The `confidence` attribute of a Vulnerability Finding |
 
-```bash
+```shell
 curl --header POST "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/vulnerabilities?finding_id=1
 ```
 
