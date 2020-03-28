@@ -143,15 +143,15 @@ While Maintainer is the highest project-level role, some actions can only be per
 
 ## Project features permissions
 
-### Wiki and issues
+### Wikis and issues
 
-Project features like wiki and issues can be hidden from users depending on
-which visibility level you select on project settings.
+Project features like wikis and issues can be hidden from users depending on
+the visibility level you select in project settings:
 
-- Disabled: disabled for everyone
-- Only team members: only team members will see even if your project is public or internal
-- Everyone with access: everyone can see depending on your project visibility level
-- Everyone: enabled for everyone (only available for GitLab Pages)
+- **Disabled**: disabled for everyone.
+- **Only team members**: only team members can view, even if your project is public or internal.
+- **Everyone with access**: everyone can view, depending on your project visibility level.
+- **Everyone**: enabled for everyone (only available for [GitLab Pages](project/pages.md)).
 
 ### Protected branches
 
